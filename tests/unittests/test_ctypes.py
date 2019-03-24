@@ -26,7 +26,11 @@ def test_ctypes():
     a_.c = 0x0302
     a_.e = 0x11
 
-    test_assert(
+    m = f_dwread_epd(EPD(a) + 0)
+    n = f_dwread_epd(EPD(a) + 1)
+
+    test_equality(
         "Writing to EPDOffsetMap",
-        [Memory(a + 0, Exactly, 0x03020B0A), Memory(a + 4, Exactly, 0x11060504)],
+        [f_dwread_epd(EPD(a) + 0), f_dwread_epd(EPD(a) + 1)],
+        [0x03020B0A, 0x11060504]
     )

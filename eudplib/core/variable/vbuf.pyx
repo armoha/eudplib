@@ -43,19 +43,24 @@ class EUDVarBuffer(EUDObject):
 
         self._vdict = {}
         self._initvals = []
+        self._flags = []
 
     def DynamicConstructed(self):
         return True
 
-    def CreateVarTrigger(self, v, initval):
+    def CreateVarTrigger(self, v, initval, flag=None):
         ret = self + (72 * len(self._initvals))
         self._initvals.append(initval)
+        self._flags.append(flag)
         self._vdict[v] = ret
         return ret
 
-    def CreateMultipleVarTriggers(self, v, initvals):
+    def CreateMultipleVarTriggers(self, v, initvals, flags=None):
         ret = self + (72 * len(self._initvals))
         self._initvals.extend(initvals)
+        if flags is None:
+            flags = [None] * len(initvals)
+        self._flags.extend(flags)
         self._vdict[v] = ret
         return ret
 
@@ -70,14 +75,20 @@ class EUDVarBuffer(EUDObject):
     def WritePayload(self, emitbuffer):
         cdef size_t i, heads, heade
         cdef size_t olen = 2408 + 72 * (len(self._initvals) - 1)
-        cdef uint8_t* output = <uint8_t*> PyMem_Malloc(olen)
+        cdef uint8_t * output = <uint8_t*> PyMem_Malloc(olen)
         memset(output, 0, olen)
         cdef uint32_t iv2
-        
+
         for i in range(len(self._initvals)):
             # 'preserve rawtrigger'
-            (<uint32_t*>(output + 72 * i + 2376))[0] = 4
-            (<uint32_t*>(output + 72 * i + 352))[0] = 0x072D0000
+            ( < uint32_t*>(output + 72 * i + 2376))[0] = 4
+            ( < uint32_t*>(output + 72 * i + 352))[0] = 0x072D0000
+
+        for i, flag in enumerate(self._flags):
+            if flag is None:
+                continue
+            ( < uint32_t*>(output + 72 * i + 328))[0] = (flag & 0xFFFFFFFF)
+            ( < uint32_t*>(output + 72 * i + 356))[0] = 0x43530000
 
         heads = 0
         for i, initval in enumerate(self._initvals):
@@ -86,7 +97,7 @@ class EUDVarBuffer(EUDObject):
                 continue
             elif isinstance(initval, int):
                 iv2 = initval & 0xFFFFFFFF
-                (<uint32_t*>(output + heade))[0] = iv2
+                ( < uint32_t*>(output + heade))[0] = iv2
                 continue
             emitbuffer.WriteBytes(output[heads:heade])
             emitbuffer.WriteDword(initval)

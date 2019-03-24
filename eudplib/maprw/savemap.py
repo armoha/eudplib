@@ -30,11 +30,20 @@ from .inlinecode.ilcprocesstrig import PreprocessInlineCode
 from .injector.mainloop import _MainStarter
 from .mpqadd import UpdateMPQ
 from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
-import binascii
+from .chkdiff import chkdiff
 
+import binascii
+import lzma
+import simplecrypt
 
 traceHeader = None
 traceMap = []
+
+patchPassword = None
+
+def PRT_SetPatchPassword(password):
+    global patchPassword
+    patchPassword = password
 
 
 def getTraceMap():
@@ -78,6 +87,19 @@ def SaveMap(fname, rootf):
     mw = mpqapi.MPQ()
     mw.Open(fname)
     mw.PutFile("staredit\\scenario.chk", rawchk)
+
+    # Get diff
+    if patchPassword:
+        print('[U] Patch-based unprotection enabled.')
+        origchkt = mapdata.GetOriginalChkTokenized()
+        print(' 1. Calculating bsdiff btw original & new chk')
+        diff = chkdiff(origchkt, chkt)
+        print(' 2. Compressing')
+        diff = lzma.compress(diff)
+        print(' 3. Encrypting')
+        diff = simplecrypt.encrypt(patchPassword, diff)
+        mw.PutFile("staredit\\scenario.chk.patch", diff)
+
     UpdateMPQ(mw)
     mw.Compact()
     mw.Close()

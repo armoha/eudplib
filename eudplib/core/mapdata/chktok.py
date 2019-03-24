@@ -80,6 +80,11 @@ class CHK:
 
         return True
 
+    def clone (self):
+        t = CHK()
+        t.sections = dict(self.sections)
+        return t
+
     def savechk(self):
         # calculate output size
         blist = []

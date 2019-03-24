@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+
 from ..eudarray import EUDArray
 
 from ...ctrlstru import EUDInfLoop, EUDEndInfLoop, EUDIf, EUDElse, EUDEndIf, EUDBreakIf

@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+
 from .memiof import (
     f_epdread_epd,
     f_dwread_epd,

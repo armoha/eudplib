@@ -1,0 +1,1205 @@
+맵 데이터 관련
+==============
+
+맵 전반 관련
+^^^^^^^^^^^^^
+
+* LoadMap(fname)
+    맵을 읽고 맵 관련 CHK 정보를 다 읽어들입니다.
+
+* GetChkTokenized()
+    CHK 데이터를 직접 읽고 쓸 수 있습니다 ::
+
+        chkt = GetChkTokenized()
+        chkt.getsection('TRIG')  # Trig 섹션 읽기
+        chkt.setsection('TRIG')  # Trig 섹션 변형
+
+    다만 STR이나 TRIG 단락은 eudplib에서도 쓰니까 웬만하면 변형하지 마세요
+
+* MPQAddFile(fname, content, isWave)
+    파일을 맵 MPQ에 넣습니다. content는 파이썬 bytes 오프젝트입니다.
+
+* MPQAddWave(fname, content)
+    WAV 파일을 맵 MPQ에 넣습니다.
+
+* EUDOnStart(func)
+    맵이 시작할 때 발동할 함수를 지정
+
+* EUDDoEvents()
+    트리거 루프를 그 자리에서 잠시 멈춥니다.
+
+* SaveMap(fname, rootf)
+    rootf 함수를 메인 함수로 해서 eudplib 맵을 저장합니다.
+
+
+
+맵 데이터
+^^^^^^^^
+
+* IsMapdataInitalized()
+    LoadMap 함수로 맵 데이터를 로드했는지를 확인합니다. 아직 맵 데이터가
+    초기화가 덜 됬으면 아래 함수들이 동작하지 않을 수도 있습니다.
+
+
+* EncodeAIScript(ais)
+* EncodeAllyStatus(s)
+* EncodeComparison(s)
+* EncodeCount(s)
+* EncodeLocation(loc)
+* EncodeModifier(s)
+* EncodeOrder(s)
+* EncodePlayer(s)
+* EncodePropState(s)
+* EncodeProperty(prop)
+* EncodeResource(s)
+* EncodeScore(s)
+* EncodeString(s)
+* EncodeSwitch(sw)
+* EncodeSwitchAction(s)
+* EncodeSwitchState(s)
+* EncodeUnit(u)
+    이름을 트리거에서 쓰는 번호로 바꿉니다. ** 인덱스랑 차이가 있을 수 있습니다 ** :
+
+        EncodeLocation('Location 0')  # 1
+
+    EncodeString에 맵에 없는 스트링을 넣으면 알아서 스트링 테이블에 새 데이터를 넣고
+    새로 만든 스트링의 오프셋을 반환합니다.
+
+
+* GetUnitIndex(u)
+* GetLocationIndex(l)
+* GetPropertyIndex(prop)
+* GetStringIndex(s)
+* GetSwitchIndex(s)
+    이름을 인덱스로 바꿉니다. :
+
+        GetLocationIndex('Location 0')  # 0
+
+* GetPlayerInfo(player)
+    player 플레이어의 정보를 나타냅니다. 자세한건 print해보세요.
+
+
+* UnitProperty(hitpoint, shield, energy, resource, hanger, cloaked, burrowed, intransit, hallucinated, invincible)
+    굉장히 복잡한 함수입니다만, CreateUnitWithProperties 액션의 프로퍼티에 쓰이는겁니다.
+    EncodeProperty 함수를 이용해 프로퍼티 번호로 만들 수 있습니다.
+
+
+
+기초 데이터
+^^^^^^^^^^
+
+* Db(b)
+    바이너리 데이터를 메모리에 올릴때 씁니다.
+
+* EUDArray(initval)
+    단순 EUD 배열에 씁니다.
+
+* EUDGrp(content)
+    GRP에 씁니다.
+
+
+
+.. ----------------------------------------------------------------------------
+
+
+트리거 관련
+===================
+
+
+조건들
+-------------------
+
+기존 조건
+^^^^^^^^
+* Always()
+* Accumulate(Player, Comparison, Number, ResourceType)
+* Bring(Player, Comparison, Number, Unit, Location)
+* Command(Player, Comparison, Number, Unit)
+* CommandLeast(Unit)
+* CommandLeastAt(Unit, Location)
+* CommandMost(Unit)
+* CommandMostAt(Unit, Location)
+* CountdownTimer(Comparison, Time)
+* Deaths(Player, Comparison, Number, Unit)
+* ElapsedTime(Comparison, Time)
+* HighestScore(ScoreType)
+* LeastKills(Unit)
+* LeastResources(ResourceType)
+* LowestScore(ScoreType)
+* MostKills(Unit)
+* MostResources(ResourceType)
+* Never()
+* Opponents(Player, Comparison, Number)
+* Score(Player, ScoreType, Comparison, Number)
+* Switch(Switch, State)
+
+특수조건
+^^^^^^^
+* Condition(locid, player, amount, unitid, comparison, condtype, restype, flags)
+    CHK 구조대로 조건을 만들어 쓰고싶을때 쓰세요. scenario.chk를 공부하지 않으신 분은
+    이걸 쓰실 일이 없을겁니다.
+
+* Memory(dest, cmptype, value)
+    오프셋의 값을 확인합니다.
+
+* MemoryEPD(dest, cmptype, value)
+    Memory랑 똑같은데 dest가 오프셋의 EPD값입니다.
+
+
+
+
+액션들
+-------------------
+
+기존 액션
+^^^^^^^^
+* CenterView(Where)
+* Comment(Text)
+* CreateUnit(Number, Unit, Where, ForPlayer)
+* CreateUnitWithProperties(Count, Unit, Where, Player, Properties)
+* Defeat()
+* DisplayText(Text, AlwaysDisplay)
+* Draw()
+* GiveUnits(Count, Unit, Owner, Where, NewOwner)
+* KillUnit(Unit, Player)
+* KillUnitAt(Count, Unit, Where, ForPlayer)
+* LeaderBoardComputerPlayers(State)
+* LeaderBoardControl(Unit, Label)
+* LeaderBoardControlAt(Unit, Location, Label)
+* LeaderBoardGoalControl(Goal, Unit, Label)
+* LeaderBoardGoalControlAt(Goal, Unit, Location, Label)
+* LeaderBoardGoalKills(Goal, Unit, Label)
+* LeaderBoardGoalResources(Goal, ResourceType, Label)
+* LeaderBoardGoalScore(Goal, ScoreType, Label)
+* LeaderBoardGreed(Goal)
+* LeaderBoardKills(Unit, Label)
+* LeaderBoardResources(ResourceType, Label)
+* LeaderBoardScore(ScoreType, Label)
+* MinimapPing(Where)
+* ModifyUnitEnergy(Count, Unit, Owner, Where, Percent)
+* ModifyUnitHangarCount(Add, Count, Unit, Owner, Where)
+* ModifyUnitHitPoints(Count, Unit, Owner, Where, Percent)
+* ModifyUnitResourceAmount(Count, Owner, Where, NewValue)
+* ModifyUnitShields(Count, Unit, Owner, Where, Percent)
+* MoveLocation(Location, OnUnit, Owner, DestLocation)
+* MoveUnit(Count, UnitType, Owner, StartLocation, DestLocation)
+* MuteUnitSpeech()
+* Order(Unit, Owner, StartLocation, OrderType, DestLocation)
+* PauseGame()
+* PauseTimer()
+* PlayWAV(WAVName)
+* PreserveTrigger()
+* RemoveUnit(Unit, Player)
+* RemoveUnitAt(Count, Unit, Where, ForPlayer)
+* RunAIScript(Script)
+* RunAIScriptAt(Script, Where)
+* SetAllianceStatus(Player, Status)
+* SetCountdownTimer(TimeModifier, Time)
+* SetDeaths(Player, Modifier, Number, Unit)
+* SetDoodadState(State, Unit, Owner, Where)
+* SetInvincibility(State, Unit, Owner, Where)
+* SetMissionObjectives(Text)
+* SetNextScenario(ScenarioName)
+* SetResources(Player, Modifier, Amount, ResourceType)
+* SetScore(Player, Modifier, Amount, ScoreType)
+* SetSwitch(Switch, State)
+* TalkingPortrait(Unit, Time)
+* Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay)
+* UnMuteUnitSpeech()
+* UnpauseGame()
+* UnpauseTimer()
+* Victory()
+* Wait(Time)
+
+
+특수 액션
+^^^^^^^^
+* Action(locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags)
+    CHK 구조대로 액션을 만들어 쓰고싶을때 쓰세요. scenario.chk를 공부하지 않으신 분은
+    이걸 쓸 일이 없을겁니다.
+
+* DisplayExtText(text)
+    DisplayText인데 스트링 용량을 잡아먹지 않습니다. 정확히 말하자면 스트링 테이블을
+    새로 만들어 써가지고 기존 스트링 65536 byte를 쓰지 않는 방식입니다. 어쨌든
+    스트링 용량을 줄이는덴 좋을겁니다.
+
+* SetMemory(dest, modtype, value)
+    메모리 값을 수정합니다.
+
+* SetMemoryEPD(dest, modtype, value)
+    메모리 값을 수정하는데 EPD를 씁니다.
+
+* SetCurrentPlayer(p)
+    Current Player값을 수정합니다. 여러 최적화가 들어가있으니까 6509B0을 직접 수정하기보단
+    이 액션을 애용해주세요.
+
+* SetNextPtr(trg, dest)
+    트리거의 nextptr값을 수정합니다. 자세한건 뻘강좌를 참고하세요.
+    http://blog.naver.com/whyask37
+
+
+
+
+기타
+-------------------
+
+* Trigger(conditions, actions, preserved)
+    조건과 액션이 있는 트리거입니다. 기본적으로 preserved 상태입니다.
+    조건/액션 갯수 제한은 없습니다. 조건과 액션에 변수를 넣을수도 있습니다.
+
+* DoActions(actions, preserved)
+    conditions가 Always인 트리거입니다. 기본적으로 preserved 되있고요.
+
+* EPD(p)
+    오프셋을 EPD 플레이어값으로 바꿉니다.
+
+* Disabled(arg)
+    조건/액션을 disable시킵니다.
+
+* PTrigger(players, conditions, actions)
+    Current Player가 players중 하나일때만 실행되는 트리거입니다. EUDPlayerLoop랑
+    궁합이 잘 맞습니다. 무조건 preserved됩니다.
+
+
+
+
+트리거 실행 순서 (고급)
+---------------------
+
+* PushTriggerScope()
+* PopTriggerScope()
+    트리거 실행 구역을 Trigger Scope라고 합니다. 같은 Scope에 있는 트리거끼리는
+    자동으로 nextptr가 다음에 정의되는 트리거로 설정됩니다. 몰라도 됩니다.
+
+* NextTrigger()
+    '바로 다음 트리거'를 나타냅니다.
+
+* RawTrigger(prevptr, nextptr, conditions, actions)
+    조건/액션 갯수 제한이 있는 트리거입니다. Trigger는 RawTrigger 여러개를
+    조합해서 만든 것입니다. RawTrigger는 주소값을 가지고 있어서 이런 식으로
+    주소값을 얻을 수 있습니다. ::
+
+        a = RawTrigger(~)
+        # SetNextPtr(a, ~) 로 nextptr 수정 등을 할 수 있습니다.
+
+        b = Trigger(~)  # Trigger는 주소값이 없기 때문에 이런 활용은 불가능합니다
+
+
+
+.. ---------------------------------------------------------------------------
+
+
+
+제어문
+===================
+
+
+기초 제어문
+----------
+
+* EUDIf()(cond)
+* EUDIfNot()(cond)
+* EUDElse()()
+* EUDElseIf()(cond)
+* EUDElseIfNot()(cond)
+* EUDEndIf()
+    If~ElseIf~Else 관련입니다.
+
+
+* EUDExecuteOnce()
+* EUDEndExecuteOnce()
+    한번만 실행되야하는 코드를 짤 때 씁니다. 단순히 Trigger에서 preserved=False를
+    하는것만으로는 안 될 경우 유용하게 쓸 수 있을겁니다.
+
+
+* EUDWhile()(cond)
+* EUDWhileNot()(cond)
+* EUDEndWhile()
+    While 관련입니다.
+
+* EUDLoopN()(count)
+* EUDEndLoopN()
+    count번 반복
+
+* EUDInfLoop()()
+* EUDEndInfLoop()
+    무한반복
+
+* EUDPlayerLoop()()
+* EUDEndPlayerLoop()
+    현재 게임에 참여중인 모든 플레이어를 한번씩 Current Player로 하면서 반복
+
+* EUDSwitch(var)
+* EUDSwitchCase()(case)
+* EUDSwitchDefault()()
+* EUDEndSwitch()
+    C언어에서의 switch문과 같습니다. EUDBreak를 하지 않으면 C언어처럼 각 case에서
+    다음 case로 자동으로 넘어갑니다.
+
+* EUDBreak()
+* EUDBreakIf(conditions)
+* EUDBreakIfNot(conditions)
+* EUDContinue()
+* EUDContinueIf(conditions)
+* EUDContinueIfNot(conditions)
+    반복문/switch에서의 break/continue
+
+* EUDSetContinuePoint()
+    반복문에서 continue를 했을 때 갈 곳을 설정하는데 씁니다. EUDWhile를 for문처럼
+    쓰면서 continue 이후 무조건 실행되야하는 코드를 만들 때 이걸 쓸 수 있습니다.
+    Continue point는 하나만 지정할 수 있습니다.
+
+* EUDIsContinuePointSet()
+    현재 블록에서 이미 Continue point가 지정되었는지 알려줍니다.
+
+
+
+Jump류 제어문
+------------
+
+* EUDBranch(conditions, ontrue, onfalse)
+    조건이 만족되는지에 따라 ontrue/onfalse로 점프합니다. ontrue/onfalse는 절대로
+    EUDVariable이 될 수 없습니다.
+
+* EUDJump(nextptr)
+    nextptr로 점프합니다. nextptr는 RawTrigger가 될 수 있고 RawTrigger를 가르키는
+    Forward나 EUDVariable이 될 수 있습니다.
+
+* EUDJumpIf(conditions, ontrue)
+* EUDJumpIfNot(conditions, onfalse)
+    조건이 만족하면 EUDJump합니다. EUDJump처럼 ontrue/onfalse가 변수여도 됩니다.
+
+
+
+특수 반복문
+----------
+
+아래 반복문들은 다음과 같이 파이썬 for문이나 epScript의 foreach문으로 ptr, epd를
+받아서 사용합니다. 아래 반복문은 내부적으로 EUDWhile을 쓰기 때문에 EUDContinue나
+EUDBreak도 문제 없이 사용할 수 있습니다. ::
+
+    for ptr, epd in EUDLoopBullet():
+        pass  # 내용
+
+    foreach(ptr, epd : EUDLoopBullet()) {
+        # 내용
+    }
+
+
+* EUDLoopList(header_offset, break_offset)
+    이중 연결 리스트를 순회합니다. header_offset은 첫 리스트 항목을 가르키는
+    포인터고, next를 따라가다 ptr이 break_offset이 되면 LoopList가 종료됩니다.
+
+* EUDLoopBullet()
+    모든 CBullet를 돕니다.
+
+* EUDLoopSprite()
+    모든 CSprite를 돕니다.
+
+* EUDLoopUnit()
+    모든 CUnit(구조오프셋)을 돕니다.
+
+* EUDLoopRange(start, end)
+    [start, end) 범위를 돕니다. EUDLoopN의 상위호환이라 보시면 됩니다. 이 함수는
+    ptr, epd가 아니라 i를 씁니다. ::
+
+        for i in EUDLoopRange(0, 5):
+            pass  # i가 0, 1, 2, 3, 4가 되면서 돎
+
+
+
+조건 연산자
+----------
+
+* EUDAnd(cond1)
+* EUDOr(cond1)
+* EUDNot(cond)
+    두개 조건의 논리곱, 논리합이나 반대조건을 뜻합니다.
+
+
+* EUDTernary(conditions)(ontrue)(onfalse)
+    C언어에서의 삼항 연산자에 해당합니다. conditions에 따라 ontrue와 onfalse의
+    값을 선택합니다. conditions에 관계 없이 ontrue랑 onfalse의 값이 계산되므로
+    주의하세요.
+
+
+
+커스텀 제어문 (고급)
+-------------------
+
+자세한건 EUDWhile이나 EUDPlayerLoop의 코드를 참고하세요.
+
+* EUDCreateBlock(name, userdata)
+    블록을 생성하고 블록 스택에 넣습니다.
+
+* EUDGetBlockList()
+    지금까지 만들어진 블럭들의 목록을 만듭니다.
+
+* EUDGetLastBlock()
+    마지막 블록을 얻습니다.
+
+* EUDGetLastBlockOfName(name)
+    마지막 해당 이름 블록을 얻습니다.
+
+* EUDPeekBlock(name)
+    마지막 블록의 이름이 name이면 그 블록을 리턴합니다. 블록 이름이 다르다면 에러를
+    띄웁니다.
+
+* EUDPopBlock(name)
+    EUDPeekBlock와 동시에 그 블록을 pop합니다.
+
+* CtrlStruOpener(f)
+    ()()같은 문법을 쓸 때 필요합니다. EUDWhile을 참고하세요.
+
+
+
+
+.. ---------------------------------------------------------------------------
+
+
+
+변수/함수 관련
+=============
+
+eudplib의 핵심 개념 중 하나가 변수와 함수의 개념입니다.
+
+변수
+-------------------
+
+* IsEUDVariable(x)
+* EUDVariable(initval)
+    eudplib의 변수입니다. 초기값은 initval입니다.
+
+    .. note:: initval은 초기값을 뜻하는거지 initval로 매번 값이 초기화된다는 뜻이
+        아닙니다. 예를 들어 아래 상황에서 DisplayText는 한번만 실행됩니다. ::
+
+            a = EUDVariable(5)
+            # a의 초기값이 5입니다.
+
+            if EUDIf()(a == 5):  # (*) 이후로 a의 값이 5로 다시 돌아가지 않기 때문에
+                # 이 if문은 한번만 실행됩니다.
+                DoActions(DisplayText('test'))
+                a << 10
+                # a는 이 이후로 계속 10입니다. (*)
+            EUDEndIf()
+
+    EUDVariable은 조건/액션에 숫자처럼 그냥 넣을 수 있습니다. EUDLightVariable보다
+    용량이 조금 더 나가긴 하지만 막 써도 맵 용량이 크게 늘지는 않습니다.
+
+    .. note::
+        CHK에서 EUDVariable 하나당 용량이 72byte긴 하지만, MPQ 압축때문에 실재 scx에서
+        용량은 거의 없다고 봐도 됩니다.
+
+
+.. note::
+    * EUDLightVariable(initvalue)  ** 쓸 일이 없습니다. **
+        4byte짜리 변수입니다. 그냥 데스값이랑 대응된다고 보시면 됩니다. v.Exactly(100)
+        같은 조건이나 v.AddNumber(100)같은 단순 액션을 쓸 수 있습니다.
+
+
+* EUDCreateVariables(varn)
+    EUDVariable을 여러개 만들 때 씁니다.
+
+
+* SeqCompute(assignpairs)
+    여러 계산을 순서대로 합니다. ::
+
+        SeqCompute([
+            (a, Add, 5),  # a 변수에 5를 더한다 (*)
+            (EPD(0x6509B0), SetTo, 30),  # 0x6509B0 오프셋을 30으로 설정한다
+
+            (b, Add, a),  # b 변수에 a 변수의 값만큼을 더한다.
+            # 계산을 순서대로 하니까, (*)에서 a에 5를 더해둔만큼 b에도 더 더해지게 되겠죠?
+        ])
+
+* SetVariables(srclist, dstlist, mdtlist)
+    SeqCompute를 쉽게 하는 방법. mdtlist는 SetTo같은 연산의 list이며, 생략하면
+    mdtlist는 모두 SetTo한걸로 가정 ::
+
+        # 이것과
+        SetVariables([a, b], [1, 2])
+
+        # 이건 같은 뜻이다.
+        SeqCompute([
+            (a, SetTo, 1),
+            (b, SetTo, 2)
+        ])
+    
+* VProc(v, actions)  ** 고급 **
+    뻘강의 "Full Variable" 단원 참고. QueueAssignTo같은 액션을 실행하는데 쓴다.
+
+
+
+함수
+-------------------
+
+* EUDFunc(fdecl_func)
+    @EUDFunc를 씌우면 EUD함수가 됩니다. ::
+
+        @EUDFunc
+        def f_add(a, b):
+            EUDReturn(a + b)
+            # return a + b도 되긴 하다만 EUDReturn을 애용해주세요.
+
+* EUDFuncPtr(argn, retn)
+    EUDFunc에 대한 함수 포인터입니다. argn, retn은 인자 갯수와 리턴값 갯수입니다 ::
+
+        # 위의 f_add를 그대로 사용
+        a = EUDFuncPtr(2, 1)(f_add)
+
+        a(1, 2)  # 3을 리턴
+
+        a.setFunc(f_mul)  # 다른 곱셈함수(있다고 하죠)로 포인터를 설정
+        a(1, 2)  # 2를 리턴
+
+
+* EUDTypedFunc(argtypes, rettypes)
+    인자와 리턴값에 타입을 지정할 수 있습니다. ::
+
+        @EUDTypedFunc([DBString], [None])
+        def f_dbstr_display(str):
+            # str는 DBString 타입입니다.
+            DoActions(str.GetDisplayActions())
+            EUDReturn(1)
+
+        a = f_dbstr_display("test")  # DBString("test")가 인자로 넘어감
+        # a는 EUDVariable(None) 타입입니다.
+
+    EUDTypedFunc는 EUDFunc의 일종이니까 EUDTypedFunc도 EUDFuncPtr에 넣을 수 있어요.
+
+
+* EUDTypedFuncPtr(argtypes, rettypes)
+    EUDFunc에 대한 함수 포인터입니다. EUDFuncPtr에 추가적으로 타입을 지정할 수 있습니다.
+
+
+* EUDMethod(method)
+* EUDTypedMethod(argtypes, rettypes)
+    EUDStruct나 EUDObject같이 메서드를 EUDFunc처럼 쓰고 싶을때 쓰면 됩니다.    
+
+
+* EUDReturn()
+    한 함수에 리턴문이 2개 이상 있을 경우에는 그냥 return이 아니라 EUDReturn을 꼭 써야합니다.
+    아니면 뒤에 함수가 잘려먹힌다던지 하는 문제가 날꺼에요.
+
+
+* EUDFuncN(argn, callerfunc, bodyfunc)  ** 고급 **
+    EUDFunc, EUDMethod 등 모든 EUD함수는 EUDFuncN 타입입니다. EUD 함수 포인터는
+    포함하지 않습니다. 어떤 함수가 EUD함수인지 판별할때 isinstance로 돌리세요.
+
+
+
+.. ----------------------------------------------------------------------------
+
+
+구조체 관련
+==========
+
+* EUDVArray()
+    Full Variable을 이용한 배열입니다. EUDArray에 비해 상수 인덱스 접근이 빠릅니다.
+    예를 들어, v[a % 2]의 속도는 EUDArray와 EUDVArray와 속도가 비슷하지만 v[2]의
+    속도는 EUDVArray가 더 빠릅니다. EUDStruct의 구현에 쓰입니다.
+
+* EUDStruct(initvar)
+    EUD 구조체를 만드는데 쓸 수 있습니다. 대표적인 EUD 구조체로 EUDStack이 있습니다. ::
+
+        class EUDStack(EUDStruct):
+            _fields_ = [
+                ('data', EUDArray),
+                'pos'
+            ]
+
+            def __init__(self, size, basetype=None):
+                if isinstance(size, int):
+                    super().__init__([
+                        # data
+                        EUDArray(size),
+                        0
+                    ])
+
+                else:
+                    super().__init__(size)
+
+                self._basetype = basetype
+
+            def push(self, value):
+                self.data[self.pos] = value
+                self.pos += 1
+
+            def pop(self):
+                self.pos -= 1
+                data = self.data[self.pos]
+                if self._basetype:
+                    data = self._basetype(data)
+                return data
+
+            def empty(self):
+                return self.pos == 0
+
+    모든 EUDStruct는 _fields_ 멤버를 갖고 있습니다. _fields_는 (이름, 타입명)의
+    list 형식입니다. 타입명이 생략되면 해당 필드는 EUDVariable로 취급됩니다. 예를
+    들어 위 EUDStack이란 구조체에는 EUDArray형의 data와 EUDVariable형의 pos를
+    갖고 있습니다.
+
+    EUDStruct의 생성자에 list를 넣으면 해당 데이터를 이용해 EUDStruct의 필드를 초기화해
+    새로운 EUDStruct를 만들게 되고, ConstExpr나 변수를 넣으면 그 변수에 있는 주소를
+    가지고 EUDStruct를 만듭니다. 차이점을 유의해두세요.
+
+    .. note::
+        아래 내용은 되게 복잡하니까, 그냥 아래 내용을 고려하기 싫으면 __init__
+        함수를 새로 만들지 않으시면 됩니다.
+
+    각 EUDStruct는 자체 주소를 갖고 있습니다. 예를 들어 :py:`a = EUDStack()` 라고
+    쓰면 이 a는 EUDStack의 이름이자 EUDStack를 가르키는 변수이기도 합니다. 실제로
+    a의 값을 :py:`f_simpleprint(a)` 등으로 출력하면 EUDStack 데이터가 있는 주소가
+    출력됩니다. a를 EUDStruct의 주소를 값으로 하는 EUDVariable이라 생각하셔도
+    되겠습니다.
+
+    그래서, EUD 함수에 a를 인자로 넘기면 a가 가르키는 EUDStack의 주솟값이 EUD
+    함수에 넘어가게 됩니다. EUDStruct는 이런 EUDVariable형 주소를 다시 EUDStruct로
+    해석하는 기능을 제공하고 있습니다. 예를 들어 아래 코드를 보시면 ::
+
+        a = EUDStack(30)
+        b = EUDVariable()
+        b << a  # b에 a의 주소가 대입된다.
+        c = EUDStack(b)  # b에 있는 주소를 EUDStack이 들어있는 주소로 해석한다.
+
+    처럼, 파이썬에서 쓰던 타입(변수) 와 같은 방식으로 형변환을 할 수 있습니다. 모든
+    EUDStruct는 위와 같은 형변환을 지원해야 합니다. 예를 들어 EUDStack에서는 ::
+
+        def __init__(self, size, basetype=None):
+            if isinstance(size, int):
+                super().__init__([
+                    # data
+                    EUDArray(size),
+                    0
+                ])
+
+            else:
+                super().__init__(size)      
+
+    처럼 size가 int인지 아닌지에 따라 생성자를 다르게 적용하고 있습니다.
+
+
+
+* EUDStack(size, basetype)
+    EUD로 구현한 스택입니다.
+
+* ObjPool(size, basetype)
+    malloc/free처럼 EUDStruct를 동적 할당할 수 있는 풀입니다. 미리 정해진 갯수만큼
+    EUDStruct를 만들어놓고 alloc 요청마다 하나씩 꺼내주는 방식으로 작동합니다.
+    size를 충분히 크게 잡아놔야 alloc가 계속 성공하겠죠?
+
+* selftype
+    가끔 EUDStruct의 필드에 자기 자신의 타입을 넣고싶을 때가 있습니다. 연결 리스트를
+    구현할 때 등이요. 이 떄 selftype를 쓰시면 됩니다.
+
+    .. note::
+        C언어랑 다르게 EUDStruct의 필드에 구조체가 들어가면 EUDStruct에는 실제
+        그 구조체가 저장되는게 아니라 구조체를 가르키는 포인터만 저장됩니다. 파이썬이나
+        자바랑 비슷하게 생각하시면 편할것같습니다.
+
+* unProxy(x)  ** 고급 **
+    x에 여러가지 타입을 적용할 수 있는데, unProxy는 x에서 이러한 타입을 모두 뗴는
+    연산이니다. 아래와 같이 두 변수를 비교할 때 씁니다. ::
+
+        a = EUDStack()
+        b = EUDVariable(a)
+        a == b  # False
+
+        c = EUDStack(b)
+        b == c  # False
+
+        unProxy(a)  # a
+        unProxy(b)  # b
+        unProxy(c)  # b
+
+        unProxy(b) == unProxy(c)
+
+
+
+.. ----------------------------------------------------------------------------
+
+
+
+잡다한 함수들
+============
+
+연산자 관련
+-------------------
+
+* f_bitand(a, b)
+* f_bitlshift(a, b)
+* f_bitnand(a, b)
+* f_bitnor(a, b)
+* f_bitnot(a)
+* f_bitnxor(a, b)
+* f_bitor(a, b)
+* f_bitrshift(a, b)
+* f_bitxor(a, b)
+* f_div(a, b)
+* f_mul(a, b)
+
+
+
+메모리 IO 관련
+-------------------
+
+* f_dwepdread_epd(targetplayer)
+* f_dwread_epd(targetplayer)
+* f_epdread_epd(targetplayer)
+    EPD 플레이어에게서 dword/epd값을 읽는 함수입니다. 위 함수들은 언제나
+    dword랑 epd를 동시에 읽기 때문에 포인터를 읽을때는 dwepdread 함수를 활용해
+    dword랑 epd값을 동시에 읽는게 효율적입니다.
+
+
+* f_dwepdread_epd_safe(targetplayer)
+* f_dwread_epd_safe(targetplayer)
+* f_epdread_epd_safe(targetplayer)
+    위 함수들의 safe 버젼입니다. safe 버젼은 targetplayer에 해당하는 메모리를
+    전혀 손대지 않고 값을 읽습니다. Write 권한이 없는 메모리를 읽을 때 유용하게
+    사용할 수 있습니다. _safe가 없는 버젼보다 2배정도 느립니다.
+
+
+* f_dwepdread_cp(cpo)
+* f_dwread_cp(cpo)
+* f_epdread_cp(cpo)
+    Current Player를 기준으로 하는 함수입니다. _epd가 붙은 함수들보다 2배 빠릅니다.
+    cpo는 Current Player를 기준으로 읽을 메모리가 얼마나 떨어져있는지를 나타냅니다.
+
+
+* f_getcurpl()
+* f_setcurpl(cp)
+    Current Player의 값을 읽고 쓰는 함수입니다. Current Player는 eudplib에서 항상
+    관리하므로 0x6509B0의 값을 직접 읽는것보다 f_getcurpl 함수를 쓰는게 32배정도
+    빠릅니다. _cp류 함수들과 조합해서 사용하면 좋습니다.
+
+
+* f_dwbreak(number)
+* f_dwbreak2(number)
+    dword를 word/byte 단위로 나누는 함수입니다. dwbreak2는 word/byte에 곱해졌던
+    값을 유지합니다. 예를 들어 f_dwbreak(0x12345678)[2]는 0x12이지만,
+    f_dwbreak2(0x10000000)[2]는 0x12000000입니다. dword의 특정 byte나 word만
+    바꿔야 할 때 f_dwbreak한 결과에 다시 0x100000같은 값을 곱할 필요가 없습니다.
+
+
+* f_flagread_epd(targetplayer)
+* f_bitsplit(a)
+    비트 단위로 dword를 읽고싶거나 dword를 나눌 때 쓰면 됩니다.
+
+
+* f_dwadd_epd(targetplayer, value)
+* f_dwadd_cp(cpo, value)
+* f_dwsubtract_epd(targetplayer, value)
+* f_dwsubtract_cp(cpo, value)
+* f_dwwrite_epd(targetplayer, value)
+* f_dwwrite_cp(cpo, value)
+    read 대신 write, add, subtract를 합니다. 당연히 read류 함수보다 32배정도
+    빠릅니다. 단순 SetMemory랑 속도가 똑같습니다.
+
+
+
+* f_bread(ptr)
+* f_bwrite(ptr, b)
+* f_wread(ptr)
+* f_wwrite(ptr, w)
+* f_dwread(ptr)
+* f_dwwrite(ptr, dw)
+    포인터에서 byte/word/dword를 읽고 쓰는 함수입니다.
+
+
+* f_blockpatch_epd(dstepd, srcepd, dwn)
+* f_dwpatch_epd(dstepd, value)
+* f_unpatchall()
+    블록 패치/dword 패치용 함수입니다. 위 2개 함수로 패치한 값들은 f_unpatchall로
+    한번에 원상복귀할 수 있습니다.
+
+
+* f_repmovsd_epd(dstepdp, srcepdp, copydwn)
+* f_memcpy(dst, src, copylen)
+    블록 단위로 메모리를 복사할 때 씁니다.
+
+
+
+
+
+스트링 관련
+-------------------
+
+* DBString(content)
+    스트링 테이블을 쓰지 않는 스트링입니다.
+
+    - GetDisplayActions() : DoActions에 넣을 수 있는 액션입니다. 이걸 쓰면
+        DBString의 내용물이 출력됩니다.
+
+    - GetStringMemoryAddr() : 스트링의 시작 주소입니다. f_dbstr류 함수를
+        부를 때 시작점으로 쓰기 좋아요.
+
+
+아래 함수들은 DBString 뿐만이 아니라 일반적인 스트링에 적용할 수 있는 함수들입니다.
+모두 다 스트링에 내용을 출력하고 난 뒤 스트링의 끝을 나타냅니다. 하나 출력하고 그 끝에
+둘 출력하고 그 끝에 셋 출력하면 하나둘셋이 출력되겠죠. 마찬가지로 아래와 같이
+스트링을 계속 조합해나갈 수 있습니다. ::
+
+    t = DBString(1024)
+    k = t.GetStringMemoryAddr()  # 스트링 처음부터 쓰기 시작합니다.
+    k = f_dbstr_adddw(k, 100)
+    k = f_dbstr_addstr(k, "원이 남았습니다")
+    DoActions(t.GetDisplayActions())
+
+    # f_dbstr_print는 조금 특별해서 t.GetStringMemoryAddr를 쓸 필요가 없습니다.
+    f_dbstr_print(t, 100, "원이 남았습니다")
+    DoActions(t.GetDisplayActions())
+
+* f_dbstr_adddw(dst, number)
+    dst에 number의 10진 표기를 출력합니다.
+
+* f_dbstr_addptr(dst, number)
+    dst에 number의 16진법 표기를 출력합니다. 앞에 0을 넣어 8자리를 채웁니다. 예를
+    들어 0x100을 이 함수로 출력하면 00000100이 됩니다.
+
+* f_dbstr_addstr(dst, src)
+    dst에 src 내용을 복붙합니다. f_strcpy와 동일합니다.
+
+* f_dbstr_print(dst, args...)
+    dst에 여러가지를 한꺼번에 출력합니다.
+
+    .. note::
+        f_dbstr_print에 변수를 넣으면 10진법으로 출력됩니다. f_dbstr_addptr처럼
+        16진법으로 출력되게 하려면 hptr(숫자)를 넣으세요.
+
+* f_simpleprint(args...)
+    그냥 간단하게 여러개 변수/스트링을 화면에 출력하고 싶을때 쓰면 좋은 함수입니다.
+    디버깅용으로 좋아요.
+
+아래 함수들은 그냥 스트링 관련 함수입니다.
+
+* f_strcmp(s1, s2)
+    두 스트링을 비교합니다.
+
+* f_strcpy(dst, src)
+    스트링 복사
+
+
+
+랜덤
+-------------------
+
+* f_dwrand()
+* f_getseed()
+* f_rand()
+* f_randomize()
+* f_srand(seed)
+
+
+
+수학
+-------------------
+
+* f_atan2(y, x)
+* f_lengthdir(length, angle)
+* f_sqrt(n)
+
+
+* EUDBinaryMax(cond, minv, maxv)
+* EUDBinaryMin(cond, minv, maxv)
+    엄밀히 말하면 얘는 EUD함수는 아닌데 그냥 여기 둬봤어요. 각각 cond(x)가 만족하는
+    [minv, maxv]에서 최대 x와 최소 x를 구하는거에요.
+
+
+
+기타
+-------------------
+
+* QueueGameCommand(data, size)
+* QueueGameCommand_RightClick(xy)
+* QueueGameCommand_Select(n, ptrList)
+
+* f_getuserplayerid()
+    자기 자신의 플레이어 번호를 얻습니다.
+
+* f_playerexist(player)
+    UDP/배틀넷 등에서만 작동합니다. 플레이어가 있는지 체크합니다.
+
+.. ----------------------------------------------------------------------------
+
+
+
+TRIG 트리거 관련
+===============
+
+.. note:: eudplib에서 TRIG 단락을 변형하고 STR 트리거를 활성화시키면서
+    원래 맵에 있던 트리거 앞 뒤로 트리거가 추가될 수 있고, EUDLoopTrigger는
+    이들 트리거도 순회하게 됩니다. 이러한 트리거중에는 맵 실행 도중 변형되면
+    안되는 트리거도 있을 수 있습니다. EUDLoopTrigger를 포함해서 아래 함수들을
+    사용할때는 이런 추가된 트리거들을 조심하세요.
+
+                    
+* EUDLoopTrigger(player)
+    player의 모든 TRIG Trigger를 돕니다.
+
+* GetFirstTrigTrigger(player)
+* GetLastTrigTrigger(player)
+    플레이어의 첫/마지막 TRIG 트리거를 나타냅니다.
+
+* TrigTriggerBegin(player)
+* TrigTriggerEnd(player)
+    TrigTriggerBegin은 GetFirstTrigTrigger랑 동일합니다. TrigTriggerEnd는
+    GetLastTrigTrigger의 nextptr이 가르키는 곳을 말합니다.
+
+
+* EUDRegisterObjectToNamespace(funcname, obj)
+* EUDRegistered(func)
+    inline_eudplib에서 함수나 클래스, 변수 등을 쓸 수 있도록 합니다. ::
+
+        @EUDRegistered
+        @EUDFunc
+        def f_add(x, y):
+            return x + y
+
+* GetEUDNamespace()
+    EUDRegistered로 등록된 함수들을 얻어옵니다.
+
+* EUDClearNamespace()  ** 고급 **
+    보통 쓸 일이 없을거긴 합니다. EUDRegistered된 함수 목록을 비웁니다.
+
+
+* RunTrigTrigger()
+    모든 Trig Trigger를 실행합니다.
+
+
+
+.. ----------------------------------------------------------------------------
+
+
+
+옵션 관련 함수
+=============
+
+* CompressPayload(mode)
+    페이로드의 압축 여부를 설정합니다. 이 옵션을 활성화시키면 맵 용량이 줄어듭니다.
+    euddraft에선 기본적으로 활성화되어있습니다.
+
+* EP_SetRValueStrictMode(mode)
+    RValue에 다른 변수를 추가적으로 대입하지 못하게 할지를 설정합니다. 기본적으로
+    비활성화 상태입니다. 이 모드가 활성화되면 다음과 같은 식에서 컴파일 에러가 납니다. ::
+
+        a, b = EUDVariable()
+        (a + b) << 5  # a + b는 r-value(수식의 결과)이므로 여기에 다른 값을 대입할 수 없습니다.
+
+        a = f_dwread_epd(EPD(0x6509B0))
+        a << 10  # a는 f_dwread_epd의 결과값이므로 a에 10을 대입할 수 없습니다.
+        # 하지만 위와 같이 함수의 결과값을 바로 변수로 쓰는 일은 생각보다 흔하기 때문에
+        # eudplib에서는 기본적으로 rvalue strict mode가 해제되어있습니다.
+
+* PRT_SetInliningRate(rate)
+    프로텍션에 관련된 함수입니다. 기본 TRIG 트리거를 어느정도 비율로 STR 단락으로
+    옮길지를 결정합니다. 이 옵션을 쓰면 맵 용량이 늘어납니다.
+
+
+
+* PRT_SkipPayloadRelocator(enable)  ** 쓸 일이 없습니다. **
+    프로텍션에 사용될수도 있겠다는 기대로 만들어둔 함수입니다. 복잡한 함수이므로
+    여러분들이 사용할 일은 아마 없을것같아요.
+
+    .. note::
+        대략적으로 설명하자면, eudplib에서는 3단계에 걸쳐서 STR 단락에 있는 트리거를
+        실행시킵니다. 1단계에서는 TRIG 트리거에서 STR 단락에 있는 vector
+        relocator를 활성화시키고, 2단계에서는 vector relocator가 STR 단락에 있는
+        트리거를 활성화시키고, 3단계에서는 STR 단락의 트리거가 후처리를 합니다.
+        PRT_SkipPayloadRelocator 옵션은 2단계를 생략하고 1단계에서 바로 STR 단락의
+        트리거를 활성화시키는 옵션으로, 이 옵션을 쓰면 맵 용량이 엄청나게 많이
+        늘어납니다.
+        \
+        원래 freeze를 개발하는 과정에서 넣은 옵션입니다만, 이 옵션을 쓴다 해서
+        딱히 프로텍션이 강해지는것같지도 않아 그냥 관뒀습니다.
+
+
+
+.. ---------------------------------------------------------------------------
+
+
+
+Payload/데이터 관련 함수 (초고급)
+===============================
+
+아마 볼 사람도 없어보이는데 대충 쓰죠. 대충 써도 이정도 길이와 난이도라는 원래 이 내용이
+얼마나 어려운지 대충 감이 잡히시리라 봅니다. 웬만하면 쓰실 일이 없을겁니다.
+
+Payload는 트리거, grp와 같이 eudplib로 넣은 데이터들의 집합체입니다. 여기서는 Payload
+관련 함수들을 다룹니다. SaveMap에서 맵에 Payload를 넣을 수 있습니다.
+
+SaveMap은 3가지 단계로 이루어집니다.
+
+- Collection phase : 데이터간 주솟값을 분석해서 맵에 쓰이는 EUDObject들을 모두 모읍니다.
+- Allocation phase : 각 EUDObject들의 길이(GetDataSize 등)에 따라 EUDObject들의 주소를 결정합니다.
+- Writing phase : 각 EUDObject들을 주소에 따라 payload에 씁니다.
+
+그래서 Allocation Writing phase 전에는 각 EUDObject의 주소가 정해지지 않았습니다.
+
+
+* EUDObject()
+    Payload에 넣을 수 있는 데이터의 기본 단위를 나타내는 클래스입니다. RawTrigger나
+    Db같은 모든 데이터 클래스는 다음과 같이 EUDObject에서 상속합니다. ::
+
+        class Db(EUDObject):
+
+            """Class for raw data object"""
+
+            def __init__(self, b):
+                super().__init__()
+                self.content = bytes(b)
+
+            def GetDataSize(self):
+                return len(self.content)
+
+            def WritePayload(self, pbuffer):
+                pbuffer.WriteBytes(self.content)
+
+
+    모든 EUDObject는 GetDataSize와 WritePayload, Evaluate 함수를 구현합니다.
+
+    - GetDataSize : 이 데이터의 크기를 나타냅니다. EUDGrp라면 메모리에서 GRP 크기를,
+        RawTrigger라면 메모리에서 트리거 크기(2408)을 나타내겠죠. 맵에 쓰인 Object
+        들에 따라 크기가 바뀌는 Object의 경우에는 Allocation Phase에서부터 정확한
+        값을 리턴해야 합니다.
+
+    - WritePayload : Payload에 데이터를 쓰는 함수입니다. pbuffer에 WriteBytes,
+        WriteByte, WriteWord, WriteDword같은 함수들로 데이터를 써내려갈 수 있습니다.
+        예를 들어 EUDGrp에선 아래와 같이 pbuffer에 데이터를 씁니다. ::
+
+            def WritePayload(self, buf):
+                buf.WriteBytes(b'\0\0')  # 2byte padding to align dwords at (*)
+
+                # fill in grp header
+                b = self._content
+                fn, w, h = struct.unpack('<HHH', b[0:6])
+                buf.WriteWord(fn)
+                buf.WriteWord(w)
+                buf.WriteWord(h)
+
+                # fill in grp frame headers table
+                selfaddr = self.Evaluate()
+
+                for i in range(fn):
+                    fhoffset = 6 + 8 * i
+                    xoff, yoff, w, h, lto = struct.unpack(
+                        '<BBBBI', b[fhoffset: fhoffset + 8])
+                    buf.WriteByte(xoff)
+                    buf.WriteByte(yoff)
+                    buf.WriteByte(w)
+                    buf.WriteByte(h)
+                    buf.WriteDword(lto + selfaddr)  # (*)
+
+                buf.WriteBytes(b[6 + 8 * fn:])
+
+        추가적으로, WriteNone을 이용해 다른 데이터를 겹쳐써도 되는 빈 공간을 만들 수
+        있습니다.
+
+    - Evaluate: EUDObject가 수식에서 쓰였을때 값을 계산하는 함수입니다. 기본값으로
+        GetObjectAddr 로 자기 자신의 주소값을 계산해서 돌려줍니다. EUDGrp에서는
+        메모리 시작에 :py:`buf.WriteBytes(b'\0\0')` 로 2byte padding을 붙이기
+        떄문에 Evaluate 함수가 다음과 같이 기본값이 +2가 되있습니다. ::
+
+            def Evaluate(self):
+                return c.GetObjectAddr(self) + 2
+
+* GetObjectAddr(obj)
+    obj의 주소값을 구합니다. 각 EUDObject의 주솟값이 allocation 단계에서 결정되기
+    때문에, EUDObject나 ConstExpr 등등 Evaluate 함수에서만 쓸 수 있습니다.
+
+* Forward()
+    뒤에 선언할 EUDObject의 주솟값을 앞에서 필요로 할 때가 있습니다. 이 때 쓰는 전방
+    선언 클래스입니다. ::
+
+        a = Forward()
+        b = RawTrigger(nextptr=a)  # a의 주솟값을 여기서 쓸 수 있다.
+        a << RawTrigger()  # 실제 a의 정의는 여기서
+
+* RegisterCreatePayloadCallback(f)
+    CreatePayload가 불릴 때, 페이로드를 만들기 전 함수를 호출하도록 합니다. EUDVariable
+    나 DBString같이 한 EUDObject로 여러개의 객체를 관리해야 할때 필요한 함수입니다.
+    자세한건 저 2개 클래스 구현을 참고하세요.
+
+* RlocInt(offset, rlocmode)
+    Relocatable Int의 약자입니다. Evaluate 함수의 결과물이 이 타입입니다. 스타에서
+    이 값은 offset + (payload의 실제 오프셋 / 4 * rlocmode)가 됩니다.
+
+* ConstExpr(baseobj, offset, rlocmode)
+    쉽게 말해서 아무때나 쓸 수 있는 RlocInt에요. RlocInt가 allocation phase 이후
+    각 EUDObject의 주소가 결정된 뒤의 절대적인 값이라고 하면, ConstExpr는 각
+    EUDObject의 주소에 대한 상대적인 위치를 나타냅니다.
+
+* CreatePayload(root)
+    root라는 EUDObject를 기초로 위에서 설명한 3개의 phase를 거쳐 Payload를 만드는
+    함수입니다. root의 주소는 payload 기준 언제나 0입니다.
+
+    payload에는 prt (ePd Relocation Table), ort(Offset Relocation Table)가
+    포함되어있습니다. 자세한건 뻘강좌를 참고하세요.
+
+* Evaluate(x)
+    x.Evaluate()랑 똑같습니다만 x가 int형일 때 등의 처리도 추가적으로 합니다.
+
+* toRlocInt(x)
+    int/RlocInt를 RlocInt로 변환합니다.
+
+* IsConstExpr(x)
+
+
+
+.. ---------------------------------------------------------------------------
+
+
+
+잡동사니
+==============
+
+* eudplibVersion()
+    eudplib 버젼
+
+* Assignable2List(a)
+    a -> [a],       [a, b] -> [a, b]
+
+* List2Assignable(l)
+    [a] -> a,       [a, b] -> [a, b]
+
+* ExprProxy(initval)  ** 고급 **
+    사칙연산이 되는 프록시입니다.
+
+
+* b2u(b)
+* u2b(s)
+    파이썬3의 bytes와 str 간에 상호변환
+
+
+* b2i1(b, index)
+* b2i2(b, index)
+* b2i4(b, index)
+* i2b1(i)
+* i2b2(i)
+* i2b4(i)
+    int를 Little Endian으로 변환하고 역변환하는 함수입니다. b2i? 함수에서 index를
+    통해 b의 어느 범위를 int로 변환할지 정할 수 있습니다.
+
+
+* epsCompile(modname, bCode)
+    eps 코드를 .py형식으로 컴파일.
+
+* ep_assert(statement, message)
+    assert인데 EPError를 냅니다.
+
+* EPError(msg)
+    eudplib 관련 에러
+
+* FlattenList(l)
+    중첩된 list를 풉니다.
+
+* SCMD2Text(s)
+    scmdraft2 형식 텍스트를 해석합니다.
+
+* TBL(content)
+    STR단락이나 .tbl파일을 해석할때 쓰면 좋아요.
+
+* EUDByteReader()
+* EUDByteWriter()
+    바이트 단위로 읽고 씁니다. f_bread 함수를 참고하세요.
+

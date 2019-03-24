@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+
 cp949_table = [
     ((0x81, 0x41), (0xAC02)),  #HANGUL SYLLABLE KIYEOK A SSANGKIYEOK
     ((0x81, 0x42), (0xAC03)),  #HANGUL SYLLABLE KIYEOK A KIYEOKSIOS

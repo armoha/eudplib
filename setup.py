@@ -18,6 +18,11 @@ setup(
     package_data={"": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst"]},
     ext_modules=cythonize(["eudplib/**/*.pyx"]),
     python_requires=">=3",
+    install_requires=[
+        'bsdiff4',
+        'simple-crypt',
+        'appdirs',
+    ],
     # metadata for upload to PyPI
     author="Trgk",
     author_email="whyask37@naver.com",

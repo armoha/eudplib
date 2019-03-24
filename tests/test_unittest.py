@@ -57,6 +57,7 @@ helper.CompressPayload(True)
 
 
 def f():
+    helper.PRT_SetPatchPassword('whatislove?')
     helper.test_runall("unittest")
 
 
