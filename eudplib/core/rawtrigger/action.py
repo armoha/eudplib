@@ -50,21 +50,9 @@ class Action(ConstExpr):
        +1D   internal[3
      ======  ============= ========  ==========
     """
-
-    def __init__(
-        self,
-        locid1,
-        strid,
-        wavid,
-        time,
-        player1,
-        player2,
-        unitid,
-        acttype,
-        amount,
-        flags,
-        eudx=0,
-    ):
+    # fmt: off
+    def __init__(self, locid1, strid, wavid, time, player1, player2,
+                 unitid, acttype, amount, flags, eudx=0):
         """
         See :mod:`eudplib.base.stocktrg` for stock actions list.
         """
@@ -72,23 +60,11 @@ class Action(ConstExpr):
 
         if eudx:
             eudx = ut.b2i2(b"SC")
-        self.fields = [
-            locid1,
-            strid,
-            wavid,
-            time,
-            player1,
-            player2,
-            unitid,
-            acttype,
-            amount,
-            flags,
-            0,
-            eudx,
-        ]
+        self.fields = [locid1, strid, wavid, time, player1,
+                       player2, unitid, acttype, amount, flags, 0, eudx]
+        # fmt: on
         self.parenttrg = None
         self.actindex = None
-
     def Disable(self):
         self.fields[9] |= 2
 

@@ -78,7 +78,6 @@ class TBL:
                 if len(self._emptystring) == empty_len:
                     self._emptystring.append(i - 1)
             self.AddString(string)
-            last_content = string
         self._loaded = True
 
     def AddString(self, string):

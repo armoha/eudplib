@@ -106,32 +106,14 @@ class CHK:
     def optimize(self):
 
         # Delete unused sections
+        # fmt: off
         used_section = [
-            b"VER ",
-            b"VCOD",
-            b"OWNR",
-            b"ERA ",
-            b"DIM ",
-            b"SIDE",
-            b"MTXM",
-            b"UNIT",
-            b"THG2",
-            b"MASK",
-            b"STR ",
-            b"UPRP",
-            b"MRGN",
-            b"TRIG",
-            b"MBRF",
-            b"SPRP",
-            b"FORC",
-            b"COLR",
-            b"PUNI",
-            b"PUPx",
-            b"PTEx",
-            b"UNIx",
-            b"UPGx",
-            b"TECx",
+            b'VER ', b'VCOD', b'OWNR', b'ERA ', b'DIM ', b'SIDE', b'MTXM',
+            b'UNIT', b'THG2', b'MASK', b'STR ', b'UPRP', b'MRGN', b'TRIG',
+            b'MBRF', b'SPRP', b'FORC', b'COLR', b'PUNI', b'PUPx', b'PTEx',
+            b'UNIx', b'UPGx', b'TECx',
         ]
+        # fmt: on
 
         unused_section = [sn for sn in self.sections.keys() if sn not in used_section]
         for sn in unused_section:

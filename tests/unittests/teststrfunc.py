@@ -3,7 +3,7 @@ from helper import *
 
 @TestInstance
 def test_strbuffer():
-    s = StringBuffer(1023)
+    s = StringBuffer(1024)
     a, b, c = [PVariable() for _ in range(3)]
 
     s.append(hptr(a), " ", hptr(b), " ", hptr(c), "\n")
@@ -28,12 +28,16 @@ def test_strbuffer():
 def test_setpname():
     EUDPlayerLoop()()
     p = f_getcurpl()
-    s = StringBuffer()
+    DoActions(DisplayText("Text1"))
+    s = StringBuffer(1024)
     s.insert(0, PName(p))
     s.append(": ㅎㅇ요")
     s.Display()
+    DoActions(DisplayText("Text2"))
     SetPName(p, "dpdkfah ", PColor(p), PName(p))
     EUDEndPlayerLoop()
+    DoActions(DisplayText("Text3"))
 
     f_setcurpl(f_getuserplayerid())
     f_eprintln(PName(CurrentPlayer), "ㅎㅇ")
+    DoActions(DisplayText("Text4"))
