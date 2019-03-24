@@ -30,12 +30,14 @@ from .unitfix import FixUnitMap
 
 _inited = False
 _chkt = None
+_origchkt = None
 _rawfile = None
 
 
 def InitMapData(chkt, rawfile):
-    global _inited, _chkt, _rawfile
+    global _inited, _origchkt, _chkt, _rawfile
     _chkt = chkt
+    _origchkt = chkt.clone()
     _rawfile = rawfile
 
     InitStringMap(chkt)
@@ -56,6 +58,11 @@ def IsMapdataInitalized():
 
 def GetChkTokenized():
     return _chkt
+
+
+def GetOriginalChkTokenized():
+    """ NEVER MODIFY ANYTHING WITHIN THIS CHKTOK """
+    return _origchkt
 
 
 def GetRawFile():

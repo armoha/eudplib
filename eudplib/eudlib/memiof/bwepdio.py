@@ -54,11 +54,17 @@ def _wwriter(epd, subp, w):
 
 
 def f_wwrite_epd(epd, subp, w):
-    try:
-        cs.DoActions(
-            c.SetDeathsX(epd, c.SetTo, w * (256 ** subp), 0, 255 * 2 ** (8 * subp))
-        )
-    except (TypeError):
+    if type(subp) is int:
+        if subp == 3:
+            return _wwriter(epd, subp, w)
+
+        try:
+            cs.DoActions(
+                c.SetDeathsX(epd, c.SetTo, w << (8 * subp), 0, 0xffff << (8 * subp))
+            )
+        except (TypeError):
+            _wwriter(epd, subp, w)
+    else:
         _wwriter(epd, subp, w)
 
 
