@@ -31,10 +31,12 @@ from .injector.mainloop import _MainStarter
 from .mpqadd import UpdateMPQ
 from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
 from .chkdiff import chkdiff
+from eudplib.utils import u2utf8
 
+import os
 import binascii
 import lzma
-import simplecrypt
+import hashlib
 
 traceHeader = None
 traceMap = []
@@ -90,15 +92,27 @@ def SaveMap(fname, rootf):
 
     # Get diff
     if patchPassword:
+        from Cryptodome.Cipher import AES
         print('[U] Patch-based unprotection enabled.')
         origchkt = mapdata.GetOriginalChkTokenized()
         print(' 1. Calculating bsdiff btw original & new chk')
-        diff = chkdiff(origchkt, chkt)
+        diff = chkdiff(chkt, origchkt)
         print(' 2. Compressing')
         diff = lzma.compress(diff)
         print(' 3. Encrypting')
-        diff = simplecrypt.encrypt(patchPassword, diff)
-        mw.PutFile("staredit\\scenario.chk.patch", diff)
+
+        aesKey = hashlib.sha256(u2utf8(patchPassword)).digest()[:16]
+        cipher = AES.new(aesKey, AES.MODE_EAX)
+        nonce = cipher.nonce
+        ciphertext, tag = cipher.encrypt_and_digest(diff)
+
+        mw.PutFile("staredit\\scenario.chk.diff", ciphertext)
+        mw.PutFile("staredit\\scenario.chk.nonce", nonce)
+        mw.PutFile("staredit\\scenario.chk.tag", tag)
+
+        open(os.path.expanduser('~/chk.diff'), 'wb').write(ciphertext)
+        open(os.path.expanduser('~/chk.nonce'), 'wb').write(nonce)
+        open(os.path.expanduser('~/chk.tag'), 'wb').write(tag)
 
     UpdateMPQ(mw)
     mw.Compact()
