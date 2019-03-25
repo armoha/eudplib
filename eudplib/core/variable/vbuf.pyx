@@ -83,7 +83,6 @@ class EUDVarBuffer(EUDObject):
             # 'preserve rawtrigger'
             ( < uint32_t*>(output + 72 * i + 2376))[0] = 4
             ( < uint32_t*>(output + 72 * i + 352))[0] = 0x072D0000
-
         for i, flag in enumerate(self._flags):
             if flag is None:
                 continue
