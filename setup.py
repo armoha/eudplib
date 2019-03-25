@@ -20,8 +20,7 @@ setup(
     python_requires=">=3",
     install_requires=[
         'bsdiff4',
-        'simple-crypt',
-        'appdirs',
+        'pycryptodomex',
     ],
     # metadata for upload to PyPI
     author="Trgk",
