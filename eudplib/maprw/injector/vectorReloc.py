@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 from ... import core as c
 from ...core.mapdata.stringmap import GetStringMap
+from ...eudlib.stringf.strbuffer import _strbuffer_list
 from eudplib import utils as ut
 from ...trigtrg import trigtrg as tt
 
@@ -89,6 +90,8 @@ def CopyDeaths(iplayer, oplayer, copyepd=False, initvalue=None):
 def CreateVectorRelocator(chkt, payload):
     global trglist
 
+    for strbuffer in _strbuffer_list:
+        strbuffer._force_multiple_of_4()
     str_section = GetStringMap().SaveTBL()
 
     """

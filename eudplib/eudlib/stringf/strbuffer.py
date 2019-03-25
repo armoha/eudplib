@@ -32,6 +32,8 @@ from .strfunc import f_strlen_epd
 from .texteffect import TextFX_FadeIn, TextFX_FadeOut
 from ..eudarray import EUDArray
 
+_strbuffer_list = list()
+
 
 @c.EUDFunc
 def f_gettextptr():
@@ -66,7 +68,7 @@ class StringBuffer:
         :type content: str, bytes, int
         """
         chkt = c.GetChkTokenized()
-        filler = ForcedAddString(b"Arta")
+        self._filler = ForcedAddString(b"Arta")
         if content is None:
             content = "\r" * 218
         elif isinstance(content, int):
@@ -82,21 +84,21 @@ class StringBuffer:
         strID_fw << self.StringIndex
         epd_fw << ut.EPD(self.epd.getValueAddr())
 
-        def _fill():
-            # calculate offset of buffer string
-            stroffset = []
-            strmap = GetStringMap()
-            outindex = 2 * len(strmap._dataindextb) + 2
+        _strbuffer_list.append(self)
 
-            for s in strmap._datatb:
-                stroffset.append(outindex)
-                outindex += len(s) + 1
-            bufferoffset = stroffset[strmap._dataindextb[self.StringIndex - 1]]
-            if bufferoffset % 4 != 0:
-                strmap._datatb[strmap._dataindextb[filler - 1]] = b"Arta"[:(2 - bufferoffset) % 4]
-                strmap._capacity -= 2 + bufferoffset % 4
+    def _force_multiple_of_4(self):
+        # calculate offset of buffer string
+        stroffset = []
+        strmap = GetStringMap()
+        outindex = 2 * len(strmap._dataindextb) + 2
 
-        c.RegisterCreatePayloadCallback(_fill)
+        for s in strmap._datatb:
+            stroffset.append(outindex)
+            outindex += len(s) + 1
+        bufferoffset = stroffset[strmap._dataindextb[self.StringIndex - 1]]
+        if bufferoffset % 4 != 0:
+            strmap._datatb[strmap._dataindextb[self._filler - 1]] = b"Arta"[:4 - bufferoffset % 4]
+            strmap._capacity -= bufferoffset % 4
 
     @c.EUDMethod
     def _init_epd(self):
