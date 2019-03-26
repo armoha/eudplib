@@ -61,7 +61,7 @@ class Condition(ConstExpr):
         self.parenttrg = None
         self.condindex = None
 
-    def Disable(self):
+    def Disabled(self):
         self.fields[7] |= 2
 
     # -------

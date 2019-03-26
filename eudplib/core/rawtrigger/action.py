@@ -65,7 +65,7 @@ class Action(ConstExpr):
         # fmt: on
         self.parenttrg = None
         self.actindex = None
-    def Disable(self):
+    def Disabled(self):
         self.fields[9] |= 2
 
     # -------
