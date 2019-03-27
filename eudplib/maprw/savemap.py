@@ -110,10 +110,6 @@ def SaveMap(fname, rootf):
         mw.PutFile("staredit\\scenario.chk.nonce", nonce)
         mw.PutFile("staredit\\scenario.chk.tag", tag)
 
-        open(os.path.expanduser('~/chk.diff'), 'wb').write(ciphertext)
-        open(os.path.expanduser('~/chk.nonce'), 'wb').write(nonce)
-        open(os.path.expanduser('~/chk.tag'), 'wb').write(tag)
-
     UpdateMPQ(mw)
     mw.Compact()
     mw.Close()
