@@ -60,7 +60,7 @@ def f_wwrite_epd(epd, subp, w):
 
         try:
             cs.DoActions(
-                c.SetDeathsX(epd, c.SetTo, w << (8 * subp), 0, 0xffff << (8 * subp))
+                c.SetDeathsX(epd, c.SetTo, w << (8 * subp), 0, 0xFFFF << (8 * subp))
             )
         except (TypeError):
             _wwriter(epd, subp, w)

@@ -39,29 +39,47 @@ _br = brw.EUDByteReader()
 
 
 def f_dwwrite(ptr, dw):
-    chars = dwm.f_dwbreak(dw)[2:]
-    _bw.seekoffset(ptr)
-    _bw.writebyte(chars[0])
-    _bw.writebyte(chars[1])
-    _bw.writebyte(chars[2])
-    _bw.writebyte(chars[3])
+    if type(ptr) == int and ptr % 4 == 0:
+        dwm.f_dwwrite_epd(ut.EPD(ptr), dw)
+    else:
+        chars = dwm.f_dwbreak(dw)[2:]
+        _bw.seekoffset(ptr)
+        _bw.writebyte(chars[0])
+        _bw.writebyte(chars[1])
+        _bw.writebyte(chars[2])
+        _bw.writebyte(chars[3])
 
 
 def f_wwrite(ptr, w):
+    if type(ptr) == int:
+        mod = ptr % 4
+        if mod <= 2:
+            cs.DoActions(c.SetDeathsX(
+                ut.EPD(ptr), c.SetTo,
+                w << (8 * mod), 0, 0xFFFF << (8 * mod)
+            ))
+            return
     epd, subp = c.f_div(ptr - 0x58A364, 4)
     bwm.f_wwrite_epd(epd, subp, w)
 
 
 def f_bwrite(ptr, b):
-    epd, subp = c.f_div(ptr - 0x58A364, 4)
-    bwm.f_bwrite_epd(epd, subp, b)
+    if type(ptr) == int:
+        mod = ptr % 4
+        cs.DoActions(c.SetDeathsX(
+            ut.EPD(ptr), c.SetTo,
+            b << (8 * mod), 0, 0xFF << (8 * mod)
+        ))
+    else:
+        epd, subp = c.f_div(ptr - 0x58A364, 4)
+        bwm.f_bwrite_epd(epd, subp, b)
 
 
 # -----------------------------
 
 
 @c.EUDFunc
-def f_dwread(ptr):
+def _dwread(ptr):
     epd, subp = c.f_div(ptr - 0x58A364, 4)
     oldcp = cp.f_getcurpl()
     dw = c.EUDVariable()
@@ -98,11 +116,24 @@ def f_dwread(ptr):
     return dw
 
 
+def f_dwread(ptr):
+    if type(ptr) == int and ptr % 4 == 0:
+        return dwm.f_dwread_epd(ut.EPD(ptr))
+    else:
+        return _dwread(ptr)
+
+
 def f_wread(ptr):
-    epd, subp = c.f_div(ptr - 0x58A364, 4)
+    if type(ptr) == int and ptr % 4 <= 2:
+        epd, subp = divmod(ptr - 0x58A364, 4)
+    else:
+        epd, subp = c.f_div(ptr - 0x58A364, 4)
     return bwm.f_wread_epd(epd, subp)
 
 
 def f_bread(ptr):
-    epd, subp = c.f_div(ptr - 0x58A364, 4)
+    if type(ptr) == int:
+        epd, subp = divmod(ptr - 0x58A364, 4)
+    else:
+        epd, subp = c.f_div(ptr - 0x58A364, 4)
     return bwm.f_bread_epd(epd, subp)
