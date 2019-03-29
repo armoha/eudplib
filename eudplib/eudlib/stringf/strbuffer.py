@@ -33,7 +33,6 @@ from .texteffect import TextFX_FadeIn, TextFX_FadeOut
 from ..eudarray import EUDArray
 
 _strbuffer_list = list()
-_init_finished = False
 
 
 @c.EUDFunc
@@ -80,16 +79,15 @@ class StringBuffer:
         self.StringIndex = ForcedAddString(content)
         self.epd, self.pos = c.EUDVariable(), c.EUDVariable()
 
-        if not _init_finished:
-            self._need_init = False
-        else:
-            self._need_init = True
+        try:
+            cs.DoActions(self.epd.SetNumber(ut.EPD(GetStringAddr(self.StringIndex))))
+        except IndexError:
+            from ...maprw.injector.mainloop import EUDOnStart
+            def _f():
+                cs.DoActions(self.epd.SetNumber(ut.EPD(GetStringAddr(self.StringIndex))))
+            EUDOnStart(_f)
 
         _strbuffer_list.append(self)
-        from ...maprw.injector.mainloop import EUDOnStart
-        def _f():
-            cs.DoActions(self.epd.SetNumber(ut.EPD(GetStringAddr(self.StringIndex))))
-        EUDOnStart(_f)
 
     def _force_multiple_of_4(self):
         # calculate offset of buffer string
@@ -104,12 +102,6 @@ class StringBuffer:
         if bufferoffset % 4 != 0:
             strmap._datatb[strmap._dataindextb[self._filler - 1]] = b"Arta"[:4 - bufferoffset % 4]
             strmap._capacity -= bufferoffset % 4
-
-    @c.EUDMethod
-    def _init_epd(self):
-        if cs.EUDIf()(self.epd.Exactly(0)):
-            cs.DoActions(self.epd.SetNumber(ut.EPD(GetStringAddr(self.StringIndex))))
-        cs.EUDEndIf()
 
     @classmethod
     def _init_template(cls):
@@ -135,8 +127,6 @@ class StringBuffer:
         c.PopTriggerScope()
 
     def append(self, *args):
-        if self._need_init:
-            self._init_epd()
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -157,8 +147,6 @@ class StringBuffer:
         end << c.NextTrigger()
 
     def insert(self, index, *args):
-        if self._need_init:
-            self._init_epd()
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -219,8 +207,6 @@ class StringBuffer:
         ])
 
     def print(self, *args):
-        if self._need_init:
-            self._init_epd()
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -284,8 +270,3 @@ class StringBuffer:
 
     def length(self):
         return f_strlen_epd(self.epd)
-
-
-
-def _f_initstrbuffer():
-    _init_finished = True
