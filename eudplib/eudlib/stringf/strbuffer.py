@@ -33,6 +33,7 @@ from .texteffect import TextFX_FadeIn, TextFX_FadeOut
 from ..eudarray import EUDArray
 
 _strbuffer_list = list()
+_init_finished = False
 
 
 @c.EUDFunc
@@ -79,12 +80,16 @@ class StringBuffer:
         self.StringIndex = ForcedAddString(content)
         self.epd, self.pos = c.EUDVariable(), c.EUDVariable()
 
-        strID_fw, epd_fw = c.Forward(), c.Forward()
-        ExtendedStringIndex_FW(strID_fw, epd_fw)
-        strID_fw << self.StringIndex
-        epd_fw << ut.EPD(self.epd.getValueAddr())
+        if not _init_finished:
+            self._need_init = False
+        else:
+            self._need_init = True
 
         _strbuffer_list.append(self)
+        from ...maprw.injector.mainloop import EUDOnStart
+        def _f():
+            cs.DoActions(self.epd.SetNumber(ut.EPD(GetStringAddr(self.StringIndex))))
+        EUDOnStart(_f)
 
     def _force_multiple_of_4(self):
         # calculate offset of buffer string
@@ -102,9 +107,9 @@ class StringBuffer:
 
     @c.EUDMethod
     def _init_epd(self):
-        if cs.EUDExecuteOnce()():
+        if cs.EUDIf()(self.epd.Exactly(0)):
             cs.DoActions(self.epd.SetNumber(ut.EPD(GetStringAddr(self.StringIndex))))
-        cs.EUDEndExecuteOnce()
+        cs.EUDEndIf()
 
     @classmethod
     def _init_template(cls):
@@ -130,7 +135,8 @@ class StringBuffer:
         c.PopTriggerScope()
 
     def append(self, *args):
-        self._init_epd()
+        if self._need_init:
+            self._init_epd()
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -151,7 +157,8 @@ class StringBuffer:
         end << c.NextTrigger()
 
     def insert(self, index, *args):
-        self._init_epd()
+        if self._need_init:
+            self._init_epd()
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -211,6 +218,29 @@ class StringBuffer:
             c.SetMemory(0x640B58, c.SetTo, prevptr)
         ])
 
+    def print(self, *args):
+        if self._need_init:
+            self._init_epd()
+        if not StringBuffer._method_template.IsSet():
+            StringBuffer._init_template()
+        end, ontrue = c.Forward(), c.Forward()
+        c.RawTrigger(
+            nextptr=StringBuffer._method_template,
+            actions=[
+                c.SetNextPtr(StringBuffer._cpbranch, end),
+                c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
+            ]
+        )
+        ontrue << c.NextTrigger()
+        f_setcurpl(self.epd)
+        f_cpstr_print(*args)
+        cs.DoActions([
+            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            c.SetCurrentPlayer(prevcp),
+            c.DisplayText(self.StringIndex)
+        ])
+        end << c.NextTrigger()
+
     def Play(self):
         cs.DoActions(c.PlayWAV(self.StringIndex))
 
@@ -256,78 +286,6 @@ class StringBuffer:
         return f_strlen_epd(self.epd)
 
 
-class ExtendedStringIndex_FW(c.ConstExpr):
-    def __init__(self, strID, epd):
-        super().__init__(self)
-        self._strID = strID
-        self._epd = epd
-
-    def Evaluate(self):
-        _RegisterInit(self._strID, self._epd)
-
-
-_init_list = list()
-
-
-def RCPC_ResetInitList():
-    _init_list.clear()
-
-
-c.RegisterCreatePayloadCallback(RCPC_ResetInitList)
-
-
-def _RegisterInit(strID, epd):
-    _init_list.append((strID, epd))
-
-
-class InitBuffer(c.EUDObject):
-    def __init__(self):
-        super().__init__()
-
-    def GetDataSize(self):
-        if len(_init_list) % 2 == 1:
-            return len(_init_list) * 6 + 6
-        else:
-            return len(_init_list) * 6 + 8
-
-    def WritePayload(self, pbuf):
-        pbuf.WriteDword((len(_init_list) + 2) // 2)
-        for strID, _ in _init_list:
-            pbuf.WriteWord(strID)
-        if len(_init_list) % 2 == 1:
-            pbuf.WriteWord(0xFFFF)
-        else:
-            pbuf.WriteDword(0xFFFFFFFF)
-        for _, epd in _init_list:
-            pbuf.WriteDword(epd)
-
 
 def _f_initstrbuffer():
-    ib = InitBuffer()
-    ptr, epd, mod = c.EUDVariable(), c.EUDVariable(), c.EUDVariable()
-    eib = ut.EPD(ib)
-    cs.DoActions([
-        ptr.SetNumber(eib + f_dwread_epd(eib)),
-        epd.SetNumber(eib + 1)
-    ])
-
-    if cs.EUDInfLoop()():
-        strID = f_wread_epd(epd, mod)
-        cs.EUDBreakIf(strID == 0xFFFF)
-        strEPD = ut.EPD(GetStringAddr(strID))
-        cs.DoActions(
-            [
-                c.SetMemoryEPD(f_dwread_epd(ptr), c.SetTo, strEPD),
-                mod.AddNumber(1),
-                ptr.AddNumber(1)
-            ]
-        )
-        c.RawTrigger(
-            conditions=mod.AtLeast(2),
-            actions=[
-                mod.SetNumber(0),
-                epd.AddNumber(1)
-            ]
-        )
-
-    cs.EUDEndInfLoop()
+    _init_finished = True

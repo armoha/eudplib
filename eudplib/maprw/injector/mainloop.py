@@ -27,7 +27,6 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
-from ...eudlib.stringf.dbstr import _f_initextstr
 from ...eudlib.stringf.strbuffer import _f_initstrbuffer
 
 
@@ -47,7 +46,6 @@ def _MainStarter(mf):
         rootstarter = c.NextTrigger()
 
         # Various initializes
-        # _f_initextstr()
         _f_initstrbuffer()
         sf.f_getcurpl()
         _f_initstacktrace()
