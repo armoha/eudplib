@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2014 trgk
+Copyright (c) 2019 Armoha
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .locf import *
-from .memiof import *
-from .stringf import *
-from .utilf import *
-from .qgcf import *
-from .mathf import *
-
-from .eudarray import EUDArray
-from .eudgrp import EUDGrp
-from .eudstack import EUDStack
-from .epdoffsetmap import EPDOffsetMap
-from .playerv import PVariable
+from .locf import (
+    f_setloc,
+    f_addloc,
+    f_dilateloc,
+    f_getlocTL,
+    f_setloc_epd,
+)

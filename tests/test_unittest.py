@@ -51,6 +51,7 @@ from unittests import (
     test_dbstring,
     test_ctypes,
     test_dict_typo,
+    test_locf,
 )
 
 helper.CompressPayload(True)
