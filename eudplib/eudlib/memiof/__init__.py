@@ -74,4 +74,6 @@ from .memifgen import (
     f_cunitepdread_cp,
     f_maskread_epd,
     f_maskread_cp,
+    f_posread_epd,
+    f_posread_cp,
 )

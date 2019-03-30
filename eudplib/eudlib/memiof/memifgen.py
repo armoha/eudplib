@@ -35,8 +35,12 @@ def bits(n):
         n ^= b
 
 
-def f_readgen_epd(mask, *args, docstring=None):
+def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
     mask = mask & 0xFFFFFFFF
+    key = (  # use function's bytecode for equality
+        tuple(initval for initval, _ in args),
+        tuple(func.__code__.co_code for _, func in args)
+    )
 
     @c.EUDFunc
     def f_read_epd_template(targetplayer):
@@ -66,11 +70,27 @@ def f_readgen_epd(mask, *args, docstring=None):
     if docstring:
         f_read_epd_template.__doc__ = docstring
 
-    return f_read_epd_template
+    try:
+        _subfdict = _fdict[mask]
+    except KeyError:
+        # since it doesn't have a mask, won't have return values either.
+        _fdict[mask] = { key: f_read_epd_template }
+        _subfdict = _fdict[mask]
+    else:
+        try:
+            _subfdict[key]
+        except KeyError:
+            _subfdict[key] = f_read_epd_template
+
+    return _subfdict[key]
 
 
-def f_readgen_cp(mask, *args, docstring=None):
+def f_readgen_cp(mask, *args, docstring=None, _fdict={}):
     mask = mask & 0xFFFFFFFF
+    key = (  # use function's bytecode for equality
+        tuple(initval for initval, _ in args),
+        tuple(func.__code__.co_code for _, func in args)
+    )
 
     @c.EUDFunc
     def readerf():
@@ -100,7 +120,30 @@ def f_readgen_cp(mask, *args, docstring=None):
     if docstring:
         f_read_cp_template.__doc__ = docstring
 
-    return f_read_cp_template
+    try:
+        _subfdict = _fdict[mask]
+    except KeyError:
+        # since it doesn't have a mask, won't have return values either.
+        _fdict[mask] = { key: f_read_cp_template }
+        _subfdict = _fdict[mask]
+    else:
+        try:
+            _subfdict[key]
+        except KeyError:
+            _subfdict[key] = f_read_cp_template
+
+    return _subfdict[key]
+
+
+def _getMapSize():
+    from ...core.mapdata import GetChkTokenized
+    chkt = GetChkTokenized()
+    dim = chkt.getsection("DIM")
+    x, y = ut.b2i2(dim[0:2]), ut.b2i2(dim[2:4])
+    x, y = (x - 1).bit_length(), (y - 1).bit_length()
+    x = 2 ** (x + 5) - 1
+    y = 2 ** (y + 5) - 1
+    return x + y * 0x10000
 
 
 f_cunitread_epd = f_readgen_epd(0x7FFFF8, (0, lambda x: x))
@@ -111,6 +154,30 @@ f_cunitepdread_epd = f_readgen_epd(
 f_cunitepdread_cp = f_readgen_cp(
     0x7FFFF8, (0, lambda x: x), (-0x58A364 // 4, lambda y: y // 4)
 )
+
+
+def f_posread_epd(epd):
+    _rf = getattr(f_posread_epd, "_rf", None)
+    if _rf is None:
+        _rf = f_readgen_epd(
+            _getMapSize(),
+            (0, lambda x: x if x <= 0xFFFF else 0),
+            (0, lambda y: y >> 16)
+        )
+        f_posread_epd._rf = _rf
+    return _rf(epd)
+
+
+def f_posread_cp(cpoffset):
+    _rf = getattr(f_posread_cp, "_rf", None)
+    if _rf is None:
+        _rf = f_readgen_cp(
+            _getMapSize(),
+            (0, lambda x: x if x <= 0xFFFF else 0),
+            (0, lambda y: y >> 16)
+        )
+        f_posread_cp._rf = _rf
+    return _rf(cpoffset)
 
 
 def f_maskread_epd(targetplayer, mask, _fdict={}):
