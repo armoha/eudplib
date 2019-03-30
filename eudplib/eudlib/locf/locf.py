@@ -27,7 +27,7 @@ from ... import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_posread_epd, f_getcurpl, f_dwread_epd
 
 
-def _locfgen(mod1, mod2, mod3, mod4):
+def _locfgen(mod1, mod2, mod3, mod4, signed=False):
 
     @c.EUDFunc
     def _locf(epd, x, y):
@@ -39,23 +39,37 @@ def _locfgen(mod1, mod2, mod3, mod4):
                 epd.AddNumber(ut.EPD(0x58DC60)),
                 epd.QueueAssignTo(ut.EPD(act) + 4),
                 c.SetNextPtr(epd.GetVTable(), x.GetVTable()),
-                x.QueueAssignTo(ut.EPD(act) + 5),
+                [
+                    x.QueueAssignTo(ut.EPD(act) + 5)
+                    if not signed else [
+                        c.SetMemory(act + 20, c.SetTo, ~0),
+                        x.QueueSubtractTo(ut.EPD(act) + 5),
+                    ]
+                ],
                 c.SetNextPtr(x.GetVTable(), T),
             ]
         )
         T << c.RawTrigger(
             nextptr=epd.GetVTable(),
             actions=[
+                [c.SetMemory(act + 20, c.Add, 1) if signed else []],
                 epd.AddNumber(1),
                 c.SetMemory(epd._varact + 16, c.Add, 8),
                 c.SetNextPtr(epd.GetVTable(), y.GetVTable()),
-                y.QueueAssignTo(ut.EPD(act) + 8 + 5),
+                [
+                    y.QueueAssignTo(ut.EPD(act) + 8 + 5)
+                    if not signed else [
+                        c.SetMemory(act + 52, c.SetTo, ~0),
+                        y.QueueSubtractTo(ut.EPD(act) + 8 + 5),
+                    ]
+                ],
                 c.SetNextPtr(y.GetVTable(), R),
             ]
         )
         R << c.RawTrigger(
             nextptr=epd.GetVTable(),
             actions=[
+                [c.SetMemory(act + 52, c.Add, 1) if signed else []],
                 epd.AddNumber(1),
                 c.SetMemory(epd._varact + 16, c.Add, 8),
                 c.SetNextPtr(epd.GetVTable(), x.GetVTable()),
@@ -87,7 +101,7 @@ def _locfgen(mod1, mod2, mod3, mod4):
 
 _SetLoc = _locfgen(c.SetTo, c.SetTo, c.SetTo, c.SetTo)
 _AddLoc = _locfgen(c.Add, c.Add, c.Add, c.Add)
-_ResizeLoc = _locfgen(c.Subtract, c.Subtract, c.Add, c.Add)
+_DilateLoc = _locfgen(c.Add, c.Add, c.Add, c.Add, signed=True)
 
 
 def f_setloc(locID, x, y):
@@ -99,7 +113,7 @@ def f_addloc(locID, x, y):
 
 
 def f_dilateloc(locID, x, y):
-    _ResizeLoc(locID * 5, x, y)
+    _DilateLoc(locID * 5, x, y)
 
 
 @c.EUDFunc
