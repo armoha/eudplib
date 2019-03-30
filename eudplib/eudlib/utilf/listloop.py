@@ -64,6 +64,28 @@ def EUDLoopUnit():
     ut.EUDPopBlock("unitloop")
 
 
+def EUDLoopNewUnit(allowance=2):
+    firstUnitPtr = ut.EPD(0x628430)
+    ut.EUDCreateBlock('newunitloop', 'newlo')
+    tos0 = c.EUDLightVariable()
+    tos0 << 0
+
+    ptr, epd = f_cunitepdread_epd(firstUnitPtr)
+    if cs.EUDWhile()(ptr >= 1):
+        if cs.EUDIf()(c.MemoryXEPD(epd + 0xA5 // 4, c.AtLeast, 0x100, 0xFF00)):
+            cs.DoActions(c.SetMemoryXEPD(epd + 0xA5 // 4, c.SetTo, 0, 0xFF00))
+            yield ptr, epd
+        if cs.EUDElse()():
+            cs.DoActions(tos0.AddNumber(1))
+            cs.EUDBreakIf(tos0.AtLeast(allowance))
+        cs.EUDEndIf()
+        cs.EUDSetContinuePoint()
+        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd + 1))
+    cs.EUDEndWhile()
+
+    ut.EUDPopBlock('newunitloop')
+
+
 def EUDLoopUnit2():
     """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
     1700개 유닛을 도는 방식으로 작동합니다.

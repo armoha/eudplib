@@ -39,6 +39,7 @@ from .listloop import (
     EUDLoopList,
     EUDLoopUnit,
     EUDLoopUnit2,
+    EUDLoopNewUnit,
     EUDLoopPlayerUnit,
     EUDLoopSprite,
     EUDLoopBullet,
