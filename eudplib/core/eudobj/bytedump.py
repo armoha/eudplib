@@ -32,6 +32,8 @@ class Db(EUDObject):
 
     def __init__(self, b):
         super().__init__()
+        if type(b) == str:
+            b = (b + "\0").encode("UTF-8")
         self.content = bytes(b)
 
     def GetDataSize(self):
