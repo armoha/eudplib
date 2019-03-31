@@ -74,6 +74,10 @@ def _locfgen(mod1, mod2, mod3, mod4, signed=False):
                 c.SetMemory(epd._varact + 16, c.Add, 8),
                 c.SetNextPtr(epd.GetVTable(), x.GetVTable()),
                 c.SetMemory(x._varact + 16, c.Add, 16),
+                [
+                    c.SetMemory(x._varact + 24, c.Subtract, 0x02000000)
+                    if signed else []
+                ],
                 c.SetNextPtr(x.GetVTable(), B),
             ]
         )
@@ -84,6 +88,10 @@ def _locfgen(mod1, mod2, mod3, mod4, signed=False):
                 c.SetMemory(epd._varact + 16, c.Add, 8),
                 c.SetNextPtr(epd.GetVTable(), y.GetVTable()),
                 c.SetMemory(y._varact + 16, c.Add, 16),
+                [
+                    c.SetMemory(y._varact + 24, c.Subtract, 0x02000000)
+                    if signed else []
+                ],
                 c.SetNextPtr(y.GetVTable(), fin),
             ]
         )

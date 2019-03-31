@@ -14,10 +14,10 @@ def test_locf():
     test_equality(
         "f_getlocTL test", [L, T], [44, 70]
     )
-    test_assert("Location functions test", [
-        Memory(0x58DC60 + 8, Exactly, 52),
-        Memory(0x58DC60 + 12, Exactly, 74),
-    ])
+    test_equality("Location functions test", [
+        f_dwread_epd(EPD(0x58DC68)),
+        f_dwread_epd(EPD(0x58DC6C)),
+    ], [52, 74])
 
     Pos = Db(i2b4(0x6FE05BD))
     f_setloc_epd(loc, EPD(Pos))

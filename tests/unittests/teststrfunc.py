@@ -56,7 +56,7 @@ def test_strbuffer():
     ])
 
     cmp = Db("SetPNameTest:")
-    f_dbstr_print(0x64107C, ptr2s(username), ":\x07 테스트입니다.")
+    f_dbstr_print(0x64107C, ptr2s(username), u2utf8(":\x07 테스트입니다."))
     SetPName(userid, "SetPNameTest")
     test_assert("SetPName test", [
         f_memcmp(0x64107C, cmp, unamelen + 1) == 0,
