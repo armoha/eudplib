@@ -40,24 +40,21 @@ def _filldw(dstepd, v1):
 @c.EUDFunc
 def _fillwbb(dstepd, v1, v2, v3):
     ret = c.EUDVariable()
-    ret << 0
+    c.VProc(v1, [
+        v1.QueueAssignTo(ret),
+        v1.SetNumberX(0, 0xFFFF0000),
+    ])
 
-    for i in range(15, -1, -1):
+    for i in range(7, -1, -1):
         c.RawTrigger(
-            conditions=v1.AtLeast(2 ** i),
-            actions=[v1.SubtractNumber(2 ** i), ret.AddNumber(2 ** i)],
+            conditions=v2.AtLeastX(1, 2 ** i),
+            actions=ret.AddNumber(2 ** (i + 16)),
         )
 
     for i in range(7, -1, -1):
         c.RawTrigger(
-            conditions=v2.AtLeast(2 ** i),
-            actions=[v2.SubtractNumber(2 ** i), ret.AddNumber(2 ** (i + 16))],
-        )
-
-    for i in range(7, -1, -1):
-        c.RawTrigger(
-            conditions=v3.AtLeast(2 ** i),
-            actions=[v3.SubtractNumber(2 ** i), ret.AddNumber(2 ** (i + 24))],
+            conditions=v3.AtLeastX(1, 2 ** i),
+            actions=ret.AddNumber(2 ** (i + 24)),
         )
 
     _dww(dstepd, ret)
@@ -66,15 +63,19 @@ def _fillwbb(dstepd, v1, v2, v3):
 @c.EUDFunc
 def _fillbbbb(dstepd, v1, v2, v3, v4):
     ret = c.EUDVariable()
-    ret << 0
+    c.VProc(v1, [
+        v1.QueueAssignTo(ret),
+        v1.SetNumberX(0, 0xFFFFFF00),
+    ])
 
-    vlist = (v1, v2, v3, v4)
+    vlist = (v2, v3, v4)
     for i, v in enumerate(vlist):
+        i += 1
         lsf = 8 * i
         for i in range(7, -1, -1):
             c.RawTrigger(
-                conditions=v.AtLeast(2 ** i),
-                actions=[v.SubtractNumber(2 ** i), ret.AddNumber(2 ** (i + lsf))],
+                conditions=v.AtLeastX(1, 2 ** i),
+                actions=ret.AddNumber(2 ** (i + lsf)),
             )
 
     _dww(dstepd, ret)
