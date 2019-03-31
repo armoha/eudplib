@@ -102,8 +102,12 @@ def _OptimizeSetPName():
     if cs.EUDExecuteOnce()():
         EUDPlayerLoop()()
         player = f_getcurpl()
-        playerid_epd = ut.EPD(0x57EEEC) + 9 * player
+        playerid_epd = 9 * player
         idlen = f_strlen_epd(playerid_epd)
+        cs.DoActions([
+            playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
+            idlen.AddNumber(1),
+        ])
         baselens[player] = idlen
         f_dbstr_print(temp_Db, PName(player), ":")
         val_odd = f_dwread_epd(ut.EPD(temp_Db))
