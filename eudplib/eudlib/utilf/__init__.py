@@ -33,7 +33,7 @@ from .random import f_getseed, f_srand, f_rand, f_dwrand, f_randomize
 
 from .mempatch import f_dwpatch_epd, f_blockpatch_epd, f_unpatchall
 
-from .pexist import f_playerexist, EUDPlayerLoop, EUDEndPlayerLoop
+from .pexist import f_playerexist, EUDLoopPlayer, EUDPlayerLoop, EUDEndPlayerLoop
 
 from .listloop import (
     EUDLoopList,

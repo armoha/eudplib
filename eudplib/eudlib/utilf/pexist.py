@@ -53,6 +53,34 @@ def f_playerexist(player):
 # --------
 
 
+def EUDLoopPlayer(ptype="Human", force=None, race=None):
+    plist = []
+    for p in range(8):
+        pinfo = c.GetPlayerInfo(p)
+        if (ptype is None or pinfo.typestr == ptype) and
+           (force is None or pinfo.force == force) and
+           (race is None or pinfo.racestr == race):
+            plist.append(p)
+    ut.EUDCreateBlock("loopplayerblock", None)
+    start, end = min(plist), max(plist)
+
+    v = c.EUDVariable()
+    v << start
+    if cs.EUDWhile()(v <= end):
+        for i in range(start, end):
+            if i not in plist:
+                cs.EUDContinueIf(v == i)
+        cs.EUDContinueIfNot(f_playerexist(v))
+        yield v
+        cs.EUDSetContinuePoint()
+        v += 1
+    cs.EUDEndWhile()
+    ut.EUDPopBlock("loopplayerblock")
+
+
+# -------
+
+
 def EUDPlayerLoop():
     def _footer():
         block = {"origcp": f_getcurpl(), "playerv": c.EUDVariable()}
