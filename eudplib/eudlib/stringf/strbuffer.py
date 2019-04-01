@@ -141,9 +141,7 @@ class StringBuffer:
         f_setcurpl(self.pos)
         f_cpstr_print(*args)
         self.pos << f_getcurpl()
-        cs.DoActions(
-            [c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0), c.SetCurrentPlayer(prevcp)]
-        )
+        f_setcurpl(prevcp)
         end << c.NextTrigger()
 
     def insert(self, index, *args):
@@ -159,7 +157,7 @@ class StringBuffer:
         )
         ontrue << c.NextTrigger()
         f_setcurpl(self.epd + index)
-        f_cpstr_print(*args)
+        f_cpstr_print(*args, EOS=False)
         self.pos << f_getcurpl()
         f_setcurpl(prevcp)
         end << c.NextTrigger()
@@ -219,7 +217,7 @@ class StringBuffer:
         )
         ontrue << c.NextTrigger()
         f_setcurpl(self.epd)
-        f_cpstr_print(*args)
+        f_cpstr_print(*args, EOS=False)
         cs.DoActions([
             c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
             c.SetCurrentPlayer(prevcp),

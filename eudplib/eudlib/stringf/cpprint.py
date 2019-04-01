@@ -165,7 +165,7 @@ def f_cpstr_addptr(number):
 _constcpstr_dict = dict()
 
 
-def f_cpstr_print(*args):
+def f_cpstr_print(*args, EOS=True):
     """Print multiple string / number to CurrentPlayer.
 
     :param args: Things to print
@@ -198,8 +198,8 @@ def f_cpstr_print(*args):
             raise ut.EPError(
                 "Object with unknown parameter type %s given to f_cpprint." % type(arg)
             )
-    # EOS
-    # cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+    if EOS:
+        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
 
 
 @c.EUDTypedFunc([c.TrgPlayer])
@@ -250,7 +250,7 @@ def f_eprintln(*args):
         ],
     )
     _print << c.NextTrigger()
-    f_cpstr_print(*args)
+    f_cpstr_print(*args, EOS=False)
     c.SetNextTrigger(_eprintln_EOS)
     _next << c.NextTrigger()
 
@@ -297,6 +297,6 @@ def f_eprintln2(*args):
         ],
     )
     _print << c.NextTrigger()
-    f_cpstr_print(*args)
+    f_cpstr_print(*args, EOS=False)
     c.SetNextTrigger(_eprintln2_EOS)
     _next << c.NextTrigger()

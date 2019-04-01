@@ -108,7 +108,7 @@ def f_cpchar_print(*args):
             cs.DoActions(color_v.SetNumber(ut.b2i1(color_code)))
             if not bytestring:
                 bytestring = color_code + b"\r\r\r"
-            f_cpstr_print(bytestring)
+            f_cpstr_print(bytestring, EOS=False)
         elif ut.isUnproxyInstance(arg, ptr2s):
             br1.seekoffset(arg._value)
             f_cpchar_addstr(arg._value)
@@ -118,7 +118,7 @@ def f_cpchar_print(*args):
         elif ut.isUnproxyInstance(arg, c.EUDVariable) or c.IsConstExpr(arg):
             f_cpchar_adddw(arg)
         else:
-            f_cpstr_print(arg)
+            f_cpstr_print(arg, EOS=False)
     cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
 
 
@@ -366,7 +366,7 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None):
             start.QueueAddTo(ut.EPD(_check_cp + 8))
         ]
     )
-    f_cpstr_print(identifier)
+    f_cpstr_print(identifier, EOS=False)
     f_cpchar_print(*args)
     f_setcurpl(start + (3 - len(color)))
 
@@ -444,7 +444,7 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None):
             start.QueueAddTo(ut.EPD(_check_cp + 8))
         ]
     )
-    f_cpstr_print(identifier)
+    f_cpstr_print(identifier, EOS=False)
     f_cpchar_print(*args)
 
     if reset is True:
