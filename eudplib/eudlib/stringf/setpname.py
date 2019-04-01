@@ -104,11 +104,7 @@ def _OptimizeSetPName():
         player = f_getcurpl()
         playerid_epd = 9 * player
         idlen = f_strlen_epd(playerid_epd)
-        cs.DoActions([
-            playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
-            idlen.AddNumber(1),
-        ])
-        baselens[player] = idlen
+        cs.DoActions(playerid_epd.AddNumber(ut.EPD(0x57EEEC)))
         f_dbstr_print(temp_Db, PName(player), ":")
         val_odd = f_dwread_epd(ut.EPD(temp_Db))
         v0, v1 = f_dwbreak(val_odd)[0:2]
@@ -138,6 +134,9 @@ def _OptimizeSetPName():
                 )
             cs.EUDEndIf()
         cs.EUDEndIf()
+        # fix ":" not recognized
+        cs.DoActions(idlen.AddNumber(1))
+        baselens[player] = idlen
         EUDEndPlayerLoop()
     cs.EUDEndExecuteOnce()
 
@@ -197,10 +196,16 @@ def SetPName(player, *name):
     if cs.EUDWhile()(ptr.AtMost(0x640B61 + 218 * 10)):
         cs.EUDContinueIf(f_check_id(player, epd))
         cs.EUDContinueIf(f_memcmp(basename, ptr, baselen) >= 1)
-        f_setcurpl(ut.EPD(temp_Db))
-        f_cpstr_print(ptr2s(ptr + baselen))
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))  # EOS
-        f_setcurpl(epd)
+        cs.DoActions([
+            c.SetCurrentPlayer(ut.EPD(temp_Db)),
+            baselen.SubtractNumber(1),
+        ])  # fix setpname save 1byte less chat contents
+        f_cpstr_print(ptr2s(ptr + baselen), EOS=False)
+        cs.DoActions([
+            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            baselen.AddNumber(1),
+            c.SetCurrentPlayer(epd),
+        ])
         c.RawTrigger(
             conditions=odds_or_even.Exactly(1),
             actions=[
@@ -209,7 +214,6 @@ def SetPName(player, *name):
             ],
         )
         f_cpstr_print(*(name + (epd2s(ut.EPD(temp_Db)),)))
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))  # EOS
 
         cs.EUDSetContinuePoint()
         cs.DoActions(
