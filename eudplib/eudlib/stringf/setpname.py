@@ -94,10 +94,9 @@ def f_check_id(player, dst):
 
 
 def _OptimizeSetPName():
+    c.PushTriggerScope()
     global start_optimize, end_optimize, isTxtPtrUnchanged
     prevTxtPtr, _end = c.Forward(), c.Forward()
-
-    cs.EUDJump(_end)
     start_optimize << c.NextTrigger()
 
     oddA = EUDArray([ut.EPD(x) for x in odd])
@@ -110,8 +109,8 @@ def _OptimizeSetPName():
         player_name = 36 * player
         playerid_epd = 9 * player
         cs.DoActions([
-            playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
             player_name.AddNumber(0x57EEEB),
+            playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
         ])
         idlen = f_strlen_epd(playerid_epd)
         nameDb = baseNames[player]
@@ -123,11 +122,11 @@ def _OptimizeSetPName():
         con_odd, con_even = oddA[player], even1A[player]
         cs.DoActions(
             [
+                idlen.AddNumber(1),  # fix ":" not recognized
+                player_name.AddNumber(1),
                 c.SetMemoryEPD(con_odd + 2, c.SetTo, val_odd),
                 c.SetMemoryEPD(even0A[player] + 2, c.SetTo, val_even0),
                 c.SetMemoryEPD(con_even + 2, c.SetTo, val_even1),
-                idlen.AddNumber(1),  # fix ":" not recognized
-                player_name.AddNumber(1),
             ]
         )
         f_dbstr_print(nameDb, ptr2s(player_name), ":")
@@ -172,6 +171,7 @@ def _OptimizeSetPName():
         )
     _end << c.NextTrigger()
     end_optimize << c.RawTrigger()
+    c.PopTriggerScope()
 
 
 def SetPName(player, *name):
