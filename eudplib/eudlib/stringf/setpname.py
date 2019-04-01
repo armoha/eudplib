@@ -46,18 +46,23 @@ temp_Db = None
 ptr, epd = None, None
 odds_or_even = None
 baselens = None
+NameDb = None
+baseNames = None
 start_optimize = c.Forward()
 end_optimize = c.Forward()
 odd, even0, even1 = [[c.Forward() for p in range(8)] for _ in range(3)]
 
 
 def _InitPName():
-    global isTxtPtrUnchanged, temp_Db, ptr, epd, temp_Db, odds_or_even, baselens
+    global isTxtPtrUnchanged, temp_Db, ptr, epd, temp_Db, odds_or_even
+    global baselens, baseNames
     isTxtPtrUnchanged = c.EUDLightVariable()
     temp_Db = c.Db(218)
     ptr, epd = c.EUDVariable(), c.EUDVariable()
     odds_or_even = c.EUDLightVariable()
     baselens = PVariable()
+    NameDb = [c.Db(26) for _ in range(8)]
+    baseNames = PVariable(NameDb)
 
 
 @c.EUDFunc
@@ -102,30 +107,39 @@ def _OptimizeSetPName():
     if cs.EUDExecuteOnce()():
         EUDPlayerLoop()()
         player = f_getcurpl()
+        player_name = 36 * player
         playerid_epd = 9 * player
+        cs.DoActions([
+            playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
+            player_name.AddNumber(0x57EEEB),
+        ])
         idlen = f_strlen_epd(playerid_epd)
-        cs.DoActions(playerid_epd.AddNumber(ut.EPD(0x57EEEC)))
-        f_dbstr_print(temp_Db, PName(player), ":")
-        val_odd = f_dwread_epd(ut.EPD(temp_Db))
+        nameDb = baseNames[player]
+        f_dbstr_print(nameDb, ptr2s(player_name), ":")
+        val_odd = f_dwread_epd(ut.EPD(nameDb))
         v0, v1 = f_dwbreak(val_odd)[0:2]
         val_even0 = v0 * 0x10000
-        val_even1 = v1 + f_wread_epd(ut.EPD(temp_Db) + 1, 0) * 0x10000
+        val_even1 = v1 + f_wread_epd(ut.EPD(nameDb) + 1, 0) * 0x10000
         con_odd, con_even = oddA[player], even1A[player]
         cs.DoActions(
             [
                 c.SetMemoryEPD(con_odd + 2, c.SetTo, val_odd),
                 c.SetMemoryEPD(even0A[player] + 2, c.SetTo, val_even0),
                 c.SetMemoryEPD(con_even + 2, c.SetTo, val_even1),
+                idlen.AddNumber(1),  # fix ":" not recognized
+                player_name.AddNumber(1),
             ]
         )
-        if cs.EUDIf()(idlen <= 3):
+        f_dbstr_print(nameDb, ptr2s(player_name), ":")
+        baselens[player] = idlen
+        if cs.EUDIf()(idlen <= 4):
             cs.DoActions(
                 [
                     c.SetMemoryEPD(con_even + 2, c.SetTo, 0),
                     c.SetMemoryEPD(con_even + 3, c.SetTo, 0x0F000000),
                 ]
             )
-            if cs.EUDIf()(idlen <= 1):
+            if cs.EUDIf()(idlen <= 2):
                 cs.DoActions(
                     [
                         c.SetMemoryEPD(con_odd + 2, c.SetTo, 0),
@@ -134,9 +148,6 @@ def _OptimizeSetPName():
                 )
             cs.EUDEndIf()
         cs.EUDEndIf()
-        # fix ":" not recognized
-        cs.DoActions(idlen.AddNumber(1))
-        baselens[player] = idlen
         EUDEndPlayerLoop()
     cs.EUDEndExecuteOnce()
 
@@ -182,7 +193,7 @@ def SetPName(player, *name):
         else:
             player = c.EncodePlayer(player)
     cs.EUDJumpIf(f_playerexist(player) == 0, _end)
-    basename, baselen = 0x57EEEC + 36 * player, baselens[player]
+    basename, baselen = baseNames[player], baselens[player]
 
     global ptr, epd, odds_or_even
     origcp = f_getcurpl()
