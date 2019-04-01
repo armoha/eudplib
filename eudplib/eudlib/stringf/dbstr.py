@@ -69,19 +69,20 @@ class DBString(ut.ExprProxy):
             sp << GetStringAddr(strId)
         cs.EUDEndExecuteOnce()
 
-        f_cp949_to_utf8_cpy(sp, self.GetStringMemoryAddr())
+        from .eudprint import f_dbstr_print
+        f_dbstr_print(sp, self)
         cs.DoActions(c.DisplayText(strId))
 
     @c.EUDMethod
-    def Play(dbs):
+    def Play(self):
         sp = c.EUDVariable(0)
         strId = c.EncodeString("_" * 2048)
         if cs.EUDExecuteOnce()():
-            strp = f_dwread_epd(ut.EPD(0x5993D4))
-            sp << strp + f_wread(strp + strId * 2)
+            sp << GetStringAddr(strId)
         cs.EUDEndExecuteOnce()
 
-        f_cp949_to_utf8_cpy(sp, dbs.GetStringMemoryAddr())
+        from .eudprint import f_dbstr_print
+        f_dbstr_print(sp, self)
         cs.DoActions(c.DisplayText(strId))
 
 
@@ -103,7 +104,7 @@ class DBStringData(c.EUDObject):
         if isinstance(content, int):
             self.content = bytes(content)
         else:
-            self.content = ut.u2b(content)
+            self.content = ut.u2utf8(content)
 
     def GetDataSize(self):
         return len(self.content) + 5

@@ -41,7 +41,7 @@ def PColor(i):
     global Color
     if Color is None:
         player_colors = "\x08\x0E\x0F\x10\x11\x15\x16\x17\x18\x19\x1B\x1C\x1D\x1E\x1F"
-        Color = EUDArray([ut.EPD(c.Db(ut.u2b(p) + b"\0")) for p in player_colors])
+        Color = EUDArray([ut.EPD(c.Db(pc)) for pc in player_colors])
     if type(i) == type(c.P1) and i == c.CurrentPlayer:
         i = prevcp
     return epd2s(Color[i])
@@ -176,7 +176,7 @@ def f_cpstr_print(*args, EOS=True):
         if ut.isUnproxyInstance(arg, str):
             arg = ut.u2utf8(arg)
         elif ut.isUnproxyInstance(arg, int):
-            arg = ut.u2b(str(arg & 0xFFFFFFFF))
+            arg = ut.u2utf8(str(arg & 0xFFFFFFFF))
         if ut.isUnproxyInstance(arg, bytes):
             key = _s2b(arg)
             if key not in _constcpstr_dict:
