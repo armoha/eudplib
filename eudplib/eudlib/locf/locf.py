@@ -113,14 +113,20 @@ _DilateLoc = _locfgen(c.Add, c.Add, c.Add, c.Add, signed=True)
 
 
 def f_setloc(locID, x, y):
+    if isinstance(locID, str):
+        locID = c.GetLocationIndex(locID)
     _SetLoc(locID * 5, x, y)
 
 
 def f_addloc(locID, x, y):
+    if isinstance(locID, str):
+        locID = c.GetLocationIndex(locID)
     _AddLoc(locID * 5, x, y)
 
 
 def f_dilateloc(locID, x, y):
+    if isinstance(locID, str):
+        locID = c.GetLocationIndex(locID)
     _DilateLoc(locID * 5, x, y)
 
 
@@ -133,6 +139,8 @@ def _GetLocTL(epd):
 
 
 def f_getlocTL(locID):
+    if isinstance(locID, str):
+        locID = c.GetLocationIndex(locID)
     # 로케이션의 위(top), 왼쪽 (left) 좌표를 얻어냅니다.
     # @param  {[type]} locID 로케이션 번호. $L(로케이션 이름) 으로 얻을 수 있습니다.
     return _GetLocTL(locID * 5)
@@ -186,4 +194,6 @@ def _SetLocEPD(loc, epd):
 
 
 def f_setloc_epd(locID, epd):
+    if isinstance(locID, str):
+        locID = c.GetLocationIndex(locID)
     return _SetLocEPD(locID * 5, epd)
