@@ -26,6 +26,7 @@ THE SOFTWARE.
 from .cpstr import (
     GetStringAddr,
     GetMapStringAddr,
+    GetTBLAddr,
     CPString,
 )
 
@@ -59,7 +60,6 @@ from .cpprint import (
 
 from .cputf8 import f_cp949_to_utf8_cpy
 from .setpname import SetPName
-from .tblprint import GetTBLAddr, f_settbl
 
 from .texteffect import (
     f_cpchar_adddw,
