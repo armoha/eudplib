@@ -130,7 +130,7 @@ class hptr:
         self._value = value
 
 
-def f_dbstr_print(dst, *args, encoding="UTF-8"):
+def f_dbstr_print(dst, *args):
     """Print multiple string / number to dst.
 
     :param dst: Destination address (Not EPD player)
@@ -145,7 +145,7 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
         if ut.isUnproxyInstance(arg, bytes):
             dst = f_dbstr_addstr(dst, c.Db(arg + b"\0"))
         elif ut.isUnproxyInstance(arg, str):
-            dst = f_dbstr_addstr(dst, c.Db(arg.encode(encoding)))
+            dst = f_dbstr_addstr(dst, c.Db(arg))
         elif ut.isUnproxyInstance(arg, DBString):
             dst = f_dbstr_addstr(dst, arg.GetStringMemoryAddr())
         elif ut.isUnproxyInstance(arg, ptr2s):

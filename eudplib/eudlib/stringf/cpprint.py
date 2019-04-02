@@ -164,7 +164,7 @@ def f_cpstr_addptr(number):
 _constcpstr_dict = dict()
 
 
-def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
+def f_cpstr_print(*args, EOS=True):
     """Print multiple string / number to CurrentPlayer.
 
     :param args: Things to print
@@ -173,7 +173,7 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
     args = ut.FlattenList(args)
     for arg in args:
         if ut.isUnproxyInstance(arg, str):
-            arg = arg.encode(encoding)
+            arg = ut.u2utf8(arg)
         elif ut.isUnproxyInstance(arg, int):
             arg = ut.u2utf8(str(arg & 0xFFFFFFFF))
         if ut.isUnproxyInstance(arg, bytes):
