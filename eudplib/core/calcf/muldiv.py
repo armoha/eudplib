@@ -88,8 +88,8 @@ def f_constmul(number):
             ret << 0
             for i in range(31, -1, -1):
                 rt.RawTrigger(
-                    conditions=a.AtLeast(2 ** i),
-                    actions=[a.SubtractNumber(2 ** i), ret.AddNumber(2 ** i * number)],
+                    conditions=a.AtLeastX(1, 2 ** i),
+                    actions=ret.AddNumber(2 ** i * number),
                 )
             return ret
 
