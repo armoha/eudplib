@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from .. import core as c
 from .. import utils as ut
-from .filler import _filldw, _fillloword, _filllsbyte, _filllobyte, _fillhibyte, _fillmsbyte
+from .filler import _filldw, _fillwbb, _fillbbbb
 
 
 def HasEUDVariable(l):
@@ -43,26 +43,21 @@ def ApplyPatchTable(initepd, obj, patchTable):
         else:
             return 0
 
-    fieldName = 0
     for i, patchEntry in enumerate(patchTable):
         patchFields = patchEntry
-        for fieldSize in patchFields:
-            if type(fieldSize) is int:
-                memoryFiller = {
-                    -1: _filldw, 0: _fillloword,
-                    2: _filllsbyte, 3: _filllobyte,
-                    4: _fillhibyte, 5: _fillmsbyte
-                }[fieldSize]
-                field = fieldSelector(fieldName)
-                if isinstance(field, c.EUDVariable):
-                    memoryFiller(initepd + i, field)
+        memoryFiller = {1: _filldw, 3: _fillwbb, 4: _fillbbbb}[len(patchFields)]
+
+        fieldList = list(map(fieldSelector, patchFields))
+        if HasEUDVariable(fieldList):
+            memoryFiller(initepd + i, *fieldList)
+            for fieldName in patchFields:
+                if type(fieldName) is int:
                     obj.fields[fieldName] = 0
-            fieldName += 1
 
 
-condpt = [[-1], [-1], [-1], [0, 4, 5], [2, 3, None, None]]
+condpt = [[0], [1], [2], [3, 4, 5], [6, 7, None, None]]
 
-actpt = [[-1], [-1], [-1], [-1], [-1], [-1], [0, 4, 5], [2, None, None, None]]
+actpt = [[0], [1], [2], [3], [4], [5], [6, 7, 8], [9, None, None, None]]
 
 
 def PatchCondition(cond):

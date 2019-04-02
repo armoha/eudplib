@@ -26,88 +26,56 @@ THE SOFTWARE.
 from .. import core as c
 from .. import utils as ut
 
-_lowordfilter = c.EUDXVariable(0, 0xFFFF)
-_lsbytefilter = c.EUDXVariable(0, 0xFF)
-_lobytefilter = c.EUDXVariable(0, 0xFF00)
-_hibytefilter = c.EUDXVariable(0, 0xFF0000)
-_msbytefilter = c.EUDXVariable(0, 0xFF000000)
+
+def _dww(dstepd, v):
+    act = c.Forward()
+    c.SeqCompute(((ut.EPD(act + 16), c.SetTo, dstepd), (ut.EPD(act + 20), c.SetTo, v)))
+    c.RawTrigger(actions=(act << c.SetMemory(0, c.SetTo, 0)))
 
 
 def _filldw(dstepd, v1):
     c.SeqCompute(((dstepd, c.SetTo, v1),))
 
 
-def _fillloword(dstepd, v1):
-    _nextptr = c.Forward()
-    c.RawTrigger(
-        nextptr=v1.GetVTable(),
-        actions=[
-            v1.QueueAssignTo(_lowordfilter),
-            c.SetNextPtr(v1.GetVTable(), _lowordfilter.GetVTable()),
-            _lowordfilter.QueueAssignTo(dstepd),
-            c.SetNextPtr(_lowordfilter.GetVTable(), _nextptr),
-        ]
-    )
-    _nextptr << c.NextTrigger()
-
-
-def _filllsbyte(dstepd, v1):
-    _nextptr = c.Forward()
-    c.RawTrigger(
-        nextptr=v1.GetVTable(),
-        actions=[
-            v1.QueueAssignTo(_lsbytefilter),
-            c.SetNextPtr(v1.GetVTable(), _lsbytefilter.GetVTable()),
-            _lsbytefilter.QueueAssignTo(dstepd),
-            c.SetNextPtr(_lsbytefilter.GetVTable(), _nextptr),
-        ]
-    )
-    _nextptr << c.NextTrigger()
-
-
 @c.EUDFunc
-def _fill_b__(v1):
-    global _lobytefilter
-    _lobytefilter << 0
+def _fillwbb(dstepd, v1, v2, v3):
+    ret = c.EUDVariable()
+    c.VProc(v1, [
+        v1.QueueAssignTo(ret),
+        v1.SetNumberX(0, 0xFFFF0000),
+    ])
+
     for i in range(7, -1, -1):
         c.RawTrigger(
             conditions=v2.AtLeastX(1, 2 ** i),
-            actions=_lobytefilter.AddNumber(2 ** (i + 8)),
+            actions=ret.AddNumber(2 ** (i + 16)),
         )
 
+    for i in range(7, -1, -1):
+        c.RawTrigger(
+            conditions=v3.AtLeastX(1, 2 ** i),
+            actions=ret.AddNumber(2 ** (i + 24)),
+        )
 
-def _filllobyte(dstepd, v1):
-    _fill_b__(v1)
-    c.SeqCompute(((dstepd, c.SetTo, _lobytefilter),))
+    _dww(dstepd, ret)
 
 
 @c.EUDFunc
-def _fill__b_(v1):
-    global _hibytefilter
-    _hibytefilter << 0
-    for i in range(7, -1, -1):
-        c.RawTrigger(
-            conditions=v2.AtLeastX(1, 2 ** i),
-            actions=_hibytefilter.AddNumber(2 ** (i + 16)),
-        )
+def _fillbbbb(dstepd, v1, v2, v3, v4):
+    ret = c.EUDVariable()
+    c.VProc(v1, [
+        v1.QueueAssignTo(ret),
+        v1.SetNumberX(0, 0xFFFFFF00),
+    ])
 
+    vlist = (v2, v3, v4)
+    for i, v in enumerate(vlist):
+        i += 1
+        lsf = 8 * i
+        for i in range(7, -1, -1):
+            c.RawTrigger(
+                conditions=v.AtLeastX(1, 2 ** i),
+                actions=ret.AddNumber(2 ** (i + lsf)),
+            )
 
-def _fillhibyte(dstepd, v1):
-    _fill__b_(v1)
-    c.SeqCompute(((dstepd, c.SetTo, _hibytefilter),))
-
-
-@c.EUDFunc
-def _fill___b(v1):
-    global _msbytefilter
-    _msbytefilter << 0
-    for i in range(7, -1, -1):
-        c.RawTrigger(
-            conditions=v2.AtLeastX(1, 2 ** i),
-            actions=_msbytefilter.AddNumber(2 ** (i + 24)),
-        )
-
-
-def _fillmsbyte(dstepd, v1):
-    _fill___b(v1)
-    c.SeqCompute(((dstepd, c.SetTo, _msbytefilter),))
+    _dww(dstepd, ret)
