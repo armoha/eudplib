@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2014 trgk
+Copyright (c) 2019 Armoha
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,49 +23,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .cpstr import (
-    GetStringAddr,
-    GetMapStringAddr,
-    CPString,
-)
+from ... import core as c, ctrlstru as cs, utils as ut
+from ..memiof import f_dwepdread_epd
+from .eudprint import f_dbstr_print
 
-from .dbstr import DBString
 
-from .strbuffer import StringBuffer, f_gettextptr
+@c.EUDFunc
+def GetTBLAddr(tblId):
+    add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
+    if cs.EUDExecuteOnce()():
+        TBL_ptr, TBL_epd = f_dwepdread_epd(ut.EPD(0x6D5A30))
+        cs.DoActions(
+            [
+                c.SetMemory(add_TBL_ptr + 20, c.SetTo, TBL_ptr),
+                c.SetMemory(add_TBL_epd + 20, c.SetTo, TBL_epd),
+            ]
+        )
+    cs.EUDEndExecuteOnce()
+    r, m = c.f_div(tblId, 2)
+    c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
+    c.RawTrigger(actions=add_TBL_epd << r.AddNumber(0))
+    ret = f_wread_epd(r, m)
+    c.RawTrigger(actions=add_TBL_ptr << ret.AddNumber(0))
+    c.EUDReturn(ret)
 
-from .strfunc import f_strcpy, f_strcmp, f_strlen, f_strlen_epd, f_strnstr
 
-from .eudprint import (
-    f_dbstr_adddw,
-    f_dbstr_addptr,
-    f_dbstr_addstr,
-    ptr2s,
-    epd2s,
-    hptr,
-    f_dbstr_print,
-    f_simpleprint,
-)
-
-from .cpprint import (
-    f_cpstr_adddw,
-    f_cpstr_addptr,
-    PColor,
-    PName,
-    f_cpstr_print,
-    f_raise_CCMU,
-    f_eprintln,
-    f_eprintln2,
-)
-
-from .cputf8 import f_cp949_to_utf8_cpy
-from .setpname import SetPName
-from .tblprint import GetTBLAddr, f_settbl
-
-from .texteffect import (
-    f_cpchar_adddw,
-    f_cpchar_print,
-    TextFX_FadeIn,
-    TextFX_FadeOut,
-    TextFX_SetTimer,
-    TextFX_Remove,
-)
+def f_settbl(tblID, offset, *args):
+    dst = GetTBLAddr(tblID) + offset
+    f_dbstr_print(dst, *args, encoding="cp949")

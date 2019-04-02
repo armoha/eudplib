@@ -27,9 +27,10 @@ from eudplib import core as c, ctrlstru as cs, utils as ut
 
 from ..memiof import CPByteWriter, f_setcurpl, f_getcurpl, f_dwread_epd, f_dwwrite
 from .rwcommon import br1
-from .cpstr import _s2b, CPString, GetTBLAddr
+from .cpstr import _s2b, CPString
 from .dbstr import DBString
 from .eudprint import ptr2s, epd2s, hptr
+from .tblprint import GetTBLAddr
 from ..eudarray import EUDArray
 
 cw = CPByteWriter()
