@@ -46,7 +46,7 @@ def ApplyPatchTable(initepd, obj, patchTable):
                     4: _fillhibyte, 5: _fillmsbyte
                 }[fieldSize]
                 field = fieldSelector(fieldName)
-                if isinstance(field, c.EUDVariable):
+                if ut.isUnproxyInstance(field, c.EUDVariable):
                     memoryFiller(initepd + i, field)
                     obj.fields[fieldName] = 0
             fieldName += 1
