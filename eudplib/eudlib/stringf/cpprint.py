@@ -132,9 +132,8 @@ def f_cpstr_addptr(number):
 
     for i in range(31, -1, -1):
         c.RawTrigger(
-            conditions=number.AtLeast(2 ** i),
+            conditions=number.AtLeastX(1, 2 ** i),
             actions=[
-                number.SubtractNumber(2 ** i),
                 digit[i // 4].AddNumber(2 ** (i % 4)),
                 c.SetDeaths(c.CurrentPlayer, c.Add, f(i), 0),
             ],
