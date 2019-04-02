@@ -77,17 +77,23 @@ def f_rand():
 def f_dwrand():
     seed1 = c.f_mul(_seed, 1103515245) + 12345
     seed2 = c.f_mul(seed1, 1103515245) + 12345
-    c.VProc(seed2, [
-        seed2.QueueAssignTo(_seed),
-        # HIWORD
-        seed1.SetNumberX(0, 0xFFFF),
-    ])
+    _seed << seed2
+
+    ret = c.EUDVariable()
+    ret << 0
+
+    # HIWORD
+    for i in range(31, 15, -1):
+        c.RawTrigger(
+            conditions=seed1.AtLeast(2 ** i),
+            actions=[seed1.SubtractNumber(2 ** i), ret.AddNumber(2 ** i)],
+        )
 
     # LOWORD
     for i in range(31, 15, -1):
         c.RawTrigger(
-            conditions=seed2.AtLeastX(1, 2 ** i),
-            actions=seed1.AddNumber(2 ** (i - 16)),
+            conditions=seed2.AtLeast(2 ** i),
+            actions=[seed2.SubtractNumber(2 ** i), ret.AddNumber(2 ** (i - 16))],
         )
 
-    return seed1
+    return ret
