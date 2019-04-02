@@ -71,7 +71,7 @@ def _fill_b__(v1):
     _lobytefilter << 0
     for i in range(7, -1, -1):
         c.RawTrigger(
-            conditions=v2.AtLeastX(1, 2 ** i),
+            conditions=v1.AtLeastX(1, 2 ** i),
             actions=_lobytefilter.AddNumber(2 ** (i + 8)),
         )
 
@@ -87,7 +87,7 @@ def _fill__b_(v1):
     _hibytefilter << 0
     for i in range(7, -1, -1):
         c.RawTrigger(
-            conditions=v2.AtLeastX(1, 2 ** i),
+            conditions=v1.AtLeastX(1, 2 ** i),
             actions=_hibytefilter.AddNumber(2 ** (i + 16)),
         )
 
@@ -103,7 +103,7 @@ def _fill___b(v1):
     _msbytefilter << 0
     for i in range(7, -1, -1):
         c.RawTrigger(
-            conditions=v2.AtLeastX(1, 2 ** i),
+            conditions=v1.AtLeastX(1, 2 ** i),
             actions=_msbytefilter.AddNumber(2 ** (i + 24)),
         )
 

@@ -25,3 +25,7 @@ def test_dwmemio():
     f_dwsubtract_cp(0, 12)
     f_setcurpl(Player1)
     test_assert("f_dwwrite works", Memory(a, Exactly, 1222))
+
+    f_randomize()
+    f_rand()
+    f_dwrand()
