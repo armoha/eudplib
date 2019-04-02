@@ -82,19 +82,19 @@ def f_cpchar_adddw(number):
         )
 
 
-def f_cpchar_print(*args):
+def f_cpchar_print(*args, encoding="UTF-8"):
     color_code = b'\x02'
     color_v << 2
     args = ut.FlattenList(args)
 
-    for arg in args:
+    if encoding.upper() == "UTF-8":
         encode_func = ut.u2utf8
+    else:
+        encode_func = ut.u2b
+
+    for arg in args:
         if isinstance(arg, bytes):
-            try:
-                arg = arg.decode("cp949")
-                encode_func = ut.u2b
-            except (UnicodeDecodeError):
-                arg = arg.decode("UTF-8")
+            arg = arg.decode(encoding)
         if isinstance(arg, str):
             bytestring = b""
             for char in arg:
@@ -118,7 +118,7 @@ def f_cpchar_print(*args):
         elif ut.isUnproxyInstance(arg, c.EUDVariable) or c.IsConstExpr(arg):
             f_cpchar_adddw(arg)
         else:
-            f_cpstr_print(arg, EOS=False)
+            f_cpstr_print(arg, EOS=False, encoding=encoding)
     cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
 
 
@@ -338,7 +338,7 @@ def R2L(colors, colors_dict={}):
     return _f()
 
 
-def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None):
+def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF-8"):
     """Print multiple string / number and apply color from Left To Right
 
     Keyword arguments:
@@ -366,8 +366,8 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None):
             start.QueueAddTo(ut.EPD(_check_cp + 8))
         ]
     )
-    f_cpstr_print(identifier, EOS=False)
-    f_cpchar_print(*args)
+    f_cpstr_print(identifier, EOS=False, encoding=encoding)
+    f_cpchar_print(*args, encoding=encoding)
     f_setcurpl(start + (3 - len(color)))
 
     if reset is True:
@@ -416,7 +416,7 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None):
     return ret
 
 
-def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None):
+def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF-8"):
     """Print multiple string / number and apply color from Left To Right
 
     Keyword arguments:
@@ -444,8 +444,8 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None):
             start.QueueAddTo(ut.EPD(_check_cp + 8))
         ]
     )
-    f_cpstr_print(identifier, EOS=False)
-    f_cpchar_print(*args)
+    f_cpstr_print(identifier, EOS=False, encoding=encoding)
+    f_cpchar_print(*args, encoding=encoding)
 
     if reset is True:
         check_gametick = c.Forward()

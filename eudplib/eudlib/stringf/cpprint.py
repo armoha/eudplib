@@ -166,7 +166,7 @@ def f_cpstr_addptr(number):
 _constcpstr_dict = dict()
 
 
-def f_cpstr_print(*args, EOS=True):
+def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
     """Print multiple string / number to CurrentPlayer.
 
     :param args: Things to print
@@ -175,7 +175,7 @@ def f_cpstr_print(*args, EOS=True):
     args = ut.FlattenList(args)
     for arg in args:
         if ut.isUnproxyInstance(arg, str):
-            arg = ut.u2utf8(arg)
+            arg = arg.encode(encoding)
         elif ut.isUnproxyInstance(arg, int):
             arg = ut.u2utf8(str(arg & 0xFFFFFFFF))
         if ut.isUnproxyInstance(arg, bytes):
@@ -221,7 +221,7 @@ _eprintln_EOS = c.Forward()
 _eprintln_end = c.Forward()
 
 
-def f_eprintln(*args):
+def f_eprintln(*args, encoding="UTF-8"):
     global _eprintln_template
     if _eprintln_template is None:
         _eprintln_template = c.Forward()
@@ -251,7 +251,7 @@ def f_eprintln(*args):
         ],
     )
     _print << c.NextTrigger()
-    f_cpstr_print(*args, EOS=False)
+    f_cpstr_print(*args, EOS=False, encoding=encoding)
     c.SetNextTrigger(_eprintln_EOS)
     _next << c.NextTrigger()
 
@@ -262,7 +262,7 @@ _eprintln2_EOS = c.Forward()
 _eprintln2_end = c.Forward()
 
 
-def f_eprintln2(*args):
+def f_eprintln2(*args, encoding="cp949"):
     global _eprintln2_template
     if _eprintln2_template is None:
         _eprintln2_template = c.Forward()
@@ -298,6 +298,6 @@ def f_eprintln2(*args):
         ],
     )
     _print << c.NextTrigger()
-    f_cpstr_print(*args, EOS=False)
+    f_cpstr_print(*args, EOS=False, encoding=encoding)
     c.SetNextTrigger(_eprintln2_EOS)
     _next << c.NextTrigger()
