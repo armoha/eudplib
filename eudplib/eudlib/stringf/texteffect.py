@@ -33,6 +33,9 @@ from ..utilf import f_getgametick
 
 
 color_codes = list(range(1, 32))
+color_codes.remove(0x9)  # tab
+color_codes.remove(0xA)  # linebreak
+color_codes.remove(0xC)  # linebreak
 color_codes.remove(0x12)  # right align
 color_codes.remove(0x13)  # center align
 color_v = c.EUDVariable()
