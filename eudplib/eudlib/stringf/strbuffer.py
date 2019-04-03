@@ -29,7 +29,7 @@ from ..memiof import f_getcurpl, f_setcurpl, f_wread_epd, f_dwread_epd
 from .cpstr import GetStringAddr
 from .cpprint import prevcp, f_cpstr_print
 from .strfunc import f_strlen_epd
-from .texteffect import TextFX_FadeIn, TextFX_FadeOut
+from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove
 from ..eudarray import EUDArray
 
 _strbuffer_list = list()
@@ -228,7 +228,7 @@ class StringBuffer:
     def Play(self):
         cs.DoActions(c.PlayWAV(self.StringIndex))
 
-    def fadeIn(self, *args, color=None, wait=1, reset=True, tag=None):
+    def fadeIn(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -240,14 +240,43 @@ class StringBuffer:
             ]
         )
         ontrue << c.NextTrigger()
-        f_setcurpl(self.pos)
+        prevpos = TextFX_Remove(tag)
+        f_setcurpl(self.epd)
         ret = TextFX_FadeIn(*args, color=color, wait=wait, reset=reset, tag=tag)
-        self.pos << f_getcurpl()
         f_setcurpl(prevcp)
+        if type(line) == int:
+            if 0 <= line <= 10:
+                self.DisplayAt(line)
+            elif line >= -11:
+                if cs.EUDIf()(prevpos == -1):
+                    self.DisplayAt(11 + line)
+                if cs.EUDElse()():
+                    prevptr = f_gettextptr()
+                    cs.DoActions([
+                        c.SetMemory(0x640B58, c.SetTo, prevpos),
+                        c.DisplayText(self.StringIndex),
+                        c.SetMemory(0x640B58, c.SetTo, prevptr),
+                    ])
+                cs.EUDEndIf()
+        else:
+            if cs.EUDIf()(line <= 10):
+                self.DisplayAt(line)
+            if cs.EUDElseIf()(line >= 0xFFFFFFF5):
+                if cs.EUDIf()(prevpos == -1):
+                    self.DisplayAt(11 + line)
+                if cs.EUDElse()():
+                    prevptr = f_gettextptr()
+                    cs.DoActions([
+                        c.SetMemory(0x640B58, c.SetTo, prevpos),
+                        c.DisplayText(self.StringIndex),
+                        c.SetMemory(0x640B58, c.SetTo, prevptr),
+                    ])
+                cs.EUDEndIf()
+            cs.EUDEndIf()
         end << c.NextTrigger()
         return ret
 
-    def fadeOut(self, *args, color=None, wait=1, reset=True, tag=None):
+    def fadeOut(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -259,10 +288,39 @@ class StringBuffer:
             ]
         )
         ontrue << c.NextTrigger()
-        f_setcurpl(self.pos)
+        prevpos = TextFX_Remove(tag)
+        f_setcurpl(self.epd)
         ret = TextFX_FadeOut(*args, color=color, wait=wait, reset=reset, tag=tag)
-        self.pos << f_getcurpl()
         f_setcurpl(prevcp)
+        if type(line) == int:
+            if 0 <= line <= 10:
+                self.DisplayAt(line)
+            elif line >= -11:
+                if cs.EUDIf()(prevpos == -1):
+                    self.DisplayAt(11 + line)
+                if cs.EUDElse()():
+                    prevptr = f_gettextptr()
+                    cs.DoActions([
+                        c.SetMemory(0x640B58, c.SetTo, prevpos),
+                        c.DisplayText(self.StringIndex),
+                        c.SetMemory(0x640B58, c.SetTo, prevptr),
+                    ])
+                cs.EUDEndIf()
+        else:
+            if cs.EUDIf()(line <= 10):
+                self.DisplayAt(line)
+            if cs.EUDElseIf()(line >= 0xFFFFFFF5):
+                if cs.EUDIf()(prevpos == -1):
+                    self.DisplayAt(11 + line)
+                if cs.EUDElse()():
+                    prevptr = f_gettextptr()
+                    cs.DoActions([
+                        c.SetMemory(0x640B58, c.SetTo, prevpos),
+                        c.DisplayText(self.StringIndex),
+                        c.SetMemory(0x640B58, c.SetTo, prevptr),
+                    ])
+                cs.EUDEndIf()
+            cs.EUDEndIf()
         end << c.NextTrigger()
         return ret
 
