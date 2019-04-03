@@ -85,7 +85,7 @@ def f_cpchar_adddw(number):
         )
 
 
-def f_cpchar_print(*args, encoding="UTF-8"):
+def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):
     color_code = b'\x02'
     color_v << 2
     args = ut.FlattenList(args)
@@ -122,7 +122,8 @@ def f_cpchar_print(*args, encoding="UTF-8"):
             f_cpchar_adddw(arg)
         else:
             f_cpstr_print(arg, EOS=False, encoding=encoding)
-    cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+    if EOS:
+        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
 
 
 _TextFX_dict = dict()
@@ -341,6 +342,27 @@ def R2L(colors, colors_dict={}):
     return _f()
 
 
+def _TextFX_Print(*args, identifier=None, encoding="UTF-8"):
+    f_cpstr_print(identifier, EOS=False, encoding=encoding)
+
+    args = ut.FlattenList(args)
+
+    for arg in args:
+        if isinstance(arg, str):
+            line = arg.split("\n")
+            if len(line) == 1:
+                f_cpchar_print(line[0], EOS=False, encoding=encoding)
+                continue
+            for s in line[:-1]:
+                f_cpchar_print(s, EOS=False, encoding=encoding)
+                f_cpstr_print(identifier + b"\n" + identifier, EOS=False, encoding=encoding)
+            f_cpchar_print(line[-1], EOS=False, encoding=encoding)
+        else:
+            f_cpchar_print(arg, EOS=False, encoding=encoding)
+
+    cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+
+
 def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF-8"):
     """Print multiple string / number and apply color from Left To Right
 
@@ -369,8 +391,7 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
             start.QueueAddTo(ut.EPD(_check_cp + 8))
         ]
     )
-    f_cpstr_print(identifier, EOS=False, encoding=encoding)
-    f_cpchar_print(*args, encoding=encoding)
+    _TextFX_Print(*args, identifier=identifier, encoding=encoding)
     f_setcurpl(start + (3 - len(color)))
 
     if reset is True:
@@ -447,8 +468,7 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
             start.QueueAddTo(ut.EPD(_check_cp + 8))
         ]
     )
-    f_cpstr_print(identifier, EOS=False, encoding=encoding)
-    f_cpchar_print(*args, encoding=encoding)
+    _TextFX_Print(*args, identifier=identifier, encoding=encoding)
 
     if reset is True:
         check_gametick = c.Forward()
