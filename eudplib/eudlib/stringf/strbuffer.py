@@ -232,17 +232,19 @@ class StringBuffer:
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
+        ret = c.EUDVariable()
         c.RawTrigger(
             nextptr=StringBuffer._method_template,
             actions=[
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
+                ret.SetNumber(-1),
             ]
         )
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
-        ret = TextFX_FadeIn(*args, color=color, wait=wait, reset=reset, tag=tag)
+        ret << TextFX_FadeIn(*args, color=color, wait=wait, reset=reset, tag=tag)
         f_setcurpl(prevcp)
         if type(line) == int:
             if 0 <= line <= 10:
@@ -280,17 +282,19 @@ class StringBuffer:
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
+        ret = c.EUDVariable()
         c.RawTrigger(
             nextptr=StringBuffer._method_template,
             actions=[
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
+                ret.SetNumber(-1),
             ]
         )
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
-        ret = TextFX_FadeOut(*args, color=color, wait=wait, reset=reset, tag=tag)
+        ret << TextFX_FadeOut(*args, color=color, wait=wait, reset=reset, tag=tag)
         f_setcurpl(prevcp)
         if type(line) == int:
             if 0 <= line <= 10:
