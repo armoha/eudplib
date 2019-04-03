@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 from ... import core as c, ctrlstru as cs, utils as ut
-from ..memiof import f_dwepdread_epd
+from ..memiof import f_dwepdread_epd, f_wread_epd
 from .eudprint import f_dbstr_print
 
 
