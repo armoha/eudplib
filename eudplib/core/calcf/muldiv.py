@@ -80,10 +80,18 @@ def f_constmul(number):
     """
     number &= 0xFFFFFFFF
     if not hasattr(f_constmul, "mulfdict"):
+        from .bitwise import f_bitlshift
         f_constmul.mulfdict = {
             0xFFFFFFFF: lambda x: -x,
             0: lambda x: 0,
             1: identity_function,
+            2 ** 1: lambda x: f_bitlshift(x, 1),
+            2 ** 2: lambda x: f_bitlshift(x, 2),
+            2 ** 3: lambda x: f_bitlshift(x, 3),
+            2 ** 4: lambda x: f_bitlshift(x, 4),
+            2 ** 5: lambda x: f_bitlshift(x, 5),
+            2 ** 6: lambda x: f_bitlshift(x, 6),
+            2 ** 7: lambda x: f_bitlshift(x, 7),
         }
 
     mulfdict = f_constmul.mulfdict
