@@ -28,6 +28,11 @@ from .. import allocator as ac, rawtrigger as rt, variable as ev, eudfunc as ef
 from eudplib import utils as ut
 
 
+@ef.EUDFunc
+def identity_function(x):
+    return x
+
+
 def f_mul(a, b):
     """Calculate a * b"""
     if isinstance(a, ev.EUDVariable) and isinstance(b, ev.EUDVariable):
@@ -73,8 +78,13 @@ def f_constmul(number):
     :param number: Constant integer being multiplied to other numbers.
     :return: Function taking one parameter.
     """
+    number &= 0xFFFFFFFF
     if not hasattr(f_constmul, "mulfdict"):
-        f_constmul.mulfdict = {}
+        f_constmul.mulfdict = {
+            0xFFFFFFFF: lambda x: -x,
+            0: lambda x: 0,
+            1: identity_function,
+        }
 
     mulfdict = f_constmul.mulfdict
 
@@ -104,8 +114,13 @@ def f_constdiv(number):
     :param number: Constant integer to divide other numbers by.
     :return: Function taking one parameter.
     """
+    number &= 0xFFFFFFFF
     if not hasattr(f_constdiv, "divfdict"):
-        f_constdiv.divfdict = {}
+        f_constdiv.divfdict = {
+            0xFFFFFFFF: lambda x: -x,
+            0: lambda x: 0xFFFFFFFF,
+            1: identity_function,
+        }
 
     divfdict = f_constdiv.divfdict
 
