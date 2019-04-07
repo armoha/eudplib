@@ -130,33 +130,37 @@ def f_dwsubtract_epd(targetplayer, value):
 @c.EUDFunc
 def f_dwbreak(number):
     """Get hiword/loword/4byte of dword"""
-    word = c.EUDCreateVariables(2)
-    byte = c.EUDCreateVariables(4)
+    word = [c.EUDXVariable(0, 0xFFFF), c.EUDVariable()]
+    byte = [c.EUDXVariable(0, 0xFF)] + c.EUDCreateVariables(3)
+    start, cont = c.Forward(), c.Forward()
 
     # Clear byte[], word[]
-    cs.DoActions(
-        [
-            word[0].SetNumber(0),
+    start << c.RawTrigger(
+        nextptr=number.GetVTable(),
+        actions=[
+            number.QueueAssignTo(word[0]),
+            c.SetNextPtr(number.GetVTable(), word[0].GetVTable()),
+            word[0].QueueAssignTo(byte[0]),
+            c.SetNextPtr(word[0].GetVTable(), cont),
             word[1].SetNumber(0),
-            byte[0].SetNumber(0),
             byte[1].SetNumber(0),
             byte[2].SetNumber(0),
             byte[3].SetNumber(0),
         ]
     )
 
-    for i in range(31, -1, -1):
+    cont << c.NextTrigger()
+    for i in range(31, 7, -1):
         byteidx = i // 8
         wordidx = i // 16
         byteexp = i % 8
         wordexp = i % 16
 
         c.RawTrigger(
-            conditions=number.AtLeast(2 ** i),
+            conditions=number.AtLeastX(1, 2 ** i),
             actions=[
                 byte[byteidx].AddNumber(2 ** byteexp),
-                word[wordidx].AddNumber(2 ** wordexp),
-                number.SubtractNumber(2 ** i),
+                [word[wordidx].AddNumber(2 ** wordexp) if wordidx == 1 else []],
             ],
         )
 
@@ -168,31 +172,36 @@ def f_dwbreak2(number):
     """Get hiword/loword/4byte of dword"""
     word = c.EUDCreateVariables(2)
     byte = c.EUDCreateVariables(4)
+    start, end = c.Forward(), c.Forward()
 
-    # Clear byte[], word[]
-    cs.DoActions(
-        [
-            word[0].SetNumber(0),
-            word[1].SetNumber(0),
-            byte[0].SetNumber(0),
-            byte[1].SetNumber(0),
-            byte[2].SetNumber(0),
-            byte[3].SetNumber(0),
+    # Set byte[], word[]
+    start << c.RawTrigger(
+        nextptr=number.GetVTable(),
+        actions=[
+            number.QueueAssignTo(word[0]),
+            c.SetNextPtr(number.GetVTable(), word[0].GetVTable()),
+            word[0].QueueAssignTo(word[1]),
+            c.SetNextPtr(word[0].GetVTable(), word[1].GetVTable()),
+            word[1].QueueAssignTo(byte[0]),
+            c.SetNextPtr(word[1].GetVTable(), byte[0].GetVTable()),
+            byte[0].QueueAssignTo(byte[1]),
+            c.SetNextPtr(byte[0].GetVTable(), byte[1].GetVTable()),
+            byte[1].QueueAssignTo(byte[2]),
+            c.SetNextPtr(byte[1].GetVTable(), byte[2].GetVTable()),
+            byte[2].QueueAssignTo(byte[3]),
+            c.SetNextPtr(byte[2].GetVTable(), end),
         ]
     )
-
-    for i in range(31, -1, -1):
-        byteidx = i // 8
-        wordidx = i // 16
-
-        c.RawTrigger(
-            conditions=number.AtLeast(2 ** i),
-            actions=[
-                byte[byteidx].AddNumber(2 ** i),
-                word[wordidx].AddNumber(2 ** i),
-                number.SubtractNumber(2 ** i),
-            ],
-        )
+    end << c.RawTrigger(
+        actions=[
+            word[0].SetNumberX(0, ~0xFFFF),
+            word[1].SetNumberX(0, 0xFFFF),
+            byte[0].SetNumberX(0, ~0xFF),
+            byte[1].SetNumberX(0, ~0xFF00),
+            byte[2].SetNumberX(0, ~0xFF0000),
+            byte[3].SetNumberX(0, 0xFFFFFF),
+        ]
+    )
 
     return word[0], word[1], byte[0], byte[1], byte[2], byte[3]
 
