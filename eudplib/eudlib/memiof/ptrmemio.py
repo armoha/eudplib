@@ -38,6 +38,15 @@ _bw = brw.EUDByteWriter()
 _br = brw.EUDByteReader()
 
 
+def _ptr2epd(ptr):
+    if ut.isUnproxyInstance(ptr, c.EUDVariable):
+        epd, subp = c.f_div(ptr + (-0x58A364), 4)
+    else:
+        dst = ptr + (-0x58A364)
+        epd, subp = dst // 4, dst % 4
+    return epd, subp
+
+
 def f_dwwrite(ptr, dw):
     if type(ptr) == int and ptr % 4 == 0:
         dwm.f_dwwrite_epd(ut.EPD(ptr), dw)
@@ -51,28 +60,13 @@ def f_dwwrite(ptr, dw):
 
 
 def f_wwrite(ptr, w):
-    if type(ptr) == int:
-        mod = ptr % 4
-        if mod <= 2:
-            cs.DoActions(c.SetDeathsX(
-                ut.EPD(ptr), c.SetTo,
-                w << (8 * mod), 0, 0xFFFF << (8 * mod)
-            ))
-            return
-    epd, subp = c.f_div(ptr - 0x58A364, 4)
+    epd, subp = _ptr2epd(ptr)
     bwm.f_wwrite_epd(epd, subp, w)
 
 
 def f_bwrite(ptr, b):
-    if type(ptr) == int:
-        mod = ptr % 4
-        cs.DoActions(c.SetDeathsX(
-            ut.EPD(ptr), c.SetTo,
-            b << (8 * mod), 0, 0xFF << (8 * mod)
-        ))
-    else:
-        epd, subp = c.f_div(ptr - 0x58A364, 4)
-        bwm.f_bwrite_epd(epd, subp, b)
+    epd, subp = _ptr2epd(ptr)
+    bwm.f_bwrite_epd(epd, subp, b)
 
 
 # -----------------------------
@@ -124,16 +118,10 @@ def f_dwread(ptr):
 
 
 def f_wread(ptr):
-    if type(ptr) == int and ptr % 4 <= 2:
-        epd, subp = divmod(ptr - 0x58A364, 4)
-    else:
-        epd, subp = c.f_div(ptr - 0x58A364, 4)
+    epd, subp = _ptr2epd(ptr)
     return bwm.f_wread_epd(epd, subp)
 
 
 def f_bread(ptr):
-    if type(ptr) == int:
-        epd, subp = divmod(ptr - 0x58A364, 4)
-    else:
-        epd, subp = c.f_div(ptr - 0x58A364, 4)
+    epd, subp = _ptr2epd(ptr)
     return bwm.f_bread_epd(epd, subp)

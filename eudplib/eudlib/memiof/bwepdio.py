@@ -29,6 +29,13 @@ from ... import core as c, ctrlstru as cs, utils as ut
 # Helper functions
 
 
+def _lshift(a, b):
+    if ut.isUnproxyInstance(a, c.EUDVariable):
+        return c.f_bitlshift(a, b)
+    else:
+        return a << b
+
+
 @c.EUDFunc
 def _wwriter(epd, subp, w):
     oldcp = cp.f_getcurpl()
@@ -36,10 +43,9 @@ def _wwriter(epd, subp, w):
     cs.EUDSwitch(subp)
     for i in range(3):
         cs.EUDSwitchCase()(i)
-        c.RawTrigger(
-            actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 * 2 ** (8 * i))
+        cs.DoActions(
+            c.SetDeathsX(c.CurrentPlayer, c.SetTo, c.f_bitlshift(w, 8 * i), 0, 0xFFFF << (8 * i))
         )
-        c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256 ** i))])
         cs.EUDBreak()
 
     # Things gets complicated on this case.
@@ -60,7 +66,7 @@ def f_wwrite_epd(epd, subp, w):
 
         try:
             cs.DoActions(
-                c.SetDeathsX(epd, c.SetTo, w << (8 * subp), 0, 0xFFFF << (8 * subp))
+                c.SetDeathsX(epd, c.SetTo, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp))
             )
         except (TypeError):
             _wwriter(epd, subp, w)
@@ -75,10 +81,9 @@ def _bwriter(epd, subp, b):
     cs.EUDSwitch(subp)
     for i in range(4):
         cs.EUDSwitchCase()(i)
-        c.RawTrigger(
-            actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 * 2 ** (8 * i))
+        cs.DoActions(
+            c.SetDeathsX(c.CurrentPlayer, c.SetTo, c.f_bitlshift(b, 8 * i), 0, 0xFF << (8 * i))
         )
-        c.SeqCompute([(c.CurrentPlayer, c.Add, b * (256 ** i))])
         cs.EUDBreak()
     cs.EUDEndSwitch()
     cp.f_setcurpl(oldcp)
@@ -88,7 +93,7 @@ def _bwriter(epd, subp, b):
 def f_bwrite_epd(epd, subp, b):
     try:
         cs.DoActions(
-            c.SetDeathsX(epd, c.SetTo, b * (256 ** subp), 0, 255 * 2 ** (8 * subp))
+            c.SetDeathsX(epd, c.SetTo, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp))
         )
     except (TypeError):
         _bwriter(epd, subp, b)
@@ -105,7 +110,7 @@ def f_wread_epd(epd, subp):
     cs.EUDSwitch(subp)
     for i in range(3):
         cs.EUDSwitchCase()(i)
-        for j in range(8 * (i + 2) - 1, 8 * i - 1, -1):
+        for j in range(8 * i, 8 * (i+2)):
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=w.AddNumber(2 ** (j - 8 * i)),
@@ -133,7 +138,7 @@ def f_bread_epd(epd, subp):
     cs.EUDSwitch(subp)
     for i in range(4):
         cs.EUDSwitchCase()(i)
-        for j in range(8 * (i + 1) - 1, 8 * i - 1, -1):
+        for j in range(8 * i, 8 * (i+1)):
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=b.AddNumber(2 ** (j - 8 * i)),
