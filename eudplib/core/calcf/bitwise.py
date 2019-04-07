@@ -178,7 +178,10 @@ def _f_bitlshift(a, b):
 def f_bitlshift(a, b):
     """ Calculate a << b """
     if isinstance(b, int):
-        return f_mul(a, _exp2(b))
+        if 1 <= b <= 7:
+            return _f_bitlshift(a, b)
+        else:
+            return f_mul(a, _exp2(b))
     else:
         return _f_bitlshift(a, b)
 
