@@ -29,8 +29,18 @@ from eudplib import utils as ut
 
 
 @ef.EUDFunc
-def identity_function(x):
+def _mul1(x):
     return x
+
+
+@ef.EUDFunc
+def _div0(x):
+    return -1, x
+
+
+@ef.EUDFunc
+def _div1(x):
+    return x, 0
 
 
 def f_mul(a, b):
@@ -84,7 +94,7 @@ def f_constmul(number):
         f_constmul.mulfdict = {
             0xFFFFFFFF: lambda x: -x,
             0: lambda x: 0,
-            1: identity_function,
+            1: _mul1,
             2 ** 1: lambda x: f_bitlshift(x, 1),
             2 ** 2: lambda x: f_bitlshift(x, 2),
             2 ** 3: lambda x: f_bitlshift(x, 3),
@@ -122,12 +132,10 @@ def f_constdiv(number):
     :param number: Constant integer to divide other numbers by.
     :return: Function taking one parameter.
     """
-    number &= 0xFFFFFFFF
     if not hasattr(f_constdiv, "divfdict"):
         f_constdiv.divfdict = {
-            0xFFFFFFFF: lambda x: -x,
-            0: lambda x: 0xFFFFFFFF,
-            1: identity_function,
+            0: _div0,
+            1: _div1,
         }
 
     divfdict = f_constdiv.divfdict
