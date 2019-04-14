@@ -35,47 +35,13 @@ class _EUDVariableFrom(c.EUDVariable):
 
 
 class PVariable(c.EUDVArray(8)):
-    def get(self, i):
-        vtproc, _next = c.Forward(), c.Forward()
-        ret = c.EUDVariable()
-        a0, a1, a2 = c.Forward(), c.Forward(), c.Forward()
-        c.RawTrigger(
-            actions=[
-                c.SetNextPtr(vtproc, self),
-                c.SetMemory(a0 + 16, c.SetTo, self._epd + 344 // 4),
-                c.SetMemory(a1 + 16, c.SetTo, self._epd + 352 // 4),
-                c.SetMemory(a2 + 16, c.SetTo, self._epd + 1),
-            ]
-        )
-        for k in range(2, -1, -1):
-            c.RawTrigger(
-                conditions=i.AtLeastX(1, 2 ** k),
-                actions=[
-                    c.SetMemory(vtproc + 4, c.Add, 72 * (2 ** k)),
-                    c.SetMemory(a0 + 16, c.Add, 18 * (2 ** k)),
-                    c.SetMemory(a1 + 16, c.Add, 18 * (2 ** k)),
-                    c.SetMemory(a2 + 16, c.Add, 18 * (2 ** k)),
-                ],
-            )
-        vtproc << c.RawTrigger(
-            nextptr=self,
-            actions=[
-                a0 << c.SetMemory(0, c.SetTo, ut.EPD(ret.getValueAddr())),
-                a1 << c.SetMemory(0, c.SetTo, 0x072D0000),
-                a2 << c.SetNextPtr(self, _next),
-            ],
-        )
-        _next << c.NextTrigger()
-        return ret
-
-    def set(self, i, value):
-        _next = c.Forward()
-        c.RawTrigger(
-            actions=[
-                value.QueueAssignTo(self._epd + 348 // 4),
-                c.SetNextPtr(value.GetVTable(), _next),
-            ]
-        )
+    def _eudset(self, i, value):
+        nptr = c.Forward()
+        cs.DoActions([
+            c.SetMemory(value._varact + 16, c.SetTo, self._epd + 348 // 4),
+            c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
+            c.SetNextPtr(value.GetVTable(), nptr),
+        ])
         for k in range(2, 0, -1):
             c.RawTrigger(
                 conditions=i.AtLeastX(1, 2 ** k),
@@ -86,21 +52,21 @@ class PVariable(c.EUDVArray(8)):
             conditions=i.AtLeastX(1, 1),
             actions=[c.SetMemory(value._varact + 16, c.Add, 18)],
         )
-        _next << c.NextTrigger()
+        nptr << c.NextTrigger()
 
     def __getitem__(self, i):
-        if ut.isUnproxyInstance(i, c.EUDVariable):
-            return self.get(i)
-        else:
+        if c.IsConstExpr(self) and c.IsConstExpr(i):
             return _EUDVariableFrom(_from=self + 72 * i)
+        else:
+            return self.get(i)
 
     def __setitem__(self, i, value):
         if ut.isUnproxyInstance(i, c.EUDVariable) and ut.isUnproxyInstance(value, c.EUDVariable):
-            self.set(i, value)
+            self._eudset(i, value)
 
         elif ut.isUnproxyInstance(i, c.EUDVariable):
             a0 = c.Forward()
-            c.RawTrigger(actions=[c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4)])
+            cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
             for k in range(2, -1, -1):
                 c.RawTrigger(
                     conditions=i.AtLeastX(1, 2 ** k),
@@ -108,47 +74,5 @@ class PVariable(c.EUDVArray(8)):
                 )
             c.RawTrigger(actions=[a0 << c.SetMemory(0, c.SetTo, value)])
 
-        elif ut.isUnproxyInstance(value, c.EUDVariable):
-            c.VProc(value, value.QueueAssignTo(self._epd + (18 * i + 348 // 4)))
-
         else:
-            c.RawTrigger(
-                actions=[
-                    c.SetDeaths(self._epd + (18 * i + 348 // 4), c.SetTo, value, 0)
-                ]
-            )
-
-    """
-    def __iter__(self):
-        vtproc, _yield = c.Forward(), c.Forward()
-        a0, a1, a2 = c.Forward(), c.Forward(), c.Forward()
-        p, ret = c.EUDVariable(), c.EUDVariable()
-        cs.DoActions([
-            p.SetNumber(0),
-            c.SetNextPtr(vtproc, self),
-            c.SetMemory(a0 + 16, c.SetTo, self._epd + 344 // 4),
-            c.SetMemory(a1 + 16, c.SetTo, self._epd + 352 // 4),
-            c.SetMemory(a2 + 16, c.SetTo, self._epd + 1),
-        ])
-        if cs.EUDWhile()(p.AtMost(7)):
-            cs.EUDContinueIfNot(f_playerexist(p))
-            vtproc << c.RawTrigger(
-                nextptr=self,
-                actions=[
-                    a0 << c.SetMemory(0, c.SetTo, ut.EPD(ret.getValueAddr())),
-                    a1 << c.SetMemory(0, c.SetTo, 0x072D0000),
-                    a2 << c.SetNextPtr(0, _yield),
-                ]
-            )
-            _yield << c.NextTrigger()
-            yield ret
-            cs.EUDSetContinuePoint()
-            cs.DoActions([
-                p.AddNumber(1),
-                c.SetMemory(vtproc + 4, c.Add, 72),
-                c.SetMemory(a0 + 16, c.Add, 18),
-                c.SetMemory(a1 + 16, c.Add, 18),
-                c.SetMemory(a2 + 16, c.Add, 18),
-            ])
-        cs.EUDEndWhile()
-    """
+            self.set(i, value)
