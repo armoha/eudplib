@@ -26,9 +26,9 @@ THE SOFTWARE.
 from .. import rawtrigger as bt
 from ..allocator import Forward, ConstExpr, IsConstExpr
 
-from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance
+from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, ep_assert
 
-from ..variable import EUDVariable, SeqCompute
+from ..variable import EUDVariable, SeqCompute, VProc
 from ..variable.vbuf import GetCurrentVariableBuffer
 
 
@@ -87,12 +87,14 @@ def EUDVArray(size, basetype=None):
             self._basetype = basetype
 
         def get(self, i):
-            if not (isUnproxyInstance(self, EUDVariable) or isUnproxyInstance(i, EUDVariable)):
-                r = self._constget(i)
-            elif isUnproxyInstance(i, EUDVariable):
+            if isUnproxyInstance(i, EUDVariable):
                 r = self._eudget(i)
             else:
-                r = self._get(i)
+                ep_assert(i < size, "EUDVArray index out of bounds.")
+                if isUnproxyInstance(self, EUDVariable):
+                    r = self._get(i)
+                else:
+                    r = self._constget(i)
 
             if self._basetype:
                 r = self._basetype.cast(r)
@@ -160,7 +162,6 @@ def EUDVArray(size, basetype=None):
                     (EPD(a2 + 16), bt.SetTo, self._epd + (18 * i + 1)),
                 ]
             )
-
             vtproc << bt.RawTrigger(
                 nextptr=0,
                 actions=[
@@ -188,8 +189,12 @@ def EUDVArray(size, basetype=None):
             return r
 
         def set(self, i, value):
-            if not (isUnproxyInstance(self, EUDVariable) or isUnproxyInstance(i, EUDVariable) or isUnproxyInstance(value, EUDVariable)):
-                self._constset(i, value)
+            if IsConstExpr(self) and IsConstExpr(i):
+                ep_assert(i < size, "EUDVArray index out of bounds.")
+                if isUnproxyInstance(value, EUDVariable):
+                    self._consteudset(i, value)
+                else:
+                    self._constset(i, value)
             else:
                 self._set(i, value)
 
@@ -204,6 +209,9 @@ def EUDVArray(size, basetype=None):
                 ]
             )
             t << bt.RawTrigger(actions=[a0 << bt.SetDeaths(0, bt.SetTo, 0, 0)])
+
+        def _consteudset(self, i, value):
+            VProc(value, [value.QueueAssignTo(self._epd + (18 * i + 348 // 4))])
 
         def _constset(self, i, value):
             bt.RawTrigger(actions=bt.SetDeaths(self._epd + (18 * i + 348 // 4), bt.SetTo, value, 0))
