@@ -26,7 +26,7 @@ THE SOFTWARE.
 from .. import rawtrigger as bt
 from ..allocator import Forward, ConstExpr, IsConstExpr
 
-from ...utils import EPD, ExprProxy, ep_assert, cachedfunc
+from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance
 
 from ..variable import EUDVariable, SeqCompute
 from ..variable.vbuf import GetCurrentVariableBuffer
@@ -50,6 +50,11 @@ def EUDVArrayData(size):
             return evb._vdict[self].Evaluate()
 
     return _EUDVArrayData
+
+
+_index = EUDVariable()
+_goto_getidx = [Forward() for _ in range(32)]
+_ret_getidx, _end_getidx = Forward(), Forward()
 
 
 @cachedfunc
@@ -82,6 +87,65 @@ def EUDVArray(size, basetype=None):
             self._basetype = basetype
 
         def get(self, i):
+            if not (isUnproxyInstance(self, EUDVariable) or isUnproxyInstance(i, EUDVariable)):
+                r = self._constget(i)
+            elif isUnproxyInstance(i, EUDVariable):
+                r = self._eudget(i)
+            else:
+                r = self._get(i)
+
+            if self._basetype:
+                r = self._basetype.cast(r)
+            return r
+
+        def _eudget(self, i):
+            global _goto_getidx, _ret_getidx, _end_getidx
+            if not _end_getidx.IsSet():
+                bt.PushTriggerScope()
+
+                for t in range(31, -1, -1):
+                    _goto_getidx[t] << bt.RawTrigger(
+                        conditions=_index.AtLeastX(1, 2**t),
+                        actions=[
+                            bt.SetMemory(_end_getidx + 4, bt.Add, 72 * (2**t)),
+                            bt.SetMemory(_ret_getidx + 16, bt.Add, 18 * (2**t)),
+                            bt.SetMemory(_ret_getidx + 48, bt.Add, 18 * (2**t)),
+                        ],
+                    )
+                _end_getidx << bt.RawTrigger(
+                    nextptr=0,
+                    actions=[
+                        _ret_getidx << bt.SetMemory(0, bt.SetTo, 0),
+                        bt.SetMemory(0, bt.SetTo, 0),
+                    ]
+                )
+                bt.PopTriggerScope()
+
+            r = EUDVariable()
+            bits = max((size-1).bit_length()-1, 0)
+            nptr = Forward()
+
+            SeqCompute(
+                [
+                    (EPD(_end_getidx + 4), bt.SetTo, self),
+                    (EPD(_ret_getidx + 16), bt.SetTo, self._epd + 344 // 4),
+                    (EPD(_ret_getidx + 48), bt.SetTo, self._epd + 1),
+                ]
+            )
+            bt.RawTrigger(
+                nextptr=i.GetVTable(),
+                actions=[
+                    i.QueueAssignTo(_index),
+                    bt.SetNextPtr(i.GetVTable(), _goto_getidx[bits]),
+                    bt.SetMemory(_ret_getidx + 20, bt.SetTo, EPD(r.getValueAddr())),
+                    bt.SetMemory(_ret_getidx + 52, bt.SetTo, nptr),
+                ]
+            )
+
+            nptr << bt.NextTrigger()
+            return r
+
+        def _get(self, i):
             # This function is hand-optimized
 
             r = EUDVariable()
@@ -106,11 +170,30 @@ def EUDVArray(size, basetype=None):
             )
 
             nptr << bt.NextTrigger()
-            if self._basetype:
-                r = self._basetype.cast(r)
+            return r
+            
+        def _constget(self, i):
+            r = EUDVariable()
+            nptr = Forward()
+
+            bt.RawTrigger(
+                nextptr=self + 72 * i,
+                actions=[
+                    bt.SetDeaths(self._epd + (18 * i + 344 // 4), bt.SetTo, EPD(r.getValueAddr()), 0),
+                    bt.SetDeaths(self._epd + (18 * i + 1), bt.SetTo, nptr, 0),
+                ],
+            )
+
+            nptr << bt.NextTrigger()
             return r
 
         def set(self, i, value):
+            if not (isUnproxyInstance(self, EUDVariable) or isUnproxyInstance(i, EUDVariable) or isUnproxyInstance(value, EUDVariable)):
+                self._constset(i, value)
+            else:
+                self._set(i, value)
+
+        def _set(self, i, value):
             # This function is hand-optimized
 
             a0, t = Forward(), Forward()
@@ -121,6 +204,9 @@ def EUDVArray(size, basetype=None):
                 ]
             )
             t << bt.RawTrigger(actions=[a0 << bt.SetDeaths(0, bt.SetTo, 0, 0)])
+
+        def _constset(self, i, value):
+            bt.RawTrigger(actions=bt.SetDeaths(self._epd + (18 * i + 348 // 4), bt.SetTo, value, 0))
 
         def fill(self, values, *, assert_expected_values_len=None):
             if assert_expected_values_len:
@@ -137,6 +223,6 @@ def EUDVArray(size, basetype=None):
             return self.get(i)
 
         def __setitem__(self, i, value):
-            return self.set(i, value)
+            self.set(i, value)
 
     return _EUDVArray
