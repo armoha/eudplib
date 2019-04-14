@@ -27,7 +27,7 @@ from .. import core as c, ctrlstru as cs, utils as ut
 from .utilf import f_playerexist
 
 
-class _EUDVariable(c.EUDVariable):
+class _EUDVariableFrom(c.EUDVariable):
     def __init__(self, _from=None):
         self._vartrigger = _from
         self._varact = self._vartrigger + (8 + 320)
@@ -89,16 +89,16 @@ class PVariable(c.EUDVArray(8)):
         _next << c.NextTrigger()
 
     def __getitem__(self, i):
-        if isinstance(i, c.EUDVariable):
+        if ut.isUnproxyInstance(i, c.EUDVariable):
             return self.get(i)
         else:
-            return _EUDVariable(_from=self + 72 * i)
+            return _EUDVariableFrom(_from=self + 72 * i)
 
     def __setitem__(self, i, value):
-        if isinstance(i, c.EUDVariable) and isinstance(value, c.EUDVariable):
+        if ut.isUnproxyInstance(i, c.EUDVariable) and ut.isUnproxyInstance(value, c.EUDVariable):
             self.set(i, value)
 
-        elif isinstance(i, c.EUDVariable):
+        elif ut.isUnproxyInstance(i, c.EUDVariable):
             a0 = c.Forward()
             c.RawTrigger(actions=[c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4)])
             for k in range(2, -1, -1):
@@ -108,7 +108,7 @@ class PVariable(c.EUDVArray(8)):
                 )
             c.RawTrigger(actions=[a0 << c.SetMemory(0, c.SetTo, value)])
 
-        elif isinstance(value, c.EUDVariable):
+        elif ut.isUnproxyInstance(value, c.EUDVariable):
             c.VProc(value, value.QueueAssignTo(self._epd + (18 * i + 348 // 4)))
 
         else:
