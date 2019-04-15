@@ -190,7 +190,8 @@ def EUDVArray(size, basetype=None):
 
         def set(self, i, value):
             if IsConstExpr(self) and IsConstExpr(i):
-                ep_assert(i < size, "EUDVArray index out of bounds.")
+                if isUnproxyInstance(i, int):
+                    ep_assert(i < size, "EUDVArray index out of bounds.")
                 if isUnproxyInstance(value, EUDVariable):
                     self._consteudset(i, value)
                 else:
