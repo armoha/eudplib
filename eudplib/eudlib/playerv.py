@@ -54,12 +54,6 @@ class PVariable(c.EUDVArray(8)):
         )
         nptr << c.NextTrigger()
 
-    def __getitem__(self, i):
-        if c.IsConstExpr(self) and c.IsConstExpr(i):
-            return _EUDVariableFrom(_from=self + 72 * i)
-        else:
-            return self.get(i)
-
     def __setitem__(self, i, value):
         if ut.isUnproxyInstance(i, c.EUDVariable) and ut.isUnproxyInstance(value, c.EUDVariable):
             self._eudset(i, value)
