@@ -632,7 +632,7 @@ expr(A) ::= LOCATION LPAREN STRING(B) RPAREN. {
 }
 
 expr(A) ::= VARRAY LPAREN exprList_nonEmpty(B) commaSkippable RPAREN. {
-    B->data = "EUDVArray(len(FlattenList([" + B->data + "])))(FlattenList([" + B->data + "]))";
+    B->data = "_VARR(FlattenList([" + B->data + "]))";
     A = mkTokenTemp(B);
 }
 
