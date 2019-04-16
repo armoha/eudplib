@@ -631,6 +631,16 @@ expr(A) ::= LOCATION LPAREN STRING(B) RPAREN. {
     A = mkTokenTemp(B);
 }
 
+expr(A) ::= VARRAY LPAREN exprList_nonEmpty(B) commaSkippable RPAREN. {
+    B->data = "EUDVArray(len(FlattenList([" + B->data + "])))(FlattenList([" + B->data + "]))";
+    A = mkTokenTemp(B);
+}
+
+expr(A) ::= LIST LPAREN exprList_nonEmpty(B) commaSkippable RPAREN. {
+    B->data = "FlattenList([" + B->data + "])";
+    A = mkTokenTemp(B);
+}
+
 // Ternary operators
 expr(A) ::= expr(L) QMARK expr(B) COLON expr(C). [QMARK] {
     std::stringstream ss;

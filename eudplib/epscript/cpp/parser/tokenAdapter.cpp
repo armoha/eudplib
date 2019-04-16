@@ -40,6 +40,9 @@ int getConvertedType(int type) {
         case TOKEN_LOCNAME: return LOCATION;
         case TOKEN_MAPSTRING: return MAPSTRING;
         case TOKEN_SWITCHNAME: return SWITCH;
+        
+        case TOKEN_VARRAY: return VARRAY;
+        case TOKEN_LIST: return LIST;
 
         // Assign operators
         case TOKEN_ASSIGN: return ASSIGN;

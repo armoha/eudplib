@@ -50,6 +50,9 @@ enum TokenType {
     TOKEN_MAPSTRING,
     TOKEN_SWITCHNAME,
 
+    TOKEN_VARRAY,
+    TOKEN_LIST,
+
     // Operators
     TOKEN_INC,
     TOKEN_DEC,
