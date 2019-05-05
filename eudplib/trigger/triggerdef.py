@@ -48,7 +48,7 @@ def Trigger(conditions=None, actions=None, preserved=True):
     if conditions is None:
         conditions = []
     if actions is None:
-        actions = None
+        actions = []
 
     conditions = ut.FlattenList(conditions)
     actions = ut.FlattenList(actions)
