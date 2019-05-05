@@ -38,7 +38,8 @@ color_codes.remove(0xA)  # linebreak
 color_codes.remove(0xC)  # linebreak
 color_codes.remove(0x12)  # right align
 color_codes.remove(0x13)  # center align
-color_v = c.EUDVariable()
+color_v = c.EUDVariable(2)
+color_code = b'\x02'
 
 
 @c.EUDFunc
@@ -86,8 +87,7 @@ def f_cpchar_adddw(number):
 
 
 def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):
-    color_code = b'\x02'
-    color_v << 2
+    global color_code
     args = ut.FlattenList(args)
 
     if encoding.upper() == "UTF-8":
@@ -100,18 +100,21 @@ def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):
             arg = arg.decode(encoding)
         if isinstance(arg, str):
             bytestring = b""
+            new_color_code = color_code
             for char in arg:
                 char = encode_func(char)
                 if ut.b2i1(char) in color_codes:
-                    color_code = char
+                    new_color_code = char
                     continue
                 while len(char) < 3:
                     char = char + b"\r"
-                bytestring = bytestring + color_code + char
-            cs.DoActions(color_v.SetNumber(ut.b2i1(color_code)))
+                bytestring = bytestring + new_color_code + char
             if not bytestring:
                 bytestring = color_code + b"\r\r\r"
             f_cpstr_print(bytestring, EOS=False)
+            if color_code != new_color_code:
+                color_code = new_color_code
+                cs.DoActions(color_v.SetNumber(ut.b2i1(color_code)))
         elif ut.isUnproxyInstance(arg, ptr2s):
             br1.seekoffset(arg._value)
             f_cpchar_addstr(arg._value)
@@ -344,9 +347,11 @@ def R2L(colors, colors_dict={}):
 
 def _TextFX_Print(*args, identifier=None, encoding="UTF-8"):
     f_cpstr_print(identifier, EOS=False, encoding=encoding)
+    global color_code
+    color_code = b"\x02"
+    color_v << 2
 
     args = ut.FlattenList(args)
-
     for arg in args:
         if isinstance(arg, str):
             line = arg.split("\n")
