@@ -197,25 +197,16 @@ def __remove_TextFX(o0, o1, e0, e1):
     trg_o0, trg_o1, trg_e0, trg_e1 = [c.Forward() for _ in range(4)]
     setPtr_o, setPtr_e = c.Forward(), c.Forward()
 
-    _proc = c.Forward()
-    c.RawTrigger(
-        nextptr=o0.GetVTable(),
-        actions=[
-            txtPtr.SetNumber(-1),
-            c.SetMemory(0x6509B0, c.SetTo, ut.EPD(0x640B60)),
-            c.SetMemory(setPtr_o + 8, c.SetTo, 0),
-            c.SetMemory(setPtr_e + 8, c.SetTo, 1),
-            o0.QueueAssignTo(ut.EPD(trg_o0) + 4),
-            o1.QueueAssignTo(ut.EPD(trg_o1) + 4),
-            e0.QueueAssignTo(ut.EPD(trg_e0) + 4),
-            e1.QueueAssignTo(ut.EPD(trg_e1) + 4),
-            c.SetNextPtr(o0.GetVTable(), o1.GetVTable()),
-            c.SetNextPtr(o1.GetVTable(), e0.GetVTable()),
-            c.SetNextPtr(e0.GetVTable(), e1.GetVTable()),
-            c.SetNextPtr(e1.GetVTable(), _proc),
-        ]
-    )
-    _proc << c.NextTrigger()
+    c.VProc([o0, o1, e0, e1], [
+        txtPtr.SetNumber(-1),
+        c.SetMemory(0x6509B0, c.SetTo, ut.EPD(0x640B60)),
+        c.SetMemory(setPtr_o + 8, c.SetTo, 0),
+        c.SetMemory(setPtr_e + 8, c.SetTo, 1),
+        o0.QueueAssignTo(ut.EPD(trg_o0) + 4),
+        o1.QueueAssignTo(ut.EPD(trg_o1) + 4),
+        e0.QueueAssignTo(ut.EPD(trg_e0) + 4),
+        e1.QueueAssignTo(ut.EPD(trg_e1) + 4),
+    ])
     if cs.EUDLoopN()(6):
         incr_o, incr_e = c.Forward(), c.Forward()
         trg_o0 << c.RawTrigger(

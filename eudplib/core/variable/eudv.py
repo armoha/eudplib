@@ -323,10 +323,16 @@ def IsEUDVariable(x):
 def VProc(v, actions):
     nexttrg = Forward()
 
-    bt.RawTrigger(
-        nextptr=v.GetVTable(),
-        actions=[actions] + [bt.SetNextPtr(v.GetVTable(), nexttrg)],
-    )
+    try:
+        bt.RawTrigger(
+            nextptr=v[0].GetVTable(),
+            actions=[actions] + [bt.SetNextPtr(v[i].GetVTable(), v[i+1].GetVTable()) for i in range(len(v)-1)] + [bt.SetNextPtr(v[-1].GetVTable(), nexttrg)]
+        )
+    except (TypeError):
+        bt.RawTrigger(
+            nextptr=v.GetVTable(),
+            actions=[actions] + [bt.SetNextPtr(v.GetVTable(), nexttrg)],
+        )
 
     nexttrg << bt.NextTrigger()
 

@@ -38,31 +38,17 @@ def _filldw(dstepd, v1):
 
 
 def _fillloword(dstepd, v1):
-    _nextptr = c.Forward()
-    c.RawTrigger(
-        nextptr=v1.GetVTable(),
-        actions=[
-            v1.QueueAssignTo(_lowordfilter),
-            c.SetNextPtr(v1.GetVTable(), _lowordfilter.GetVTable()),
-            _lowordfilter.QueueAssignTo(dstepd),
-            c.SetNextPtr(_lowordfilter.GetVTable(), _nextptr),
-        ]
-    )
-    _nextptr << c.NextTrigger()
+    c.VProc([v1, _lowordfilter], [
+        v1.QueueAssignTo(_lowordfilter),
+        _lowordfilter.QueueAssignTo(dstepd),
+    ])
 
 
 def _filllsbyte(dstepd, v1):
-    _nextptr = c.Forward()
-    c.RawTrigger(
-        nextptr=v1.GetVTable(),
-        actions=[
-            v1.QueueAssignTo(_lsbytefilter),
-            c.SetNextPtr(v1.GetVTable(), _lsbytefilter.GetVTable()),
-            _lsbytefilter.QueueAssignTo(dstepd),
-            c.SetNextPtr(_lsbytefilter.GetVTable(), _nextptr),
-        ]
-    )
-    _nextptr << c.NextTrigger()
+    c.VProc([v1, _lsbytefilter], [
+        v1.QueueAssignTo(_lsbytefilter),
+        _lsbytefilter.QueueAssignTo(dstepd),
+    ])
 
 
 @c.EUDFunc

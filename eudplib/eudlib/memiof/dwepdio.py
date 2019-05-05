@@ -132,24 +132,17 @@ def f_dwbreak(number):
     """Get hiword/loword/4byte of dword"""
     word = [c.EUDXVariable(0, 0xFFFF), c.EUDVariable()]
     byte = [c.EUDXVariable(0, 0xFF)] + c.EUDCreateVariables(3)
-    start, cont = c.Forward(), c.Forward()
 
     # Clear byte[], word[]
-    start << c.RawTrigger(
-        nextptr=number.GetVTable(),
-        actions=[
-            number.QueueAssignTo(word[0]),
-            c.SetNextPtr(number.GetVTable(), word[0].GetVTable()),
-            word[0].QueueAssignTo(byte[0]),
-            c.SetNextPtr(word[0].GetVTable(), cont),
-            word[1].SetNumber(0),
-            byte[1].SetNumber(0),
-            byte[2].SetNumber(0),
-            byte[3].SetNumber(0),
-        ]
-    )
+    c.VProc([number, word[0]], [
+        number.QueueAssignTo(word[0]),
+        word[0].QueueAssignTo(byte[0]),
+        word[1].SetNumber(0),
+        byte[1].SetNumber(0),
+        byte[2].SetNumber(0),
+        byte[3].SetNumber(0),
+    ])
 
-    cont << c.NextTrigger()
     for i in range(31, 7, -1):
         byteidx = i // 8
         wordidx = i // 16
@@ -172,27 +165,17 @@ def f_dwbreak2(number):
     """Get hiword/loword/4byte of dword"""
     word = c.EUDCreateVariables(2)
     byte = c.EUDCreateVariables(4)
-    start, end = c.Forward(), c.Forward()
 
     # Set byte[], word[]
-    start << c.RawTrigger(
-        nextptr=number.GetVTable(),
-        actions=[
-            number.QueueAssignTo(word[0]),
-            c.SetNextPtr(number.GetVTable(), word[0].GetVTable()),
-            word[0].QueueAssignTo(word[1]),
-            c.SetNextPtr(word[0].GetVTable(), word[1].GetVTable()),
-            word[1].QueueAssignTo(byte[0]),
-            c.SetNextPtr(word[1].GetVTable(), byte[0].GetVTable()),
-            byte[0].QueueAssignTo(byte[1]),
-            c.SetNextPtr(byte[0].GetVTable(), byte[1].GetVTable()),
-            byte[1].QueueAssignTo(byte[2]),
-            c.SetNextPtr(byte[1].GetVTable(), byte[2].GetVTable()),
-            byte[2].QueueAssignTo(byte[3]),
-            c.SetNextPtr(byte[2].GetVTable(), end),
-        ]
-    )
-    end << c.RawTrigger(
+    c.VProc([number, word[0], word[1], byte[0], byte[1], byte[2]], [
+        number.QueueAssignTo(word[0]),
+        word[0].QueueAssignTo(word[1]),
+        word[1].QueueAssignTo(byte[0]),
+        byte[0].QueueAssignTo(byte[1]),
+        byte[1].QueueAssignTo(byte[2]),
+        byte[2].QueueAssignTo(byte[3]),
+    ])
+    c.RawTrigger(
         actions=[
             word[0].SetNumberX(0, ~0xFFFF),
             word[1].SetNumberX(0, 0xFFFF),

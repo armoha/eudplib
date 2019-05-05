@@ -57,10 +57,14 @@ def f_bitor(a, b):
 def f_bitxor(a, b):
     """Calculate a ^ b"""
     act = ac.Forward()
-
-    ev.VProc(a, a.QueueAssignTo(EPD(act) + 5 + 16))
-    ev.VProc(b, b.QueueAssignTo(EPD(act)))
-    ev.VProc(b, [rt.SetMemory(act + 32, rt.SetTo, ~0), b.QueueSubtractTo(EPD(act) + 8)])
+    ev.VProc([a, b], [
+        a.QueueAssignTo(EPD(act) + 5 + 16),
+        b.QueueAssignTo(EPD(act)),
+    ])
+    ev.VProc(b, [
+        rt.SetMemory(act + 32, rt.SetTo, ~0),
+        b.QueueSubtractTo(EPD(act) + 8)
+    ])
     rt.RawTrigger(
         actions=[
             act << a.SetNumberX(~0, 0),  # a | b
