@@ -41,34 +41,44 @@ def f_srand(seed):
     _seed << seed
 
 
+@c.EUDFunc
 def f_randomize():
     global _seed
 
     # Store switch 1
-    sw1 = c.EUDVariable()
-    if cs.EUDIf()(c.Switch("Switch 1", c.Set)):
-        sw1 << c.EncodeSwitchAction(c.Set)
-    if cs.EUDElse()():
-        sw1 << c.EncodeSwitchAction(c.Clear)
-    cs.EUDEndIf()
+    end = c.Forward()
+    c.RawTrigger(
+        conditions=c.Switch("Switch 1", c.Set),
+        actions=c.SetMemoryX(end + 328 + 24, c.SetTo, 4 << 24, 0xFF << 24),
+    )
+    c.RawTrigger(
+        conditions=c.Switch("Switch 1", c.Cleared),
+        actions=c.SetMemoryX(end + 328 + 24, c.SetTo, 5 << 24, 0xFF << 24),
+    )
 
     dseed = c.EUDVariable()
+    n = c.EUDLightVariable()
     c.RawTrigger(
         actions=[
             _seed.SetNumber(0),
             dseed.SetNumber(1),
+            c.SetSwitch("Switch 1", c.Random),
+            n.SetNumber(32),
         ]
     )
 
-    if cs.EUDLoopN()(32):
-        cs.DoActions(c.SetSwitch("Switch 1", c.Random))
+    if cs.EUDWhile()(n >= 1):
         if cs.EUDIf()(c.Switch("Switch 1", c.Set)):
             _seed += dseed
         cs.EUDEndIf()
-        dseed += dseed
-    cs.EUDEndLoopN()
+        c.VProc(dseed, [
+            dseed.QueueAddTo(dseed),
+            c.SetSwitch("Switch 1", c.Random),
+            n.SubtractNumber(1),
+        ])
+    cs.EUDEndWhile()
 
-    cs.DoActions(c.SetSwitch("Switch 1", sw1))
+    end << c.RawTrigger(actions=c.SetSwitch("Switch 1", c.Set))
 
 
 @c.EUDFunc
