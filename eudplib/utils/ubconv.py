@@ -35,7 +35,10 @@ def UbconvSetEncoding(encoding):
 
 def u2b(s):
     if isinstance(s, str):
-        return s.encode(g_encoding)
+        try:
+            return s.encode(g_encoding)
+        except (UnicodeEncodeError):
+            return s.encode("utf-8")
     elif isinstance(s, bytes):
         return s
     else:

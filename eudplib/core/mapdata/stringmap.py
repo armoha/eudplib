@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 from . import tblformat
-from ...utils import b2i2, b2i4, u2b, ep_assert, unProxy
+from ...utils import b2i2, b2i4, u2b, u2utf8, ep_assert, unProxy
 
 
 class StringIdMap:
@@ -59,7 +59,7 @@ def IgnoreColor(s):
 def InitStringMap(chkt):
     global strmap, unitmap, locmap, swmap
 
-    strmap = tblformat.TBL(chkt.getsection("STR"))
+    strmap = tblformat.TBL(chkt.getsection("STR"), fix_unitname=True)
     unitmap = StringIdMap()
     locmap = StringIdMap()
     swmap = StringIdMap()
@@ -112,7 +112,7 @@ def GetSwitchIndex(s):
 
 
 def GetUnitIndex(u):
-    return unitmap.GetStringIndex(u)
+    return unitmap.GetStringIndex(u2utf8(u))
 
 
 def ApplyStringMap(chkt):

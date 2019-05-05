@@ -31,7 +31,7 @@ from eudplib import utils as ut
 
 
 class TBL:
-    def __init__(self, content=None):
+    def __init__(self, content=None, fix_unitname=False):
         #
         # datatb : table of strings                       : string data table
         # dataindextb : string id -> data id              : string offset table
@@ -45,6 +45,7 @@ class TBL:
         self._emptystring = []
         self._loaded = False
         self._first_extended_string = None
+        self._fix_unitname = fix_unitname
 
         if content is not None:
             self.LoadTBL(content)
@@ -55,6 +56,15 @@ class TBL:
         self._capacity = 2
 
         stringcount = ut.b2i2(content, 0)
+        if self._fix_unitname:
+            from .mapdata import GetChkTokenized
+            chkt = GetChkTokenized()
+            unix = chkt.getsection("UNIx")
+            unitstr = set()
+            for i in range(228):
+                unitstrid = ut.b2i2(unix, 3192 + i * 2)
+                if unitstrid >= 1:
+                    unitstr.add(unitstrid)
         for i in range(stringcount):
             i += 1
             stringoffset = ut.b2i2(content, i * 2)
@@ -77,11 +87,16 @@ class TBL:
                         break
                 if len(self._emptystring) == empty_len:
                     self._emptystring.append(i - 1)
+            elif self._fix_unitname:
+                try:
+                    string = (string.decode("cp949")).encode("utf-8")
+                except (UnicodeDecodeError):
+                    pass
             self.AddString(string)
         self._loaded = True
 
     def AddString(self, string):
-        string = ut.u2b(string)  # Starcraft uses multibyte encoding.
+        string = ut.u2b(string)  # Starcraft: Remastered uses both utf-8 and multibyte encoding.
         if not isinstance(string, bytes):
             raise ut.EPError("Invalid type for string")
 

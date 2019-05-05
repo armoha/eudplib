@@ -28,10 +28,12 @@ def FixUnitMap(chkt):
     unit = bytearray(chkt.getsection("UNIT"))
 
     for i in range(0, len(unit), 36):
-        if unit[i + 17] == 100 and unit[i + 14] & 2:
-            unit[i + 14] -= 2
-        if unit[i + 18] == 100 and unit[i + 14] & 4:
-            unit[i + 14] -= 4
-        if unit[i + 19] == 100 and unit[i + 14] & 8:
-            unit[i + 14] -= 8
+        if unit[i + 17] == 100:
+            unit[i + 14] &= ~2
+        if unit[i + 18] == 100:
+            unit[i + 14] &= ~4
+        if unit[i + 19] == 100:
+            unit[i + 14] &= ~8
+
     chkt.setsection("UNIT", unit)
+    chkt.setsection("VER ", b"\xCE\0")
