@@ -362,7 +362,7 @@ bodyStmt ::= vdefAssign_stmt SEMICOLON.
 bodyStmt ::= cdef_stmt SEMICOLON.
 bodyStmt ::= assign_stmt SEMICOLON.
 bodyStmt ::= funcexprStmt SEMICOLON.
-bodyStmt ::= actionStmt SEMICOLON.
+bodyStmt ::= actionStmt.
 
 bodyStmt ::= once_stmt.
 bodyStmt ::= if_stmt.
@@ -1166,10 +1166,16 @@ expr(A) ::= KILLS(B) LPAREN fArgs(C) RPAREN. {
     A = mkTokenTemp(B);
 }
 
-actionStmt ::= ACTIONNAME(A) LPAREN fArgs(B) RPAREN. {
+actionStmt ::= ACTIONNAME(A) LPAREN fArgs(B) RPAREN SEMICOLON. {
     writeTraceInfo(ps->gen, A);
     ps->gen << "DoActions(" << A->data << "(" << B->data << "))" << std::endl;
     delete A; delete B;
+}
+
+expr(A) ::= ACTIONNAME(B) LPAREN fArgs(C) RPAREN. {
+    B->data = B->data + "(" + C->data + ")";
+    delete C;
+    A = mkTokenTemp(B);
 }
 
 
