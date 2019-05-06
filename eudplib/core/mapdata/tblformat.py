@@ -30,8 +30,12 @@ String table manager. Internally used in eudplib.
 from eudplib import utils as ut
 
 
+def IgnoreColor(s):
+    return bytes(filter(lambda x: not (0x01 <= x <= 0x1F or x == 0x7F), s))
+
+
 class TBL:
-    def __init__(self, content=None, fix_unitname=False):
+    def __init__(self, content=None, init_chkt=None):
         #
         # datatb : table of strings                       : string data table
         # dataindextb : string id -> data id              : string offset table
@@ -45,10 +49,12 @@ class TBL:
         self._emptystring = []
         self._loaded = False
         self._first_extended_string = None
-        self._fix_unitname = fix_unitname
 
         if content is not None:
-            self.LoadTBL(content)
+            if init_chkt:
+                self.LoadTBLWithChk(content, init_chkt)
+            else:
+                self.LoadTBL(content)
 
     def LoadTBL(self, content):
         self._datatb.clear()
@@ -56,15 +62,7 @@ class TBL:
         self._capacity = 2
 
         stringcount = ut.b2i2(content, 0)
-        if self._fix_unitname:
-            from .mapdata import GetChkTokenized
-            chkt = GetChkTokenized()
-            unix = chkt.getsection("UNIx")
-            unitstr = set()
-            for i in range(228):
-                unitstrid = ut.b2i2(unix, 3192 + i * 2)
-                if unitstrid >= 1:
-                    unitstr.add(unitstrid)
+
         for i in range(stringcount):
             i += 1
             stringoffset = ut.b2i2(content, i * 2)
@@ -82,21 +80,120 @@ class TBL:
                     while content[nextend] != 0:
                         nextend += 1
                     nextstring = content[nextoffset:nextend]
-                    if self._fix_unitname and j in unitstr:
-                        try:
-                            nextstring = (nextstring.decode("cp949")).encode("utf-8")
-                        except (UnicodeDecodeError):
-                            pass
                     if nextstring != b"":
                         self._emptystring.append((i - 1, nextstring))
                         break
                 if len(self._emptystring) == empty_len:
                     self._emptystring.append(i - 1)
-            elif self._fix_unitname and i in unitstr:
-                try:
-                    string = (string.decode("cp949")).encode("utf-8")
-                except (UnicodeDecodeError):
-                    pass
+            self.AddString(string)
+        self._loaded = True
+
+    def LoadTBLWithChk(self, content, init_chkt):
+        self._datatb.clear()
+        self._stringmap.clear()
+        self._capacity = 2
+
+        chkt, unitmap, locmap, swmap = init_chkt
+
+        unix = chkt.getsection("UNIx")
+        mrgn = chkt.getsection("MRGN")
+        try:
+            swnm = chkt.getsection("SWNM")
+        except (KeyError):
+            swnm = None  # Not Required
+        sprp = chkt.getsection("SPRP")
+        forc = chkt.getsection("FORC")
+
+        locdict = dict()
+        swnmdict = dict()
+        unitdict = dict()
+
+        # Get location names
+        if mrgn:
+            locn = len(mrgn) // 20
+            for i in range(locn):
+                locstrid = ut.b2i2(mrgn, 20 * i + 16)
+                if locstrid:
+                    locdict[locstrid] = i
+        
+        # Get switch names
+        if swnm:
+            for i in range(256):
+                swstrid = ut.b2i4(swnm, 4 * i)
+                if swstrid:
+                    swnmdict[swstrid] = i
+
+        # Get unit names
+        if unix:
+            for i in range(228):
+                unitstrid = ut.b2i2(unix, 3192 + i * 2)
+                if unitstrid:
+                    unitdict[unitstrid] = i
+
+        reserved_str = set(unitdict.keys())
+
+        if sprp:
+            for i in range(2):
+                mapstrid = ut.b2i2(sprp, i * 2)
+                if mapstrid:
+                    reserved_str.add(mapstrid)
+
+        if forc:
+            for i in range(4):
+                forcstrid = ut.b2i2(forc, 8 + i * 2)
+                if forcstrid:
+                    reserved_str.add(forcstrid)
+
+        removed_str = set(locdict.keys()).union(swnmdict.keys()) - reserved_str
+        stringcount = ut.b2i2(content, 0)
+
+        for i in range(stringcount):
+            i += 1
+            stringoffset = ut.b2i2(content, i * 2)
+            send = stringoffset
+            while content[send] != 0:
+                send += 1
+
+            string = content[stringoffset:send]
+            if string == b"" or string in removed_str:
+                empty_len = len(self._emptystring)
+                for j in range(i, stringcount):
+                    j += 1
+                    if j in removed_str:
+                        continue
+                    nextoffset = ut.b2i2(content, j * 2)
+                    nextend = nextoffset
+                    while content[nextend] != 0:
+                        nextend += 1
+                    nextstring = content[nextoffset:nextend]
+                    if nextstring != b"":
+                        if j in unitdict:
+                            try:
+                                nextstring = (nextstring.decode("cp949")).encode("utf-8")
+                            except (UnicodeDecodeError):
+                                pass
+                        self._emptystring.append((i - 1, nextstring))
+                        break
+                if len(self._emptystring) == empty_len:
+                    self._emptystring.append(i - 1)
+
+            if string:
+                if i in unitdict:
+                    try:
+                        string = (string.decode("cp949")).encode("utf-8")
+                    except (UnicodeDecodeError):
+                        pass
+                    unitmap.AddItem(string, unitdict[i])
+                    if string != IgnoreColor(string):
+                        unitmap.AddItem(IgnoreColor(string), unitdict[i])
+                if i in locdict:
+                    locmap.AddItem(string, locdict[i])
+                if i in swnmdict:
+                    swmap.AddItem(string, swnmdict[i])
+            
+            if string in removed_str:
+                string = b""
+
             self.AddString(string)
         self._loaded = True
 
