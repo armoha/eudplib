@@ -82,12 +82,17 @@ class TBL:
                     while content[nextend] != 0:
                         nextend += 1
                     nextstring = content[nextoffset:nextend]
+                    if self._fix_unitname and j in unitstr:
+                        try:
+                            nextstring = (nextstring.decode("cp949")).encode("utf-8")
+                        except (UnicodeDecodeError):
+                            pass
                     if nextstring != b"":
                         self._emptystring.append((i - 1, nextstring))
                         break
                 if len(self._emptystring) == empty_len:
                     self._emptystring.append(i - 1)
-            elif self._fix_unitname:
+            elif self._fix_unitname and i in unitstr:
                 try:
                     string = (string.decode("cp949")).encode("utf-8")
                 except (UnicodeDecodeError):
