@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..core.mapdata import mapdata, mpqapi
+from ..core.mapdata import mapdata, mpqapi, fixmapdata
 from ..core import RegisterCreatePayloadCallback
 from .injector.applyInjector import applyInjector
 from .inlinecode.ilcprocesstrig import PreprocessInlineCode
@@ -77,6 +77,7 @@ def SaveMap(fname, rootf):
     PreprocessInlineCode(chkt)
     mapdata.UpdateMapData()
 
+    fixmapdata.FixMapData(chkt)
     applyInjector(chkt, root)
 
     chkt.optimize()

@@ -26,7 +26,6 @@ THE SOFTWARE.
 from .stringmap import InitStringMap, ApplyStringMap
 from .proptable import InitPropertyMap, ApplyPropertyMap
 from .playerinfo import InitPlayerInfo
-from .unitfix import FixUnitMap
 
 _inited = False
 _chkt = None
@@ -43,7 +42,6 @@ def InitMapData(chkt, rawfile):
     InitStringMap(chkt)
     InitPropertyMap(chkt)
     InitPlayerInfo(chkt)
-    FixUnitMap(chkt)
     _inited = True
 
 
