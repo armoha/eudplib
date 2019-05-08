@@ -155,7 +155,7 @@ class TBL:
                 send += 1
 
             string = content[stringoffset:send]
-            if string == b"" or string in removed_str:
+            if string == b"" or i in removed_str:
                 empty_len = len(self._emptystring)
                 for j in range(i, stringcount):
                     j += 1
@@ -191,7 +191,7 @@ class TBL:
                 if i in swnmdict:
                     swmap.AddItem(string, swnmdict[i])
             
-            if string in removed_str:
+            if i in removed_str:
                 string = b""
 
             self.AddString(string)
