@@ -77,3 +77,5 @@ from .memifgen import (
     f_posread_epd,
     f_posread_cp,
 )
+
+from .varrayreader import EUDVArrayReader
