@@ -324,17 +324,18 @@ def VProc(v, actions):
     nexttrg = Forward()
 
     try:
-        bt.RawTrigger(
+        trg = bt.RawTrigger(
             nextptr=v[0].GetVTable(),
             actions=[actions] + [bt.SetNextPtr(v[i].GetVTable(), v[i+1].GetVTable()) for i in range(len(v)-1)] + [bt.SetNextPtr(v[-1].GetVTable(), nexttrg)]
         )
     except (TypeError):
-        bt.RawTrigger(
+        trg = bt.RawTrigger(
             nextptr=v.GetVTable(),
             actions=[actions] + [bt.SetNextPtr(v.GetVTable(), nexttrg)],
         )
 
     nexttrg << bt.NextTrigger()
+    return trg
 
 
 # From vbuffer.py
