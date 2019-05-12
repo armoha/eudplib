@@ -8,7 +8,7 @@ except ImportError:
         return None
 
 
-__version__ = "0.58.7"
+__version__ = "0.58.8"
 
 
 setup(
@@ -28,5 +28,5 @@ setup(
     description="EUD Trigger generator",
     license="MIT license",
     keywords="starcraft rawtrigger eud",
-    url="http://blog.naver.com/whyask37/",  # project home page, if any
+    url="https://github.com/armoha/eudplib",  # project home page, if any
 )
