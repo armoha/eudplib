@@ -75,9 +75,6 @@ class EUDArrayData(c.EUDObject):
     def __setitem__(self, key, item):
         return self.set(key, item)
 
-    def __iter__(self):
-        raise TypeError("'EUDArray' object is not iterable")
-
 
 class EUDArray(ut.ExprProxy):
     def __init__(self, initval=None, *, _from=None):
@@ -103,6 +100,3 @@ class EUDArray(ut.ExprProxy):
 
     def __setitem__(self, key, item):
         return self.set(key, item)
-
-    def __iter__(self):
-        raise TypeError("'EUDArray' object is not iterable")

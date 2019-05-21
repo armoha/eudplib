@@ -234,7 +234,4 @@ def EUDVArray(size, basetype=None):
         def __setitem__(self, i, value):
             self.set(i, value)
 
-        def __iter__(self):
-            raise TypeError("'EUDVArray' object is not iterable")
-
     return _EUDVArray
