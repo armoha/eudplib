@@ -79,7 +79,7 @@ def f_strlen_epd(epd):
     oldcp = f_getcurpl()
     ret = c.EUDVariable()
     c.VProc(epd, [
-        epd.QueueAssignTo(EPD(0x6509B0)),
+        epd.SetDest(EPD(0x6509B0)),
         ret.SetNumber(0),
     ])
     if cs.EUDWhile()(c.Deaths(c.CurrentPlayer, c.AtLeast, 1, 0)):
@@ -92,7 +92,7 @@ def f_strlen_epd(epd):
         cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF000000))
         cs.DoActions([ret.AddNumber(1), c.SetMemory(0x6509B0, c.Add, 1)])
     cs.EUDEndWhile()
-    c.VProc(oldcp, oldcp.QueueAssignTo(EPD(0x6509B0)))
+    c.VProc(oldcp, oldcp.SetDest(EPD(0x6509B0)))
     c.EUDReturn(ret)
 
 

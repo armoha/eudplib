@@ -48,7 +48,7 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
         ret = [c.EUDVariable() for _ in args]
 
         c.VProc(targetplayer, [
-            targetplayer.QueueAssignTo(ut.EPD(0x6509B0)),
+            targetplayer.SetDest(ut.EPD(0x6509B0)),
             [retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)],
         ])
 
@@ -61,7 +61,7 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
                 ],
             )
 
-        c.VProc(origcp, origcp.QueueAssignTo(ut.EPD(0x6509B0)))
+        c.VProc(origcp, origcp.SetDest(ut.EPD(0x6509B0)))
 
         return ut.List2Assignable(ret)
 

@@ -31,71 +31,47 @@ def _locfgen(mod1, mod2, mod3, mod4, signed=False):
 
     @c.EUDFunc
     def _locf(epd, x, y):
-        L, T, R, B, fin, act = [c.Forward() for _ in range(6)]
+        act = c.Forward()
 
-        L << c.RawTrigger(
-            nextptr=epd.GetVTable(),
-            actions=[
-                epd.AddNumber(ut.EPD(0x58DC60)),
-                epd.QueueAssignTo(ut.EPD(act) + 4),
-                c.SetNextPtr(epd.GetVTable(), x.GetVTable()),
-                [
-                    x.QueueAssignTo(ut.EPD(act) + 5)
-                    if not signed else [
-                        c.SetMemory(act + 20, c.SetTo, ~0),
-                        x.QueueSubtractTo(ut.EPD(act) + 5),
-                    ]
-                ],
-                c.SetNextPtr(x.GetVTable(), T),
+        c.VProc([epd, x], [
+            epd.AddNumber(ut.EPD(0x58DC60)),
+            epd.SetDest(ut.EPD(act) + 4),
+        ] + [
+            x.SetDest(ut.EPD(act) + 5)
+            if not signed else [
+                c.SetMemory(act + 20, c.SetTo, ~0),
+                x.QueueSubtractTo(ut.EPD(act) + 5),
             ]
-        )
-        T << c.RawTrigger(
-            nextptr=epd.GetVTable(),
-            actions=[
-                [c.SetMemory(act + 20, c.Add, 1) if signed else []],
-                epd.AddNumber(1),
-                epd.AddDest(8),
-                c.SetNextPtr(epd.GetVTable(), y.GetVTable()),
-                [
-                    y.QueueAssignTo(ut.EPD(act) + 8 + 5)
-                    if not signed else [
-                        c.SetMemory(act + 52, c.SetTo, ~0),
-                        y.QueueSubtractTo(ut.EPD(act) + 8 + 5),
-                    ]
-                ],
-                c.SetNextPtr(y.GetVTable(), R),
+        ])
+        c.VProc([epd, y], [
+            [c.SetMemory(act + 20, c.Add, 1) if signed else []],
+            epd.AddNumber(1),
+            epd.AddDest(8),
+        ] + [
+            y.SetDest(ut.EPD(act) + 8 + 5)
+            if not signed else [
+                c.SetMemory(act + 52, c.SetTo, ~0),
+                y.QueueSubtractTo(ut.EPD(act) + 8 + 5),
             ]
-        )
-        R << c.RawTrigger(
-            nextptr=epd.GetVTable(),
-            actions=[
-                [c.SetMemory(act + 52, c.Add, 1) if signed else []],
-                epd.AddNumber(1),
-                epd.AddDest(8),
-                c.SetNextPtr(epd.GetVTable(), x.GetVTable()),
-                x.AddDest(16),
-                [
-                    c.SetMemory(x._varact + 24, c.Subtract, 0x02000000)
-                    if signed else []
-                ],
-                c.SetNextPtr(x.GetVTable(), B),
-            ]
-        )
-        B << c.RawTrigger(
-            nextptr=epd.GetVTable(),
-            actions=[
-                epd.AddNumber(1),
-                epd.AddDest(8),
-                c.SetNextPtr(epd.GetVTable(), y.GetVTable()),
-                y.AddDest(16),
-                [
-                    c.SetMemory(y._varact + 24, c.Subtract, 0x02000000)
-                    if signed else []
-                ],
-                c.SetNextPtr(y.GetVTable(), fin),
-            ]
-        )
-        fin << c.RawTrigger(
+        ])
+        c.VProc([epd, x], [
+            [c.SetMemory(act + 52, c.Add, 1) if signed else []],
+            epd.AddNumber(1),
+            epd.AddDest(8),
+            x.AddDest(16),
+        ] + [
+            c.SetMemory(x._varact + 24, c.Subtract, 0x02000000)
+            if signed else []
+        ])
+        c.VProc([epd, y], [
+            epd.AddNumber(1),
+            epd.AddDest(8),
+            y.AddDest(16),
+        ] + [
+            c.SetMemory(y._varact + 24, c.Subtract, 0x02000000)
+            if signed else []
+        ])
+        c.RawTrigger(
             actions=[
                 act << c.SetMemory(0, mod1, 0),
                 c.SetMemory(0, mod2, 0),
@@ -151,33 +127,21 @@ def _SetLocEPD(loc, epd):
     origcp = f_getcurpl()
     x, y = f_posread_epd(epd)
 
-    act, t1, t2 = c.Forward(), c.Forward(), c.Forward()
+    act = c.Forward()
+
+    c.VProc([loc, x, y], [
+        loc.SetDest(ut.EPD(act) + 5),
+        x.SetDest(ut.EPD(act) + 5 + 8 * 2),
+        y.SetDest(ut.EPD(act) + 5 + 8 * 4),
+    ])
+
+    c.VProc([x, y, origcp], [
+        x.SetDest(ut.EPD(act) + 5 + 8 * 6),
+        y.SetDest(ut.EPD(act) + 5 + 8 * 8),
+        origcp.SetDest(ut.EPD(act) + 5 + 8 * 9),
+    ])
 
     c.RawTrigger(
-        nextptr=loc.GetVTable(),
-        actions=[
-            loc.QueueAssignTo(ut.EPD(act) + 5),
-            c.SetNextPtr(loc.GetVTable(), x.GetVTable()),
-            x.QueueAssignTo(ut.EPD(act) + 5 + 8 * 2),
-            c.SetNextPtr(x.GetVTable(), y.GetVTable()),
-            y.QueueAssignTo(ut.EPD(act) + 5 + 8 * 4),
-            c.SetNextPtr(y.GetVTable(), t1),
-        ]
-    )
-
-    t1 << c.RawTrigger(
-        nextptr=x.GetVTable(),
-        actions=[
-            x.QueueAssignTo(ut.EPD(act) + 5 + 8 * 6),
-            c.SetNextPtr(x.GetVTable(), y.GetVTable()),
-            y.QueueAssignTo(ut.EPD(act) + 5 + 8 * 8),
-            c.SetNextPtr(y.GetVTable(), origcp.GetVTable()),
-            origcp.QueueAssignTo(ut.EPD(act) + 5 + 8 * 9),
-            c.SetNextPtr(origcp.GetVTable(), t2),
-        ]
-    )
-
-    t2 << c.RawTrigger(
         actions=[
             act << c.SetMemory(0x6509B0, c.SetTo, 0),
             c.SetMemory(0x6509B0, c.Add, ut.EPD(0x58DC60)),

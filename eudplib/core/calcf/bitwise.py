@@ -47,7 +47,7 @@ def f_bitor(a, b):
     """Calculate a | b"""
     act = ac.Forward()
 
-    ev.VProc(b, b.QueueAssignTo(EPD(act)))
+    ev.VProc(b, b.SetDest(EPD(act)))
     rt.RawTrigger(actions=[act << a.SetNumberX(~0, 0)])
 
     return a
@@ -58,7 +58,7 @@ def f_bitxor(a, b):
     """Calculate a ^ b"""
     act = ac.Forward()
     ev.VProc([a, b], [
-        a.QueueAssignTo(EPD(act) + 21),
+        a.SetDest(EPD(act) + 21),
         b.QueueAssignTo(EPD(act)),
     ])
     ev.VProc(b, [
@@ -101,7 +101,7 @@ def f_bitnor(a, b):
     ret = ev.EUDVariable()
     act = ac.Forward()
 
-    ev.VProc(b, [ret.SetNumber(~0), b.QueueAssignTo(EPD(act))])
+    ev.VProc(b, [ret.SetNumber(~0), b.SetDest(EPD(act))])
     ev.VProc(a, [act << a.SetNumberX(~0, 0), a.QueueSubtractTo(ret)])
 
     return ret

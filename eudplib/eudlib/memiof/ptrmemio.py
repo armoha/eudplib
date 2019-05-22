@@ -74,11 +74,12 @@ def f_bwrite(ptr, b):
 
 @c.EUDFunc
 def _dwread(ptr):
-    epd, subp = c.f_div(ptr - 0x58A364, 4)
+    ptr -= 0x58A364
+    epd, subp = c.f_div(ptr, 4)
     oldcp = cp.f_getcurpl()
     dw = c.EUDVariable()
     c.VProc(epd, [
-        epd.QueueAssignTo(ut.EPD(0x6509B0)),
+        epd.SetDest(ut.EPD(0x6509B0)),
         dw.SetNumber(0),
     ])
     cs.EUDSwitch(subp)
@@ -109,7 +110,7 @@ def _dwread(ptr):
         cs.EUDBreak()
 
     cs.EUDEndSwitch()
-    c.VProc(oldcp, oldcp.QueueAssignTo(ut.EPD(0x6509B0)))
+    c.VProc(oldcp, oldcp.SetDest(ut.EPD(0x6509B0)))
     return dw
 
 

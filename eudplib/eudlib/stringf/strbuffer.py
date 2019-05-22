@@ -110,7 +110,7 @@ class StringBuffer:
         cp = f_getcurpl()
         c.VProc(
             cp,
-            cp.QueueAssignTo(ut.EPD(cls._cpbranch) + 4)
+            cp.SetDest(ut.EPD(cls._cpbranch) + 4)
         )
         cls._cpbranch << c.RawTrigger(
             nextptr=0,
@@ -121,7 +121,7 @@ class StringBuffer:
             nextptr=cp.GetVTable(),
             actions=[
                 c.SetNextPtr(cp.GetVTable(), 0),
-                cp.QueueAssignTo(prevcp),
+                cp.SetDest(prevcp),
             ]
         )
         c.PopTriggerScope()

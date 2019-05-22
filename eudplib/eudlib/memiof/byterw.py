@@ -60,7 +60,7 @@ class EUDByteStream:
         c.VProc([q, r], [
             self._offset.SetNumber(-0x58A364 // 4),
             q.QueueAddTo(self._offset),
-            r.QueueAssignTo(self._suboffset),
+            r.SetDest(self._suboffset),
         ])
 
     # -------
@@ -76,7 +76,7 @@ class EUDByteStream:
         ret = c.EUDVariable()
 
         c.VProc(self._offset, [
-            ret.SetNumber(0), self._offset.QueueAssignTo(EPD(0x6509B0)),
+            ret.SetNumber(0), self._offset.SetDest(EPD(0x6509B0)),
         ])
 
         for i in range(3):
@@ -103,7 +103,7 @@ class EUDByteStream:
         cs.DoActions([self._offset.AddNumber(1), self._suboffset.SetNumber(0)])
 
         case[-1] << c.NextTrigger()
-        c.VProc(orig, orig.QueueAssignTo(EPD(0x6509B0)))
+        c.VProc(orig, orig.SetDest(EPD(0x6509B0)))
         return ret
 
     @c.EUDMethod

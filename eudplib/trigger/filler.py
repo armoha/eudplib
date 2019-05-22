@@ -40,14 +40,14 @@ def _filldw(dstepd, v1):
 def _fillloword(dstepd, v1):
     c.VProc([v1, _lowordfilter], [
         v1.QueueAssignTo(_lowordfilter),
-        _lowordfilter.QueueAssignTo(dstepd),
+        _lowordfilter.SetDest(dstepd),
     ])
 
 
 def _filllsbyte(dstepd, v1):
     c.VProc([v1, _lsbytefilter], [
         v1.QueueAssignTo(_lsbytefilter),
-        _lsbytefilter.QueueAssignTo(dstepd),
+        _lsbytefilter.SetDest(dstepd),
     ])
 
 
@@ -63,7 +63,7 @@ def _fill_b__(v1):
 
 def _filllobyte(dstepd, v1):
     _fill_b__(v1)
-    c.VProc(_lobytefilter, _lobytefilter.QueueAssignTo(dstepd))
+    c.VProc(_lobytefilter, _lobytefilter.SetDest(dstepd))
 
 
 @c.EUDFunc
@@ -78,7 +78,7 @@ def _fill__b_(v1):
 
 def _fillhibyte(dstepd, v1):
     _fill__b_(v1)
-    c.VProc(_hibytefilter, _hibytefilter.QueueAssignTo(dstepd))
+    c.VProc(_hibytefilter, _hibytefilter.SetDest(dstepd))
 
 
 @c.EUDFunc
@@ -93,4 +93,4 @@ def _fill___b(v1):
 
 def _fillmsbyte(dstepd, v1):
     _fill___b(v1)
-    c.VProc(_msbytefilter, _msbytefilter.QueueAssignTo(dstepd))
+    c.VProc(_msbytefilter, _msbytefilter.SetDest(dstepd))

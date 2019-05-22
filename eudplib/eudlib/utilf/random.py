@@ -83,16 +83,22 @@ def f_randomize():
 
 @c.EUDFunc
 def f_rand():
-    _seed << c.f_mul(_seed, 1103515245) + 12345
+    seed = c.f_mul(_seed, 1103515245)
+    c.VProc(seed, [
+        seed.AddNumber(12345),
+        seed.SetDest(_seed),
+    ])
     return f_dwbreak(_seed)[1]  # Only HIWORD is returned
 
 
 @c.EUDFunc
 def f_dwrand():
-    seed1 = c.f_mul(_seed, 1103515245) + 12345
-    seed2 = c.f_mul(seed1, 1103515245) + 12345
+    seed1 = c.f_mul(_seed, 1103515245)
+    seed1 += 12345
+    seed2 = c.f_mul(seed1, 1103515245)
     c.VProc(seed2, [
-        seed2.QueueAssignTo(_seed),
+        seed2.AddNumber(12345),
+        seed2.SetDest(_seed),
         # HIWORD
         seed1.SetNumberX(0, 0xFFFF)
     ])

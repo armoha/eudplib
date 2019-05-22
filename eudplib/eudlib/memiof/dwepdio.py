@@ -34,7 +34,7 @@ def f_dwepdread_epd(targetplayer):
     ptr, epd = c.EUDVariable(), c.EUDVariable()
     c.VProc(targetplayer, [
         ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)),
-        targetplayer.QueueAssignTo(ut.EPD(0x6509B0)),
+        targetplayer.SetDest(ut.EPD(0x6509B0)),
     ])
 
     for i in range(31, -1, -1):
@@ -46,7 +46,7 @@ def f_dwepdread_epd(targetplayer):
             ],
         )
 
-    c.VProc(origcp, origcp.QueueAssignTo(ut.EPD(0x6509B0)))
+    c.VProc(origcp, origcp.SetDest(ut.EPD(0x6509B0)))
 
     return ptr, epd
 
@@ -57,7 +57,7 @@ def f_dwread_epd(targetplayer):
     ptr = c.EUDVariable()
     c.VProc(targetplayer, [
         ptr.SetNumber(0),
-        targetplayer.QueueAssignTo(ut.EPD(0x6509B0)),
+        targetplayer.SetDest(ut.EPD(0x6509B0)),
     ])
     for i in range(31, -1, -1):
         c.RawTrigger(
@@ -65,7 +65,7 @@ def f_dwread_epd(targetplayer):
             actions=ptr.AddNumber(2 ** i),
         )
 
-    c.VProc(origcp, origcp.QueueAssignTo(ut.EPD(0x6509B0)))
+    c.VProc(origcp, origcp.SetDest(ut.EPD(0x6509B0)))
 
     return ptr
 
@@ -89,7 +89,7 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
 
             # All set to 0
             c.VProc(targetplayer, [
-                targetplayer.QueueAssignTo(ut.EPD(0x6509B0)),
+                targetplayer.SetDest(ut.EPD(0x6509B0)),
                 [flagv.SetNumber(0) for flagv in flagsv],
             ])
 
@@ -107,7 +107,7 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
                     ],
                 )
 
-            c.VProc(origcp, origcp.QueueAssignTo(ut.EPD(0x6509B0)))
+            c.VProc(origcp, origcp.SetDest(ut.EPD(0x6509B0)))
 
             return flagsv
 
@@ -140,8 +140,8 @@ def f_dwbreak(number):
 
     # Clear byte[], word[]
     c.VProc([number, word[0]], [
-        number.QueueAssignTo(word[0]),
-        word[0].QueueAssignTo(byte[0]),
+        number.SetDest(word[0]),
+        word[0].SetDest(byte[0]),
         word[1].SetNumber(0),
         byte[1].SetNumber(0),
         byte[2].SetNumber(0),
@@ -173,12 +173,12 @@ def f_dwbreak2(number):
 
     # Set byte[], word[]
     c.VProc([number, word[0], word[1], byte[0], byte[1], byte[2]], [
-        number.QueueAssignTo(word[0]),
-        word[0].QueueAssignTo(word[1]),
-        word[1].QueueAssignTo(byte[0]),
-        byte[0].QueueAssignTo(byte[1]),
-        byte[1].QueueAssignTo(byte[2]),
-        byte[2].QueueAssignTo(byte[3]),
+        number.SetDest(word[0]),
+        word[0].SetDest(word[1]),
+        word[1].SetDest(byte[0]),
+        byte[0].SetDest(byte[1]),
+        byte[1].SetDest(byte[2]),
+        byte[2].SetDest(byte[3]),
     ])
     c.RawTrigger(
         actions=[
