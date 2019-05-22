@@ -77,7 +77,10 @@ def _dwread(ptr):
     epd, subp = c.f_div(ptr - 0x58A364, 4)
     oldcp = cp.f_getcurpl()
     dw = c.EUDVariable()
-    cs.DoActions([c.SetCurrentPlayer(epd), dw.SetNumber(0)])
+    c.VProc(epd, [
+        epd.QueueAssignTo(ut.EPD(0x6509B0)),
+        dw.SetNumber(0),
+    ])
     cs.EUDSwitch(subp)
 
     # Case 0
@@ -106,7 +109,7 @@ def _dwread(ptr):
         cs.EUDBreak()
 
     cs.EUDEndSwitch()
-    cp.f_setcurpl(oldcp)
+    c.VProc(oldcp, oldcp.QueueAssignTo(ut.EPD(0x6509B0)))
     return dw
 
 

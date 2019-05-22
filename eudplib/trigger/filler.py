@@ -53,7 +53,6 @@ def _filllsbyte(dstepd, v1):
 
 @c.EUDFunc
 def _fill_b__(v1):
-    global _lobytefilter
     _lobytefilter << 0
     for i in range(7, -1, -1):
         c.RawTrigger(
@@ -64,12 +63,11 @@ def _fill_b__(v1):
 
 def _filllobyte(dstepd, v1):
     _fill_b__(v1)
-    c.SeqCompute(((dstepd, c.SetTo, _lobytefilter),))
+    c.VProc(_lobytefilter, _lobytefilter.QueueAssignTo(dstepd))
 
 
 @c.EUDFunc
 def _fill__b_(v1):
-    global _hibytefilter
     _hibytefilter << 0
     for i in range(7, -1, -1):
         c.RawTrigger(
@@ -80,12 +78,11 @@ def _fill__b_(v1):
 
 def _fillhibyte(dstepd, v1):
     _fill__b_(v1)
-    c.SeqCompute(((dstepd, c.SetTo, _hibytefilter),))
+    c.VProc(_hibytefilter, _hibytefilter.QueueAssignTo(dstepd))
 
 
 @c.EUDFunc
 def _fill___b(v1):
-    global _msbytefilter
     _msbytefilter << 0
     for i in range(7, -1, -1):
         c.RawTrigger(
@@ -96,4 +93,4 @@ def _fill___b(v1):
 
 def _fillmsbyte(dstepd, v1):
     _fill___b(v1)
-    c.SeqCompute(((dstepd, c.SetTo, _msbytefilter),))
+    c.VProc(_msbytefilter, _msbytefilter.QueueAssignTo(dstepd))

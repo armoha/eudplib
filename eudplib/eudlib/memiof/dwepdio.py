@@ -25,27 +25,28 @@ THE SOFTWARE.
 
 from ... import core as c, ctrlstru as cs, utils as ut
 
-from .modcurpl import f_setcurpl, f_getcurpl
+from .modcurpl import f_getcurpl
 
 
 @c.EUDFunc
 def f_dwepdread_epd(targetplayer):
     origcp = f_getcurpl()
     ptr, epd = c.EUDVariable(), c.EUDVariable()
-    cs.DoActions(
-        [ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)), c.SetCurrentPlayer(targetplayer)]
-    )
+    c.VProc(targetplayer, [
+        ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)),
+        targetplayer.QueueAssignTo(ut.EPD(0x6509B0)),
+    ])
 
     for i in range(31, -1, -1):
         c.RawTrigger(
-            conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i)],
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i),
             actions=[
                 ptr.AddNumber(2 ** i),
                 epd.AddNumber(2 ** (i - 2)) if i >= 2 else [],
             ],
         )
 
-    f_setcurpl(origcp)
+    c.VProc(origcp, origcp.QueueAssignTo(ut.EPD(0x6509B0)))
 
     return ptr, epd
 
@@ -54,14 +55,17 @@ def f_dwepdread_epd(targetplayer):
 def f_dwread_epd(targetplayer):
     origcp = f_getcurpl()
     ptr = c.EUDVariable()
-    cs.DoActions([ptr.SetNumber(0), c.SetCurrentPlayer(targetplayer)])
+    c.VProc(targetplayer, [
+        ptr.SetNumber(0),
+        targetplayer.QueueAssignTo(ut.EPD(0x6509B0)),
+    ])
     for i in range(31, -1, -1):
         c.RawTrigger(
             conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i)],
             actions=ptr.AddNumber(2 ** i),
         )
 
-    f_setcurpl(origcp)
+    c.VProc(origcp, origcp.QueueAssignTo(ut.EPD(0x6509B0)))
 
     return ptr
 
@@ -81,12 +85,13 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
         @c.EUDFunc
         def readerf(targetplayer):
             origcp = f_getcurpl()
-            f_setcurpl(targetplayer)
-
             flagsv = [c.EUDVariable() for _ in flags]
 
             # All set to 0
-            c.RawTrigger(actions=[flagv.SetNumber(0) for flagv in flagsv])
+            c.VProc(targetplayer, [
+                targetplayer.QueueAssignTo(ut.EPD(0x6509B0)),
+                [flagv.SetNumber(0) for flagv in flagsv],
+            ])
 
             # Fill flags
             for i in range(31, -1, -1):
@@ -102,7 +107,7 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
                     ],
                 )
 
-            f_setcurpl(origcp)
+            c.VProc(origcp, origcp.QueueAssignTo(ut.EPD(0x6509B0)))
 
             return flagsv
 

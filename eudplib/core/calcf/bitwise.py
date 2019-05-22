@@ -58,7 +58,7 @@ def f_bitxor(a, b):
     """Calculate a ^ b"""
     act = ac.Forward()
     ev.VProc([a, b], [
-        a.QueueAssignTo(EPD(act) + 5 + 16),
+        a.QueueAssignTo(EPD(act) + 21),
         b.QueueAssignTo(EPD(act)),
     ])
     ev.VProc(b, [
@@ -68,7 +68,7 @@ def f_bitxor(a, b):
     rt.RawTrigger(
         actions=[
             act << a.SetNumberX(~0, 0),  # a | b
-            rt.SetMemoryX(act + 20 + 64, rt.SetTo, 0, ~0),  # a & b
+            rt.SetMemoryX(act + 84, rt.SetTo, 0, ~0),  # a & b
             a.SubtractNumber(0),
         ]
     )
@@ -127,11 +127,11 @@ def f_bitsplit(a):
     :returns: int bits[32];  // bits[i] = (ith bit from LSB of a is set)
     """
     bits = ev.EUDCreateVariables(32)
+    rt.RawTrigger(actions=[bits[i].SetNumber(0) for i in range(32)])
     for i in range(31, -1, -1):
-        bits[i] << 0
         rt.RawTrigger(
-            conditions=a.AtLeast(2 ** i),
-            actions=[a.SubtractNumber(2 ** i), bits[i].SetNumber(1)],
+            conditions=a.AtLeastX(1, 2 ** i),
+            actions=bits[i].SetNumber(1),
         )
     return bits
 

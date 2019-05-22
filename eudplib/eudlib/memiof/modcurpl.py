@@ -23,27 +23,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from eudplib import core as c, ctrlstru as cs
+from eudplib import core as c, ctrlstru as cs, utils as ut
 
 
 def f_setcurpl(cp):
-    cs.DoActions(c.SetCurrentPlayer(cp))
+    if c.IsEUDVariable(cp):
+        cpcond = c.curpl.cpcacheMatchCond()
+        cpcache = c.curpl.GetCPCache()
+        c.VProc(cp, cp.QueueAssignTo(cpcache))
+        c.VProc(cp, cp.SetDest(ut.EPD(cpcond) + 2))
+        c.VProc(cp, cp.SetDest(ut.EPD(0x6509B0)))
+    else:
+        cs.DoActions(c.SetCurrentPlayer(cp))
 
 
 # This function initializes _curpl_checkcond, so should be called at least once
 @c.EUDFunc
 def _f_updatecpcache():
+    cpcond = c.curpl.cpcacheMatchCond()
     cpcache = c.curpl.GetCPCache()
     cpcache << 0
     for i in range(31, -1, -1):
         c.RawTrigger(
-            conditions=[c.Memory(0x6509B0, c.AtLeast, 2 ** i)],
-            actions=[
-                c.SetMemory(0x6509B0, c.Subtract, 2 ** i),
-                cpcache.AddNumber(2 ** i),
-            ],
+            conditions=c.MemoryX(0x6509B0, c.AtLeast, 1, 2 ** i),
+            actions=cpcache.AddNumber(2 ** i),
         )
-    cs.DoActions(c.SetCurrentPlayer(cpcache))
+    c.VProc(cpcache, cpcache.QueueAssignTo(ut.EPD(0x6509B0)))
+    c.VProc(cpcache, cpcache.SetDest(ut.EPD(cpcond) + 2))
 
 
 @c.EUDFunc
@@ -69,4 +75,11 @@ def f_addcurpl(cp):
     eudplib internally caches the current player value,
     so this function add to that value.
     """
-    cs.DoActions(c.AddCurrentPlayer(cp))
+    if c.IsEUDVariable(cp):
+        cpcond = c.curpl.cpcacheMatchCond()
+        cpcache = c.curpl.GetCPCache()
+        c.VProc(cp, cp.QueueAddTo(cpcache))
+        c.VProc(cp, cp.SetDest(ut.EPD(cpcond) + 2))
+        c.VProc(cp, cp.SetDest(ut.EPD(0x6509B0)))
+    else:
+        cs.DoActions(c.AddCurrentPlayer(cp))

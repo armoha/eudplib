@@ -62,7 +62,7 @@ class EUDVArrayReader:
             ])
             trg = c.VProc(varr_epd, [acts] + [
                 varr_epd.AddNumber(328 // 4 + 3),
-                c.SetMemory(varr_epd._varact + 16, c.Add, -8),
+                varr_epd.AddDest(-8),
             ])
             return trg
         else:

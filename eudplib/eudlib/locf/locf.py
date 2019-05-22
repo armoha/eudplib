@@ -54,7 +54,7 @@ def _locfgen(mod1, mod2, mod3, mod4, signed=False):
             actions=[
                 [c.SetMemory(act + 20, c.Add, 1) if signed else []],
                 epd.AddNumber(1),
-                c.SetMemory(epd._varact + 16, c.Add, 8),
+                epd.AddDest(8),
                 c.SetNextPtr(epd.GetVTable(), y.GetVTable()),
                 [
                     y.QueueAssignTo(ut.EPD(act) + 8 + 5)
@@ -71,9 +71,9 @@ def _locfgen(mod1, mod2, mod3, mod4, signed=False):
             actions=[
                 [c.SetMemory(act + 52, c.Add, 1) if signed else []],
                 epd.AddNumber(1),
-                c.SetMemory(epd._varact + 16, c.Add, 8),
+                epd.AddDest(8),
                 c.SetNextPtr(epd.GetVTable(), x.GetVTable()),
-                c.SetMemory(x._varact + 16, c.Add, 16),
+                x.AddDest(16),
                 [
                     c.SetMemory(x._varact + 24, c.Subtract, 0x02000000)
                     if signed else []
@@ -85,9 +85,9 @@ def _locfgen(mod1, mod2, mod3, mod4, signed=False):
             nextptr=epd.GetVTable(),
             actions=[
                 epd.AddNumber(1),
-                c.SetMemory(epd._varact + 16, c.Add, 8),
+                epd.AddDest(8),
                 c.SetNextPtr(epd.GetVTable(), y.GetVTable()),
-                c.SetMemory(y._varact + 16, c.Add, 16),
+                y.AddDest(16),
                 [
                     c.SetMemory(y._varact + 24, c.Subtract, 0x02000000)
                     if signed else []

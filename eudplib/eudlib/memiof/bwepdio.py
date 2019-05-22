@@ -30,8 +30,10 @@ from ... import core as c, ctrlstru as cs, utils as ut
 
 
 def _lshift(a, b):
-    if ut.isUnproxyInstance(a, c.EUDVariable):
+    if c.IsEUDVariable(a):
         return c.f_bitlshift(a, b)
+    elif isinstance(b, int) and b == 0:
+        return a
     else:
         return a << b
 
@@ -39,12 +41,12 @@ def _lshift(a, b):
 @c.EUDFunc
 def _wwriter(epd, subp, w):
     oldcp = cp.f_getcurpl()
-    cp.f_setcurpl(epd)
+    c.VProc(epd, epd.QueueAssignTo(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
     for i in range(3):
         cs.EUDSwitchCase()(i)
         cs.DoActions(
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, c.f_bitlshift(w, 8 * i), 0, 0xFFFF << (8 * i))
+            c.SetDeathsX(c.CurrentPlayer, c.SetTo, _lshift(w, 8 * i), 0, 0xFFFF << (8 * i))
         )
         cs.EUDBreak()
 
@@ -56,7 +58,7 @@ def _wwriter(epd, subp, w):
         cpm.f_bwrite_cp(1, 0, b1)
 
     cs.EUDEndSwitch()
-    cp.f_setcurpl(oldcp)
+    c.VProc(oldcp, oldcp.QueueAssignTo(ut.EPD(0x6509B0)))
 
 
 def f_wwrite_epd(epd, subp, w):
@@ -77,16 +79,16 @@ def f_wwrite_epd(epd, subp, w):
 @c.EUDFunc
 def _bwriter(epd, subp, b):
     oldcp = cp.f_getcurpl()
-    cp.f_setcurpl(epd)
+    c.VProc(epd, epd.QueueAssignTo(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
     for i in range(4):
         cs.EUDSwitchCase()(i)
         cs.DoActions(
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, c.f_bitlshift(b, 8 * i), 0, 0xFF << (8 * i))
+            c.SetDeathsX(c.CurrentPlayer, c.SetTo, _lshift(b, 8 * i), 0, 0xFF << (8 * i))
         )
         cs.EUDBreak()
     cs.EUDEndSwitch()
-    cp.f_setcurpl(oldcp)
+    c.VProc(oldcp, oldcp.QueueAssignTo(ut.EPD(0x6509B0)))
     return b
 
 
@@ -106,7 +108,10 @@ def f_bwrite_epd(epd, subp, b):
 def f_wread_epd(epd, subp):
     oldcp = cp.f_getcurpl()
     w = c.EUDVariable()
-    cs.DoActions([c.SetCurrentPlayer(epd), w.SetNumber(0)])
+    c.VProc(epd, [
+        epd.QueueAssignTo(ut.EPD(0x6509B0)),
+        w.SetNumber(0),
+    ])
     cs.EUDSwitch(subp)
     for i in range(3):
         cs.EUDSwitchCase()(i)
@@ -126,7 +131,7 @@ def f_wread_epd(epd, subp):
         w << b0 + b1 * 256
 
     cs.EUDEndSwitch()
-    cp.f_setcurpl(oldcp)
+    c.VProc(oldcp, oldcp.QueueAssignTo(ut.EPD(0x6509B0)))
     return w
 
 
@@ -134,7 +139,10 @@ def f_wread_epd(epd, subp):
 def f_bread_epd(epd, subp):
     oldcp = cp.f_getcurpl()
     b = c.EUDVariable()
-    cs.DoActions([c.SetCurrentPlayer(epd), b.SetNumber(0)])
+    c.VProc(epd, [
+        epd.QueueAssignTo(ut.EPD(0x6509B0)),
+        b.SetNumber(0),
+    ])
     cs.EUDSwitch(subp)
     for i in range(4):
         cs.EUDSwitchCase()(i)
@@ -146,5 +154,5 @@ def f_bread_epd(epd, subp):
 
         cs.EUDBreak()
     cs.EUDEndSwitch()
-    cp.f_setcurpl(oldcp)
+    c.VProc(oldcp, oldcp.QueueAssignTo(ut.EPD(0x6509B0)))
     return b

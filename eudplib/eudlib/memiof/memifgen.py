@@ -47,12 +47,10 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
         origcp = cp.f_getcurpl()
         ret = [c.EUDVariable() for _ in args]
 
-        cs.DoActions(
-            [
-                c.SetCurrentPlayer(targetplayer),
-                [retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)],
-            ]
-        )
+        c.VProc(targetplayer, [
+            targetplayer.QueueAssignTo(ut.EPD(0x6509B0)),
+            [retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)],
+        ])
 
         for i in bits(mask):
             c.RawTrigger(
@@ -63,7 +61,7 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
                 ],
             )
 
-        cp.f_setcurpl(origcp)
+        c.VProc(origcp, origcp.QueueAssignTo(ut.EPD(0x6509B0)))
 
         return ut.List2Assignable(ret)
 
