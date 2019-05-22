@@ -48,6 +48,15 @@ def EP_SetRValueStrictMode(mode):
     isRValueStrict = mode
 
 
+def _ProcessDest(dest):
+    try:
+        dest.checkNonRValue()
+        dest = EPD(dest.getValueAddr())
+    except AttributeError:
+        pass
+    return dest
+
+
 # Unused variable don't need to be allocated.
 class VariableTriggerForward(ConstExpr):
     def __init__(self, initval, mask=None):
@@ -78,6 +87,9 @@ class EUDVariable(VariableBase):
     def GetVTable(self):
         return self._vartrigger
 
+    def getDestAddr(self):
+        return self._varact + 16
+
     def getValueAddr(self):
         return self._varact + 20
 
@@ -99,39 +111,35 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def QueueAssignTo(self, dest):
-        try:
-            dest.checkNonRValue()
-            dest = EPD(dest.getValueAddr())
-        except AttributeError:
-            pass
+    def SetDest(self, dest):
+        dest = _ProcessDest(dest)
+        return bt.SetMemory(self.getDestAddr(), bt.SetTo, dest)
 
+    def AddDest(self, dest):
+        dest = _ProcessDest(dest)
+        return bt.SetMemory(self.getDestAddr(), bt.Add, dest)
+
+    def SubtractDest(self, dest):
+        dest = _ProcessDest(dest)
+        return bt.SetMemory(self.getDestAddr(), bt.Subtract, dest)
+
+    # -------
+
+    def QueueAssignTo(self, dest):
         return [
-            bt.SetDeaths(EPD(self._varact + 16), bt.SetTo, dest, 0),
+            self.SetDest(dest),
             bt.SetDeaths(EPD(self._varact + 24), bt.SetTo, 0x072D0000, 0),
         ]
 
     def QueueAddTo(self, dest):
-        try:
-            dest.checkNonRValue()
-            dest = EPD(dest.getValueAddr())
-        except AttributeError:
-            pass
-
         return [
-            bt.SetDeaths(EPD(self._varact + 16), bt.SetTo, dest, 0),
+            self.SetDest(dest),
             bt.SetDeaths(EPD(self._varact + 24), bt.SetTo, 0x082D0000, 0),
         ]
 
     def QueueSubtractTo(self, dest):
-        try:
-            dest.checkNonRValue()
-            dest = EPD(dest.getValueAddr())
-        except AttributeError:
-            pass
-
         return [
-            bt.SetDeaths(EPD(self._varact + 16), bt.SetTo, dest, 0),
+            self.SetDest(dest),
             bt.SetDeaths(EPD(self._varact + 24), bt.SetTo, 0x092D0000, 0),
         ]
 
