@@ -40,7 +40,6 @@ def _lshift(a, b):
 
 @c.EUDFunc
 def _wwriter(epd, subp, w):
-    oldcp = cp.f_getcurpl()
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
     for i in range(3):
@@ -58,7 +57,7 @@ def _wwriter(epd, subp, w):
         cpm.f_bwrite_cp(1, 0, b1)
 
     cs.EUDEndSwitch()
-    c.VProc(oldcp, oldcp.SetDest(ut.EPD(0x6509B0)))
+    cp.f_setcurpl2cpcache()
 
 
 def f_wwrite_epd(epd, subp, w):
@@ -78,7 +77,6 @@ def f_wwrite_epd(epd, subp, w):
 
 @c.EUDFunc
 def _bwriter(epd, subp, b):
-    oldcp = cp.f_getcurpl()
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
     for i in range(4):
@@ -88,7 +86,7 @@ def _bwriter(epd, subp, b):
         )
         cs.EUDBreak()
     cs.EUDEndSwitch()
-    c.VProc(oldcp, oldcp.SetDest(ut.EPD(0x6509B0)))
+    cp.f_setcurpl2cpcache()
     return b
 
 
@@ -106,7 +104,6 @@ def f_bwrite_epd(epd, subp, b):
 
 @c.EUDFunc
 def f_wread_epd(epd, subp):
-    oldcp = cp.f_getcurpl()
     w = c.EUDVariable()
     c.VProc(epd, [
         epd.SetDest(ut.EPD(0x6509B0)),
@@ -131,13 +128,12 @@ def f_wread_epd(epd, subp):
         w << b0 + b1 * 256
 
     cs.EUDEndSwitch()
-    c.VProc(oldcp, oldcp.SetDest(ut.EPD(0x6509B0)))
+    cp.f_setcurpl2cpcache()
     return w
 
 
 @c.EUDFunc
 def f_bread_epd(epd, subp):
-    oldcp = cp.f_getcurpl()
     b = c.EUDVariable()
     c.VProc(epd, [
         epd.SetDest(ut.EPD(0x6509B0)),
@@ -154,5 +150,5 @@ def f_bread_epd(epd, subp):
 
         cs.EUDBreak()
     cs.EUDEndSwitch()
-    c.VProc(oldcp, oldcp.SetDest(ut.EPD(0x6509B0)))
+    cp.f_setcurpl2cpcache()
     return b

@@ -25,12 +25,11 @@ THE SOFTWARE.
 
 from ... import core as c, ctrlstru as cs, utils as ut
 
-from .modcurpl import f_getcurpl
+from .modcurpl import f_setcurpl2cpcache
 
 
 @c.EUDFunc
 def f_dwepdread_epd(targetplayer):
-    origcp = f_getcurpl()
     ptr, epd = c.EUDVariable(), c.EUDVariable()
     c.VProc(targetplayer, [
         ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)),
@@ -46,14 +45,13 @@ def f_dwepdread_epd(targetplayer):
             ],
         )
 
-    c.VProc(origcp, origcp.SetDest(ut.EPD(0x6509B0)))
+    f_setcurpl2cpcache()
 
     return ptr, epd
 
 
 @c.EUDFunc
 def f_dwread_epd(targetplayer):
-    origcp = f_getcurpl()
     ptr = c.EUDVariable()
     c.VProc(targetplayer, [
         ptr.SetNumber(0),
@@ -65,7 +63,7 @@ def f_dwread_epd(targetplayer):
             actions=ptr.AddNumber(2 ** i),
         )
 
-    c.VProc(origcp, origcp.SetDest(ut.EPD(0x6509B0)))
+    f_setcurpl2cpcache()
 
     return ptr
 
@@ -84,7 +82,6 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
         # Create reader function
         @c.EUDFunc
         def readerf(targetplayer):
-            origcp = f_getcurpl()
             flagsv = [c.EUDVariable() for _ in flags]
 
             # All set to 0
@@ -107,7 +104,7 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
                     ],
                 )
 
-            c.VProc(origcp, origcp.SetDest(ut.EPD(0x6509B0)))
+            f_setcurpl2cpcache()
 
             return flagsv
 

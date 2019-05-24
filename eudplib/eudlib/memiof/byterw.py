@@ -71,7 +71,6 @@ class EUDByteStream:
 
         :returns: Read byte
         """
-        orig = cp.f_getcurpl()
         case = [c.Forward() for _ in range(5)]
         ret = c.EUDVariable()
 
@@ -103,7 +102,7 @@ class EUDByteStream:
         cs.DoActions([self._offset.AddNumber(1), self._suboffset.SetNumber(0)])
 
         case[-1] << c.NextTrigger()
-        c.VProc(orig, orig.SetDest(EPD(0x6509B0)))
+        cp.f_setcurpl2cpcache()
         return ret
 
     @c.EUDMethod

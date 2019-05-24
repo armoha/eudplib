@@ -28,7 +28,7 @@ from ... import ctrlstru as cs
 from ...utils import EPD
 
 from .rwcommon import br1, br2, bw1
-from ..memiof import f_getcurpl
+from ..memiof import f_setcurpl2cpcache
 
 
 @c.EUDFunc
@@ -76,7 +76,6 @@ def f_strcmp(s1, s2):
 
 @c.EUDFunc
 def f_strlen_epd(epd):
-    oldcp = f_getcurpl()
     ret = c.EUDVariable()
     c.VProc(epd, [
         epd.SetDest(EPD(0x6509B0)),
@@ -92,7 +91,7 @@ def f_strlen_epd(epd):
         cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF000000))
         cs.DoActions([ret.AddNumber(1), c.SetMemory(0x6509B0, c.Add, 1)])
     cs.EUDEndWhile()
-    c.VProc(oldcp, oldcp.SetDest(EPD(0x6509B0)))
+    f_setcurpl2cpcache()
     c.EUDReturn(ret)
 
 

@@ -76,7 +76,6 @@ def f_bwrite(ptr, b):
 def _dwread(ptr):
     ptr -= 0x58A364
     epd, subp = c.f_div(ptr, 4)
-    oldcp = cp.f_getcurpl()
     dw = c.EUDVariable()
     c.VProc(epd, [
         epd.SetDest(ut.EPD(0x6509B0)),
@@ -110,7 +109,7 @@ def _dwread(ptr):
         cs.EUDBreak()
 
     cs.EUDEndSwitch()
-    c.VProc(oldcp, oldcp.SetDest(ut.EPD(0x6509B0)))
+    cp.f_setcurpl2cpcache()
     return dw
 
 

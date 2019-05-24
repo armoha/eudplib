@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 from ... import core as c, ctrlstru as cs, utils as ut
-from ..memiof import f_posread_epd, f_getcurpl, f_dwread_epd
+from ..memiof import f_posread_epd, f_setcurpl2cpcache, f_dwread_epd
 
 
 def _locfgen(mod1, mod2, mod3, mod4, signed=False):
@@ -124,35 +124,31 @@ def f_getlocTL(locID):
 
 @c.EUDFunc
 def _SetLocEPD(loc, epd):
-    origcp = f_getcurpl()
     x, y = f_posread_epd(epd)
 
     act = c.Forward()
 
     c.VProc([loc, x, y], [
-        loc.SetDest(ut.EPD(act) + 5),
-        x.SetDest(ut.EPD(act) + 5 + 8 * 2),
-        y.SetDest(ut.EPD(act) + 5 + 8 * 4),
+        loc.SetDest(ut.EPD(0x6509B0)),
+        x.SetDest(ut.EPD(act + 32 * 0 + 20)),
+        y.SetDest(ut.EPD(act + 32 * 2 + 20)),
     ])
 
-    c.VProc([x, y, origcp], [
-        x.SetDest(ut.EPD(act) + 5 + 8 * 6),
-        y.SetDest(ut.EPD(act) + 5 + 8 * 8),
-        origcp.SetDest(ut.EPD(act) + 5 + 8 * 9),
+    c.VProc([x, y], [
+        c.SetMemory(0x6509B0, c.Add, ut.EPD(0x58DC60)),
+        x.SetDest(ut.EPD(act + 32 * 4 + 20)),
+        y.SetDest(ut.EPD(act + 32 * 6 + 20)),
     ])
 
-    c.RawTrigger(
+    f_setcurpl2cpcache(
         actions=[
-            act << c.SetMemory(0x6509B0, c.SetTo, 0),
-            c.SetMemory(0x6509B0, c.Add, ut.EPD(0x58DC60)),
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            act << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
             c.SetMemory(0x6509B0, c.Add, 1),
             c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
             c.SetMemory(0x6509B0, c.Add, 1),
             c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
             c.SetMemory(0x6509B0, c.Add, 1),
             c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetMemory(0x6509B0, c.SetTo, 0),
         ]
     )
 

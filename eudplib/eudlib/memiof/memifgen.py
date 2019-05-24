@@ -44,7 +44,6 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
 
     @c.EUDFunc
     def f_read_epd_template(targetplayer):
-        origcp = cp.f_getcurpl()
         ret = [c.EUDVariable() for _ in args]
 
         c.VProc(targetplayer, [
@@ -61,7 +60,7 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
                 ],
             )
 
-        c.VProc(origcp, origcp.SetDest(ut.EPD(0x6509B0)))
+        cp.f_setcurpl2cpcache()
 
         return ut.List2Assignable(ret)
 
