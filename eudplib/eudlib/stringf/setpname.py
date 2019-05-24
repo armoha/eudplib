@@ -35,7 +35,7 @@ from ..memiof import (
 from .eudprint import f_dbstr_print, ptr2s, epd2s
 from .cpprint import f_cpstr_print, PName
 from .strfunc import f_strlen_epd
-from ..utilf import f_playerexist, EUDPlayerLoop, EUDEndPlayerLoop, f_getgametick
+from ..utilf import f_playerexist, EUDPlayerLoop, EUDEndPlayerLoop, f_getgametick, EUDLoopPlayer
 from ..playerv import PVariable
 from ..eudarray import EUDArray
 
@@ -104,50 +104,48 @@ def _OptimizeSetPName():
     even1A = EUDArray([ut.EPD(x) for x in even1])
 
     if cs.EUDExecuteOnce()():
-        EUDPlayerLoop()()
-        player = f_getcurpl()
-        player_name = 36 * player
-        playerid_epd = 9 * player
-        cs.DoActions([
-            player_name.AddNumber(0x57EEEB),
-            playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
-        ])
-        idlen = f_strlen_epd(playerid_epd)
-        nameDb = baseNames[player]
-        f_dbstr_print(nameDb, ptr2s(player_name), ":")
-        val_odd = f_dwread_epd(ut.EPD(nameDb))
-        v0, v1 = f_dwbreak(val_odd)[0:2]
-        val_even0 = v0 * 0x10000
-        val_even1 = v1 + f_wread_epd(ut.EPD(nameDb) + 1, 0) * 0x10000
-        con_odd, con_even = oddA[player], even1A[player]
-        cs.DoActions(
-            [
-                idlen.AddNumber(1),  # fix ":" not recognized
-                player_name.AddNumber(1),
-                c.SetMemoryEPD(con_odd + 2, c.SetTo, val_odd),
-                c.SetMemoryEPD(even0A[player] + 2, c.SetTo, val_even0),
-                c.SetMemoryEPD(con_even + 2, c.SetTo, val_even1),
-            ]
-        )
-        f_dbstr_print(nameDb, ptr2s(player_name), ":")
-        baselens[player] = idlen
-        if cs.EUDIf()(idlen <= 4):
+        for player in EUDLoopPlayer(None):
+            player_name = 36 * player
+            playerid_epd = 9 * player
+            cs.DoActions([
+                player_name.AddNumber(0x57EEEB),
+                playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
+            ])
+            idlen = f_strlen_epd(playerid_epd)
+            nameDb = baseNames[player]
+            f_dbstr_print(nameDb, ptr2s(player_name), ":")
+            val_odd = f_dwread_epd(ut.EPD(nameDb))
+            v0, v1 = f_dwbreak(val_odd)[0:2]
+            val_even0 = v0 * 0x10000
+            val_even1 = v1 + f_wread_epd(ut.EPD(nameDb) + 1, 0) * 0x10000
+            con_odd, con_even = oddA[player], even1A[player]
             cs.DoActions(
                 [
-                    c.SetMemoryEPD(con_even + 2, c.SetTo, 0),
-                    c.SetMemoryEPD(con_even + 3, c.SetTo, 0x0F000000),
+                    idlen.AddNumber(1),  # fix ":" not recognized
+                    player_name.AddNumber(1),
+                    c.SetMemoryEPD(con_odd + 2, c.SetTo, val_odd),
+                    c.SetMemoryEPD(even0A[player] + 2, c.SetTo, val_even0),
+                    c.SetMemoryEPD(con_even + 2, c.SetTo, val_even1),
                 ]
             )
-            if cs.EUDIf()(idlen <= 2):
+            f_dbstr_print(nameDb, ptr2s(player_name), ":")
+            baselens[player] = idlen
+            if cs.EUDIf()(idlen <= 4):
                 cs.DoActions(
                     [
-                        c.SetMemoryEPD(con_odd + 2, c.SetTo, 0),
-                        c.SetMemoryEPD(con_odd + 3, c.SetTo, 0x0F000000),
+                        c.SetMemoryEPD(con_even + 2, c.SetTo, 0),
+                        c.SetMemoryEPD(con_even + 3, c.SetTo, 0x0F000000),
                     ]
                 )
+                if cs.EUDIf()(idlen <= 2):
+                    cs.DoActions(
+                        [
+                            c.SetMemoryEPD(con_odd + 2, c.SetTo, 0),
+                            c.SetMemoryEPD(con_odd + 3, c.SetTo, 0x0F000000),
+                        ]
+                    )
+                cs.EUDEndIf()
             cs.EUDEndIf()
-        cs.EUDEndIf()
-        EUDEndPlayerLoop()
     cs.EUDEndExecuteOnce()
 
     once = c.Forward()

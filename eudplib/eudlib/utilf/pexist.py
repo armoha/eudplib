@@ -69,9 +69,9 @@ def EUDLoopPlayer(ptype="Human", force=None, race=None):
     plist = []
     for p in range(8):
         pinfo = c.GetPlayerInfo(p)
-        if ((ptype is None or pinfo.typestr == ptype) and
-            (force is None or pinfo.force == EncodeForce(force)) and
-            (race is None or pinfo.racestr == race)
+        if ((not ptype or pinfo.typestr == ptype) and
+            (not force or pinfo.force == EncodeForce(force)) and
+            (not race or pinfo.racestr == race)
         ):
             plist.append(p)
     ut.EUDCreateBlock("loopplayerblock", None)
