@@ -37,6 +37,16 @@ def f_setcurpl(cp):
         cs.DoActions(c.SetCurrentPlayer(cp))
 
 
+def f_setcurpl2cpcache(v=[], actions=[]):
+    cpcache = c.curpl.GetCPCache()
+    if v:
+        trg = c.VProc([v] + [cpcache], [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))])
+    else:
+        trg = c.VProc(cpcache, [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))])
+    
+    return trg
+
+
 # This function initializes _curpl_checkcond, so should be called at least once
 @c.EUDFunc
 def _f_updatecpcache():
@@ -48,7 +58,7 @@ def _f_updatecpcache():
             conditions=c.MemoryX(0x6509B0, c.AtLeast, 1, 2 ** i),
             actions=cpcache.AddNumber(2 ** i),
         )
-    c.VProc(cpcache, cpcache.QueueAssignTo(ut.EPD(0x6509B0)))
+    f_setcurpl2cpcache()
     c.VProc(cpcache, cpcache.SetDest(ut.EPD(cpcond) + 2))
 
 

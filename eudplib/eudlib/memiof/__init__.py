@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .modcurpl import f_setcurpl, f_addcurpl, f_getcurpl
+from .modcurpl import f_setcurpl, f_addcurpl, f_getcurpl, f_setcurpl2cpcache
 
 
 from .bwepdio import f_wwrite_epd, f_bwrite_epd, f_wread_epd, f_bread_epd
