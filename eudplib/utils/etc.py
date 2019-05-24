@@ -76,7 +76,7 @@ def Assignable2List(a):
     if a is None:
         return []
 
-    elif isinstance(a, collections.Iterable):
+    elif isinstance(a, collections.Iterable) and not hasattr(a, 'dontFlatten'):
         return list(a)
 
     else:
