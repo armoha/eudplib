@@ -332,6 +332,7 @@ def VProc(v, actions):
     nexttrg = Forward()
 
     try:
+        v = FlattenList(v)
         trg = bt.RawTrigger(
             nextptr=v[0].GetVTable(),
             actions=[actions] + [bt.SetNextPtr(v[i].GetVTable(), v[i+1].GetVTable()) for i in range(len(v)-1)] + [bt.SetNextPtr(v[-1].GetVTable(), nexttrg)]
