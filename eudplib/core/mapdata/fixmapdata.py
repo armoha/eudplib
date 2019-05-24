@@ -38,8 +38,6 @@ def FixUnitMap(chkt):
             unit[i + 14] &= ~2
         if unit[i + 18] == 100:
             unit[i + 14] &= ~4
-        if unit[i + 19] == 100:
-            unit[i + 14] &= ~8
 
     chkt.setsection("UNIT", unit)
 
