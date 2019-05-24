@@ -25,80 +25,36 @@ THE SOFTWARE.
 
 from ... import core as c
 from ... import ctrlstru as cs
+from ... import utils as ut
 
 from . import modcurpl as cp
 from . import byterw as bm
+from . import cpmemio as cm
 
 
 @c.EUDFunc
 def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
-    epd_diff = dstepdp - srcepdp
-    tempv = c.Forward()
+    cpmoda = c.Forward()
 
-    # Backup original cp.
-    origcp = cp.f_getcurpl()
-
-    cp.f_setcurpl(srcepdp)
-
-    # Set cpmodas.
-    cpmoda1_list = [c.Forward() for _ in range(32)]
-    cpmoda2_list = [c.Forward() for _ in range(32)]
-    cpmoda0_list = [c.Forward(), c.Forward()]
-    cs.DoActions(
-        [
-            [c.SetMemory(cpmoda1 + 20, c.SetTo, epd_diff) for cpmoda1 in cpmoda1_list],
-            [c.SetMemory(cpmoda2 + 20, c.SetTo, -epd_diff) for cpmoda2 in cpmoda2_list],
-            [
-                c.SetMemory(cpmoda0_list[0] + 20, c.SetTo, epd_diff),
-                c.SetMemory(cpmoda0_list[1] + 20, c.SetTo, -epd_diff),
-            ],
-        ]
-    )
+    c.VProc([dstepdp, srcepdp], [
+        c.SetMemory(cpmoda, c.SetTo, -1),
+        dstepdp.QueueAddTo(ut.EPD(cpmoda)),
+        srcepdp.SetDest(ut.EPD(0x6509B0)),
+    ])
 
     if cs.EUDWhileNot()(copydwn == 0):
-        cpmoda01, cpmoda02 = cpmoda0_list
+        cpmod = cm.f_dwread_cp(0)
+        cpmoda << cpmod.getDestAddr()
 
-        # *dstepdp, tempv = 0
-        c.RawTrigger(
-            actions=[
-                cpmoda01 << c.SetMemory(0x6509B0, c.Add, 0),
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                cpmoda02 << c.SetMemory(0x6509B0, c.Add, 0),
-                c.SetMemory(tempv, c.SetTo, 0),
-            ]
-        )
-
-        for i in range(31, -1, -1):
-            cpmoda1, cpmoda2 = cpmoda1_list[i], cpmoda2_list[i]
-            # if *srcepdp >= 2**i:
-            #     *srcepdp -= 2 ** i
-            #     *dstepdp += 2 ** i
-            #     tempv += 2 ** i
-            c.RawTrigger(
-                conditions=c.Deaths(c.CurrentPlayer, c.AtLeast, 2 ** i, 0),
-                actions=[
-                    c.SetDeaths(c.CurrentPlayer, c.Subtract, 2 ** i, 0),
-                    cpmoda1 << c.SetMemory(0x6509B0, c.Add, 0),
-                    c.SetDeaths(c.CurrentPlayer, c.Add, 2 ** i, 0),
-                    cpmoda2 << c.SetMemory(0x6509B0, c.Add, 0),
-                    c.SetMemory(tempv, c.Add, 2 ** i),
-                ],
-            )
-
-        resetteract = c.Forward()
-        tempv << resetteract + 20
-
-        c.RawTrigger(
-            actions=[
-                resetteract << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                c.SetMemory(0x6509B0, c.Add, 1),
-                copydwn.SubtractNumber(1),
-            ]
-        )
+        c.VProc(cpmod, [
+            cpmod.AddDest(1),
+            c.SetMemory(0x6509B0, c.Add, 1),
+            copydwn.SubtractNumber(1),
+        ])
 
     cs.EUDEndWhile()
 
-    cp.f_setcurpl(origcp)
+    cp.f_setcurpl2cpcache()
 
 
 # -------
