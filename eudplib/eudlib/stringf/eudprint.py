@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from eudplib import core as c, ctrlstru as cs, utils as ut
 
-from .rwcommon import br1, bw1
+from ..rwcommon import br1, bw1
 from .dbstr import DBString
 
 

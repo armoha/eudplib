@@ -5,7 +5,7 @@
 from ..eudarray import EUDArray
 
 from ...ctrlstru import EUDInfLoop, EUDEndInfLoop, EUDIf, EUDElse, EUDEndIf, EUDBreakIf
-from .rwcommon import br1, bw1
+from ..rwcommon import br1, bw1
 from .cp949_table import cp949_table
 
 """

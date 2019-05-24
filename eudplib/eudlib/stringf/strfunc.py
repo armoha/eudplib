@@ -27,7 +27,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ...utils import EPD
 
-from .rwcommon import br1, br2, bw1
+from ..rwcommon import br1, bw1
 from ..memiof import f_setcurpl2cpcache
 
 
@@ -58,11 +58,11 @@ def f_strcpy(dst, src):
 @c.EUDFunc
 def f_strcmp(s1, s2):
     br1.seekoffset(s1)
-    br2.seekoffset(s2)
+    bw1.seekoffset(s2)
 
     if cs.EUDInfLoop()():
         ch1 = br1.readbyte()
-        ch2 = br2.readbyte()
+        ch2 = bw1.readbyte()
         if cs.EUDIf()(ch1 == ch2):
             if cs.EUDIf()(ch1 == 0):
                 c.EUDReturn(0)
@@ -115,11 +115,11 @@ def f_strlen(src):
 @c.EUDFunc
 def f_strnstr(string, substring, count):
     br1.seekoffset(string)
-    br2.seekoffset(substring)
+    bw1.seekoffset(substring)
     dst, _offset, _suboffset = c.EUDCreateVariables(3)
     dst << -1
 
-    b = br2.readbyte()
+    b = bw1.readbyte()
     if cs.EUDIf()(b == 0):
         c.EUDReturn(string)
     cs.EUDEndIf()
@@ -131,7 +131,7 @@ def f_strnstr(string, substring, count):
         _offset << br1._offset
         _suboffset << br1._suboffset
         if cs.EUDWhile()(1):
-            c = br2.readbyte()
+            c = bw1.readbyte()
             if cs.EUDIf()(c == 0):
                 c.EUDReturn(string + dst)
             cs.EUDEndIf()
@@ -139,6 +139,6 @@ def f_strnstr(string, substring, count):
         cs.EUDEndWhile()
         br1._offset << _offset
         br1._suboffset << _suboffset
-        br2.seekoffset(substring + 1)
+        bw1.seekoffset(substring + 1)
     cs.EUDEndWhile()
     c.EUDReturn(-1)

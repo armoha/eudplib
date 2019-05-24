@@ -23,11 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..memiof import byterw as bm
+from .memiof import byterw as bm
 
 br1 = bm.EUDByteReader()
-br2 = bm.EUDByteReader()
-br3 = bm.EUDByteReader()
+# br2 = bm.EUDByteReader()
+# br3 = bm.EUDByteReader()
 bw1 = bm.EUDByteWriter()
-bw2 = bm.EUDByteWriter()
-bw3 = bm.EUDByteWriter()
+# bw2 = bm.EUDByteWriter()
+# bw3 = bm.EUDByteWriter()

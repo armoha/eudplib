@@ -30,12 +30,13 @@ from . import (
     bwepdio as bwm,
     modcurpl as cp,
 )
+from ..rwcommon import br1, bw1
 from ... import core as c, ctrlstru as cs, utils as ut
 
 # Helper functions
 
-_bw = brw.EUDByteWriter()
-_br = brw.EUDByteReader()
+_br = br1
+_bw = bw1
 
 
 def _ptr2epd(ptr):

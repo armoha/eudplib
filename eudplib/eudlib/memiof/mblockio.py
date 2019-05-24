@@ -26,6 +26,7 @@ THE SOFTWARE.
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
+from ..rwcommon import br1, bw1
 
 from . import modcurpl as cp
 from . import byterw as bm
@@ -60,8 +61,8 @@ def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
 # -------
 
 
-_br = bm.EUDByteReader()
-_bw = bm.EUDByteWriter()
+_br = br1
+_bw = bw1
 
 
 @c.EUDFunc

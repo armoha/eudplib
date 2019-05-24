@@ -25,10 +25,10 @@ THE SOFTWARE.
 
 import itertools
 from ... import core as c, ctrlstru as cs, utils as ut
-from ..memiof import f_getcurpl, f_setcurpl
+from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from .eudprint import ptr2s, epd2s
 from .cpprint import f_cpstr_print, cw
-from .rwcommon import br1
+from ..rwcommon import br1
 from ..utilf import f_getgametick
 
 
@@ -43,7 +43,7 @@ color_code = b'\x02'
 
 
 @c.EUDFunc
-def f_cpchar_addstr(src):
+def _cpchar_addstr():
     if cs.EUDInfLoop()():
         b1 = br1.readbyte()
         cs.EUDBreakIf(b1 == 0)
@@ -61,6 +61,16 @@ def f_cpchar_addstr(src):
             cs.EUDEndIf()
         cs.EUDEndIf()
     cs.EUDEndInfLoop()
+
+
+def f_cpchar_addstr(src):
+    br1.seekoffset(src)
+    _cpchar_addstr()
+
+
+def f_cpchar_addstr_epd(src):
+    br1.seekepd(src)
+    _cpchar_addstr()
 
 
 @c.EUDFunc
@@ -116,11 +126,9 @@ def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):
                 color_code = new_color_code
                 cs.DoActions(color_v.SetNumber(ut.b2i1(color_code)))
         elif ut.isUnproxyInstance(arg, ptr2s):
-            br1.seekoffset(arg._value)
             f_cpchar_addstr(arg._value)
         elif ut.isUnproxyInstance(arg, epd2s):
-            br1.seekepd(arg._value)
-            f_cpchar_addstr(arg._value)
+            f_cpchar_addstr_epd(arg._value)
         elif ut.isUnproxyInstance(arg, c.EUDVariable) or c.IsConstExpr(arg):
             f_cpchar_adddw(arg)
         else:
@@ -148,84 +156,38 @@ def TextFX_SetTimer(tag, modtype, value):
 @c.EUDFunc
 def _remove_TextFX(o0, o1, e0, e1):
     txtPtr = c.EUDVariable()
-    con_o0 = [c.Forward() for _ in range(7)]
-    con_o1 = [c.Forward() for _ in range(7)]
-    con_e0 = [c.Forward() for _ in range(5)]
-    con_e1 = [c.Forward() for _ in range(5)]
-    cs.DoActions(
-        [
-            txtPtr.SetNumber(-1),
-            [c.SetMemory(con + 8, c.SetTo, o0) for con in con_o0],
-            [c.SetMemory(con + 8, c.SetTo, o1) for con in con_o1],
-            [c.SetMemory(con + 8, c.SetTo, e0) for con in con_e0],
-            [c.SetMemory(con + 8, c.SetTo, e1) for con in con_e1],
-        ]
-    )
-    for i in range(7):
-        _odd = 0x640B60 + 436 * i
-        c.RawTrigger(
-            conditions=[
-                con_o0[i] << c.Memory(_odd, c.Exactly, -1),
-                con_o1[i] << c.MemoryX(_odd + 4, c.Exactly, -1, 0xFFFF),
-            ],
-            actions=[
-                txtPtr.SetNumber(2 * i),
-                c.SetMemory(_odd, c.SetTo, 0),
-                c.SetMemory(_odd + 4, c.SetTo, 0),
-            ],
-        )
-    for i in range(5):
-        _even = 0x640C38 + 436 * i
-        c.RawTrigger(
-            conditions=[
-                con_e0[i] << c.MemoryX(_even, c.Exactly, -1, 0xFFFF0000),
-                con_e1[i] << c.Memory(_even + 4, c.Exactly, -1),
-            ],
-            actions=[
-                txtPtr.SetNumber(2 * i + 1),
-                c.SetMemoryX(_even, c.SetTo, 0, 0xFFFF0000),
-                c.SetMemory(_even + 4, c.SetTo, 0),
-            ],
-        )
-    return txtPtr
-
-
-@c.EUDFunc
-def __remove_TextFX(o0, o1, e0, e1):
-    origcp = f_getcurpl()
-    txtPtr = c.EUDVariable()
     trg_o0, trg_o1, trg_e0, trg_e1 = [c.Forward() for _ in range(4)]
     setPtr_o, setPtr_e = c.Forward(), c.Forward()
 
     c.VProc([o0, o1, e0, e1], [
         txtPtr.SetNumber(-1),
         c.SetMemory(0x6509B0, c.SetTo, ut.EPD(0x640B60)),
-        c.SetMemory(setPtr_o + 8, c.SetTo, 0),
-        c.SetMemory(setPtr_e + 8, c.SetTo, 1),
-        o0.QueueAssignTo(ut.EPD(trg_o0) + 4),
-        o1.QueueAssignTo(ut.EPD(trg_o1) + 4),
-        e0.QueueAssignTo(ut.EPD(trg_e0) + 4),
-        e1.QueueAssignTo(ut.EPD(trg_e1) + 4),
+        c.SetMemory(setPtr_o + 20, c.SetTo, 0),
+        c.SetMemory(setPtr_e + 20, c.SetTo, 1),
+        o0.SetDest(ut.EPD(trg_o0 + 16)),
+        o1.SetDest(ut.EPD(trg_o1 + 16)),
+        e0.SetDest(ut.EPD(trg_e0 + 16)),
+        e1.SetDest(ut.EPD(trg_e1 + 16)),
     ])
     if cs.EUDLoopN()(6):
         incr_o, incr_e = c.Forward(), c.Forward()
         trg_o0 << c.RawTrigger(
             nextptr=incr_o,
             conditions=[
-                c.Deaths(c.CurrentPlayer, c.Exactly, -1, 0),
+                c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
             ],
             actions=[
                 c.SetMemory(0x6509B0, c.Add, 1),
-                c.SetNextPtr(trg_o0, trg_o1)
+                c.SetNextPtr(trg_o0, trg_o1),
             ]
         )
         trg_o1 << c.RawTrigger(
             conditions=[
-                c.DeathsX(c.CurrentPlayer, c.Exactly, -1, 0, 0xFFFF),
+                c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF),
             ],
             actions=[
                 c.SetNextPtr(trg_o0, incr_o),
-                c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF),
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
                 c.SetMemory(0x6509B0, c.Add, -1),
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
                 setPtr_o << txtPtr.SetNumber(0),
@@ -233,14 +195,14 @@ def __remove_TextFX(o0, o1, e0, e1):
         )
         incr_o << c.RawTrigger(
             actions=[
-                c.SetMemory(0x6509B0, c.Add, 54),
-                c.SetMemory(setPtr_o + 8, c.Add, 2),
+                c.SetMemory(0x6509B0, c.Add, 216 // 4),
+                c.SetMemory(setPtr_o + 20, c.Add, 2),
             ]
         )
         trg_e0 << c.RawTrigger(
             nextptr=incr_e,
             conditions=[
-                c.DeathsX(c.CurrentPlayer, c.Exactly, -1, 0, 0xFFFF0000),
+                c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000),
             ],
             actions=[
                 c.SetMemory(0x6509B0, c.Add, 1),
@@ -249,7 +211,7 @@ def __remove_TextFX(o0, o1, e0, e1):
         )
         trg_e1 << c.RawTrigger(
             conditions=[
-                c.Deaths(c.CurrentPlayer, c.Exactly, -1, 0),
+                c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
             ],
             actions=[
                 c.SetNextPtr(trg_e0, incr_e),
@@ -261,12 +223,12 @@ def __remove_TextFX(o0, o1, e0, e1):
         )
         incr_e << c.RawTrigger(
             actions=[
-                c.SetMemory(0x6509B0, c.Add, 55),
-                c.SetMemory(setPtr_e + 8, c.Add, 2),
+                c.SetMemory(0x6509B0, c.Add, 220 // 4),
+                c.SetMemory(setPtr_e + 20, c.Add, 2),
             ]
         )
     cs.EUDEndLoopN()
-    f_setcurpl(origcp)
+    f_setcurpl2cpcache()
     return txtPtr
 
 
