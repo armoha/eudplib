@@ -32,7 +32,7 @@ from ... import utils as ut
 
 def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
     def _EUDTypedFunc(fdecl_func):
-        argspec = inspect.getargspec(fdecl_func)
+        argspec = inspect.getfullargspec(fdecl_func)
         argn = len(argspec[0])
         ut.ep_assert(
             argspec[1] is None, "No variadic arguments (*args) allowed for EUDFunc."

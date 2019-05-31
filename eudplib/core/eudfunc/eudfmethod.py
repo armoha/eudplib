@@ -37,7 +37,7 @@ _mth_classtype = {}
 def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):
     def _EUDTypedMethod(method):
         # Get argument number of fdecl_func
-        argspec = inspect.getargspec(method)
+        argspec = inspect.getfullargspec(method)
         ut.ep_assert(
             argspec[1] is None, "No variadic arguments (*args) allowed for EUDFunc."
         )
