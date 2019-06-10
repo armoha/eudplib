@@ -75,6 +75,9 @@ class EUDArrayData(c.EUDObject):
     def __setitem__(self, key, item):
         return self.set(key, item)
 
+    def __iter__(self):
+        raise NotImplementedError
+
 
 class EUDArray(ut.ExprProxy):
     def __init__(self, initval=None, *, _from=None):
@@ -100,3 +103,6 @@ class EUDArray(ut.ExprProxy):
 
     def __setitem__(self, key, item):
         return self.set(key, item)
+
+    def __iter__(self):
+        raise NotImplementedError
