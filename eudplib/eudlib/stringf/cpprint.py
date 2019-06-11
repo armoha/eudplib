@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from eudplib import core as c, ctrlstru as cs, utils as ut
 
-from ..memiof import CPByteWriter, f_setcurpl, f_getcurpl, f_dwread_epd, f_dwwrite
+from ..memiof import CPByteWriter, f_setcurpl, f_getcurpl, f_dwwrite, f_cunitread_epd
 from ..rwcommon import br1
 from .cpstr import _s2b, CPString
 from .dbstr import DBString
@@ -205,14 +205,18 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
 
 @c.EUDTypedFunc([c.TrgPlayer])
 def f_raise_CCMU(player):
-    orignextptr = f_dwread_epd(ut.EPD(0x628438))
-    cs.DoActions(
-        [
+    if cs.EUDIf()(c.Memory(0x628438, c.AtLeast, 0x59CCA8)):
+        orignextptr = f_cunitread_epd(ut.EPD(0x628438))
+        print_error = c.Forward()
+        c.VProc(player, player.SetDest(ut.EPD(print_error + 16)))
+        c.VProc(orignextptr, [
             c.SetMemory(0x628438, c.SetTo, 0),
-            c.CreateUnit(1, 0, 64, player),
-            c.SetMemory(0x628438, c.SetTo, orignextptr),
-        ]
-    )
+            print_error << c.CreateUnit(1, 0, 64, 0),
+            orignextptr.SetDest(ut.EPD(0x628438)),
+        ])
+    if cs.EUDElse()():
+        cs.DoActions(c.CreateUnit(1, 0, 64, player))
+    cs.EUDEndIf()
 
 
 _eprintln_template = None
