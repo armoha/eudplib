@@ -26,6 +26,8 @@ THE SOFTWARE.
 from ... import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_posread_epd, f_setcurpl2cpcache, f_dwread_epd
 
+_loct = 0x58DC60
+
 
 def _locfgen(mod1, mod2, mod3, mod4, signed=False):
 
@@ -34,7 +36,7 @@ def _locfgen(mod1, mod2, mod3, mod4, signed=False):
         act = c.Forward()
 
         c.VProc([epd, x], [
-            epd.AddNumber(ut.EPD(0x58DC60)),
+            epd.AddNumber(ut.EPD(_loct)),
             epd.SetDest(ut.EPD(act) + 4),
         ] + [
             x.SetDest(ut.EPD(act) + 5)
@@ -91,24 +93,48 @@ _DilateLoc = _locfgen(c.Add, c.Add, c.Add, c.Add, signed=True)
 def f_setloc(locID, x, y):
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    _SetLoc(locID * 5, x, y)
+    if c.IsConstExpr(locID) and c.IsConstExpr(x) and c.IsConstExpr(y):
+        cs.DoActions([
+            c.SetMemory(_loct + 20 * locID, c.SetTo, x),
+            c.SetMemory(_loct + 20 * locID + 4, c.SetTo, y),
+            c.SetMemory(_loct + 20 * locID + 8, c.SetTo, x),
+            c.SetMemory(_loct + 20 * locID + 12, c.SetTo, y),
+        ])
+    else:
+        _SetLoc(locID * 5, x, y)
 
 
 def f_addloc(locID, x, y):
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    _AddLoc(locID * 5, x, y)
+    if c.IsConstExpr(locID) and c.IsConstExpr(x) and c.IsConstExpr(y):
+        cs.DoActions([
+            c.SetMemory(_loct + 20 * locID, c.Add, x),
+            c.SetMemory(_loct + 20 * locID + 4, c.Add, y),
+            c.SetMemory(_loct + 20 * locID + 8, c.Add, x),
+            c.SetMemory(_loct + 20 * locID + 12, c.Add, y),
+        ])
+    else:
+        _AddLoc(locID * 5, x, y)
 
 
 def f_dilateloc(locID, x, y):
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    _DilateLoc(locID * 5, x, y)
+    if c.IsConstExpr(locID) and c.IsConstExpr(x) and c.IsConstExpr(y):
+        cs.DoActions([
+            c.SetMemory(_loct + 20 * locID, c.Subtract, x),
+            c.SetMemory(_loct + 20 * locID + 4, c.Subtract, y),
+            c.SetMemory(_loct + 20 * locID + 8, c.Add, x),
+            c.SetMemory(_loct + 20 * locID + 12, c.Add, y),
+        ])
+    else:
+        _DilateLoc(locID * 5, x, y)
 
 
 @c.EUDFunc
 def _GetLocTL(epd):
-    epd += ut.EPD(0x58DC60)
+    epd += ut.EPD(_loct)
     c.EUDReturn(
         f_dwread_epd(epd),
         f_dwread_epd(epd + 1))
@@ -135,7 +161,7 @@ def _SetLocEPD(loc, epd):
     ])
 
     c.VProc([x, y], [
-        c.SetMemory(0x6509B0, c.Add, ut.EPD(0x58DC60)),
+        c.SetMemory(0x6509B0, c.Add, ut.EPD(_loct)),
         x.SetDest(ut.EPD(act + 32 * 4 + 20)),
         y.SetDest(ut.EPD(act + 32 * 6 + 20)),
     ])
