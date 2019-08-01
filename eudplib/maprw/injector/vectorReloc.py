@@ -119,8 +119,9 @@ def CreateVectorRelocator(chkt, payload):
     # STR SECTION
     #############
     str_sled = []
+    mrgn_ort = mrgn + 836
     sledheader_prt = b"\0\0\0\0" + ut.i2b4(mrgn)
-    sledheader_ort = b"\0\0\0\0" + ut.i2b4(mrgn + 2408)
+    sledheader_ort = b"\0\0\0\0" + ut.i2b4(mrgn_ort)
 
     # apply prt
     prttrg_start = 2408 * len(str_sled)  # = 0
@@ -159,7 +160,7 @@ def CreateVectorRelocator(chkt, payload):
                 players=[tt.AllPlayers],
                 actions=[
                     [
-                        tt.SetMemory(mrgn + 2408 + 328 + 32 * j + 16, tt.Add, pch[j])
+                        tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, pch[j])
                         for j in range(packn)
                     ]
                 ],
@@ -176,13 +177,13 @@ def CreateVectorRelocator(chkt, payload):
             actions=[
                 [
                     tt.SetMemory(
-                        mrgn + 2408 + 328 + 32 * j + 16,
+                        mrgn_ort + 328 + 32 * j + 16,
                         tt.Add,
                         0xFFFFFFFF - prevoffset[j],
                     )
                     for j in range(packn)
                 ],
-                tt.SetMemory(mrgn + 2408 + 4, tt.Add, 4),  # skip garbage area
+                tt.SetMemory(mrgn_ort + 4, tt.Add, 4),  # skip garbage area
             ],
         )
     )
@@ -201,39 +202,35 @@ def CreateVectorRelocator(chkt, payload):
     ##############
     # MRGN SECTION
     ##############
-    mrgn_trigger = []
-    mrgn_trigger.append(
-        bytes(4)
-        + ut.i2b4(prttrg_start + strsled_offset)
-        + tt.Trigger(
-            players=[tt.AllPlayers],
-            actions=[
-                # SetDeaths actions in MRGN initially points to EPD(payload - 4)
-                [
-                    tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4)
-                    for _ in range(packn)
-                ],
-                tt.SetMemory(mrgn + 4, tt.Add, 2408),
+    mrgn_trigger = bytearray()
+    mrgn_trigger_prt = bytes(4) + ut.i2b4(prttrg_start + strsled_offset) + tt.Trigger(
+        players=[tt.AllPlayers],
+        actions=[
+            # SetDeaths actions in MRGN initially points to EPD(payload - 4)
+            [
+                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4)
+                for _ in range(packn)
             ],
-        )
-    )
-
-    mrgn_trigger.append(
-        bytes(4)
-        + ut.i2b4(orttrg_start + strsled_offset)
-        + tt.Trigger(
-            players=[tt.AllPlayers],
-            actions=[
-                [
-                    tt.SetMemory(payload_offset - 4, tt.Add, payload_offset)
-                    for _ in range(packn)
-                ],
-                tt.SetMemory(mrgn + 2408 + 4, tt.Add, 2408),
+            tt.SetMemory(mrgn + 4, tt.Add, 2408),
+        ],
+    ) + bytes(836)
+    mrgn_trigger_ort = bytes(836 + 4) + ut.i2b4(orttrg_start + strsled_offset) + tt.Trigger(
+        players=[tt.AllPlayers],
+        actions=[
+            [
+                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset)
+                for _ in range(packn)
             ],
-        )
+            tt.SetMemory(mrgn_ort + 4, tt.Add, 2408),
+        ],
     )
+    for b1, b2 in zip(mrgn_trigger_prt, mrgn_trigger_ort):
+        mrgn_trigger.append(b1 ^ b2)
 
-    mrgn_section = b"".join(mrgn_trigger) + bytes(5100 - 2408 * 2)
+    oldmrgnraw = chkt.getsection("MRGN")
+    mrgn_section = bytes(mrgn_trigger) + oldmrgnraw[2408 + 836:]
+    if len(mrgn_section) != 5100:
+        raise RuntimeError("MRGN section size bug")
     chkt.setsection("MRGN", mrgn_section)
 
     ##############
@@ -282,12 +279,12 @@ def CreateVectorRelocator(chkt, payload):
                 ],
                 tt.SetMemory(mrgn + 4, tt.Add, 2 ** e),
                 [
-                    tt.SetMemory(mrgn + 2408 + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2))
+                    tt.SetMemory(mrgn_ort + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2))
                     for i in range(packn)
                 ],
-                tt.SetMemory(mrgn + 2408 + 4, tt.Add, 2 ** e),
+                tt.SetMemory(mrgn_ort + 4, tt.Add, 2 ** e),
                 [
-                    tt.SetMemory(mrgn + 2408 + 328 + 32 * i + 20, tt.Add, 2 ** e)
+                    tt.SetMemory(mrgn_ort + 328 + 32 * i + 20, tt.Add, 2 ** e)
                     for i in range(packn)
                 ],
                 tt.SetMemory(strs, tt.Subtract, 2 ** e),
