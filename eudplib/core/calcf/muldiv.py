@@ -168,38 +168,35 @@ def f_constdiv(number):
 
 @ef.EUDFunc
 def _f_mul(a, b):
-    ret, y0 = ev.EUDCreateVariables(2)
+    ret = ev.EUDVariable()
+    endmul, reset_nptr = ac.Forward(), ac.Forward()
 
     # Init
-    ev.SeqCompute([(ret, rt.SetTo, 0), (y0, rt.SetTo, b)])
-
-    chain = [ac.Forward() for _ in range(32)]
-    chain_y0 = [ac.Forward() for _ in range(32)]
-
-    # Calculate chain_y0
-    for i in range(32):
-        ev.SeqCompute(((ut.EPD(chain_y0[i]), rt.SetTo, y0), (y0, rt.Add, y0)))
-        if i <= 30:
-            p1, p2, p3 = ac.Forward(), ac.Forward(), ac.Forward()
-            p1 << rt.RawTrigger(
-                nextptr=p2,
-                conditions=a.AtMost(2 ** (i + 1) - 1),
-                actions=rt.SetNextPtr(p1, p3),
-            )
-            p3 << rt.RawTrigger(nextptr=chain[i], actions=rt.SetNextPtr(p1, p2))
-            p2 << rt.NextTrigger()
+    rt.RawTrigger(actions=[ret.SetNumber(0), b.QueueAddTo(0)[1]])
 
     # Run multiplication chain
-    for i in range(31, -1, -1):
-        cy0 = ac.Forward()
-
-        chain[i] << rt.RawTrigger(
-            conditions=[a.AtLeast(2 ** i)],
-            actions=[a.SubtractNumber(2 ** i), cy0 << ret.AddNumber(0)],
+    for i in range(32):
+        p1, p2, p3, p4 = [ac.Forward() for _ in range(4)]
+        p1 << rt.RawTrigger(
+            nextptr=p2,
+            conditions=a.AtLeastX(1, 2 ** i),
+            actions=[a.SubtractNumber(2 ** i), rt.SetNextPtr(p1, p3)],
         )
+        p3 << ev.VProc(b, [b.SetDest(ret), rt.SetNextPtr(p1, p2)])
+        p2 << rt.NextTrigger()
+        if i <= 30:
+            rt.RawTrigger(
+                nextptr=p4,
+                conditions=a.Exactly(0),
+                actions=[
+                    rt.SetNextPtr(p2, endmul),
+                    rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
+                    rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
+                ]
+            )
+            p4 << ev.VProc(b, b.SetDest(b))
 
-        chain_y0[i] << cy0 + 20
-
+    endmul << rt.RawTrigger(actions=[reset_nptr << rt.SetNextPtr(p1, p2)])
     return ret
 
 
