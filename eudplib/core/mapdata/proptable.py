@@ -39,7 +39,10 @@ def InitPropertyMap(chkt):
 
     # Backup UPRP data
     uprp = chkt.getsection("UPRP")
-    upus = chkt.getsection("UPUS") or bytes([1] * 64)
+    try:
+        upus = chkt.getsection("UPUS")
+    except KeyError:
+        upus = bytes([1] * 64)
 
     for i in range(64):
         if upus[i]:

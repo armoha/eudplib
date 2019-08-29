@@ -132,14 +132,15 @@ class CHK:
 
         # MASK optimization : cancel 0xFFs.
         mask = self.getsection(b"MASK")
-        clippos = 0
-        for i in range(terrainsize - 1, -1, -1):
-            if mask[i] != 0xFF:
-                clippos = i + 1
-                break
+        if mask:
+            clippos = 0
+            for i in range(terrainsize - 1, -1, -1):
+                if mask[i] != 0xFF:
+                    clippos = i + 1
+                    break
 
-        mask = mask[:clippos]
-        self.setsection(b"MASK", mask)
+            mask = mask[:clippos]
+            self.setsection(b"MASK", mask)
 
         # MTXM optimization
         # MASK optimization : cancel 0xFFs.
