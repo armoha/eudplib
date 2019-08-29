@@ -225,6 +225,27 @@ class StringBuffer:
         ])
         end << c.NextTrigger()
 
+    def printAt(self, line, *args):
+        if not StringBuffer._method_template.IsSet():
+            StringBuffer._init_template()
+        end, ontrue = c.Forward(), c.Forward()
+        c.RawTrigger(
+            nextptr=StringBuffer._method_template,
+            actions=[
+                c.SetNextPtr(StringBuffer._cpbranch, end),
+                c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
+            ]
+        )
+        ontrue << c.NextTrigger()
+        f_setcurpl(self.epd)
+        f_cpstr_print(*args, EOS=False)
+        cs.DoActions([
+            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            c.SetCurrentPlayer(prevcp),
+        ])
+        self.DisplayAt(line)
+        end << c.NextTrigger()
+
     def Play(self):
         cs.DoActions(c.PlayWAV(self.StringIndex))
 
