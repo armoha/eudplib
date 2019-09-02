@@ -131,11 +131,11 @@ def f_strnstr(string, substring, count):
         _offset << br1._offset
         _suboffset << br1._suboffset
         if cs.EUDWhile()(1):
-            c = bw1.readbyte()
-            if cs.EUDIf()(c == 0):
+            d = bw1.readbyte()
+            if cs.EUDIf()(d == 0):
                 c.EUDReturn(string + dst)
             cs.EUDEndIf()
-            cs.EUDBreakIfNot(br1.readbyte() == c)
+            cs.EUDBreakIfNot(br1.readbyte() == d)
         cs.EUDEndWhile()
         br1._offset << _offset
         br1._suboffset << _suboffset
