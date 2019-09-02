@@ -148,7 +148,7 @@ def f_setloc(locID, *coords):
         raise NotImplementedError("number of coordinates should be 2 or 4.")
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    if c.IsConstExpr(locID) and all(c.IsConstExpr(c) for c in coords):
+    if c.IsConstExpr(locID) and all(c.IsConstExpr(co) for co in coords):
         dst = _loct + 20 * locID
         if len(coords) == 2:
             l, t = coords
@@ -172,7 +172,7 @@ def f_addloc(locID, *coords):
         raise NotImplementedError("number of coordinates should be 2 or 4.")
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    if c.IsConstExpr(locID) and all(c.IsConstExpr(c) for c in coords):
+    if c.IsConstExpr(locID) and all(c.IsConstExpr(co) for co in coords):
         dst = _loct + 20 * locID
         if len(coords) == 2:
             l, t = coords
@@ -196,7 +196,7 @@ def f_dilateloc(locID, *coords):
         raise NotImplementedError("number of coordinates should be 2 or 4.")
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    if c.IsConstExpr(locID) and all(c.IsConstExpr(c) for c in coords):
+    if c.IsConstExpr(locID) and all(c.IsConstExpr(co) for co in coords):
         dst = _loct + 20 * locID
         if len(coords) == 2:
             l, t = coords
