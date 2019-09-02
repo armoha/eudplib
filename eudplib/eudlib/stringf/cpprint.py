@@ -29,7 +29,7 @@ from ..memiof import CPByteWriter, f_setcurpl, f_getcurpl, f_dwwrite, f_cunitrea
 from ..rwcommon import br1
 from .cpstr import _s2b, CPString
 from .dbstr import DBString
-from .eudprint import ptr2s, epd2s, hptr
+from .eudprint import ptr2s, epd2s, hptr, _conststr_dict
 from .tblprint import GetTBLAddr
 from ..eudarray import EUDArray
 
@@ -422,9 +422,6 @@ def f_cpstr_addptr(number):
             )
 
 
-_constcpstr_dict = dict()
-
-
 def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
     """Print multiple string / number to CurrentPlayer.
 
@@ -439,11 +436,13 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
             arg = ut.u2utf8(str(arg & 0xFFFFFFFF))
         if ut.isUnproxyInstance(arg, bytes):
             key = _s2b(arg)
-            if key not in _constcpstr_dict:
-                _constcpstr_dict[key] = CPString(arg)
-            arg = _constcpstr_dict[key]
+            if key not in _conststr_dict:
+                _conststr_dict[key] = c.Db(arg + b"\0")
+            arg = _conststr_dict[key]
         if ut.isUnproxyInstance(arg, CPString):
             arg.Display()
+        elif ut.isUnproxyInstance(arg, c.Db):
+            f_cpstr_addstr_epd(ut.EPD(arg))
         elif ut.isUnproxyInstance(arg, ptr2s):
             f_cpstr_addstr(arg._value)
         elif ut.isUnproxyInstance(arg, epd2s):
