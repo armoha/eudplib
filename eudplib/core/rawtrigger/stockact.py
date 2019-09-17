@@ -25,6 +25,8 @@ THE SOFTWARE.
 
 from .action import Action
 from .constenc import (
+    Add,
+    CurrentPlayer,
     EncodeAllyStatus,
     EncodeCount,
     EncodeModifier,

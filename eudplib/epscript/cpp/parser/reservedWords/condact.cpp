@@ -25,7 +25,7 @@ const char* actionList[] = {
         "ModifyUnitEnergy", "ModifyUnitShields", "ModifyUnitResourceAmount",
         "ModifyUnitHangarCount", "PauseTimer", "UnpauseTimer", "Draw",
         "SetAllianceStatus", "SetMemory", "SetNextPtr", "SetMemoryEPD", "SetCurrentPlayer",
-        "SetDeathsX", "SetMemoryX", "SetMemoryXEPD",
+        "SetDeathsX", "SetMemoryX", "SetMemoryXEPD", "SetKills",
 };
 
 bool isConditionName(const std::string& name) {

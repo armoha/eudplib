@@ -29,3 +29,6 @@ def test_dwmemio():
     f_randomize()
     f_rand()
     f_dwrand()
+
+    # Fixes https://cafe.naver.com/edac/81090
+    SetKills(CurrentPlayer, SetTo, 0, 0)
