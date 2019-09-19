@@ -90,10 +90,12 @@ def InitMpqLibrary():
         libstorm.SFileCompactArchive.restype = c_int
         libstorm.SFileAddFile.restype = c_int
         libstorm.SFileAddWave.restype = c_int
+        libstorm.SFileSetMaxFileCount.restype = c_int
 
         libstorm.SFileCompactArchive.argtypes = [c_void_p, c_char_p, c_int]
         libstorm.SFileAddFile.argtypes = [c_void_p, c_char_p, c_char_p, c_int]
         libstorm.SFileAddWave.argtypes = [c_void_p, c_char_p, c_char_p, c_int, c_int]
+        libstorm.SFileSetMaxFileCount.argtypes = [c_void_p, c_int]
 
         return True
 
@@ -213,6 +215,9 @@ class MPQ:
         )
         os.unlink(tmpfname)
         return ret
+
+    def SetMaxFileCount(self, count):
+        self.libstorm.SFileSetMaxFileCount(self.mpqh, count)
 
     def Compact(self):
         self.libstorm.SFileCompactArchive(self.mpqh, None, 0)
