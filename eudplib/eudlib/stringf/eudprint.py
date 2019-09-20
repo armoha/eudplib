@@ -82,6 +82,7 @@ def f_dbstr_adddw(dst, number):
     # Get digits
     for i in range(10):
         number, ch[i] = c.f_div(number, 10)
+        ch[i] += b"0"[0]
         if i != 9:
             cs.EUDJumpIf(number == 0, skipper[i])
 
@@ -89,7 +90,7 @@ def f_dbstr_adddw(dst, number):
     for i in range(9, -1, -1):
         if i != 9:
             skipper[i] << c.NextTrigger()
-        bw1.writebyte(ch[i] + b"0"[0])
+        bw1.writebyte(ch[i])
         if i == 0:
             _dw_jump << c.NextTrigger()
         dst += 1
