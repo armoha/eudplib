@@ -44,7 +44,8 @@ def EUDLoopList(header_offset, break_offset=None):
 
     yield ptr, epd
     cs.EUDSetContinuePoint()
-    c.SetVariables([ptr, epd], f_dwepdread_epd(epd + 1))
+    epd += 1
+    c.SetVariables([ptr, epd], f_dwepdread_epd(epd))
     cs.EUDEndWhile()
 
     ut.ep_assert(ut.EUDPopBlock(blockname)[1] is header_offset, "listloop mismatch")
@@ -58,7 +59,8 @@ def EUDLoopUnit():
     if cs.EUDWhile()(ptr >= 1):
         yield ptr, epd
         cs.EUDSetContinuePoint()
-        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd + 1))
+        epd += 1
+        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd))
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("unitloop")
@@ -72,15 +74,23 @@ def EUDLoopNewUnit(allowance=2):
 
     ptr, epd = f_cunitepdread_epd(firstUnitPtr)
     if cs.EUDWhile()(ptr >= 1):
-        if cs.EUDIf()(c.MemoryXEPD(epd + 0xA5 // 4, c.AtLeast, 0x100, 0xFF00)):
-            cs.DoActions(c.SetMemoryXEPD(epd + 0xA5 // 4, c.SetTo, 0, 0xFF00))
+        epd += 0xA5 // 4
+        if cs.EUDIf()(c.MemoryXEPD(epd, c.AtLeast, 0x100, 0xFF00)):
+            cs.DoActions([
+                c.SetMemoryXEPD(epd, c.SetTo, 0, 0xFF00),
+                epd.AddNumber(-(0xA5 // 4)),
+            ])
             yield ptr, epd
         if cs.EUDElse()():
-            cs.DoActions(tos0.AddNumber(1))
+            cs.DoActions([
+                tos0.AddNumber(1),
+                epd.AddNumber(-(0xA5 // 4))
+            ])
             cs.EUDBreakIf(tos0.AtLeast(allowance))
         cs.EUDEndIf()
         cs.EUDSetContinuePoint()
-        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd + 1))
+        epd += 1
+        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd))
     cs.EUDEndWhile()
 
     ut.EUDPopBlock('newunitloop')
@@ -91,11 +101,13 @@ def EUDLoopUnit2():
     1700개 유닛을 도는 방식으로 작동합니다.
     """
     ptr, epd = c.EUDCreateVariables(2)
-    cs.DoActions([ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8))])
+    cs.DoActions([ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8) + (0x4C // 4))])
     if cs.EUDLoopN()(1700):
         # orderID가 0(Die)이면 없는 유닛으로 판단.
-        cs.EUDContinueIf(c.MemoryXEPD(epd + (0x4C // 4), c.Exactly, 0, 0xFF00))
+        cs.EUDContinueIf(c.MemoryXEPD(epd, c.Exactly, 0, 0xFF00))
+        epd -= (0x4C // 4)
         yield ptr, epd
+        epd += (0x4C // 4)
         cs.EUDSetContinuePoint()
         cs.DoActions([ptr.AddNumber(336), epd.AddNumber(336 // 4)])
     cs.EUDEndLoopN()
@@ -111,7 +123,8 @@ def EUDLoopPlayerUnit(player):
         yield ptr, epd
         cs.EUDSetContinuePoint()
         # /*0x06C*/ BW::CUnit*  nextPlayerUnit;
-        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd + 0x6C // 4))
+        epd += 0x6C // 4
+        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd))
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("playerunitloop")
@@ -133,7 +146,8 @@ def EUDLoopSprite():
         if cs.EUDWhile()(ptr >= 1):
             yield ptr, epd
             cs.EUDSetContinuePoint()
-            c.SetVariables([ptr, epd], f_dwepdread_epd(epd + 1))
+            epd += 1
+            c.SetVariables([ptr, epd], f_dwepdread_epd(epd))
         cs.EUDEndWhile()
         y_epd += 1
     cs.EUDEndWhile()
