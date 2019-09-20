@@ -29,6 +29,9 @@ from ..rwcommon import br1, bw1
 from .dbstr import DBString
 
 _conststr_dict = dict()
+_str_jump, _str_EOS, _str_dst = c.Forward(), c.Forward(), c.Forward()
+_dw_jump, _dw_EOS, _dw_dst = c.Forward(), c.Forward(), c.Forward()
+_ptr_jump, _ptr_EOS, _ptr_dst = c.Forward(), c.Forward(), c.Forward()
 
 
 @c.EUDFunc
@@ -40,6 +43,7 @@ def f_dbstr_addstr(dst, src):
 
     :returns: dst + strlen(src)
     """
+    global _str_jump, _str_EOS, _str_dst
     b = c.EUDVariable()
 
     br1.seekoffset(src)
@@ -47,10 +51,15 @@ def f_dbstr_addstr(dst, src):
 
     if cs.EUDInfLoop()():
         c.SetVariables(b, br1.readbyte())
-        bw1.writebyte(b)
         cs.EUDBreakIf(b == 0)
+        bw1.writebyte(b)
         dst += 1
     cs.EUDEndInfLoop()
+
+    _str_jump << c.RawTrigger()
+    _str_EOS << c.NextTrigger()
+    bw1.writebyte(0)  # EOS
+    _str_dst << c.NextTrigger()
 
     return dst
 
@@ -64,6 +73,7 @@ def f_dbstr_adddw(dst, number):
 
     :returns: dst + strlen(itoa(number))
     """
+    global _dw_jump, _dw_EOS, _dw_dst
     bw1.seekoffset(dst)
 
     skipper = [c.Forward() for _ in range(9)]
@@ -80,9 +90,13 @@ def f_dbstr_adddw(dst, number):
         if i != 9:
             skipper[i] << c.NextTrigger()
         bw1.writebyte(ch[i] + b"0"[0])
+        if i == 0:
+            _dw_jump << c.NextTrigger()
         dst += 1
 
+    _dw_EOS << c.NextTrigger()
     bw1.writebyte(0)  # EOS
+    _dw_dst << c.NextTrigger()
 
     return dst
 
@@ -96,6 +110,7 @@ def f_dbstr_addptr(dst, number):
 
     :returns: dst + strlen(itoa(number))
     """
+    global _ptr_jump, _ptr_EOS, _ptr_dst
     bw1.seekoffset(dst)
     ch = [0] * 8
 
@@ -110,9 +125,13 @@ def f_dbstr_addptr(dst, number):
         if cs.EUDElse()():
             bw1.writebyte(ch[i] + (b"A"[0] - 10))
         cs.EUDEndIf()
+        if i == 0:
+            _ptr_jump << c.NextTrigger()
         dst += 1
 
+    _ptr_EOS << c.NextTrigger()
     bw1.writebyte(0)  # EOS
+    _ptr_dst << c.NextTrigger()
 
     return dst
 
