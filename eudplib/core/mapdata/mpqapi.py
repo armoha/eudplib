@@ -55,16 +55,16 @@ def InitMpqLibrary():
             from ctypes import WinDLL
 
             if struct.calcsize("P") == 4:  # 32bit
-                libstorm = WinDLL(find_data_file("StormLib32.dll", __file__))
+                libstorm = WinDLL(find_data_file("StormLib32.dll", __file__), use_last_error=True)
             else:  # 64bit
-                libstorm = WinDLL(find_data_file("StormLib64.dll", __file__))
+                libstorm = WinDLL(find_data_file("StormLib64.dll", __file__), use_last_error=True)
             filename_u2b = u2b
 
         elif platformName == "Darwin":  # mac
             from ctypes import CDLL
 
             try:
-                libstorm = CDLL("libstorm.dylib")
+                libstorm = CDLL("libstorm.dylib", use_last_error=True)
                 filename_u2b = lambda x: x.encode("utf-8")
             except OSError:
                 print("You need to install stormlib before using eudplib.")
@@ -217,10 +217,10 @@ class MPQ:
         return ret
 
     def SetMaxFileCount(self, count):
-        self.libstorm.SFileSetMaxFileCount(self.mpqh, count)
+        return self.libstorm.SFileSetMaxFileCount(self.mpqh, count)
 
     def Compact(self):
-        self.libstorm.SFileCompactArchive(self.mpqh, None, 0)
+        return self.libstorm.SFileCompactArchive(self.mpqh, None, 0)
 
 
 InitMpqLibrary()

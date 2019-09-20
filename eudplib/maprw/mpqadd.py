@@ -24,6 +24,8 @@ THE SOFTWARE.
 """
 
 from .. import utils as ut
+import ctypes
+import sys
 
 _addedFiles = {}
 
@@ -87,7 +89,10 @@ def UpdateMPQ(mpqw):
     `MPQAddFile` queues addition, and UpdateMPQ really adds them.
     """
 
-    mpqw.SetMaxFileCount(1 << (len(_addedFiles)).bit_length())
+    max_count = max(1024, 1 << (len(_addedFiles)).bit_length())
+    setmax = mpqw.SetMaxFileCount(max_count)
+    if not setmax:
+        raise ctypes.WinError(ctypes.get_last_error())
 
     for fname, content, isWave in _addedFiles.values():
         if content is not None:
@@ -96,9 +101,11 @@ def UpdateMPQ(mpqw):
             else:
                 ret = mpqw.PutFile(ut.u2b(fname), content)
             if not ret:
-                raise ut.EPError(
-                    "Failed adding file %s to mpq: May be duplicate" % fname
+                print(
+                    "Failed adding file %s to mpq: May be duplicate" % fname,
+                    file=sys.stderr
                 )
+                raise ctypes.WinError(ctypes.get_last_error())
 
 
 def GetAddedFiles():
