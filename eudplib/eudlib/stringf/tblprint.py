@@ -27,6 +27,7 @@ from ... import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_dwepdread_epd, f_wread_epd
 from .eudprint import f_dbstr_print
 
+
 @c.EUDFunc
 def GetTBLAddr(tblId):
     add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
@@ -48,11 +49,20 @@ def GetTBLAddr(tblId):
 
 
 def f_settbl(tblID, offset, *args):
+    dst = GetTBLAddr(tblID)
+    dst += offset
+    f_dbstr_print(dst, *args, encoding="cp949")
+
+
+def f_settbl2(tblID, offset, *args):
     from .eudprint import hptr, _str_jump, _str_EOS, _str_dst, _dw_jump, _dw_EOS, _dw_dst, _ptr_jump, _ptr_EOS, _ptr_dst
-    dst = GetTBLAddr(tblID) + offset
+    dst = GetTBLAddr(tblID)
     dw = any(c.IsConstExpr(x) or c.IsEUDVariable(x) for x in args)
     ptr = any(ut.isUnproxyInstance(x, hptr) for x in args)
-    cs.DoActions([c.SetNextPtr(_str_jump, _str_dst)] +
+    cs.DoActions([
+        c.SetNextPtr(_str_jump, _str_dst),
+        dst.AddNumber(offset)
+    ] +
     [
         c.SetNextPtr(_dw_jump, _dw_dst)
         if dw else []

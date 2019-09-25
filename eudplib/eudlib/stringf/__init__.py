@@ -59,7 +59,7 @@ from .cpprint import (
 
 from .cputf8 import f_cp949_to_utf8_cpy
 from .setpname import SetPName
-from .tblprint import GetTBLAddr, f_settbl
+from .tblprint import GetTBLAddr, f_settbl, f_settbl2
 
 from .texteffect import (
     f_cpchar_adddw,
