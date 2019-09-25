@@ -30,7 +30,7 @@ THE SOFTWARE.
 """
 
 from ... import core as c
-from ...core.mapdata.stringmap import GetStringMap
+from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
 from ...eudlib.stringf.strbuffer import _strbuffer_list
 from eudplib import utils as ut
 from ...trigtrg import trigtrg as tt
@@ -197,7 +197,7 @@ def CreateVectorRelocator(chkt, payload):
     str_section = (
         str_section + bytes(str_padding_length) + str_sled + b"\0\0\0\0" + payload.data
     )
-    chkt.setsection("STR", str_section)
+    chkt.setsection(GetStringSectionName(), str_section)
 
     ##############
     # MRGN SECTION

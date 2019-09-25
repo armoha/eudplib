@@ -47,17 +47,29 @@ class StringIdMap:
 
 
 strmap = None
+strsection = None
 unitmap = None
 locmap = None
 swmap = None
 
 
 def InitStringMap(chkt):
-    global strmap, unitmap, locmap, swmap
+    global strmap, strsection, unitmap, locmap, swmap
 
     unitmap = StringIdMap()
     locmap = StringIdMap()
     swmap = StringIdMap()
+
+    if b2i2(chkt.getsection("VER")) & 1:
+        try:
+            strx = chkt.getsection("STRx")
+        except KeyError:
+            pass
+        else:
+            strsection = "STRx"
+            strmap = tblformat.TBL(strx, [chkt, unitmap, locmap, swmap], entry_size=4)
+            return
+    strsection = "STR"
     strmap = tblformat.TBL(chkt.getsection("STR"), [chkt, unitmap, locmap, swmap])
 
 
@@ -78,7 +90,7 @@ def GetUnitIndex(u):
 
 
 def ApplyStringMap(chkt):
-    chkt.setsection("STR", strmap.SaveTBL())
+    chkt.setsection(strsection, strmap.SaveTBL())
 
 
 def ForcedAddString(s):
@@ -87,3 +99,7 @@ def ForcedAddString(s):
 
 def GetStringMap():
     return strmap
+
+
+def GetStringSectionName():
+    return strsection

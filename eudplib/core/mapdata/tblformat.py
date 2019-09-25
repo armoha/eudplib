@@ -34,8 +34,32 @@ def IgnoreColor(s):
     return bytes(filter(lambda x: not (0x01 <= x <= 0x1F or x == 0x7F), s))
 
 
+def b2in(n):
+    b2in_map = {
+        2: ut.b2i2,
+        4: ut.b2i4,
+    }
+    return b2in_map[n]
+
+
+def i2bn(n):
+    i2bn_map = {
+        2: ut.i2b2,
+        4: ut.i2b4,
+    }
+    return i2bn_map[n]
+
+
+def u2bn(n):
+    u2bn_map = {
+        2: ut.u2b,
+        4: ut.u2utf8,
+    }
+    return u2bn_map[n]
+
+
 class TBL:
-    def __init__(self, content=None, init_chkt=None):
+    def __init__(self, content=None, init_chkt=None, entry_size=2):
         #
         # datatb : table of strings                       : string data table
         # dataindextb : string id -> data id              : string offset table
@@ -45,7 +69,8 @@ class TBL:
         self._datatb = []
         self._stringmap = {}
         self._dataindextb = []  # String starts from #1
-        self._capacity = 2  # Size of STR section
+        self._capacity = entry_size  # Size of STR section
+        self._entry_size = entry_size
         self._emptystring = []
         self._loaded = False
         self._first_extended_string = None
@@ -59,13 +84,15 @@ class TBL:
     def LoadTBL(self, content):
         self._datatb.clear()
         self._stringmap.clear()
-        self._capacity = 2
+        self._capacity = self._entry_size
 
-        stringcount = ut.b2i2(content, 0)
+        size = self._entry_size
+        b2i = b2in(size)
+        stringcount = b2i(content, 0)
 
         for i in range(stringcount):
             i += 1
-            stringoffset = ut.b2i2(content, i * 2)
+            stringoffset = b2i(content, i * size)
             send = stringoffset
             while content[send] != 0:
                 send += 1
@@ -75,7 +102,7 @@ class TBL:
                 empty_len = len(self._emptystring)
                 for j in range(i, stringcount):
                     j += 1
-                    nextoffset = ut.b2i2(content, j * 2)
+                    nextoffset = b2i(content, j * size)
                     nextend = nextoffset
                     while content[nextend] != 0:
                         nextend += 1
@@ -91,7 +118,7 @@ class TBL:
     def LoadTBLWithChk(self, content, init_chkt):
         self._datatb.clear()
         self._stringmap.clear()
-        self._capacity = 2
+        self._capacity = self._entry_size
 
         chkt, unitmap, locmap, swmap = init_chkt
 
@@ -144,12 +171,14 @@ class TBL:
                 if forcstrid:
                     reserved_str.add(forcstrid)
 
+        size = self._entry_size
+        b2i = b2in(size)
         removed_str = set(locdict.keys()).union(swnmdict.keys()) - reserved_str
-        stringcount = ut.b2i2(content, 0)
+        stringcount = b2i(content, 0)
 
         for i in range(stringcount):
             i += 1
-            stringoffset = ut.b2i2(content, i * 2)
+            stringoffset = b2i(content, i * size)
             send = stringoffset
             while content[send] != 0:
                 send += 1
@@ -161,7 +190,7 @@ class TBL:
                     j += 1
                     if j in removed_str:
                         continue
-                    nextoffset = ut.b2i2(content, j * 2)
+                    nextoffset = b2i(content, j * size)
                     nextend = nextoffset
                     while content[nextend] != 0:
                         nextend += 1
@@ -209,7 +238,7 @@ class TBL:
             repr_stringid = self._stringmap[string]
             dataindex = self._dataindextb[repr_stringid]
             self._dataindextb.append(dataindex)
-            self._capacity += 2  # just string offset
+            self._capacity += self._entry_size  # just string offset
 
         # Else -> Create new entry
         except KeyError:
@@ -235,10 +264,10 @@ class TBL:
                 self._datatb.append(string)
                 self._dataindextb.append(dataindex)
                 # string + b'\0' + string offset
-                self._capacity += len(string) + 1 + 2
+                self._capacity += len(string) + 1 + self._entry_size
             self._stringmap[string] = stringindex
 
-        ut.ep_assert(self._capacity < 65536, "String table overflow")
+        ut.ep_assert(self._capacity < (1 << (8 * self._entry_size)), "String table overflow")
 
         return stringindex
 
@@ -268,17 +297,19 @@ class TBL:
 
         # calculate offset of each string
         stroffset = []
-        outindex = 2 * len(self._dataindextb) + 2
+        size = self._entry_size
+        outindex = size * len(self._dataindextb) + size
         for s in self._datatb:
             stroffset.append(outindex)
             outindex += len(s) + 1
+        i2b = i2bn(size)
 
         # String count
-        outbytes.append(ut.i2b2(len(self._dataindextb)))
+        outbytes.append(i2b(len(self._dataindextb)))
 
         # String offsets
         for dataidx in self._dataindextb:
-            outbytes.append(ut.i2b2(stroffset[dataidx]))
+            outbytes.append(i2b(stroffset[dataidx]))
 
         # String data
         for s in self._datatb:
@@ -300,8 +331,8 @@ class TBL:
         self._datatb.append(string)
         self._dataindextb.append(dataindex)
         # string + b'\0' + string offset
-        self._capacity += len(string) + 1 + 2
+        self._capacity += len(string) + 1 + self._entry_size
 
-        ut.ep_assert(self._capacity < 65536, "String table overflow")
+        ut.ep_assert(self._capacity < (1 << (8 * self._entry_size)), "String table overflow")
 
         return stringindex
