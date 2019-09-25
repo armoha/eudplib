@@ -5,7 +5,9 @@ from helper import *
 def test_atan2():
     atanarray = EUDArray(360)
     for angle in EUDLoopRange(360):
+        EP_SetRValueStrictMode(False)
         x, y = f_lengthdir(1000, angle)
+        EP_SetRValueStrictMode(True)
         atanarray[angle] = f_atan2(y, x)
 
     # Value of atan2 may vary by 1 due to rounding error.

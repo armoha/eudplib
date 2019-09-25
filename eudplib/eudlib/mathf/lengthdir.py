@@ -51,48 +51,70 @@ def f_lengthdir(length, angle):
         angle << c.f_div(angle, 360)[1]
     cs.EUDEndIf()
 
-    ldir_x, ldir_y = c.EUDVariable(), c.EUDVariable()  # cos, sin * 65536
     # sign of cos, sin
     csign, ssign = c.EUDLightVariable(), c.EUDLightVariable()
     tableangle = c.EUDVariable()
 
     # get cos, sin from table
     if cs.EUDIf()(angle <= 89):
-        tableangle << angle
-        csign << 1
-        ssign << 1
+        c.VProc(angle, [
+            csign.SetNumber(1),
+            ssign.SetNumber(1),
+            angle.QueueAssignTo(tableangle)
+        ])
 
     if cs.EUDElseIf()(angle <= 179):
-        tableangle << 180 - angle
-        csign << -1
-        ssign << 1
+        c.VProc(angle, [
+            csign.SetNumber(-1),
+            ssign.SetNumber(1),
+            tableangle.SetNumber(180),
+            angle.QueueSubtractTo(tableangle)
+        ])
 
     if cs.EUDElseIf()(angle <= 269):
-        tableangle << angle - 180
-        csign << -1
-        ssign << -1
+        c.VProc(angle, [
+            csign.SetNumber(-1),
+            ssign.SetNumber(-1),
+            angle.QueueAddTo(tableangle),
+            tableangle.SetNumber(-180)
+        ])
 
     if cs.EUDElse()():
-        tableangle << 360 - angle
-        csign << 1
-        ssign << -1
+        c.VProc(angle, [
+            csign.SetNumber(1),
+            ssign.SetNumber(-1),
+            angle.QueueSubtractTo(tableangle),
+            tableangle.SetNumber(360)
+        ])
 
     cs.EUDEndIf()
 
     tablecos = f_dwread_epd(ut.EPD(cdb) + tableangle)
-    tablesin = f_dwread_epd(ut.EPD(sdb) + tableangle)
+    tableangle += ut.EPD(sdb)
+    tablesin = f_dwread_epd(tableangle)
 
-    # calculate lengthdir
-    ldir_x << c.f_div(c.f_mul(tablecos, length), 65536)[0]
-    ldir_y << c.f_div(c.f_mul(tablesin, length), 65536)[0]
+    # calculate lengthdir: cos, sin * 65536
+    ldir_x = c.f_div(c.f_mul(tablecos, length), 65536)[0]
+    ldir_y = c.f_div(c.f_mul(tablesin, length), 65536)[0]
+    signedness = c.EUDVariable()
 
     # restore sign of cos, sin
     if cs.EUDIf()(csign == -1):
-        ldir_x << 0xFFFFFFFF - ldir_x + 1
+        c.VProc([ldir_x, signedness], [
+            signedness.SetDest(ldir_x),
+            signedness.SetNumber(0xFFFFFFFF),
+            ldir_x.QueueSubtractTo(signedness)
+        ])
+        ldir_x += 1
     cs.EUDEndIf()
 
     if cs.EUDIf()(ssign == -1):
-        ldir_y << 0xFFFFFFFF - ldir_y + 1
+        c.VProc([ldir_y, signedness], [
+            signedness.SetDest(ldir_y),
+            signedness.SetNumber(0xFFFFFFFF),
+            ldir_y.QueueSubtractTo(signedness)
+        ])
+        ldir_y += 1
     cs.EUDEndIf()
 
     return ldir_x, ldir_y
