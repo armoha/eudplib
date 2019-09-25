@@ -116,7 +116,7 @@ class CHK:
             b'VER ', b'VCOD', b'OWNR', b'ERA ', b'DIM ', b'SIDE', b'MTXM',
             b'UNIT', b'THG2', b'MASK', b'STR ', b'UPRP', b'MRGN', b'TRIG',
             b'MBRF', b'SPRP', b'FORC', b'COLR', b'PUNI', b'PUPx', b'PTEx',
-            b'UNIx', b'UPGx', b'TECx',
+            b'UNIx', b'UPGx', b'TECx', b'STRx', b'CRGB',
         ]
         # fmt: on
 
