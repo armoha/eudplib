@@ -89,10 +89,12 @@ def UpdateMPQ(mpqw):
     `MPQAddFile` queues addition, and UpdateMPQ really adds them.
     """
 
-    max_count = max(1024, 1 << (len(_addedFiles)).bit_length())
-    setmax = mpqw.SetMaxFileCount(max_count)
-    if not setmax:
-        raise ctypes.WinError(ctypes.get_last_error())
+    count = mpqw.GetMaxFileCount()
+    if count < len(_addedFiles):
+        max_count = max(1024, 1 << (len(_addedFiles)).bit_length())
+        ret = mpqw.SetMaxFileCount(max_count)
+        if not ret:
+            raise ctypes.WinError(ctypes.get_last_error())
 
     for fname, content, isWave in _addedFiles.values():
         if content is not None:
