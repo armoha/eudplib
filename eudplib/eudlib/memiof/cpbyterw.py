@@ -62,6 +62,9 @@ class CPByteWriter:
         """Flush buffer."""
         # mux bytes
         cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+        if cs.EUDIf()(self._suboffset == 0):
+            c.EUDReturn()
+        cs.EUDEndIf()
 
         for i in range(7, -1, -1):
             for j in range(4):

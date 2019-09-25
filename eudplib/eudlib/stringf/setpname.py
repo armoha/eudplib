@@ -222,7 +222,9 @@ def SetPName(player, *name):
                 c.AddCurrentPlayer(1),
             ],
         )
-        f_cpstr_print(*(name + (epd2s(ut.EPD(temp_Db)),)))
+        name = list(name)
+        name.append(epd2s(ut.EPD(temp_Db)))
+        f_cpstr_print(*name)
 
         cs.EUDSetContinuePoint()
         cs.DoActions(
