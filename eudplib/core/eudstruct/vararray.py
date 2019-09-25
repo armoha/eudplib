@@ -223,7 +223,7 @@ def EUDVArray(size, basetype=None):
 
             SeqCompute(
                 [
-                    (EPD(self + 344 + i * 72), bt.SetTo, value)
+                    (self._epd + (18 * i + 348 // 4), bt.SetTo, value)
                     for i, value in enumerate(values)
                 ]
             )
