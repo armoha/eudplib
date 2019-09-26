@@ -60,7 +60,7 @@ def InitStringMap(chkt):
     locmap = StringIdMap()
     swmap = StringIdMap()
 
-    if b2i2(chkt.getsection("VER")) & 1:
+    if b2i2(chkt.getsection("VER")) & 3 == 2:
         try:
             strx = chkt.getsection("STRx")
         except KeyError:
