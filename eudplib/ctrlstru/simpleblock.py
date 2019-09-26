@@ -121,14 +121,23 @@ def EUDEndIf():
 # -------
 
 
+_once_templv = c.EUDLightVariable()
+_once_pow = 0
+
+
 def EUDExecuteOnce():
     def _footer():
+        global _once_templv, _once_pow
         block = {"blockend": c.Forward()}
         ut.EUDCreateBlock("executeonceblock", block)
 
-        tv = c.EUDLightVariable()
-        EUDJumpIf(tv == 1, block["blockend"])
-        tv << 1
+        tv = _once_templv
+        EUDJumpIf(tv.AtLeastX(1, 1 << _once_pow), block["blockend"])
+        tv += (1 << _once_pow)
+        _once_pow += 1
+        if _once_pow >= 32:
+            _once_templv = c.EUDLightVariable()
+            _once_pow = 0
         return True
 
     return CtrlStruOpener(_footer)

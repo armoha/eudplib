@@ -52,37 +52,33 @@ def f_lengthdir(length, angle):
     cs.EUDEndIf()
 
     # sign of cos, sin
-    csign, ssign = c.EUDLightVariable(), c.EUDLightVariable()
+    sign = c.EUDLightVariable()
     tableangle = c.EUDVariable()
 
     # get cos, sin from table
     if cs.EUDIf()(angle <= 89):
         c.VProc(angle, [
-            csign.SetNumber(1),
-            ssign.SetNumber(1),
+            sign.SetNumber(0),
             angle.QueueAssignTo(tableangle)
         ])
 
     if cs.EUDElseIf()(angle <= 179):
         c.VProc(angle, [
-            csign.SetNumber(-1),
-            ssign.SetNumber(1),
+            sign.SetNumber(1),
             tableangle.SetNumber(180),
             angle.QueueSubtractTo(tableangle)
         ])
 
     if cs.EUDElseIf()(angle <= 269):
         c.VProc(angle, [
-            csign.SetNumber(-1),
-            ssign.SetNumber(-1),
+            sign.SetNumber(3),
             angle.QueueAddTo(tableangle),
             tableangle.SetNumber(-180)
         ])
 
     if cs.EUDElse()():
         c.VProc(angle, [
-            csign.SetNumber(1),
-            ssign.SetNumber(-1),
+            sign.SetNumber(2),
             angle.QueueSubtractTo(tableangle),
             tableangle.SetNumber(360)
         ])
@@ -99,7 +95,7 @@ def f_lengthdir(length, angle):
     signedness = c.EUDVariable()
 
     # restore sign of cos, sin
-    if cs.EUDIf()(csign == -1):
+    if cs.EUDIf()(sign.ExactlyX(1, 1)):
         c.VProc([ldir_x, signedness], [
             signedness.SetDest(ldir_x),
             signedness.SetNumber(0xFFFFFFFF),
@@ -108,7 +104,7 @@ def f_lengthdir(length, angle):
         ldir_x += 1
     cs.EUDEndIf()
 
-    if cs.EUDIf()(ssign == -1):
+    if cs.EUDIf()(sign.ExactlyX(2, 2)):
         c.VProc([ldir_y, signedness], [
             signedness.SetDest(ldir_y),
             signedness.SetNumber(0xFFFFFFFF),
