@@ -36,11 +36,11 @@ def test_strbuffer():
     ])
 
     s2 = StringBuffer(1023)
-    s2Addr = GetStringAddr(s2.StringIndex)
+    s2Addr = GetMapStringAddr(s2.StringIndex)
 
     test_assert("StringBuffer uniqueness test", [
         s1.StringIndex != s2.StringIndex,
-        GetStringAddr(s1.StringIndex) != s2Addr,
+        GetMapStringAddr(s1.StringIndex) != s2Addr,
     ])
 
     s2.insert(0)

@@ -24,15 +24,13 @@ THE SOFTWARE.
 """
 
 from eudplib import core as c, ctrlstru as cs, utils as ut
-from ..memiof import f_dwepdread_epd, f_wread_epd
+from ..memiof import f_dwepdread_epd, f_wread_epd, f_dwread_epd
 from eudplib.core.curpl import _curpl_checkcond, _curpl_var
-
-
-chkt = c.GetChkTokenized()
+from eudplib.core.mapdata.stringmap import GetStringSectionName
 
 
 @c.EUDFunc
-def GetStringAddr(strId):
+def GetMapStringAddr(strId):
     add_STR_ptr, add_STR_epd = c.Forward(), c.Forward()
     if cs.EUDExecuteOnce()():
         STR_ptr, STR_epd = f_dwepdread_epd(ut.EPD(0x5993D4))
@@ -43,15 +41,19 @@ def GetStringAddr(strId):
             ]
         )
     cs.EUDEndExecuteOnce()
-    r, m = c.f_div(strId, 2)
-    c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
-    c.RawTrigger(actions=add_STR_epd << r.AddNumber(0))
-    ret = f_wread_epd(r, m)
+    str_chunk_name = GetStringSectionName()
+    if str_chunk_name == "STR":
+        r, m = c.f_div(strId, 2)
+        c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
+        c.RawTrigger(actions=add_STR_epd << r.AddNumber(0))
+        ret = f_wread_epd(r, m)
+    elif str_chunk_name == "STRx":
+        c.RawTrigger(actions=add_STR_epd << strId.AddNumber(0))
+        ret = f_dwread_epd(strId)
+    else:
+        raise ut.EPError("Invalid string section name: {}".format(str_chunk_name))
     c.RawTrigger(actions=add_STR_ptr << ret.AddNumber(0))
     c.EUDReturn(ret)
-
-
-GetMapStringAddr = GetStringAddr
 
 
 def _s2b(x):

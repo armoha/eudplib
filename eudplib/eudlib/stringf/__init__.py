@@ -24,7 +24,6 @@ THE SOFTWARE.
 """
 
 from .cpstr import (
-    GetStringAddr,
     GetMapStringAddr,
     CPString,
 )

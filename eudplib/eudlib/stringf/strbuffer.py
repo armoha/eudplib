@@ -26,7 +26,7 @@ THE SOFTWARE.
 from ... import core as c, ctrlstru as cs, utils as ut
 from ...core.mapdata.stringmap import ForcedAddString, ApplyStringMap, GetStringMap
 from ..memiof import f_getcurpl, f_setcurpl, f_wread_epd, f_dwread_epd
-from .cpstr import GetStringAddr
+from .cpstr import GetMapStringAddr
 from .cpprint import prevcp, f_cpstr_print
 from .strfunc import f_strlen_epd
 from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove
@@ -80,11 +80,11 @@ class StringBuffer:
         self.epd, self.pos = c.EUDVariable(), c.EUDVariable()
 
         try:
-            cs.DoActions(self.epd.SetNumber(ut.EPD(GetStringAddr(self.StringIndex))))
+            cs.DoActions(self.epd.SetNumber(ut.EPD(GetMapStringAddr(self.StringIndex))))
         except IndexError:
             from ...maprw.injector.mainloop import EUDOnStart
             def _f():
-                cs.DoActions(self.epd.SetNumber(ut.EPD(GetStringAddr(self.StringIndex))))
+                cs.DoActions(self.epd.SetNumber(ut.EPD(GetMapStringAddr(self.StringIndex))))
             EUDOnStart(_f)
 
         _strbuffer_list.append(self)
