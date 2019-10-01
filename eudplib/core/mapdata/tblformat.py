@@ -59,7 +59,7 @@ def u2bn(n):
 
 
 class TBL:
-    def __init__(self, content=None, init_chkt=None, entry_size=2):
+    def __init__(self, content=None, init_chkt=None, load_entry=2, save_entry=2):
         #
         # datatb : table of strings                       : string data table
         # dataindextb : string id -> data id              : string offset table
@@ -69,8 +69,9 @@ class TBL:
         self._datatb = []
         self._stringmap = {}
         self._dataindextb = []  # String starts from #1
-        self._capacity = entry_size  # Size of STR section
-        self._entry_size = entry_size
+        self._capacity = save_entry  # Size of STR section
+        self._loadentry = load_entry
+        self._saveentry = save_entry
         self._emptystring = []
         self._loaded = False
         self._first_extended_string = None
@@ -84,9 +85,9 @@ class TBL:
     def LoadTBL(self, content):
         self._datatb.clear()
         self._stringmap.clear()
-        self._capacity = self._entry_size
+        self._capacity = self._saveentry
 
-        size = self._entry_size
+        size = self._loadentry
         b2i = b2in(size)
         stringcount = b2i(content, 0)
 
@@ -118,7 +119,7 @@ class TBL:
     def LoadTBLWithChk(self, content, init_chkt):
         self._datatb.clear()
         self._stringmap.clear()
-        self._capacity = self._entry_size
+        self._capacity = self._saveentry
 
         chkt, unitmap, locmap, swmap = init_chkt
 
@@ -171,7 +172,7 @@ class TBL:
                 if forcstrid:
                     reserved_str.add(forcstrid)
 
-        size = self._entry_size
+        size = self._loadentry
         b2i = b2in(size)
         removed_str = set(locdict.keys()).union(swnmdict.keys()) - reserved_str
         stringcount = b2i(content, 0)
@@ -238,7 +239,7 @@ class TBL:
             repr_stringid = self._stringmap[string]
             dataindex = self._dataindextb[repr_stringid]
             self._dataindextb.append(dataindex)
-            self._capacity += self._entry_size  # just string offset
+            self._capacity += self._saveentry  # just string offset
 
         # Else -> Create new entry
         except KeyError:
@@ -264,10 +265,10 @@ class TBL:
                 self._datatb.append(string)
                 self._dataindextb.append(dataindex)
                 # string + b'\0' + string offset
-                self._capacity += len(string) + 1 + self._entry_size
+                self._capacity += len(string) + 1 + self._saveentry
             self._stringmap[string] = stringindex
 
-        ut.ep_assert(self._capacity < (1 << (8 * self._entry_size)), "String table overflow")
+        ut.ep_assert(self._capacity < (1 << (8 * self._saveentry)), "String table overflow")
 
         return stringindex
 
@@ -297,7 +298,7 @@ class TBL:
 
         # calculate offset of each string
         stroffset = []
-        size = self._entry_size
+        size = self._saveentry
         outindex = size * len(self._dataindextb) + size
         for s in self._datatb:
             stroffset.append(outindex)
@@ -331,8 +332,8 @@ class TBL:
         self._datatb.append(string)
         self._dataindextb.append(dataindex)
         # string + b'\0' + string offset
-        self._capacity += len(string) + 1 + self._entry_size
+        self._capacity += len(string) + 1 + self._saveentry
 
-        ut.ep_assert(self._capacity < (1 << (8 * self._entry_size)), "String table overflow")
+        ut.ep_assert(self._capacity < (1 << (8 * self._saveentry)), "String table overflow")
 
         return stringindex

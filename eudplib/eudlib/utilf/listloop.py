@@ -30,6 +30,8 @@ from eudplib import utils as ut
 
 from ..memiof import f_cunitepdread_epd, f_dwepdread_epd
 
+_unlimiter = False
+
 
 def EUDLoopList(header_offset, break_offset=None):
     blockname = "listloop"
@@ -101,13 +103,14 @@ def EUDLoopUnit2():
     1700개 유닛을 도는 방식으로 작동합니다.
     """
     ptr, epd = c.EUDCreateVariables(2)
-    cs.DoActions([ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8) + (0x4C // 4))])
+    if not _unlimiter:  # orderID가 [0]Die면 없는 유닛으로 판단.
+        offset, cont = 0xC // 4, c.MemoryEPD(epd, c.Exactly, 0)
+    else:  # Sprite가 0이면 없는 유닛으로 판단.
+        offset, cont = 0x4C // 4, c.MemoryXEPD(epd, c.Exactly, 0, 0xFF00)
+    cs.DoActions([ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8) + offset)])
     if cs.EUDLoopN()(1700):
-        # orderID가 0(Die)이면 없는 유닛으로 판단.
-        cs.EUDContinueIf(c.MemoryXEPD(epd, c.Exactly, 0, 0xFF00))
-        epd -= (0x4C // 4)
-        yield ptr, epd
-        epd += (0x4C // 4)
+        cs.EUDContinueIf(cont_cond)
+        yield ptr, epd - offset
         cs.EUDSetContinuePoint()
         cs.DoActions([ptr.AddNumber(336), epd.AddNumber(336 // 4)])
     cs.EUDEndLoopN()

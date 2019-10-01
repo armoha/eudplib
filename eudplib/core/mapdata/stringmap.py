@@ -67,10 +67,10 @@ def InitStringMap(chkt):
             pass
         else:
             strsection = "STRx"
-            strmap = tblformat.TBL(strx, [chkt, unitmap, locmap, swmap], entry_size=4)
+            strmap = tblformat.TBL(strx, [chkt, unitmap, locmap, swmap], load_entry=4, save_entry=4)
             return
-    strsection = "STR"
-    strmap = tblformat.TBL(chkt.getsection("STR"), [chkt, unitmap, locmap, swmap])
+    strsection = "STRx"
+    strmap = tblformat.TBL(chkt.getsection("STR"), [chkt, unitmap, locmap, swmap], save_entry=4)
 
 
 def GetLocationIndex(l):
