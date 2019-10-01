@@ -109,7 +109,7 @@ def EUDLoopUnit2():
         offset, cont = 0x4C // 4, c.MemoryXEPD(epd, c.Exactly, 0, 0xFF00)
     cs.DoActions([ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8) + offset)])
     if cs.EUDLoopN()(1700):
-        cs.EUDContinueIf(cont_cond)
+        cs.EUDContinueIf(cont)
         yield ptr, epd - offset
         cs.EUDSetContinuePoint()
         cs.DoActions([ptr.AddNumber(336), epd.AddNumber(336 // 4)])

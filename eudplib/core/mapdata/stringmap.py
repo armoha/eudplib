@@ -60,15 +60,14 @@ def InitStringMap(chkt):
     locmap = StringIdMap()
     swmap = StringIdMap()
 
-    if b2i2(chkt.getsection("VER")) & 3 == 2:
-        try:
-            strx = chkt.getsection("STRx")
-        except KeyError:
-            pass
-        else:
-            strsection = "STRx"
-            strmap = tblformat.TBL(strx, [chkt, unitmap, locmap, swmap], load_entry=4, save_entry=4)
-            return
+    try:
+        strx = chkt.getsection("STRx")
+    except KeyError:
+        pass
+    else:
+        strsection = "STRx"
+        strmap = tblformat.TBL(strx, [chkt, unitmap, locmap, swmap], load_entry=4, save_entry=4)
+        return
     strsection = "STRx"
     strmap = tblformat.TBL(chkt.getsection("STR"), [chkt, unitmap, locmap, swmap], save_entry=4)
 

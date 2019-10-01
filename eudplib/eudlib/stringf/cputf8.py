@@ -4,7 +4,8 @@
 
 from ..eudarray import EUDArray
 
-from ...ctrlstru import EUDInfLoop, EUDEndInfLoop, EUDIf, EUDElse, EUDEndIf, EUDBreakIf
+from ...core import EUDFunc
+from ...ctrlstru import EUDInfLoop, EUDEndInfLoop, EUDIf, EUDElse, EUDEndIf, EUDBreakIf, DoActions
 from ..rwcommon import br1, bw1
 from .cp949_table import cp949_table
 
@@ -20,14 +21,14 @@ index (n-33)*94+m-33.
 """
 
 
-# Create conversion table
-cvtb = [0] * 65536
-for (ch1, ch2), tab in cp949_table:
-    cvtb[ch1 + ch2 * 256] = tab
-cvtb = EUDArray(cvtb)
-
-
+@EUDFunc
 def f_cp949_to_utf8_cpy(dst, src):
+    # Create conversion table
+    cvtb = [0] * 65536
+    for (ch1, ch2), tab in cp949_table:
+        cvtb[ch1 + ch2 * 256] = tab
+    cvtb = EUDArray(cvtb)
+
     br1.seekoffset(src)
     bw1.seekoffset(dst)
 
@@ -35,6 +36,7 @@ def f_cp949_to_utf8_cpy(dst, src):
         b1 = br1.readbyte()
         EUDBreakIf(b1 == 0)
         if EUDIf()(b1 < 128):
+            dst += 1
             bw1.writebyte(b1)
         if EUDElse()():
             b2 = br1.readbyte()
@@ -42,14 +44,32 @@ def f_cp949_to_utf8_cpy(dst, src):
             code = cvtb[b2 * 256 + b1]
             if EUDIf()(code <= 0x07FF):
                 # Encode as 2-byte
-                bw1.writebyte(0b11000000 | (code // (1 << 6)) & 0b11111)
-                bw1.writebyte(0b10000000 | (code // (1 << 0)) & 0b111111)
+                b1 = code // (1 << 6)
+                b2 = code & 0b111111
+                DoActions([
+                    dst.AddNumber(2),
+                    b1.AddNumber(0b11000000),
+                    b2.AddNumber(0b10000000),
+                ])
+                bw1.writebyte(b1)
+                bw1.writebyte(b2)
             if EUDElse()():
                 # Encode as 3-byte
-                bw1.writebyte(0b11100000 | (code // (1 << 12)) & 0b1111)
-                bw1.writebyte(0b10000000 | (code // (1 << 6)) & 0b111111)
-                bw1.writebyte(0b10000000 | (code // (1 << 0)) & 0b111111)
+                b1 = code // (1 << 12)
+                b2 = (code // (1 << 6)) & 0b111111
+                b3 = code & 0b111111
+                DoActions([
+                    dst.AddNumber(3),
+                    b1.AddNumber(0b11100000),
+                    b2.AddNumber(0b10000000),
+                    b3.AddNumber(0b10000000),
+                ])
+                bw1.writebyte(b1)
+                bw1.writebyte(b2)
+                bw1.writebyte(b3)
             EUDEndIf()
         EUDEndIf()
     EUDEndInfLoop()
     bw1.writebyte(0)
+
+    return dst
