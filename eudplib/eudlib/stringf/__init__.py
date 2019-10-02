@@ -30,7 +30,7 @@ from .cpstr import (
 
 from .dbstr import DBString
 
-from .strbuffer import StringBuffer, f_gettextptr
+from .strbuffer import StringBuffer, DisplayTextAt, GetGlobalStringBuffer, f_gettextptr
 
 from .strfunc import f_strcpy, f_strcmp, f_strlen, f_strlen_epd, f_strnstr
 

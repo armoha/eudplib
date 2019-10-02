@@ -29,8 +29,7 @@ from ..memiof import f_dwread_epd
 
 @c.EUDFunc
 def f_getuserplayerid():
-    ret = c.EUDVariable()
     if cs.EUDExecuteOnce()():
-        ret << f_dwread_epd(ut.EPD(0x512684))
+        ret = f_dwread_epd(ut.EPD(0x512684))
     cs.EUDEndExecuteOnce()
     return ret

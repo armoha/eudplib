@@ -26,7 +26,6 @@ THE SOFTWARE.
 from eudplib import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_dwread_epd, f_dwwrite_epd
 from .cpstr import GetMapStringAddr
-from .cputf8 import f_cp949_to_utf8_cpy
 
 
 class DBString(ut.ExprProxy):
@@ -63,27 +62,17 @@ class DBString(ut.ExprProxy):
 
     @c.EUDMethod
     def Display(self):
-        sp = c.EUDVariable(0)
-        strId = c.EncodeString("_" * 2048)
-        if cs.EUDExecuteOnce()():
-            sp << GetMapStringAddr(strId)
-        cs.EUDEndExecuteOnce()
-
-        from .eudprint import f_dbstr_print
-        f_dbstr_print(sp, self)
-        cs.DoActions(c.DisplayText(strId))
+        from .eudprint import epd2s
+        from .strbuffer import GetGlobalStringBuffer
+        gsb = GetGlobalStringBuffer()
+        gsb.print(epd2s(ut.EPD(self) + 1))
 
     @c.EUDMethod
     def Play(self):
-        sp = c.EUDVariable(0)
-        strId = c.EncodeString("_" * 2048)
-        if cs.EUDExecuteOnce()():
-            sp << GetMapStringAddr(strId)
-        cs.EUDEndExecuteOnce()
-
-        from .eudprint import f_dbstr_print
-        f_dbstr_print(sp, self)
-        cs.DoActions(c.DisplayText(strId))
+        gsb = GetGlobalStringBuffer()
+        gsb.insert(0)
+        gsb.append(epd2s(ut.EPD(self) + 1))
+        gsb.Play()
 
 
 class DBStringData(c.EUDObject):

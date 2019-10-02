@@ -47,6 +47,20 @@ def f_gettextptr():
     return ret
 
 
+@c.EUDTypedFunc([None, c.TrgString], [None, None])
+def DisplayTextAt(line, text):
+    tp = f_gettextptr()
+    f_dwadd_epd(EPD(0x640B58), line)
+    c.RawTrigger(
+        conditions=c.Memory(0x640B58, c.AtLeast, 11),
+        actions=c.SetMemory(0x640B58, c.Subtract, 11)
+    )
+    cs.DoActions([
+        c.DisplayText(text),
+        c.SetMemory(0x640B58, c.SetTo, tp)
+    ])
+
+
 class StringBuffer:
     """Object for storing single modifiable string.
 
@@ -351,3 +365,13 @@ class StringBuffer:
 
     def length(self):
         return f_strlen_epd(self.epd)
+
+
+_globalsb = None
+
+
+def GetGlobalStringBuffer():
+    global _globalsb
+    if _globalsb is None:
+        _globalsb = StringBuffer(1023)
+    return _globalsb
