@@ -26,10 +26,13 @@ THE SOFTWARE.
 from eudplib import core as c, utils as ut, ctrlstru as cs
 from ..memiof import f_dwread_epd
 
+_localcp = None
 
-@c.EUDFunc
+
 def f_getuserplayerid():
-    if cs.EUDExecuteOnce()():
-        ret = f_dwread_epd(ut.EPD(0x512684))
-    cs.EUDEndExecuteOnce()
-    return ret
+    global _localcp
+    if _localcp is None:
+        if cs.EUDExecuteOnce()():
+            _localcp = f_dwread_epd(ut.EPD(0x512684))
+        cs.EUDEndExecuteOnce()
+    return _localcp
