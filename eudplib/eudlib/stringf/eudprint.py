@@ -29,6 +29,7 @@ from ..rwcommon import br1, bw1
 from .dbstr import DBString
 
 _conststr_dict = dict()
+_epd2s_jump, _epd2s_ptr, _epd2s_dst = c.Forward(), c.Forward(), c.Forward()
 _str_jump, _str_EOS, _str_dst = c.Forward(), c.Forward(), c.Forward()
 _dw_jump, _dw_EOS, _dw_dst = c.Forward(), c.Forward(), c.Forward()
 _ptr_jump, _ptr_EOS, _ptr_dst = c.Forward(), c.Forward(), c.Forward()
@@ -43,10 +44,14 @@ def f_dbstr_addstr(dst, src):
 
     :returns: dst + strlen(src)
     """
+    global _epd2s_jump, _epd2s_ptr, _epd2s_dst
     global _str_jump, _str_EOS, _str_dst
     b = c.EUDVariable()
 
+    _epd2s_jump << br1.seekepd(src)
+    _epd2s_ptr << c.NextTrigger()
     br1.seekoffset(src)
+    _epd2s_dst << c.NextTrigger()
     bw1.seekoffset(dst)
 
     if cs.EUDInfLoop()():
@@ -176,9 +181,17 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
                 _conststr_dict[arg] = c.Db(arg + b"\0")
             arg = _conststr_dict[arg]
         if ut.isUnproxyInstance(arg, c.Db):
-            dst = f_dbstr_addstr(dst, arg)
+            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_dst))
+            dst = f_dbstr_addstr(dst, ut.EPD(arg))
+            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_ptr))
         elif ut.isUnproxyInstance(arg, DBString):
-            dst = f_dbstr_addstr(dst, arg.GetStringMemoryAddr())
+            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_dst))
+            dst = f_dbstr_addstr(dst, ut.EPD(arg.GetStringMemoryAddr()))
+            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_ptr))
+        elif ut.isUnproxyInstance(arg, epd2s):
+            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_dst))
+            dst = f_dbstr_addstr(dst, arg._value)
+            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_ptr))
         elif ut.isUnproxyInstance(arg, ptr2s):
             dst = f_dbstr_addstr(dst, arg._value)
         elif ut.isUnproxyInstance(arg, c.EUDVariable):
@@ -189,7 +202,7 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
             dst = f_dbstr_addptr(dst, arg._value)
         else:
             raise ut.EPError(
-                "Object wit unknown parameter type %s given to f_eudprint." % type(arg)
+                "Object with unknown parameter type %s given to f_eudprint." % type(arg)
             )
 
     return dst
