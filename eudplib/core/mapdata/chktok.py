@@ -114,9 +114,9 @@ class CHK:
         # fmt: off
         used_section = [
             b'VER ', b'VCOD', b'OWNR', b'ERA ', b'DIM ', b'SIDE', b'MTXM',
-            b'UNIT', b'THG2', b'MASK', b'STR ', b'UPRP', b'MRGN', b'TRIG',
+            b'UNIT', b'THG2', b'MASK', b'STRx', b'UPRP', b'MRGN', b'TRIG',
             b'MBRF', b'SPRP', b'FORC', b'COLR', b'PUNI', b'PUPx', b'PTEx',
-            b'UNIx', b'UPGx', b'TECx', b'STRx', b'CRGB',
+            b'UNIx', b'UPGx', b'TECx', b'CRGB',
         ]
         # fmt: on
 

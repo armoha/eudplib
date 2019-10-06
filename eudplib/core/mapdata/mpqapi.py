@@ -102,7 +102,7 @@ def InitMpqLibrary():
         return True
 
     except OSError:
-        print("Loading SFmpq failed.")
+        print("Loading StormLib failed.")
         libstorm = None
         return False
 
