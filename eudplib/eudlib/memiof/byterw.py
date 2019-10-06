@@ -42,15 +42,17 @@ class EUDByteStream:
     def seekepd(self, epdoffset):
         """Seek EUDByteStream to specific epd player address"""
         if c.IsEUDVariable(epdoffset):
-            c.VProc(epdoffset, [
+            return c.VProc(epdoffset, [
                 epdoffset.QueueAssignTo(self._offset),
                 self._suboffset.SetNumber(0),
             ])
         else:
-            cs.DoActions([
-                self._offset.SetNumber(epdoffset),
-                self._suboffset.SetNumber(0),
-            ])
+            return c.RawTrigger(
+                actions=[
+                    self._offset.SetNumber(epdoffset),
+                    self._suboffset.SetNumber(0),
+                ]
+            )
 
     @c.EUDMethod
     def seekoffset(self, offset):

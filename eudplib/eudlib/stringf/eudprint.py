@@ -48,7 +48,16 @@ def f_dbstr_addstr(dst, src):
     global _str_jump, _str_EOS, _str_dst
     b = c.EUDVariable()
 
-    _epd2s_jump << br1.seekepd(src)
+    _epd2s_jump << c.RawTrigger(
+        conditions=c.Never(),
+        actions=[
+            src.QueueAssignTo(br1._offset),
+            br1._suboffset.SetNumber(0),
+            c.SetNextPtr(src.GetVTable(), _epd2s_dst),
+            c.SetMemory(_epd2s_jump + 20, c.Add, 1 << 24),
+            c.SetNextPtr(_epd2s_jump, src.GetVTable())
+        ]
+    )
     _epd2s_ptr << c.NextTrigger()
     br1.seekoffset(src)
     _epd2s_dst << c.NextTrigger()
@@ -61,7 +70,7 @@ def f_dbstr_addstr(dst, src):
         dst += 1
     cs.EUDEndInfLoop()
 
-    _str_jump << c.RawTrigger()
+    _str_jump << c.RawTrigger(actions=c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_ptr))
     _str_EOS << c.NextTrigger()
     bw1.writebyte(0)  # EOS
     _str_dst << c.NextTrigger()
@@ -181,17 +190,14 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
                 _conststr_dict[arg] = c.Db(arg + b"\0")
             arg = _conststr_dict[arg]
         if ut.isUnproxyInstance(arg, c.Db):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_dst))
+            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -(1 << 24)))
             dst = f_dbstr_addstr(dst, ut.EPD(arg))
-            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_ptr))
         elif ut.isUnproxyInstance(arg, DBString):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_dst))
+            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -(1 << 24)))
             dst = f_dbstr_addstr(dst, ut.EPD(arg.GetStringMemoryAddr()))
-            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_ptr))
         elif ut.isUnproxyInstance(arg, epd2s):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_dst))
+            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -(1 << 24)))
             dst = f_dbstr_addstr(dst, arg._value)
-            cs.DoActions(c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_ptr))
         elif ut.isUnproxyInstance(arg, ptr2s):
             dst = f_dbstr_addstr(dst, arg._value)
         elif ut.isUnproxyInstance(arg, c.EUDVariable):
