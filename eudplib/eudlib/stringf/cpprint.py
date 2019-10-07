@@ -65,8 +65,11 @@ def _PColor(p):
 
 
 def PColor(i):
-    if type(i) == type(c.P1) and i == c.CurrentPlayer:
-        i = prevcp
+    if type(i) == type(c.P1):
+        if i == c.CurrentPlayer:
+            i = prevcp
+        else:
+            i = c.EncodePlayer(i)
     return epd2s(_PColor(i))
 
 
