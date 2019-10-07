@@ -39,8 +39,8 @@ prevcp = c.EUDVariable()
 
 @c.EUDFunc
 def _PColor(p):
-    p = c.f_bitlshift(p, 1)
-    pcolor = f_bread_epd(ut.EPD(0x581D76) + p, 2)
+    p += ut.EPD(0x581D76)
+    pcolor = f_bread_epd(p, 2)
     # fmt: off
     pt_arr = EUDArray([
         21, 14, 16, 14, 14, 14, 14, 28, 16, 14, 28, 28, 28, 28, 16, 16,
@@ -61,7 +61,8 @@ def _PColor(p):
         21, 21, 21, 21, 21, 21, 14, 21, 21, 21, 14, 28, 28, 28,  4,  4,
     ])
     # fmt: on
-    c.EUDReturn(ut.EPD(pt_arr) + pcolor)
+    pcolor += ut.EPD(pt_arr)
+    return pcolor
 
 
 def PColor(i):
@@ -70,7 +71,7 @@ def PColor(i):
             i = prevcp
         else:
             i = c.EncodePlayer(i)
-    return epd2s(_PColor(i))
+    return epd2s(_PColor(i * 2))
 
 
 def PName(x):
