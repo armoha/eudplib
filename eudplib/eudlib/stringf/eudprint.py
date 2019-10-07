@@ -51,11 +51,11 @@ def f_dbstr_addstr(dst, src):
     _epd2s_jump << c.RawTrigger(
         conditions=c.Never(),
         actions=[
+            c.SetNextPtr(_epd2s_jump, src.GetVTable()),
+            c.SetNextPtr(src.GetVTable(), _epd2s_dst),
             src.QueueAssignTo(br1._offset),
             br1._suboffset.SetNumber(0),
-            c.SetNextPtr(src.GetVTable(), _epd2s_dst),
-            c.SetMemory(_epd2s_jump + 20, c.Add, 1 << 24),
-            c.SetNextPtr(_epd2s_jump, src.GetVTable())
+            c.SetMemory(_epd2s_jump + 20, c.Add, 0x1000000),
         ]
     )
     _epd2s_ptr << c.NextTrigger()
@@ -70,7 +70,7 @@ def f_dbstr_addstr(dst, src):
         dst += 1
     cs.EUDEndInfLoop()
 
-    _str_jump << c.RawTrigger(actions=c.SetMemory(_epd2s_jump + 444, c.SetTo, _epd2s_ptr))
+    _str_jump << c.RawTrigger(actions=c.SetNextPtr(_epd2s_jump, _epd2s_ptr))
     _str_EOS << c.NextTrigger()
     bw1.writebyte(0)  # EOS
     _str_dst << c.NextTrigger()
@@ -190,13 +190,13 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
                 _conststr_dict[arg] = c.Db(arg + b"\0")
             arg = _conststr_dict[arg]
         if ut.isUnproxyInstance(arg, c.Db):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -(1 << 24)))
+            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -0x1000000))
             dst = f_dbstr_addstr(dst, ut.EPD(arg))
         elif ut.isUnproxyInstance(arg, DBString):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -(1 << 24)))
+            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -0x1000000))
             dst = f_dbstr_addstr(dst, ut.EPD(arg.GetStringMemoryAddr()))
         elif ut.isUnproxyInstance(arg, epd2s):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -(1 << 24)))
+            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -0x1000000))
             dst = f_dbstr_addstr(dst, arg._value)
         elif ut.isUnproxyInstance(arg, ptr2s):
             dst = f_dbstr_addstr(dst, arg._value)
