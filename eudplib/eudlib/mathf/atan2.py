@@ -50,9 +50,11 @@ def f_atan2(y, x):
     if cs.EUDIf()(y >= x):
         z = c.EUDVariable()
         # Swap x, y so that y <= x
-        z << x
-        x << y
-        y << z
+        c.VProc([x, y, z], [
+            x.QueueAssignTo(z),
+            y.QueueAssignTo(x),
+            z.QueueAssignTo(y),
+        ])
         signflags += 4  # set xyabscmp
     cs.EUDEndIf()
 
@@ -61,7 +63,8 @@ def f_atan2(y, x):
     # 45 * x**3 <= 0xFFFFFFFF : x <= 456.99....
     if cs.EUDIf()(x >= 400):
         # Normalize below 400
-        divn = x // 400 + 1
+        divn = x // 400
+        divn += 1
         x //= divn
         y //= divn
     cs.EUDEndIf()
