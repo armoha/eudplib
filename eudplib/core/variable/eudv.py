@@ -508,11 +508,9 @@ def SeqCompute(assignpairs):
             srcdict[src] = dst, mdt
 
         else:
-            if actioncount >= 64 - 3:
+            if not constcollecting:
                 FlushPairs()
-            elif isinstance(src, int):
-                pass
-            elif not constcollecting:
+            elif actioncount >= 64 - 3:
                 FlushPairs()
 
             actioncount += 1
