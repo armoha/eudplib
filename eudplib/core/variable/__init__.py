@@ -29,6 +29,7 @@ from .eudv import (
     IsEUDVariable,
     EUDCreateVariables,
     SeqCompute,
+    NonSeqCompute,
     SetVariables,
     EP_SetRValueStrictMode,
 )

@@ -523,6 +523,48 @@ def SeqCompute(assignpairs):
     srcdictsub.clear()
 
 
+def NonSeqCompute(assignpairs):
+    import itertools
+    
+    dstvarset = set()
+    srcvarset = set()
+    constpairs = list()
+    varassigndict = dict()
+
+    for assignpair in assignpairs:
+        dst, mdt, src = assignpair
+        if IsEUDVariable(dst):
+            dstvarset.add(dst)
+        if IsEUDVariable(src):
+            srcvarset.add(src)
+            try:
+                varassigndict[src].append(assignpair)
+            except KeyError:
+                varassigndict[src] = [assignpair]
+        else:
+            constpairs.append(assignpair)
+    
+    if len(assignpairs) == len(constpairs):
+        SeqCompute(assignpairs)
+        return
+    ep_assert(dstvarset.isdisjoint(srcvarset), "dst and src have intersection")
+
+    varpairlists = list()
+    for pairlist in varassigndict.values():
+        pairlist.sort(key=lambda x: id(x[0]))
+        pairlist.sort(key=lambda x: x[1]._name)
+        varpairlists.append(pairlist)
+
+    varassignpairs = list()
+    for vp in itertools.zip_longest(*varpairlists):
+        for varassignpair in vp:
+            if varassignpair is not None:
+                varassignpairs.append(varassignpair)
+
+    newassignpairs = constpairs + varassignpairs
+    SeqCompute(newassignpairs)
+
+
 def SetVariables(srclist, dstlist, mdtlist=None):
     srclist = FlattenList(srclist)
     dstlist = FlattenList(dstlist)

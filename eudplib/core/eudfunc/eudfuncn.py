@@ -172,7 +172,10 @@ class EUDFuncN:
             for farg, arg in zip(self._fargs, args)
             if ev.IsEUDVariable(arg)
         ]
-        ev.SeqCompute(nextPtrAssignment + constAssigns + varAssigns)
+        if len(varAssigns) <= 2:
+            ev.SeqCompute(nextPtrAssignment + constAssigns + varAssigns)
+        else:
+            ev.NonSeqCompute(nextPtrAssignment + constAssigns + varAssigns)
         bt.SetNextTrigger(self._fstart)
 
         fcallend << bt.NextTrigger()
