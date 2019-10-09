@@ -467,9 +467,11 @@ def SeqCompute(assignpairs):
             actioncount += 3
 
         else:
-            if not constcollecting:
+            if actioncount >= 64 - 3:
                 FlushPairs()
-            elif actioncount >= 64 - 3:
+            elif isinstance(src, int):
+                pass
+            elif not constcollecting:
                 FlushPairs()
 
             actioncount += 1
