@@ -362,7 +362,7 @@ def _GetComputeDest(dst):
         return dst
 
 
-def _SeqComputeSub(assignpairs):
+def _SeqComputeSub(assignpairs, _srcdict={}):
     """
     Subset of SeqCompute with following restrictions
 
@@ -395,6 +395,27 @@ def _SeqComputeSub(assignpairs):
     #
     nextptr = None  # nextptr for this rawtrigger
     vt_nextptr = None  # what to set for nextptr of current vtable
+    last_pairs = None
+
+    def _RemoveDuplicateActions():
+        if last_pairs is None:
+            return
+        last_src, last_dst, last_mdt = last_pairs
+        try:
+            prev_dst, prev_mdt, prev_nptr = _srcdict[last_src]
+        except KeyError:
+            pass
+        else:
+            lastact = actionlist[-1]
+            queueact, setnptr = lastact
+            setdst, setmdt = queueact
+            if last_dst is prev_dst:
+                queueact.remove(setdst)
+            if last_mdt is prev_mdt:
+                queueact.remove(setmdt)
+            if vt_nextptr._expr is prev_nptr._expr:
+                lastact.remove(setnptr)
+        _srcdict[last_src] = (last_dst, last_mdt, vt_nextptr)
 
     for dst, mdt, src in assignpairs[const_assigning_index:]:
         dst = _GetComputeDest(dst)
@@ -403,6 +424,8 @@ def _SeqComputeSub(assignpairs):
             nextptr = src.GetVTable()
         else:
             vt_nextptr << src.GetVTable()
+
+        _RemoveDuplicateActions()
 
         vt_nextptr = Forward()
         queuef = {
@@ -414,16 +437,23 @@ def _SeqComputeSub(assignpairs):
         actionlist.append(
             [queuef(src, dst), bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
         )
+        last_pairs = src, dst, mdt
 
     bt.RawTrigger(nextptr=nextptr, actions=actionlist)
 
     vt_nextptr << bt.NextTrigger()
+    _RemoveDuplicateActions()
 
 
 def SeqCompute(assignpairs):
     # We need dependency map while writing assignment pairs
     dstvarset = set()
     srcvarset = set()
+
+    # Record previous dst, mdt for src to optimize duplicate actions
+    import inspect
+    srcdictsub = inspect.signature(_SeqComputeSub).parameters['_srcdict'].default
+    srcdict={}
 
     # Sublist of assignments to put in _SeqComputeSub
     subassignpairs = []
@@ -466,6 +496,17 @@ def SeqCompute(assignpairs):
             constcollecting = False
             actioncount += 3
 
+            try:
+                prev_dst, prev_mdt = srcdict[src]
+            except KeyError:
+                pass
+            else:
+                if dst is prev_dst:
+                    actioncount -= 1
+                if mdt is prev_mdt:
+                    actioncount -= 1
+            srcdict[src] = dst, mdt
+
         else:
             if actioncount >= 64 - 3:
                 FlushPairs()
@@ -481,6 +522,7 @@ def SeqCompute(assignpairs):
             dstvarset.add(dst)
 
     FlushPairs()
+    srcdictsub.clear()
 
 
 def SetVariables(srclist, dstlist, mdtlist=None):

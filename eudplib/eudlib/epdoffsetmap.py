@@ -5,6 +5,7 @@
 from .memiof import (
     f_epdread_epd,
     f_dwread_epd,
+    f_dwepdread_epd,
     f_wread_epd,
     f_bread_epd,
     f_dwwrite_epd,
@@ -56,6 +57,11 @@ def EPDOffsetMap(ct):
             offset, size = addrTable[name]
             ut.ep_assert(size == 4, "Only dword can be read as epd")
             return f_epdread_epd(self._epd + offset // 4)
+
+        def getdwepd(self, name):
+            offset, size = addrTable[name]
+            ut.ep_assert(size == 4, "Only dword can be read as epd")
+            return f_dwepdread_epd(self._epd + offset // 4)
 
         def __setattr__(self, name, value):
             if name == "_epd":
