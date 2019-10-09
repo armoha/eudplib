@@ -26,7 +26,7 @@ THE SOFTWARE.
 from ... import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_posread_epd, f_setcurpl2cpcache, f_dwread_epd
 
-_loct = 0x58DC60
+_loct = ut.EPD(0x58DC60)
 
 
 def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
@@ -36,7 +36,7 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
         act = c.Forward()
 
         c.VProc([epd, x], [
-            epd.AddNumber(ut.EPD(_loct)),
+            epd.AddNumber(_loct),
             epd.SetDest(ut.EPD(act) + 4),
         ] + [
             x.SetDest(ut.EPD(act) + 5)
@@ -92,7 +92,7 @@ def _locfgen4(mod1, mod2, mod3, mod4, signed=False):
         act = c.Forward()
 
         c.VProc([epd, l], [
-            epd.AddNumber(ut.EPD(_loct)),
+            epd.AddNumber(_loct),
             epd.SetDest(ut.EPD(act) + 4),
         ] + [
             l.SetDest(ut.EPD(act) + 5)
@@ -148,18 +148,18 @@ def f_setloc(locID, *coords):
         raise NotImplementedError("number of coordinates should be 2 or 4.")
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    if c.IsConstExpr(locID) and all(c.IsConstExpr(co) for co in coords):
-        dst = _loct + 20 * locID
+    if c.IsConstExpr(locID):
+        dst = _loct + 5 * locID
         if len(coords) == 2:
             l, t = coords
             r, b = coords
         else:
             l, t, r, b = coords
-        cs.DoActions([
-            c.SetMemory(dst, c.SetTo, l),
-            c.SetMemory(dst + 4, c.SetTo, t),
-            c.SetMemory(dst + 8, c.SetTo, r),
-            c.SetMemory(dst + 12, c.SetTo, b),
+        c.SeqCompute([
+            (dst, c.SetTo, l),
+            (dst + 1, c.SetTo, t),
+            (dst + 2, c.SetTo, r),
+            (dst + 3, c.SetTo, b),
         ])
     elif len(coords) == 2:
         _SetLoc2(locID * 5, *coords)
@@ -172,18 +172,18 @@ def f_addloc(locID, *coords):
         raise NotImplementedError("number of coordinates should be 2 or 4.")
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    if c.IsConstExpr(locID) and all(c.IsConstExpr(co) for co in coords):
-        dst = _loct + 20 * locID
+    if c.IsConstExpr(locID):
+        dst = _loct + 5 * locID
         if len(coords) == 2:
             l, t = coords
             r, b = coords
         else:
             l, t, r, b = coords
-        cs.DoActions([
-            c.SetMemory(dst, c.Add, l),
-            c.SetMemory(dst + 4, c.Add, t),
-            c.SetMemory(dst + 8, c.Add, r),
-            c.SetMemory(dst + 12, c.Add, b),
+        c.SeqCompute([
+            (dst, c.Add, l),
+            (dst + 1, c.Add, t),
+            (dst + 2, c.Add, r),
+            (dst + 3, c.Add, b),
         ])
     elif len(coords) == 2:
         _AddLoc2(locID * 5, *coords)
@@ -196,18 +196,18 @@ def f_dilateloc(locID, *coords):
         raise NotImplementedError("number of coordinates should be 2 or 4.")
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    if c.IsConstExpr(locID) and all(c.IsConstExpr(co) for co in coords):
-        dst = _loct + 20 * locID
+    if c.IsConstExpr(locID):
+        dst = _loct + 5 * locID
         if len(coords) == 2:
             l, t = coords
             r, b = coords
         else:
             l, t, r, b = coords
-        cs.DoActions([
-            c.SetMemory(dst, c.Add, -l),
-            c.SetMemory(dst + 4, c.Add, -t),
-            c.SetMemory(dst + 8, c.Add, r),
-            c.SetMemory(dst + 12, c.Add, b),
+        c.SeqCompute([
+            (dst, c.Add, -l),
+            (dst + 1, c.Add, -t),
+            (dst + 2, c.Add, r),
+            (dst + 3, c.Add, b),
         ])
     elif len(coords) == 2:
         _DilateLoc2(locID * 5, *coords)
@@ -217,7 +217,7 @@ def f_dilateloc(locID, *coords):
 
 @c.EUDFunc
 def _GetLocTL(epd):
-    epd += ut.EPD(_loct)
+    epd += _loct
     c.EUDReturn(
         f_dwread_epd(epd),
         f_dwread_epd(epd + 1))
@@ -244,7 +244,7 @@ def _SetLocEPD(loc, epd):
     ])
 
     c.VProc([x, y], [
-        c.SetMemory(0x6509B0, c.Add, ut.EPD(_loct)),
+        c.SetMemory(0x6509B0, c.Add, _loct),
         x.SetDest(ut.EPD(act + 32 * 4 + 20)),
         y.SetDest(ut.EPD(act + 32 * 6 + 20)),
     ])
