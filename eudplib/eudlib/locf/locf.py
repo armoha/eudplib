@@ -45,10 +45,24 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
                 x.QueueSubtractTo(ut.EPD(act) + 5),
             ]
         ])
+        settb = c.Forward()
+        c.RawTrigger(
+            nextptr=epd.GetVTable(),
+            actions=[
+                [c.SetMemory(act + 20, c.Add, 1) if signed else []],
+                epd.AddNumber(2),
+                epd.AddDest(16),
+                x.AddDest(16),
+                c.SetNextPtr(x.GetVTable(), settb),
+            ] + [
+                c.SetMemory(x._varact + 24, c.Subtract, 0x02000000)
+                if signed else []
+            ]
+        )
+        settb << c.NextTrigger()
         c.VProc([epd, y], [
-            [c.SetMemory(act + 20, c.Add, 1) if signed else []],
-            epd.AddNumber(1),
-            epd.AddDest(8),
+            epd.AddNumber(-1),
+            epd.AddDest(-8),
         ] + [
             y.SetDest(ut.EPD(act) + 8 + 5)
             if not signed else [
@@ -56,23 +70,21 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
                 y.QueueSubtractTo(ut.EPD(act) + 8 + 5),
             ]
         ])
-        c.VProc([epd, x], [
-            [c.SetMemory(act + 52, c.Add, 1) if signed else []],
-            epd.AddNumber(1),
-            epd.AddDest(8),
-            x.AddDest(16),
-        ] + [
-            c.SetMemory(x._varact + 24, c.Subtract, 0x02000000)
-            if signed else []
-        ])
-        c.VProc([epd, y], [
-            epd.AddNumber(1),
-            epd.AddDest(8),
-            y.AddDest(16),
-        ] + [
-            c.SetMemory(y._varact + 24, c.Subtract, 0x02000000)
-            if signed else []
-        ])
+        setcoords = c.Forward()
+        c.RawTrigger(
+            nextptr=epd.GetVTable(),
+            actions=[
+                [c.SetMemory(act + 52, c.Add, 1) if signed else []],
+                epd.AddNumber(2),
+                epd.AddDest(16),
+                y.AddDest(16),
+                c.SetNextPtr(y.GetVTable(), setcoords),
+            ] + [
+                c.SetMemory(y._varact + 24, c.Subtract, 0x02000000)
+                if signed else []
+            ]
+        )
+        setcoords << c.NextTrigger()
         c.RawTrigger(
             actions=[
                 act << c.SetMemory(0, mod1, 0),
@@ -235,7 +247,7 @@ def f_getlocTL(locID):
 def _SetLocEPD(loc, epd):
     x, y = f_posread_epd(epd)
 
-    act = c.Forward()
+    act, nptr = c.Forward(), c.Forward()
 
     c.VProc([loc, x, y], [
         loc.SetDest(ut.EPD(0x6509B0)),
@@ -243,12 +255,16 @@ def _SetLocEPD(loc, epd):
         y.SetDest(ut.EPD(act + 32 * 2 + 20)),
     ])
 
-    c.VProc([x, y], [
-        c.SetMemory(0x6509B0, c.Add, _loct),
-        x.SetDest(ut.EPD(act + 32 * 4 + 20)),
-        y.SetDest(ut.EPD(act + 32 * 6 + 20)),
-    ])
-
+    c.RawTrigger(
+        nextptr=x.GetVTable(),
+        actions=[
+            c.SetMemory(0x6509B0, c.Add, _loct),
+            x.SetDest(ut.EPD(act + 32 * 4 + 20)),
+            y.SetDest(ut.EPD(act + 32 * 6 + 20)),
+            c.SetNextPtr(y.GetVTable(), nptr),
+        ]
+    )
+    nptr << c.NextTrigger()
     f_setcurpl2cpcache(
         actions=[
             act << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),

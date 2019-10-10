@@ -342,13 +342,10 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
     timer, counter, identifier = _TextFX_dict[tag]
 
     start = f_getcurpl()
-    c.VProc(
-        start,
-        [
-            c.SetMemory(_check_cp + 8, c.SetTo, 1),
-            start.QueueAddTo(ut.EPD(_check_cp + 8))
-        ]
-    )
+    c.SeqCompute([
+        (ut.EPD(_check_cp) + 2, c.SetTo, 1),
+        (ut.EPD(_check_cp) + 2, c.Add, start),
+    ])
     _TextFX_Print(*args, identifier=identifier, encoding=encoding)
     f_setcurpl(start + (3 - len(color)))
 
@@ -356,14 +353,11 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
         check_gametick = c.Forward()
         if cs.EUDIf()([check_gametick << c.Memory(0x57F23C, c.AtLeast, 0)]):
             gametick = f_getgametick()
-            c.VProc(
-                gametick,
-                [
-                    timer.SetNumber(0),
-                    c.SetMemory(check_gametick + 8, c.SetTo, 1),
-                    gametick.QueueAddTo(ut.EPD(check_gametick) + 2),
-                ],
-            )
+            c.SeqCompute([
+                (timer, c.SetTo, 0),
+                (ut.EPD(check_gametick) + 2, c.SetTo, 1),
+                (ut.EPD(check_gametick) + 2, c.Add, gametick),
+            ])
         cs.EUDEndIf()
 
     _end = c.Forward()
@@ -419,27 +413,21 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
     timer, counter, identifier = _TextFX_dict[tag]
 
     start = f_getcurpl()
-    c.VProc(
-        start,
-        [
-            c.SetMemory(_check_cp + 8, c.SetTo, 1),
-            start.QueueAddTo(ut.EPD(_check_cp + 8))
-        ]
-    )
+    c.SeqCompute([
+        (ut.EPD(_check_cp) + 2, c.SetTo, 1),
+        (ut.EPD(_check_cp) + 2, c.Add, start),
+    ])
     _TextFX_Print(*args, identifier=identifier, encoding=encoding)
 
     if reset is True:
         check_gametick = c.Forward()
         if cs.EUDIf()([check_gametick << c.Memory(0x57F23C, c.AtLeast, 0)]):
             gametick = f_getgametick()
-            c.VProc(
-                gametick,
-                [
-                    timer.SetNumber(0),
-                    c.SetMemory(check_gametick + 8, c.SetTo, 1),
-                    gametick.QueueAddTo(ut.EPD(check_gametick) + 2),
-                ],
-            )
+            c.SeqCompute([
+                (timer, c.SetTo, 0),
+                (ut.EPD(check_gametick) + 2, c.SetTo, 1),
+                (ut.EPD(check_gametick) + 2, c.Add, gametick),
+            ])
         cs.EUDEndIf()
 
     cs.DoActions([

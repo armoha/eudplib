@@ -36,26 +36,30 @@ def f_atan2(y, x):
 
     # Check x sign
     if cs.EUDIf()(x >= 0x80000000):
-        x << -x
-        signflags += 1  # set xsign
+        c.SeqCompute([
+            (signflags, c.Add, 1),  # set xsign
+            (x, c.SetTo, -x),
+        ])
     cs.EUDEndIf()
 
     # Check y sign
     if cs.EUDIf()(y >= 0x80000000):
-        y << -y
-        signflags += 2  # set ysign
+        c.SeqCompute([
+            (signflags, c.Add, 2),  # set ysign
+            (y, c.SetTo, -y),
+        ])
     cs.EUDEndIf()
 
     # Check x/y order
     if cs.EUDIf()(y >= x):
         z = c.EUDVariable()
         # Swap x, y so that y <= x
-        c.VProc([x, y, z], [
-            x.QueueAssignTo(z),
-            y.QueueAssignTo(x),
-            z.QueueAssignTo(y),
+        c.SeqCompute([
+            (signflags, c.Add, 4),  # set xyabscmp
+            (z, c.SetTo, x),
+            (x, c.SetTo, y),
+            (y, c.SetTo, z),
         ])
-        signflags += 4  # set xyabscmp
     cs.EUDEndIf()
 
     # To prevent overflow, we limit values of y and x.
