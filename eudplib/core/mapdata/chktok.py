@@ -80,7 +80,7 @@ class CHK:
 
         return True
 
-    def clone (self):
+    def clone(self):
         t = CHK()
         t.sections = dict(self.sections)
         return t

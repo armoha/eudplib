@@ -39,7 +39,7 @@ color_codes.remove(0xC)  # linebreak
 color_codes.remove(0x12)  # right align
 color_codes.remove(0x13)  # center align
 color_v = c.EUDVariable(2)
-color_code = b'\x02'
+color_code = b"\x02"
 
 
 @c.EUDFunc
@@ -144,7 +144,11 @@ id_gen = itertools.cycle(itertools.product(id_codes, repeat=6))
 
 def _add_TextFX_timer(tag):
     if tag not in _TextFX_dict:
-        _TextFX_dict[tag] = (c.EUDVariable(), c.EUDLightVariable(), ut.u2b("".join(next(id_gen))))
+        _TextFX_dict[tag] = (
+            c.EUDVariable(),
+            c.EUDLightVariable(),
+            ut.u2b("".join(next(id_gen))),
+        )
 
 
 def TextFX_SetTimer(tag, modtype, value):
@@ -159,39 +163,35 @@ def _remove_TextFX(o0, o1, e0, e1):
     trg_o0, trg_o1, trg_e0, trg_e1 = [c.Forward() for _ in range(4)]
     setPtr_o, setPtr_e = c.Forward(), c.Forward()
 
-    c.VProc([o0, o1, e0, e1], [
-        txtPtr.SetNumber(-1),
-        c.SetMemory(0x6509B0, c.SetTo, ut.EPD(0x640B60)),
-        c.SetMemory(setPtr_o + 20, c.SetTo, 0),
-        c.SetMemory(setPtr_e + 20, c.SetTo, 1),
-        o0.SetDest(ut.EPD(trg_o0 + 16)),
-        o1.SetDest(ut.EPD(trg_o1 + 16)),
-        e0.SetDest(ut.EPD(trg_e0 + 16)),
-        e1.SetDest(ut.EPD(trg_e1 + 16)),
-    ])
+    c.VProc(
+        [o0, o1, e0, e1],
+        [
+            txtPtr.SetNumber(-1),
+            c.SetMemory(0x6509B0, c.SetTo, ut.EPD(0x640B60)),
+            c.SetMemory(setPtr_o + 20, c.SetTo, 0),
+            c.SetMemory(setPtr_e + 20, c.SetTo, 1),
+            o0.SetDest(ut.EPD(trg_o0 + 16)),
+            o1.SetDest(ut.EPD(trg_o1 + 16)),
+            e0.SetDest(ut.EPD(trg_e0 + 16)),
+            e1.SetDest(ut.EPD(trg_e1 + 16)),
+        ],
+    )
     if cs.EUDLoopN()(6):
         incr_o, incr_e = c.Forward(), c.Forward()
         trg_o0 << c.RawTrigger(
             nextptr=incr_o,
-            conditions=[
-                c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
-            ],
-            actions=[
-                c.SetMemory(0x6509B0, c.Add, 1),
-                c.SetNextPtr(trg_o0, trg_o1),
-            ]
+            conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0)],
+            actions=[c.SetMemory(0x6509B0, c.Add, 1), c.SetNextPtr(trg_o0, trg_o1)],
         )
         trg_o1 << c.RawTrigger(
-            conditions=[
-                c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF),
-            ],
+            conditions=[c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)],
             actions=[
                 c.SetNextPtr(trg_o0, incr_o),
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
                 c.SetMemory(0x6509B0, c.Add, -1),
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
                 setPtr_o << txtPtr.SetNumber(0),
-            ]
+            ],
         )
         incr_o << c.RawTrigger(
             actions=[
@@ -201,25 +201,18 @@ def _remove_TextFX(o0, o1, e0, e1):
         )
         trg_e0 << c.RawTrigger(
             nextptr=incr_e,
-            conditions=[
-                c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000),
-            ],
-            actions=[
-                c.SetMemory(0x6509B0, c.Add, 1),
-                c.SetNextPtr(trg_e0, trg_e1)
-            ]
+            conditions=[c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000)],
+            actions=[c.SetMemory(0x6509B0, c.Add, 1), c.SetNextPtr(trg_e0, trg_e1)],
         )
         trg_e1 << c.RawTrigger(
-            conditions=[
-                c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
-            ],
+            conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0)],
             actions=[
                 c.SetNextPtr(trg_e0, incr_e),
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
                 c.SetMemory(0x6509B0, c.Add, -1),
                 c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
                 setPtr_e << txtPtr.SetNumber(1),
-            ]
+            ],
         )
         incr_e << c.RawTrigger(
             actions=[
@@ -252,10 +245,8 @@ def _is_CP_less_than_start(actions):
     if not _is_below_start.IsSet():
         c.PushTriggerScope()
         _is_below_start << c.RawTrigger(
-            conditions=[
-                _check_cp << c.Memory(0x6509B0, c.AtMost, 1)
-            ],
-            actions=_cpbelowbuffer.SetNumber(1)
+            conditions=[_check_cp << c.Memory(0x6509B0, c.AtMost, 1)],
+            actions=_cpbelowbuffer.SetNumber(1),
         )
         c.PopTriggerScope()
     _next = c.Forward()
@@ -313,7 +304,9 @@ def _TextFX_Print(*args, identifier=None, encoding="UTF-8"):
                 continue
             for s in line[:-1]:
                 f_cpchar_print(s, EOS=False, encoding=encoding)
-                f_cpstr_print(identifier + b"\n" + identifier, EOS=False, encoding=encoding)
+                f_cpstr_print(
+                    identifier + b"\n" + identifier, EOS=False, encoding=encoding
+                )
             f_cpchar_print(line[-1], EOS=False, encoding=encoding)
         else:
             f_cpchar_print(arg, EOS=False, encoding=encoding)
@@ -342,10 +335,9 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
     timer, counter, identifier = _TextFX_dict[tag]
 
     start = f_getcurpl()
-    c.SeqCompute([
-        (ut.EPD(_check_cp) + 2, c.SetTo, 1),
-        (ut.EPD(_check_cp) + 2, c.Add, start),
-    ])
+    c.SeqCompute(
+        [(ut.EPD(_check_cp) + 2, c.SetTo, 1), (ut.EPD(_check_cp) + 2, c.Add, start)]
+    )
     _TextFX_Print(*args, identifier=identifier, encoding=encoding)
     f_setcurpl(start + (3 - len(color)))
 
@@ -353,24 +345,28 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
         check_gametick = c.Forward()
         if cs.EUDIf()([check_gametick << c.Memory(0x57F23C, c.AtLeast, 0)]):
             gametick = f_getgametick()
-            c.SeqCompute([
-                (timer, c.SetTo, 0),
-                (ut.EPD(check_gametick) + 2, c.SetTo, 1),
-                (ut.EPD(check_gametick) + 2, c.Add, gametick),
-            ])
+            c.SeqCompute(
+                [
+                    (timer, c.SetTo, 0),
+                    (ut.EPD(check_gametick) + 2, c.SetTo, 1),
+                    (ut.EPD(check_gametick) + 2, c.Add, gametick),
+                ]
+            )
         cs.EUDEndIf()
 
     _end = c.Forward()
     _is_finished, _draw_color = c.Forward(), c.Forward()
     ret = c.EUDVariable()
 
-    cs.DoActions([
-        counter.AddNumber(1),
-        [c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else []],
-        ret.SetNumber(1),
-        c.SetNextPtr(_is_finished, _draw_color),
-        c.AddCurrentPlayer(timer),
-    ])
+    cs.DoActions(
+        [
+            counter.AddNumber(1),
+            [c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else []],
+            ret.SetNumber(1),
+            c.SetNextPtr(_is_finished, _draw_color),
+            c.AddCurrentPlayer(timer),
+        ]
+    )
     _is_finished << c.RawTrigger(
         conditions=[
             c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
@@ -413,28 +409,31 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
     timer, counter, identifier = _TextFX_dict[tag]
 
     start = f_getcurpl()
-    c.SeqCompute([
-        (ut.EPD(_check_cp) + 2, c.SetTo, 1),
-        (ut.EPD(_check_cp) + 2, c.Add, start),
-    ])
+    c.SeqCompute(
+        [(ut.EPD(_check_cp) + 2, c.SetTo, 1), (ut.EPD(_check_cp) + 2, c.Add, start)]
+    )
     _TextFX_Print(*args, identifier=identifier, encoding=encoding)
 
     if reset is True:
         check_gametick = c.Forward()
         if cs.EUDIf()([check_gametick << c.Memory(0x57F23C, c.AtLeast, 0)]):
             gametick = f_getgametick()
-            c.SeqCompute([
-                (timer, c.SetTo, 0),
-                (ut.EPD(check_gametick) + 2, c.SetTo, 1),
-                (ut.EPD(check_gametick) + 2, c.Add, gametick),
-            ])
+            c.SeqCompute(
+                [
+                    (timer, c.SetTo, 0),
+                    (ut.EPD(check_gametick) + 2, c.SetTo, 1),
+                    (ut.EPD(check_gametick) + 2, c.Add, gametick),
+                ]
+            )
         cs.EUDEndIf()
 
-    cs.DoActions([
-        counter.AddNumber(1),
-        [c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else []],
-        c.AddCurrentPlayer((len(color) - 1) - timer),
-    ])
+    cs.DoActions(
+        [
+            counter.AddNumber(1),
+            [c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else []],
+            c.AddCurrentPlayer((len(color) - 1) - timer),
+        ]
+    )
     ret = R2L(color)
     c.RawTrigger(conditions=ret.Exactly(0), actions=counter.SetNumber(0))
     c.RawTrigger(

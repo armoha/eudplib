@@ -39,17 +39,20 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
     mask = mask & 0xFFFFFFFF
     key = (  # use function's bytecode for equality
         tuple(initval for initval, _ in args),
-        tuple(func.__code__.co_code for _, func in args)
+        tuple(func.__code__.co_code for _, func in args),
     )
 
     @c.EUDFunc
     def f_read_epd_template(targetplayer):
         ret = [c.EUDVariable() for _ in args]
 
-        c.VProc(targetplayer, [
-            targetplayer.SetDest(ut.EPD(0x6509B0)),
-            [retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)],
-        ])
+        c.VProc(
+            targetplayer,
+            [
+                targetplayer.SetDest(ut.EPD(0x6509B0)),
+                [retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)],
+            ],
+        )
 
         for i in bits(mask):
             c.RawTrigger(
@@ -71,7 +74,7 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
         _subfdict = _fdict[mask]
     except KeyError:
         # since it doesn't have a mask, won't have return values either.
-        _fdict[mask] = { key: f_read_epd_template }
+        _fdict[mask] = {key: f_read_epd_template}
         _subfdict = _fdict[mask]
     else:
         try:
@@ -86,7 +89,7 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}):
     mask = mask & 0xFFFFFFFF
     key = (  # use function's bytecode for equality
         tuple(initval for initval, _ in args),
-        tuple(func.__code__.co_code for _, func in args)
+        tuple(func.__code__.co_code for _, func in args),
     )
 
     @c.EUDFunc
@@ -121,7 +124,7 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}):
         _subfdict = _fdict[mask]
     except KeyError:
         # since it doesn't have a mask, won't have return values either.
-        _fdict[mask] = { key: f_read_cp_template }
+        _fdict[mask] = {key: f_read_cp_template}
         _subfdict = _fdict[mask]
     else:
         try:
@@ -134,6 +137,7 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}):
 
 def _getMapSize():
     from ...core.mapdata import GetChkTokenized
+
     chkt = GetChkTokenized()
     dim = chkt.getsection("DIM")
     x, y = ut.b2i2(dim[0:2]), ut.b2i2(dim[2:4])
@@ -159,7 +163,7 @@ def f_posread_epd(epd):
         _rf = f_readgen_epd(
             _getMapSize(),
             (0, lambda x: x if x <= 0xFFFF else 0),
-            (0, lambda y: y >> 16)
+            (0, lambda y: y >> 16),
         )
         f_posread_epd._rf = _rf
     return _rf(epd)
@@ -171,7 +175,7 @@ def f_posread_cp(cpoffset):
         _rf = f_readgen_cp(
             _getMapSize(),
             (0, lambda x: x if x <= 0xFFFF else 0),
-            (0, lambda y: y >> 16)
+            (0, lambda y: y >> 16),
         )
         f_posread_cp._rf = _rf
     return _rf(cpoffset)

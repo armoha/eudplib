@@ -48,6 +48,7 @@ class Condition(ConstExpr):
        +12   internal[2]
      ======  =============  ========  ===========
     """
+
     # fmt: off
     def __init__(self, locid, player, amount, unitid,
                  comparison, condtype, restype, flags, eudx=0):

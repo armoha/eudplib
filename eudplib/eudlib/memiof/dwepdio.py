@@ -31,10 +31,14 @@ from .modcurpl import f_setcurpl2cpcache
 @c.EUDFunc
 def f_dwepdread_epd(targetplayer):
     ptr, epd = c.EUDVariable(), c.EUDVariable()
-    c.VProc(targetplayer, [
-        ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)),
-        targetplayer.SetDest(ut.EPD(0x6509B0)),
-    ])
+    c.VProc(
+        targetplayer,
+        [
+            ptr.SetNumber(0),
+            epd.SetNumber(ut.EPD(0)),
+            targetplayer.SetDest(ut.EPD(0x6509B0)),
+        ],
+    )
 
     for i in range(31, -1, -1):
         c.RawTrigger(
@@ -53,10 +57,7 @@ def f_dwepdread_epd(targetplayer):
 @c.EUDFunc
 def f_dwread_epd(targetplayer):
     ptr = c.EUDVariable()
-    c.VProc(targetplayer, [
-        ptr.SetNumber(0),
-        targetplayer.SetDest(ut.EPD(0x6509B0)),
-    ])
+    c.VProc(targetplayer, [ptr.SetNumber(0), targetplayer.SetDest(ut.EPD(0x6509B0))])
     for i in range(31, -1, -1):
         c.RawTrigger(
             conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i)],
@@ -85,10 +86,13 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
             flagsv = [c.EUDVariable() for _ in flags]
 
             # All set to 0
-            c.VProc(targetplayer, [
-                targetplayer.SetDest(ut.EPD(0x6509B0)),
-                [flagv.SetNumber(0) for flagv in flagsv],
-            ])
+            c.VProc(
+                targetplayer,
+                [
+                    targetplayer.SetDest(ut.EPD(0x6509B0)),
+                    [flagv.SetNumber(0) for flagv in flagsv],
+                ],
+            )
 
             # Fill flags
             for i in range(31, -1, -1):
@@ -136,14 +140,17 @@ def f_dwbreak(number):
     byte = [c.EUDXVariable(0, 0xFF)] + c.EUDCreateVariables(3)
 
     # Clear byte[], word[]
-    c.VProc([number, word[0]], [
-        number.SetDest(word[0]),
-        word[0].SetDest(byte[0]),
-        word[1].SetNumber(0),
-        byte[1].SetNumber(0),
-        byte[2].SetNumber(0),
-        byte[3].SetNumber(0),
-    ])
+    c.VProc(
+        [number, word[0]],
+        [
+            number.SetDest(word[0]),
+            word[0].SetDest(byte[0]),
+            word[1].SetNumber(0),
+            byte[1].SetNumber(0),
+            byte[2].SetNumber(0),
+            byte[3].SetNumber(0),
+        ],
+    )
 
     for i in range(31, 7, -1):
         byteidx = i // 8
@@ -169,14 +176,17 @@ def f_dwbreak2(number):
     byte = c.EUDCreateVariables(4)
 
     # Set byte[], word[]
-    c.VProc([number, word[0], word[1], byte[0], byte[1], byte[2]], [
-        number.SetDest(word[0]),
-        word[0].SetDest(word[1]),
-        word[1].SetDest(byte[0]),
-        byte[0].SetDest(byte[1]),
-        byte[1].SetDest(byte[2]),
-        byte[2].SetDest(byte[3]),
-    ])
+    c.VProc(
+        [number, word[0], word[1], byte[0], byte[1], byte[2]],
+        [
+            number.SetDest(word[0]),
+            word[0].SetDest(word[1]),
+            word[1].SetDest(byte[0]),
+            byte[0].SetDest(byte[1]),
+            byte[1].SetDest(byte[2]),
+            byte[2].SetDest(byte[3]),
+        ],
+    )
     c.RawTrigger(
         actions=[
             word[0].SetNumberX(0, ~0xFFFF),

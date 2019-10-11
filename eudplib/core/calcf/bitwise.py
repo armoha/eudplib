@@ -57,14 +57,8 @@ def f_bitor(a, b):
 def f_bitxor(a, b):
     """Calculate a ^ b"""
     act = ac.Forward()
-    ev.VProc([a, b], [
-        a.SetDest(EPD(act) + 21),
-        b.QueueAssignTo(EPD(act)),
-    ])
-    ev.VProc(b, [
-        rt.SetMemory(act + 32, rt.SetTo, ~0),
-        b.QueueSubtractTo(EPD(act) + 8)
-    ])
+    ev.VProc([a, b], [a.SetDest(EPD(act) + 21), b.QueueAssignTo(EPD(act))])
+    ev.VProc(b, [rt.SetMemory(act + 32, rt.SetTo, ~0), b.QueueSubtractTo(EPD(act) + 8)])
     rt.RawTrigger(
         actions=[
             act << a.SetNumberX(~0, 0),  # a | b
@@ -129,10 +123,7 @@ def f_bitsplit(a):
     bits = ev.EUDCreateVariables(32)
     rt.RawTrigger(actions=[bits[i].SetNumber(0) for i in range(32)])
     for i in range(31, -1, -1):
-        rt.RawTrigger(
-            conditions=a.AtLeastX(1, 2 ** i),
-            actions=bits[i].SetNumber(1),
-        )
+        rt.RawTrigger(conditions=a.AtLeastX(1, 2 ** i), actions=bits[i].SetNumber(1))
     return bits
 
 

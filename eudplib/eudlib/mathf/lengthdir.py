@@ -57,31 +57,37 @@ def f_lengthdir(length, angle):
 
     # get cos, sin from table
     if cs.EUDIf()(angle <= 89):
-        c.VProc(angle, [
-            sign.SetNumber(0),
-            angle.QueueAssignTo(tableangle)
-        ])
+        c.VProc(angle, [sign.SetNumber(0), angle.QueueAssignTo(tableangle)])
 
     if cs.EUDElseIf()(angle <= 179):
-        c.VProc(angle, [
-            sign.SetNumber(1),
-            tableangle.SetNumber(180),
-            angle.QueueSubtractTo(tableangle)
-        ])
+        c.VProc(
+            angle,
+            [
+                sign.SetNumber(1),
+                tableangle.SetNumber(180),
+                angle.QueueSubtractTo(tableangle),
+            ],
+        )
 
     if cs.EUDElseIf()(angle <= 269):
-        c.VProc(angle, [
-            sign.SetNumber(3),
-            angle.QueueAddTo(tableangle),
-            tableangle.SetNumber(-180)
-        ])
+        c.VProc(
+            angle,
+            [
+                sign.SetNumber(3),
+                angle.QueueAddTo(tableangle),
+                tableangle.SetNumber(-180),
+            ],
+        )
 
     if cs.EUDElse()():
-        c.VProc(angle, [
-            sign.SetNumber(2),
-            angle.QueueSubtractTo(tableangle),
-            tableangle.SetNumber(360)
-        ])
+        c.VProc(
+            angle,
+            [
+                sign.SetNumber(2),
+                angle.QueueSubtractTo(tableangle),
+                tableangle.SetNumber(360),
+            ],
+        )
 
     cs.EUDEndIf()
 
@@ -96,20 +102,26 @@ def f_lengthdir(length, angle):
 
     # restore sign of cos, sin
     if cs.EUDIf()(sign.ExactlyX(1, 1)):
-        c.VProc([ldir_x, signedness], [
-            signedness.SetDest(ldir_x),
-            signedness.SetNumber(0xFFFFFFFF),
-            ldir_x.QueueSubtractTo(signedness)
-        ])
+        c.VProc(
+            [ldir_x, signedness],
+            [
+                signedness.SetDest(ldir_x),
+                signedness.SetNumber(0xFFFFFFFF),
+                ldir_x.QueueSubtractTo(signedness),
+            ],
+        )
         ldir_x += 1
     cs.EUDEndIf()
 
     if cs.EUDIf()(sign.ExactlyX(2, 2)):
-        c.VProc([ldir_y, signedness], [
-            signedness.SetDest(ldir_y),
-            signedness.SetNumber(0xFFFFFFFF),
-            ldir_y.QueueSubtractTo(signedness)
-        ])
+        c.VProc(
+            [ldir_y, signedness],
+            [
+                signedness.SetDest(ldir_y),
+                signedness.SetNumber(0xFFFFFFFF),
+                ldir_y.QueueSubtractTo(signedness),
+            ],
+        )
         ldir_y += 1
     cs.EUDEndIf()
 

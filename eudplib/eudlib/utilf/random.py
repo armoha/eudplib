@@ -71,11 +71,14 @@ def f_randomize():
         if cs.EUDIf()(c.Switch("Switch 1", c.Set)):
             _seed += dseed
         cs.EUDEndIf()
-        c.VProc(dseed, [
-            dseed.QueueAddTo(dseed),
-            c.SetSwitch("Switch 1", c.Random),
-            n.SubtractNumber(1),
-        ])
+        c.VProc(
+            dseed,
+            [
+                dseed.QueueAddTo(dseed),
+                c.SetSwitch("Switch 1", c.Random),
+                n.SubtractNumber(1),
+            ],
+        )
     cs.EUDEndWhile()
 
     end << c.RawTrigger(actions=c.SetSwitch("Switch 1", c.Set))
@@ -84,10 +87,7 @@ def f_randomize():
 @c.EUDFunc
 def f_rand():
     seed = c.f_mul(_seed, 1103515245)
-    c.VProc(seed, [
-        seed.AddNumber(12345),
-        seed.SetDest(_seed),
-    ])
+    c.VProc(seed, [seed.AddNumber(12345), seed.SetDest(_seed)])
     return f_dwbreak(_seed)[1]  # Only HIWORD is returned
 
 
@@ -96,18 +96,20 @@ def f_dwrand():
     seed1 = c.f_mul(_seed, 1103515245)
     seed1 += 12345
     seed2 = c.f_mul(seed1, 1103515245)
-    c.VProc(seed2, [
-        seed2.AddNumber(12345),
-        seed2.SetDest(_seed),
-        # HIWORD
-        seed1.SetNumberX(0, 0xFFFF)
-    ])
+    c.VProc(
+        seed2,
+        [
+            seed2.AddNumber(12345),
+            seed2.SetDest(_seed),
+            # HIWORD
+            seed1.SetNumberX(0, 0xFFFF),
+        ],
+    )
 
     # LOWORD
     for i in range(31, 15, -1):
         c.RawTrigger(
-            conditions=seed2.AtLeastX(1, 2 ** i),
-            actions=seed1.AddNumber(2 ** (i - 16)),
+            conditions=seed2.AtLeastX(1, 2 ** i), actions=seed1.AddNumber(2 ** (i - 16))
         )
 
     return seed1

@@ -37,15 +37,16 @@ class _EUDVariableFrom(c.EUDVariable):
 class PVariable(c.EUDVArray(8)):
     def _eudset(self, i, value):
         nptr = c.Forward()
-        cs.DoActions([
-            value.SetDest(self._epd + 348 // 4),
-            c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
-            c.SetNextPtr(value.GetVTable(), nptr),
-        ])
+        cs.DoActions(
+            [
+                value.SetDest(self._epd + 348 // 4),
+                c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
+                c.SetNextPtr(value.GetVTable(), nptr),
+            ]
+        )
         for k in range(2, 0, -1):
             c.RawTrigger(
-                conditions=i.AtLeastX(1, 2 ** k),
-                actions=[value.AddDest(18 * (2 ** k))],
+                conditions=i.AtLeastX(1, 2 ** k), actions=[value.AddDest(18 * (2 ** k))]
             )
         c.RawTrigger(
             nextptr=value.GetVTable(),
@@ -55,7 +56,9 @@ class PVariable(c.EUDVArray(8)):
         nptr << c.NextTrigger()
 
     def __setitem__(self, i, value):
-        if ut.isUnproxyInstance(i, c.EUDVariable) and ut.isUnproxyInstance(value, c.EUDVariable):
+        if ut.isUnproxyInstance(i, c.EUDVariable) and ut.isUnproxyInstance(
+            value, c.EUDVariable
+        ):
             self._eudset(i, value)
 
         elif ut.isUnproxyInstance(i, c.EUDVariable):

@@ -55,9 +55,13 @@ def InitMpqLibrary():
             from ctypes import WinDLL
 
             if struct.calcsize("P") == 4:  # 32bit
-                libstorm = WinDLL(find_data_file("StormLib32.dll", __file__), use_last_error=True)
+                libstorm = WinDLL(
+                    find_data_file("StormLib32.dll", __file__), use_last_error=True
+                )
             else:  # 64bit
-                libstorm = WinDLL(find_data_file("StormLib64.dll", __file__), use_last_error=True)
+                libstorm = WinDLL(
+                    find_data_file("StormLib64.dll", __file__), use_last_error=True
+                )
             filename_u2b = u2b
 
         elif platformName == "Darwin":  # mac

@@ -64,6 +64,7 @@ class DBString(ut.ExprProxy):
     def Display(self):
         from .eudprint import epd2s
         from .strbuffer import GetGlobalStringBuffer
+
         gsb = GetGlobalStringBuffer()
         gsb.print(epd2s(ut.EPD(self) + 1))
 

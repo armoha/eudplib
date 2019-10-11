@@ -5,7 +5,15 @@
 from ..eudarray import EUDArray
 
 from ...core import EUDFunc
-from ...ctrlstru import EUDInfLoop, EUDEndInfLoop, EUDIf, EUDElse, EUDEndIf, EUDBreakIf, DoActions
+from ...ctrlstru import (
+    EUDInfLoop,
+    EUDEndInfLoop,
+    EUDIf,
+    EUDElse,
+    EUDEndIf,
+    EUDBreakIf,
+    DoActions,
+)
 from ..rwcommon import br1, bw1
 from .cp949_table import cp949_table
 
@@ -46,11 +54,13 @@ def f_cp949_to_utf8_cpy(dst, src):
                 # Encode as 2-byte
                 b1 = code // (1 << 6)
                 b2 = code & 0b111111
-                DoActions([
-                    dst.AddNumber(2),
-                    b1.AddNumber(0b11000000),
-                    b2.AddNumber(0b10000000),
-                ])
+                DoActions(
+                    [
+                        dst.AddNumber(2),
+                        b1.AddNumber(0b11000000),
+                        b2.AddNumber(0b10000000),
+                    ]
+                )
                 bw1.writebyte(b1)
                 bw1.writebyte(b2)
             if EUDElse()():
@@ -58,12 +68,14 @@ def f_cp949_to_utf8_cpy(dst, src):
                 b1 = code // (1 << 12)
                 b2 = (code // (1 << 6)) & 0b111111
                 b3 = code & 0b111111
-                DoActions([
-                    dst.AddNumber(3),
-                    b1.AddNumber(0b11100000),
-                    b2.AddNumber(0b10000000),
-                    b3.AddNumber(0b10000000),
-                ])
+                DoActions(
+                    [
+                        dst.AddNumber(3),
+                        b1.AddNumber(0b11100000),
+                        b2.AddNumber(0b10000000),
+                        b3.AddNumber(0b10000000),
+                    ]
+                )
                 bw1.writebyte(b1)
                 bw1.writebyte(b2)
                 bw1.writebyte(b3)

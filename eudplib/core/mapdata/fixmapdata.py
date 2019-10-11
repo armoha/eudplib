@@ -50,6 +50,6 @@ def RemoveLocationStringInfo(chkt):
     mrgn = bytearray(chkt.getsection("MRGN"))
 
     for i in range(0, len(mrgn), 20):
-        mrgn[i + 16:i + 18] = b'\0\0'
+        mrgn[i + 16 : i + 18] = b"\0\0"
 
     chkt.setsection("MRGN", mrgn)

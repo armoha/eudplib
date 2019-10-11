@@ -44,7 +44,9 @@ condition / actions.
 """
 
 
-def Condition(locid, player, amount, unitid, comparison, condtype, restype, flag, eudx=0):
+def Condition(
+    locid, player, amount, unitid, comparison, condtype, restype, flag, eudx=0
+):
     if player < 0:
         player += 0x100000000  # EPD
 

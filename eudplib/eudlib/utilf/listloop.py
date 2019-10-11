@@ -70,7 +70,7 @@ def EUDLoopUnit():
 
 def EUDLoopNewUnit(allowance=2):
     firstUnitPtr = ut.EPD(0x628430)
-    ut.EUDCreateBlock('newunitloop', 'newlo')
+    ut.EUDCreateBlock("newunitloop", "newlo")
     tos0 = c.EUDLightVariable()
     tos0 << 0
 
@@ -78,16 +78,12 @@ def EUDLoopNewUnit(allowance=2):
     if cs.EUDWhile()(ptr >= 1):
         epd += 0xA5 // 4
         if cs.EUDIf()(c.MemoryXEPD(epd, c.AtLeast, 0x100, 0xFF00)):
-            cs.DoActions([
-                c.SetMemoryXEPD(epd, c.SetTo, 0, 0xFF00),
-                epd.AddNumber(-(0xA5 // 4)),
-            ])
+            cs.DoActions(
+                [c.SetMemoryXEPD(epd, c.SetTo, 0, 0xFF00), epd.AddNumber(-(0xA5 // 4))]
+            )
             yield ptr, epd
         if cs.EUDElse()():
-            cs.DoActions([
-                tos0.AddNumber(1),
-                epd.AddNumber(-(0xA5 // 4))
-            ])
+            cs.DoActions([tos0.AddNumber(1), epd.AddNumber(-(0xA5 // 4))])
             cs.EUDBreakIf(tos0.AtLeast(allowance))
         cs.EUDEndIf()
         cs.EUDSetContinuePoint()
@@ -95,7 +91,7 @@ def EUDLoopNewUnit(allowance=2):
         c.SetVariables([ptr, epd], f_cunitepdread_epd(epd))
     cs.EUDEndWhile()
 
-    ut.EUDPopBlock('newunitloop')
+    ut.EUDPopBlock("newunitloop")
 
 
 def EUDLoopUnit2():

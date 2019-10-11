@@ -77,10 +77,7 @@ def f_strcmp(s1, s2):
 @c.EUDFunc
 def f_strlen_epd(epd):
     ret = c.EUDVariable()
-    c.VProc(epd, [
-        epd.SetDest(EPD(0x6509B0)),
-        ret.SetNumber(0),
-    ])
+    c.VProc(epd, [epd.SetDest(EPD(0x6509B0)), ret.SetNumber(0)])
     if cs.EUDWhile()(c.Deaths(c.CurrentPlayer, c.AtLeast, 1, 0)):
         cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF))
         ret += 1

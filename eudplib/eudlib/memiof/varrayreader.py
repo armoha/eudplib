@@ -34,11 +34,7 @@ class EUDVArrayReader:
     def _maketrg(self):
         c.PushTriggerScope()
         self._trg << c.RawTrigger(
-            nextptr=0,
-            actions=[
-                c.SetMemory(0, c.SetTo, 0),
-                c.SetNextPtr(0, self._fin),
-            ]
+            nextptr=0, actions=[c.SetMemory(0, c.SetTo, 0), c.SetNextPtr(0, self._fin)]
         )
         self._fin << c.RawTrigger(
             actions=[
@@ -54,16 +50,21 @@ class EUDVArrayReader:
             self._maketrg()
 
         if c.IsEUDVariable(varr_ptr):
-            c.VProc([varr_ptr, varr_epd], [
-                varr_ptr.QueueAssignTo(ut.EPD(self._trg) + 1),
-                varr_epd.AddNumber(1),
-                varr_epd.QueueAssignTo(ut.EPD(self._trg) + 360 // 4 + 4),
-                c.SetMemory(self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())),
-            ])
-            trg = c.VProc(varr_epd, [acts] + [
-                varr_epd.AddNumber(328 // 4 + 3),
-                varr_epd.AddDest(-8),
-            ])
+            c.VProc(
+                [varr_ptr, varr_epd],
+                [
+                    varr_ptr.QueueAssignTo(ut.EPD(self._trg) + 1),
+                    varr_epd.AddNumber(1),
+                    varr_epd.QueueAssignTo(ut.EPD(self._trg) + 360 // 4 + 4),
+                    c.SetMemory(
+                        self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())
+                    ),
+                ],
+            )
+            trg = c.VProc(
+                varr_epd,
+                [acts] + [varr_epd.AddNumber(328 // 4 + 3), varr_epd.AddDest(-8)],
+            )
             return trg
         else:
             return [
@@ -78,8 +79,7 @@ class EUDVArrayReader:
             self._maketrg()
         nptr = c.Forward()
         trg = c.RawTrigger(
-            nextptr=self._trg,
-            actions=[acts] + [c.SetNextPtr(self._fin, nptr)],
+            nextptr=self._trg, actions=[acts] + [c.SetNextPtr(self._fin, nptr)]
         )
         nptr << c.NextTrigger()
         return trg

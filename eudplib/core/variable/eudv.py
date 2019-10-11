@@ -335,7 +335,12 @@ def VProc(v, actions):
         v = FlattenList(v)
         trg = bt.RawTrigger(
             nextptr=v[0].GetVTable(),
-            actions=[actions] + [bt.SetNextPtr(v[i].GetVTable(), v[i+1].GetVTable()) for i in range(len(v)-1)] + [bt.SetNextPtr(v[-1].GetVTable(), nexttrg)]
+            actions=[actions]
+            + [
+                bt.SetNextPtr(v[i].GetVTable(), v[i + 1].GetVTable())
+                for i in range(len(v) - 1)
+            ]
+            + [bt.SetNextPtr(v[-1].GetVTable(), nexttrg)],
         )
     except (TypeError):
         trg = bt.RawTrigger(
@@ -452,8 +457,9 @@ def SeqCompute(assignpairs):
 
     # Record previous dst, mdt for src to optimize duplicate actions
     import inspect
-    srcdictsub = inspect.signature(_SeqComputeSub).parameters['_srcdict'].default
-    srcdict={}
+
+    srcdictsub = inspect.signature(_SeqComputeSub).parameters["_srcdict"].default
+    srcdict = {}
 
     # Sublist of assignments to put in _SeqComputeSub
     subassignpairs = []
@@ -525,7 +531,7 @@ def SeqCompute(assignpairs):
 
 def NonSeqCompute(assignpairs):
     import itertools
-    
+
     dstvarset = set()
     srcvarset = set()
     constpairs = list()
@@ -543,7 +549,7 @@ def NonSeqCompute(assignpairs):
                 varassigndict[src] = [assignpair]
         else:
             constpairs.append(assignpair)
-    
+
     if len(assignpairs) == len(constpairs):
         SeqCompute(assignpairs)
         return

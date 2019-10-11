@@ -78,10 +78,7 @@ def _dwread(ptr):
     ptr -= 0x58A364
     epd, subp = c.f_div(ptr, 4)
     dw = c.EUDVariable()
-    c.VProc(epd, [
-        epd.SetDest(ut.EPD(0x6509B0)),
-        dw.SetNumber(0),
-    ])
+    c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), dw.SetNumber(0)])
     cs.EUDSwitch(subp)
 
     # Case 0

@@ -153,7 +153,7 @@ def CreateInjectFinalizer(chkt, root):
         cs.DoActions([c.SetDeaths(9, c.SetTo, 0, 0), c.SetDeaths(10, c.SetTo, 0, 0)])
 
         # revert mrgndata
-        mrgndata = chkt.getsection("MRGN")[:2408 + 836]
+        mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
         mrgndata_db = c.Db(mrgndata)
         sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
 

@@ -45,7 +45,9 @@ def _wwriter(epd, subp, w):
     for i in range(3):
         cs.EUDSwitchCase()(i)
         cs.DoActions(
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, _lshift(w, 8 * i), 0, 0xFFFF << (8 * i))
+            c.SetDeathsX(
+                c.CurrentPlayer, c.SetTo, _lshift(w, 8 * i), 0, 0xFFFF << (8 * i)
+            )
         )
         cs.EUDBreak()
 
@@ -67,7 +69,9 @@ def f_wwrite_epd(epd, subp, w):
 
         try:
             cs.DoActions(
-                c.SetDeathsX(epd, c.SetTo, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp))
+                c.SetDeathsX(
+                    epd, c.SetTo, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp)
+                )
             )
         except (TypeError):
             _wwriter(epd, subp, w)
@@ -82,7 +86,9 @@ def _bwriter(epd, subp, b):
     for i in range(4):
         cs.EUDSwitchCase()(i)
         cs.DoActions(
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, _lshift(b, 8 * i), 0, 0xFF << (8 * i))
+            c.SetDeathsX(
+                c.CurrentPlayer, c.SetTo, _lshift(b, 8 * i), 0, 0xFF << (8 * i)
+            )
         )
         cs.EUDBreak()
     cs.EUDEndSwitch()
@@ -105,14 +111,11 @@ def f_bwrite_epd(epd, subp, b):
 @c.EUDFunc
 def f_wread_epd(epd, subp):
     w = c.EUDVariable()
-    c.VProc(epd, [
-        epd.SetDest(ut.EPD(0x6509B0)),
-        w.SetNumber(0),
-    ])
+    c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), w.SetNumber(0)])
     cs.EUDSwitch(subp)
     for i in range(3):
         cs.EUDSwitchCase()(i)
-        for j in range(8 * i, 8 * (i+2)):
+        for j in range(8 * i, 8 * (i + 2)):
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=w.AddNumber(2 ** (j - 8 * i)),
@@ -135,14 +138,11 @@ def f_wread_epd(epd, subp):
 @c.EUDFunc
 def f_bread_epd(epd, subp):
     b = c.EUDVariable()
-    c.VProc(epd, [
-        epd.SetDest(ut.EPD(0x6509B0)),
-        b.SetNumber(0),
-    ])
+    c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), b.SetNumber(0)])
     cs.EUDSwitch(subp)
     for i in range(4):
         cs.EUDSwitchCase()(i)
-        for j in range(8 * i, 8 * (i+1)):
+        for j in range(8 * i, 8 * (i + 1)):
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=b.AddNumber(2 ** (j - 8 * i)),

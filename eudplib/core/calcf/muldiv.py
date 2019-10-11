@@ -91,6 +91,7 @@ def f_constmul(number):
     number &= 0xFFFFFFFF
     if not hasattr(f_constmul, "mulfdict"):
         from .bitwise import f_bitlshift
+
         f_constmul.mulfdict = {
             0xFFFFFFFF: lambda x: -x,
             0: lambda x: 0,
@@ -133,10 +134,7 @@ def f_constdiv(number):
     :return: Function taking one parameter.
     """
     if not hasattr(f_constdiv, "divfdict"):
-        f_constdiv.divfdict = {
-            0: _div0,
-            1: _div1,
-        }
+        f_constdiv.divfdict = {0: _div0, 1: _div1}
 
     divfdict = f_constdiv.divfdict
 
@@ -192,7 +190,7 @@ def _f_mul(a, b):
                     rt.SetNextPtr(p2, endmul),
                     rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
                     rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
-                ]
+                ],
             )
             p4 << ev.VProc(b, b.SetDest(b))
 

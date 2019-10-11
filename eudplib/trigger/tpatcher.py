@@ -25,7 +25,14 @@ THE SOFTWARE.
 
 from .. import core as c
 from .. import utils as ut
-from .filler import _filldw, _fillloword, _filllsbyte, _filllobyte, _fillhibyte, _fillmsbyte
+from .filler import (
+    _filldw,
+    _fillloword,
+    _filllsbyte,
+    _filllobyte,
+    _fillhibyte,
+    _fillmsbyte,
+)
 
 
 def ApplyPatchTable(initepd, obj, patchTable):
@@ -41,9 +48,12 @@ def ApplyPatchTable(initepd, obj, patchTable):
         for fieldSize in patchFields:
             if type(fieldSize) is int:
                 memoryFiller = {
-                    -1: _filldw, 0: _fillloword,
-                    2: _filllsbyte, 3: _filllobyte,
-                    4: _fillhibyte, 5: _fillmsbyte
+                    -1: _filldw,
+                    0: _fillloword,
+                    2: _filllsbyte,
+                    3: _filllobyte,
+                    4: _fillhibyte,
+                    5: _fillmsbyte,
                 }[fieldSize]
                 field = fieldSelector(fieldName)
                 if ut.isUnproxyInstance(field, c.EUDVariable):

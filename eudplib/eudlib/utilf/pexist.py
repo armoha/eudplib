@@ -54,14 +54,8 @@ def f_playerexist(player):
 
 
 def EUDLoopPlayer(ptype="Human", force=None, race=None):
-
     def EncodeForce(f):
-        force_dict = {
-            c.Force1: 0,
-            c.Force2: 1,
-            c.Force3: 2,
-            c.Force4: 3,
-        }
+        force_dict = {c.Force1: 0, c.Force2: 1, c.Force3: 2, c.Force4: 3}
         if type(f) != int and f in force_dict:
             return force_dict[f]
         return f
@@ -69,9 +63,10 @@ def EUDLoopPlayer(ptype="Human", force=None, race=None):
     plist = []
     for p in range(8):
         pinfo = c.GetPlayerInfo(p)
-        if ((not ptype or pinfo.typestr == ptype) and
-            (not force or pinfo.force == EncodeForce(force)) and
-            (not race or pinfo.racestr == race)
+        if (
+            (not ptype or pinfo.typestr == ptype)
+            and (not force or pinfo.force == EncodeForce(force))
+            and (not race or pinfo.racestr == race)
         ):
             plist.append(p)
     ut.EUDCreateBlock("loopplayerblock", None)

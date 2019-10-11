@@ -35,7 +35,13 @@ from ..memiof import (
 from .eudprint import f_dbstr_print, ptr2s, epd2s
 from .cpprint import f_cpstr_print, PName
 from .strfunc import f_strlen_epd
-from ..utilf import f_playerexist, EUDPlayerLoop, EUDEndPlayerLoop, f_getgametick, EUDLoopPlayer
+from ..utilf import (
+    f_playerexist,
+    EUDPlayerLoop,
+    EUDEndPlayerLoop,
+    f_getgametick,
+    EUDLoopPlayer,
+)
 from ..playerv import PVariable
 from ..eudarray import EUDArray
 
@@ -107,10 +113,12 @@ def _OptimizeSetPName():
         for player in EUDLoopPlayer(None):
             player_name = 36 * player
             playerid_epd = 9 * player
-            cs.DoActions([
-                player_name.AddNumber(0x57EEEB),
-                playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
-            ])
+            cs.DoActions(
+                [
+                    player_name.AddNumber(0x57EEEB),
+                    playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
+                ]
+            )
             idlen = f_strlen_epd(playerid_epd)
             nameDb = baseNames[player]
             f_dbstr_print(nameDb, ptr2s(player_name), ":")
@@ -205,16 +213,17 @@ def SetPName(player, *name):
     if cs.EUDWhile()(ptr.AtMost(0x640B61 + 218 * 10)):
         cs.EUDContinueIf(f_check_id(player, epd))
         cs.EUDContinueIf(f_memcmp(basename, ptr, baselen) >= 1)
-        cs.DoActions([
-            c.SetCurrentPlayer(ut.EPD(temp_Db)),
-            baselen.SubtractNumber(1),
-        ])  # fix setpname save 1byte less chat contents
+        cs.DoActions(
+            [c.SetCurrentPlayer(ut.EPD(temp_Db)), baselen.SubtractNumber(1)]
+        )  # fix setpname save 1byte less chat contents
         f_cpstr_print(ptr2s(ptr + baselen), EOS=False)
-        cs.DoActions([
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            baselen.AddNumber(1),
-            c.SetCurrentPlayer(epd),
-        ])
+        cs.DoActions(
+            [
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                baselen.AddNumber(1),
+                c.SetCurrentPlayer(epd),
+            ]
+        )
         c.RawTrigger(
             conditions=odds_or_even.Exactly(1),
             actions=[

@@ -37,21 +37,27 @@ from . import cpmemio as cm
 def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
     cpmoda = c.Forward()
 
-    c.VProc([dstepdp, srcepdp], [
-        c.SetMemory(cpmoda, c.SetTo, -1),
-        dstepdp.QueueAddTo(ut.EPD(cpmoda)),
-        srcepdp.SetDest(ut.EPD(0x6509B0)),
-    ])
+    c.VProc(
+        [dstepdp, srcepdp],
+        [
+            c.SetMemory(cpmoda, c.SetTo, -1),
+            dstepdp.QueueAddTo(ut.EPD(cpmoda)),
+            srcepdp.SetDest(ut.EPD(0x6509B0)),
+        ],
+    )
 
     if cs.EUDWhileNot()(copydwn == 0):
         cpmod = cm.f_dwread_cp(0)
         cpmoda << cpmod.getDestAddr()
 
-        c.VProc(cpmod, [
-            cpmod.AddDest(1),
-            c.SetMemory(0x6509B0, c.Add, 1),
-            copydwn.SubtractNumber(1),
-        ])
+        c.VProc(
+            cpmod,
+            [
+                cpmod.AddDest(1),
+                c.SetMemory(0x6509B0, c.Add, 1),
+                copydwn.SubtractNumber(1),
+            ],
+        )
 
     cs.EUDEndWhile()
 

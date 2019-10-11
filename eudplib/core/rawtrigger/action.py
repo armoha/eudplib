@@ -50,6 +50,7 @@ class Action(ConstExpr):
        +1D   internal[3
      ======  ============= ========  ==========
     """
+
     # fmt: off
     def __init__(self, locid1, strid, wavid, time, player1, player2,
                  unitid, acttype, amount, flags, eudx=0):

@@ -107,11 +107,11 @@ def EUDVArray(size, basetype=None):
 
                 for t in range(31, -1, -1):
                     _goto_getidx[t] << bt.RawTrigger(
-                        conditions=_index.AtLeastX(1, 2**t),
+                        conditions=_index.AtLeastX(1, 2 ** t),
                         actions=[
-                            bt.SetMemory(_end_getidx + 4, bt.Add, 72 * (2**t)),
-                            bt.SetMemory(_ret_getidx + 16, bt.Add, 18 * (2**t)),
-                            bt.SetMemory(_ret_getidx + 48, bt.Add, 18 * (2**t)),
+                            bt.SetMemory(_end_getidx + 4, bt.Add, 72 * (2 ** t)),
+                            bt.SetMemory(_ret_getidx + 16, bt.Add, 18 * (2 ** t)),
+                            bt.SetMemory(_ret_getidx + 48, bt.Add, 18 * (2 ** t)),
                         ],
                     )
                 _end_getidx << bt.RawTrigger(
@@ -119,12 +119,12 @@ def EUDVArray(size, basetype=None):
                     actions=[
                         _ret_getidx << bt.SetMemory(0, bt.SetTo, 0),
                         bt.SetMemory(0, bt.SetTo, 0),
-                    ]
+                    ],
                 )
                 bt.PopTriggerScope()
 
             r = EUDVariable()
-            bits = max((size-1).bit_length()-1, 0)
+            bits = max((size - 1).bit_length() - 1, 0)
             nptr = Forward()
 
             SeqCompute(
@@ -141,7 +141,7 @@ def EUDVArray(size, basetype=None):
                     bt.SetNextPtr(i.GetVTable(), _goto_getidx[bits]),
                     bt.SetMemory(_ret_getidx + 20, bt.SetTo, EPD(r.getValueAddr())),
                     bt.SetMemory(_ret_getidx + 52, bt.SetTo, nptr),
-                ]
+                ],
             )
 
             nptr << bt.NextTrigger()
@@ -172,7 +172,7 @@ def EUDVArray(size, basetype=None):
 
             nptr << bt.NextTrigger()
             return r
-            
+
         def _constget(self, i):
             r = EUDVariable()
             nptr = Forward()
@@ -180,7 +180,12 @@ def EUDVArray(size, basetype=None):
             bt.RawTrigger(
                 nextptr=self + 72 * i,
                 actions=[
-                    bt.SetDeaths(self._epd + (18 * i + 344 // 4), bt.SetTo, EPD(r.getValueAddr()), 0),
+                    bt.SetDeaths(
+                        self._epd + (18 * i + 344 // 4),
+                        bt.SetTo,
+                        EPD(r.getValueAddr()),
+                        0,
+                    ),
                     bt.SetDeaths(self._epd + (18 * i + 1), bt.SetTo, nptr, 0),
                 ],
             )
@@ -215,7 +220,11 @@ def EUDVArray(size, basetype=None):
             VProc(value, [value.QueueAssignTo(self._epd + (18 * i + 348 // 4))])
 
         def _constset(self, i, value):
-            bt.RawTrigger(actions=bt.SetDeaths(self._epd + (18 * i + 348 // 4), bt.SetTo, value, 0))
+            bt.RawTrigger(
+                actions=bt.SetDeaths(
+                    self._epd + (18 * i + 348 // 4), bt.SetTo, value, 0
+                )
+            )
 
         def fill(self, values, *, assert_expected_values_len=None):
             if assert_expected_values_len:

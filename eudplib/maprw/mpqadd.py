@@ -105,7 +105,7 @@ def UpdateMPQ(mpqw):
             if not ret:
                 print(
                     "Failed adding file %s to mpq: May be duplicate" % fname,
-                    file=sys.stderr
+                    file=sys.stderr,
                 )
                 raise ctypes.WinError(ctypes.get_last_error())
 

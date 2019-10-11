@@ -43,7 +43,7 @@ def f_setcurpl2cpcache(v=[], actions=[]):
         trg = c.VProc([v] + [cpcache], [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))])
     else:
         trg = c.VProc(cpcache, [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))])
-    
+
     return trg
 
 
