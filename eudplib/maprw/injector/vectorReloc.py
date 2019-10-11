@@ -45,20 +45,13 @@ def Trigger(players=[tt.AllPlayers], *args, **kwargs):
 
 
 def CopyDeaths(iplayer, oplayer, copyepd=False, initvalue=None):
-    tmpplayer = 11
-
     if initvalue is None:
         if copyepd:
             initvalue = tt.EPD(0)
         else:
             initvalue = 0
 
-    Trigger(
-        actions=[
-            tt.SetDeaths(oplayer, tt.SetTo, initvalue, 0),
-            tt.SetDeaths(tmpplayer, tt.SetTo, 0, 0),
-        ]
-    )
+    Trigger(actions=tt.SetDeaths(oplayer, tt.SetTo, initvalue, 0))
 
     for i in range(31, 1, -1):
         if copyepd:
@@ -68,22 +61,8 @@ def CopyDeaths(iplayer, oplayer, copyepd=False, initvalue=None):
             subval = 2 ** i
 
         Trigger(
-            conditions=[tt.Deaths(iplayer, tt.AtLeast, 2 ** i, 0)],
-            actions=[
-                tt.SetDeaths(iplayer, tt.Subtract, 2 ** i, 0),
-                tt.SetDeaths(tmpplayer, tt.Add, 2 ** i, 0),
-                tt.SetDeaths(oplayer, tt.Add, subval, 0),
-            ],
-        )
-
-    for i in range(31, 1, -1):
-        Trigger(
-            players=[tt.AllPlayers],
-            conditions=[tt.Deaths(tmpplayer, tt.AtLeast, 2 ** i, 0)],
-            actions=[
-                tt.SetDeaths(iplayer, tt.Add, 2 ** i, 0),
-                tt.SetDeaths(tmpplayer, tt.Subtract, 2 ** i, 0),
-            ],
+            conditions=[tt.DeathsX(iplayer, tt.AtLeast, 1, 0, 2 ** i)],
+            actions=tt.SetDeaths(oplayer, tt.Add, subval, 0),
         )
 
 
@@ -177,9 +156,7 @@ def CreateVectorRelocator(chkt, payload):
             actions=[
                 [
                     tt.SetMemory(
-                        mrgn_ort + 328 + 32 * j + 16,
-                        tt.Add,
-                        0xFFFFFFFF - prevoffset[j],
+                        mrgn_ort + 328 + 32 * j + 16, tt.Add, 0xFFFFFFFF - prevoffset[j]
                     )
                     for j in range(packn)
                 ],
@@ -203,32 +180,41 @@ def CreateVectorRelocator(chkt, payload):
     # MRGN SECTION
     ##############
     mrgn_trigger = bytearray()
-    mrgn_trigger_prt = bytes(4) + ut.i2b4(prttrg_start + strsled_offset) + tt.Trigger(
-        players=[tt.AllPlayers],
-        actions=[
-            # SetDeaths actions in MRGN initially points to EPD(payload - 4)
-            [
-                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4)
-                for _ in range(packn)
+    mrgn_trigger_prt = (
+        bytes(4)
+        + ut.i2b4(prttrg_start + strsled_offset)
+        + tt.Trigger(
+            players=[tt.AllPlayers],
+            actions=[
+                # SetDeaths actions in MRGN initially points to EPD(payload - 4)
+                [
+                    tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4)
+                    for _ in range(packn)
+                ],
+                tt.SetMemory(mrgn + 4, tt.Add, 2408),
             ],
-            tt.SetMemory(mrgn + 4, tt.Add, 2408),
-        ],
-    ) + bytes(836)
-    mrgn_trigger_ort = bytes(836 + 4) + ut.i2b4(orttrg_start + strsled_offset) + tt.Trigger(
-        players=[tt.AllPlayers],
-        actions=[
-            [
-                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset)
-                for _ in range(packn)
+        )
+        + bytes(836)
+    )
+    mrgn_trigger_ort = (
+        bytes(836 + 4)
+        + ut.i2b4(orttrg_start + strsled_offset)
+        + tt.Trigger(
+            players=[tt.AllPlayers],
+            actions=[
+                [
+                    tt.SetMemory(payload_offset - 4, tt.Add, payload_offset)
+                    for _ in range(packn)
+                ],
+                tt.SetMemory(mrgn_ort + 4, tt.Add, 2408),
             ],
-            tt.SetMemory(mrgn_ort + 4, tt.Add, 2408),
-        ],
+        )
     )
     for b1, b2 in zip(mrgn_trigger_prt, mrgn_trigger_ort):
         mrgn_trigger.append(b1 ^ b2)
 
     oldmrgnraw = chkt.getsection("MRGN")
-    mrgn_section = bytes(mrgn_trigger) + oldmrgnraw[2408 + 836:]
+    mrgn_section = bytes(mrgn_trigger) + oldmrgnraw[2408 + 836 :]
     if len(mrgn_section) != 5100:
         raise RuntimeError("MRGN section size bug")
     chkt.setsection("MRGN", mrgn_section)
@@ -241,10 +227,7 @@ def CreateVectorRelocator(chkt, payload):
     # Check if epd is supported
     Trigger(actions=[tt.SetDeaths(-12, tt.SetTo, 1, 1)])
 
-    Trigger(
-        conditions=[tt.Deaths(0, tt.Exactly, 0, 0)],
-        actions=[tt.Draw()],
-    )
+    Trigger(conditions=[tt.Deaths(0, tt.Exactly, 0, 0)], actions=[tt.Draw()])
 
     # End trigger execution if EUDA is not supported
     #  - using condition #115 twice.
@@ -266,37 +249,19 @@ def CreateVectorRelocator(chkt, payload):
         # prt table
         # player
         Trigger(
-            conditions=tt.Memory(strs, tt.AtLeast, 2 ** e),
+            conditions=tt.MemoryX(strs, tt.AtLeast, 1, 2 ** e),
             actions=[
                 [
-                    tt.SetMemory(mrgn + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2))
-                    for i in range(packn)
-                ],
-                tt.SetDeaths(11, tt.Add, 2 ** e, 0),
-                [
-                    tt.SetMemory(mrgn + 328 + 32 * i + 20, tt.Add, 2 ** (e - 2))
-                    for i in range(packn)
-                ],
+                    tt.SetMemory(mrgn + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2)),
+                    tt.SetMemory(mrgn + 328 + 32 * i + 20, tt.Add, 2 ** (e - 2)),
+                    tt.SetMemory(mrgn_ort + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2)),
+                    tt.SetMemory(mrgn_ort + 328 + 32 * i + 20, tt.Add, 2 ** e),
+                ]
+                for i in range(packn)
+            ]
+            + [
                 tt.SetMemory(mrgn + 4, tt.Add, 2 ** e),
-                [
-                    tt.SetMemory(mrgn_ort + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2))
-                    for i in range(packn)
-                ],
                 tt.SetMemory(mrgn_ort + 4, tt.Add, 2 ** e),
-                [
-                    tt.SetMemory(mrgn_ort + 328 + 32 * i + 20, tt.Add, 2 ** e)
-                    for i in range(packn)
-                ],
-                tt.SetMemory(strs, tt.Subtract, 2 ** e),
-            ],
-        )
-
-    for e in range(31, 1, -1):
-        Trigger(
-            conditions=tt.Deaths(11, tt.AtLeast, 2 ** e, 0),
-            actions=[
-                tt.SetDeaths(11, tt.Subtract, 2 ** e, 0),
-                tt.SetMemory(strs, tt.Add, 2 ** e),
             ],
         )
 
@@ -323,21 +288,8 @@ def CreateVectorRelocator(chkt, payload):
     # read pts[player].lasttrigger
     for e in range(31, 1, -1):
         Trigger(
-            conditions=tt.Deaths(tt.CurrentPlayer, tt.AtLeast, 2 ** e, 0),
-            actions=[
-                tt.SetDeaths(tt.CurrentPlayer, tt.Subtract, 2 ** e, 0),
-                tt.SetDeaths(10, tt.Add, 2 ** e, 0),
-                tt.SetDeaths(11, tt.Add, 2 ** e, 0),
-            ],
-        )
-
-    for e in range(31, 1, -1):
-        Trigger(
-            conditions=tt.Deaths(10, tt.AtLeast, 2 ** e, 0),
-            actions=[
-                tt.SetDeaths(10, tt.Subtract, 2 ** e, 0),
-                tt.SetDeaths(tt.CurrentPlayer, tt.Add, 2 ** e, 0),
-            ],
+            conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2 ** e),
+            actions=tt.SetDeaths(11, tt.Add, 2 ** e, 0),
         )
 
     # apply to curpl

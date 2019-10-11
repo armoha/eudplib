@@ -26,7 +26,7 @@ THE SOFTWARE.
 from .... import utils as ut
 from ...rawtrigger import (
     RawTrigger,
-    Memory,
+    MemoryX,
     AtLeast,
     SetNextPtr,
     SetMemory,
@@ -95,15 +95,10 @@ def GetTraceStackDepth():
     v << 0
     for i in range(31, -1, -1):
         RawTrigger(
-            conditions=Memory(recordTraceAct + 16, AtLeast, 2 ** i),
-            actions=[
-                SetMemory(recordTraceAct + 16, Subtract, 2 ** i),
-                v.AddNumber(2 ** i),
-            ],
+            conditions=MemoryX(recordTraceAct + 16, AtLeast, 1, 2 ** i),
+            actions=v.AddNumber(2 ** i),
         )
-    SeqCompute(
-        [(ut.EPD(recordTraceAct + 16), SetTo, v), (v, Subtract, traceToolDataEPD + 4)]
-    )
+    SeqCompute([(v, Subtract, traceToolDataEPD + 4)])
     return v
 
 

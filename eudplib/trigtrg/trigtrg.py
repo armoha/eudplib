@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from struct import pack
 from eudplib import utils as ut
-from ..utils import EPD
+from ..utils import EPD, b2i2
 from ..core.rawtrigger.constenc import *
 from ..core.rawtrigger.strenc import *
 
@@ -44,15 +44,17 @@ condition / actions.
 """
 
 
-def Condition(locid, player, amount, unitid, comparison, condtype, restype, flag):
+def Condition(locid, player, amount, unitid, comparison, condtype, restype, flag, eudx=0):
     if player < 0:
         player += 0x100000000  # EPD
 
     player &= 0xFFFFFFFF
     amount &= 0xFFFFFFFF
+    if eudx:
+        eudx = b2i2(b"SC")
 
     return pack(
-        "<IIIHBBBBBB",
+        "<IIIHBBBBH",
         locid,
         player,
         amount,
@@ -61,13 +63,12 @@ def Condition(locid, player, amount, unitid, comparison, condtype, restype, flag
         condtype,
         restype,
         flag,
-        0,
-        0,
+        eudx,
     )
 
 
 def Action(
-    locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags
+    locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags, eudx=0
 ):
     player1 &= 0xFFFFFFFF
     player2 &= 0xFFFFFFFF
@@ -76,8 +77,10 @@ def Action(
         player1 += 0x100000000  # EPD
     if player2 < 0:
         player2 += 0x100000000  # EPD
+    if eudx:
+        eudx = b2i2(b"SC")
     return pack(
-        "<IIIIIIHBBBBBB",
+        "<IIIIIIHBBBBH",
         locid1,
         strid,
         wavid,
@@ -89,8 +92,7 @@ def Action(
         amount,
         flags,
         0,
-        0,
-        0,
+        eudx,
     )
 
 
@@ -613,3 +615,25 @@ def Memory(dest, cmptype, value):
 
 def SetMemory(dest, modtype, value):
     return SetDeaths(EPD(dest), modtype, value, 0)
+
+
+def DeathsX(Player, Comparison, Number, Unit, Mask):
+    Player = EncodePlayer(Player)
+    Comparison = EncodeComparison(Comparison)
+    Unit = EncodeUnit(Unit)
+    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx=True)
+
+
+def MemoryX(dest, cmptype, value, mask):
+    return DeathsX(EPD(dest), cmptype, value, 0, mask)
+
+
+def SetDeathsX(Player, Modifier, Number, Unit, Mask):
+    Player = EncodePlayer(Player)
+    Modifier = EncodeModifier(Modifier)
+    Unit = EncodeUnit(Unit)
+    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx=True)
+
+
+def SetMemoryX(dest, modtype, value, mask):
+    return SetDeathsX(EPD(dest), modtype, value, 0, mask)

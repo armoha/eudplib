@@ -54,22 +54,34 @@ def CreatePayloadRelocator(payload):
         prtn << len(payload.prttable)
         if payload.prttable:
             if cs.EUDWhile()(prtn >= 1):
-                cs.DoActions(prtn.SubtractNumber(1))
-                sf.f_dwadd_epd(
-                    ut.EPD(orig_payload) + sf.f_dwread_epd(prtn + ut.EPD(prtdb)),
-                    orig_payload // 4,
+                prtn += ut.EPD(prtdb) - 1
+                epd, dst = sf.f_dwread_epd(prtn), c.Forward()
+                c.VProc(
+                    epd,
+                    [
+                        prtn.SubtractNumber(ut.EPD(prtdb)),
+                        epd.AddNumber(ut.EPD(orig_payload)),
+                        epd.SetDest(ut.EPD(dst) + 4),
+                    ],
                 )
+                cs.DoActions([dst << c.SetDeaths(0, c.Add, orig_payload // 4, 0)])
             cs.EUDEndWhile()
 
         # init ort
         ortn << len(payload.orttable)
         if payload.orttable:
             if cs.EUDWhile()(ortn >= 1):
-                cs.DoActions(ortn.SubtractNumber(1))
-                sf.f_dwadd_epd(
-                    ut.EPD(orig_payload) + sf.f_dwread_epd(ortn + ut.EPD(ortdb)),
-                    orig_payload,
+                ortn += ut.EPD(ortdb) - 1
+                epd, dst = sf.f_dwread_epd(ortn), c.Forward()
+                c.VProc(
+                    epd,
+                    [
+                        ortn.SubtractNumber(ut.EPD(ortdb)),
+                        epd.AddNumber(ut.EPD(orig_payload)),
+                        epd.SetDest(ut.EPD(dst) + 4),
+                    ],
                 )
+                cs.DoActions([dst << c.SetDeaths(0, c.Add, orig_payload, 0)])
             cs.EUDEndWhile()
 
         # Jump
