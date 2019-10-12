@@ -121,23 +121,12 @@ def EUDEndIf():
 # -------
 
 
-_once_templv = c.EUDLightVariable()
-_once_pow = 0
-
-
 def EUDExecuteOnce():
     def _footer():
         global _once_templv, _once_pow
-        block = {"blockend": c.Forward()}
+        block = {"blockstart": c.Forward(), "blockend": c.Forward()}
         ut.EUDCreateBlock("executeonceblock", block)
-
-        tv = _once_templv
-        EUDJumpIf(tv.AtLeastX(1, 1 << _once_pow), block["blockend"])
-        tv += (1 << _once_pow)
-        _once_pow += 1
-        if _once_pow >= 32:
-            _once_templv = c.EUDLightVariable()
-            _once_pow = 0
+        block["blockstart"] << c.RawTrigger()
         return True
 
     return CtrlStruOpener(_footer)
@@ -147,5 +136,5 @@ def EUDEndExecuteOnce():
     lb = ut.EUDPopBlock("executeonceblock")
     ut.ep_assert(lb[0] == "executeonceblock", "Block start/end mismatch")
     block = lb[1]
-
+    c.RawTrigger(actions=c.SetNextPtr(block["blockstart"], block["blockend"]))
     block["blockend"] << c.NextTrigger()

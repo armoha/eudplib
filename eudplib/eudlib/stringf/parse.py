@@ -34,7 +34,7 @@ def f_parse(dst, radix=10):
         int: _parse_dw,
         hex: _parse_ptr,
         2: _parse_bin,
-        10: _parse_dw
+        10: _parse_dw,
         16: _parse_ptr,
     }
     try:
@@ -147,4 +147,3 @@ def _parse_ptr(dst):
     cs.EUDEndIf()
 
     c.EUDReturn(ret)
-
