@@ -55,27 +55,9 @@ def f_settbl(tblID, offset, *args):
 
 
 def f_settbl2(tblID, offset, *args):
-    from .eudprint import hptr, _str_jump, _str_EOS, _str_dst, _dw_jump, _dw_EOS, _dw_dst, _ptr_jump, _ptr_EOS, _ptr_dst
+    from .eudprint import _OmitEOS
+
     dst = GetTBLAddr(tblID)
-    dw = any(c.IsConstExpr(x) or c.IsEUDVariable(x) for x in args)
-    ptr = any(ut.isUnproxyInstance(x, hptr) for x in args)
-    cs.DoActions([
-        c.SetNextPtr(_str_jump, _str_dst),
-        dst.AddNumber(offset)
-    ] +
-    [
-        c.SetNextPtr(_dw_jump, _dw_dst)
-        if dw else []
-    ] + [
-        c.SetNextPtr(_ptr_jump, _ptr_dst)
-        if ptr else []
-    ])
-    f_dbstr_print(dst, *args, encoding="cp949")
-    cs.DoActions([c.SetNextPtr(_str_jump, _str_EOS)] +
-    [
-        c.SetNextPtr(_dw_jump, _dw_EOS)
-        if dw else []
-    ] + [
-        c.SetNextPtr(_ptr_jump, _ptr_EOS)
-        if ptr else []
-    ])
+    dst += offset
+    for _ in _OmitEOS(*args):
+        f_dbstr_print(dst, *args, encoding="cp949")

@@ -31,6 +31,7 @@ from .cpprint import prevcp, f_cpstr_print
 from .strfunc import f_strlen_epd
 from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove
 from ..eudarray import EUDArray
+from ..utilf import f_getuserplayerid
 
 _strbuffer_list = list()
 
@@ -41,8 +42,8 @@ def f_gettextptr():
     ret << 0
     for i in range(3, -1, -1):
         c.RawTrigger(
-            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
-            actions=ret.AddNumber(2**i)
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2 ** i),
+            actions=ret.AddNumber(2 ** i),
         )
     return ret
 
@@ -53,12 +54,9 @@ def DisplayTextAt(line, text):
     f_dwadd_epd(EPD(0x640B58), line)
     c.RawTrigger(
         conditions=c.Memory(0x640B58, c.AtLeast, 11),
-        actions=c.SetMemory(0x640B58, c.Subtract, 11)
+        actions=c.SetMemory(0x640B58, c.Subtract, 11),
     )
-    cs.DoActions([
-        c.DisplayText(text),
-        c.SetMemory(0x640B58, c.SetTo, tp)
-    ])
+    cs.DoActions([c.DisplayText(text), c.SetMemory(0x640B58, c.SetTo, tp)])
 
 
 class StringBuffer:
@@ -67,6 +65,7 @@ class StringBuffer:
     Manipluating STR section is easy. :)
     You can do anything you would do with normal string with StringBuffer.
     """
+
     _method_template = c.Forward()
     _cpbranch = c.Forward()
     _ontrue = c.Forward()
@@ -97,8 +96,12 @@ class StringBuffer:
             cs.DoActions(self.epd.SetNumber(ut.EPD(GetMapStringAddr(self.StringIndex))))
         except IndexError:
             from ...maprw.injector.mainloop import EUDOnStart
+
             def _f():
-                cs.DoActions(self.epd.SetNumber(ut.EPD(GetMapStringAddr(self.StringIndex))))
+                cs.DoActions(
+                    self.epd.SetNumber(ut.EPD(GetMapStringAddr(self.StringIndex)))
+                )
+
             EUDOnStart(_f)
 
         _strbuffer_list.append(self)
@@ -114,7 +117,9 @@ class StringBuffer:
             outindex += len(s) + 1
         bufferoffset = stroffset[strmap._dataindextb[self.StringIndex - 1]]
         if bufferoffset % 4 != 0:
-            strmap._datatb[strmap._dataindextb[self._filler - 1]] = b"Arta"[:4 - bufferoffset % 4]
+            strmap._datatb[strmap._dataindextb[self._filler - 1]] = b"Arta"[
+                : 4 - bufferoffset % 4
+            ]
             strmap._capacity -= bufferoffset % 4
 
     @classmethod
@@ -122,21 +127,15 @@ class StringBuffer:
         c.PushTriggerScope()
         cls._method_template << c.NextTrigger()
         cp = f_getcurpl()
-        c.VProc(
-            cp,
-            cp.SetDest(ut.EPD(cls._cpbranch) + 4)
-        )
+        c.VProc(cp, cp.SetDest(ut.EPD(cls._cpbranch) + 4))
         cls._cpbranch << c.RawTrigger(
             nextptr=0,
             conditions=c.Memory(0x512684, c.Exactly, 0),
-            actions=c.SetNextPtr(cls._cpbranch, cls._ontrue)
+            actions=c.SetNextPtr(cls._cpbranch, cls._ontrue),
         )
         cls._ontrue << c.RawTrigger(
             nextptr=cp.GetVTable(),
-            actions=[
-                c.SetNextPtr(cp.GetVTable(), 0),
-                cp.SetDest(prevcp),
-            ]
+            actions=[c.SetNextPtr(cp.GetVTable(), 0), cp.SetDest(prevcp)],
         )
         c.PopTriggerScope()
 
@@ -149,7 +148,7 @@ class StringBuffer:
             actions=[
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
-            ]
+            ],
         )
         ontrue << c.NextTrigger()
         f_setcurpl(self.pos)
@@ -167,7 +166,7 @@ class StringBuffer:
             actions=[
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
-            ]
+            ],
         )
         ontrue << c.NextTrigger()
         f_setcurpl(self.epd + index)
@@ -185,7 +184,7 @@ class StringBuffer:
             actions=[
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
-            ]
+            ],
         )
         ontrue << c.NextTrigger()
         index = self.epd + start
@@ -213,10 +212,9 @@ class StringBuffer:
             conditions=c.Memory(0x640B58, c.AtLeast, 11),
             actions=c.SetMemory(0x640B58, c.Subtract, 11),
         )
-        cs.DoActions([
-            c.DisplayText(self.StringIndex),
-            c.SetMemory(0x640B58, c.SetTo, prevptr)
-        ])
+        cs.DoActions(
+            [c.DisplayText(self.StringIndex), c.SetMemory(0x640B58, c.SetTo, prevptr)]
+        )
 
     def print(self, *args):
         if not StringBuffer._method_template.IsSet():
@@ -227,16 +225,18 @@ class StringBuffer:
             actions=[
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
-            ]
+            ],
         )
         ontrue << c.NextTrigger()
         f_setcurpl(self.epd)
         f_cpstr_print(*args, EOS=False)
-        cs.DoActions([
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetCurrentPlayer(prevcp),
-            c.DisplayText(self.StringIndex)
-        ])
+        cs.DoActions(
+            [
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetCurrentPlayer(prevcp),
+                c.DisplayText(self.StringIndex),
+            ]
+        )
         end << c.NextTrigger()
 
     def printAt(self, line, *args):
@@ -248,15 +248,14 @@ class StringBuffer:
             actions=[
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
-            ]
+            ],
         )
         ontrue << c.NextTrigger()
         f_setcurpl(self.epd)
         f_cpstr_print(*args, EOS=False)
-        cs.DoActions([
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetCurrentPlayer(prevcp),
-        ])
+        cs.DoActions(
+            [c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0), c.SetCurrentPlayer(prevcp)]
+        )
         self.DisplayAt(line)
         end << c.NextTrigger()
 
@@ -274,7 +273,7 @@ class StringBuffer:
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
                 ret.SetNumber(-1),
-            ]
+            ],
         )
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
@@ -289,11 +288,13 @@ class StringBuffer:
                     self.DisplayAt(11 + line)
                 if cs.EUDElse()():
                     prevptr = f_gettextptr()
-                    cs.DoActions([
-                        c.SetMemory(0x640B58, c.SetTo, prevpos),
-                        c.DisplayText(self.StringIndex),
-                        c.SetMemory(0x640B58, c.SetTo, prevptr),
-                    ])
+                    cs.DoActions(
+                        [
+                            c.SetMemory(0x640B58, c.SetTo, prevpos),
+                            c.DisplayText(self.StringIndex),
+                            c.SetMemory(0x640B58, c.SetTo, prevptr),
+                        ]
+                    )
                 cs.EUDEndIf()
         else:
             if cs.EUDIf()(line <= 10):
@@ -303,11 +304,13 @@ class StringBuffer:
                     self.DisplayAt(11 + line)
                 if cs.EUDElse()():
                     prevptr = f_gettextptr()
-                    cs.DoActions([
-                        c.SetMemory(0x640B58, c.SetTo, prevpos),
-                        c.DisplayText(self.StringIndex),
-                        c.SetMemory(0x640B58, c.SetTo, prevptr),
-                    ])
+                    cs.DoActions(
+                        [
+                            c.SetMemory(0x640B58, c.SetTo, prevpos),
+                            c.DisplayText(self.StringIndex),
+                            c.SetMemory(0x640B58, c.SetTo, prevptr),
+                        ]
+                    )
                 cs.EUDEndIf()
             cs.EUDEndIf()
         end << c.NextTrigger()
@@ -324,7 +327,7 @@ class StringBuffer:
                 c.SetNextPtr(StringBuffer._cpbranch, end),
                 c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
                 ret.SetNumber(-1),
-            ]
+            ],
         )
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
@@ -339,11 +342,13 @@ class StringBuffer:
                     self.DisplayAt(11 + line)
                 if cs.EUDElse()():
                     prevptr = f_gettextptr()
-                    cs.DoActions([
-                        c.SetMemory(0x640B58, c.SetTo, prevpos),
-                        c.DisplayText(self.StringIndex),
-                        c.SetMemory(0x640B58, c.SetTo, prevptr),
-                    ])
+                    cs.DoActions(
+                        [
+                            c.SetMemory(0x640B58, c.SetTo, prevpos),
+                            c.DisplayText(self.StringIndex),
+                            c.SetMemory(0x640B58, c.SetTo, prevptr),
+                        ]
+                    )
                 cs.EUDEndIf()
         else:
             if cs.EUDIf()(line <= 10):
@@ -353,11 +358,13 @@ class StringBuffer:
                     self.DisplayAt(11 + line)
                 if cs.EUDElse()():
                     prevptr = f_gettextptr()
-                    cs.DoActions([
-                        c.SetMemory(0x640B58, c.SetTo, prevpos),
-                        c.DisplayText(self.StringIndex),
-                        c.SetMemory(0x640B58, c.SetTo, prevptr),
-                    ])
+                    cs.DoActions(
+                        [
+                            c.SetMemory(0x640B58, c.SetTo, prevpos),
+                            c.DisplayText(self.StringIndex),
+                            c.SetMemory(0x640B58, c.SetTo, prevptr),
+                        ]
+                    )
                 cs.EUDEndIf()
             cs.EUDEndIf()
         end << c.NextTrigger()
@@ -375,3 +382,19 @@ def GetGlobalStringBuffer():
     if _globalsb is None:
         _globalsb = StringBuffer(1023)
     return _globalsb
+
+
+def f_simpleprint(*args, spaced=True):
+    # Add spaces between arguments
+    if spaced:
+        spaced_args = []
+        for arg in args:
+            spaced_args.extend([arg, " "])
+        args = spaced_args[:-1]
+
+    # Print
+    oldcp = f_getcurpl()
+    f_setcurpl(f_getuserplayerid())
+    gsb = GetGlobalStringBuffer()
+    gsb.print(*args)
+    f_setcurpl(oldcp)

@@ -29,10 +29,46 @@ from ..rwcommon import br1, bw1
 from .dbstr import DBString
 
 _conststr_dict = dict()
-_epd2s_jump, _epd2s_ptr, _epd2s_dst = c.Forward(), c.Forward(), c.Forward()
 _str_jump, _str_EOS, _str_dst = c.Forward(), c.Forward(), c.Forward()
 _dw_jump, _dw_EOS, _dw_dst = c.Forward(), c.Forward(), c.Forward()
 _ptr_jump, _ptr_EOS, _ptr_dst = c.Forward(), c.Forward(), c.Forward()
+
+
+def _dbstr_addstr_core(_f=[]):
+    if not _str_jump.IsSet():
+
+        def _():
+            global _str_jump, _str_EOS, _str_dst
+            c.PushTriggerScope()
+            strlen = c.EUDVariable()
+            init = c.RawTrigger(actions=strlen.SetNumber(0))
+            write = c.Forward()
+
+            if cs.EUDInfLoop()():
+                b = br1.readbyte()
+                _str_jump << c.RawTrigger(
+                    conditions=b.Exactly(0), actions=c.SetNextPtr(_str_jump, _str_EOS)
+                )
+                write << c.NextTrigger()
+                bw1.writebyte(b)
+                strlen += 1
+            cs.EUDEndInfLoop()
+
+            _str_EOS << c.NextTrigger()
+            bw1.writebyte(0)  # EOS
+            _str_dst << c.RawTrigger(actions=c.SetNextPtr(_str_jump, write))
+            c.PopTriggerScope()
+
+            return init, _str_dst, strlen
+
+        _f.extend(_())
+
+    init, end, strlen = _f
+    nptr = c.Forward()
+    c.RawTrigger(nextptr=init, actions=c.SetNextPtr(end, nptr))
+    nptr << c.NextTrigger()
+
+    return strlen
 
 
 @c.EUDFunc
@@ -44,36 +80,27 @@ def f_dbstr_addstr(dst, src):
 
     :returns: dst + strlen(src)
     """
-    global _epd2s_jump, _epd2s_ptr, _epd2s_dst
-    global _str_jump, _str_EOS, _str_dst
-    b = c.EUDVariable()
-
-    _epd2s_jump << c.RawTrigger(
-        conditions=c.Never(),
-        actions=[
-            c.SetNextPtr(_epd2s_jump, src.GetVTable()),
-            c.SetNextPtr(src.GetVTable(), _epd2s_dst),
-            src.QueueAssignTo(br1._offset),
-            br1._suboffset.SetNumber(0),
-            c.SetMemory(_epd2s_jump + 20, c.Add, 0x1000000),
-        ]
-    )
-    _epd2s_ptr << c.NextTrigger()
-    br1.seekoffset(src)
-    _epd2s_dst << c.NextTrigger()
     bw1.seekoffset(dst)
+    br1.seekoffset(src)
+    strlen = _dbstr_addstr_core()
+    dst += strlen
 
-    if cs.EUDInfLoop()():
-        c.SetVariables(b, br1.readbyte())
-        cs.EUDBreakIf(b == 0)
-        bw1.writebyte(b)
-        dst += 1
-    cs.EUDEndInfLoop()
+    return dst
 
-    _str_jump << c.RawTrigger(actions=c.SetNextPtr(_epd2s_jump, _epd2s_ptr))
-    _str_EOS << c.NextTrigger()
-    bw1.writebyte(0)  # EOS
-    _str_dst << c.NextTrigger()
+
+@c.EUDFunc
+def f_dbstr_addstr_epd(dst, epd):
+    """Print string as string to dst. Same as strcpy except of return value.
+
+    :param dst: Destination address (Not EPD player)
+    :param epd: Source EPD player
+
+    :returns: dst + strlen_epd(epd)
+    """
+    bw1.seekoffset(dst)
+    br1.seekoffset(epd)
+    strlen = _dbstr_addstr_core()
+    dst += strlen
 
     return dst
 
@@ -151,6 +178,22 @@ def f_dbstr_addptr(dst, number):
     return dst
 
 
+def _OmitEOS(*args):
+    dw = any(c.IsConstExpr(x) or c.IsEUDVariable(x) for x in args)
+    ptr = any(ut.isUnproxyInstance(x, hptr) for x in args)
+    cs.DoActions(
+        [c.SetMemory(_str_jump + 348, c.SetTo, _str_dst)]
+        + [c.SetNextPtr(_dw_jump, _dw_dst) if dw else []]
+        + [c.SetNextPtr(_ptr_jump, _ptr_dst) if ptr else []]
+    )
+    yield (dw, ptr)
+    if dw or ptr:
+        cs.DoActions(
+            [c.SetNextPtr(_dw_jump, _dw_EOS) if dw else []]
+            + [c.SetNextPtr(_ptr_jump, _ptr_EOS) if ptr else []]
+        )
+
+
 class ptr2s:
     def __init__(self, value):
         self._value = value
@@ -190,14 +233,11 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
                 _conststr_dict[arg] = c.Db(arg + b"\0")
             arg = _conststr_dict[arg]
         if ut.isUnproxyInstance(arg, c.Db):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -0x1000000))
-            dst = f_dbstr_addstr(dst, ut.EPD(arg))
+            dst = f_dbstr_addstr_epd(dst, ut.EPD(arg))
         elif ut.isUnproxyInstance(arg, DBString):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -0x1000000))
-            dst = f_dbstr_addstr(dst, ut.EPD(arg.GetStringMemoryAddr()))
+            dst = f_dbstr_addstr_epd(dst, ut.EPD(arg.GetStringMemoryAddr()))
         elif ut.isUnproxyInstance(arg, epd2s):
-            cs.DoActions(c.SetMemory(_epd2s_jump + 20, c.Add, -0x1000000))
-            dst = f_dbstr_addstr(dst, arg._value)
+            dst = f_dbstr_addstr_epd(dst, arg._value)
         elif ut.isUnproxyInstance(arg, ptr2s):
             dst = f_dbstr_addstr(dst, arg._value)
         elif ut.isUnproxyInstance(arg, c.EUDVariable):
@@ -212,19 +252,3 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
             )
 
     return dst
-
-
-_printf_buffer = DBString(8192)
-
-
-def f_simpleprint(*args, spaced=True):
-    # Add spaces between arguments
-    if spaced:
-        spaced_args = []
-        for arg in args:
-            spaced_args.extend([arg, " "])
-        args = spaced_args[:-1]
-
-    # Print
-    f_dbstr_print(_printf_buffer, *args)
-    _printf_buffer.Display()
