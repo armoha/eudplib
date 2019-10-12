@@ -29,12 +29,11 @@ THE SOFTWARE.
 - Modifies TRIG rawtrigger's nextptr. Modification is fixed in stage 3.
 """
 
+from eudplib import utils as ut
+
 from ... import core as c
 from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
-from ...eudlib.stringf.strbuffer import _strbuffer_list
-from eudplib import utils as ut
 from ...trigtrg import trigtrg as tt
-
 
 trglist = []
 
@@ -69,8 +68,6 @@ def CopyDeaths(iplayer, oplayer, copyepd=False, initvalue=None):
 def CreateVectorRelocator(chkt, payload):
     global trglist
 
-    for strbuffer in _strbuffer_list:
-        strbuffer._force_multiple_of_4()
     str_section = GetStringMap().SaveTBL()
 
     """

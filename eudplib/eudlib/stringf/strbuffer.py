@@ -23,17 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ... import core as c, ctrlstru as cs, utils as ut
-from ...core.mapdata.stringmap import ForcedAddString, ApplyStringMap, GetStringMap
-from ..memiof import f_getcurpl, f_setcurpl, f_wread_epd, f_dwread_epd
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
+from ...core.mapdata.stringmap import (AddStringWithAddrMultipleOf4,
+                                       ApplyStringMap, GetStringMap)
+from ..eudarray import EUDArray
+from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl, f_wread_epd
+from ..utilf import f_getuserplayerid
+from .cpprint import f_cpstr_print, prevcp
 from .cpstr import GetMapStringAddr
-from .cpprint import prevcp, f_cpstr_print
 from .strfunc import f_strlen_epd
 from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove
-from ..eudarray import EUDArray
-from ..utilf import f_getuserplayerid
-
-_strbuffer_list = list()
 
 
 @c.EUDFunc
@@ -81,7 +82,6 @@ class StringBuffer:
         :type content: str, bytes, int
         """
         chkt = c.GetChkTokenized()
-        self._filler = ForcedAddString(b"Arta")
         if content is None:
             content = "\r" * 218
         elif isinstance(content, int):
@@ -89,7 +89,7 @@ class StringBuffer:
         else:
             content = ut.u2utf8(content)
         self.capacity = len(content)
-        self.StringIndex = ForcedAddString(content)
+        self.StringIndex = AddStringWithAddrMultipleOf4(content)
         self.epd, self.pos = c.EUDVariable(), c.EUDVariable()
 
         try:
@@ -103,24 +103,6 @@ class StringBuffer:
                 )
 
             EUDOnStart(_f)
-
-        _strbuffer_list.append(self)
-
-    def _force_multiple_of_4(self):
-        # calculate offset of buffer string
-        stroffset = []
-        strmap = GetStringMap()
-        outindex = 2 * len(strmap._dataindextb) + 2
-
-        for s in strmap._datatb:
-            stroffset.append(outindex)
-            outindex += len(s) + 1
-        bufferoffset = stroffset[strmap._dataindextb[self.StringIndex - 1]]
-        if bufferoffset % 4 != 0:
-            strmap._datatb[strmap._dataindextb[self._filler - 1]] = b"Arta"[
-                : 4 - bufferoffset % 4
-            ]
-            strmap._capacity -= bufferoffset % 4
 
     @classmethod
     def _init_template(cls):

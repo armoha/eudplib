@@ -23,8 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from ...utils import b2i2, b2i4, ep_assert, u2b, u2utf8, unProxy
 from . import tblformat
-from ...utils import b2i2, b2i4, u2b, u2utf8, ep_assert, unProxy
 
 
 class StringIdMap:
@@ -96,8 +96,12 @@ def ApplyStringMap(chkt):
     chkt.setsection(strsection, strmap.SaveTBL())
 
 
-def ForcedAddString(s):
-    return strmap.ForcedAddString(s) + 1
+def ForceAddString(s):
+    return strmap.ForceAddString(s) + 1
+
+
+def AddStringWithAddrMultipleOf4(s):
+    return strmap.AddStringWithAddrMultipleOf4(s) + 1
 
 
 def GetStringMap():

@@ -23,15 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from eudplib import core as c, ctrlstru as cs, utils as ut
+from eudplib import core as c
+from eudplib import ctrlstru as cs
+from eudplib import utils as ut
 
-from ..memiof import CPByteWriter, f_setcurpl, f_getcurpl, f_dwwrite, f_cunitread_epd, f_bread_epd
-from ..rwcommon import br1
-from .cpstr import _s2b, CPString
-from .dbstr import DBString
-from .eudprint import ptr2s, epd2s, hptr, _conststr_dict
-from .tblprint import GetTBLAddr
 from ..eudarray import EUDArray
+from ..memiof import (CPByteWriter, f_bread_epd, f_cunitread_epd, f_dwwrite,
+                      f_getcurpl, f_setcurpl)
+from ..rwcommon import br1
+from .cpstr import CPString, _s2b
+from .dbstr import DBString
+from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
+from .tblprint import GetTBLAddr
 
 cw = CPByteWriter()
 prevcp = c.EUDVariable()
@@ -66,7 +69,7 @@ def _PColor(p):
 
 
 def PColor(i):
-    if type(i) == type(c.P1):
+    if isinstance(i, type(c.P1)):
         if i == c.CurrentPlayer:
             i = prevcp
         else:
@@ -159,9 +162,8 @@ def f_cpstr_addptr(number):
 
     for i in range(31, -1, -1):
         c.RawTrigger(
-            conditions=number.AtLeast(2 ** i),
+            conditions=number.AtLeastX(1, 2 ** i),
             actions=[
-                number.SubtractNumber(2 ** i),
                 digit[i // 4].AddNumber(2 ** (i % 4)),
                 c.SetDeaths(c.CurrentPlayer, c.Add, f(i), 0),
             ],
@@ -234,11 +236,14 @@ def f_raise_CCMU(player):
         orignextptr = f_cunitread_epd(ut.EPD(0x628438))
         print_error = c.Forward()
         c.VProc(player, player.SetDest(ut.EPD(print_error + 16)))
-        c.VProc(orignextptr, [
-            c.SetMemory(0x628438, c.SetTo, 0),
-            print_error << c.CreateUnit(1, 0, 64, 0),
-            orignextptr.SetDest(ut.EPD(0x628438)),
-        ])
+        c.VProc(
+            orignextptr,
+            [
+                c.SetMemory(0x628438, c.SetTo, 0),
+                print_error << c.CreateUnit(1, 0, 64, 0),
+                orignextptr.SetDest(ut.EPD(0x628438)),
+            ],
+        )
     if cs.EUDElse()():
         cs.DoActions(c.CreateUnit(1, 0, 64, player))
     cs.EUDEndIf()
@@ -257,6 +262,7 @@ def f_eprintln(*args, encoding="UTF-8"):
 
         c.PushTriggerScope()
         _eprintln_template << c.NextTrigger()
+        prevcp << f_getcurpl()
         f_raise_CCMU(c.CurrentPlayer)
         if cs.EUDIf()(c.Memory(0x512684, c.Exactly, prevcp)):
             _eprintln_print << c.RawTrigger(
@@ -271,7 +277,6 @@ def f_eprintln(*args, encoding="UTF-8"):
         c.PopTriggerScope()
 
     _print, _next = c.Forward(), c.Forward()
-    prevcp << f_getcurpl()
     c.RawTrigger(
         nextptr=_eprintln_template,
         actions=[
@@ -298,6 +303,7 @@ def f_eprintln2(*args, encoding="cp949"):
 
         c.PushTriggerScope()
         _eprintln2_template << c.NextTrigger()
+        prevcp << f_getcurpl()
 
         if cs.EUDExecuteOnce()():
             # [871] Unit's waypoint list is full.
@@ -318,7 +324,6 @@ def f_eprintln2(*args, encoding="cp949"):
         c.PopTriggerScope()
 
     _print, _next = c.Forward(), c.Forward()
-    prevcp << f_getcurpl()
     c.RawTrigger(
         nextptr=_eprintln2_template,
         actions=[

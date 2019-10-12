@@ -27,7 +27,7 @@ THE SOFTWARE.
 String table manager. Internally used in eudplib.
 """
 
-from eudplib import utils as ut
+from ... import utils as ut
 
 
 def IgnoreColor(s):
@@ -35,26 +35,17 @@ def IgnoreColor(s):
 
 
 def b2in(n):
-    b2in_map = {
-        2: ut.b2i2,
-        4: ut.b2i4,
-    }
+    b2in_map = {2: ut.b2i2, 4: ut.b2i4}
     return b2in_map[n]
 
 
 def i2bn(n):
-    i2bn_map = {
-        2: ut.i2b2,
-        4: ut.i2b4,
-    }
+    i2bn_map = {2: ut.i2b2, 4: ut.i2b4}
     return i2bn_map[n]
 
 
 def u2bn(n):
-    u2bn_map = {
-        2: ut.u2b,
-        4: ut.u2utf8,
-    }
+    u2bn_map = {2: ut.u2b, 4: ut.u2utf8}
     return u2bn_map[n]
 
 
@@ -75,6 +66,7 @@ class TBL:
         self._emptystring = []
         self._loaded = False
         self._first_extended_string = None
+        self._multiple_of_4 = []
 
         if content is not None:
             if init_chkt:
@@ -143,7 +135,7 @@ class TBL:
                 locstrid = ut.b2i2(mrgn, 20 * i + 16)
                 if locstrid:
                     locdict[locstrid] = i
-        
+
         # Get switch names
         if swnm:
             for i in range(256):
@@ -199,7 +191,9 @@ class TBL:
                     if nextstring != b"":
                         if j in unitdict:
                             try:
-                                nextstring = (nextstring.decode("cp949")).encode("utf-8")
+                                nextstring = (nextstring.decode("cp949")).encode(
+                                    "utf-8"
+                                )
                             except (UnicodeDecodeError):
                                 pass
                         self._emptystring.append((i - 1, nextstring))
@@ -220,7 +214,7 @@ class TBL:
                     locmap.AddItem(string, locdict[i])
                 if i in swnmdict:
                     swmap.AddItem(string, swnmdict[i])
-            
+
             if i in removed_str:
                 string = b""
 
@@ -228,7 +222,8 @@ class TBL:
         self._loaded = True
 
     def AddString(self, string):
-        string = ut.u2b(string)  # Starcraft: Remastered uses both utf-8 and multibyte encoding.
+        # Starcraft: Remastered uses both utf-8 and multibyte encoding.
+        string = ut.u2b(string)
         if not isinstance(string, bytes):
             raise ut.EPError("Invalid type for string")
 
@@ -268,7 +263,9 @@ class TBL:
                 self._capacity += len(string) + 1 + self._saveentry
             self._stringmap[string] = stringindex
 
-        ut.ep_assert(self._capacity < (1 << (8 * self._saveentry)), "String table overflow")
+        ut.ep_assert(
+            self._capacity < (1 << (8 * self._saveentry)), "String table overflow"
+        )
 
         return stringindex
 
@@ -296,6 +293,9 @@ class TBL:
     def SaveTBL(self):
         outbytes = []
 
+        if self._multiple_of_4:
+            self._SetAddrToMultipleOf4()
+
         # calculate offset of each string
         stroffset = []
         size = self._saveentry
@@ -319,7 +319,7 @@ class TBL:
 
         return b"".join(outbytes)
 
-    def ForcedAddString(self, string):
+    def ForceAddString(self, string):
         string = ut.u2b(string)  # Starcraft uses multibyte encoding.
         if not isinstance(string, bytes):
             raise ut.EPError("Invalid type for string")
@@ -334,6 +334,37 @@ class TBL:
         # string + b'\0' + string offset
         self._capacity += len(string) + 1 + self._saveentry
 
-        ut.ep_assert(self._capacity < (1 << (8 * self._saveentry)), "String table overflow")
+        ut.ep_assert(
+            self._capacity < (1 << (8 * self._saveentry)), "String table overflow"
+        )
 
         return stringindex
+
+    def AddStringWithAddrMultipleOf4(self, string):
+        filler = self.ForceAddString("Arta")
+        stringindex = self.ForceAddString(string)
+        self._multiple_of_4.append(stringindex)
+
+        ut.ep_assert(
+            filler + 1 == stringindex, "Filler string is not next to new string"
+        )
+
+        return stringindex
+
+    def _SetAddrToMultipleOf4(self):
+        # calculate offset of buffer string
+        stroffset = []
+        outindex = self._saveentry * (len(self._dataindextb) + 1)
+
+        for s in self._datatb:
+            stroffset.append(outindex)
+            outindex += len(s) + 1
+        for index in self._multiple_of_4:
+            bufferoffset = stroffset[self._dataindextb[index]]
+            if bufferoffset % 4 != 0:
+                self._datatb[self._dataindextb[index - 1]] = b"Arta"[
+                    : 4 - bufferoffset % 4
+                ]
+                self._capacity -= bufferoffset % 4
+                for i, offset in enumerate(stroffset[index - 1 :]):
+                    stroffset[index - 1 + i] = offset - bufferoffset % 4
