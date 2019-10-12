@@ -23,7 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from eudplib import core as c, ctrlstru as cs, utils as ut
+from eudplib import core as c
+from eudplib import ctrlstru as cs
+from eudplib import utils as ut
 
 from ..rwcommon import br1, bw1
 from .dbstr import DBString
@@ -98,7 +100,7 @@ def f_dbstr_addstr_epd(dst, epd):
     :returns: dst + strlen_epd(epd)
     """
     bw1.seekoffset(dst)
-    br1.seekoffset(epd)
+    br1.seekepd(epd)
     strlen = _dbstr_addstr_core()
     dst += strlen
 
