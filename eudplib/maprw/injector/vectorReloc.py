@@ -23,18 +23,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-""" Stage 1 : works in TRIG section.
-- Check if EUD is available. If not, defeat
-- Initialize stage 2 & execute it
-- Modifies TRIG rawtrigger's nextptr. Modification is fixed in stage 3.
-"""
-
 from eudplib import utils as ut
 
 from ... import core as c
 from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
 from ...trigtrg import trigtrg as tt
 
+""" Stage 1 : works in TRIG section.
+- Check if EUD is available. If not, defeat
+- Initialize stage 2 & execute it
+- Modifies TRIG rawtrigger's nextptr. Modification is fixed in stage 3.
+"""
 trglist = []
 
 

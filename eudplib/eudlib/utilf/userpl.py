@@ -24,9 +24,11 @@ THE SOFTWARE.
 """
 
 from eudplib import core as c, utils as ut, ctrlstru as cs
+
 from ..memiof import f_dwread_epd
 
 _localcp = None
+_cpbranch = None
 
 
 def f_getuserplayerid():
@@ -36,3 +38,34 @@ def f_getuserplayerid():
             _localcp = f_dwread_epd(ut.EPD(0x512684))
         cs.EUDEndExecuteOnce()
     return _localcp
+
+
+def CPBranch(ontrue, onfalse):
+    global _cpbranch
+    if _cpbranch is None:
+        c.PushTriggerScope()
+        _cpbranch = c.Forward()
+        _cpbranch << c.RawTrigger(
+            nextptr=0, conditions=LocalCP(), actions=c.SetNextPtr(_cpbranch, 0)
+        )
+        c.PopTriggerScope()
+
+    c.RawTrigger(
+        nextptr=_cpbranch,
+        actions=[
+            c.SetNextPtr(_cpbranch, onfalse),
+            c.SetMemory(_cpbranch + 348, c.SetTo, ontrue),
+        ],
+    )
+
+
+class ReadInit:
+    def __init__(self, dst, src):
+        self._dst = ut.EPD(dst)
+        self._src = ut.EPD(src)
+
+
+def LocalCP():
+    ret = c.Memory(0x6509B0, c.Exactly, 0)
+    ReadInit(ret + 16, 0x512684)
+    return

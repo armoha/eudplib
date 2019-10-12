@@ -30,7 +30,7 @@ from ...core.mapdata.stringmap import (AddStringWithAddrMultipleOf4,
                                        ApplyStringMap, GetStringMap)
 from ..eudarray import EUDArray
 from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl, f_wread_epd
-from ..utilf import f_getuserplayerid
+from ..utilf import f_getuserplayerid, LocalCP
 from .cpprint import f_cpstr_print, prevcp
 from .cpstr import GetMapStringAddr
 from .strfunc import f_strlen_epd
@@ -109,10 +109,9 @@ class StringBuffer:
         c.PushTriggerScope()
         cls._method_template << c.NextTrigger()
         cp = f_getcurpl()
-        c.VProc(cp, cp.SetDest(ut.EPD(cls._cpbranch) + 4))
         cls._cpbranch << c.RawTrigger(
             nextptr=0,
-            conditions=c.Memory(0x512684, c.Exactly, 0),
+            conditions=LocalCP(),
             actions=c.SetNextPtr(cls._cpbranch, cls._ontrue),
         )
         cls._ontrue << c.RawTrigger(

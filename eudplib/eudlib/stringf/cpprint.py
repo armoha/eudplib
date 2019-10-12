@@ -31,6 +31,7 @@ from ..eudarray import EUDArray
 from ..memiof import (CPByteWriter, f_bread_epd, f_cunitread_epd, f_dwwrite,
                       f_getcurpl, f_setcurpl)
 from ..rwcommon import br1
+from ..utilf import LocalCP
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
