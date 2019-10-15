@@ -194,7 +194,8 @@ def CreateInjectFinalizer(chkt, root):
             c.PopTriggerScope()
 
             prevtstart = sf.f_dwread_epd(ut.EPD(pts + player * 12 + 8))
-            prevtend = sf.f_dwread_epd(ut.EPD(pts + player * 12 + 4))
+            prevtend, prevtend_epd = sf.f_dwepdread_epd(ut.EPD(pts + player * 12 + 4))
+            prevtend_epd += 1
 
             # If there were triggers
             if cs.EUDIfNot()(prevtstart == ~(pts + player * 12 + 4)):
@@ -205,7 +206,7 @@ def CreateInjectFinalizer(chkt, root):
                         c.SetMemory(pts + player * 12 + 4, c.SetTo, tre),
                         # Link trs
                         c.SetMemory(trs + 4, c.SetTo, prevtstart),
-                        c.SetMemory(prevtend + 4, c.SetTo, tre),
+                        c.SetMemoryEPD(prevtend_epd, c.SetTo, tre),
                         # Cache dlist start & end
                         c.SetMemory(rtt.orig_tstart + player * 4, c.SetTo, prevtstart),
                         c.SetMemory(rtt.orig_tend + player * 4, c.SetTo, prevtend),
