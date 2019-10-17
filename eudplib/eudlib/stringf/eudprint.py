@@ -36,7 +36,7 @@ _dw_jump, _dw_EOS, _dw_dst = c.Forward(), c.Forward(), c.Forward()
 _ptr_jump, _ptr_EOS, _ptr_dst = c.Forward(), c.Forward(), c.Forward()
 
 
-def _dbstr_addstr_core(_f=[]):
+def _addstr_core(_f=[]):
     if not _str_jump.IsSet():
 
         def _():
@@ -84,7 +84,7 @@ def f_dbstr_addstr(dst, src):
     """
     bw1.seekoffset(dst)
     br1.seekoffset(src)
-    strlen = _dbstr_addstr_core()
+    strlen = _addstr_core()
     dst += strlen
 
     return dst
@@ -101,23 +101,29 @@ def f_dbstr_addstr_epd(dst, epd):
     """
     bw1.seekoffset(dst)
     br1.seekepd(epd)
-    strlen = _dbstr_addstr_core()
+    strlen = _addstr_core()
     dst += strlen
 
     return dst
 
 
 @c.EUDFunc
-def f_dbstr_adddw(dst, number):
-    """Print number as string to dst.
+def _addstr(src):
+    br1.seekoffset(src)
+    return _addstr_core()
 
-    :param dst: Destination address (Not EPD player)
-    :param number: DWORD to print
 
-    :returns: dst + strlen(itoa(number))
-    """
+@c.EUDFunc
+def _addstr_epd(epd):
+    br1.seekepd(epd)
+    return _addstr_core()
+
+
+@c.EUDFunc
+def _adddw(number):
     global _dw_jump, _dw_EOS, _dw_dst
-    bw1.seekoffset(dst)
+    strlen = c.EUDVariable()
+    strlen << 0
 
     skipper = [c.Forward() for _ in range(9)]
     ch = [0] * 10
@@ -136,17 +142,17 @@ def f_dbstr_adddw(dst, number):
         bw1.writebyte(ch[i])
         if i == 0:
             _dw_jump << c.NextTrigger()
-        dst += 1
+        strlen += 1
 
     _dw_EOS << c.NextTrigger()
     bw1.writebyte(0)  # EOS
     _dw_dst << c.NextTrigger()
 
-    return dst
+    return strlen
 
 
 @c.EUDFunc
-def f_dbstr_addptr(dst, number):
+def f_dbstr_adddw(dst, number):
     """Print number as string to dst.
 
     :param dst: Destination address (Not EPD player)
@@ -154,8 +160,17 @@ def f_dbstr_addptr(dst, number):
 
     :returns: dst + strlen(itoa(number))
     """
-    global _ptr_jump, _ptr_EOS, _ptr_dst
     bw1.seekoffset(dst)
+    dst += _adddw(number)
+
+    return dst
+
+
+@c.EUDFunc
+def _addptr(number):
+    global _ptr_jump, _ptr_EOS, _ptr_dst
+    strlen = c.EUDVariable()
+    strlen << 0
     ch = [0] * 8
 
     # Get digits
@@ -171,11 +186,26 @@ def f_dbstr_addptr(dst, number):
         cs.EUDEndIf()
         if i == 0:
             _ptr_jump << c.NextTrigger()
-        dst += 1
+        strlen += 1
 
     _ptr_EOS << c.NextTrigger()
     bw1.writebyte(0)  # EOS
     _ptr_dst << c.NextTrigger()
+
+    return strlen
+
+
+@c.EUDFunc
+def f_dbstr_addptr(dst, number):
+    """Print number as string to dst.
+
+    :param dst: Destination address (Not EPD player)
+    :param number: DWORD to print
+
+    :returns: dst + strlen(itoa(number))
+    """
+    bw1.seekoffset(dst)
+    dst += _addptr(number)
 
     return dst
 
@@ -222,7 +252,29 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
         dst = dst.GetStringMemoryAddr()
 
     args = ut.FlattenList(args)
-    for arg in args:
+
+    arg0f = {
+        "str": f_dbstr_addstr,
+        "epd": f_dbstr_addstr_epd,
+        "dw": f_dbstr_adddw,
+        "ptr": f_dbstr_addptr,
+    }
+    argnf = {"str": _addstr, "epd": _addstr_epd, "dw": _adddw, "ptr": _addptr}
+
+    strlens = list()
+
+    def _proc_arg(index, arg):
+        addf = argnf
+        if index == 0:
+            addf = arg0f
+
+        def _(argument):
+            if index == 0:
+                nonlocal dst
+                return (dst, argument)
+            else:
+                return (argument,)
+
         if ut.isUnproxyInstance(arg, str):
             arg = arg.encode(encoding)
         elif ut.isUnproxyInstance(arg, int):
@@ -235,22 +287,33 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
                 _conststr_dict[arg] = c.Db(arg + b"\0")
             arg = _conststr_dict[arg]
         if ut.isUnproxyInstance(arg, c.Db):
-            dst = f_dbstr_addstr_epd(dst, ut.EPD(arg))
+            strlen = addf["epd"](*_(ut.EPD(arg)))
         elif ut.isUnproxyInstance(arg, DBString):
-            dst = f_dbstr_addstr_epd(dst, ut.EPD(arg.GetStringMemoryAddr()))
+            strlen = addf["epd"](*_(ut.EPD(arg.GetStringMemoryAddr())))
         elif ut.isUnproxyInstance(arg, epd2s):
-            dst = f_dbstr_addstr_epd(dst, arg._value)
+            strlen = addf["epd"](*_(arg._value))
         elif ut.isUnproxyInstance(arg, ptr2s):
-            dst = f_dbstr_addstr(dst, arg._value)
+            strlen = addf["str"](*_(arg._value))
         elif ut.isUnproxyInstance(arg, c.EUDVariable):
-            dst = f_dbstr_adddw(dst, arg)
+            strlen = addf["dw"](*_(arg))
         elif c.IsConstExpr(arg):
-            dst = f_dbstr_adddw(dst, arg)
+            strlen = addf["dw"](*_(arg))
         elif ut.isUnproxyInstance(arg, hptr):
-            dst = f_dbstr_addptr(dst, arg._value)
+            strlen = addf["ptr"](*_(arg._value))
         else:
             raise ut.EPError(
                 "Object with unknown parameter type %s given to f_eudprint." % type(arg)
             )
+        strlens.append(strlen)
 
-    return dst
+    if len(args) >= 2:
+        for _ in _OmitEOS(*args):
+            for i, arg in enumerate(args[:-1]):
+                _proc_arg(i, arg)
+        _proc_arg(-1, args[-1])
+
+        c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
+    else:
+        _proc_arg(0, args[0])
+
+    return strlens[0]
