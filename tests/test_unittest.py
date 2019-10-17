@@ -52,6 +52,7 @@ from unittests import (
     test_ctypes,
     test_dict_typo,
     test_locf,
+    test_parse,
 )
 
 helper.CompressPayload(True)
