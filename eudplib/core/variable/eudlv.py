@@ -36,5 +36,8 @@ class EUDLightVariable(VariableBase):
     def getValueAddr(self):
         return self._memaddr
 
+    def checkNonRValue(self):
+        pass
+
     def __hash__(self):
         return id(self)

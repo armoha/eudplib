@@ -34,7 +34,7 @@ class EUDVArrayReader:
     def _maketrg(self):
         c.PushTriggerScope()
         self._trg << c.RawTrigger(
-            nextptr=0, actions=[c.SetMemory(0, c.SetTo, 0), c.SetNextPtr(0, self._fin)]
+            nextptr=0, actions=[c.SetDeaths(0, c.SetTo, 0, 0), c.SetNextPtr(0, self._fin)]
         )
         self._fin << c.RawTrigger(
             actions=[

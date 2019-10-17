@@ -86,10 +86,10 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
         setcoords << c.NextTrigger()
         c.RawTrigger(
             actions=[
-                act << c.SetMemory(0, mod1, 0),
-                c.SetMemory(0, mod2, 0),
-                c.SetMemory(0, mod3, 0),
-                c.SetMemory(0, mod4, 0),
+                act << c.SetDeaths(0, mod1, 0, 0),
+                c.SetDeaths(0, mod2, 0, 0),
+                c.SetDeaths(0, mod3, 0, 0),
+                c.SetDeaths(0, mod4, 0, 0),
             ]
         )
 
@@ -144,10 +144,10 @@ def _locfgen4(mod1, mod2, mod3, mod4, signed=False):
         )
         c.RawTrigger(
             actions=[
-                act << c.SetMemory(0, mod1, 0),
-                c.SetMemory(0, mod2, 0),
-                c.SetMemory(0, mod3, 0),
-                c.SetMemory(0, mod4, 0),
+                act << c.SetDeaths(0, mod1, 0, 0),
+                c.SetDeaths(0, mod2, 0, 0),
+                c.SetDeaths(0, mod3, 0, 0),
+                c.SetDeaths(0, mod4, 0, 0),
             ]
         )
 

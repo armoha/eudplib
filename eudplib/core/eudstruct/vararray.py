@@ -117,8 +117,8 @@ def EUDVArray(size, basetype=None):
                 _end_getidx << bt.RawTrigger(
                     nextptr=0,
                     actions=[
-                        _ret_getidx << bt.SetMemory(0, bt.SetTo, 0),
-                        bt.SetMemory(0, bt.SetTo, 0),
+                        _ret_getidx << bt.SetDeaths(0, bt.SetTo, 0, 0),
+                        bt.SetDeaths(0, bt.SetTo, 0, 0),
                     ],
                 )
                 bt.PopTriggerScope()

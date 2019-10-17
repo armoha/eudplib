@@ -69,7 +69,7 @@ class PVariable(c.EUDVArray(8)):
                     conditions=i.AtLeastX(1, 2 ** k),
                     actions=[c.SetMemory(a0 + 16, c.Add, 18 * (2 ** k))],
                 )
-            c.RawTrigger(actions=[a0 << c.SetMemory(0, c.SetTo, value)])
+            c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
 
         else:
             self.set(i, value)
