@@ -26,7 +26,7 @@ THE SOFTWARE.
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ..rwcommon import br1, bw1
+from ..rwcommon import br1, br2, bw1
 
 from . import modcurpl as cp
 from . import byterw as bm
@@ -64,43 +64,27 @@ def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
     cp.f_setcurpl2cpcache()
 
 
-# -------
-
-
-_br = br1
-_bw = bw1
-
-
 @c.EUDFunc
 def f_memcpy(dst, src, copylen):
-    b = c.EUDVariable()
+    br1.seekoffset(src)
+    bw1.seekoffset(dst)
 
-    _br.seekoffset(src)
-    _bw.seekoffset(dst)
-
-    loopstart = c.NextTrigger()
-    loopend = c.Forward()
-
-    cs.EUDJumpIf(copylen.Exactly(0), loopend)
-
-    c.SetVariables(b, _br.readbyte())
-    _bw.writebyte(b)
-
-    cs.DoActions(copylen.SubtractNumber(1))
-    cs.EUDJump(loopstart)
-
-    loopend << c.NextTrigger()
+    if cs.EUDWhile()(copylen >= 1):
+        b = br1.readbyte()
+        bw1.writebyte(b)
+        copylen -= 1
+    cs.EUDEndWhile()
 
 
 @c.EUDFunc
 def f_memcmp(buf1, buf2, count):
-    _br.seekoffset(buf1)
-    _bw.seekoffset(buf2)
+    br1.seekoffset(buf1)
+    br2.seekoffset(buf2)
 
     if cs.EUDWhile()(count >= 1):
         count -= 1
-        ch1 = _br.readbyte()
-        ch2 = _bw.readbyte()
+        ch1 = br1.readbyte()
+        ch2 = br2.readbyte()
         cs.EUDContinueIf(ch1 == ch2)
         c.EUDReturn(ch1 - ch2)
     cs.EUDEndWhile()

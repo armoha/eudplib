@@ -26,7 +26,7 @@ THE SOFTWARE.
 from .memiof import byterw as bm
 
 br1 = bm.EUDByteReader()
-# br2 = bm.EUDByteReader()
+br2 = bm.EUDByteReader()
 # br3 = bm.EUDByteReader()
 bw1 = bm.EUDByteWriter()
 # bw2 = bm.EUDByteWriter()
