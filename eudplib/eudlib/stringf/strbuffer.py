@@ -30,9 +30,10 @@ from ...core.mapdata.stringmap import (AddStringWithAddrMultipleOf4,
                                        ApplyStringMap, GetStringMap)
 from ..eudarray import EUDArray
 from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl, f_wread_epd
-from ..utilf import f_getuserplayerid, LocalCP
+from ..utilf import f_getuserplayerid
 from .cpprint import f_cpstr_print, prevcp
 from .cpstr import GetMapStringAddr
+from .cpprint import prevcp, f_cpstr_print, epd2s, f_gettextptr, f_getnextchatdst, proc_lf
 from .strfunc import f_strlen_epd
 from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove
 
@@ -109,9 +110,10 @@ class StringBuffer:
         c.PushTriggerScope()
         cls._method_template << c.NextTrigger()
         cp = f_getcurpl()
+        c.VProc(cp, cp.SetDest(ut.EPD(cls._cpbranch) + 4))
         cls._cpbranch << c.RawTrigger(
             nextptr=0,
-            conditions=LocalCP(),
+            conditions=c.Memory(0x512684, c.Exactly, 0),
             actions=c.SetNextPtr(cls._cpbranch, cls._ontrue),
         )
         cls._ontrue << c.RawTrigger(
@@ -184,20 +186,62 @@ class StringBuffer:
         end << c.NextTrigger()
 
     def Display(self):
-        cs.DoActions(c.DisplayText(self.StringIndex))
+        global proc_lf
+        if not StringBuffer._method_template.IsSet():
+            StringBuffer._init_template()
+        end, ontrue = c.Forward(), c.Forward()
+        c.RawTrigger(
+            nextptr=StringBuffer._method_template,
+            actions=[
+                c.SetNextPtr(StringBuffer._cpbranch, end),
+                c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
+            ]
+        )
+        ontrue << c.NextTrigger()
+        dst = f_getnextchatdst()
+        cs.DoActions([
+            c.DisplayText("\r\x02"),
+            proc_lf.SetNumber(1)
+        ])
+        f_setcurpl(dst)
+        f_cpstr_print(epd2s(self.epd))
+        f_setcurpl(prevcp)
+        proc_lf << 0
+        end << c.NextTrigger()
 
     def DisplayAt(self, line):
+        global proc_lf
+        if not StringBuffer._method_template.IsSet():
+            StringBuffer._init_template()
+        end, ontrue = c.Forward(), c.Forward()
+        c.RawTrigger(
+            nextptr=StringBuffer._method_template,
+            actions=[
+                c.SetNextPtr(StringBuffer._cpbranch, end),
+                c.SetMemory(StringBuffer._ontrue + 348, c.SetTo, ontrue),
+            ]
+        )
+        ontrue << c.NextTrigger()
         prevptr = f_gettextptr()
         cs.DoActions(c.SetMemory(0x640B58, c.Add, line))
         c.RawTrigger(
             conditions=c.Memory(0x640B58, c.AtLeast, 11),
             actions=c.SetMemory(0x640B58, c.Subtract, 11),
         )
-        cs.DoActions(
-            [c.DisplayText(self.StringIndex), c.SetMemory(0x640B58, c.SetTo, prevptr)]
-        )
+        dst = f_getnextchatdst()
+        cs.DoActions([
+            c.DisplayText("\r\x02"),
+            proc_lf.SetNumber(1),
+            c.SetMemory(0x640B58, c.SetTo, prevptr)
+        ])
+        f_setcurpl(dst)
+        f_cpstr_print(epd2s(self.epd))
+        f_setcurpl(prevcp)
+        proc_lf << 0
+        end << c.NextTrigger()
 
     def print(self, *args):
+        global proc_lf
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -209,15 +253,26 @@ class StringBuffer:
             ],
         )
         ontrue << c.NextTrigger()
-        f_setcurpl(self.epd)
-        f_cpstr_print(*args, EOS=False)
-        cs.DoActions(
-            [
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                c.SetCurrentPlayer(prevcp),
-                c.DisplayText(self.StringIndex),
-            ]
-        )
+        dst = f_getnextchatdst()
+        cs.DoActions([
+            c.DisplayText("\r\x02"),
+            proc_lf.SetNumber(1),
+        ])
+        f_setcurpl(dst)
+        for arg in args:
+            if isinstance(arg, str) and "\n" in arg:
+                substrings = arg.split("\n")
+                for i, subs in enumerate(substrings):
+                    f_cpstr_print(subs)
+                    if i < len(substrings) - 1:
+                        dst = f_getnextchatdst()
+                        f_setcurpl(prevcp)
+                        cs.DoActions(c.DisplayText("\r\x02"))
+                        f_setcurpl(dst)
+            else:
+                f_cpstr_print(arg)
+        f_setcurpl(prevcp)
+        proc_lf << 0
         end << c.NextTrigger()
 
     def printAt(self, line, *args):
@@ -232,15 +287,19 @@ class StringBuffer:
             ],
         )
         ontrue << c.NextTrigger()
-        f_setcurpl(self.epd)
-        f_cpstr_print(*args, EOS=False)
-        cs.DoActions(
-            [c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0), c.SetCurrentPlayer(prevcp)]
+        prevptr = f_gettextptr()
+        cs.DoActions(c.SetMemory(0x640B58, c.Add, line))
+        c.RawTrigger(
+            conditions=c.Memory(0x640B58, c.AtLeast, 11),
+            actions=c.SetMemory(0x640B58, c.Subtract, 11),
         )
-        self.DisplayAt(line)
+        self.print(*args)
+        cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevptr))
+        f_setcurpl(prevcp)
         end << c.NextTrigger()
 
     def Play(self):
+        print("StringBuffer.Play isn't supported in SC:R 1.23.1.6337")
         cs.DoActions(c.PlayWAV(self.StringIndex))
 
     def fadeIn(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
@@ -269,13 +328,9 @@ class StringBuffer:
                     self.DisplayAt(11 + line)
                 if cs.EUDElse()():
                     prevptr = f_gettextptr()
-                    cs.DoActions(
-                        [
-                            c.SetMemory(0x640B58, c.SetTo, prevpos),
-                            c.DisplayText(self.StringIndex),
-                            c.SetMemory(0x640B58, c.SetTo, prevptr),
-                        ]
-                    )
+                    cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevpos))
+                    self.Display()
+                    cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevptr))
                 cs.EUDEndIf()
         else:
             if cs.EUDIf()(line <= 10):
@@ -285,13 +340,9 @@ class StringBuffer:
                     self.DisplayAt(11 + line)
                 if cs.EUDElse()():
                     prevptr = f_gettextptr()
-                    cs.DoActions(
-                        [
-                            c.SetMemory(0x640B58, c.SetTo, prevpos),
-                            c.DisplayText(self.StringIndex),
-                            c.SetMemory(0x640B58, c.SetTo, prevptr),
-                        ]
-                    )
+                    cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevpos))
+                    self.Display()
+                    cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevptr))
                 cs.EUDEndIf()
             cs.EUDEndIf()
         end << c.NextTrigger()
@@ -323,13 +374,9 @@ class StringBuffer:
                     self.DisplayAt(11 + line)
                 if cs.EUDElse()():
                     prevptr = f_gettextptr()
-                    cs.DoActions(
-                        [
-                            c.SetMemory(0x640B58, c.SetTo, prevpos),
-                            c.DisplayText(self.StringIndex),
-                            c.SetMemory(0x640B58, c.SetTo, prevptr),
-                        ]
-                    )
+                    cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevpos))
+                    self.Display()
+                    cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevptr))
                 cs.EUDEndIf()
         else:
             if cs.EUDIf()(line <= 10):
@@ -339,13 +386,9 @@ class StringBuffer:
                     self.DisplayAt(11 + line)
                 if cs.EUDElse()():
                     prevptr = f_gettextptr()
-                    cs.DoActions(
-                        [
-                            c.SetMemory(0x640B58, c.SetTo, prevpos),
-                            c.DisplayText(self.StringIndex),
-                            c.SetMemory(0x640B58, c.SetTo, prevptr),
-                        ]
-                    )
+                    cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevpos))
+                    self.Display()
+                    cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevptr))
                 cs.EUDEndIf()
             cs.EUDEndIf()
         end << c.NextTrigger()

@@ -31,14 +31,16 @@ from ..eudarray import EUDArray
 from ..memiof import (CPByteWriter, f_bread_epd, f_cunitread_epd, f_dwwrite,
                       f_getcurpl, f_setcurpl)
 from ..rwcommon import br1
-from ..utilf import LocalCP
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
 from .tblprint import GetTBLAddr
+from ..eudarray import EUDArray
+from math import ceil
 
 cw = CPByteWriter()
 prevcp = c.EUDVariable()
+proc_lf = c.EUDLightVariable()
 
 
 @c.EUDFunc
@@ -87,11 +89,44 @@ def PName(x):
 
 
 @c.EUDFunc
+def f_gettextptr():
+    ret = c.EUDVariable()
+    ret << 0
+    for i in range(3, -1, -1):
+        c.RawTrigger(
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
+            actions=ret.AddNumber(2**i)
+        )
+    return ret
+
+
+@c.EUDFunc
+def f_getnextchatdst():
+    ret = c.EUDVariable()
+    ret << ut.EPD(0x640B60)
+    for i in range(3, -1, -1):
+        c.RawTrigger(
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
+            actions=ret.AddNumber(ceil((2**i) * 54.5))
+        )
+    return ret
+
+
+@c.EUDFunc
 def _addstr_cp():
     b = c.EUDVariable()
     if cs.EUDInfLoop()():
         c.SetVariables(b, br1.readbyte())
         cs.EUDBreakIf(b == 0)
+        if cs.EUDIf()([proc_lf.Exactly(1), b == ord("\n")]):
+            cw.flushdword()
+            dst = f_getnextchatdst()
+            cs.DoActions([
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.DisplayText("\r\x02"),
+                c.SetCurrentPlayer(dst),
+            ])
+        cs.EUDEndIf()
         cw.writebyte(b)
     cs.EUDEndInfLoop()
 
