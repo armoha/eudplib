@@ -29,12 +29,11 @@ from eudplib import utils as ut
 
 from ..eudarray import EUDArray
 from ..memiof import (CPByteWriter, f_bread_epd, f_cunitread_epd, f_dwwrite,
-                      f_getcurpl, f_setcurpl)
+                      f_getcurpl, f_setcurpl, f_dwepdread_epd, f_wread_epd)
 from ..rwcommon import br1
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
-from .tblprint import GetTBLAddr
 from ..eudarray import EUDArray
 from ..utilf import IsUserCP
 from math import ceil
@@ -111,6 +110,26 @@ def f_getnextchatdst():
             actions=ret.AddNumber(ceil((2**i) * 54.5))
         )
     return ret
+
+
+@c.EUDFunc
+def GetTBLAddr(tblId):
+    add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
+    if cs.EUDExecuteOnce()():
+        TBL_ptr, TBL_epd = f_dwepdread_epd(ut.EPD(0x6D5A30))
+        cs.DoActions(
+            [
+                c.SetMemory(add_TBL_ptr + 20, c.SetTo, TBL_ptr),
+                c.SetMemory(add_TBL_epd + 20, c.SetTo, TBL_epd),
+            ]
+        )
+    cs.EUDEndExecuteOnce()
+    r, m = c.f_div(tblId, 2)
+    c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
+    c.RawTrigger(actions=add_TBL_epd << r.AddNumber(0))
+    ret = f_wread_epd(r, m)
+    c.RawTrigger(actions=add_TBL_ptr << ret.AddNumber(0))
+    c.EUDReturn(ret)
 
 
 @c.EUDFunc

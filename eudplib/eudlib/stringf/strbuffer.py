@@ -311,9 +311,9 @@ class StringBuffer:
         f_setcurpl(prevcp)
         end << c.NextTrigger()
 
-    def printfAt(self, format_string, *args):
+    def printfAt(self, line, format_string, *args):
         fmtargs = _format_args(format_string, *args)
-        self.printAt(*fmtargs)
+        self.printAt(line, *fmtargs)
 
     def Play(self):
         print("StringBuffer.Play isn't supported in SC:R 1.23.1.6337")

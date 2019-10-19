@@ -121,13 +121,13 @@ class _EUDFormatter(string.Formatter):
             return PColor(value)
         elif format_spec.endswith("n"):
             return PName(value)
-        elif c.IsConstExpr(value):
-            return value
         else:
             types = (c.Db, ptr2s, epd2s, hptr, c.EUDVariable, DBString)
             for t in types:
                 if ut.isUnproxyInstance(value, t):
                     return value
+            if c.IsConstExpr(value):
+                return value
         return format(value, format_spec)
 
     def get_value(self, key, args, kwargs):
@@ -142,9 +142,9 @@ def _format_args(format_string, *args):
     return formatter.format(format_string, *args)
 
 
-def f_sprintf(dst, format_string, *args):
+def f_sprintf(dst, format_string, *args, EOS=True, encoding="UTF-8"):
     fmtargs = _format_args(format_string, *args)
-    f_dbstr_print(dst, *fmtargs)
+    f_dbstr_print(dst, *fmtargs, EOS=EOS, encoding=encoding)
 
 
 def f_sprintf_cp(format_string, *args, EOS=True, encoding="UTF-8"):
