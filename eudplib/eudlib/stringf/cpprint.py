@@ -36,6 +36,7 @@ from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
 from .tblprint import GetTBLAddr
 from ..eudarray import EUDArray
+from ..utilf import IsUserCP
 from math import ceil
 
 cw = CPByteWriter()
@@ -298,9 +299,9 @@ def f_eprintln(*args):
 
         c.PushTriggerScope()
         _eprintln_template << c.NextTrigger()
-        prevcp << f_getcurpl()
         f_raise_CCMU(c.CurrentPlayer)
-        if cs.EUDIf()(c.Memory(0x512684, c.Exactly, prevcp)):
+        if cs.EUDIf()(IsUserCP()):
+            prevcp << f_getcurpl()
             _eprintln_print << c.RawTrigger(
                 nextptr=0, actions=[c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))]
             )
@@ -339,7 +340,6 @@ def f_eprintln2(*args):
 
         c.PushTriggerScope()
         _eprintln2_template << c.NextTrigger()
-        prevcp << f_getcurpl()
 
         if cs.EUDExecuteOnce()():
             # [871] Unit's waypoint list is full.
@@ -348,7 +348,8 @@ def f_eprintln2(*args):
             epd = ut.EPD(ptr) + 1
         cs.EUDEndExecuteOnce()
 
-        if cs.EUDIf()(c.Memory(0x512684, c.Exactly, prevcp)):
+        if cs.EUDIf()(IsUserCP()):
+            prevcp << f_getcurpl()
             f_setcurpl(epd)
             _eprintln2_print << c.RawTrigger(nextptr=0)
             _eprintln2_EOS << c.RawTrigger(

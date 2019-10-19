@@ -26,6 +26,7 @@ THE SOFTWARE.
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
+from ...eudlib.utilf.userpl import _f_initisusercp
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
 
 jumper = None
@@ -44,6 +45,7 @@ def _MainStarter(mf):
         rootstarter = c.NextTrigger()
 
         # Various initializes
+        _f_initisusercp()
         sf.f_getcurpl()
         _f_initstacktrace()
 

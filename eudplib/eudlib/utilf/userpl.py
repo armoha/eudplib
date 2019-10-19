@@ -27,6 +27,7 @@ from eudplib import core as c, utils as ut, ctrlstru as cs
 from ..memiof import f_dwread_epd
 
 _localcp = None
+_isusercpcons = set()
 
 
 def f_getuserplayerid():
@@ -36,3 +37,61 @@ def f_getuserplayerid():
             _localcp = f_dwread_epd(ut.EPD(0x512684))
         cs.EUDEndExecuteOnce()
     return _localcp
+
+
+def IsUserCP():
+    fw = c.Forward()
+    ret = c.Memory(0x6509B0, c.Exactly, fw)
+    fw << IsUserCP_FW(ret)
+    return ret
+
+
+class IsUserCP_FW(c.ConstExpr):
+    def __init__(self, condition):
+        super().__init__(self)
+        self._condition = condition
+
+    def Evaluate(self):
+        _RegisterIsUserCP(self._condition)
+        return c.toRlocInt(0)
+
+
+def RCPC_ResetConditionSet():
+    _isusercpcons.clear()
+
+
+c.RegisterCreatePayloadCallback(RCPC_ResetConditionSet)
+
+
+def _RegisterIsUserCP(isusercp):
+    _isusercpcons.add(isusercp)
+
+
+class UserCPBuffer(c.EUDObject):
+    def __init__(self):
+        super().__init__()
+
+    def GetDataSize(self):
+        return (len(_isusercpcons) + 1) * 4
+
+    def WritePayload(self, pbuf):
+        for con in _isusercpcons:
+            pbuf.WriteDword(ut.EPD(con + 8))
+        pbuf.WriteDword(0xFFFFFFFF)
+
+
+def _f_initisusercp():
+    """(internal)Initialize IsUserCP."""
+    rb = UserCPBuffer()
+    ptr = c.EUDVariable(ut.EPD(rb))
+    userp = f_getuserplayerid()
+    write = c.Forward()
+    c.VProc(userp, userp.SetDest(ut.EPD(write) + 5))
+
+    if cs.EUDInfLoop()():
+        v = f_dwread_epd(ptr)
+        cs.EUDBreakIf(v == 0xFFFFFFFF)
+        c.VProc(v, v.SetDest(ut.EPD(write) + 4))
+        c.RawTrigger(actions=[write << c.SetDeaths(0, c.SetTo, 0, 0), ptr.AddNumber(1)])
+
+    cs.EUDEndInfLoop()

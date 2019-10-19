@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from .logic import EUDAnd, EUDOr, EUDNot
 
-from .userpl import f_getuserplayerid
+from .userpl import f_getuserplayerid, IsUserCP
 
 from .gametick import f_getgametick
 
