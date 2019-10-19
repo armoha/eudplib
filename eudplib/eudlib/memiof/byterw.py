@@ -32,6 +32,7 @@ from ...utils import EPD
 
 class EUDByteReader:
     """Read byte by byte."""
+
     ret = c.EUDVariable()
 
     def __init__(self):
@@ -81,14 +82,16 @@ class EUDByteReader:
         :returns: Read byte
         """
         case = [c.Forward() for _ in range(5)]
-        ret = EUDByteReader.ret
+        ret, suboffset = EUDByteReader.ret, self._suboffset
 
-        cs.DoActions([self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0)])
+        cs.DoActions(
+            [self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0)]
+        )
 
         for i in range(4):
             case[i] << c.NextTrigger()
             if i < 3:
-                cs.EUDJumpIfNot(self._suboffset.Exactly(i), case[i + 1])
+                cs.EUDJumpIfNot(suboffset == i, case[i + 1])
             for j in range(8):
                 c.RawTrigger(
                     conditions=c.DeathsX(
@@ -97,12 +100,12 @@ class EUDByteReader:
                     actions=ret.AddNumber(2 ** j),
                 )
             if i < 3:
-                c.RawTrigger(nextptr=case[-1], actions=self._suboffset.AddNumber(1))
+                c.RawTrigger(nextptr=case[-1], actions=suboffset.AddNumber(1))
             else:  # suboffset == 3
                 cs.DoActions(
                     [
                         c.SetMemory(self._read + 20, c.Add, 1),
-                        self._suboffset.SetNumber(0),
+                        suboffset.SetNumber(0),
                     ]
                 )
 
@@ -161,7 +164,8 @@ class EUDByteWriter:
         Write a byte to current position of EUDByteWriter.
         ByteWriter will advance by 1 byte.
         """
-        cs.EUDSwitch(self._suboffset)
+        suboffset = self._suboffset
+        cs.EUDSwitch(suboffset)
         if cs.EUDSwitchCase()(0):
             c.VProc(
                 byte,
@@ -185,15 +189,15 @@ class EUDByteWriter:
 
         cs.DoActions(
             [
-                self._suboffset.AddNumber(1),
+                suboffset.AddNumber(1),
                 self._write << c.SetDeathsX(0, c.SetTo, 0, 0, 0xFF00),
                 c.SetMemory(self._write + 20, c.SetTo, 0),
             ]
         )
         c.RawTrigger(
-            conditions=self._suboffset.AtLeast(4),
+            conditions=[suboffset >= 4],
             actions=[
-                self._suboffset.SetNumber(0),
+                suboffset.SetNumber(0),
                 c.SetMemory(self._write + 16, c.Add, 1),
             ],
         )

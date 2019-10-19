@@ -291,7 +291,7 @@ _eprintln_EOS = c.Forward()
 _eprintln_end = c.Forward()
 
 
-def f_eprintln(*args, encoding="UTF-8"):
+def f_eprintln(*args):
     global _eprintln_template
     if _eprintln_template is None:
         _eprintln_template = c.Forward()
@@ -321,7 +321,7 @@ def f_eprintln(*args, encoding="UTF-8"):
         ],
     )
     _print << c.NextTrigger()
-    f_cpstr_print(*args, EOS=False, encoding=encoding)
+    f_cpstr_print(*args, EOS=False, encoding="UTF-8")
     c.SetNextTrigger(_eprintln_EOS)
     _next << c.NextTrigger()
 
@@ -332,7 +332,7 @@ _eprintln2_EOS = c.Forward()
 _eprintln2_end = c.Forward()
 
 
-def f_eprintln2(*args, encoding="cp949"):
+def f_eprintln2(*args):
     global _eprintln2_template
     if _eprintln2_template is None:
         _eprintln2_template = c.Forward()
@@ -368,6 +368,6 @@ def f_eprintln2(*args, encoding="cp949"):
         ],
     )
     _print << c.NextTrigger()
-    f_cpstr_print(*args, EOS=False, encoding=encoding)
+    f_cpstr_print(*args, EOS=False, encoding="UTF-8")
     c.SetNextTrigger(_eprintln2_EOS)
     _next << c.NextTrigger()

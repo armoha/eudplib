@@ -27,6 +27,7 @@ from .cpstr import GetMapStringAddr, CPString
 from .dbstr import DBString
 
 from .parse import f_parse
+from .fmtprint import f_sprintf, f_sprintf_cp, f_eprintf
 
 from .strbuffer import (
     StringBuffer,

@@ -34,6 +34,7 @@ from ..utilf import f_getuserplayerid
 from .cpprint import f_cpstr_print, prevcp
 from .cpstr import GetMapStringAddr
 from .cpprint import prevcp, f_cpstr_print, epd2s, f_gettextptr, f_getnextchatdst, proc_lf
+from .fmtprint import _format_args
 from .strfunc import f_strlen_epd
 from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove
 
@@ -140,6 +141,10 @@ class StringBuffer:
         f_setcurpl(prevcp)
         end << c.NextTrigger()
 
+    def appendf(self, format_string, *args):
+        fmtargs = _format_args(format_string, *args)
+        self.append(*fmtargs)
+
     def insert(self, index, *args):
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
@@ -157,6 +162,10 @@ class StringBuffer:
         self.pos << f_getcurpl()
         f_setcurpl(prevcp)
         end << c.NextTrigger()
+
+    def insertf(self, format_string, *args):
+        fmtargs = _format_args(format_string, *args)
+        self.insert(*fmtargs)
 
     def delete(self, start, length=1):
         if not StringBuffer._method_template.IsSet():
@@ -275,6 +284,10 @@ class StringBuffer:
         proc_lf << 0
         end << c.NextTrigger()
 
+    def printf(self, format_string, *args):
+        fmtargs = _format_args(format_string, *args)
+        self.print(*fmtargs)
+
     def printAt(self, line, *args):
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
@@ -297,6 +310,10 @@ class StringBuffer:
         cs.DoActions(c.SetMemory(0x640B58, c.SetTo, prevptr))
         f_setcurpl(prevcp)
         end << c.NextTrigger()
+
+    def printfAt(self, format_string, *args):
+        fmtargs = _format_args(format_string, *args)
+        self.printAt(*fmtargs)
 
     def Play(self):
         print("StringBuffer.Play isn't supported in SC:R 1.23.1.6337")
@@ -348,6 +365,10 @@ class StringBuffer:
         end << c.NextTrigger()
         return ret
 
+    def fadeInf(self, format_string, *args, color=None, wait=1, reset=True, line=-1, tag=None):
+        fmtargs = _format_args(format_string, *args)
+        self.fadeIn(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
+
     def fadeOut(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
@@ -393,6 +414,10 @@ class StringBuffer:
             cs.EUDEndIf()
         end << c.NextTrigger()
         return ret
+
+    def fadeOutf(self, format_string, *args, color=None, wait=1, reset=True, line=-1, tag=None):
+        fmtargs = _format_args(format_string, *args)
+        self.fadeOut(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
 
     def length(self):
         return f_strlen_epd(self.epd)
