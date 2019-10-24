@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import os
 
 begining_str = """\
@@ -9,7 +12,7 @@ begining_str = """\
 print('Auto "license inserter')
 
 for root, dirs, files in os.walk("../eudplib"):
-    if 'pybind11' in root:
+    if "pybind11" in root:
         continue
 
     for f in files:

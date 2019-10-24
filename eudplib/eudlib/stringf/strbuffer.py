@@ -163,9 +163,9 @@ class StringBuffer:
         f_setcurpl(prevcp)
         end << c.NextTrigger()
 
-    def insertf(self, format_string, *args):
+    def insertf(self, index, format_string, *args):
         fmtargs = _format_args(format_string, *args)
-        self.insert(*fmtargs)
+        self.insert(index, *fmtargs)
 
     def delete(self, start, length=1):
         if not StringBuffer._method_template.IsSet():
