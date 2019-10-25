@@ -34,8 +34,11 @@ def test_xvmixedtrg():
 
     DoActions(a.SetNumber(15), a.SetMask(19))
     DoActions(SetDeaths(a, SetTo, f_div(40, a)[0], a))
+    d1 = EUDVariable()
+    d1 << a
+    d2, d3 = f_div(40, a)
 
-    test_assert("XVariable flag trigger test", [Deaths(3, Exactly, 13, 3)])
+    test_equality("XVariable flag trigger test", [d1, d2, d3], [3, 13, 1])
 
     DoActions(
         SetDeaths(AllPlayers, SetTo, 0, 0),

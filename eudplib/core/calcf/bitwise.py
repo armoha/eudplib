@@ -29,74 +29,90 @@ from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .muldiv import f_mul
 from ...utils import EPD
+from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ..variable.evcommon import _ev, _xv
+
+_x = _xv[0]
 
 
-@ef.EUDFunc
 def f_bitand(a, b):
     """Calculate a & b"""
-    act = ac.Forward()
+    ret = ev.EUDVariable()
 
-    ev.VProc(b, [rt.SetMemory(act, rt.SetTo, ~0), b.QueueSubtractTo(EPD(act))])
-    rt.RawTrigger(actions=[act << a.SetNumberX(0, 0)])
+    assignPairs = [
+        (ret, rt.SetTo, 0),
+        (_x, rt.SetTo, a),
+        (EPD(_x.getMaskAddr()), rt.SetTo, b),
+        (ret, rt.SetTo, _x),
+    ]
+    if not ev.IsEUDVariable(b):
+        assignPairs[1], assignPairs[2] = assignPairs[2], assignPairs[1]
+    ev.SeqCompute(assignPairs)
 
-    return a
+    return ret
 
 
-@ef.EUDFunc
 def f_bitor(a, b):
     """Calculate a | b"""
-    act = ac.Forward()
-
-    ev.VProc(b, b.SetDest(EPD(act)))
-    rt.RawTrigger(actions=[act << a.SetNumberX(~0, 0)])
-
-    return a
-
-
-@ef.EUDFunc
-def f_bitxor(a, b):
-    """Calculate a ^ b"""
-    act = ac.Forward()
-    ev.VProc([a, b], [a.SetDest(EPD(act) + 21), b.QueueAssignTo(EPD(act))])
-    ev.VProc(b, [rt.SetMemory(act + 32, rt.SetTo, ~0), b.QueueSubtractTo(EPD(act) + 8)])
-    rt.RawTrigger(
-        actions=[
-            act << a.SetNumberX(~0, 0),  # a | b
-            rt.SetMemoryX(act + 84, rt.SetTo, 0, ~0),  # a & b
-            a.SubtractNumber(0),
-        ]
-    )
-
-    return a
-
-
-@ef.EUDFunc
-def f_bitnand(a, b):
-    """Calculate ~(a & b)"""
     ret = ev.EUDVariable()
-    act = ac.Forward()
 
-    ev.VProc(
-        b,
-        [
-            ret.SetNumber(~0),
-            rt.SetMemory(act, rt.SetTo, ~0),
-            b.QueueSubtractTo(EPD(act)),
-        ],
-    )
-    ev.VProc(a, [act << a.SetNumberX(0, 0), a.QueueSubtractTo(ret)])
+    assignPairs = [
+        (_x, rt.SetTo, ~0),
+        (ret, rt.SetTo, a),
+        (EPD(_x.getMaskAddr()), rt.SetTo, b),
+        (ret, rt.SetTo, _x),
+    ]
+    if not ev.IsEUDVariable(b):
+        assignPairs[1], assignPairs[2] = assignPairs[2], assignPairs[1]
+    ev.SeqCompute(assignPairs)
 
     return ret
 
 
 @ef.EUDFunc
+def f_bitxor(a, b):
+    """Calculate a ^ b"""
+    assignPairs = [
+        (_x, rt.SetTo, ~0),
+        (_x, rt.Subtract, a),
+        (EPD(_x.getMaskAddr()), rt.SetTo, b),
+        (a, rt.SetTo, _x),  # (~a & b) + (a & ~b)
+    ]
+    ev.SeqCompute(assignPairs)
+
+    return a
+
+
+def f_bitnand(a, b):
+    """Calculate ~(a & b)"""
+    ret = ev.EUDVariable()
+    assignPairs = [
+        (ret, rt.SetTo, ~0),
+        (_x, rt.SetTo, a),
+        (EPD(_x.getMaskAddr()), rt.SetTo, b),
+        (ret, rt.Subtract, _x),  # (~a & b) + (a & ~b)
+    ]
+    if not ev.IsEUDVariable(b):
+        assignPairs[1], assignPairs[2] = assignPairs[2], assignPairs[1]
+    ev.SeqCompute(assignPairs)
+
+    return ret
+
+
 def f_bitnor(a, b):
     """Calculate ~(a | b)"""
     ret = ev.EUDVariable()
-    act = ac.Forward()
 
-    ev.VProc(b, [ret.SetNumber(~0), b.SetDest(EPD(act))])
-    ev.VProc(a, [act << a.SetNumberX(~0, 0), a.QueueSubtractTo(ret)])
+    assignPairs = [
+        (ret, rt.SetTo, ~0),
+        (_x, rt.SetTo, 0),
+        (ret, rt.Subtract, a),
+        (EPD(_x.getMaskAddr()), rt.SetTo, b),
+        (ret, rt.SetTo, _x),
+    ]
+    if not ev.IsEUDVariable(b):
+        assignPairs[1], assignPairs[2] = assignPairs[2], assignPairs[1]
+    ev.SeqCompute(assignPairs)
 
     return ret
 
@@ -130,25 +146,24 @@ def f_bitsplit(a):
 # -------
 
 
+@_EUDPredefineParam(_ev[:1])
+@_EUDPredefineReturn(_ev[1:2])
 @ef.EUDFunc
 def _exp2_vv(n):
-    ret = ev.EUDVariable()
+    ret = _exp2_vv._frets[0]
     ret << 0
     for i in range(32):
         rt.RawTrigger(conditions=[n == i], actions=[ret.SetNumber((2 ** i))])
-    return ret
+    # return ret
 
 
 def _exp2(n):
     if isinstance(n, int):
-        return 1 << n
         if n >= 32:
             return 0
-        else:
-            return 1 << n
+        return 1 << n
 
-    else:
-        return _exp2_vv(n)
+    return _exp2_vv(n)
 
 
 @ef.EUDFunc

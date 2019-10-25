@@ -137,7 +137,8 @@ class EUDFuncN:
         _setCurrentCompiledFunc(lastCompiledFunc)
 
     def _CreateFuncArgs(self):
-        self._fargs = [ev.EUDVariable() for _ in range(self._argn)]
+        if self._fargs is None:
+            self._fargs = [ev.EUDVariable() for _ in range(self._argn)]
 
     def _AddReturn(self, retv, needjump):
         retv = ut.FlattenList(retv)

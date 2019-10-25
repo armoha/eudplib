@@ -25,7 +25,10 @@ def f2(a):
 
 @TestInstance
 def test_multret():
-    a, b = f1(0), f1(1)
+    # a, b = f1(0), f1(1)
+    a, b = EUDCreateVariables(2)
+    f1(0, ret=a)
+    f1(1, ret=b)
     c, d, e = f2(0), f2(1), f2(2)
     test_assert(
         "Multiple EUDReturn test",

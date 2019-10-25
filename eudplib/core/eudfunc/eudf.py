@@ -83,8 +83,44 @@ def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):
             args = applyTypes(argtypes, args)
             return fdecl_func(*args)
 
-        ret = EUDXTypedFuncN(argn, caller, fdecl_func, argtypes, rettypes, argmasks, traced=traced)
+        ret = EUDXTypedFuncN(
+            argn, caller, fdecl_func, argtypes, rettypes, argmasks, traced=traced
+        )
         functools.update_wrapper(ret, fdecl_func)
         return ret
 
     return _EUDXTypedFunc
+
+
+def _EUDPredefineParam(fargs):
+    """
+    Use with cautions!
+    1. Don't initialize value!
+    2. Reset modifier to `SetTo` when you're done!
+    3. Always SetDest when assign to other variables!
+    4. No EUDFunc call in function body!
+    """
+
+    def wrapper(f):
+        f._fargs = fargs
+        f._argn = len(fargs)
+        return f
+
+    return wrapper
+
+
+def _EUDPredefineReturn(frets):
+    """
+    Use with cautions!
+    1. Always initialize value!
+    2. Reset modifier to `SetTo` when you're done!
+    3. Don't modify Dest in function body!
+    4. No EUDFunc call in function body!
+    """
+
+    def wrapper(f):
+        f._frets = frets
+        f._retn = len(frets)
+        return f
+
+    return wrapper

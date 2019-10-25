@@ -158,6 +158,8 @@ class EUDVariable(VariableBase):
         return self
 
     def __isub__(self, other):
+        if IsConstExpr(other):
+            return self.__iadd__(-other)
         self << self - other
         return self
 
@@ -174,6 +176,15 @@ class EUDVariable(VariableBase):
     def __sub__(self, other):
         t = EUDVariable()
 
+        # TODO: fix bug with freeing tests.
+        # if IsConstExpr(other):
+        #     SeqCompute(
+        #         [
+        #             (t, bt.SetTo, -other),
+        #             (t, bt.Add, self),
+        #         ]
+        #     )
+        # else:
         SeqCompute(
             [
                 (t, bt.SetTo, 0xFFFFFFFF),

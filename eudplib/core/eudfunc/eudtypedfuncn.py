@@ -100,4 +100,5 @@ class EUDXTypedFuncN(EUDTypedFuncN):
             self._argn == len(self._argmasks),
             "Number of argument masks should be constant",
         )
-        self._fargs = [ev.EUDXVariable(0, mask) for mask in self._argmasks]
+        if self._fargs is None:
+            self._fargs = [ev.EUDXVariable(0, mask) for mask in self._argmasks]

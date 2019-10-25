@@ -26,6 +26,8 @@ THE SOFTWARE.
 from .. import allocator as ac, rawtrigger as rt, variable as ev, eudfunc as ef
 
 from eudplib import utils as ut
+from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ..variable.evcommon import _ev
 
 
 @ef.EUDFunc
@@ -111,16 +113,18 @@ def f_constmul(number):
         return mulfdict[number]
     except KeyError:
 
+        @_EUDPredefineParam(_ev[:1])
+        @_EUDPredefineReturn(_ev[1:2])
         @ef.EUDFunc
         def _mulf(a):
-            ret = ev.EUDVariable()
+            ret = _mulf._frets[0]
             ret << 0
             for i in range(31, -1, -1):
                 rt.RawTrigger(
                     conditions=a.AtLeastX(1, 2 ** i),
                     actions=ret.AddNumber(2 ** i * number),
                 )
-            return ret
+            # return ret
 
         mulfdict[number] = _mulf
         return _mulf
@@ -142,10 +146,12 @@ def f_constdiv(number):
         return divfdict[number]
     except KeyError:
 
+        @_EUDPredefineReturn(_ev[:2])
+        @_EUDPredefineParam(_ev[1:2])
         @ef.EUDFunc
         def _divf(a):
-            ret = ev.EUDVariable()
-            ret << 0
+            quotient = _divf._frets[0]
+            quotient << 0
             for i in range(31, -1, -1):
                 # number too big
                 if 2 ** i * number >= 2 ** 32:
@@ -153,9 +159,12 @@ def f_constdiv(number):
 
                 rt.RawTrigger(
                     conditions=a.AtLeast(2 ** i * number),
-                    actions=[a.SubtractNumber(2 ** i * number), ret.AddNumber(2 ** i)],
+                    actions=[
+                        a.SubtractNumber(2 ** i * number),
+                        quotient.AddNumber(2 ** i),
+                    ],
                 )
-            return ret, a
+            # return quotient, a
 
         divfdict[number] = _divf
         return _divf
@@ -164,9 +173,10 @@ def f_constdiv(number):
 # -------
 
 
+@_EUDPredefineReturn(_ev[:1])
 @ef.EUDFunc
 def _f_mul(a, b):
-    ret = ev.EUDVariable()
+    ret = _f_mul._frets[0]
     endmul, reset_nptr = ac.Forward(), ac.Forward()
 
     # Init
@@ -195,7 +205,7 @@ def _f_mul(a, b):
             p4 << ev.VProc(b, b.SetDest(b))
 
     endmul << rt.RawTrigger(actions=[reset_nptr << rt.SetNextPtr(p1, p2)])
-    return ret
+    # return ret
 
 
 @ef.EUDFunc
