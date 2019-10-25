@@ -329,27 +329,22 @@ def IsEUDVariable(x):
 
 
 def VProc(v, actions):
-    nexttrg = Forward()
+    v = FlattenList(v)
+    actions = FlattenList(actions)
+    end = Forward()
+    triggers = list()
+    
+    for cv, nv in zip(v, v[1:]):
+        actions.append(bt.SetNextPtr(cv.GetVTable(), nv.GetVTable()))
+    actions.append(bt.SetNextPtr(v[-1].GetVTable(), end))
 
-    try:
-        v = FlattenList(v)
-        trg = bt.RawTrigger(
-            nextptr=v[0].GetVTable(),
-            actions=[actions]
-            + [
-                bt.SetNextPtr(v[i].GetVTable(), v[i + 1].GetVTable())
-                for i in range(len(v) - 1)
-            ]
-            + [bt.SetNextPtr(v[-1].GetVTable(), nexttrg)],
-        )
-    except (TypeError):
-        trg = bt.RawTrigger(
-            nextptr=v.GetVTable(),
-            actions=[actions] + [bt.SetNextPtr(v.GetVTable(), nexttrg)],
-        )
+    for i in range(0, len(actions), 64):
+        trg = bt.RawTrigger(actions=actions[i:i + 64])
+        triggers.append(trg)
+    triggers[-1]._nextptr = v[0].GetVTable()
+    end << bt.NextTrigger()
 
-    nexttrg << bt.NextTrigger()
-    return trg
+    return List2Assignable(triggers)
 
 
 # From vbuffer.py
