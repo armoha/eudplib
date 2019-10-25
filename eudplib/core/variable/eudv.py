@@ -567,8 +567,7 @@ def NonSeqCompute(assignpairs):
             if varassignpair is not None:
                 varassignpairs.append(varassignpair)
 
-    newassignpairs = constpairs + varassignpairs
-    SeqCompute(newassignpairs)
+    SeqCompute(constpairs + varassignpairs)
 
 
 def SetVariables(srclist, dstlist, mdtlist=None):

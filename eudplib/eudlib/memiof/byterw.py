@@ -84,9 +84,7 @@ class EUDByteReader:
         case = [c.Forward() for _ in range(5)]
         ret, suboffset = EUDByteReader.ret, self._suboffset
 
-        cs.DoActions(
-            [self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0)]
-        )
+        cs.DoActions(self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0))
 
         for i in range(4):
             case[i] << c.NextTrigger()
@@ -103,10 +101,7 @@ class EUDByteReader:
                 c.RawTrigger(nextptr=case[-1], actions=suboffset.AddNumber(1))
             else:  # suboffset == 3
                 cs.DoActions(
-                    [
-                        c.SetMemory(self._read + 20, c.Add, 1),
-                        suboffset.SetNumber(0),
-                    ]
+                    c.SetMemory(self._read + 20, c.Add, 1), suboffset.SetNumber(0)
                 )
 
         case[-1] << c.NextTrigger()
@@ -196,10 +191,7 @@ class EUDByteWriter:
         )
         c.RawTrigger(
             conditions=[suboffset >= 4],
-            actions=[
-                suboffset.SetNumber(0),
-                c.SetMemory(self._write + 16, c.Add, 1),
-            ],
+            actions=[suboffset.SetNumber(0), c.SetMemory(self._write + 16, c.Add, 1)],
         )
 
     @classmethod

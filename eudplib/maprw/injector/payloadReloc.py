@@ -79,7 +79,7 @@ def CreatePayloadRelocator(payload):
                         epd.SetDest(ut.EPD(dst) + 4),
                     ],
                 )
-                cs.DoActions([dst << c.SetDeaths(0, c.Add, orig_payload, 0)])
+                cs.DoActions(dst << c.SetDeaths(0, c.Add, orig_payload, 0))
             cs.EUDEndWhile()
 
         # Jump

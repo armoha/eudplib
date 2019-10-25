@@ -247,7 +247,7 @@
     조건과 액션이 있는 트리거입니다. 기본적으로 preserved 상태입니다.
     조건/액션 갯수 제한은 없습니다. 조건과 액션에 변수를 넣을수도 있습니다.
 
-* DoActions(actions, preserved)
+* DoActions(*actions, preserved)
     conditions가 Always인 트리거입니다. 기본적으로 preserved 되있고요.
 
 * EPD(p)

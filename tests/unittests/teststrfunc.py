@@ -17,7 +17,7 @@ def test_strbuffer():
     s1.delete(1, 1)
 
     userid = f_getuserplayerid()
-    DoActions([SetCurrentPlayer(userid), SetMemory(0x640B58, SetTo, 0)])
+    DoActions(SetCurrentPlayer(userid), SetMemory(0x640B58, SetTo, 0))
     s1.Display()
 
     test_assert(

@@ -28,8 +28,8 @@ from .. import trigger as tg
 from eudplib import utils as ut
 
 
-def DoActions(actions, preserved=True):
-    tg.Trigger(actions=ut.FlattenList(actions), preserved=preserved)
+def DoActions(*actions, preserved=True):
+    tg.Trigger(actions=actions, preserved=preserved)
 
 
 def EUDJump(nextptr):

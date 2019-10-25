@@ -78,10 +78,10 @@ def test_ptr_write():
 
 @TestInstance
 def test_ptr_constmemio():
-    DoActions([
+    DoActions(
         SetMemory(0x656EB0, SetTo, 0x04030201),
         SetMemory(0x656EB4, SetTo, 0x08070605),
-    ])
+    )
     a = 0x656EB0
 
     # bread
@@ -123,10 +123,10 @@ def test_ptr_constmemio():
         [0, 0x04030201, 0, 0x05040302, 0, 0x07060504, 0],
     )
 
-    DoActions([
+    DoActions(
         SetMemory(0x656EB0, SetTo, 0x04030201),
         SetMemory(0x656EB4, SetTo, 0x08070605),
-    ])
+    )
     # bwrite
     f_setcurpl(Player1)
     a = 0x656EB0
@@ -143,10 +143,10 @@ def test_ptr_constmemio():
 
     # wwrite
     f_setcurpl(Player1)
-    DoActions([
+    DoActions(
         SetMemory(0x656EB0, SetTo, 0x04030201),
         SetMemory(0x656EB4, SetTo, 0x08070605),
-    ])
+    )
     a = 0x656EB0
     cp0 = f_getcurpl()
     f_wwrite(a + 0, 0xAABB)

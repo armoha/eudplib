@@ -5,7 +5,7 @@ from helper import *
 def test_dwpatch():
 
     # Initial value
-    DoActions([SetMemory(0x58A364, SetTo, 1234), SetMemory(0x58A368, SetTo, 5678)])
+    DoActions(SetMemory(0x58A364, SetTo, 1234), SetMemory(0x58A368, SetTo, 5678))
 
     # f_dwpatch
     f_dwpatch_epd(EPD(0x58A364), 123)
@@ -34,4 +34,4 @@ def test_dwpatch():
     )
 
     # reset
-    DoActions([SetMemory(0x58A364, SetTo, 0), SetMemory(0x58A368, SetTo, 0)])
+    DoActions(SetMemory(0x58A364, SetTo, 0), SetMemory(0x58A368, SetTo, 0))
