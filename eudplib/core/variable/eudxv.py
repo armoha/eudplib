@@ -34,46 +34,49 @@ class EUDXVariable(EUDVariable):
         self._varact = self._vartrigger + (8 + 320)
         self._rvalue = False
 
+    def getMaskAddr(self):
+        return self._varact
+
     # -------
 
     def SetMask(self, value):
-        return bt.SetDeaths(EPD(self._varact), bt.SetTo, value, 0)
+        return bt.SetMemory(self.getMaskAddr(), bt.SetTo, value)
 
     def AddMask(self, value):
-        return bt.SetDeaths(EPD(self._varact), bt.Add, value, 0)
+        return bt.SetMemory(self.getMaskAddr(), bt.Add, value)
 
     def SubtractMask(self, value):
-        return bt.SetDeaths(EPD(self._varact), bt.Subtract, value, 0)
+        return bt.SetMemory(self.getMaskAddr(), bt.Subtract, value)
 
     # -------
 
     def SetMaskX(self, value, mask):
-        return bt.SetDeathsX(EPD(self._varact), bt.SetTo, value, 0, mask)
+        return bt.SetMemoryX(self.getMaskAddr(), bt.SetTo, value, mask)
 
     def AddMaskX(self, value, mask):
-        return bt.SetDeathsX(EPD(self._varact), bt.Add, value, 0, mask)
+        return bt.SetMemoryX(self.getMaskAddr(), bt.Add, value, mask)
 
     def SubtractMaskX(self, value, mask):
-        return bt.SetDeathsX(EPD(self._varact), bt.Subtract, value, 0, mask)
+        return bt.SetMemoryX(self.getMaskAddr(), bt.Subtract, value, mask)
 
     # -------
 
     def MaskAtLeast(self, value):
-        return bt.Deaths(EPD(self._varact), bt.AtLeast, value, 0)
+        return bt.Memory(self.getMaskAddr(), bt.AtLeast, value)
 
     def MaskAtMost(self, value):
-        return bt.Deaths(EPD(self._varact), bt.AtMost, value, 0)
+        return bt.Memory(self.getMaskAddr(), bt.AtMost, value)
 
     def MaskExactly(self, value):
-        return bt.Deaths(EPD(self._varact), bt.Exactly, value, 0)
+        return bt.Memory(self.getMaskAddr(), bt.Exactly, value)
 
     # -------
 
     def MaskAtLeastX(self, value, mask):
-        return bt.DeathsX(EPD(self._varact), bt.AtLeast, value, mask, 0)
+        return bt.MemoryX(self.getMaskAddr(), bt.AtLeast, value, mask)
 
     def MaskAtMostX(self, value, mask):
-        return bt.DeathsX(EPD(self._varact), bt.AtMost, value, mask, 0)
+        return bt.MemoryX(self.getMaskAddr(), bt.AtMost, value, mask)
 
     def MaskExactlyX(self, value, mask):
-        return bt.DeathsX(EPD(self._varact), bt.Exactly, value, mask, 0)
+        return bt.MemoryX(self.getMaskAddr(), bt.Exactly, value, mask)
