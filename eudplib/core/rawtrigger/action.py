@@ -59,13 +59,14 @@ class Action(ConstExpr):
         """
         super().__init__(self)
 
-        if eudx:
-            eudx = ut.b2i2(b"SC")
+        if isinstance(eudx, str):
+            eudx = ut.b2i2(ut.u2b(eudx))
         self.fields = [locid1, strid, wavid, time, player1,
                        player2, unitid, acttype, amount, flags, 0, eudx]
         # fmt: on
         self.parenttrg = None
         self.actindex = None
+
     def Disabled(self):
         self.fields[9] |= 2
 

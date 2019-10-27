@@ -36,6 +36,9 @@ class Db(EUDObject):
             b = (b + "\0").encode("UTF-8")
         self.content = bytes(b)
 
+    def getValueAddr(self):
+        return self
+
     def GetDataSize(self):
         return len(self.content)
 

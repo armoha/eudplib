@@ -52,8 +52,8 @@ def Condition(
 
     player &= 0xFFFFFFFF
     amount &= 0xFFFFFFFF
-    if eudx:
-        eudx = b2i2(b"SC")
+    if isinstance(eudx, str):
+        eudx = ut.b2i2(ut.u2b(eudx))
 
     return pack(
         "<IIIHBBBBH",
@@ -79,8 +79,8 @@ def Action(
         player1 += 0x100000000  # EPD
     if player2 < 0:
         player2 += 0x100000000  # EPD
-    if eudx:
-        eudx = b2i2(b"SC")
+    if isinstance(eudx, str):
+        eudx = ut.b2i2(ut.u2b(eudx))
     return pack(
         "<IIIIIIHBBBBH",
         locid1,
@@ -623,7 +623,7 @@ def DeathsX(Player, Comparison, Number, Unit, Mask):
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
-    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx=True)
+    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx="SC")
 
 
 def MemoryX(dest, cmptype, value, mask):
@@ -634,7 +634,7 @@ def SetDeathsX(Player, Modifier, Number, Unit, Mask):
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
     Unit = EncodeUnit(Unit)
-    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx=True)
+    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx="SC")
 
 
 def SetMemoryX(dest, modtype, value, mask):

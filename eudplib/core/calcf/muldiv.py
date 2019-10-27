@@ -45,39 +45,43 @@ def _div1(x):
     return x, 0
 
 
-def f_mul(a, b):
+def f_mul(a, b, **kwargs):
     """Calculate a * b"""
     if isinstance(a, ev.EUDVariable) and isinstance(b, ev.EUDVariable):
-        return _f_mul(a, b)
+        return _f_mul(a, b, **kwargs)
 
     elif isinstance(a, ev.EUDVariable):
-        return f_constmul(b)(a)
+        return f_constmul(b)(a, **kwargs)
 
     elif isinstance(b, ev.EUDVariable):
-        return f_constmul(a)(b)
+        return f_constmul(a)(b, **kwargs)
 
-    else:
+    try:
+        ret = kwargs["ret"]
+    except KeyError:
         ret = ev.EUDVariable()
-        ret << a * b
-        return ret
+    ret << a * b
+    return ret
 
 
-def f_div(a, b):
+def f_div(a, b, **kwargs):
     """Calculate (a//b, a%b) """
     if isinstance(b, ev.EUDVariable):
-        return _f_div(a, b)
+        return _f_div(a, b, **kwargs)
 
     elif isinstance(a, ev.EUDVariable):
-        return f_constdiv(b)(a)
+        return f_constdiv(b)(a, **kwargs)
 
+    if b:
+        q, m = divmod(a, b)
     else:
-        if b:
-            q, m = a // b, a % b
-        else:
-            q, m = 0xFFFFFFFF, a
+        q, m = 0xFFFFFFFF, a
+    try:
+        vq, vm = kwargs["ret"]
+    except KeyError:
         vq, vm = ev.EUDCreateVariables(2)
-        ev.SeqCompute([(vq, rt.SetTo, q), (vm, rt.SetTo, m)])
-        return vq, vm
+    ev.SeqCompute([(vq, rt.SetTo, q), (vm, rt.SetTo, m)])
+    return vq, vm
 
 
 # -------

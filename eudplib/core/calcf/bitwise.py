@@ -185,15 +185,14 @@ def _f_bitlshift(a, b):
     return a
 
 
-def f_bitlshift(a, b):
+def f_bitlshift(a, b, **kwargs):
     """ Calculate a << b """
     if isinstance(b, int):
         if 1 <= b <= 7:
-            return _f_bitlshift(a, b)
+            return _f_bitlshift(a, b, **kwargs)
         else:
-            return f_mul(a, _exp2(b))
-    else:
-        return _f_bitlshift(a, b)
+            return f_mul(a, _exp2(b), **kwargs)
+    return _f_bitlshift(a, b, **kwargs)
 
 
 def f_bitrshift(a, b):
