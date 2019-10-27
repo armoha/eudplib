@@ -64,17 +64,19 @@ def _DispatchInlineCode(nextptr, trigepd, u):
 
         t = c.Forward()
         nt = c.Forward()
+        acts = [
+            c.SetMemory(cs0 + 20, c.SetTo, codeStart),
+            c.SetMemory(cs1 + 20, c.SetTo, ut.EPD(codeEnd + 4)),
+            c.SetMemory(cs2 + 20, c.SetTo, cs_a0_epd + 4),
+            c.SetMemory(cs3 + 20, c.SetTo, cs_a0_epd + 5),
+            c.SetMemory(resetter + 16, c.SetTo, ut.EPD(t + 4)),
+            c.SetMemory(resetter + 20, c.SetTo, nt),
+            c.SetNextPtr(t, end),
+        ]
+        random.shuffle(acts)
         t << c.RawTrigger(
             conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, funcID, v)],
-            actions=[
-                c.SetMemory(cs0 + 20, c.SetTo, codeStart),
-                c.SetMemory(cs1 + 20, c.SetTo, ut.EPD(codeEnd + 4)),
-                c.SetMemory(cs2 + 20, c.SetTo, cs_a0_epd + 4),
-                c.SetMemory(cs3 + 20, c.SetTo, cs_a0_epd + 5),
-                c.SetMemory(resetter + 16, c.SetTo, ut.EPD(t + 4)),
-                c.SetMemory(resetter + 20, c.SetTo, nt),
-                c.SetNextPtr(t, end),
-            ],
+            actions=acts,
         )
         nt << c.NextTrigger()
 
@@ -242,19 +244,20 @@ def CreateInjectFinalizer(chkt, root):
             # If there were triggers
             if cs.EUDIfNot()(prevtstart == ~(pts + player * 12 + 4)):
                 link_trs = c.Forward()
-                c.VProc(
-                    [prevtstart, prevtend, prevtend_epd],
-                    [
-                        # Link pts
-                        c.SetMemory(pts + player * 12 + 8, c.SetTo, tstart),
-                        c.SetMemory(pts + player * 12 + 4, c.SetTo, tre),
-                        # Cache dlist start & end
-                        prevtstart.SetDest(ut.EPD(rtt.orig_tstart) + player),
-                        prevtend.SetDest(ut.EPD(rtt.orig_tend) + player),
-                        prevtend_epd.AddNumber(1),
-                        prevtend_epd.SetDest(ut.EPD(link_trs) + 4),
-                    ],
-                )
+                vs = [prevtstart, prevtend, prevtend_epd]
+                acts = [
+                    # Link pts
+                    c.SetMemory(pts + player * 12 + 8, c.SetTo, tstart),
+                    c.SetMemory(pts + player * 12 + 4, c.SetTo, tre),
+                    # Cache dlist start & end
+                    prevtstart.SetDest(ut.EPD(rtt.orig_tstart) + player),
+                    prevtend.SetDest(ut.EPD(rtt.orig_tend) + player),
+                    prevtend_epd.AddNumber(1),
+                    prevtend_epd.SetDest(ut.EPD(link_trs) + 4),
+                ]
+                random.shuffle(vs)
+                random.shuffle(acts)
+                c.VProc(vs, acts)
                 c.VProc(
                     prevtstart,
                     [

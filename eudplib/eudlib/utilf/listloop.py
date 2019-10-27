@@ -47,7 +47,7 @@ def EUDLoopList(header_offset, break_offset=None):
     yield ptr, epd
     cs.EUDSetContinuePoint()
     epd += 1
-    c.SetVariables([ptr, epd], f_dwepdread_epd(epd))
+    f_dwepdread_epd(epd, ret=[ptr, epd])
     cs.EUDEndWhile()
 
     ut.ep_assert(ut.EUDPopBlock(blockname)[1] is header_offset, "listloop mismatch")
@@ -62,7 +62,7 @@ def EUDLoopUnit():
         yield ptr, epd
         cs.EUDSetContinuePoint()
         epd += 1
-        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd))
+        f_cunitepdread_epd(epd, ret=[ptr, epd])
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("unitloop")
@@ -88,7 +88,7 @@ def EUDLoopNewUnit(allowance=2):
         cs.EUDEndIf()
         cs.EUDSetContinuePoint()
         epd += 1
-        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd))
+        f_cunitepdread_epd(epd, ret=[ptr, epd])
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("newunitloop")
@@ -123,7 +123,7 @@ def EUDLoopPlayerUnit(player):
         cs.EUDSetContinuePoint()
         # /*0x06C*/ BW::CUnit*  nextPlayerUnit;
         epd += 0x6C // 4
-        c.SetVariables([ptr, epd], f_cunitepdread_epd(epd))
+        f_cunitepdread_epd(epd, ret=[ptr, epd])
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("playerunitloop")
@@ -146,7 +146,7 @@ def EUDLoopSprite():
             yield ptr, epd
             cs.EUDSetContinuePoint()
             epd += 1
-            c.SetVariables([ptr, epd], f_dwepdread_epd(epd))
+            f_dwepdread_epd(epd, ret=[ptr, epd])
         cs.EUDEndWhile()
         y_epd += 1
     cs.EUDEndWhile()

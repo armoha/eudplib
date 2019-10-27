@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from eudplib import utils as ut
 
 from ... import core as c
@@ -106,16 +108,16 @@ def CreateVectorRelocator(chkt, payload):
         prts = list(map(lambda x: x // 4, payload.prttable[i : i + packn]))
         prts = prts + [-1] * (packn - len(prts))  # -1 : dummy space
         pch = [prts[j] - prevoffset[j] for j in range(packn)]
+        acts = [
+            tt.SetMemory(mrgn + 328 + 32 * j + 16, tt.Add, pch[j])
+            for j in range(packn)
+        ]
+        random.shuffle(acts)
         str_sled.append(
             sledheader_prt
             + tt.Trigger(
                 players=[tt.AllPlayers],
-                actions=[
-                    [
-                        tt.SetMemory(mrgn + 328 + 32 * j + 16, tt.Add, pch[j])
-                        for j in range(packn)
-                    ]
-                ],
+                actions=acts,
             )
         )
 
@@ -129,35 +131,37 @@ def CreateVectorRelocator(chkt, payload):
         orts = list(map(lambda x: x // 4, payload.orttable[i : i + packn]))
         orts = orts + [-1] * (packn - len(orts))  # -1 : dummy space
         pch = [orts[j] - prevoffset[j] for j in range(packn)]
+        acts = [
+            tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, pch[j])
+            for j in range(packn)
+        ]
+        random.shuffle(acts)
         str_sled.append(
             sledheader_ort
             + tt.Trigger(
                 players=[tt.AllPlayers],
-                actions=[
-                    [
-                        tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, pch[j])
-                        for j in range(packn)
-                    ]
-                ],
+                actions=acts,
             )
         )
 
         prevoffset = orts
 
     # jump to ort
+    acts = [
+        [
+            tt.SetMemory(
+                mrgn_ort + 328 + 32 * j + 16, tt.Add, 0xFFFFFFFF - prevoffset[j]
+            )
+            for j in range(packn)
+        ],
+        tt.SetMemory(mrgn_ort + 4, tt.Add, 4),  # skip garbage area
+    ]
+    random.shuffle(acts)
     str_sled.append(
         sledheader_ort
         + tt.Trigger(
             players=[tt.AllPlayers],
-            actions=[
-                [
-                    tt.SetMemory(
-                        mrgn_ort + 328 + 32 * j + 16, tt.Add, 0xFFFFFFFF - prevoffset[j]
-                    )
-                    for j in range(packn)
-                ],
-                tt.SetMemory(mrgn_ort + 4, tt.Add, 4),  # skip garbage area
-            ],
+            actions=acts,
         )
     )
 
@@ -176,34 +180,38 @@ def CreateVectorRelocator(chkt, payload):
     # MRGN SECTION
     ##############
     mrgn_trigger = bytearray()
+    acts = [
+        # SetDeaths actions in MRGN initially points to EPD(payload - 4)
+        [
+            tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4)
+            for _ in range(packn)
+        ],
+        tt.SetMemory(mrgn + 4, tt.Add, 2408),
+    ]
+    random.shuffle(acts)
     mrgn_trigger_prt = (
         bytes(4)
         + ut.i2b4(prttrg_start + strsled_offset)
         + tt.Trigger(
             players=[tt.AllPlayers],
-            actions=[
-                # SetDeaths actions in MRGN initially points to EPD(payload - 4)
-                [
-                    tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4)
-                    for _ in range(packn)
-                ],
-                tt.SetMemory(mrgn + 4, tt.Add, 2408),
-            ],
+            actions=acts,
         )
         + bytes(836)
     )
+    acts = [
+        [
+            tt.SetMemory(payload_offset - 4, tt.Add, payload_offset)
+            for _ in range(packn)
+        ],
+        tt.SetMemory(mrgn_ort + 4, tt.Add, 2408),
+    ]
+    random.shuffle(acts)
     mrgn_trigger_ort = (
         bytes(836 + 4)
         + ut.i2b4(orttrg_start + strsled_offset)
         + tt.Trigger(
             players=[tt.AllPlayers],
-            actions=[
-                [
-                    tt.SetMemory(payload_offset - 4, tt.Add, payload_offset)
-                    for _ in range(packn)
-                ],
-                tt.SetMemory(mrgn_ort + 4, tt.Add, 2408),
-            ],
+            actions=acts,
         )
     )
     for b1, b2 in zip(mrgn_trigger_prt, mrgn_trigger_ort):
@@ -220,6 +228,7 @@ def CreateVectorRelocator(chkt, payload):
     ##############
     trglist.clear()
 
+    """
     # Check if epd is supported
     Trigger(actions=[tt.SetDeaths(-12, tt.SetTo, 1, 1)])
 
@@ -236,6 +245,7 @@ def CreateVectorRelocator(chkt, payload):
     )
 
     Trigger(actions=[tt.SetDeaths(-12, tt.SetTo, 0, 1)])
+    """
 
     # -------
 
@@ -244,21 +254,22 @@ def CreateVectorRelocator(chkt, payload):
     for e in range(31, 1, -1):
         # prt table
         # player
+        acts = [
+            [
+                tt.SetMemory(mrgn + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2)),
+                tt.SetMemory(mrgn + 328 + 32 * i + 20, tt.Add, 2 ** (e - 2)),
+                tt.SetMemory(mrgn_ort + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2)),
+                tt.SetMemory(mrgn_ort + 328 + 32 * i + 20, tt.Add, 2 ** e),
+            ]
+            for i in range(packn)
+        ] + [
+            tt.SetMemory(mrgn + 4, tt.Add, 2 ** e),
+            tt.SetMemory(mrgn_ort + 4, tt.Add, 2 ** e),
+        ]
+        random.shuffle(acts)
         Trigger(
             conditions=tt.MemoryX(strs, tt.AtLeast, 1, 2 ** e),
-            actions=[
-                [
-                    tt.SetMemory(mrgn + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2)),
-                    tt.SetMemory(mrgn + 328 + 32 * i + 20, tt.Add, 2 ** (e - 2)),
-                    tt.SetMemory(mrgn_ort + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2)),
-                    tt.SetMemory(mrgn_ort + 328 + 32 * i + 20, tt.Add, 2 ** e),
-                ]
-                for i in range(packn)
-            ]
-            + [
-                tt.SetMemory(mrgn + 4, tt.Add, 2 ** e),
-                tt.SetMemory(mrgn_ort + 4, tt.Add, 2 ** e),
-            ],
+            actions=acts,
         )
 
     # Payload update
