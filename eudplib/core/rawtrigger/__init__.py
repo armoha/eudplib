@@ -91,4 +91,5 @@ from .strenc import (
     EncodeString,
     EncodeSwitch,
     EncodeUnit,
+    EncodeTBL,
 )

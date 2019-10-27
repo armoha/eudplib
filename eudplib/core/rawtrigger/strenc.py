@@ -27,7 +27,7 @@ from ..mapdata import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitI
 
 from eudplib import utils as ut
 
-from .strdict import DefAIScriptDict, DefLocationDict, DefSwitchDict, DefUnitDict
+from .strdict import DefAIScriptDict, DefLocationDict, DefSwitchDict, DefUnitDict, DefTBLDict
 
 import difflib
 
@@ -35,10 +35,10 @@ import difflib
 def EncodeAIScript(ais, issueError=False):
     ais = ut.unProxy(ais)
 
-    if type(ais) is str:
+    if isinstance(ais, str):
         ais = ut.u2b(ais)
 
-    if type(ais) is bytes:
+    if isinstance(ais, bytes):
         ut.ep_assert(len(ais) >= 4, "AIScript name too short")
 
         if len(ais) > 4:
@@ -47,8 +47,7 @@ def EncodeAIScript(ais, issueError=False):
         elif len(ais) == 4:
             return ut.b2i4(ais)
 
-    else:
-        return ais
+    return ais
 
 
 def _EncodeAny(t, f, dl, s, issueError):
@@ -62,33 +61,31 @@ def _EncodeAny(t, f, dl, s, issueError):
                 try:
                     return dl[s]
                 except KeyError:
-                    sl = ["Cannot encode string %s as %s." % (s, t)]
+                    sl = "Cannot encode string %s as %s." % (s, t)
                     for match in difflib.get_close_matches(s, dl.keys()):
-                        sl.append(" - Suggestion: %s" % match)
-                    raise ut.EPError("\n".join(sl))
+                        sl += " - Suggestion: %s" % match
+                    raise ut.EPError(sl)
 
             if issueError:
                 raise ut.EPError('[Warning] "%s" is not a %s' % (s, t))
             return s
 
-    else:
-        try:
-            return dl.get(s, s)
+    try:
+        return dl.get(s, s)
 
-        except TypeError:  # unhashable
-            return s
-
-
-def EncodeLocation(loc, issueError=False):
-    return _EncodeAny(
-        "location", lambda s: GetLocationIndex(s) + 1, DefLocationDict, loc, issueError
-    )
+    except TypeError:  # unhashable
+        return s
 
 
 def EncodeLocationIndex(loc, issueError=False):
-    return _EncodeAny(
-        "location", lambda s: GetLocationIndex(s), DefLocationDict, loc, issueError
-    )
+    return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc, issueError)
+
+
+def EncodeLocation(loc, issueError=False):
+    loc_index = EncodeLocationIndex(loc, issueError)
+    if isinstance(loc_index, int):
+        loc_index += 1
+    return loc_index
 
 
 def EncodeString(s, issueError=False):
@@ -101,3 +98,22 @@ def EncodeSwitch(sw, issueError=False):
 
 def EncodeUnit(u, issueError=False):
     return _EncodeAny("unit", GetUnitIndex, DefUnitDict, u, issueError)
+
+
+def EncodeTBL(t, issueError=False):
+    s = ut.unProxy(t)
+
+    if isinstance(s, str):
+        try:
+            return DefTBLDict[s]
+        except KeyError:
+            sl = "Cannot encode string %s as stat_txt.tbl." % s
+            for match in difflib.get_close_matches(s, dl.keys()):
+                sl += "\n - Suggestion: %s" % match
+            raise ut.EPError(sl)
+
+    try:
+        return DefTBLDict.get(s, s)
+
+    except TypeError:  # unhashable
+        return s
