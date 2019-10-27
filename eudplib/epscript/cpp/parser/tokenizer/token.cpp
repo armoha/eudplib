@@ -45,6 +45,7 @@ const char* getTokenTypeString(int type) {
             {TOKEN_LOCNAME, "TOKEN_LOCNAME"},
             {TOKEN_MAPSTRING, "TOKEN_MAPSTRING"},
             {TOKEN_SWITCHNAME, "TOKEN_SWITCHNAME"},
+            {TOKEN_STATTXTTBL, "TOKEN_STATTXTTBL"},
             {TOKEN_VARRAY, "TOKEN_VARRAY"},
             {TOKEN_LIST, "TOKEN_LIST"},
             {TOKEN_INC, "TOKEN_INC"},

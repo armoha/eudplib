@@ -631,6 +631,11 @@ expr(A) ::= LOCATION LPAREN STRING(B) RPAREN. {
     A = mkTokenTemp(B);
 }
 
+expr(A) ::= STATTXTTBL LPAREN STRING(B) RPAREN. {
+    B->data = "EncodeTBL(" + B->data + ")";
+    A = mkTokenTemp(B);
+}
+
 expr(A) ::= VARRAY LPAREN exprList_nonEmpty(B) commaSkippable RPAREN. {
     B->data = "_VARR(FlattenList([" + B->data + "]))";
     A = mkTokenTemp(B);
