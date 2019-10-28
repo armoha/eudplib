@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
 import traceback
 
 from .. import rawtrigger as bt
@@ -407,6 +408,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
     nextptr = None  # nextptr for this rawtrigger
     vt_nextptr = None  # what to set for nextptr of current vtable
     last_pairs = None
+    nonConstActions = list()
 
     def _RemoveDuplicateActions():
         if last_pairs is None:
@@ -417,7 +419,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
         except KeyError:
             pass
         else:
-            lastact = actionlist[-1]
+            lastact = nonConstActions[-1]
             queueact, setnptr = lastact
             setdst, setmdt = queueact
             if last_dst is prev_dst:
@@ -445,15 +447,17 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
             bt.Subtract: EUDVariable.QueueSubtractTo,
         }[mdt]
 
-        actionlist.append(
+        nonConstActions.append(
             [queuef(src, dst), bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
         )
         last_pairs = src, dst, mdt
 
-    bt.RawTrigger(nextptr=nextptr, actions=actionlist)
+    _RemoveDuplicateActions()
+    nonConstActions = FlattenList(nonConstActions)
+    random.shuffle(nonConstActions)
+    bt.RawTrigger(nextptr=nextptr, actions=[actionlist, nonConstActions])
 
     vt_nextptr << bt.NextTrigger()
-    _RemoveDuplicateActions()
 
 
 def SeqCompute(assignpairs):

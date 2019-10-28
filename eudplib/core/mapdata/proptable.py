@@ -62,11 +62,13 @@ def GetPropertyIndex(prop):
         return _uprpdict[prop] + 1  # SC counts unit properties from 1. Sucks
 
     except KeyError:
+        indexNotFound = False
         for uprpindex in range(64):
             if _uprptable[uprpindex] is None:
+                indexFound = True
                 break
 
-        ut.ep_assert(uprpindex < 64, "Unit property table overflow")
+        ut.ep_assert(indexFound, "Unit property table overflow")
 
         _uprptable[uprpindex] = prop
         _uprpdict[prop] = uprpindex

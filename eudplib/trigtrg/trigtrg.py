@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from struct import pack
 from eudplib import utils as ut
-from ..utils import EPD, b2i2
+from ..utils import EPD, b2i2, u2b
 from ..core.rawtrigger.constenc import *
 from ..core.rawtrigger.strenc import *
 
@@ -53,7 +53,7 @@ def Condition(
     player &= 0xFFFFFFFF
     amount &= 0xFFFFFFFF
     if isinstance(eudx, str):
-        eudx = ut.b2i2(ut.u2b(eudx))
+        eudx = b2i2(u2b(eudx))
 
     return pack(
         "<IIIHBBBBH",
@@ -80,7 +80,7 @@ def Action(
     if player2 < 0:
         player2 += 0x100000000  # EPD
     if isinstance(eudx, str):
-        eudx = ut.b2i2(ut.u2b(eudx))
+        eudx = b2i2(u2b(eudx))
     return pack(
         "<IIIIIIHBBBBH",
         locid1,

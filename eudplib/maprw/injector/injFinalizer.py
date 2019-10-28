@@ -182,20 +182,13 @@ def CreateInjectFinalizer(chkt, root):
         # Revert nextptr
         triggerend = sf.f_dwread_epd(9)
         ptsprev_epd = sf.f_dwread_epd(10)
-        revert_nptr = c.Forward()
         c.VProc(
-            [triggerend, ptsprev_epd],
+            [ptsprev_epd, triggerend],
             [
-                triggerend.SetDest(ut.EPD(revert_nptr) + 5),
-                ptsprev_epd.SetDest(ut.EPD(revert_nptr) + 4),
-            ],
-        )
-        cs.DoActions(
-            [
-                revert_nptr << c.SetDeaths(0, c.SetTo, 0, 0),
                 c.SetDeaths(9, c.SetTo, 0, 0),
                 c.SetDeaths(10, c.SetTo, 0, 0),
-            ]
+                ptsprev_epd.SetDest(ut.EPD(triggerend.getDestAddr())),
+            ],
         )
 
         # revert mrgndata
@@ -205,12 +198,10 @@ def CreateInjectFinalizer(chkt, root):
 
         # Flip TRIG properties
         i = c.EUDVariable()
-        if cs.EUDWhile()(i <= 7):
-            flip_epd = triggerend  # reuse variable
-            c.f_bitlshift(i, 2, ret=flip_epd)
-            c.VProc(i, [i.QueueAddTo(flip_epd), flip_epd.AddNumber(ut.EPD(pts + 8))])
-            _FlipProp(sf.f_epdread_epd(flip_epd))
-            i += 1
+        if cs.EUDWhile()(i <= 3 * 7):
+            i += ut.EPD(pts + 8)
+            _FlipProp(sf.f_epdread_epd(i))
+            i += 3 - ut.EPD(pts + 8)
         cs.EUDEndWhile()
 
         # Create payload for each players & Link them with pts
@@ -271,7 +262,7 @@ def CreateInjectFinalizer(chkt, root):
         if c.PushTriggerScope():
             tmcheckt << c.NextTrigger()
             sf.f_getgametick(ret=curtime)
-            if cs.EUDIf()(lasttime < curtime):
+            if cs.EUDIf()(curtime > lasttime):  # beware QueueAddTo (-)
                 c.VProc(curtime, curtime.SetDest(lasttime))
                 c.SetNextTrigger(root)
             cs.EUDEndIf()

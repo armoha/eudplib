@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 import random
 
-from ..core.rawtrigger import EncodeModifier, SetDeaths, Action
+from ..core.rawtrigger import EncodeModifier, SetDeaths, Action, SetTo, Add, Subtract, CurrentPlayer
 from ..utils import EPD
 
 _seed = 0
@@ -65,7 +65,7 @@ def SetMemoryS(dest, modtype, value):
     modtype = EncodeModifier(modtype, issueError=True)
     cpmod, cpo, unit = rand(dest)
     return [
-        SetMemory2(0x6509B0, cpmod, cpo),
+        SetMemoryC(0x6509B0, cpmod, cpo),
         SetDeaths(CurrentPlayer, modtype, value, unit),
     ]
 
@@ -73,10 +73,7 @@ def SetMemoryS(dest, modtype, value):
 def SetMemoryC(dest, modtype, value):
     modtype = EncodeModifier(modtype, issueError=True)
     _loc = random.randint(0, 0xFFFFFFFF)
-    _str = random.randint(0, 0xFFFFFFFF)
-    _wav = random.randint(0, 0xFFFFFFFF)
-    _time = random.randint(0, 0xFFFFFFFF)
     u = random.randint(0, 0xFFFF)
-    epd = EPD(dest) - 12 * unit
+    epd = EPD(dest) - 12 * u
     flag = random.randint(0, 0xFF) & (0xFF - 2)
-    return Action(_loc, _str, _wav, _time, epd, value, u, 45, modtype, flag)
+    return Action(_loc, 0, 0, 0, epd, value, u, 45, modtype, flag)
