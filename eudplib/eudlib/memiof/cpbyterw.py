@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from eudplib import core as c, ctrlstru as cs, utils as ut
 
 
@@ -46,7 +48,9 @@ class CPByteWriter:
             buffer.
         """
         cs.EUDSwitch(self._suboffset)
-        for i in range(3):
+        r = list(range(3))
+        random.shuffle(r)
+        for i in r:
             if cs.EUDSwitchCase()(i):
                 cs.DoActions([self._b[i].SetNumber(byte), self._suboffset.AddNumber(1)])
                 cs.EUDBreak()

@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from .. import allocator as ac, rawtrigger as rt, variable as ev, eudfunc as ef
 
 from eudplib import utils as ut
@@ -123,7 +125,9 @@ def f_constmul(number):
         def _mulf(a):
             ret = _mulf._frets[0]
             ret << 0
-            for i in range(31, -1, -1):
+            r = list(range(32))
+            random.shuffle(r)
+            for i in r:
                 rt.RawTrigger(
                     conditions=a.AtLeastX(1, 2 ** i),
                     actions=ret.AddNumber(2 ** i * number),
@@ -197,15 +201,13 @@ def _f_mul(a, b):
         p3 << ev.VProc(b, [b.SetDest(ret), rt.SetNextPtr(p1, p2)])
         p2 << rt.NextTrigger()
         if i <= 30:
-            rt.RawTrigger(
-                nextptr=p4,
-                conditions=a.Exactly(0),
-                actions=[
-                    rt.SetNextPtr(p2, endmul),
-                    rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
-                    rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
-                ],
-            )
+            acts = [
+                rt.SetNextPtr(p2, endmul),
+                rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
+                rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
+            ]
+            random.shuffle(acts)
+            rt.RawTrigger(nextptr=p4, conditions=[a == 0], actions=acts)
             p4 << ev.VProc(b, b.SetDest(b))
 
     endmul << rt.RawTrigger(actions=[reset_nptr << rt.SetNextPtr(p1, p2)])
@@ -233,7 +235,9 @@ def _f_div(a, b):
         # Skip if over 0x80000000
         p1, p2, p3 = ac.Forward(), ac.Forward(), ac.Forward()
         p1 << rt.RawTrigger(
-            nextptr=p2, conditions=x.AtLeast(0x80000000), actions=rt.SetNextPtr(p1, p3)
+            nextptr=p2,
+            conditions=x.AtLeastX(1, 0x80000000),
+            actions=rt.SetNextPtr(p1, p3),
         )
         p3 << rt.RawTrigger(nextptr=chain[i], actions=rt.SetNextPtr(p1, p2))
         p2 << rt.NextTrigger()

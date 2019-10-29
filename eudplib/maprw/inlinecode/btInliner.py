@@ -24,6 +24,8 @@ THE SOFTWARE.
 """
 
 
+import random
+
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
@@ -70,7 +72,9 @@ def InlineCodifyBinaryTrigger(bTrigger):
 
         cp = sf.f_getcurpl()
         cs.EUDSwitch(cp)
-        for player in range(8):
+        r = list(range(8))
+        random.shuffle(r)
+        for player in r:
             if playerExecutesTrigger[player]:
                 if cs.EUDSwitchCase()(player):
                     c.RawTrigger(trigSection=bTrigger)

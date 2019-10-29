@@ -53,7 +53,9 @@ def CopyDeaths(iplayer, oplayer, copyepd=False, initvalue=None):
 
     Trigger(actions=tt.SetDeaths(oplayer, tt.SetTo, initvalue, 0))
 
-    for i in range(31, 1, -1):
+    r = list(range(31, 1, -1))
+    random.shuffle(r)
+    for i in r:
         if copyepd:
             subval = 2 ** (i - 2)
 
@@ -245,7 +247,9 @@ def CreateVectorRelocator(chkt, payload):
 
     # Init mrgn rawtrigger
     strs = 0x5993D4
-    for e in range(31, 1, -1):
+    r = list(range(31, 1, -1))
+    random.shuffle(r)
+    for e in r:
         # prt table
         # player
         acts = [
@@ -261,10 +265,7 @@ def CreateVectorRelocator(chkt, payload):
             tt.SetMemory(mrgn_ort + 4, tt.Add, 2 ** e),
         ]
         random.shuffle(acts)
-        Trigger(
-            conditions=tt.MemoryX(strs, tt.AtLeast, 1, 2 ** e),
-            actions=acts,
-        )
+        Trigger(conditions=tt.MemoryX(strs, tt.AtLeast, 1, 2 ** e), actions=acts)
 
     # Payload update
     curpl = 0x6509B0
@@ -275,7 +276,9 @@ def CreateVectorRelocator(chkt, payload):
 
     pts = 0x51A280
 
-    for player in range(8):
+    r = list(range(8))
+    random.shuffle(r)
+    for player in r:
         triggerend = ~(0x51A284 + player * 12)
 
         Trigger(
@@ -287,7 +290,9 @@ def CreateVectorRelocator(chkt, payload):
         )
 
     # read pts[player].lasttrigger
-    for e in range(31, 1, -1):
+    r = list(range(31, 1, -1))
+    random.shuffle(r)
+    for e in r:
         Trigger(
             conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2 ** e),
             actions=tt.SetDeaths(11, tt.Add, 2 ** e, 0),
@@ -300,9 +305,11 @@ def CreateVectorRelocator(chkt, payload):
             tt.SetMemory(curpl, tt.SetTo, ut.EPD(4)),
         ]
     )
-    for e in range(31, 1, -1):
+    r = list(range(31, 1, -1))
+    random.shuffle(r)
+    for e in r:
         Trigger(
-            conditions=tt.Deaths(11, tt.AtLeast, 2 ** e, 0),
+            conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2 ** e),
             actions=[
                 tt.SetDeaths(11, tt.Subtract, 2 ** e, 0),
                 # used for nextptr recovery in stage 3

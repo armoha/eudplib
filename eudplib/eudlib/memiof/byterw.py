@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from ... import core as c
 from ... import ctrlstru as cs
 
@@ -90,7 +92,9 @@ class EUDByteReader:
             case[i] << c.NextTrigger()
             if i < 3:
                 cs.EUDJumpIfNot(suboffset == i, case[i + 1])
-            for j in range(8):
+            r = list(range(8))
+            random.shuffle(r)
+            for j in r:
                 c.RawTrigger(
                     conditions=c.DeathsX(
                         c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)
@@ -170,10 +174,14 @@ class EUDByteWriter:
                 ],
             )
             cs.EUDBreak()
-        for i in range(1, 4):
+        s = list(range(1, 4))
+        random.shuffle(s)
+        for i in s:
             if cs.EUDSwitchCase()(i):
                 cs.DoActions(c.SetMemory(self._write, c.SetTo, 0xFF << (8 * i)))
-                for j in range(8):
+                r = list(range(8))
+                random.shuffle(r)
+                for j in r:
                     c.RawTrigger(
                         conditions=byte.AtLeastX(1, 2 ** j),
                         actions=c.SetMemory(self._write + 20, c.Add, 2 ** (j + i * 8)),

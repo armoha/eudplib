@@ -46,12 +46,12 @@ class PVariable(c.EUDVArray(8)):
         )
         for k in range(2, 0, -1):
             c.RawTrigger(
-                conditions=i.AtLeastX(1, 2 ** k), actions=[value.AddDest(18 * (2 ** k))]
+                conditions=i.AtLeastX(1, 2 ** k), actions=value.AddDest(18 * (2 ** k))
             )
         c.RawTrigger(
             nextptr=value.GetVTable(),
             conditions=i.AtLeastX(1, 1),
-            actions=[value.AddDest(18)],
+            actions=value.AddDest(18),
         )
         nptr << c.NextTrigger()
 

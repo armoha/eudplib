@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from . import (
     dwepdio as dwm,
     cpmemio as cpm,
@@ -87,10 +89,14 @@ def _dwread(ptr):
         cs.EUDBreak()
 
     # Else → Complex
-    for i in range(1, 4):
+    s = list(range(1, 4))
+    random.shuffle(s)
+    for i in s:
         cs.EUDSwitchCase()(i)
 
-        for j in range(31, 8 * i - 1, -1):
+        r = list(range(31, 8 * i - 1, -1))
+        random.shuffle(r)
+        for j in r:
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=dw.AddNumber(2 ** (j - 8 * i)),
@@ -98,7 +104,9 @@ def _dwread(ptr):
 
         c.SeqCompute([(ut.EPD(0x6509B0), c.Add, 1)])
 
-        for j in range(8 * i - 1, -1, -1):
+        r = list(range(8 * i - 1, -1, -1))
+        random.shuffle(r)
+        for j in r:
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=dw.AddNumber(2 ** (j + 32 - 8 * i)),

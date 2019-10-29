@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from .. import allocator as ac
 from .. import variable as ev
 from .. import eudfunc as ef
@@ -152,8 +154,10 @@ def f_bitsplit(a):
 def _exp2_vv(n):
     ret = _exp2_vv._frets[0]
     ret << 0
-    for i in range(32):
-        rt.RawTrigger(conditions=[n == i], actions=[ret.SetNumber((2 ** i))])
+    r = list(range(32))
+    random.shuffle(r)
+    for i in r:
+        rt.RawTrigger(conditions=[n == i], actions=ret.SetNumber(2 ** i))
     # return ret
 
 

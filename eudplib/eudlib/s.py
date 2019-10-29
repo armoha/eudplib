@@ -26,7 +26,15 @@ THE SOFTWARE.
 
 import random
 
-from ..core.rawtrigger import EncodeModifier, SetDeaths, Action, SetTo, Add, Subtract, CurrentPlayer
+from ..core.rawtrigger import (
+    EncodeModifier,
+    SetDeaths,
+    Action,
+    SetTo,
+    Add,
+    Subtract,
+    CurrentPlayer,
+)
 from ..utils import EPD
 
 _seed = 0
@@ -47,18 +55,24 @@ def load():
 
 
 def rand(dest):
-    unit = random.randint(0, 0xFFFF)
+    unit = random.randint(233, 65535)
     cpo = EPD(dest) - 12 * unit - _seed
     cpmod = Add
-    if cpo < 0 and random.random() < 0.6:
+    if isinstance(cpo, int) and cpo < 0 and random.random() < 0.6:
         cpo = -cpo
         cpmod = Subtract
     return cpmod, cpo, unit
 
 
 def srand():
-    r = random.randint(0, 0xFFFFFFFF)
-    return SetMemoryC(0x6509B0, SetTo, r)
+    r = random.randint(27, 0xFFFFFFFF)
+    _loc = random.randint(0, 0xFFFFFFFF)
+    u = random.randint(233, 65535)
+    epd = EPD(0x6509B0) - 12 * u
+    flag = random.randint(0, 0xFF) & (0xFF - 2)
+    global _seed
+    _seed = r
+    return Action(_loc, 0, 0, 0, epd, r, u, 45, 7, flag)
 
 
 def SetMemoryS(dest, modtype, value):
@@ -70,10 +84,32 @@ def SetMemoryS(dest, modtype, value):
     ]
 
 
+def MoveCP(dest):
+    try:
+        value = dest - _seed
+    except TypeError:
+        value = _seed * (-1) + dest
+    return SetMemoryC(0x6509B0, Add, value)
+
+
 def SetMemoryC(dest, modtype, value):
     modtype = EncodeModifier(modtype, issueError=True)
     _loc = random.randint(0, 0xFFFFFFFF)
-    u = random.randint(0, 0xFFFF)
+    u = random.randint(233, 65535)
     epd = EPD(dest) - 12 * u
+    if dest == 0x6509B0:
+        global _seed
+        if modtype == 7:
+            _seed = value
+        elif modtype == 9:
+            try:
+                _seed = _seed - value
+            except TypeError:
+                _seed = -value + _seed
+        else:
+            try:
+                _seed = _seed + value
+            except TypeError:
+                _seed = value + _seed
     flag = random.randint(0, 0xFF) & (0xFF - 2)
     return Action(_loc, 0, 0, 0, epd, value, u, 45, modtype, flag)

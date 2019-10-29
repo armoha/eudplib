@@ -425,7 +425,7 @@ def SetMemoryX(dest, modtype, value, mask):
 
 
 def SetMemoryXEPD(epd, modtype, value, mask):
-    return SetDeathsX(dest, modtype, value, 0, mask)
+    return SetDeathsX(epd, modtype, value, 0, mask)
 
 
 def SetKills(Player, Modifier, Number, Unit):

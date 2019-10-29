@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from . import dwepdio as dwm, cpmemio as cpm, byterw as brw, modcurpl as cp
 from ... import core as c, ctrlstru as cs, utils as ut
 
@@ -42,7 +44,9 @@ def _lshift(a, b):
 def _wwriter(epd, subp, w):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
-    for i in range(3):
+    r = list(range(3))
+    random.shuffle(r)
+    for i in r:
         cs.EUDSwitchCase()(i)
         cs.DoActions(
             c.SetDeathsX(
@@ -83,7 +87,9 @@ def f_wwrite_epd(epd, subp, w):
 def _bwriter(epd, subp, b):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
-    for i in range(4):
+    r = list(range(4))
+    random.shuffle(r)
+    for i in r:
         cs.EUDSwitchCase()(i)
         cs.DoActions(
             c.SetDeathsX(
@@ -113,9 +119,13 @@ def f_wread_epd(epd, subp):
     w = c.EUDVariable()
     c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), w.SetNumber(0)])
     cs.EUDSwitch(subp)
-    for i in range(3):
+    r = list(range(3))
+    random.shuffle(r)
+    for i in r:
         cs.EUDSwitchCase()(i)
-        for j in range(8 * i, 8 * (i + 2)):
+        s = list(range(8 * i, 8 * (i + 2)))
+        random.shuffle(s)
+        for j in s:
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=w.AddNumber(2 ** (j - 8 * i)),
@@ -140,9 +150,13 @@ def f_bread_epd(epd, subp):
     b = c.EUDVariable()
     c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), b.SetNumber(0)])
     cs.EUDSwitch(subp)
-    for i in range(4):
+    r = list(range(4))
+    random.shuffle(r)
+    for i in r:
         cs.EUDSwitchCase()(i)
-        for j in range(8 * i, 8 * (i + 1)):
+        s = list(range(8 * i, 8 * (i + 1)))
+        random.shuffle(s)
+        for j in s:
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=b.AddNumber(2 ** (j - 8 * i)),

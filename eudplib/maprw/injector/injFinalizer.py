@@ -49,7 +49,7 @@ def _DispatchInlineCode(nextptr, trigepd, u):
     resetter = c.Forward()
     end = c.Forward()
 
-    v = random.randint(0, 65535)
+    v = random.randint(233, 65535)
     c.VProc(
         trigepd,
         [
@@ -142,7 +142,7 @@ def _FlipProp(trigepd):
         # we get it now.
         trigepd += 1
         nexttrig, nexttrigepd = sf.f_dwepdread_epd(trigepd)
-        u = random.randint(0, 65535)
+        u = random.randint(233, 65535)
         c.VProc(
             trigepd,
             [
@@ -209,7 +209,9 @@ def CreateInjectFinalizer(chkt, root):
         curtime = c.EUDVariable()
         tmcheckt = c.Forward()
 
-        for player in range(8):
+        r = list(range(8))
+        random.shuffle(r)
+        for player in r:
             trs = rtt._runner_start[player]
             tre = rtt._runner_end[player]
 
