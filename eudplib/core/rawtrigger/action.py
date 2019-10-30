@@ -53,7 +53,7 @@ class Action(ConstExpr):
 
     # fmt: off
     def __init__(self, locid1, strid, wavid, time, player1, player2,
-                 unitid, acttype, amount, flags, eudx=0):
+                 unitid, acttype, amount, flags, *, eudx=0):
         """
         See :mod:`eudplib.base.stocktrg` for stock actions list.
         """

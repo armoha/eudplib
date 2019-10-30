@@ -45,7 +45,7 @@ condition / actions.
 
 
 def Condition(
-    locid, player, amount, unitid, comparison, condtype, restype, flag, eudx=0
+    locid, player, amount, unitid, comparison, condtype, restype, flag, *, eudx=0
 ):
     if player < 0:
         player += 0x100000000  # EPD
@@ -70,7 +70,7 @@ def Condition(
 
 
 def Action(
-    locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags, eudx=0
+    locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags, *, eudx=0
 ):
     player1 &= 0xFFFFFFFF
     player2 &= 0xFFFFFFFF

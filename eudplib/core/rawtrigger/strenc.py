@@ -50,7 +50,7 @@ def EncodeAIScript(ais, issueError=False):
     return ais
 
 
-def _EncodeAny(t, f, dl, s, issueError):
+def _EncodeAny(t, f, dl, s, issueError, *, dlo=0):
     s = ut.unProxy(s)
 
     if isinstance(s, str) or isinstance(s, bytes):
@@ -59,7 +59,10 @@ def _EncodeAny(t, f, dl, s, issueError):
         except KeyError:
             if isinstance(s, str):
                 try:
-                    return dl[s]
+                    ret = dl[s]
+                    if dlo:
+                        ret += dlo
+                    return ret
                 except KeyError:
                     sl = "Cannot encode string %s as %s." % (s, t)
                     for match in difflib.get_close_matches(s, dl.keys()):
@@ -78,14 +81,11 @@ def _EncodeAny(t, f, dl, s, issueError):
 
 
 def EncodeLocationIndex(loc, issueError=False):
-    return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc, issueError)
+    return _EncodeAny("locationIndex", GetLocationIndex, DefLocationDict, loc, issueError)
 
 
 def EncodeLocation(loc, issueError=False):
-    loc_index = EncodeLocationIndex(loc, issueError)
-    if isinstance(loc_index, int):
-        loc_index += 1
-    return loc_index
+    return _EncodeAny("location", lambda s: GetLocationIndex(s) + 1, DefLocationDict, loc, issueError, dlo=1)
 
 
 def EncodeString(s, issueError=False):
