@@ -151,11 +151,12 @@ def _FlipProp(trigepd):
             ],
         )
 
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.Subtract, 8, u))
-        c.RawTrigger(
-            conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 4, u),  # Preserved
-            actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 8, u),  # Disable now
-        )
+        if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 4, u)):  # Preserved
+            # Disable now
+            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 8, u))
+        if cs.EUDElse()():
+            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.Subtract, 8, u))
+        cs.EUDEndIf()
 
         # Dispatch inline code
         if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 0x10000000, u)):
