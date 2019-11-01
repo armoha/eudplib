@@ -29,6 +29,7 @@ import random
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
+from ...trigtrg.runtrigtrg import _runner_cp
 
 
 def InlineCodifyBinaryTrigger(bTrigger):
@@ -70,17 +71,30 @@ def InlineCodifyBinaryTrigger(bTrigger):
     if c.PushTriggerScope():
         tStart = c.RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
 
-        cp = sf.f_getcurpl()
-        cs.EUDSwitch(cp)
-        r = list(range(8))
-        random.shuffle(r)
-        for player in r:
-            if playerExecutesTrigger[player]:
-                if cs.EUDSwitchCase()(player):
+        cp = _runner_cp
+        
+        # case 1. AllPlayers
+        if all(playerExecutesTrigger[player] for player in range(8)):
+            c.RawTrigger(trigSection=bTrigger)
+        else:
+            # case 2. continuous
+            plfo = [i for i, x in enumerate(playerExecutesTrigger) if x]
+            if len(plfo) >= 1 and max(plfo) - min(plfo) == len(plfo) - 1:
+                if cs.EUDIf()([cp >= min(plfo), cp <= max(plfo)]):
                     c.RawTrigger(trigSection=bTrigger)
-                    cs.EUDBreak()
+                cs.EUDEndIf()
+            else:
+                # case 3. else
+                cs.EUDSwitch(cp)
+                r = list(range(8))
+                random.shuffle(r)
+                for player in r:
+                    if playerExecutesTrigger[player]:
+                        if cs.EUDSwitchCase()(player):
+                            c.RawTrigger(trigSection=bTrigger)
+                            cs.EUDBreak()
 
-        cs.EUDEndSwitch()
+                cs.EUDEndSwitch()
 
         tEnd = c.RawTrigger()
     c.PopTriggerScope()

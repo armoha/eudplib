@@ -41,7 +41,7 @@ import random
 """
 
 
-def _DispatchInlineCode(nextptr, trigepd, u):
+def _DispatchInlineCode(nextptr, trigepd, prop):
     cs0 = c.Forward()  # set cs0+20 to codeStart
     cs1 = c.Forward()  # set cs1+20 to ut.EPD(codeEnd) + 1
     cs2 = c.Forward()  # set cs2+20 to cs_a0_epd + 4
@@ -53,7 +53,7 @@ def _DispatchInlineCode(nextptr, trigepd, u):
     c.VProc(
         trigepd,
         [
-            trigepd.AddNumber(-(8 + 320 + 2048) // 4 + 2 + 12 * (u - v)),
+            trigepd.AddNumber(-prop + 2 - 12 * v),
             trigepd.SetDest(ut.EPD(0x6509B0)),
         ],
     )
@@ -86,7 +86,7 @@ def _DispatchInlineCode(nextptr, trigepd, u):
     c.VProc(
         [trigepd, nextptr],
         [
-            trigepd.AddNumber(-1),
+            trigepd.AddNumber(12 * v - 1),
             # Reset t's nextptr
             resetter << c.SetNextPtr(0, 0),
             # SetNextPtr for this trigger
@@ -143,10 +143,11 @@ def _FlipProp(trigepd):
         trigepd += 1
         nexttrig, nexttrigepd = sf.f_dwepdread_epd(trigepd)
         u = random.randint(233, 65535)
+        prop = (8 + 320 + 2048) // 4 - 12 * u
         c.VProc(
             trigepd,
             [
-                trigepd.AddNumber((8 + 320 + 2048) // 4 - 1 - 12 * u),
+                trigepd.AddNumber(prop - 1),
                 trigepd.SetDest(ut.EPD(0x6509B0)),
             ],
         )
@@ -161,7 +162,7 @@ def _FlipProp(trigepd):
         # Dispatch inline code
         if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 0x10000000, u)):
             cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 4, u))  # Preserve
-            _DispatchInlineCode(nexttrig, trigepd, u)
+            _DispatchInlineCode(nexttrig, trigepd, prop)
         cs.EUDEndIf()
 
         trigepd << nexttrigepd
