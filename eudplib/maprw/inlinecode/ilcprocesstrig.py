@@ -28,7 +28,11 @@ from ...trigtrg import trigtrg as tt
 from random import random
 
 from .ilccompile import ComputeBaseInlineCodeGlobals, CompileInlineCode
-from .btInliner import InlineCodifyBinaryTrigger
+from .btInliner import (
+    GetExecutingPlayers,
+    InlineCodifyBinaryTrigger,
+    InlineCodifyMultipleBinaryTriggers,
+)
 
 
 _inlineCodes = []
@@ -50,6 +54,8 @@ def PreprocessInlineCode(chkt):
 
 def PreprocessTrigSection(trigSection):
     """ Fetch inline codes & compiles them """
+    if _inliningRate == 1:
+        return ConsecutiveInlineTrigSection(trigSection)
     ComputeBaseInlineCodeGlobals()
 
     inlineCodes = []
@@ -81,6 +87,36 @@ def PreprocessTrigSection(trigSection):
 
     So we need 'normal' trigger at the last of TRIG triggers for every player.
     """
+    trigSegments.append(tt.Trigger(players=[tt.AllPlayers]))
+
+    trigSection = b"".join(trigSegments)
+    return inlineCodes, trigSection
+
+
+def ConsecutiveInlineTrigSection(trigSection):
+    inlineCodes = []
+    trigSegments = []
+    pTriggers = ([], [], [], [], [], [], [], [])
+    for i in range(0, len(trigSection), 2400):
+        trigSegment = trigSection[i : i + 2400]
+        if len(trigSegment) != 2400:
+            continue
+
+        propv = ut.b2i4(trigSegment, 320 + 2048)
+
+        decoded = DispatchInlineCode(inlineCodes, trigSegment)
+        errMsg = "Consecutive inlining is not possible for this basemap"
+        ut.ep_assert(not decoded and propv < 0x80000000, errMsg)
+
+        playerExecutesTrigger = GetExecutingPlayers(trigSegment)
+        for p in range(8):
+            if playerExecutesTrigger[p]:
+                pTriggers[p].append(trigSegment)
+    for p in range(8):
+        if pTriggers[p]:
+            func = InlineCodifyMultipleBinaryTriggers(pTriggers[p])
+            trigSegment = CreateInlineCodeDispatcher(inlineCodes, func, 1 << p)
+            trigSegments.append(trigSegment)
     trigSegments.append(tt.Trigger(players=[tt.AllPlayers]))
 
     trigSection = b"".join(trigSegments)

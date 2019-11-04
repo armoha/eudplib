@@ -32,18 +32,8 @@ from ... import eudlib as sf
 from ...trigtrg.runtrigtrg import _runner_cp
 
 
-def InlineCodifyBinaryTrigger(bTrigger):
-    """ Inline codify raw(binary) trigger data.
-
-    For minimal protection, eudplib make some of the trig-triggers to
-    eudplib trigger. This function makes eudplib trigger out of raw
-    binary trigger stream.
-
-    :param bTrigger: Binary trigger data
-    :returns: (tStart, tEnd) pair, as being used by tEnd
-    """
-
-    # 1. Get executing players of the trigger.
+def GetExecutingPlayers(bTrigger):
+    # Get executing players of the trigger.
     # If all player executes it, then pass it
     if bTrigger[320 + 2048 + 4 + 17] != 0:
         playerExecutesTrigger = [True] * 8
@@ -65,6 +55,23 @@ def InlineCodifyBinaryTrigger(bTrigger):
                 for player in range(8):
                     if playerForce[player] == force:
                         playerExecutesTrigger[player] = True
+    return playerExecutesTrigger
+
+
+def InlineCodifyBinaryTrigger(bTrigger):
+    """ Inline codify raw(binary) trigger data.
+
+    For minimal protection, eudplib make some of the trig-triggers to
+    eudplib trigger. This function makes eudplib trigger out of raw
+    binary trigger stream.
+
+    :param bTrigger: Binary trigger data
+    :returns: (tStart, tEnd) pair, as being used by tEnd
+    """
+
+    # 1. Get executing players of the trigger.
+    # If all player executes it, then pass it
+    playerExecutesTrigger = GetExecutingPlayers(bTrigger)
 
     # 2. Create function body
 
@@ -80,7 +87,7 @@ def InlineCodifyBinaryTrigger(bTrigger):
             if actionbyte in (4, 7):
                 noWaitPreserve = False
                 break
-        
+
         if not bTrigger[320 + 2048] & 4:
             noWaitPreserve = False
 
@@ -104,6 +111,31 @@ def InlineCodifyBinaryTrigger(bTrigger):
             cs.EUDEndSwitch()
 
             tEnd = c.RawTrigger()
+    c.PopTriggerScope()
+
+    return (tStart, tEnd)
+
+
+def InlineCodifyMultipleBinaryTriggers(bTriggers):
+    """ Inline codify raw(binary) trigger data.
+
+    For minimal protection, eudplib make some of the trig-triggers to
+    eudplib trigger. This function makes eudplib trigger out of raw
+    binary trigger stream.
+
+    :param bTrigger: Binary trigger data
+    :returns: (tStart, tEnd) pair, as being used by tEnd
+    """
+
+    # Create function body
+
+    if c.PushTriggerScope():
+        tStart = c.RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
+
+        for bTrigger in bTriggers:
+            c.RawTrigger(trigSection=bTrigger)
+
+        tEnd = c.RawTrigger()
     c.PopTriggerScope()
 
     return (tStart, tEnd)
