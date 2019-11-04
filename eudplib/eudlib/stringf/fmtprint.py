@@ -144,7 +144,7 @@ def _format_args(format_string, *args):
 
 def f_sprintf(dst, format_string, *args, EOS=True, encoding="UTF-8"):
     fmtargs = _format_args(format_string, *args)
-    f_dbstr_print(dst, *fmtargs, EOS=EOS, encoding=encoding)
+    return f_dbstr_print(dst, *fmtargs, EOS=EOS, encoding=encoding)
 
 
 def f_sprintf_cp(format_string, *args, EOS=True, encoding="UTF-8"):

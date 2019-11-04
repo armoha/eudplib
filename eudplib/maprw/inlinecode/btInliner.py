@@ -72,15 +72,15 @@ def InlineCodifyBinaryTrigger(bTrigger):
         tStart = c.RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
 
         cp = _runner_cp
-        
+        executingPlayers = [p for p, e in enumerate(playerExecutesTrigger) if e]
+
         # case 1. AllPlayers
         if all(playerExecutesTrigger[player] for player in range(8)):
             c.RawTrigger(trigSection=bTrigger)
-        else:
-            # case 2. continuous
-            plfo = [i for i, x in enumerate(playerExecutesTrigger) if x]
-            if len(plfo) >= 1 and max(plfo) - min(plfo) == len(plfo) - 1:
-                if cs.EUDIf()([cp >= min(plfo), cp <= max(plfo)]):
+        elif len(executingPlayers) >= 1:
+            # case 2. consecutive
+            if max(executingPlayers) - min(executingPlayers) == len(executingPlayers) - 1:
+                if cs.EUDIf()([cp >= min(executingPlayers), cp <= max(executingPlayers)]):
                     c.RawTrigger(trigSection=bTrigger)
                 cs.EUDEndIf()
             else:

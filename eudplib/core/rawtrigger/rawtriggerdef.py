@@ -116,12 +116,14 @@ class RawTrigger(EUDObject):
         # Uses trigger segment for initialization
         # NOTE : player information is lost inside eudplib.
         else:
-            self._conditions = [
-                Db(trigSection[i * 20 : i * 20 + 20]) for i in range(16)
-            ]
-            self._actions = [
-                Db(trigSection[320 + i * 32 : 320 + i * 32 + 32]) for i in range(64)
-            ]
+            self._conditions, self._actions = [], []
+            for i in range(16):
+                if trigSection[i * 20 + 15] >= 1:
+                    self._conditions.append(Db(trigSection[i * 20 : i * 20 + 20]))
+            for i in range(64):
+                if trigSection[320 + i * 32 + 26] >= 1:
+                    action = Db(trigSection[320 + i * 32 : 320 + i * 32 + 32])
+                    self._actions.append(action)
             self.preserved = bool(trigSection[320 + 2048] & 4)
 
     def GetNextPtrMemory(self):
