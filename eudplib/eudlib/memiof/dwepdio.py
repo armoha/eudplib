@@ -37,7 +37,7 @@ from ...core.variable.evcommon import _ev
 @c.EUDFunc
 def f_dwepdread_epd(targetplayer):
     ptr, epd = f_dwepdread_epd._frets
-    u = random.randint(233, 65535)
+    u = random.randint(234, 65535)
     acts = [
         ptr.SetNumber(0),
         epd.SetNumber(ut.EPD(0)),
@@ -66,7 +66,7 @@ def f_dwepdread_epd(targetplayer):
 @c.EUDFunc
 def f_dwread_epd(targetplayer):
     ptr = f_dwread_epd._frets[0]
-    u = random.randint(233, 65535)
+    u = random.randint(234, 65535)
     acts = [
         ptr.SetNumber(0),
         targetplayer.AddNumber(-12 * u),

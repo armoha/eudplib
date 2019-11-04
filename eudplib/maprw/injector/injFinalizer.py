@@ -49,7 +49,7 @@ def _DispatchInlineCode(nextptr, trigepd, prop):
     resetter = c.Forward()
     end = c.Forward()
 
-    v = random.randint(233, 65535)
+    v = random.randint(234, 65535)
     c.VProc(
         trigepd,
         [
@@ -142,7 +142,7 @@ def _FlipProp(trigepd):
         # we get it now.
         trigepd += 1
         nexttrig, nexttrigepd = sf.f_dwepdread_epd(trigepd)
-        u = random.randint(233, 65535)
+        u = random.randint(234, 65535)
         prop = (8 + 320 + 2048) // 4 - 12 * u
         c.VProc(
             trigepd,

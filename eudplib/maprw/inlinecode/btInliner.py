@@ -72,31 +72,38 @@ def InlineCodifyBinaryTrigger(bTrigger):
         tStart = c.RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
 
         cp = _runner_cp
-        executingPlayers = [p for p, e in enumerate(playerExecutesTrigger) if e]
+        execP = [p for p, e in enumerate(playerExecutesTrigger) if e]
+        noWaitPreserve = True
 
-        # case 1. AllPlayers
-        if all(playerExecutesTrigger[player] for player in range(8)):
-            c.RawTrigger(trigSection=bTrigger)
-        elif len(executingPlayers) >= 1:
-            # case 2. consecutive
-            if max(executingPlayers) - min(executingPlayers) == len(executingPlayers) - 1:
-                if cs.EUDIf()([cp >= min(executingPlayers), cp <= max(executingPlayers)]):
-                    c.RawTrigger(trigSection=bTrigger)
-                cs.EUDEndIf()
-            else:
-                # case 3. else
-                cs.EUDSwitch(cp)
-                r = list(range(8))
-                random.shuffle(r)
-                for player in r:
-                    if playerExecutesTrigger[player]:
-                        if cs.EUDSwitchCase()(player):
-                            c.RawTrigger(trigSection=bTrigger)
-                            cs.EUDBreak()
+        for i in range(64):
+            actionbyte = bTrigger[320 + 32 * i + 26]
+            if actionbyte in (4, 7):
+                noWaitPreserve = False
+                break
+        
+        if not bTrigger[320 + 2048] & 4:
+            noWaitPreserve = False
 
-                cs.EUDEndSwitch()
+        if noWaitPreserve and len(execP) == 8:
+            tEnd = c.RawTrigger(trigSection=bTrigger)
+        if noWaitPreserve and max(execP) - min(execP) == len(execP) - 1:
+            if cs.EUDIf()([cp >= min(execP), cp <= max(execP)]):
+                c.RawTrigger(trigSection=bTrigger)
+            cs.EUDEndIf()
+            tEnd = c.RawTrigger()
+        else:
+            cs.EUDSwitch(cp)
+            r = list(range(8))
+            random.shuffle(r)
+            for player in r:
+                if playerExecutesTrigger[player]:
+                    if cs.EUDSwitchCase()(player):
+                        c.RawTrigger(trigSection=bTrigger)
+                        cs.EUDBreak()
 
-        tEnd = c.RawTrigger()
+            cs.EUDEndSwitch()
+
+            tEnd = c.RawTrigger()
     c.PopTriggerScope()
 
     return (tStart, tEnd)

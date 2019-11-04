@@ -55,31 +55,26 @@ def load():
 
 
 def rand(dest):
-    unit = random.randint(233, 65535)
+    unit = random.randint(234, 65535)
     cpo = EPD(dest) - 12 * unit - _seed
-    cpmod = Add
-    if isinstance(cpo, int) and cpo < 0 and random.random() < 0.6:
-        cpo = -cpo
-        cpmod = Subtract
-    return cpmod, cpo, unit
+    return cpo, unit
 
 
 def srand():
     r = random.randint(27, 0xFFFFFFFF)
-    _loc = random.randint(0, 0xFFFFFFFF)
-    u = random.randint(233, 65535)
+    _loc = random.randint(1, 0xFFFFFFFF)
+    u = random.randint(234, 65535)
     epd = EPD(0x6509B0) - 12 * u
-    flag = random.randint(0, 0xFF) & (0xFF - 2)
     global _seed
     _seed = r
-    return Action(_loc, 0, 0, 0, epd, r, u, 45, 7, flag)
+    return Action(_loc, 0, 0, 0, epd, r, u, 45, 7, 20)
 
 
 def SetMemoryS(dest, modtype, value):
     modtype = EncodeModifier(modtype, issueError=True)
-    cpmod, cpo, unit = rand(dest)
+    cpo, unit = rand(dest)
     return [
-        SetMemoryC(0x6509B0, cpmod, cpo),
+        SetMemoryC(0x6509B0, Add, cpo),
         SetDeaths(CurrentPlayer, modtype, value, unit),
     ]
 
@@ -95,7 +90,7 @@ def MoveCP(dest):
 def SetMemoryC(dest, modtype, value):
     modtype = EncodeModifier(modtype, issueError=True)
     _loc = random.randint(0, 0xFFFFFFFF)
-    u = random.randint(233, 65535)
+    u = random.randint(234, 65535)
     epd = EPD(dest) - 12 * u
     if dest == 0x6509B0:
         global _seed

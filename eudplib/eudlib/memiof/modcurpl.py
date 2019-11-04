@@ -59,7 +59,7 @@ def _f_updatecpcache():
     r = list(range(31, -1, -1))
     random.shuffle(r)
     for i in r:
-        u = random.randint(233, 65535)
+        u = random.randint(234, 65535)
         c.RawTrigger(
             conditions=c.DeathsX(ut.EPD(0x6509B0) - 12 * u, c.AtLeast, 1, u, 2 ** i),
             actions=SetMemoryC(cpcache.getValueAddr(), c.Add, 2 ** i),
