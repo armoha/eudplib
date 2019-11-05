@@ -54,9 +54,9 @@ def PreprocessInlineCode(chkt):
 
 def PreprocessTrigSection(trigSection):
     """ Fetch inline codes & compiles them """
+    ComputeBaseInlineCodeGlobals()
     if _inliningRate == 1:
         return ConsecutiveInlineTrigSection(trigSection)
-    ComputeBaseInlineCodeGlobals()
 
     inlineCodes = []
     trigSegments = []
@@ -97,26 +97,37 @@ def ConsecutiveInlineTrigSection(trigSection):
     inlineCodes = []
     trigSegments = []
     pTriggers = ([], [], [], [], [], [], [], [])
+
+    def appendPTriggers(p):
+        if pTriggers[p]:
+            func = InlineCodifyMultipleBinaryTriggers(pTriggers[p])
+            trigSegment = CreateInlineCodeDispatcher(inlineCodes, func, 1 << p)
+            trigSegments.append(trigSegment)
+            pTriggers[p].clear()
+
     for i in range(0, len(trigSection), 2400):
         trigSegment = trigSection[i : i + 2400]
         if len(trigSegment) != 2400:
             continue
 
         propv = ut.b2i4(trigSegment, 320 + 2048)
+        playerExecutesTrigger = GetExecutingPlayers(trigSegment)
 
         decoded = DispatchInlineCode(inlineCodes, trigSegment)
-        errMsg = "Consecutive inlining is not possible for this basemap"
-        ut.ep_assert(not decoded and propv < 0x80000000, errMsg)
+        if decoded:
+            trigSegment = decoded
 
-        playerExecutesTrigger = GetExecutingPlayers(trigSegment)
+        elif propv < 0x80000000:
+            for p in range(8):
+                if playerExecutesTrigger[p]:
+                    pTriggers[p].append(trigSegment)
+            continue
         for p in range(8):
             if playerExecutesTrigger[p]:
-                pTriggers[p].append(trigSegment)
+                appendPTriggers(p)
+        trigSegments.append(trigSegment)
     for p in range(8):
-        if pTriggers[p]:
-            func = InlineCodifyMultipleBinaryTriggers(pTriggers[p])
-            trigSegment = CreateInlineCodeDispatcher(inlineCodes, func, 1 << p)
-            trigSegments.append(trigSegment)
+        appendPTriggers(p)
     trigSegments.append(tt.Trigger(players=[tt.AllPlayers]))
 
     trigSection = b"".join(trigSegments)
