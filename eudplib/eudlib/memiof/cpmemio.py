@@ -60,14 +60,14 @@ def f_dwepdread_cp(cpo, **kwargs):
 def f_dwread_cp(cpo, **kwargs):
     ret = kwargs.get("ret")
     if ret is not None:
-        ret.append(_ev[0])
+        ret.append(_ev[4])
     return f_dwepdread_cp(cpo, **kwargs)[0]
 
 
 def f_epdread_cp(cpo, **kwargs):
     ret = kwargs.get("ret")
     if ret is not None:
-        ret.insert(0, _ev[0])
+        ret.insert(0, _ev[4])
     return f_dwepdread_cp(cpo, **kwargs)[1]
 
 
@@ -154,54 +154,48 @@ def f_bread_cp(cpo, subp):
 def f_dwwrite_cp(cpo, value):
     cs.DoActions(
         [
-            [
-                c.SetMemory(0x6509B0, c.Add, cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0),
-            [
-                c.SetMemory(0x6509B0, c.Add, -cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-        ]
+            c.SetMemory(0x6509B0, c.Add, cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
+        c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0),
+        [
+            c.SetMemory(0x6509B0, c.Add, -cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
     )
 
 
 def f_dwadd_cp(cpo, value):
     cs.DoActions(
         [
-            [
-                c.SetMemory(0x6509B0, c.Add, cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-            c.SetDeaths(c.CurrentPlayer, c.Add, value, 0),
-            [
-                c.SetMemory(0x6509B0, c.Add, -cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-        ]
+            c.SetMemory(0x6509B0, c.Add, cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
+        c.SetDeaths(c.CurrentPlayer, c.Add, value, 0),
+        [
+            c.SetMemory(0x6509B0, c.Add, -cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
     )
 
 
 def f_dwsubtract_cp(cpo, value):
     cs.DoActions(
         [
-            [
-                c.SetMemory(0x6509B0, c.Add, cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-            c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0),
-            [
-                c.SetMemory(0x6509B0, c.Add, -cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-        ]
+            c.SetMemory(0x6509B0, c.Add, cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
+        c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0),
+        [
+            c.SetMemory(0x6509B0, c.Add, -cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
     )
 
 
@@ -232,23 +226,22 @@ def f_wwrite_cp(cpo, subp, w):
     try:
         cs.DoActions(
             [
-                [
-                    c.SetMemory(0x6509B0, c.Add, cpo)
-                    if not isinstance(cpo, int) or cpo != 0
-                    else []
-                ],
-                c.SetDeathsX(
-                    c.CurrentPlayer,
-                    c.SetTo,
-                    w * (256 ** subp),
-                    0,
-                    65535 * 2 ** (8 * subp),
-                )[
-                    c.SetMemory(0x6509B0, c.Add, -cpo)
-                    if not isinstance(cpo, int) or cpo != 0
-                    else []
-                ],
-            ]
+                c.SetMemory(0x6509B0, c.Add, cpo)
+                if not isinstance(cpo, int) or cpo != 0
+                else []
+            ],
+            c.SetDeathsX(
+                c.CurrentPlayer,
+                c.SetTo,
+                w * (256 ** subp),
+                0,
+                65535 * 2 ** (8 * subp),
+            ),
+            [
+                c.SetMemory(0x6509B0, c.Add, -cpo)
+                if not isinstance(cpo, int) or cpo != 0
+                else []
+            ],
         )
     except (TypeError):
         if not isinstance(cpo, int) or cpo != 0:
@@ -279,23 +272,22 @@ def f_bwrite_cp(cpo, subp, b):
     try:
         cs.DoActions(
             [
-                [
-                    c.SetMemory(0x6509B0, c.Add, cpo)
-                    if not isinstance(cpo, int) or cpo != 0
-                    else []
-                ],
-                c.SetDeathsX(
-                    c.CurrentPlayer,
-                    c.SetTo,
-                    b * (256 ** subp),
-                    0,
-                    255 * 2 ** (8 * subp),
-                )[
-                    c.SetMemory(0x6509B0, c.Add, -cpo)
-                    if not isinstance(cpo, int) or cpo != 0
-                    else []
-                ],
-            ]
+                c.SetMemory(0x6509B0, c.Add, cpo)
+                if not isinstance(cpo, int) or cpo != 0
+                else []
+            ],
+            c.SetDeathsX(
+                c.CurrentPlayer,
+                c.SetTo,
+                b * (256 ** subp),
+                0,
+                255 * 2 ** (8 * subp),
+            ),
+            [
+                c.SetMemory(0x6509B0, c.Add, -cpo)
+                if not isinstance(cpo, int) or cpo != 0
+                else []
+            ],
         )
     except (TypeError):
         if not isinstance(cpo, int) or cpo != 0:
