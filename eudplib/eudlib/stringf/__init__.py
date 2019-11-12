@@ -35,6 +35,8 @@ from .strbuffer import (
     GetGlobalStringBuffer,
     f_gettextptr,
     f_simpleprint,
+    f_println,
+    f_printAt,
 )
 
 from .strfunc import f_strcpy, f_strcmp, f_strlen, f_strlen_epd, f_strnstr

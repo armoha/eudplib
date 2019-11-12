@@ -111,7 +111,6 @@ class StringBuffer:
         c.PushTriggerScope()
         cls._method_template << c.NextTrigger()
         cp = f_getcurpl()
-        c.VProc(cp, cp.SetDest(ut.EPD(cls._cpbranch) + 4))
         cls._cpbranch << c.RawTrigger(
             nextptr=0,
             conditions=IsUserCP(),
@@ -447,3 +446,13 @@ def f_simpleprint(*args, spaced=True):
     gsb = GetGlobalStringBuffer()
     gsb.print(*args)
     f_setcurpl(oldcp)
+
+
+def f_println(format_string, *args):
+    gsb = GetGlobalStringBuffer()
+    gsb.printf(format_string, *args)
+
+
+def f_printAt(line, format_string, *args):
+    gsb = GetGlobalStringBuffer()
+    gsb.printfAt(line, format_string, *args)
