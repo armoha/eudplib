@@ -37,7 +37,7 @@ from .btInliner import (
 
 
 _inlineCodes = []
-_inliningRate = 0
+_inliningRate = 1
 
 
 def PRT_SetInliningRate(rate):
