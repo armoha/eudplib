@@ -31,6 +31,8 @@ from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ...trigtrg.runtrigtrg import _runner_cp
 
+sharedTriggers = []
+
 
 def GetExecutingPlayers(bTrigger):
     # Get executing players of the trigger.
@@ -58,6 +60,19 @@ def GetExecutingPlayers(bTrigger):
     return playerExecutesTrigger
 
 
+def NoWaitAndPreserved(bTrigger):
+    execOnce = True
+    for i in range(64):
+        actionbyte = bTrigger[320 + 32 * i + 26]
+        if actionbyte in (4, 7):  # Wait or Transmission
+            return False
+        elif actionbyte == 3:  # PreserveTrigger
+            execOnce = False
+    if execOnce and not (bTrigger[320 + 2048] & 4):
+        return False
+    return True
+
+
 def InlineCodifyBinaryTrigger(bTrigger):
     """ Inline codify raw(binary) trigger data.
 
@@ -80,16 +95,7 @@ def InlineCodifyBinaryTrigger(bTrigger):
 
         cp = _runner_cp
         execP = [p for p, e in enumerate(playerExecutesTrigger) if e]
-        noWaitPreserve = True
-
-        for i in range(64):
-            actionbyte = bTrigger[320 + 32 * i + 26]
-            if actionbyte in (4, 7):
-                noWaitPreserve = False
-                break
-
-        if not bTrigger[320 + 2048] & 4:
-            noWaitPreserve = False
+        noWaitPreserve = NoWaitAndPreserved(bTrigger)
 
         if noWaitPreserve and len(execP) == 8:
             tEnd = c.RawTrigger(trigSection=bTrigger)
@@ -116,6 +122,14 @@ def InlineCodifyBinaryTrigger(bTrigger):
     return (tStart, tEnd)
 
 
+def TryToShareTrigger(bTrigger):
+    playerExecutesTrigger = GetExecutingPlayers(bTrigger)
+    if NoWaitAndPreserved(bTrigger) and playerExecutesTrigger.count(True) >= 2:
+        sharedTriggers.append(bTrigger)
+        return len(sharedTriggers) - 1
+    return bTrigger
+
+
 def InlineCodifyMultipleBinaryTriggers(bTriggers):
     """ Inline codify raw(binary) trigger data.
 
@@ -129,13 +143,50 @@ def InlineCodifyMultipleBinaryTriggers(bTriggers):
 
     # Create function body
 
+    firstTrigger = None
+    tStartActions = [c.SetDeaths(0, c.SetTo, 0, 0)]
+    b2s = False
+
     if c.PushTriggerScope():
-        tStart = c.RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
-
+        nextTrigger = c.Forward()
         for bTrigger in bTriggers:
-            c.RawTrigger(trigSection=bTrigger)
-
+            if isinstance(bTrigger, bytes):
+                bTrigger = c.RawTrigger(trigSection=bTrigger)
+                if firstTrigger is None:
+                    firstTrigger = bTrigger
+                nextTrigger << bTrigger
+                nextTrigger = c.Forward()
+                b2s = True
+            elif isinstance(bTrigger, int):
+                sTrigger = sharedTriggers[bTrigger]
+                if isinstance(sTrigger, bytes):
+                    sTrigger = c.RawTrigger(trigSection=sTrigger)
+                    sharedTriggers[bTrigger] = sTrigger
+                elif isinstance(sTrigger, c.RawTrigger):
+                    if b2s:
+                        c.SetNextTrigger(sTrigger)
+                else:
+                    raise TypeError()
+                nextTrigger << sTrigger
+                nextTrigger = c.Forward()
+                tStartActions.append(c.SetNextPtr(sTrigger, nextTrigger))
+                if firstTrigger is None:
+                    firstTrigger = sTrigger
+                b2s = False
+            else:
+                raise TypeError()
         tEnd = c.RawTrigger()
+        nextTrigger << tEnd
+    c.PopTriggerScope()
+
+    if c.PushTriggerScope():
+        tStart = c.Forward()
+        tStart << c.NextTrigger()
+
+        cs.DoActions(tStartActions)
+
+        c.SetNextTrigger(firstTrigger)
+
     c.PopTriggerScope()
 
     return (tStart, tEnd)

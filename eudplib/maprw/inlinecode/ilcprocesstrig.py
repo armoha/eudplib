@@ -30,6 +30,7 @@ from random import random
 from .ilccompile import ComputeBaseInlineCodeGlobals, CompileInlineCode
 from .btInliner import (
     GetExecutingPlayers,
+    TryToShareTrigger,
     InlineCodifyBinaryTrigger,
     InlineCodifyMultipleBinaryTriggers,
 )
@@ -118,6 +119,7 @@ def ConsecutiveInlineTrigSection(trigSection):
             trigSegment = decoded
 
         elif propv < 0x80000000:
+            trigSegment = TryToShareTrigger(trigSegment)
             for p in range(8):
                 if playerExecutesTrigger[p]:
                     pTriggers[p].append(trigSegment)
