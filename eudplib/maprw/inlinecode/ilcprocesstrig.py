@@ -30,6 +30,7 @@ from random import random
 from .ilccompile import ComputeBaseInlineCodeGlobals, CompileInlineCode
 from .btInliner import (
     GetExecutingPlayers,
+    GetTriggerSize,
     TryToShareTrigger,
     InlineCodifyBinaryTrigger,
     InlineCodifyMultipleBinaryTriggers,
@@ -38,6 +39,7 @@ from .btInliner import (
 
 _inlineCodes = []
 _inliningRate = 1
+_cutoffRate = [1 + (i - 2) / 3 for i in range(9)]
 
 
 def PRT_SetInliningRate(rate):
@@ -119,7 +121,17 @@ def ConsecutiveInlineTrigSection(trigSection):
             trigSegment = decoded
 
         elif propv < 0x80000000:
-            trigSegment = TryToShareTrigger(trigSegment)
+            pCount = playerExecutesTrigger.count(True)
+            if pCount >= 2:
+                trigSegment = TryToShareTrigger(trigSegment)
+                if isinstance(trigSegment, bytes):
+                    size = GetTriggerSize(trigSegment)
+                    if size * pCount * _cutoffRate[pCount] > 2400:
+                        for p in range(8):
+                            if playerExecutesTrigger[p]:
+                                appendPTriggers(p)
+                        trigSegments.append(trigSegment)
+                        continue
             for p in range(8):
                 if playerExecutesTrigger[p]:
                     pTriggers[p].append(trigSegment)
