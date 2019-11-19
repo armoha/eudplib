@@ -59,6 +59,7 @@ def InitStringMap(chkt):
     unitmap = StringIdMap()
     locmap = StringIdMap()
     swmap = StringIdMap()
+    init_chkt = [chkt, unitmap, locmap, swmap]
 
     try:
         strx = chkt.getsection("STRx")
@@ -66,14 +67,10 @@ def InitStringMap(chkt):
         pass
     else:
         strsection = "STRx"
-        strmap = tblformat.TBL(
-            strx, [chkt, unitmap, locmap, swmap], load_entry=4, save_entry=4
-        )
+        strmap = tblformat.TBL(strx, init_chkt, load_entry=4, save_entry=4)
         return
     strsection = "STRx"
-    strmap = tblformat.TBL(
-        chkt.getsection("STR"), [chkt, unitmap, locmap, swmap], save_entry=4
-    )
+    strmap = tblformat.TBL(chkt.getsection("STR"), init_chkt, save_entry=4)
 
 
 def GetLocationIndex(l):

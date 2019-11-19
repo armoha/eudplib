@@ -193,9 +193,7 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append(
-                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
-                )
+                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
         constAssigns = [
             (farg, bt.SetTo, arg)
             for farg, arg in zip(self._fargs, args)
