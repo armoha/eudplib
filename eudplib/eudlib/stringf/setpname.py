@@ -33,6 +33,7 @@ from ..memiof import (
     f_memcmp,
 )
 from .eudprint import f_dbstr_print, ptr2s, epd2s
+from .fmtprint import _format_args
 from .cpprint import f_cpstr_print, PName
 from .strfunc import f_strlen_epd
 from ..utilf import (
@@ -178,6 +179,11 @@ def _OptimizeSetPName():
     _end << c.NextTrigger()
     end_optimize << c.RawTrigger()
     c.PopTriggerScope()
+
+
+def SetPNamef(player, format_string, *args):
+    fmtargs = _format_args(format_string, *args)
+    SetPName(player, *fmtargs)
 
 
 def SetPName(player, *name):

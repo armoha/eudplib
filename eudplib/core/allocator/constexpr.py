@@ -91,6 +91,9 @@ class ConstExpr:
         ut.ep_assert(4 % k == 0 and self.rlocmode == 4)
         return self.offset % k
 
+    def __neg__(self):
+        return self.__mul__(-1)
+
 
 class ConstExprInt(ConstExpr):
     def __init__(self, value):

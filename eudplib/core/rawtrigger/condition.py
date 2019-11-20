@@ -51,11 +51,11 @@ class Condition(ConstExpr):
 
     # fmt: off
     def __init__(self, locid, player, amount, unitid,
-                 comparison, condtype, restype, flags, eudx=0):
+                 comparison, condtype, restype, flags, *, eudx=0):
         super().__init__(self)
 
-        if eudx:
-            eudx = ut.b2i2(b"SC")
+        if isinstance(eudx, str):
+            eudx = ut.b2i2(ut.u2b(eudx))
         self.fields = [locid, player, amount, unitid,
                        comparison, condtype, restype, flags, eudx]
         # fmt: on

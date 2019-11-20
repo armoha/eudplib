@@ -6,6 +6,7 @@
 #define EPSCRIPT_CONSTPARSER_H
 
 #include <string>
-int parseConstantName(const std::string& name);
+int parseConstantName(const std::string &name);
+void initConstmap();
 
 #endif //EPSCRIPT_CONSTPARSER_H

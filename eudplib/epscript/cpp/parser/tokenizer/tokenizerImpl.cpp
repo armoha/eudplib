@@ -146,6 +146,7 @@ Token* TokenizerImpl::getToken() {
         if(identifier == "$L") return TK(TOKEN_LOCNAME);
         if(identifier == "$S") return TK(TOKEN_SWITCHNAME);
         if(identifier == "$T") return TK(TOKEN_MAPSTRING);
+        if(identifier == "$B") return TK(TOKEN_STATTXTTBL);
 
         if(identifier == "VArray") return TK(TOKEN_VARRAY);
         if(identifier == "list") return TK(TOKEN_LIST);

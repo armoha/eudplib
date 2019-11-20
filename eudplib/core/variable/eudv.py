@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
 import traceback
 
 from .. import rawtrigger as bt
@@ -158,6 +159,8 @@ class EUDVariable(VariableBase):
         return self
 
     def __isub__(self, other):
+        if IsConstExpr(other):
+            return self.__iadd__(-other)
         self << self - other
         return self
 
@@ -174,6 +177,15 @@ class EUDVariable(VariableBase):
     def __sub__(self, other):
         t = EUDVariable()
 
+        # TODO: fix bug with freeing tests.
+        # if IsConstExpr(other):
+        #     SeqCompute(
+        #         [
+        #             (t, bt.SetTo, -other),
+        #             (t, bt.Add, self),
+        #         ]
+        #     )
+        # else:
         SeqCompute(
             [
                 (t, bt.SetTo, 0xFFFFFFFF),
@@ -329,27 +341,22 @@ def IsEUDVariable(x):
 
 
 def VProc(v, actions):
-    nexttrg = Forward()
+    v = FlattenList(v)
+    actions = FlattenList(actions)
+    end = Forward()
+    triggers = list()
+    
+    for cv, nv in zip(v, v[1:]):
+        actions.append(bt.SetNextPtr(cv.GetVTable(), nv.GetVTable()))
+    actions.append(bt.SetNextPtr(v[-1].GetVTable(), end))
 
-    try:
-        v = FlattenList(v)
-        trg = bt.RawTrigger(
-            nextptr=v[0].GetVTable(),
-            actions=[actions]
-            + [
-                bt.SetNextPtr(v[i].GetVTable(), v[i + 1].GetVTable())
-                for i in range(len(v) - 1)
-            ]
-            + [bt.SetNextPtr(v[-1].GetVTable(), nexttrg)],
-        )
-    except (TypeError):
-        trg = bt.RawTrigger(
-            nextptr=v.GetVTable(),
-            actions=[actions] + [bt.SetNextPtr(v.GetVTable(), nexttrg)],
-        )
+    for i in range(0, len(actions), 64):
+        trg = bt.RawTrigger(actions=actions[i:i + 64])
+        triggers.append(trg)
+    triggers[-1]._nextptr = v[0].GetVTable()
+    end << bt.NextTrigger()
 
-    nexttrg << bt.NextTrigger()
-    return trg
+    return List2Assignable(triggers)
 
 
 # From vbuffer.py
@@ -401,6 +408,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
     nextptr = None  # nextptr for this rawtrigger
     vt_nextptr = None  # what to set for nextptr of current vtable
     last_pairs = None
+    nonConstActions = list()
 
     def _RemoveDuplicateActions():
         if last_pairs is None:
@@ -411,7 +419,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
         except KeyError:
             pass
         else:
-            lastact = actionlist[-1]
+            lastact = nonConstActions[-1]
             queueact, setnptr = lastact
             setdst, setmdt = queueact
             if last_dst is prev_dst:
@@ -439,15 +447,17 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
             bt.Subtract: EUDVariable.QueueSubtractTo,
         }[mdt]
 
-        actionlist.append(
+        nonConstActions.append(
             [queuef(src, dst), bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
         )
         last_pairs = src, dst, mdt
 
-    bt.RawTrigger(nextptr=nextptr, actions=actionlist)
+    _RemoveDuplicateActions()
+    nonConstActions = FlattenList(nonConstActions)
+    random.shuffle(nonConstActions)
+    bt.RawTrigger(nextptr=nextptr, actions=[actionlist, nonConstActions])
 
     vt_nextptr << bt.NextTrigger()
-    _RemoveDuplicateActions()
 
 
 def SeqCompute(assignpairs):
@@ -567,8 +577,7 @@ def NonSeqCompute(assignpairs):
             if varassignpair is not None:
                 varassignpairs.append(varassignpair)
 
-    newassignpairs = constpairs + varassignpairs
-    SeqCompute(newassignpairs)
+    SeqCompute(constpairs + varassignpairs)
 
 
 def SetVariables(srclist, dstlist, mdtlist=None):

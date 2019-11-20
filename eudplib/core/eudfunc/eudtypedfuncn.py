@@ -71,13 +71,34 @@ class EUDTypedFuncN(EUDFuncN):
         self._argtypes = argtypes
         self._rettypes = rettypes
 
-    def __call__(self, *args):
+    def __call__(self, *args, ret=None):
         # This layer is nessecary for function to accept non-EUDVariable object
         # as argument. For instance, EUDFuncN.
         args = applyTypes(self._argtypes, args)
-        rets = super().__call__(*args)
+        rets = super().__call__(*args, ret=ret)
 
         # Cast returns to rettypes before caller code.
         rets = ut.Assignable2List(rets)
         rets = applyTypes(self._rettypes, rets)
         return ut.List2Assignable(rets)
+
+
+class EUDXTypedFuncN(EUDTypedFuncN):
+
+    """
+    EUDFuncN specialization for EUDX.
+    """
+
+    def __init__(
+        self, argn, callerfunc, bodyfunc, argtypes, rettypes, argmasks, *, traced
+    ):
+        super().__init__(argn, callerfunc, bodyfunc, argtypes, rettypes, traced=traced)
+        self._argmasks = argmasks
+
+    def _CreateFuncArgs(self):
+        ut.ep_assert(
+            self._argn == len(self._argmasks),
+            "Number of argument masks should be constant",
+        )
+        if self._fargs is None:
+            self._fargs = [ev.EUDXVariable(0, mask) for mask in self._argmasks]

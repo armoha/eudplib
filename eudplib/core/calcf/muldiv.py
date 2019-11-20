@@ -23,9 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from .. import allocator as ac, rawtrigger as rt, variable as ev, eudfunc as ef
 
 from eudplib import utils as ut
+from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ..variable.evcommon import _ev
 
 
 @ef.EUDFunc
@@ -43,39 +47,43 @@ def _div1(x):
     return x, 0
 
 
-def f_mul(a, b):
+def f_mul(a, b, **kwargs):
     """Calculate a * b"""
     if isinstance(a, ev.EUDVariable) and isinstance(b, ev.EUDVariable):
-        return _f_mul(a, b)
+        return _f_mul(a, b, **kwargs)
 
     elif isinstance(a, ev.EUDVariable):
-        return f_constmul(b)(a)
+        return f_constmul(b)(a, **kwargs)
 
     elif isinstance(b, ev.EUDVariable):
-        return f_constmul(a)(b)
+        return f_constmul(a)(b, **kwargs)
 
-    else:
+    try:
+        ret = kwargs["ret"]
+    except KeyError:
         ret = ev.EUDVariable()
-        ret << a * b
-        return ret
+    ret << a * b
+    return ret
 
 
-def f_div(a, b):
+def f_div(a, b, **kwargs):
     """Calculate (a//b, a%b) """
     if isinstance(b, ev.EUDVariable):
-        return _f_div(a, b)
+        return _f_div(a, b, **kwargs)
 
     elif isinstance(a, ev.EUDVariable):
-        return f_constdiv(b)(a)
+        return f_constdiv(b)(a, **kwargs)
 
+    if b:
+        q, m = divmod(a, b)
     else:
-        if b:
-            q, m = a // b, a % b
-        else:
-            q, m = 0xFFFFFFFF, a
+        q, m = 0xFFFFFFFF, a
+    try:
+        vq, vm = kwargs["ret"]
+    except KeyError:
         vq, vm = ev.EUDCreateVariables(2)
-        ev.SeqCompute([(vq, rt.SetTo, q), (vm, rt.SetTo, m)])
-        return vq, vm
+    ev.SeqCompute([(vq, rt.SetTo, q), (vm, rt.SetTo, m)])
+    return vq, vm
 
 
 # -------
@@ -111,16 +119,20 @@ def f_constmul(number):
         return mulfdict[number]
     except KeyError:
 
+        @_EUDPredefineParam(_ev[:1])
+        @_EUDPredefineReturn(_ev[1:2])
         @ef.EUDFunc
         def _mulf(a):
-            ret = ev.EUDVariable()
+            ret = _mulf._frets[0]
             ret << 0
-            for i in range(31, -1, -1):
+            r = list(range(32))
+            random.shuffle(r)
+            for i in r:
                 rt.RawTrigger(
                     conditions=a.AtLeastX(1, 2 ** i),
                     actions=ret.AddNumber(2 ** i * number),
                 )
-            return ret
+            # return ret
 
         mulfdict[number] = _mulf
         return _mulf
@@ -142,10 +154,12 @@ def f_constdiv(number):
         return divfdict[number]
     except KeyError:
 
+        @_EUDPredefineReturn(_ev[:2])
+        @_EUDPredefineParam(_ev[1:2])
         @ef.EUDFunc
         def _divf(a):
-            ret = ev.EUDVariable()
-            ret << 0
+            quotient = _divf._frets[0]
+            quotient << 0
             for i in range(31, -1, -1):
                 # number too big
                 if 2 ** i * number >= 2 ** 32:
@@ -153,9 +167,12 @@ def f_constdiv(number):
 
                 rt.RawTrigger(
                     conditions=a.AtLeast(2 ** i * number),
-                    actions=[a.SubtractNumber(2 ** i * number), ret.AddNumber(2 ** i)],
+                    actions=[
+                        a.SubtractNumber(2 ** i * number),
+                        quotient.AddNumber(2 ** i),
+                    ],
                 )
-            return ret, a
+            # return quotient, a
 
         divfdict[number] = _divf
         return _divf
@@ -164,9 +181,10 @@ def f_constdiv(number):
 # -------
 
 
+@_EUDPredefineReturn(_ev[:1])
 @ef.EUDFunc
 def _f_mul(a, b):
-    ret = ev.EUDVariable()
+    ret = _f_mul._frets[0]
     endmul, reset_nptr = ac.Forward(), ac.Forward()
 
     # Init
@@ -183,19 +201,17 @@ def _f_mul(a, b):
         p3 << ev.VProc(b, [b.SetDest(ret), rt.SetNextPtr(p1, p2)])
         p2 << rt.NextTrigger()
         if i <= 30:
-            rt.RawTrigger(
-                nextptr=p4,
-                conditions=a.Exactly(0),
-                actions=[
-                    rt.SetNextPtr(p2, endmul),
-                    rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
-                    rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
-                ],
-            )
+            acts = [
+                rt.SetNextPtr(p2, endmul),
+                rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
+                rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
+            ]
+            random.shuffle(acts)
+            rt.RawTrigger(nextptr=p4, conditions=[a == 0], actions=acts)
             p4 << ev.VProc(b, b.SetDest(b))
 
     endmul << rt.RawTrigger(actions=[reset_nptr << rt.SetNextPtr(p1, p2)])
-    return ret
+    # return ret
 
 
 @ef.EUDFunc
@@ -219,7 +235,9 @@ def _f_div(a, b):
         # Skip if over 0x80000000
         p1, p2, p3 = ac.Forward(), ac.Forward(), ac.Forward()
         p1 << rt.RawTrigger(
-            nextptr=p2, conditions=x.AtLeast(0x80000000), actions=rt.SetNextPtr(p1, p3)
+            nextptr=p2,
+            conditions=x.AtLeastX(1, 0x80000000),
+            actions=rt.SetNextPtr(p1, p3),
         )
         p3 << rt.RawTrigger(nextptr=chain[i], actions=rt.SetNextPtr(p1, p2))
         p2 << rt.NextTrigger()

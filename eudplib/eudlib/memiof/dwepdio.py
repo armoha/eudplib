@@ -23,50 +23,68 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from ... import core as c, ctrlstru as cs, utils as ut
 
 from .modcurpl import f_setcurpl2cpcache
+from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ...core.variable.evcommon import _ev
 
 
+@_EUDPredefineReturn(_ev[:2])
+@_EUDPredefineParam(_ev[2:3])
 @c.EUDFunc
 def f_dwepdread_epd(targetplayer):
-    ptr, epd = c.EUDVariable(), c.EUDVariable()
-    c.VProc(
-        targetplayer,
-        [
-            ptr.SetNumber(0),
-            epd.SetNumber(ut.EPD(0)),
-            targetplayer.SetDest(ut.EPD(0x6509B0)),
-        ],
-    )
+    ptr, epd = f_dwepdread_epd._frets
+    u = random.randint(234, 65535)
+    acts = [
+        ptr.SetNumber(0),
+        epd.SetNumber(ut.EPD(0)),
+        targetplayer.AddNumber(-12 * u),
+        targetplayer.SetDest(ut.EPD(0x6509B0)),
+    ]
+    random.shuffle(acts)
+    c.VProc(targetplayer, acts)
 
-    for i in range(31, -1, -1):
+    r = list(range(31, -1, -1))
+    random.shuffle(r)
+    for i in r:
+        acts = [ptr.AddNumber(2 ** i), epd.AddNumber(2 ** (i - 2)) if i >= 2 else []]
+        random.shuffle(acts)
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i),
-            actions=[
-                ptr.AddNumber(2 ** i),
-                epd.AddNumber(2 ** (i - 2)) if i >= 2 else [],
-            ],
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i), actions=acts
         )
 
     f_setcurpl2cpcache()
 
-    return ptr, epd
+    # return ptr, epd
 
 
+@_EUDPredefineReturn(_ev[:1])
+@_EUDPredefineParam(_ev[1:2])
 @c.EUDFunc
 def f_dwread_epd(targetplayer):
-    ptr = c.EUDVariable()
-    c.VProc(targetplayer, [ptr.SetNumber(0), targetplayer.SetDest(ut.EPD(0x6509B0))])
-    for i in range(31, -1, -1):
+    ptr = f_dwread_epd._frets[0]
+    u = random.randint(234, 65535)
+    acts = [
+        ptr.SetNumber(0),
+        targetplayer.AddNumber(-12 * u),
+        targetplayer.SetDest(ut.EPD(0x6509B0)),
+    ]
+    random.shuffle(acts)
+    c.VProc(targetplayer, acts)
+    r = list(range(31, -1, -1))
+    random.shuffle(r)
+    for i in r:
         c.RawTrigger(
-            conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i)],
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i),
             actions=ptr.AddNumber(2 ** i),
         )
 
     f_setcurpl2cpcache()
 
-    return ptr
+    # return ptr
 
 
 def f_epdread_epd(targetplayer):
@@ -152,7 +170,9 @@ def f_dwbreak(number):
         ],
     )
 
-    for i in range(31, 7, -1):
+    r = list(range(31, 7, -1))
+    random.shuffle(r)
+    for i in r:
         byteidx = i // 8
         wordidx = i // 16
         byteexp = i % 8

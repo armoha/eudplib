@@ -211,7 +211,14 @@ def f_dbstr_addptr(dst, number):
 
 
 def _OmitEOS(*args):
-    dw = any(c.IsConstExpr(x) or c.IsEUDVariable(x) for x in args)
+    dw = any(
+        (
+            c.IsConstExpr(x)
+            and not isinstance(x, (int, str, bytes)) and not ut.isUnproxyInstance(x, c.Db)
+        )
+        or c.IsEUDVariable(x)
+        for x in args
+    )
     ptr = any(ut.isUnproxyInstance(x, hptr) for x in args)
     cs.DoActions(
         [c.SetMemory(_str_jump + 348, c.SetTo, _str_dst)]
@@ -219,11 +226,11 @@ def _OmitEOS(*args):
         + [c.SetNextPtr(_ptr_jump, _ptr_dst) if ptr else []]
     )
     yield (dw, ptr)
-    if dw or ptr:
-        cs.DoActions(
-            [c.SetNextPtr(_dw_jump, _dw_EOS) if dw else []]
-            + [c.SetNextPtr(_ptr_jump, _ptr_EOS) if ptr else []]
-        )
+    cs.DoActions(
+        [c.SetMemory(_str_jump + 348, c.SetTo, _str_EOS)]
+        + [c.SetNextPtr(_dw_jump, _dw_EOS) if dw else []]
+        + [c.SetNextPtr(_ptr_jump, _ptr_EOS) if ptr else []]
+    )
 
 
 class ptr2s:
@@ -241,7 +248,7 @@ class hptr:
         self._value = value
 
 
-def f_dbstr_print(dst, *args, encoding="UTF-8"):
+def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
     """Print multiple string / number to dst.
 
     :param dst: Destination address (Not EPD player)
@@ -306,14 +313,21 @@ def f_dbstr_print(dst, *args, encoding="UTF-8"):
             )
         strlens.append(strlen)
 
-    if len(args) >= 2:
-        for _ in _OmitEOS(*args):
-            for i, arg in enumerate(args[:-1]):
-                _proc_arg(i, arg)
-        _proc_arg(-1, args[-1])
+    if EOS:
+        if len(args) >= 2:
+            for _ in _OmitEOS(*args):
+                for i, arg in enumerate(args[:-1]):
+                    _proc_arg(i, arg)
+            _proc_arg(-1, args[-1])
 
-        c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
+            c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
+        else:
+            _proc_arg(0, args[0])
     else:
-        _proc_arg(0, args[0])
+        for _ in _OmitEOS(*args):
+            for i, arg in enumerate(args):
+                _proc_arg(i, arg)
+        if len(args) >= 2:
+            c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
 
     return strlens[0]

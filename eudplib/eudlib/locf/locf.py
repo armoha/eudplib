@@ -243,15 +243,18 @@ def f_dilateloc(locID, *coords):
 @c.EUDFunc
 def _GetLocTL(epd):
     epd += _loct
-    c.EUDReturn(f_dwread_epd(epd), f_dwread_epd(epd + 1))
+    left = f_dwread_epd(epd)
+    epd += 1
+    f_dwread_epd(epd, ret=epd)
+    return left, epd
 
 
-def f_getlocTL(locID):
+def f_getlocTL(locID, **kwargs):
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
     # 로케이션의 위(top), 왼쪽 (left) 좌표를 얻어냅니다.
     # @param  {[type]} locID 로케이션 번호. $L(로케이션 이름) 으로 얻을 수 있습니다.
-    return _GetLocTL(locID * 5)
+    return _GetLocTL(locID * 5, **kwargs)
 
 
 @c.EUDFunc

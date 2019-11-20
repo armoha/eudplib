@@ -162,7 +162,7 @@ def CollectObjects(root):
             objc.EndWrite()
 
         # Check for new objects
-        for obj in list(_dynamic_objects_set):
+        for obj in _dynamic_objects_set:
             objc.StartWrite()
             obj.CollectDependency(objc)
             objc.EndWrite()

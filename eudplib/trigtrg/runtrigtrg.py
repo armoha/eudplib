@@ -29,6 +29,8 @@ from .. import ctrlstru as cs
 _runner_start = [c.Forward() for _ in range(8)]
 _runner_end = [c.Forward() for _ in range(8)]
 
+_runner_cp = c.EUDLightVariable()
+
 c.PushTriggerScope()
 for player in range(8):
     _runner_start[player] << c.RawTrigger(nextptr=_runner_end[player])
@@ -53,6 +55,7 @@ def RunTrigTrigger():
             nextptr=_runner_start[player],
             actions=[
                 c.SetMemory(0x6509B0, c.SetTo, player),
+                _runner_cp.SetNumber(player),
                 c.SetNextPtr(_runner_end[player], nt),
             ],
         )

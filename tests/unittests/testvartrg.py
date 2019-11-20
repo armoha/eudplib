@@ -18,7 +18,7 @@ def test_vmixedtrg():
     DoActions(SetDeaths(a, SetTo, f_mul(a, 30), 0))
     a << 2
     DoActions(SetDeaths(a, SetTo, a - 50, 0))
-    DoActions([SetDeaths(3, SetTo, 123, a), SetDeaths(a, SetTo, a, a)])
+    DoActions(SetDeaths(3, SetTo, 123, a), SetDeaths(a, SetTo, a, a))
 
     test_assert(
         "Variable mixed trigger test",
@@ -31,4 +31,4 @@ def test_vmixedtrg():
         ],
     )
 
-    DoActions([SetDeaths(AllPlayers, SetTo, 0, 0), SetDeaths(AllPlayers, SetTo, 0, 2)])
+    DoActions(SetDeaths(AllPlayers, SetTo, 0, 0), SetDeaths(AllPlayers, SetTo, 0, 2))

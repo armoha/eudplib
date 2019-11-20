@@ -24,28 +24,9 @@ THE SOFTWARE.
 """
 
 from ... import core as c, ctrlstru as cs, utils as ut
-from ..memiof import f_dwepdread_epd, f_wread_epd
+from .cpprint import GetTBLAddr
 from .eudprint import f_dbstr_print
-
-
-@c.EUDFunc
-def GetTBLAddr(tblId):
-    add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
-    if cs.EUDExecuteOnce()():
-        TBL_ptr, TBL_epd = f_dwepdread_epd(ut.EPD(0x6D5A30))
-        cs.DoActions(
-            [
-                c.SetMemory(add_TBL_ptr + 20, c.SetTo, TBL_ptr),
-                c.SetMemory(add_TBL_epd + 20, c.SetTo, TBL_epd),
-            ]
-        )
-    cs.EUDEndExecuteOnce()
-    r, m = c.f_div(tblId, 2)
-    c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
-    c.RawTrigger(actions=add_TBL_epd << r.AddNumber(0))
-    ret = f_wread_epd(r, m)
-    c.RawTrigger(actions=add_TBL_ptr << ret.AddNumber(0))
-    c.EUDReturn(ret)
+from .fmtprint import f_sprintf
 
 
 def f_settbl(tblID, offset, *args):
@@ -55,9 +36,18 @@ def f_settbl(tblID, offset, *args):
 
 
 def f_settbl2(tblID, offset, *args):
-    from .eudprint import _OmitEOS
-
     dst = GetTBLAddr(tblID)
     dst += offset
-    for _ in _OmitEOS(*args):
-        f_dbstr_print(dst, *args, encoding="cp949")
+    f_dbstr_print(dst, *args, EOS=False, encoding="cp949")
+
+
+def f_settblf(tblID, offset, format_string, *args):
+    dst = GetTBLAddr(tblID)
+    dst += offset
+    f_sprintf(dst, format_string, *args, encoding="cp949")
+
+
+def f_settblf2(tblID, offset, format_string, *args):
+    dst = GetTBLAddr(tblID)
+    dst += offset
+    f_sprintf(dst, format_string, "", *args, EOS=False, eencoding="cp949")

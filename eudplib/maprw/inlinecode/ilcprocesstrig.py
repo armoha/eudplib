@@ -28,11 +28,18 @@ from ...trigtrg import trigtrg as tt
 from random import random
 
 from .ilccompile import ComputeBaseInlineCodeGlobals, CompileInlineCode
-from .btInliner import InlineCodifyBinaryTrigger
+from .btInliner import (
+    GetExecutingPlayers,
+    GetTriggerSize,
+    TryToShareTrigger,
+    InlineCodifyBinaryTrigger,
+    InlineCodifyMultipleBinaryTriggers,
+)
 
 
 _inlineCodes = []
-_inliningRate = 0
+_inliningRate = 1
+_cutoffRate = [1 + (i - 2) / 3 for i in range(9)]
 
 
 def PRT_SetInliningRate(rate):
@@ -51,6 +58,8 @@ def PreprocessInlineCode(chkt):
 def PreprocessTrigSection(trigSection):
     """ Fetch inline codes & compiles them """
     ComputeBaseInlineCodeGlobals()
+    if _inliningRate == 1:
+        return ConsecutiveInlineTrigSection(trigSection)
 
     inlineCodes = []
     trigSegments = []
@@ -81,6 +90,58 @@ def PreprocessTrigSection(trigSection):
 
     So we need 'normal' trigger at the last of TRIG triggers for every player.
     """
+    trigSegments.append(tt.Trigger(players=[tt.AllPlayers]))
+
+    trigSection = b"".join(trigSegments)
+    return inlineCodes, trigSection
+
+
+def ConsecutiveInlineTrigSection(trigSection):
+    inlineCodes = []
+    trigSegments = []
+    pTriggers = ([], [], [], [], [], [], [], [])
+
+    def appendPTriggers(p):
+        if pTriggers[p]:
+            func = InlineCodifyMultipleBinaryTriggers(pTriggers[p])
+            trigSegment = CreateInlineCodeDispatcher(inlineCodes, func, 1 << p)
+            trigSegments.append(trigSegment)
+            pTriggers[p].clear()
+
+    for i in range(0, len(trigSection), 2400):
+        trigSegment = trigSection[i : i + 2400]
+        if len(trigSegment) != 2400:
+            continue
+
+        propv = ut.b2i4(trigSegment, 320 + 2048)
+        playerExecutesTrigger = GetExecutingPlayers(trigSegment)
+
+        decoded = DispatchInlineCode(inlineCodes, trigSegment)
+        if decoded:
+            trigSegment = decoded
+
+        elif propv < 0x80000000:
+            pCount = playerExecutesTrigger.count(True)
+            if pCount >= 2:
+                trigSegment = TryToShareTrigger(trigSegment)
+                if isinstance(trigSegment, bytes):
+                    size = GetTriggerSize(trigSegment)
+                    if size * pCount * _cutoffRate[pCount] > 2400:
+                        for p in range(8):
+                            if playerExecutesTrigger[p]:
+                                appendPTriggers(p)
+                        trigSegments.append(trigSegment)
+                        continue
+            for p in range(8):
+                if playerExecutesTrigger[p]:
+                    pTriggers[p].append(trigSegment)
+            continue
+        for p in range(8):
+            if playerExecutesTrigger[p]:
+                appendPTriggers(p)
+        trigSegments.append(trigSegment)
+    for p in range(8):
+        appendPTriggers(p)
     trigSegments.append(tt.Trigger(players=[tt.AllPlayers]))
 
     trigSection = b"".join(trigSegments)

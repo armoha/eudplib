@@ -36,10 +36,8 @@ from eudplib import utils as ut
 def CreatePayloadRelocator(payload):
     # We first build code injector.
     prtdb = c.Db(b"".join([ut.i2b4(x // 4) for x in payload.prttable]))
-    prtn = c.EUDVariable()
-
     ortdb = c.Db(b"".join([ut.i2b4(x // 4) for x in payload.orttable]))
-    ortn = c.EUDVariable()
+    n = c.EUDVariable()
 
     orig_payload = c.Db(payload.data)
 
@@ -51,15 +49,15 @@ def CreatePayloadRelocator(payload):
         # should be able to penetrate through this very easily
 
         # init prt
-        prtn << len(payload.prttable)
         if payload.prttable:
-            if cs.EUDWhile()(prtn >= 1):
-                prtn += ut.EPD(prtdb) - 1
-                epd, dst = sf.f_dwread_epd(prtn), c.Forward()
+            n << len(payload.prttable)
+            if cs.EUDWhile()(n >= 1):
+                n += ut.EPD(prtdb) - 1
+                epd, dst = sf.f_dwread_epd(n), c.Forward()
                 c.VProc(
                     epd,
                     [
-                        prtn.SubtractNumber(ut.EPD(prtdb)),
+                        n.SubtractNumber(ut.EPD(prtdb)),
                         epd.AddNumber(ut.EPD(orig_payload)),
                         epd.SetDest(ut.EPD(dst) + 4),
                     ],
@@ -68,20 +66,20 @@ def CreatePayloadRelocator(payload):
             cs.EUDEndWhile()
 
         # init ort
-        ortn << len(payload.orttable)
         if payload.orttable:
-            if cs.EUDWhile()(ortn >= 1):
-                ortn += ut.EPD(ortdb) - 1
-                epd, dst = sf.f_dwread_epd(ortn), c.Forward()
+            n << len(payload.orttable)
+            if cs.EUDWhile()(n >= 1):
+                n += ut.EPD(ortdb) - 1
+                epd, dst = sf.f_dwread_epd(n), c.Forward()
                 c.VProc(
                     epd,
                     [
-                        ortn.SubtractNumber(ut.EPD(ortdb)),
+                        n.SubtractNumber(ut.EPD(ortdb)),
                         epd.AddNumber(ut.EPD(orig_payload)),
                         epd.SetDest(ut.EPD(dst) + 4),
                     ],
                 )
-                cs.DoActions([dst << c.SetDeaths(0, c.Add, orig_payload, 0)])
+                cs.DoActions(dst << c.SetDeaths(0, c.Add, orig_payload, 0))
             cs.EUDEndWhile()
 
         # Jump

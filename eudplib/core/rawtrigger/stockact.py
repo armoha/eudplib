@@ -417,18 +417,15 @@ def SetDeathsX(Player, Modifier, Number, Unit, Mask):
     Player = EncodePlayer(Player, issueError=True)
     Modifier = EncodeModifier(Modifier, issueError=True)
     Unit = EncodeUnit(Unit, issueError=True)
-    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx=True)
+    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx="SC")
 
 
 def SetMemoryX(dest, modtype, value, mask):
-    modtype = EncodeModifier(modtype, issueError=True)
-    return Action(mask, 0, 0, 0, EPD(dest), value, 0, 45, modtype, 20, eudx=True)
+    return SetDeathsX(EPD(dest), modtype, value, 0, mask)
 
 
-def SetMemoryXEPD(dest, modtype, value, mask):
-    dest = EncodePlayer(dest, issueError=True)
-    modtype = EncodeModifier(modtype, issueError=True)
-    return Action(mask, 0, 0, 0, dest, value, 0, 45, modtype, 20, eudx=True)
+def SetMemoryXEPD(epd, modtype, value, mask):
+    return SetDeathsX(epd, modtype, value, 0, mask)
 
 
 def SetKills(Player, Modifier, Number, Unit):

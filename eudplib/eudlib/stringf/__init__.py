@@ -27,6 +27,7 @@ from .cpstr import GetMapStringAddr, CPString
 from .dbstr import DBString
 
 from .parse import f_parse
+from .fmtprint import f_sprintf, f_sprintf_cp, f_eprintf
 
 from .strbuffer import (
     StringBuffer,
@@ -34,6 +35,8 @@ from .strbuffer import (
     GetGlobalStringBuffer,
     f_gettextptr,
     f_simpleprint,
+    f_println,
+    f_printAt,
 )
 
 from .strfunc import f_strcpy, f_strcmp, f_strlen, f_strlen_epd, f_strnstr
@@ -56,13 +59,14 @@ from .cpprint import (
     PName,
     f_cpstr_print,
     f_raise_CCMU,
+    GetTBLAddr,
     f_eprintln,
     f_eprintln2,
 )
 
 from .cputf8 import f_cp949_to_utf8_cpy
-from .setpname import SetPName
-from .tblprint import GetTBLAddr, f_settbl, f_settbl2
+from .setpname import SetPName, SetPNamef
+from .tblprint import f_settbl, f_settbl2, f_settblf, f_settblf2
 
 from .texteffect import (
     f_cpchar_adddw,

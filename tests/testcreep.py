@@ -99,10 +99,8 @@ def main():
             )
 
             DoActions(
-                [
-                    CreateUnit(1, "Kakaru (Twilight Critter)", 1, Player1),
-                    RemoveUnitAt(All, "Kakaru (Twilight Critter)", 1, Player1),
-                ]
+                CreateUnit(1, "Kakaru (Twilight Critter)", 1, Player1),
+                RemoveUnitAt(All, "Kakaru (Twilight Critter)", 1, Player1),
             )
 
         DoActions(KillUnit("Kakaru (Twilight Critter)", Player1))

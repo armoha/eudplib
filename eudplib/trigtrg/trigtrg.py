@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from struct import pack
 from eudplib import utils as ut
-from ..utils import EPD, b2i2
+from ..utils import EPD, b2i2, u2b
 from ..core.rawtrigger.constenc import *
 from ..core.rawtrigger.strenc import *
 
@@ -45,15 +45,15 @@ condition / actions.
 
 
 def Condition(
-    locid, player, amount, unitid, comparison, condtype, restype, flag, eudx=0
+    locid, player, amount, unitid, comparison, condtype, restype, flag, *, eudx=0
 ):
     if player < 0:
         player += 0x100000000  # EPD
 
     player &= 0xFFFFFFFF
     amount &= 0xFFFFFFFF
-    if eudx:
-        eudx = b2i2(b"SC")
+    if isinstance(eudx, str):
+        eudx = b2i2(u2b(eudx))
 
     return pack(
         "<IIIHBBBBH",
@@ -70,7 +70,7 @@ def Condition(
 
 
 def Action(
-    locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags, eudx=0
+    locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags, *, eudx=0
 ):
     player1 &= 0xFFFFFFFF
     player2 &= 0xFFFFFFFF
@@ -79,8 +79,8 @@ def Action(
         player1 += 0x100000000  # EPD
     if player2 < 0:
         player2 += 0x100000000  # EPD
-    if eudx:
-        eudx = b2i2(b"SC")
+    if isinstance(eudx, str):
+        eudx = b2i2(u2b(eudx))
     return pack(
         "<IIIIIIHBBBBH",
         locid1,
@@ -623,7 +623,7 @@ def DeathsX(Player, Comparison, Number, Unit, Mask):
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
-    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx=True)
+    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx="SC")
 
 
 def MemoryX(dest, cmptype, value, mask):
@@ -634,7 +634,7 @@ def SetDeathsX(Player, Modifier, Number, Unit, Mask):
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
     Unit = EncodeUnit(Unit)
-    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx=True)
+    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx="SC")
 
 
 def SetMemoryX(dest, modtype, value, mask):

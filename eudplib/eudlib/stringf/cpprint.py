@@ -29,16 +29,18 @@ from eudplib import utils as ut
 
 from ..eudarray import EUDArray
 from ..memiof import (CPByteWriter, f_bread_epd, f_cunitread_epd, f_dwwrite,
-                      f_getcurpl, f_setcurpl)
+                      f_getcurpl, f_setcurpl, f_dwepdread_epd, f_wread_epd)
 from ..rwcommon import br1
-from ..utilf import LocalCP
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
-from .tblprint import GetTBLAddr
+from ..eudarray import EUDArray
+from ..utilf import IsUserCP
+from math import ceil
 
 cw = CPByteWriter()
 prevcp = c.EUDVariable()
+proc_lf = c.EUDLightVariable()
 
 
 @c.EUDFunc
@@ -87,11 +89,64 @@ def PName(x):
 
 
 @c.EUDFunc
+def f_gettextptr():
+    ret = c.EUDVariable()
+    ret << 0
+    for i in range(3, -1, -1):
+        c.RawTrigger(
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
+            actions=ret.AddNumber(2**i)
+        )
+    return ret
+
+
+@c.EUDFunc
+def f_getnextchatdst():
+    ret = c.EUDVariable()
+    ret << ut.EPD(0x640B60)
+    for i in range(3, -1, -1):
+        c.RawTrigger(
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
+            actions=ret.AddNumber(ceil((2**i) * 54.5))
+        )
+    return ret
+
+
+@c.EUDTypedFunc([c.TrgTBL], None)
+def GetTBLAddr(tblId):
+    add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
+    if cs.EUDExecuteOnce()():
+        TBL_ptr, TBL_epd = f_dwepdread_epd(ut.EPD(0x6D5A30))
+        cs.DoActions(
+            [
+                c.SetMemory(add_TBL_ptr + 20, c.SetTo, TBL_ptr),
+                c.SetMemory(add_TBL_epd + 20, c.SetTo, TBL_epd),
+            ]
+        )
+    cs.EUDEndExecuteOnce()
+    r, m = c.f_div(tblId, 2)
+    c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
+    c.RawTrigger(actions=add_TBL_epd << r.AddNumber(0))
+    ret = f_wread_epd(r, m)
+    c.RawTrigger(actions=add_TBL_ptr << ret.AddNumber(0))
+    c.EUDReturn(ret)
+
+
+@c.EUDFunc
 def _addstr_cp():
     b = c.EUDVariable()
     if cs.EUDInfLoop()():
         c.SetVariables(b, br1.readbyte())
         cs.EUDBreakIf(b == 0)
+        if cs.EUDIf()([proc_lf.Exactly(1), b == ord("\n")]):
+            cw.flushdword()
+            dst = f_getnextchatdst()
+            cs.DoActions([
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.DisplayText("\r\x02"),
+                c.SetCurrentPlayer(dst),
+            ])
+        cs.EUDEndIf()
         cw.writebyte(b)
     cs.EUDEndInfLoop()
 
@@ -256,16 +311,16 @@ _eprintln_EOS = c.Forward()
 _eprintln_end = c.Forward()
 
 
-def f_eprintln(*args, encoding="UTF-8"):
+def f_eprintln(*args):
     global _eprintln_template
     if _eprintln_template is None:
         _eprintln_template = c.Forward()
 
         c.PushTriggerScope()
         _eprintln_template << c.NextTrigger()
-        prevcp << f_getcurpl()
         f_raise_CCMU(c.CurrentPlayer)
-        if cs.EUDIf()(c.Memory(0x512684, c.Exactly, prevcp)):
+        if cs.EUDIf()(IsUserCP()):
+            prevcp << f_getcurpl()
             _eprintln_print << c.RawTrigger(
                 nextptr=0, actions=[c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))]
             )
@@ -286,7 +341,7 @@ def f_eprintln(*args, encoding="UTF-8"):
         ],
     )
     _print << c.NextTrigger()
-    f_cpstr_print(*args, EOS=False, encoding=encoding)
+    f_cpstr_print(*args, EOS=False, encoding="UTF-8")
     c.SetNextTrigger(_eprintln_EOS)
     _next << c.NextTrigger()
 
@@ -297,14 +352,13 @@ _eprintln2_EOS = c.Forward()
 _eprintln2_end = c.Forward()
 
 
-def f_eprintln2(*args, encoding="cp949"):
+def f_eprintln2(*args):
     global _eprintln2_template
     if _eprintln2_template is None:
         _eprintln2_template = c.Forward()
 
         c.PushTriggerScope()
         _eprintln2_template << c.NextTrigger()
-        prevcp << f_getcurpl()
 
         if cs.EUDExecuteOnce()():
             # [871] Unit's waypoint list is full.
@@ -313,7 +367,8 @@ def f_eprintln2(*args, encoding="cp949"):
             epd = ut.EPD(ptr) + 1
         cs.EUDEndExecuteOnce()
 
-        if cs.EUDIf()(c.Memory(0x512684, c.Exactly, prevcp)):
+        if cs.EUDIf()(IsUserCP()):
+            prevcp << f_getcurpl()
             f_setcurpl(epd)
             _eprintln2_print << c.RawTrigger(nextptr=0)
             _eprintln2_EOS << c.RawTrigger(
@@ -333,6 +388,6 @@ def f_eprintln2(*args, encoding="cp949"):
         ],
     )
     _print << c.NextTrigger()
-    f_cpstr_print(*args, EOS=False, encoding=encoding)
+    f_cpstr_print(*args, EOS=False, encoding="UTF-8")
     c.SetNextTrigger(_eprintln2_EOS)
     _next << c.NextTrigger()

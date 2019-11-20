@@ -189,5 +189,5 @@ def test_runall(testname):
 
 
 def test_wait(time):
-    DoActions([SetMemory(0x6509A0, SetTo, time)])
+    DoActions(SetMemory(0x6509A0, SetTo, time))
     EUDDoEvents()

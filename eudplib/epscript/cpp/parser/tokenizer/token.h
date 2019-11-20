@@ -9,7 +9,8 @@
 
 #include <string>
 
-enum TokenType {
+enum TokenType
+{
     // Internally used by parser
     TOKEN_INVALID = -3,
     TOKEN_TEMP = -2,
@@ -49,6 +50,7 @@ enum TokenType {
     TOKEN_LOCNAME,
     TOKEN_MAPSTRING,
     TOKEN_SWITCHNAME,
+    TOKEN_STATTXTTBL,
 
     TOKEN_VARRAY,
     TOKEN_LIST,
@@ -104,22 +106,23 @@ enum TokenType {
 };
 
 const int MAX_SUBTOKEN_NUM = 5;
+bool checkLeakedTokens();
 
 #ifdef MEMORY_DEBUG
-bool checkLeakedTokens();
 void clearLeakedTokens();
 #endif
 
-struct Token {
-    Token(const std::string& data, int line);
+struct Token
+{
+    Token(const std::string &data, int line);
     Token(TokenType type, int line);
-    Token(TokenType type, const std::string& data, int line);
+    Token(TokenType type, const std::string &data, int line);
     ~Token();
 
     int type;
     std::string data;
     int line;
-    Token* subToken[MAX_SUBTOKEN_NUM];
+    Token *subToken[MAX_SUBTOKEN_NUM];
 };
 
 #endif //EPSCRIPT_TOKEN_H

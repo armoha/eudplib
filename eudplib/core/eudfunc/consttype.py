@@ -42,6 +42,7 @@ from ..rawtrigger import (
     EncodeUnit,
     EncodeString,
     EncodeSwitch,
+    EncodeTBL,
 )
 
 
@@ -72,3 +73,4 @@ TrgLocationIndex = createEncoder(EncodeLocationIndex)
 TrgString = createEncoder(EncodeString)
 TrgSwitch = createEncoder(EncodeSwitch)
 TrgUnit = createEncoder(EncodeUnit)
+TrgTBL = createEncoder(EncodeTBL)

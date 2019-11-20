@@ -25,6 +25,8 @@ THE SOFTWARE.
 
 # This code uses simple LCG algorithm.
 
+import random
+
 from eudplib import core as c, ctrlstru as cs
 from ..memiof import f_dwbreak
 
@@ -107,7 +109,9 @@ def f_dwrand():
     )
 
     # LOWORD
-    for i in range(31, 15, -1):
+    r = list(range(31, 15, -1))
+    random.shuffle(r)
+    for i in r:
         c.RawTrigger(
             conditions=seed2.AtLeastX(1, 2 ** i), actions=seed1.AddNumber(2 ** (i - 16))
         )

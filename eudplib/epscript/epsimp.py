@@ -67,6 +67,7 @@ def modifyCodeLineno(codeobj, codeMap):
 
     codeobj = types.CodeType(
         codeobj.co_argcount,
+        codeobj.co_posonlyargcount,  # python 3.8 support (See PEP 570)
         codeobj.co_kwonlyargcount,
         codeobj.co_nlocals,
         codeobj.co_stacksize,

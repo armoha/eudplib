@@ -23,7 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from eudplib import core as c, ctrlstru as cs, utils as ut
+from eudplib.eudlib.s import SetMemoryC
 
 
 def f_setcurpl(cp):
@@ -53,10 +56,13 @@ def _f_updatecpcache():
     cpcond = c.curpl.cpcacheMatchCond()
     cpcache = c.curpl.GetCPCache()
     cpcache << 0
-    for i in range(31, -1, -1):
+    r = list(range(31, -1, -1))
+    random.shuffle(r)
+    for i in r:
+        u = random.randint(234, 65535)
         c.RawTrigger(
-            conditions=c.MemoryX(0x6509B0, c.AtLeast, 1, 2 ** i),
-            actions=cpcache.AddNumber(2 ** i),
+            conditions=c.DeathsX(ut.EPD(0x6509B0) - 12 * u, c.AtLeast, 1, u, 2 ** i),
+            actions=SetMemoryC(cpcache.getValueAddr(), c.Add, 2 ** i),
         )
     f_setcurpl2cpcache()
     c.VProc(cpcache, cpcache.SetDest(ut.EPD(cpcond) + 2))

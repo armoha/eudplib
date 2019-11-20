@@ -76,6 +76,7 @@ class EUDFuncN:
         functools.update_wrapper(self, bodyfunc)
         self._fstart = None
         self._fend = None
+        self._nptr = None
         self._fargs = None
         self._frets = None
         self._triggerCount = None
@@ -102,8 +103,7 @@ class EUDFuncN:
         prev_bsm = SetCurrentBlockStruManager(f_bsm)
         bt.PushTriggerScope()
 
-        f_args = [ev.EUDVariable() for _ in range(self._argn)]
-        self._fargs = f_args
+        self._CreateFuncArgs()
 
         fstart = bt.NextTrigger()
         self._fstart = fstart
@@ -111,14 +111,19 @@ class EUDFuncN:
         if self._traced:
             _EUDTracePush()
 
-        final_rets = self._callerfunc(*f_args)
+        final_rets = self._callerfunc(*self._fargs)
         if final_rets is not None:
             self._AddReturn(ut.Assignable2List(final_rets), False)
 
         self._fend << bt.NextTrigger()
         if self._traced:
             _EUDTracePop()
-        self._fend = bt.RawTrigger()
+        if self._retn is None or self._retn == 0:
+            self._fend = bt.RawTrigger()
+            self._nptr = self._fend + 4
+        else:
+            fendTrgs = ut.FlattenList(ev.VProc([self._frets], []))
+            self._fend, self._nptr = fendTrgs[0], fendTrgs[-1]._actions[-1] + 20
 
         bt.PopTriggerScope()
 
@@ -131,24 +136,41 @@ class EUDFuncN:
             self._retn = 0
         _setCurrentCompiledFunc(lastCompiledFunc)
 
+    def _CreateFuncArgs(self):
+        if self._fargs is None:
+            self._fargs = [ev.EUDVariable() for _ in range(self._argn)]
+
     def _AddReturn(self, retv, needjump):
         retv = ut.FlattenList(retv)
         if self._frets is None:
-            self._frets = [ev.EUDVariable() for _ in range(len(retv))]
+            self._frets = [ev.EUDVariable() for _ in retv]
             self._retn = len(retv)
 
         ut.ep_assert(
             len(retv) == len(self._frets),
             "Numbers of returned value should be constant."
-            " (From function %s)" % self._callerfunc.__name__,
+            " (From function %s)" % self._bodyfunc.__name__,
         )
 
-        ev.SetVariables(self._frets, retv)
+        constAssigns = [
+            (fret, bt.SetTo, ret)
+            for fret, ret in zip(self._frets, retv)
+            if not ev.IsEUDVariable(ret)
+        ]
+        varAssigns = [
+            (fret, bt.SetTo, ret)
+            for fret, ret in zip(self._frets, retv)
+            if ev.IsEUDVariable(ret)
+        ]
+        if len(varAssigns) <= 2:
+            ev.SeqCompute(constAssigns + varAssigns)
+        else:
+            ev.NonSeqCompute(constAssigns + varAssigns)
 
         if needjump:
             bt.SetNextTrigger(self._fend)
 
-    def __call__(self, *args):
+    def __call__(self, *args, ret=None):
         if self._fstart is None:
             self._CreateFuncBody()
 
@@ -161,7 +183,17 @@ class EUDFuncN:
 
         # SeqCompute gets faster when const-assignments are in front of
         # variable assignments.
-        nextPtrAssignment = [(ut.EPD(self._fend + 4), bt.SetTo, fcallend)]
+        if ret is None:
+            ret = [ev.EUDVariable() for _ in range(self._retn)]
+        ret = ut.FlattenList(ret)
+        nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
+        if self._retn >= 1:
+            for fret, retv in zip(self._frets, ret):
+                try:
+                    retv = ut.EPD(retv.getValueAddr())
+                except AttributeError:
+                    pass
+                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
         constAssigns = [
             (farg, bt.SetTo, arg)
             for farg, arg in zip(self._fargs, args)
@@ -181,12 +213,12 @@ class EUDFuncN:
         fcallend << bt.NextTrigger()
 
         if self._frets is not None:
-            retn = len(self._frets)
-            tmp_rets = [ev.EUDVariable() for _ in range(retn)]
-            ev.SetVariables(tmp_rets, self._frets)
-            for tv in tmp_rets:
-                tv.makeR()
-            return ut.List2Assignable(tmp_rets)
+            for retv in ret:
+                try:
+                    retv.makeR()
+                except AttributeError:
+                    pass
+            return ut.List2Assignable(ret)
 
 
 def EUDReturn(*args):

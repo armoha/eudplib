@@ -23,17 +23,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import random
+
 from ... import core as c, ctrlstru as cs, utils as ut
 from . import dwepdio as dwm
+from ...core.variable.evcommon import _ev
 
 
 @c.EUDFunc
 def _reader():
     ptr, epd = c.EUDVariable(), c.EUDVariable()
     cs.DoActions([ptr.SetNumber(0), epd.SetNumber(ut.EPD(0))])
-    for i in range(31, -1, -1):
+    r = list(range(31, -1, -1))
+    random.shuffle(r)
+    for i in r:
         c.RawTrigger(
-            conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i)],
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i),
             actions=[
                 ptr.AddNumber(2 ** i),
                 epd.AddNumber(2 ** (i - 2)) if i >= 2 else [],
@@ -43,21 +48,27 @@ def _reader():
     return ptr, epd
 
 
-def f_dwepdread_cp(cpo):
+def f_dwepdread_cp(cpo, **kwargs):
     if not isinstance(cpo, int) or cpo != 0:
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    ptr, epd = _reader()
+    ptr, epd = _reader(**kwargs)
     if not isinstance(cpo, int) or cpo != 0:
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
     return ptr, epd
 
 
-def f_dwread_cp(cpo):
-    return f_dwepdread_cp(cpo)[0]
+def f_dwread_cp(cpo, **kwargs):
+    ret = kwargs.get("ret")
+    if ret is not None:
+        ret.append(_ev[4])
+    return f_dwepdread_cp(cpo, **kwargs)[0]
 
 
-def f_epdread_cp(cpo):
-    return f_dwepdread_cp(cpo)[1]
+def f_epdread_cp(cpo, **kwargs):
+    ret = kwargs.get("ret")
+    if ret is not None:
+        ret.insert(0, _ev[4])
+    return f_dwepdread_cp(cpo, **kwargs)[1]
 
 
 @c.EUDFunc
@@ -65,23 +76,31 @@ def _wreader(subp):
     w = c.EUDVariable()
     w << 0
     cs.EUDSwitch(subp)
-    for bits in range(3):
+    s = list(range(3))
+    random.shuffle(s)
+    for bits in s:
         cs.EUDSwitchCase()(bits)
         byte = 8 * bits
-        for power in range(byte + 15, byte - 1, -1):
+        r = list(range(byte + 15, byte - 1, -1))
+        random.shuffle(r)
+        for power in r:
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** power),
                 actions=w.AddNumber(2 ** (power - byte)),
             )
         cs.EUDBreak()
     if cs.EUDSwitchCase()(3):
-        for power in range(31, 23, -1):
+        r = list(range(31, 23, -1))
+        random.shuffle(r)
+        for power in r:
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** power),
                 actions=w.AddNumber(2 ** (power - 24)),
             )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-        for power in range(7, -1, -1):
+        r = list(range(7, -1, -1))
+        random.shuffle(r)
+        for power in r:
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** power),
                 actions=w.AddNumber(2 ** (power + 8)),
@@ -106,9 +125,13 @@ def _breader(subp):
     b = c.EUDVariable()
     b << 0
     cs.EUDSwitch(subp)
-    for i in range(4):
+    s = list(range(4))
+    random.shuffle(s)
+    for i in s:
         cs.EUDSwitchCase()(i)
-        for j in range(8 * (i + 1) - 1, 8 * i - 1, -1):
+        r = list(range(8 * (i + 1) - 1, 8 * i - 1, -1))
+        random.shuffle(r)
+        for j in r:
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=b.AddNumber(2 ** (j - 8 * i)),
@@ -131,61 +154,57 @@ def f_bread_cp(cpo, subp):
 def f_dwwrite_cp(cpo, value):
     cs.DoActions(
         [
-            [
-                c.SetMemory(0x6509B0, c.Add, cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0),
-            [
-                c.SetMemory(0x6509B0, c.Add, -cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-        ]
+            c.SetMemory(0x6509B0, c.Add, cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
+        c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0),
+        [
+            c.SetMemory(0x6509B0, c.Add, -cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
     )
 
 
 def f_dwadd_cp(cpo, value):
     cs.DoActions(
         [
-            [
-                c.SetMemory(0x6509B0, c.Add, cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-            c.SetDeaths(c.CurrentPlayer, c.Add, value, 0),
-            [
-                c.SetMemory(0x6509B0, c.Add, -cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-        ]
+            c.SetMemory(0x6509B0, c.Add, cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
+        c.SetDeaths(c.CurrentPlayer, c.Add, value, 0),
+        [
+            c.SetMemory(0x6509B0, c.Add, -cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
     )
 
 
 def f_dwsubtract_cp(cpo, value):
     cs.DoActions(
         [
-            [
-                c.SetMemory(0x6509B0, c.Add, cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-            c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0),
-            [
-                c.SetMemory(0x6509B0, c.Add, -cpo)
-                if not isinstance(cpo, int) or cpo != 0
-                else []
-            ],
-        ]
+            c.SetMemory(0x6509B0, c.Add, cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
+        c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0),
+        [
+            c.SetMemory(0x6509B0, c.Add, -cpo)
+            if not isinstance(cpo, int) or cpo != 0
+            else []
+        ],
     )
 
 
 @c.EUDFunc
 def _wwriter(subp, w):
     cs.EUDSwitch(subp)
-    for i in range(3):
+    r = list(range(3))
+    random.shuffle(r)
+    for i in r:
         cs.EUDSwitchCase()(i)
         c.RawTrigger(
             actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 * 2 ** (8 * i))
@@ -207,23 +226,22 @@ def f_wwrite_cp(cpo, subp, w):
     try:
         cs.DoActions(
             [
-                [
-                    c.SetMemory(0x6509B0, c.Add, cpo)
-                    if not isinstance(cpo, int) or cpo != 0
-                    else []
-                ],
-                c.SetDeathsX(
-                    c.CurrentPlayer,
-                    c.SetTo,
-                    w * (256 ** subp),
-                    0,
-                    65535 * 2 ** (8 * subp),
-                )[
-                    c.SetMemory(0x6509B0, c.Add, -cpo)
-                    if not isinstance(cpo, int) or cpo != 0
-                    else []
-                ],
-            ]
+                c.SetMemory(0x6509B0, c.Add, cpo)
+                if not isinstance(cpo, int) or cpo != 0
+                else []
+            ],
+            c.SetDeathsX(
+                c.CurrentPlayer,
+                c.SetTo,
+                w * (256 ** subp),
+                0,
+                65535 * 2 ** (8 * subp),
+            ),
+            [
+                c.SetMemory(0x6509B0, c.Add, -cpo)
+                if not isinstance(cpo, int) or cpo != 0
+                else []
+            ],
         )
     except (TypeError):
         if not isinstance(cpo, int) or cpo != 0:
@@ -236,7 +254,9 @@ def f_wwrite_cp(cpo, subp, w):
 @c.EUDFunc
 def _bwriter(subp, b):
     cs.EUDSwitch(subp)
-    for i in range(4):
+    r = list(range(4))
+    random.shuffle(r)
+    for i in r:
         cs.EUDSwitchCase()(i)
         c.RawTrigger(
             actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 * 2 ** (8 * i))
@@ -252,23 +272,22 @@ def f_bwrite_cp(cpo, subp, b):
     try:
         cs.DoActions(
             [
-                [
-                    c.SetMemory(0x6509B0, c.Add, cpo)
-                    if not isinstance(cpo, int) or cpo != 0
-                    else []
-                ],
-                c.SetDeathsX(
-                    c.CurrentPlayer,
-                    c.SetTo,
-                    b * (256 ** subp),
-                    0,
-                    255 * 2 ** (8 * subp),
-                )[
-                    c.SetMemory(0x6509B0, c.Add, -cpo)
-                    if not isinstance(cpo, int) or cpo != 0
-                    else []
-                ],
-            ]
+                c.SetMemory(0x6509B0, c.Add, cpo)
+                if not isinstance(cpo, int) or cpo != 0
+                else []
+            ],
+            c.SetDeathsX(
+                c.CurrentPlayer,
+                c.SetTo,
+                b * (256 ** subp),
+                0,
+                255 * 2 ** (8 * subp),
+            ),
+            [
+                c.SetMemory(0x6509B0, c.Add, -cpo)
+                if not isinstance(cpo, int) or cpo != 0
+                else []
+            ],
         )
     except (TypeError):
         if not isinstance(cpo, int) or cpo != 0:

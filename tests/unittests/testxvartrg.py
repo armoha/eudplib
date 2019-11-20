@@ -19,7 +19,7 @@ def test_xvmixedtrg():
     DoActions(SetDeaths(a, SetTo, f_mul(a, 30), 0))
     a << 2
     DoActions(SetDeaths(a, SetTo, a - 50, 0))
-    DoActions([SetDeaths(3, SetTo, 123, a), SetDeaths(a, SetTo, a, a)])
+    DoActions(SetDeaths(3, SetTo, 123, a), SetDeaths(a, SetTo, a, a))
 
     test_assert(
         "XVariable mixed trigger test",
@@ -32,15 +32,16 @@ def test_xvmixedtrg():
         ],
     )
 
-    DoActions([a.SetNumber(15), a.SetMask(19)])
+    DoActions(a.SetNumber(15), a.SetMask(19))
     DoActions(SetDeaths(a, SetTo, f_div(40, a)[0], a))
+    d1 = EUDVariable()
+    d1 << a
+    d2, d3 = f_div(40, a)
 
-    test_assert("XVariable flag trigger test", [Deaths(3, Exactly, 13, 3)])
+    test_equality("XVariable flag trigger test", [d1, d2, d3], [3, 13, 1])
 
     DoActions(
-        [
-            SetDeaths(AllPlayers, SetTo, 0, 0),
-            SetDeaths(AllPlayers, SetTo, 0, 2),
-            SetDeaths(AllPlayers, SetTo, 0, 3),
-        ]
+        SetDeaths(AllPlayers, SetTo, 0, 0),
+        SetDeaths(AllPlayers, SetTo, 0, 2),
+        SetDeaths(AllPlayers, SetTo, 0, 3),
     )
