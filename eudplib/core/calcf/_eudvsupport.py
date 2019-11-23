@@ -28,6 +28,7 @@ from .bitwise import f_bitand, f_bitor, f_bitxor, f_bitnot, f_bitlshift, f_bitrs
 
 
 from ..variable import EUDVariable
+from ..variable.evcommon import _ev
 
 
 def DefClsMethod(name, f):
@@ -53,6 +54,9 @@ def DefOperator(name, f):
 DefOperator("__mul__", lambda x, y: f_mul(x, y))
 DefOperator("__floordiv__", lambda x, y: f_div(x, y)[0])
 DefOperator("__mod__", lambda x, y: f_div(x, y)[1])
+DefOperator("__imul__", lambda x, y: f_mul(x, y, ret=[x]))
+DefOperator("__ifloordiv__", lambda x, y: f_div(x, y, ret=[x, _ev[4]])[0])
+DefOperator("__imod__", lambda x, y: f_div(x, y, ret=[_ev[4], x])[1])
 DefOperator("__and__", lambda x, y: f_bitand(x, y))
 DefOperator("__or__", lambda x, y: f_bitor(x, y))
 DefOperator("__xor__", lambda x, y: f_bitxor(x, y))
