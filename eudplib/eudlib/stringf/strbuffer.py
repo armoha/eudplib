@@ -365,7 +365,7 @@ class StringBuffer:
 
     def fadeInf(self, format_string, *args, color=None, wait=1, reset=True, line=-1, tag=None):
         fmtargs = _format_args(format_string, *args)
-        self.fadeIn(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
+        return self.fadeIn(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
 
     def fadeOut(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
         if not StringBuffer._method_template.IsSet():
@@ -415,7 +415,7 @@ class StringBuffer:
 
     def fadeOutf(self, format_string, *args, color=None, wait=1, reset=True, line=-1, tag=None):
         fmtargs = _format_args(format_string, *args)
-        self.fadeOut(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
+        return self.fadeOut(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
 
     def length(self):
         return f_strlen_epd(self.epd)
