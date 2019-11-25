@@ -191,11 +191,9 @@ class EUDByteWriter:
         cs.EUDEndSwitch()
 
         cs.DoActions(
-            [
-                suboffset.AddNumber(1),
-                self._write << c.SetDeathsX(0, c.SetTo, 0, 0, 0xFF00),
-                c.SetMemory(self._write + 20, c.SetTo, 0),
-            ]
+            suboffset.AddNumber(1),
+            self._write << c.SetDeathsX(0, c.SetTo, 0, 0, 0xFF00),
+            c.SetMemory(self._write + 20, c.SetTo, 0),
         )
         c.RawTrigger(
             conditions=[suboffset >= 4],

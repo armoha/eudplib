@@ -28,7 +28,7 @@ from ... import ctrlstru as cs
 from ...utils import EPD
 
 from ..rwcommon import br1, br2, bw1
-from ..memiof import f_setcurpl2cpcache
+from ..memiof import f_setcurpl2cpcache, f_dwread_epd
 
 
 @c.EUDFunc
@@ -86,7 +86,7 @@ def f_strlen_epd(epd):
         cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF0000))
         ret += 1
         cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF000000))
-        cs.DoActions([ret.AddNumber(1), c.SetMemory(0x6509B0, c.Add, 1)])
+        cs.DoActions(ret.AddNumber(1), c.SetMemory(0x6509B0, c.Add, 1))
     cs.EUDEndWhile()
     f_setcurpl2cpcache()
     c.EUDReturn(ret)
@@ -96,13 +96,13 @@ def f_strlen_epd(epd):
 def f_strlen(src):
     ret = c.EUDVariable()
     epd, mod = c.f_div(src, 4)
-    cs.DoActions([ret.SetNumber(0), epd.AddNumber(-0x58A364 // 4)])
+    cs.DoActions(ret.SetNumber(0), epd.AddNumber(-0x58A364 // 4))
     for i in range(1, 4):
         if cs.EUDIf()(mod == i):
             if cs.EUDIf()(c.MemoryXEPD(epd, c.Exactly, 0, 255 * (256 ** i))):
                 c.EUDReturn(ret)
             cs.EUDEndIf()
-            cs.DoActions([mod.AddNumber(1), ret.AddNumber(1)])
+            cs.DoActions(mod.AddNumber(1), ret.AddNumber(1))
         cs.EUDEndIf()
     epd += 1
     ret += f_strlen_epd(epd)
@@ -112,30 +112,32 @@ def f_strlen(src):
 @c.EUDFunc
 def f_strnstr(string, substring, count):
     br1.seekoffset(string)
-    bw1.seekoffset(substring)
-    dst, _offset, _suboffset = c.EUDCreateVariables(3)
+    br2.seekoffset(substring)
+    dst = c.EUDVariable()
     dst << -1
 
-    b = bw1.readbyte()
+    b = br2.readbyte()
     if cs.EUDIf()(b == 0):
         c.EUDReturn(string)
     cs.EUDEndIf()
     if cs.EUDWhile()(count >= 1):
         a = br1.readbyte()
-        cs.DoActions([dst.AddNumber(1), count.SubtractNumber(1)])
+        cs.DoActions(dst.AddNumber(1), count.SubtractNumber(1))
         cs.EUDBreakIf(a == 0)
         cs.EUDContinueIfNot(a == b)
-        _offset << br1._offset
-        _suboffset << br1._suboffset
+        offset = f_dwread_epd(EPD(br1._read) + 5)
+        suboffset = f_dwread_epd(EPD(br1._suboffset.getValueAddr()))
         if cs.EUDInfLoop()():
-            d = bw1.readbyte()
+            d = br2.readbyte()
             if cs.EUDIf()(d == 0):
                 c.EUDReturn(string + dst)
             cs.EUDEndIf()
             cs.EUDBreakIfNot(br1.readbyte() == d)
         cs.EUDEndInfLoop()
-        br1._offset << _offset
-        br1._suboffset << _suboffset
-        bw1.seekoffset(substring + 1)
+        c.VProc([offset, suboffset], [
+            offset.SetDest(EPD(br1._read) + 5),
+            suboffset.SetDest(br1._suboffset)
+        ])
+        br2.seekoffset(substring + 1)
     cs.EUDEndWhile()
     c.EUDReturn(-1)

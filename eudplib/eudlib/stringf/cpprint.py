@@ -28,8 +28,16 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
 from ..eudarray import EUDArray
-from ..memiof import (CPByteWriter, f_bread_epd, f_cunitread_epd, f_dwwrite,
-                      f_getcurpl, f_setcurpl, f_dwepdread_epd, f_wread_epd)
+from ..memiof import (
+    CPByteWriter,
+    f_bread_epd,
+    f_cunitread_epd,
+    f_dwwrite,
+    f_getcurpl,
+    f_setcurpl,
+    f_dwepdread_epd,
+    f_wread_epd,
+)
 from ..rwcommon import br1
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
@@ -40,7 +48,6 @@ from math import ceil
 
 cw = CPByteWriter()
 prevcp = c.EUDVariable()
-proc_lf = c.EUDLightVariable()
 
 
 @c.EUDFunc
@@ -94,8 +101,8 @@ def f_gettextptr():
     ret << 0
     for i in range(3, -1, -1):
         c.RawTrigger(
-            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
-            actions=ret.AddNumber(2**i)
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2 ** i),
+            actions=ret.AddNumber(2 ** i),
         )
     return ret
 
@@ -106,8 +113,8 @@ def f_getnextchatdst():
     ret << ut.EPD(0x640B60)
     for i in range(3, -1, -1):
         c.RawTrigger(
-            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
-            actions=ret.AddNumber(ceil((2**i) * 54.5))
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2 ** i),
+            actions=ret.AddNumber(ceil((2 ** i) * 54.5)),
         )
     return ret
 
@@ -117,11 +124,12 @@ def GetTBLAddr(tblId):
     add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
     if cs.EUDExecuteOnce()():
         TBL_ptr, TBL_epd = f_dwepdread_epd(ut.EPD(0x6D5A30))
-        cs.DoActions(
+        c.VProc(
+            [TBL_ptr, TBL_epd],
             [
-                c.SetMemory(add_TBL_ptr + 20, c.SetTo, TBL_ptr),
-                c.SetMemory(add_TBL_epd + 20, c.SetTo, TBL_epd),
-            ]
+                TBL_ptr.SetDest(ut.EPD(add_TBL_ptr) + 5),
+                TBL_epd.SetDest(ut.EPD(add_TBL_epd) + 5),
+            ],
         )
     cs.EUDEndExecuteOnce()
     r, m = c.f_div(tblId, 2)
@@ -136,17 +144,8 @@ def GetTBLAddr(tblId):
 def _addstr_cp():
     b = c.EUDVariable()
     if cs.EUDInfLoop()():
-        c.SetVariables(b, br1.readbyte())
+        b = br1.readbyte()
         cs.EUDBreakIf(b == 0)
-        if cs.EUDIf()([proc_lf.Exactly(1), b == ord("\n")]):
-            cw.flushdword()
-            dst = f_getnextchatdst()
-            cs.DoActions([
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                c.DisplayText("\r\x02"),
-                c.SetCurrentPlayer(dst),
-            ])
-        cs.EUDEndIf()
         cw.writebyte(b)
     cs.EUDEndInfLoop()
 
@@ -205,10 +204,8 @@ def f_cpstr_addptr(number):
     """
     digit = [c.EUDLightVariable() for _ in range(8)]
     cs.DoActions(
-        [
-            [digit[i].SetNumber(0) for i in range(8)],
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
-        ]
+        [digit[i].SetNumber(0) for i in range(8)],
+        c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
     )
 
     def f(x):
@@ -236,14 +233,12 @@ def f_cpstr_addptr(number):
                     ),
                 )
             cs.DoActions(
+                c.AddCurrentPlayer(1),
                 [
-                    c.AddCurrentPlayer(1),
-                    [
-                        c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0)
-                        if i == 16
-                        else []
-                    ],
-                ]
+                    c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0)
+                    if i == 16
+                    else []
+                ],
             )
 
 

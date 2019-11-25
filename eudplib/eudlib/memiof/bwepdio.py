@@ -61,7 +61,6 @@ def _wwriter(epd, subp, w):
         b0, b1 = dwm.f_dwbreak(w)[2:4]
         cpm.f_bwrite_cp(0, 3, b0)
         cpm.f_bwrite_cp(1, 0, b1)
-        cs.DoActions(c.SetResources(0, c.SetTo, b1, c.Gas))
 
     cs.EUDEndSwitch()
     cp.f_setcurpl2cpcache()

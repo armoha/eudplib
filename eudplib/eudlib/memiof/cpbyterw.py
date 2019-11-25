@@ -52,7 +52,7 @@ class CPByteWriter:
         random.shuffle(r)
         for i in r:
             if cs.EUDSwitchCase()(i):
-                cs.DoActions([self._b[i].SetNumber(byte), self._suboffset.AddNumber(1)])
+                cs.DoActions(self._b[i].SetNumber(byte), self._suboffset.AddNumber(1))
                 cs.EUDBreak()
 
         if cs.EUDSwitchCase()(3):
@@ -80,9 +80,7 @@ class CPByteWriter:
                     ],
                 )
         cs.DoActions(
-            [
-                c.AddCurrentPlayer(1),
-                self._suboffset.SetNumber(0),
-                [self._b[i].SetNumber(ut.b2i1(b"\r")) for i in range(4)],
-            ]
+            c.AddCurrentPlayer(1),
+            self._suboffset.SetNumber(0),
+            [self._b[i].SetNumber(ut.b2i1(b"\r")) for i in range(4)],
         )

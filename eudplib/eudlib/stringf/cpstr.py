@@ -29,7 +29,7 @@ from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import GetStringSectionName
 
 
-@c.EUDFunc
+@c.EUDTypedFunc([c.TrgString])
 def GetMapStringAddr(strId):
     add_STR_ptr, add_STR_epd = c.Forward(), c.Forward()
     if cs.EUDExecuteOnce()():

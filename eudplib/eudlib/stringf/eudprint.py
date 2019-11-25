@@ -221,15 +221,15 @@ def _OmitEOS(*args):
     )
     ptr = any(ut.isUnproxyInstance(x, hptr) for x in args)
     cs.DoActions(
-        [c.SetMemory(_str_jump + 348, c.SetTo, _str_dst)]
-        + [c.SetNextPtr(_dw_jump, _dw_dst) if dw else []]
-        + [c.SetNextPtr(_ptr_jump, _ptr_dst) if ptr else []]
+        c.SetMemory(_str_jump + 348, c.SetTo, _str_dst),
+        c.SetNextPtr(_dw_jump, _dw_dst) if dw else [],
+        c.SetNextPtr(_ptr_jump, _ptr_dst) if ptr else [],
     )
     yield (dw, ptr)
     cs.DoActions(
-        [c.SetMemory(_str_jump + 348, c.SetTo, _str_EOS)]
-        + [c.SetNextPtr(_dw_jump, _dw_EOS) if dw else []]
-        + [c.SetNextPtr(_ptr_jump, _ptr_EOS) if ptr else []]
+        c.SetMemory(_str_jump + 348, c.SetTo, _str_EOS),
+        c.SetNextPtr(_dw_jump, _dw_EOS) if dw else [],
+        c.SetNextPtr(_ptr_jump, _ptr_EOS) if ptr else [],
     )
 
 

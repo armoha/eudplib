@@ -14,7 +14,9 @@ def test_strbuffer():
     s1.append(hptr(b))
 
     s1.append(347, "test.")
+    EP_SetRValueStrictMode(False)
     s1.delete(1, 1)
+    EP_SetRValueStrictMode(True)
 
     userid = f_getuserplayerid()
     DoActions(SetCurrentPlayer(userid), SetMemory(0x640B58, SetTo, 0))
