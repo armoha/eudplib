@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
+String table manager. Internally used in eudplib.
+
 Copyright (c) 2014 trgk
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,11 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-"""
-String table manager. Internally used in eudplib.
-"""
-
 from ... import utils as ut
+from ...localize import _
 
 
 def IgnoreColor(s):
@@ -49,6 +48,10 @@ def u2bn(n):
     return u2bn_map[n]
 
 
+def roundup_by_4(num):
+    return -((-num) // 4) * 4
+
+
 class TBL:
     def __init__(self, content=None, init_chkt=None, load_entry=2, save_entry=2):
         #
@@ -66,7 +69,6 @@ class TBL:
         self._emptystring = []
         self._loaded = False
         self._first_extended_string = None
-        self._multiple_of_4 = []
 
         if content is not None:
             if init_chkt:
@@ -225,7 +227,7 @@ class TBL:
         # Starcraft: Remastered uses both utf-8 and multibyte encoding.
         string = ut.u2b(string)
         if not isinstance(string, bytes):
-            raise ut.EPError("Invalid type for string")
+            raise ut.EPError(_("Invalid type for string"))
 
         stringindex = len(self._dataindextb)
 
@@ -252,7 +254,7 @@ class TBL:
                         self._dataindextb[i] += 1
                 self._dataindextb[stringindex] = dataindex
                 # string + b'\0'
-                self._capacity += len(string) + 1
+                self._capacity += roundup_by_4(len(string) + 1)
             else:
                 if self._first_extended_string is None:
                     self._first_extended_string = string
@@ -260,11 +262,11 @@ class TBL:
                 self._datatb.append(string)
                 self._dataindextb.append(dataindex)
                 # string + b'\0' + string offset
-                self._capacity += len(string) + 1 + self._saveentry
+                self._capacity += roundup_by_4(len(string) + 1) + self._saveentry
             self._stringmap[string] = stringindex
 
         ut.ep_assert(
-            self._capacity < (1 << (8 * self._saveentry)), "String table overflow"
+            self._capacity < (1 << (8 * self._saveentry)), _("String table overflow")
         )
 
         return stringindex
@@ -280,29 +282,25 @@ class TBL:
                 return None
 
     def GetStringIndex(self, string):
-        string = ut.u2b(string)
-        if not isinstance(string, bytes):
-            raise ut.EPError("Invalid type for string")
-
         try:
-            return self._stringmap[string] + 1
-
+            return self._stringmap[ut.u2b(string)] + 1
         except KeyError:
-            return self.AddString(string) + 1
+            try:
+                return self._stringmap[ut.u2utf8(string)] + 1
+            except KeyError:
+                return self.AddString(string) + 1
 
     def SaveTBL(self):
         outbytes = []
 
-        if self._multiple_of_4:
-            self._SetAddrToMultipleOf4()
-
         # calculate offset of each string
         stroffset = []
         size = self._saveentry
-        outindex = size * len(self._dataindextb) + size
+        outindex = roundup_by_4(size * len(self._dataindextb) + size)
+
         for s in self._datatb:
             stroffset.append(outindex)
-            outindex += len(s) + 1
+            outindex += roundup_by_4(len(s) + 1)
         i2b = i2bn(size)
 
         # String count
@@ -312,17 +310,22 @@ class TBL:
         for dataidx in self._dataindextb:
             outbytes.append(i2b(stroffset[dataidx]))
 
+        tablesize = size * (len(self._dataindextb) + 1)
+        for _ in range(roundup_by_4(tablesize) - tablesize):
+            outbytes.append(b"\0")
+
         # String data
         for s in self._datatb:
             outbytes.append(s)
-            outbytes.append(b"\0")
+            for _ in range(roundup_by_4(len(s) + 1) - len(s)):
+                outbytes.append(b"\0")
 
         return b"".join(outbytes)
 
     def ForceAddString(self, string):
         string = ut.u2b(string)  # Starcraft uses multibyte encoding.
         if not isinstance(string, bytes):
-            raise ut.EPError("Invalid type for string")
+            raise ut.EPError(_("Invalid type for string"))
 
         stringindex = len(self._dataindextb)
 
@@ -332,39 +335,10 @@ class TBL:
         self._datatb.append(string)
         self._dataindextb.append(dataindex)
         # string + b'\0' + string offset
-        self._capacity += len(string) + 1 + self._saveentry
+        self._capacity += roundup_by_4(len(string) + 1) + self._saveentry
 
         ut.ep_assert(
-            self._capacity < (1 << (8 * self._saveentry)), "String table overflow"
+            self._capacity < (1 << (8 * self._saveentry)), _("String table overflow")
         )
 
         return stringindex
-
-    def AddStringWithAddrMultipleOf4(self, string):
-        filler = self.ForceAddString("Arta")
-        stringindex = self.ForceAddString(string)
-        self._multiple_of_4.append(stringindex)
-
-        ut.ep_assert(
-            filler + 1 == stringindex, "Filler string is not next to new string"
-        )
-
-        return stringindex
-
-    def _SetAddrToMultipleOf4(self):
-        # calculate offset of buffer string
-        stroffset = []
-        outindex = self._saveentry * (len(self._dataindextb) + 1)
-
-        for s in self._datatb:
-            stroffset.append(outindex)
-            outindex += len(s) + 1
-        for index in self._multiple_of_4:
-            bufferoffset = stroffset[self._dataindextb[index]]
-            if bufferoffset % 4 != 0:
-                self._datatb[self._dataindextb[index - 1]] = b"Arta"[
-                    : 4 - bufferoffset % 4
-                ]
-                self._capacity -= bufferoffset % 4
-                for i, offset in enumerate(stroffset[index - 1 :]):
-                    stroffset[index - 1 + i] = offset - bufferoffset % 4
