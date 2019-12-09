@@ -234,11 +234,9 @@ def f_cpstr_addptr(number):
                 )
             cs.DoActions(
                 c.AddCurrentPlayer(1),
-                [
-                    c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0)
-                    if i == 16
-                    else []
-                ],
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0)
+                if i == 16
+                else [],
             )
 
 
@@ -317,10 +315,10 @@ def f_eprintln(*args):
         if cs.EUDIf()(IsUserCP()):
             prevcp << f_getcurpl()
             _eprintln_print << c.RawTrigger(
-                nextptr=0, actions=[c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))]
+                nextptr=0, actions=c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))
             )
             _eprintln_EOS << c.RawTrigger(
-                actions=[c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)]
+                actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
             )
             f_setcurpl(prevcp)
         cs.EUDEndIf()
@@ -367,7 +365,7 @@ def f_eprintln2(*args):
             f_setcurpl(epd)
             _eprintln2_print << c.RawTrigger(nextptr=0)
             _eprintln2_EOS << c.RawTrigger(
-                actions=[c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)]
+                actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
             )
             f_setcurpl(prevcp)
         cs.EUDEndIf()

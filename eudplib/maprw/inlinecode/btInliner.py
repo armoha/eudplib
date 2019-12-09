@@ -24,11 +24,10 @@ THE SOFTWARE.
 """
 
 
-import random
-
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
+from ... import utils as ut
 from ...trigtrg.runtrigtrg import _runner_cp
 
 sharedTriggers = []
@@ -106,9 +105,7 @@ def InlineCodifyBinaryTrigger(bTrigger):
             tEnd = c.RawTrigger()
         else:
             cs.EUDSwitch(cp)
-            r = list(range(8))
-            random.shuffle(r)
-            for player in r:
+            for player in ut.RandList(range(8)):
                 if playerExecutesTrigger[player]:
                     if cs.EUDSwitchCase()(player):
                         c.RawTrigger(trigSection=bTrigger)

@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import random
-
 from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl
 
 from eudplib import core as c, ctrlstru as cs, utils as ut
@@ -39,9 +37,7 @@ def f_playerexist(player):
     pts = 0x51A280
 
     cs.EUDSwitch(player)
-    r = list(range(8))
-    random.shuffle(r)
-    for p in r:
+    for p in ut.RandList(range(8)):
         if cs.EUDSwitchCase()(p):
             if cs.EUDIf()(c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4))):
                 c.EUDReturn(0)

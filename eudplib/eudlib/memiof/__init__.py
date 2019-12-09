@@ -57,7 +57,7 @@ from .cpmemio import (
 )
 
 
-from .byterw import EUDByteReader, EUDByteWriter
+from .byterw import EUDByteReader, EUDByteWriter, EUDByteStream
 
 from .cpbyterw import CPByteWriter
 

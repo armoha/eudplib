@@ -56,9 +56,7 @@ def _f_updatecpcache():
     cpcond = c.curpl.cpcacheMatchCond()
     cpcache = c.curpl.GetCPCache()
     cpcache << 0
-    r = list(range(31, -1, -1))
-    random.shuffle(r)
-    for i in r:
+    for i in ut.RandList(range(32)):
         u = random.randint(234, 65535)
         c.RawTrigger(
             conditions=c.DeathsX(ut.EPD(0x6509B0) - 12 * u, c.AtLeast, 1, u, 2 ** i),
