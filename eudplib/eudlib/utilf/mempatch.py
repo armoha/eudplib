@@ -48,22 +48,22 @@ def poppatchstack():
 
 @c.EUDFunc
 def f_dwpatch_epd(dstepd, value):
-    global patchstack, ps_top, dws_top
+    global dws_top
 
     prev_value = f_dwread_epd(dstepd)
+    dws_pos = ut.EPD(dwstack) + dws_top
     c.VProc(
-        [dstepd, value, dws_top, prev_value],
+        [dstepd, value, dws_pos, prev_value],
         [
             dstepd.SetDest(ut.EPD(value.getDestAddr())),
-            dws_top.AddNumber(ut.EPD(dwstack)),
-            dws_top.SetDest(ut.EPD(prev_value.getDestAddr())),
+            dws_pos.SetDest(ut.EPD(prev_value.getDestAddr())),
         ],
     )
 
     pushpatchstack(dstepd)
-    pushpatchstack(dws_top)
+    pushpatchstack(dws_pos)
     pushpatchstack(1)
-    dws_top += 1 - ut.EPD(dwstack)
+    dws_top += 1
 
 
 @c.EUDFunc
