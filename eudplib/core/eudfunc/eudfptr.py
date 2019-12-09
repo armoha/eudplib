@@ -26,6 +26,7 @@ THE SOFTWARE.
 from .. import rawtrigger as rt
 from .. import allocator as ac
 from ... import utils as ut
+from ...localize import _
 
 from .eudfuncn import EUDFuncN
 from .eudtypedfuncn import applyTypes
@@ -120,7 +121,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):
             return cls(_from=_from)
 
         def checkValidFunction(self, f):
-            ut.ep_assert(isinstance(f, EUDFuncN), "%s is not an EUDFuncN" % f)
+            ut.ep_assert(isinstance(f, EUDFuncN), _("{} is not an EUDFuncN").format(f))
             if not f._fstart:
                 f._CreateFuncBody()
 
@@ -128,11 +129,11 @@ def EUDTypedFuncPtr(argtypes, rettypes):
             f_retn = f._retn
             ut.ep_assert(
                 argn == f_argn,
-                "Function requires %d arguments (Expected %d)" % (f_argn, argn),
+                _("Function requires {} arguments (Expected {})").format(f_argn, argn),
             )
             ut.ep_assert(
                 retn == f_retn,
-                "Function returns %d values (Expected %d)" % (f_retn, retn),
+                _("Function returns {} values (Expected {})").format(f_retn, retn),
             )
 
         def setFunc(self, f):

@@ -27,6 +27,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import trigtrg as tt
 from eudplib import utils as ut
+from eudplib.localize import _
 
 from ..memiof import f_cunitepdread_epd, f_dwepdread_epd
 
@@ -50,7 +51,7 @@ def EUDLoopList(header_offset, break_offset=None):
     f_dwepdread_epd(epd, ret=[ptr, epd])
     cs.EUDEndWhile()
 
-    ut.ep_assert(ut.EUDPopBlock(blockname)[1] is header_offset, "listloop mismatch")
+    ut.ep_assert(ut.EUDPopBlock(blockname)[1] is header_offset, _("listloop mismatch"))
 
 
 def EUDLoopUnit():
@@ -79,11 +80,11 @@ def EUDLoopNewUnit(allowance=2):
         epd += 0xA5 // 4
         if cs.EUDIf()(c.MemoryXEPD(epd, c.AtLeast, 0x100, 0xFF00)):
             cs.DoActions(
-                [c.SetMemoryXEPD(epd, c.SetTo, 0, 0xFF00), epd.AddNumber(-(0xA5 // 4))]
+                c.SetMemoryXEPD(epd, c.SetTo, 0, 0xFF00), epd.AddNumber(-(0xA5 // 4))
             )
             yield ptr, epd
         if cs.EUDElse()():
-            cs.DoActions([tos0.AddNumber(1), epd.AddNumber(-(0xA5 // 4))])
+            cs.DoActions(tos0.AddNumber(1), epd.AddNumber(-(0xA5 // 4)))
             cs.EUDBreakIf(tos0.AtLeast(allowance))
         cs.EUDEndIf()
         cs.EUDSetContinuePoint()
@@ -103,12 +104,12 @@ def EUDLoopUnit2():
         offset, cont = 0xC // 4, c.MemoryEPD(epd, c.Exactly, 0)
     else:  # Sprite가 0이면 없는 유닛으로 판단.
         offset, cont = 0x4C // 4, c.MemoryXEPD(epd, c.Exactly, 0, 0xFF00)
-    cs.DoActions([ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8) + offset)])
+    cs.DoActions(ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8) + offset))
     if cs.EUDLoopN()(1700):
         cs.EUDContinueIf(cont)
         yield ptr, epd - offset
         cs.EUDSetContinuePoint()
-        cs.DoActions([ptr.AddNumber(336), epd.AddNumber(336 // 4)])
+        cs.DoActions(ptr.AddNumber(336), epd.AddNumber(336 // 4))
     cs.EUDEndLoopN()
 
 

@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from eudplib import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_dwepdread_epd, f_wread_epd, f_dwread_epd
+from eudplib.localize import _
 from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import GetStringSectionName
 
@@ -35,10 +36,8 @@ def GetMapStringAddr(strId):
     if cs.EUDExecuteOnce()():
         STR_ptr, STR_epd = f_dwepdread_epd(ut.EPD(0x5993D4))
         cs.DoActions(
-            [
-                c.SetMemory(add_STR_ptr + 20, c.SetTo, STR_ptr),
-                c.SetMemory(add_STR_epd + 20, c.SetTo, STR_epd),
-            ]
+            c.SetMemory(add_STR_ptr + 20, c.SetTo, STR_ptr),
+            c.SetMemory(add_STR_epd + 20, c.SetTo, STR_epd),
         )
     cs.EUDEndExecuteOnce()
     str_chunk_name = GetStringSectionName()
@@ -51,7 +50,7 @@ def GetMapStringAddr(strId):
         c.RawTrigger(actions=add_STR_epd << strId.AddNumber(0))
         ret = f_dwread_epd(strId)
     else:
-        raise ut.EPError("Invalid string section name: {}".format(str_chunk_name))
+        raise ut.EPError(_("Invalid string section name: {}").format(str_chunk_name))
     c.RawTrigger(actions=add_STR_ptr << ret.AddNumber(0))
     c.EUDReturn(ret)
 
@@ -87,7 +86,7 @@ class CPString:
         elif isinstance(content, str) or isinstance(content, bytes):
             self.content = _s2b(content)
         else:
-            raise ut.EPError("Unexpected type for CPString: %s" % type(content))
+            raise ut.EPError(_("Unexpected type for CPString: {}").format(type(content)))
 
         self.length = len(self.content) // 4
         self.trigger = list()
@@ -113,7 +112,7 @@ class CPString:
                 modlength -= 1
         actions.extend(
             [
-                [c.SetMemory(0x6509B0, c.Add, modlength) if modlength else []],
+                c.SetMemory(0x6509B0, c.Add, modlength) if modlength else [],
                 _addcpcache(self.length),
             ]
         )

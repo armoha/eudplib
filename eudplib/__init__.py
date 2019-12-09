@@ -24,6 +24,8 @@ THE SOFTWARE.
 """
 
 
+from .localize import *
+
 oldGlobals = set(globals().keys())
 
 from .utils import *

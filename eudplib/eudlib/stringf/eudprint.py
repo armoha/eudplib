@@ -26,6 +26,7 @@ THE SOFTWARE.
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
+from eudplib.localize import _
 
 from ..rwcommon import br1, bw1
 from .dbstr import DBString
@@ -39,7 +40,7 @@ _ptr_jump, _ptr_EOS, _ptr_dst = c.Forward(), c.Forward(), c.Forward()
 def _addstr_core(_f=[]):
     if not _str_jump.IsSet():
 
-        def _():
+        def f():
             global _str_jump, _str_EOS, _str_dst
             c.PushTriggerScope()
             strlen = c.EUDVariable()
@@ -63,7 +64,7 @@ def _addstr_core(_f=[]):
 
             return init, _str_dst, strlen
 
-        _f.extend(_())
+        _f.extend(f())
 
     init, end, strlen = _f
     nptr = c.Forward()
@@ -270,12 +271,12 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
 
     strlens = list()
 
-    def _proc_arg(index, arg):
+    def proc_arg(index, arg):
         addf = argnf
         if index == 0:
             addf = arg0f
 
-        def _(argument):
+        def dstmsg(argument):
             if index == 0:
                 nonlocal dst
                 return (dst, argument)
@@ -294,22 +295,22 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
                 _conststr_dict[arg] = c.Db(arg + b"\0")
             arg = _conststr_dict[arg]
         if ut.isUnproxyInstance(arg, c.Db):
-            strlen = addf["epd"](*_(ut.EPD(arg)))
+            strlen = addf["epd"](*dstmsg(ut.EPD(arg)))
         elif ut.isUnproxyInstance(arg, DBString):
-            strlen = addf["epd"](*_(ut.EPD(arg.GetStringMemoryAddr())))
+            strlen = addf["epd"](*dstmsg(ut.EPD(arg.GetStringMemoryAddr())))
         elif ut.isUnproxyInstance(arg, epd2s):
-            strlen = addf["epd"](*_(arg._value))
+            strlen = addf["epd"](*dstmsg(arg._value))
         elif ut.isUnproxyInstance(arg, ptr2s):
-            strlen = addf["str"](*_(arg._value))
+            strlen = addf["str"](*dstmsg(arg._value))
         elif ut.isUnproxyInstance(arg, c.EUDVariable):
-            strlen = addf["dw"](*_(arg))
+            strlen = addf["dw"](*dstmsg(arg))
         elif c.IsConstExpr(arg):
-            strlen = addf["dw"](*_(arg))
+            strlen = addf["dw"](*dstmsg(arg))
         elif ut.isUnproxyInstance(arg, hptr):
-            strlen = addf["ptr"](*_(arg._value))
+            strlen = addf["ptr"](*dstmsg(arg._value))
         else:
             raise ut.EPError(
-                "Object with unknown parameter type %s given to f_eudprint." % type(arg)
+                _("Object with unknown parameter type {} given to f_eudprint.").format(type(arg))
             )
         strlens.append(strlen)
 
@@ -317,16 +318,16 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
         if len(args) >= 2:
             for _ in _OmitEOS(*args):
                 for i, arg in enumerate(args[:-1]):
-                    _proc_arg(i, arg)
-            _proc_arg(-1, args[-1])
+                    proc_arg(i, arg)
+            proc_arg(-1, args[-1])
 
             c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
         else:
-            _proc_arg(0, args[0])
+            proc_arg(0, args[0])
     else:
         for _ in _OmitEOS(*args):
             for i, arg in enumerate(args):
-                _proc_arg(i, arg)
+                proc_arg(i, arg)
         if len(args) >= 2:
             c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
 

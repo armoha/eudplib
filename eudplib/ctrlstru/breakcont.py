@@ -26,6 +26,7 @@ THE SOFTWARE.
 from . import loopblock as lb, swblock as sb
 
 from .. import utils as ut
+from ..localize import _
 
 
 def EUDContinue():
@@ -60,7 +61,7 @@ def EUDBreak():
             sb.EUDSwitchBreak()
             return
 
-    raise ut.EPError("No loop/switch block surrounding this code area")
+    raise ut.EPError(_("No loop/switch block surrounding this code area"))
 
 
 def EUDBreakIf(conditions):
@@ -72,7 +73,7 @@ def EUDBreakIf(conditions):
             sb.EUDSwitchBreakIf(conditions)
             return
 
-    raise ut.EPError("No loop/switch block surrounding this code area")
+    raise ut.EPError(_("No loop/switch block surrounding this code area"))
 
 
 def EUDBreakIfNot(conditions):
@@ -84,4 +85,4 @@ def EUDBreakIfNot(conditions):
             sb.EUDSwitchBreakIfNot(conditions)
             return
 
-    raise ut.EPError("No loop/switch block surrounding this code area")
+    raise ut.EPError(_("No loop/switch block surrounding this code area"))

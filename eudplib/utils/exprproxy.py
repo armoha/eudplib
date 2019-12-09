@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from eudplib.localize import _
+
 
 class ExprProxy:
 
@@ -36,7 +38,7 @@ class ExprProxy:
         try:
             return cls(_from=_from)
         except TypeError as e:
-            raise TypeError("Type %s is not castable" % cls.__name__, e)
+            raise TypeError(_("Type {} is not castable").format(cls.__name__), e)
 
     def getValue(self):
         return self._value

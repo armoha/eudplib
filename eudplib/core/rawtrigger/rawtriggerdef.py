@@ -27,6 +27,7 @@ from ..eudobj import EUDObject, Db
 from .triggerscope import NextTrigger, _RegisterTrigger
 from .condition import Condition
 from eudplib import utils as ut
+from eudplib.localize import _
 
 
 # Trigger counter thing
@@ -97,8 +98,8 @@ class RawTrigger(EUDObject):
                 actions = []
             actions = ut.FlattenList(actions)
 
-            ut.ep_assert(len(conditions) <= 16, "Too many conditions")
-            ut.ep_assert(len(actions) <= 64, "Too many actions")
+            ut.ep_assert(len(conditions) <= 16, _("Too many conditions"))
+            ut.ep_assert(len(actions) <= 64, _("Too many actions"))
 
             # Register condition/actions to trigger
             for i, cond in enumerate(conditions):

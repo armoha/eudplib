@@ -31,6 +31,7 @@ from .. import allocator as ac
 from .. import rawtrigger as bt
 from .. import variable as ev
 from .trace.tracetool import _EUDTracePush, _EUDTracePop
+from ...localize import _
 from ...utils.blockstru import BlockStruManager, SetCurrentBlockStruManager
 
 
@@ -128,7 +129,7 @@ class EUDFuncN:
         bt.PopTriggerScope()
 
         # Finalize
-        ut.ep_assert(f_bsm.empty(), "Block start/end mismatch inside function")
+        ut.ep_assert(f_bsm.empty(), _("Block start/end mismatch inside function"))
         SetCurrentBlockStruManager(prev_bsm)
 
         # No return -> set return count to 0
@@ -148,8 +149,8 @@ class EUDFuncN:
 
         ut.ep_assert(
             len(retv) == len(self._frets),
-            "Numbers of returned value should be constant."
-            " (From function %s)" % self._bodyfunc.__name__,
+            _("Number of returned values should be constant.")
+            + _(" (From function %s)").format(self._bodyfunc.__name__),
         )
 
         constAssigns = [
@@ -176,7 +177,7 @@ class EUDFuncN:
 
         ut.ep_assert(
             len(args) == self._argn,
-            "Argument number mismatch : " + "len(%s) != %d" % (repr(args), self._argn),
+            _("Argument number mismatch : ") + "len(%s) != %d" % (repr(args), self._argn),
         )
 
         fcallend = ac.Forward()

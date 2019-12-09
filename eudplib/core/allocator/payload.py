@@ -26,9 +26,9 @@ THE SOFTWARE.
 from . import rlocint, pbuffer
 from . import constexpr
 from eudplib import utils as ut
-from eudplib.utils import stackobjs
+from eudplib.localize import _
+from eudplib.utils import stackobjs, RandList
 
-import random
 import time
 
 _found_objects = []
@@ -77,7 +77,7 @@ def CompressPayload(mode):
 
     global _payload_compress
     if mode not in [True, False]:
-        raise ut.EPError("Invalid type")
+        raise ut.EPError(_("Invalid type"))
 
     if mode:
         _payload_compress = True
@@ -131,7 +131,7 @@ def CollectObjects(root):
     global _dynamic_objects_set
     global _untraversed_objects
 
-    lprint("[Stage 1/3] CollectObjects", flush=True)
+    lprint(_("[Stage 1/3] CollectObjects"), flush=True)
 
     phase = PHASE_COLLECTING
 
@@ -148,8 +148,7 @@ def CollectObjects(root):
     while _untraversed_objects:
         while _untraversed_objects:
             lprint(
-                " - Collected %d / %d objects"
-                % (
+                _(" - Collected {} / {} objects").format(
                     len(_found_objects_set),
                     len(_found_objects_set) + len(_untraversed_objects),
                 )
@@ -168,13 +167,11 @@ def CollectObjects(root):
             objc.EndWrite()
 
     if len(_found_objects_set) == 0:
-        raise ut.EPError("No object collected")
+        raise ut.EPError(_("No object collected"))
 
     # Shuffle objects -> Randomize(?) addresses
     _found_objects_set.remove(_rootobj)
-    fo2 = list(_found_objects_set)
-    random.shuffle(fo2)
-    _found_objects = [_rootobj] + fo2
+    _found_objects = [_rootobj] + RandList(_found_objects_set)
 
     # cleanup
     _found_objects_set = None
@@ -182,7 +179,7 @@ def CollectObjects(root):
 
     # Final
     lprint(
-        " - Collected %d / %d objects" % (len(_found_objects), len(_found_objects)),
+        _(" - Collected {} / {} objects").format(len(_found_objects), len(_found_objects)),
         flush=True,
     )
 
@@ -284,7 +281,7 @@ def AllocObjects():
     phase = PHASE_ALLOCATING
     objn = len(_found_objects)
 
-    lprint("[Stage 2/3] AllocObjects", flush=True)
+    lprint(_("[Stage 2/3] AllocObjects"), flush=True)
 
     # Quick and less space-efficient approach
     if not _payload_compress:
@@ -295,10 +292,10 @@ def AllocObjects():
             _alloctable[obj] = lallocaddr
             lallocaddr += allocsize
 
-            lprint(" - Allocated %d / %d objects" % (i + 1, objn))
+            lprint(_(" - Allocated {} / {} objects").format(i + 1, objn))
         _payload_size = lallocaddr
 
-        lprint(" - Allocated %d / %d objects" % (objn, objn), flush=True)
+        lprint(_(" - Allocated {} / {} objects").format(objn, objn), flush=True)
         phase = None
         return
 
@@ -316,14 +313,14 @@ def AllocObjects():
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
 
             raise ut.EPError(
-                "Occupation map length (%d) & Object size mismatch for object (%d)"
-                % (len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
+                _("Occupation map length ({}) & Object size mismatch for object ({})")
+                .format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
             )
-        lprint(" - Preprocessed %d / %d objects" % (i + 1, objn))
+        lprint(_(" - Preprocessed {} / {} objects").format(i + 1, objn))
 
-    lprint(" - Preprocessed %d / %d objects" % (objn, objn), flush=True)
+    lprint(_(" - Preprocessed {} / {} objects").format(objn, objn), flush=True)
 
-    lprint(" - Allocating objects..", flush=True)
+    lprint(_(" - Allocating objects.."), flush=True)
     stackobjs.StackObjects(_found_objects, dwoccupmap_dict, _alloctable)
 
     # Get payload length
@@ -341,7 +338,7 @@ def ConstructPayload():
     global phase
 
     phase = PHASE_WRITING
-    lprint("[Stage 3/3] ConstructPayload", flush=True)
+    lprint(_("[Stage 3/3] ConstructPayload"), flush=True)
     objn = len(_found_objects)
 
     pbuf = pbuffer.PayloadBuffer(_payload_size)
@@ -354,13 +351,13 @@ def ConstructPayload():
         written_bytes = pbuf.EndWrite()
         ut.ep_assert(
             written_bytes == objsize,
-            "obj.GetDataSize()(%d) != Real payload size(%d) for object %s"
-            % (objsize, written_bytes, obj),
+            _("obj.GetDataSize()({}) != Real payload size({}) for object {}")
+            .format(objsize, written_bytes, obj),
         )
 
-        lprint(" - Written %d / %d objects" % (i + 1, objn))
+        lprint(_(" - Written {} / {} objects").format(i + 1, objn))
 
-    lprint(" - Written %d / %d objects" % (objn, objn), flush=True)
+    lprint(_(" - Written {} / {} objects").format(objn, objn), flush=True)
     phase = None
     return pbuf.CreatePayload()
 

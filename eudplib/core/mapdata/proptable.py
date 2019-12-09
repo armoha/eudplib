@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 
 from eudplib import utils as ut
+from eudplib.localize import _
 from .unitprp import UnitProperty
 
 _uprpdict = {}
@@ -54,7 +55,7 @@ def InitPropertyMap(chkt):
 def GetPropertyIndex(prop):
     ut.ep_assert(
         isinstance(prop, UnitProperty) or isinstance(prop, bytes),
-        "Invalid property type",
+        _("Invalid property type"),
     )
 
     prop = bytes(prop)
@@ -68,7 +69,7 @@ def GetPropertyIndex(prop):
                 indexFound = True
                 break
 
-        ut.ep_assert(indexFound, "Unit property table overflow")
+        ut.ep_assert(indexFound, _("Unit property table overflow"))
 
         _uprptable[uprpindex] = prop
         _uprpdict[prop] = uprpindex

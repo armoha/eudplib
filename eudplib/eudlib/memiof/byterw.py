@@ -28,6 +28,7 @@ from ...core.variable.evcommon import _ev
 from ... import ctrlstru as cs
 
 from . import dwepdio as dwm, modcurpl as cp
+from ...localize import _
 from ...utils import EPD, EPError, RandList
 
 
@@ -220,7 +221,7 @@ class EUDByteStream:
         elif isinstance(bytestream, EUDByteWriter):
             offset = EPD(bytestream._write) + 4
         else:
-            raise EPError("copyto target should be EUDByteReader/Writer/Stream")
+            raise EPError(_("copyto target should be EUDByteReader/Writer/Stream"))
         c.VProc(
             [self._offset, self._suboffset],
             [

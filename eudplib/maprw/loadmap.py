@@ -24,6 +24,8 @@ THE SOFTWARE.
 """
 
 from ..core.mapdata import chktok, mpqapi, mapdata
+from ..localize import _
+from ..utils import ep_eprint
 from .mpqadd import UpdateFileListByListfile
 
 
@@ -33,8 +35,19 @@ def LoadMap(fname):
     :param fname: Path for basemap.
     """
 
-    print("Loading map %s" % fname)
-    rawfile = open(fname, "rb").read()
+    print(_("Loading map {}").format(fname))
+    try:
+        rawfile = open(fname, "rb").read()
+    except FileNotFoundError:
+        ep_eprint(_("input map does not exist"))
+        raise
+    except PermissionError:
+        ep_eprint(
+            _("You lacks permission to get access rights for input map"),
+            _("Try to turn off antivirus or StarCraft"),
+            sep="\n"
+        )
+        raise
     mpqr = mpqapi.MPQ()
     mpqr.Open(fname)
     chkt = chktok.CHK()

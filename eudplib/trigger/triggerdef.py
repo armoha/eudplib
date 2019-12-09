@@ -26,6 +26,7 @@ THE SOFTWARE.
 from .. import core as c
 from .tpatcher import PatchCondition, PatchAction
 from eudplib import utils as ut
+from eudplib.localize import _
 
 
 def Trigger(conditions=None, actions=None, preserved=True):
@@ -43,7 +44,7 @@ def Trigger(conditions=None, actions=None, preserved=True):
         actions. Trigger internally uses `RawTrigger`.
     """
 
-    ut.ep_assert(isinstance(preserved, bool), "preserved should be bool")
+    ut.ep_assert(isinstance(preserved, bool), _("preserved should be bool"))
 
     if conditions is None:
         conditions = []

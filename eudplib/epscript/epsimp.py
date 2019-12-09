@@ -26,6 +26,7 @@ THE SOFTWARE.
 from importlib.machinery import FileFinder, SourceFileLoader
 
 from .epscompile import epsCompile
+from eudplib.localize import _
 from eudplib.utils import EPError
 import os
 import sys
@@ -93,10 +94,10 @@ class EPSLoader(SourceFileLoader):
         fileData = open(path, "rb").read()
         if path.endswith(".pyc") or path.endswith(".pyo"):
             return fileData
-        print('[epScript] Compiling "%s"...' % os.path.relpath(path))
+        print(_('[epScript] Compiling "{}"...').format(os.path.relpath(path)))
         compiled = epsCompile(path, fileData)
         if compiled is None:
-            raise EPError(" - Compiled failed for %s" % path)
+            raise EPError(_(" - Compiled failed for {}").format(path))
         dirname, filename = os.path.split(path)
         epsdir = os.path.join(dirname, "__epspy__")
         try:

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# cython: language_level=3
 
 '''
 Copyright (c) 2014 trgk
@@ -26,6 +27,7 @@ THE SOFTWARE.
 from .rlocint cimport RlocInt_C, toRlocInt
 from .rlocint import RlocInt, RlocInt_C, toRlocInt
 from ... import utils as ut
+from ...localize import _
 
 
 cdef class ConstExpr:
@@ -86,9 +88,8 @@ cdef class ConstExpr:
         if not isinstance(k, int):
             return NotImplemented
         ut.ep_assert(
-            (self.rlocmode == 0) or
-            (self.rlocmode % k == 0),
-            'Address not divisible'
+            (self.rlocmode == 0) or (self.rlocmode % k == 0),
+            _('Address not divisible')
         )
         return ConstExpr(self.baseobj, self.offset // k, self.rlocmode // k)
 
@@ -123,10 +124,10 @@ cdef class Forward(ConstExpr):
     def __lshift__(self, expr):
         ut.ep_assert(
             self._expr is None,
-            'Reforwarding without reset is not allowed'
+            _('Reforwarding without reset is not allowed')
         )
         expr = ut.unProxy(expr)
-        ut.ep_assert(expr is not None, 'Cannot forward to None')
+        ut.ep_assert(expr is not None, _('Cannot forward to None'))
         if isinstance(expr, int):
             self._expr = ConstExprInt(expr)
         else:
@@ -140,7 +141,7 @@ cdef class Forward(ConstExpr):
         self._expr = None
 
     cpdef RlocInt_C Evaluate(self):
-        ut.ep_assert(self._expr is not None, 'Forward not initialized')
+        ut.ep_assert(self._expr is not None, _('Forward not initialized'))
         return self._expr.Evaluate()
 
     def __call__(self, *args, **kwargs):
@@ -166,7 +167,7 @@ cpdef RlocInt_C Evaluate(x):
         try:
             return toRlocInt(x)
         except TypeError:
-            raise ut.EPError("Cannot evaluate value '%s'" % x)
+            raise ut.EPError(_("Cannot evaluate value '{}'").format(x))
 
 
 def IsConstExpr(x):

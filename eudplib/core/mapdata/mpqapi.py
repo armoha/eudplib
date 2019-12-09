@@ -28,7 +28,8 @@ import os
 import struct
 import platform
 from tempfile import NamedTemporaryFile
-from eudplib.utils import u2b, b2u, find_data_file
+from eudplib.localize import _
+from eudplib.utils import u2b, u2utf8, b2u, ep_eprint, find_data_file
 
 
 filename_u2b = None
@@ -69,11 +70,14 @@ def InitMpqLibrary():
 
             try:
                 libstorm = CDLL("libstorm.dylib", use_last_error=True)
-                filename_u2b = lambda x: x.encode("utf-8")
-            except OSError:
-                print("You need to install stormlib before using eudplib.")
-                print(" $ brew install homebrew/games/stormlib")
-                return False
+                filename_u2b = u2utf8
+            except OSError as e:
+                ep_eprint(
+                    _("You need to install stormlib before using eudplib."),
+                    " $ brew install homebrew/games/stormlib",
+                    sep="\n",
+                )
+                raise
 
         # for MpqRead
         libstorm.SFileOpenArchive.restype = c_int
@@ -106,9 +110,8 @@ def InitMpqLibrary():
         return True
 
     except OSError:
-        print("Loading StormLib failed.")
-        libstorm = None
-        return False
+        ep_eprint(_("Loading StormLib failed."))
+        raise
 
 
 class MPQ:
@@ -121,7 +124,7 @@ class MPQ:
 
     def Open(self, fname):
         if self.mpqh is not None:
-            raise RuntimeError("Duplicate opening")
+            raise RuntimeError(_("Duplicate opening"))
 
         h = c_void_p()
         ret = self.libstorm.SFileOpenArchive(filename_u2b(fname), 0, 0, byref(h))

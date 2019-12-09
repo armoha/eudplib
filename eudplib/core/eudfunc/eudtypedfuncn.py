@@ -27,6 +27,7 @@ from ... import utils as ut
 from .. import variable as ev
 
 from .eudfuncn import EUDFuncN
+from ...localize import _
 
 
 def applyTypes(typesdecl, varlist):
@@ -45,8 +46,9 @@ def applyTypes(typesdecl, varlist):
 
     ut.ep_assert(
         len(varlist) == len(typesdecl),
-        "Different number of variables(%d) from type declarations(%d)"
-        % (len(varlist), len(typesdecl)),
+        _("Different number of variables({}) from type declarations({})").format(
+            len(varlist), len(typesdecl)
+        ),
     )
 
     rets = []
@@ -98,7 +100,7 @@ class EUDXTypedFuncN(EUDTypedFuncN):
     def _CreateFuncArgs(self):
         ut.ep_assert(
             self._argn == len(self._argmasks),
-            "Number of argument masks should be constant",
+            _("Different number of arguments({}) from mask declarations({})."),
         )
         if self._fargs is None:
             self._fargs = [ev.EUDXVariable(0, mask) for mask in self._argmasks]

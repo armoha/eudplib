@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from ..allocator import ConstExpr, IsConstExpr
 from eudplib import utils as ut
+from eudplib.localize import _
 
 
 class Action(ConstExpr):
@@ -75,53 +76,53 @@ class Action(ConstExpr):
     def CheckArgs(self, i):
         ut.ep_assert(
             self.fields[0] is None or IsConstExpr(self.fields[0]),
-            'Invalid locid1 "%s" in trigger index %d' % (self.fields[0], i),
+            _('Invalid locid1 "{}" in trigger index {}').format(self.fields[0], i),
         )
         ut.ep_assert(
             self.fields[1] is None or IsConstExpr(self.fields[1]),
-            'Invalid strid "%s" in trigger index %d' % (self.fields[1], i),
+            _('Invalid strid "{}" in trigger index {}').format(self.fields[1], i),
         )
         ut.ep_assert(
             self.fields[2] is None or IsConstExpr(self.fields[2]),
-            'Invalid wavid "%s" in trigger index %d' % (self.fields[2], i),
+            _('Invalid wavid "{}" in trigger index {}').format(self.fields[2], i),
         )
         ut.ep_assert(
             self.fields[3] is None or IsConstExpr(self.fields[3]),
-            'Invalid time "%s" in trigger index %d' % (self.fields[3], i),
+            _('Invalid time "{}" in trigger index {}').format(self.fields[3], i),
         )
         ut.ep_assert(
             self.fields[4] is None or IsConstExpr(self.fields[4]),
-            'Invalid player1 "%s" in trigger index %d' % (self.fields[4], i),
+            _('Invalid player1 "{}" in trigger index {}').format(self.fields[4], i),
         )
         ut.ep_assert(
             self.fields[5] is None or IsConstExpr(self.fields[5]),
-            'Invalid player2 "%s" in trigger index %d' % (self.fields[5], i),
+            _('Invalid player2 "{}" in trigger index {}').format(self.fields[5], i),
         )
         ut.ep_assert(
             self.fields[6] is None or IsConstExpr(self.fields[6]),
-            'Invalid unitid "%s" in trigger index %d' % (self.fields[6], i),
+            _('Invalid unitid "{}" in trigger index {}').format(self.fields[6], i),
         )
         ut.ep_assert(
             self.fields[7] is None or IsConstExpr(self.fields[7]),
-            'Invalid acttype "%s" in trigger index %d' % (self.fields[7], i),
+            _('Invalid acttype "{}" in trigger index {}').format(self.fields[7], i),
         )
         ut.ep_assert(
             self.fields[8] is None or IsConstExpr(self.fields[8]),
-            'Invalid amount "%s" in trigger index %d' % (self.fields[8], i),
+            _('Invalid amount "{}" in trigger index {}').format(self.fields[8], i),
         )
         ut.ep_assert(
             self.fields[9] is None or IsConstExpr(self.fields[9]),
-            'Invalid flags "%s" in trigger index %d' % (self.fields[9], i),
+            _('Invalid flags "{}" in trigger index {}').format(self.fields[9], i),
         )
         return True
 
     def SetParentTrigger(self, trg, index):
         ut.ep_assert(
-            self.parenttrg is None, "Actions cannot be shared by two triggers."
+            self.parenttrg is None, _("Actions cannot be shared by two triggers.")
         )
 
-        ut.ep_assert(trg is not None, "Trigger should not be null.")
-        ut.ep_assert(0 <= index < 64, "Triggers out of range")
+        ut.ep_assert(trg is not None, _("Trigger should not be null."))
+        ut.ep_assert(0 <= index < 64, _("Triggers out of range"))
 
         self.parenttrg = trg
         self.actindex = index

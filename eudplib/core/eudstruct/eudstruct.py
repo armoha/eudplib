@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from ... import utils as ut
+from ...localize import _
 from ..allocator import IsConstExpr
 from ..variable import EUDVariable
 from .vararray import EUDVArray
@@ -155,7 +156,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
             try:
                 self.setfield(name, value)
             except KeyError as e:
-                raise ut.EPError("Unknown field name %s" % name)
+                raise ut.EPError(_("Unknown field name {}").format(name))
         else:
             self.__dict__[name] = value
 
@@ -170,4 +171,4 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
         return type(self)(var)
 
     def __lshift__(self, rhs):
-        raise ut.EPError("Cannot reassign another value to eudstruct.")
+        raise ut.EPError(_("Cannot reassign another value to eudstruct."))

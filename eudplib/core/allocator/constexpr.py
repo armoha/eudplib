@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from .rlocint import RlocInt_C, toRlocInt
 from ... import utils as ut
+from ...localize import _
 
 
 class ConstExpr:
@@ -81,7 +82,10 @@ class ConstExpr:
         if not isinstance(k, int):
             return NotImplemented
         ut.ep_assert(
-            (self.rlocmode == 0) or (self.rlocmode % k == 0), "Address not divisible"
+            (self.rlocmode == 0) or (self.rlocmode % k == 0),
+            _("Address not divisible; {} is not a factor of {}").format(
+                k, self.rlocmode
+            ),
         )
         return ConstExpr(self.baseobj, self.offset // k, self.rlocmode // k)
 
@@ -114,8 +118,8 @@ class Forward(ConstExpr):
         self._expr = None
 
     def __lshift__(self, expr):
-        ut.ep_assert(self._expr is None, "Reforwarding without reset is not allowed")
-        ut.ep_assert(expr is not None, "Cannot forward to None")
+        ut.ep_assert(self._expr is None, _("Reforwarding without reset is not allowed"))
+        ut.ep_assert(expr is not None, _("Cannot forward to None"))
         if ut.isUnproxyInstance(expr, int):
             self._expr = ConstExprInt(expr)
         else:
@@ -129,7 +133,7 @@ class Forward(ConstExpr):
         self._expr = None
 
     def Evaluate(self):
-        ut.ep_assert(self._expr is not None, "Forward not initialized")
+        ut.ep_assert(self._expr is not None, _("Forward not initialized"))
         return self._expr.Evaluate()
 
     def __call__(self, *args, **kwargs):

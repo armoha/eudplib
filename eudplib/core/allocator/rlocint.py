@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from eudplib import utils as ut
+from eudplib.localize import _
 
 
 class RlocInt_C:
@@ -57,20 +58,20 @@ class RlocInt_C:
 
     def __mul__(self, other):
         if isinstance(other, RlocInt_C):
-            ut.ep_assert(other.rlocmode == 0, "Cannot divide RlocInt with non-const")
+            ut.ep_assert(other.rlocmode == 0, _("Cannot divide RlocInt with non-const"))
             other = other.offset
 
         return RlocInt_C((self.offset * other) & 0xFFFFFFFF, self.rlocmode * other)
 
     def __floordiv__(self, other):
         if isinstance(other, RlocInt_C):
-            ut.ep_assert(other.rlocmode == 0, "Cannot divide RlocInt with non-const")
+            ut.ep_assert(other.rlocmode == 0, _("Cannot divide RlocInt with non-const"))
             other = other.offset
-        ut.ep_assert(other != 0, "Divide by zero")
+        ut.ep_assert(other != 0, _("Divide by zero"))
         ut.ep_assert(
             (self.rlocmode == 0)
             or (self.rlocmode % other == 0 and self.offset % other == 0),
-            "RlocInt not divisible by %d" % other,
+            _("RlocInt not divisible by {}").format(other),
         )
         return RlocInt_C((self.offset // other) & 0xFFFFFFFF, self.rlocmode // other)
 

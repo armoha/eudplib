@@ -1,3 +1,5 @@
+# cython: language_level=3
+
 cdef class RlocInt_C:
     cdef public size_t offset, rlocmode
 

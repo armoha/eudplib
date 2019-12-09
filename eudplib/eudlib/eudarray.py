@@ -26,6 +26,7 @@ THE SOFTWARE.
 from .. import core as c
 from .. import utils as ut
 from .memiof import f_dwread_epd, f_dwwrite_epd
+from ..localize import _
 
 
 class EUDArrayData(c.EUDObject):
@@ -44,7 +45,7 @@ class EUDArrayData(c.EUDObject):
 
         else:
             for i, item in enumerate(arr):
-                ut.ep_assert(c.IsConstExpr(item), "Invalid item #%d" % i)
+                ut.ep_assert(c.IsConstExpr(item), _("Invalid item #{}").format(i))
             self._datas = arr
             self._arrlen = len(arr)
 
@@ -76,7 +77,7 @@ class EUDArrayData(c.EUDObject):
         return self.set(key, item)
 
     def __iter__(self):
-        raise NotImplementedError
+        raise EPError(_("Can't iterate EUDArray"))
 
 
 class EUDArray(ut.ExprProxy):
@@ -105,4 +106,4 @@ class EUDArray(ut.ExprProxy):
         return self.set(key, item)
 
     def __iter__(self):
-        raise NotImplementedError
+        raise EPError(_("Can't iterate EUDArray"))

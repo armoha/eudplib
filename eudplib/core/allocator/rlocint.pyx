@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# cython: language_level=3
 
 '''
 Copyright (c) 2014 trgk
@@ -24,6 +25,7 @@ THE SOFTWARE.
 '''
 
 from eudplib import utils as ut
+from eudplib.localize import _
 
 
 cdef class RlocInt_C:
@@ -50,9 +52,9 @@ cdef class RlocInt_C:
                 )
         else:
             return RlocInt_C(
-                    (rhs.offset + lhs) & 0xFFFFFFFF,
-                    rhs.rlocmode
-                )
+                (rhs.offset + lhs) & 0xFFFFFFFF,
+                rhs.rlocmode
+            )
 
     def __sub__(lhs, rhs):
         lhs = toRlocInt(lhs)
@@ -71,7 +73,7 @@ cdef class RlocInt_C:
         if isinstance(other, RlocInt_C):
             ut.ep_assert(
                 other.rlocmode == 0,
-                'Cannot divide RlocInt with non-const'
+                _('Cannot divide RlocInt with non-const')
             )
             other = other.offset
 
@@ -84,15 +86,13 @@ cdef class RlocInt_C:
         if isinstance(other, RlocInt_C):
             ut.ep_assert(
                 other.rlocmode == 0,
-                'Cannot divide RlocInt with non-const'
+                _('Cannot divide RlocInt with non-const')
             )
             other = other.offset
-        ut.ep_assert(other != 0, 'Divide by zero')
+        ut.ep_assert(other != 0, _('Divide by zero'))
         ut.ep_assert(
-            (self.rlocmode == 0) or
-            (self.rlocmode % other == 0 and
-             self.offset % other == 0),
-            'RlocInt not divisible by %d' % other
+            (self.rlocmode == 0) or (self.rlocmode % other == 0 and self.offset % other == 0),
+            _('RlocInt not divisible by {}').format(other)
         )
         return RlocInt_C(
             (self.offset // other) & 0xFFFFFFFF,

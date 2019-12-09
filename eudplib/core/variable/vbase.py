@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from .. import rawtrigger as bt
 from eudplib import utils as ut
+from eudplib.localize import _
 
 
 class VariableBase:
@@ -32,7 +33,7 @@ class VariableBase:
         pass
 
     def getValueAddr(self):
-        raise ut.EPError("override")
+        raise NotImplementedError
 
     # -------
 
