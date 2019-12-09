@@ -54,6 +54,7 @@ from unittests import (
     test_locf,
     test_fmtprint,
     test_parse,
+    test_arithmetics,
 )
 
 helper.CompressPayload(True)

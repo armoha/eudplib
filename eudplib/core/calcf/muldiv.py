@@ -30,21 +30,6 @@ from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ..variable.evcommon import _ev
 
 
-@ef.EUDFunc
-def _mul1(x):
-    return x
-
-
-@ef.EUDFunc
-def _div0(x):
-    return -1, x
-
-
-@ef.EUDFunc
-def _div1(x):
-    return x, 0
-
-
 def f_mul(a, b, **kwargs):
     """Calculate a * b"""
     if isinstance(a, ev.EUDVariable) and isinstance(b, ev.EUDVariable):
@@ -98,17 +83,35 @@ def f_constmul(number):
     if not hasattr(f_constmul, "mulfdict"):
         from .bitwise import f_bitlshift
 
+        @ef.EUDFunc
+        def _mul_1(x):
+            return -x
+
+        @ef.EUDFunc
+        def _mul0(x):
+            return 0
+
+        @ef.EUDFunc
+        def _mul1(x):
+            return x
+
+        def _mul_pow2(p):
+            def pow2(x, **kwargs):
+                return f_bitlshift(x, p, **kwargs)
+
+            return pow2
+
         f_constmul.mulfdict = {
-            0xFFFFFFFF: lambda x: -x,
-            0: lambda x: 0,
+            0xFFFFFFFF: _mul_1,
+            0: _mul0,
             1: _mul1,
-            2 ** 1: lambda x: f_bitlshift(x, 1),
-            2 ** 2: lambda x: f_bitlshift(x, 2),
-            2 ** 3: lambda x: f_bitlshift(x, 3),
-            2 ** 4: lambda x: f_bitlshift(x, 4),
-            2 ** 5: lambda x: f_bitlshift(x, 5),
-            2 ** 6: lambda x: f_bitlshift(x, 6),
-            2 ** 7: lambda x: f_bitlshift(x, 7),
+            2 ** 1: _mul_pow2(1),
+            2 ** 2: _mul_pow2(2),
+            2 ** 3: _mul_pow2(3),
+            2 ** 4: _mul_pow2(4),
+            2 ** 5: _mul_pow2(5),
+            2 ** 6: _mul_pow2(6),
+            2 ** 7: _mul_pow2(7),
         }
 
     mulfdict = f_constmul.mulfdict
@@ -142,6 +145,16 @@ def f_constdiv(number):
     :return: Function taking one parameter.
     """
     if not hasattr(f_constdiv, "divfdict"):
+
+        @ef.EUDFunc
+        def _div0(x):
+            return -1, x
+
+
+        @ef.EUDFunc
+        def _div1(x):
+            return x, 0
+
         f_constdiv.divfdict = {0: _div0, 1: _div1}
 
     divfdict = f_constdiv.divfdict
