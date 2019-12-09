@@ -14,7 +14,7 @@ _h = sys.excepthook
 _u = sys.unraisablehook
 _locale_path = os.path.dirname(__file__)
 _t = gettext.translation("eudplib", _locale_path, languages=[_lc], fallback=True)
-if isinstance(_t, gettext.NullTranslations):
+if not isinstance(_t, gettext.GNUTranslations):
     _locale_path = os.path.dirname(os.path.dirname(os.path.dirname(_locale_path)))
     _t = gettext.translation("eudplib", _locale_path, languages=[_lc], fallback=True)
 _, _t = _t.gettext, _t.gettext
