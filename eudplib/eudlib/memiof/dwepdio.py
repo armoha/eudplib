@@ -24,12 +24,14 @@ THE SOFTWARE.
 """
 
 import random
+import warnings
 
 from ... import core as c, ctrlstru as cs, utils as ut
 
 from .modcurpl import f_setcurpl2cpcache
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ...core.variable.evcommon import _ev
+from ...localize import _
 
 
 @_EUDPredefineReturn(_ev[:2])
@@ -44,16 +46,13 @@ def f_dwepdread_epd(targetplayer):
         targetplayer.AddNumber(-12 * u),
         targetplayer.SetDest(ut.EPD(0x6509B0)),
     ]
-    random.shuffle(acts)
-    c.VProc(targetplayer, acts)
+    c.VProc(targetplayer, ut.RandList(acts))
 
-    r = list(range(31, -1, -1))
-    random.shuffle(r)
-    for i in r:
+    for i in ut.RandList(range(32)):
         acts = [ptr.AddNumber(2 ** i), epd.AddNumber(2 ** (i - 2)) if i >= 2 else []]
-        random.shuffle(acts)
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i), actions=acts
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i),
+            actions=ut.RandList(acts),
         )
 
     f_setcurpl2cpcache()
@@ -72,11 +71,8 @@ def f_dwread_epd(targetplayer):
         targetplayer.AddNumber(-12 * u),
         targetplayer.SetDest(ut.EPD(0x6509B0)),
     ]
-    random.shuffle(acts)
-    c.VProc(targetplayer, acts)
-    r = list(range(31, -1, -1))
-    random.shuffle(r)
-    for i in r:
+    c.VProc(targetplayer, ut.RandList(acts))
+    for i in ut.RandList(range(32)):
         c.RawTrigger(
             conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i),
             actions=ptr.AddNumber(2 ** i),
@@ -170,9 +166,7 @@ def f_dwbreak(number):
         ],
     )
 
-    r = list(range(31, 7, -1))
-    random.shuffle(r)
-    for i in r:
+    for i in ut.RandList(range(8, 32)):
         byteidx = i // 8
         wordidx = i // 16
         byteexp = i % 8
@@ -182,7 +176,7 @@ def f_dwbreak(number):
             conditions=number.AtLeastX(1, 2 ** i),
             actions=[
                 byte[byteidx].AddNumber(2 ** byteexp),
-                [word[wordidx].AddNumber(2 ** wordexp) if wordidx == 1 else []],
+                word[wordidx].AddNumber(2 ** wordexp) if wordidx == 1 else [],
             ],
         )
 
@@ -222,6 +216,27 @@ def f_dwbreak2(number):
 
 
 # backward compatibility functions
-f_dwepdread_epd_safe = f_dwepdread_epd
-f_dwread_epd_safe = f_dwread_epd
-f_epdread_epd_safe = f_epdread_epd
+
+
+def f_dwepdread_epd_safe(*args, **kwargs):
+    warnings.warn(
+        _("safe read functions are deprecated in 0.61 and will be removed in 0.63"),
+        DeprecationWarning,
+    )
+    return f_dwepdread_epd(*args, **kwargs)
+
+
+def f_dwread_epd_safe(*args, **kwargs):
+    warnings.warn(
+        _("safe read functions are deprecated in 0.61 and will be removed in 0.63"),
+        DeprecationWarning,
+    )
+    return f_dwread_epd(*args, **kwargs)
+
+
+def f_epdread_epd_safe(*args, **kwargs):
+    warnings.warn(
+        _("safe read functions are deprecated in 0.61 and will be removed in 0.63"),
+        DeprecationWarning,
+    )
+    return f_epdread_epd(*args, **kwargs)
