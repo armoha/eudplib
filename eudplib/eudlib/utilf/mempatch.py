@@ -51,18 +51,19 @@ def f_dwpatch_epd(dstepd, value):
     global patchstack, ps_top, dws_top
 
     prev_value = f_dwread_epd(dstepd)
-    f_dwwrite_epd(dstepd, value)
-    cs.DoActions(
+    c.VProc(
+        [dstepd, value, dws_top, prev_value],
         [
-            c.SetMemoryEPD(dstepd, c.SetTo, value),
-            c.SetMemoryEPD(ut.EPD(dwstack) + dws_top, c.SetTo, prev_value),
-        ]
+            dstepd.SetDest(ut.EPD(value.getDestAddr())),
+            dws_top.AddNumber(ut.EPD(dwstack)),
+            dws_top.SetDest(ut.EPD(prev_value.getDestAddr())),
+        ],
     )
 
     pushpatchstack(dstepd)
-    pushpatchstack(ut.EPD(dwstack) + dws_top)
+    pushpatchstack(dws_top)
     pushpatchstack(1)
-    dws_top += 1
+    dws_top += 1 - ut.EPD(dwstack)
 
 
 @c.EUDFunc

@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import random
-
 from eudplib import core as c, ctrlstru as cs, utils as ut
 
 
@@ -32,8 +30,10 @@ class CPByteWriter:
     """Write byte by byte"""
 
     def __init__(self):
-        self._suboffset = c.EUDVariable()
-        self._b = [c.EUDLightVariable(ut.b2i1(b"\r")) for _ in range(4)]
+        self._suboffset = c.EUDLightVariable()
+        self._b = [c.EUDVariable(ut.b2i1(b"\r"))] + [
+            c.EUDLightVariable(ut.b2i1(b"\r")) for _ in range(3)
+        ]
 
     @c.EUDMethod
     def writebyte(self, byte):
@@ -48,15 +48,13 @@ class CPByteWriter:
             buffer.
         """
         cs.EUDSwitch(self._suboffset)
-        r = list(range(3))
-        random.shuffle(r)
-        for i in r:
+        for i in ut.RandList(range(3)):
             if cs.EUDSwitchCase()(i):
-                cs.DoActions(self._b[i].SetNumber(byte), self._suboffset.AddNumber(1))
+                c.VProc(byte, [byte.SetDest(self._b[i]), self._suboffset.AddNumber(1)])
                 cs.EUDBreak()
 
         if cs.EUDSwitchCase()(3):
-            cs.DoActions(self._b[3].SetNumber(byte))
+            c.VProc(byte, byte.SetDest(self._b[3]))
             self.flushdword()
 
         cs.EUDEndSwitch()
@@ -70,15 +68,13 @@ class CPByteWriter:
             c.EUDReturn()
         cs.EUDEndIf()
 
-        for i in range(7, -1, -1):
-            for j in range(4):
-                c.RawTrigger(
-                    conditions=[self._b[j].AtLeast(2 ** i)],
-                    actions=[
-                        self._b[j].SubtractNumber(2 ** i),
-                        c.SetDeaths(c.CurrentPlayer, c.Add, 2 ** (i + j * 8), 0),
-                    ],
-                )
+        c.VProc(self._b[0], self._b[0].SetDest(c.EncodePlayer(c.CurrentPlayer)))
+        for k in ut.RandList(range(8, 32)):
+            i, j = divmod(k, 8)
+            c.RawTrigger(
+                conditions=self._b[i].AtLeastX(1, 2 ** j),
+                actions=c.SetDeaths(c.CurrentPlayer, c.Add, 2 ** k, 0),
+            )
         cs.DoActions(
             c.AddCurrentPlayer(1),
             self._suboffset.SetNumber(0),
