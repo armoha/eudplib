@@ -26,6 +26,7 @@ THE SOFTWARE.
 import functools
 import collections
 import itertools
+import random
 import sys
 import os.path
 
@@ -202,3 +203,9 @@ def find_data_file(filename, file):
         datadir = os.path.dirname(file)
 
     return os.path.join(datadir, filename)
+
+
+def RandList(lst):
+    lst = list(lst)
+    random.shuffle(lst)
+    return lst
