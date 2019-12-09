@@ -26,8 +26,15 @@ THE SOFTWARE.
 from ..mapdata import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
 
 from eudplib import utils as ut
+from eudplib.localize import _
 
-from .strdict import DefAIScriptDict, DefLocationDict, DefSwitchDict, DefUnitDict, DefTBLDict
+from .strdict import (
+    DefAIScriptDict,
+    DefLocationDict,
+    DefSwitchDict,
+    DefUnitDict,
+    DefTBLDict,
+)
 
 import difflib
 
@@ -39,7 +46,7 @@ def EncodeAIScript(ais, issueError=False):
         ais = ut.u2b(ais)
 
     if isinstance(ais, bytes):
-        ut.ep_assert(len(ais) >= 4, "AIScript name too short")
+        ut.ep_assert(len(ais) >= 4, _("AIScript name too short"))
 
         if len(ais) > 4:
             return ut.b2i4(DefAIScriptDict[ais])
@@ -64,13 +71,13 @@ def _EncodeAny(t, f, dl, s, issueError, *, dlo=0):
                         ret += dlo
                     return ret
                 except KeyError:
-                    sl = "Cannot encode string %s as %s." % (s, t)
+                    sl = _("Cannot encode string {} as {}.").format(s, t)
                     for match in difflib.get_close_matches(s, dl.keys()):
-                        sl += " - Suggestion: %s" % match
+                        sl += "\n" + _(" - Suggestion: {}").format(match)
                     raise ut.EPError(sl)
 
             if issueError:
-                raise ut.EPError('[Warning] "%s" is not a %s' % (s, t))
+                raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
             return s
 
     try:
@@ -81,11 +88,20 @@ def _EncodeAny(t, f, dl, s, issueError, *, dlo=0):
 
 
 def EncodeLocationIndex(loc, issueError=False):
-    return _EncodeAny("locationIndex", GetLocationIndex, DefLocationDict, loc, issueError)
+    return _EncodeAny(
+        "locationIndex", GetLocationIndex, DefLocationDict, loc, issueError
+    )
 
 
 def EncodeLocation(loc, issueError=False):
-    return _EncodeAny("location", lambda s: GetLocationIndex(s) + 1, DefLocationDict, loc, issueError, dlo=1)
+    return _EncodeAny(
+        "location",
+        lambda s: GetLocationIndex(s) + 1,
+        DefLocationDict,
+        loc,
+        issueError,
+        dlo=1,
+    )
 
 
 def EncodeString(s, issueError=False):
@@ -107,10 +123,13 @@ def EncodeTBL(t, issueError=False):
         try:
             return DefTBLDict[s]
         except KeyError:
-            sl = "Cannot encode string %s as stat_txt.tbl." % s
+            sl = _("Cannot encode string {} as {}.").format(s, "stat_txt.tbl")
             for match in difflib.get_close_matches(s, dl.keys()):
-                sl += "\n - Suggestion: %s" % match
+                sl += "\n" + _(" - Suggestion: {}").format(match)
             raise ut.EPError(sl)
+        if issueError:
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(t, "stat_txt.tbl"))
+        return s
 
     try:
         return DefTBLDict.get(s, s)

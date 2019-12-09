@@ -23,11 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import random
 import traceback
 
 from .. import rawtrigger as bt
 from ..allocator import Forward, ConstExpr, IsConstExpr
+from ...localize import _
 from ...utils import (
     FlattenList,
     EPD,
@@ -36,6 +36,8 @@ from ...utils import (
     isUnproxyInstance,
     ep_assert,
     EPError,
+    ep_warn,
+    RandList,
 )
 from .vbase import VariableBase
 from .vbuf import GetCurrentVariableBuffer
@@ -108,7 +110,7 @@ class EUDVariable(VariableBase):
 
     def checkNonRValue(self):
         if isRValueStrict and self._rvalue:
-            raise EPError("Trying to modify value of l-value variable")
+            raise EPError(_("Trying to modify value of l-value variable"))
 
     # -------
 
@@ -251,7 +253,7 @@ class EUDVariable(VariableBase):
 
     def __lt__(self, other):
         if isinstance(other, int) and other <= 0:
-            print("[Warning] No unsigned number can be leq than %d" % other)
+            ep_warn(_("No unsigned number can be leq than {}").format(other))
             traceback.print_stack()
             return [bt.Never()]  # No unsigned number is less than 0
 
@@ -265,7 +267,7 @@ class EUDVariable(VariableBase):
 
     def __gt__(self, other):
         if isinstance(other, int) and other >= 0xFFFFFFFF:
-            print("[Warning] No unsigned int can be greater than %d" % other)
+            ep_warn(_("No unsigned number can be greater than {}").format(other))
             traceback.print_stack()
             return [bt.Never()]  # No unsigned number is less than 0
 
@@ -453,9 +455,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
         last_pairs = src, dst, mdt
 
     _RemoveDuplicateActions()
-    nonConstActions = FlattenList(nonConstActions)
-    random.shuffle(nonConstActions)
-    bt.RawTrigger(nextptr=nextptr, actions=[actionlist, nonConstActions])
+    bt.RawTrigger(nextptr=nextptr, actions=[actionlist, RandList(nonConstActions)])
 
     vt_nextptr << bt.NextTrigger()
 
@@ -563,7 +563,7 @@ def NonSeqCompute(assignpairs):
     if len(assignpairs) == len(constpairs):
         SeqCompute(assignpairs)
         return
-    ep_assert(dstvarset.isdisjoint(srcvarset), "dst and src have intersection")
+    ep_assert(dstvarset.isdisjoint(srcvarset), _("dst and src have intersection"))
 
     varpairlists = list()
     for pairlist in varassigndict.values():
@@ -583,7 +583,7 @@ def NonSeqCompute(assignpairs):
 def SetVariables(srclist, dstlist, mdtlist=None):
     srclist = FlattenList(srclist)
     dstlist = FlattenList(dstlist)
-    ep_assert(len(srclist) == len(dstlist), "Input/output size mismatch")
+    ep_assert(len(srclist) == len(dstlist), _("Input/output size mismatch"))
 
     if mdtlist is None:
         mdtlist = [bt.SetTo] * len(srclist)

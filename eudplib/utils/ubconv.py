@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from .eperror import EPError
+from ..localize import _
 
 g_encoding = "cp949"
 
@@ -42,7 +43,7 @@ def u2b(s):
     elif isinstance(s, bytes):
         return s
     else:
-        raise EPError("Invalid type %s" % type(s))
+        raise EPError(_("Invalid type {}").format(type(s)))
 
 
 def b2u(b):
@@ -51,7 +52,7 @@ def b2u(b):
     elif isinstance(b, str):
         return b
     else:
-        raise EPError("Invalid type %s" % type(b))
+        raise EPError(_("Invalid type {}").format(type(s)))
 
 
 def u2utf8(s):
@@ -60,4 +61,4 @@ def u2utf8(s):
     elif isinstance(s, bytes):
         return s
     else:
-        raise EPError("Invalid type %s" % type(s))
+        raise EPError(_("Invalid type {}").format(type(s)))

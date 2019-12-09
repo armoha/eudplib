@@ -27,7 +27,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ...utils import EPD
 
-from ..rwcommon import br1, br2, bw1
+from ..rwcommon import br1, br2, bw1, bs1
 from ..memiof import f_setcurpl2cpcache, f_dwread_epd
 
 
@@ -111,7 +111,7 @@ def f_strlen(src):
 
 @c.EUDFunc
 def f_strnstr(string, substring, count):
-    br1.seekoffset(string)
+    bs1.seekoffset(string)
     br2.seekoffset(substring)
     dst = c.EUDVariable()
     dst << -1
@@ -121,23 +121,26 @@ def f_strnstr(string, substring, count):
         c.EUDReturn(string)
     cs.EUDEndIf()
     if cs.EUDWhile()(count >= 1):
-        a = br1.readbyte()
+        a = bs1.readbyte()
         cs.DoActions(dst.AddNumber(1), count.SubtractNumber(1))
         cs.EUDBreakIf(a == 0)
         cs.EUDContinueIfNot(a == b)
-        offset = f_dwread_epd(EPD(br1._read) + 5)
-        suboffset = f_dwread_epd(EPD(br1._suboffset.getValueAddr()))
+        oldoffset, oldsuboffset = c.EUDCreateVariables(2)
+        c.VProc(
+            [bs1._offset, bs1._suboffset],
+            [bs1._offset.SetDest(oldoffset), bs1._suboffset.SetDest(oldsuboffset)],
+        )
         if cs.EUDInfLoop()():
             d = br2.readbyte()
             if cs.EUDIf()(d == 0):
                 c.EUDReturn(string + dst)
             cs.EUDEndIf()
-            cs.EUDBreakIfNot(br1.readbyte() == d)
+            cs.EUDBreakIfNot(bs1.readbyte() == d)
         cs.EUDEndInfLoop()
-        c.VProc([offset, suboffset], [
-            offset.SetDest(EPD(br1._read) + 5),
-            suboffset.SetDest(br1._suboffset)
-        ])
+        c.VProc(
+            [oldoffset, oldsuboffset],
+            [oldoffset.SetDest(bs1._offset), oldsuboffset.SetDest(bs1._suboffset)],
+        )
         br2.seekoffset(substring + 1)
     cs.EUDEndWhile()
     c.EUDReturn(-1)

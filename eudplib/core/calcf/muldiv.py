@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import random
-
 from .. import allocator as ac, rawtrigger as rt, variable as ev, eudfunc as ef
 
 from eudplib import utils as ut
@@ -125,9 +123,7 @@ def f_constmul(number):
         def _mulf(a):
             ret = _mulf._frets[0]
             ret << 0
-            r = list(range(32))
-            random.shuffle(r)
-            for i in r:
+            for i in ut.RandList(range(32)):
                 rt.RawTrigger(
                     conditions=a.AtLeastX(1, 2 ** i),
                     actions=ret.AddNumber(2 ** i * number),
@@ -206,8 +202,7 @@ def _f_mul(a, b):
                 rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
                 rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
             ]
-            random.shuffle(acts)
-            rt.RawTrigger(nextptr=p4, conditions=[a == 0], actions=acts)
+            rt.RawTrigger(nextptr=p4, conditions=[a == 0], actions=ut.RandList(acts))
             p4 << ev.VProc(b, b.SetDest(b))
 
     endmul << rt.RawTrigger(actions=[reset_nptr << rt.SetNextPtr(p1, p2)])

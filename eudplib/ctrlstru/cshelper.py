@@ -24,6 +24,9 @@ THE SOFTWARE.
 """
 
 
+from eudplib.localize import _
+
+
 class CtrlStruOpener:
     def __init__(self, f):
         self._f = f
@@ -32,13 +35,14 @@ class CtrlStruOpener:
     def __del__(self):
         if not self._called:
             raise RuntimeError(
-                "Control structures must be double-parenthesised."
-                + " ex) EUDInfLoop()()"
+                _("Control structures must be double-parenthesised.")
+                + "\n ex) EUDInfLoop()()"
             )
 
     def __bool__(self):
         raise RuntimeError(
-            "Control structures must be double-parenthesised." + " ex) EUDInfLoop()()"
+            _("Control structures must be double-parenthesised.")
+            + "\n ex) EUDInfLoop()()"
         )
 
     def __call__(self, *args, **kwargs):

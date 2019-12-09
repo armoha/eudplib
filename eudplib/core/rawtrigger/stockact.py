@@ -38,7 +38,6 @@ from .constenc import (
     EncodeScore,
     EncodeSwitchAction,
 )
-
 from .strenc import (
     EncodeAIScript,
     EncodeLocation,
@@ -46,7 +45,8 @@ from .strenc import (
     EncodeSwitch,
     EncodeUnit,
 )
-from ...utils import EPD
+from ...localize import _
+from ...utils import EPD, ep_warn, ep_assert
 
 
 def Victory():
@@ -62,7 +62,7 @@ def PreserveTrigger():
 
 
 def Wait(Time):
-    print("[Warning] Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!")
+    ep_warn(_("Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"))
     return Action(0, 0, 0, Time, 0, 0, 0, 4, 0, 4)
 
 
@@ -75,6 +75,7 @@ def UnpauseGame():
 
 
 def Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay=4):
+    ep_warn(_("Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"))
     Unit = EncodeUnit(Unit, issueError=True)
     Where = EncodeLocation(Where, issueError=True)
     WAVName = EncodeString(WAVName, issueError=True)
@@ -438,6 +439,7 @@ def SetKills(Player, Modifier, Number, Unit):
                 SetDeaths(CurrentPlayer, Modifier, Number, Unit),
                 SetMemory(0x6509B0, Add, 12 * 228),
             ]
-        else:
-            raise NotImplementedError
+        ep_assert(Player <= 11, _("SetKills Player should be only P1~P12 or CurrentPlayer"))
+    if isinstance(Unit, int):
+        ep_assert(Unit <= 227, _("SetKills Unit should be at most 227"))
     return SetDeaths(Player - 228 * 12, Modifier, Number, Unit)

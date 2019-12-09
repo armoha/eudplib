@@ -87,12 +87,10 @@ def f_cpchar_adddw(number):
         if i != 9:
             skipper[i] << c.NextTrigger()
         cs.DoActions(
-            [
-                c.SetDeaths(
-                    c.CurrentPlayer, c.SetTo, color_v + ch[i] * 256 + (0x0D0D3000), 0
-                ),
-                c.AddCurrentPlayer(1),
-            ]
+            c.SetDeaths(
+                c.CurrentPlayer, c.SetTo, color_v + ch[i] * 256 + (0x0D0D3000), 0
+            ),
+            c.AddCurrentPlayer(1),
         )
 
 
@@ -359,13 +357,11 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
     ret = c.EUDVariable()
 
     cs.DoActions(
-        [
-            counter.AddNumber(1),
-            [c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else []],
-            ret.SetNumber(1),
-            c.SetNextPtr(_is_finished, _draw_color),
-            c.AddCurrentPlayer(timer),
-        ]
+        counter.AddNumber(1),
+        c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else [],
+        ret.SetNumber(1),
+        c.SetNextPtr(_is_finished, _draw_color),
+        c.AddCurrentPlayer(timer),
     )
     _is_finished << c.RawTrigger(
         conditions=[
@@ -428,11 +424,9 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
         cs.EUDEndIf()
 
     cs.DoActions(
-        [
-            counter.AddNumber(1),
-            [c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else []],
-            c.AddCurrentPlayer((len(color) - 1) - timer),
-        ]
+        counter.AddNumber(1),
+        c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else [],
+        c.AddCurrentPlayer((len(color) - 1) - timer),
     )
     ret = R2L(color)
     c.RawTrigger(conditions=ret.Exactly(0), actions=counter.SetNumber(0))

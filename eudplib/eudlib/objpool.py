@@ -27,6 +27,7 @@ import weakref
 
 from .. import core as c, ctrlstru as cs, utils as ut
 from ..core.variable import eudv as ev
+from ..localize import _
 
 from .eudarray import EUDArray
 
@@ -75,7 +76,7 @@ class ObjPool:
     def alloc(self, basetype, *args, **kwargs):
         ut.ep_assert(
             len(basetype._fields_) <= max_fieldn,
-            "Only structs less than %d fields can be allocated" % max_fieldn,
+            _("Only structs less than {} fields can be allocated").format(max_fieldn),
         )
         data = self._alloc()
         data = basetype.cast(data)
@@ -85,7 +86,7 @@ class ObjPool:
     def free(self, basetype, data):
         ut.ep_assert(
             len(basetype._fields_) <= max_fieldn,
-            "Only structs less than %d fields can be allocated" % max_fieldn,
+            _("Only structs less than {} fields can be allocated").format(max_fieldn),
         )
 
         data = basetype.cast(data)

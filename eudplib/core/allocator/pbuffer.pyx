@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# cython: language_level=3
 
 '''
 Copyright (c) 2014 trgk
@@ -33,6 +34,7 @@ from .rlocint cimport RlocInt_C
 
 from . import constexpr
 from eudplib import utils as ut
+from eudplib.localize import _
 
 
 class Payload:
@@ -88,14 +90,14 @@ cdef class PayloadBuffer:
         if number.rlocmode:
             ut.ep_assert(
                 self._datacur % 4 == 0,
-                'Non-const dwords must be aligned to 4byte'
+                _('Non-const dwords must be aligned to 4byte')
             )
             if number.rlocmode == 1:
                 self._prttable.append(self._datacur)
             elif number.rlocmode == 4:
                 self._orttable.append(self._datacur)
             else:
-                raise ut.EPError('rlocmode should be 1 or 4')
+                raise ut.EPError(_('rlocmode should be 1 or 4'))
 
         cdef unsigned int offset = number.offset & 0xFFFFFFFF
         self._data[self._datacur + 0] = offset & 0xFF
@@ -117,7 +119,7 @@ cdef class PayloadBuffer:
 
         cdef int* pdata
         try:
-            pdata = <int*>PyCapsule_GetPointer(_packerData[structformat], "int*")  
+            pdata = <int*>PyCapsule_GetPointer(_packerData[structformat], "int*")
         except KeyError:
             pdata = CreateStructPackerData(structformat)
             _packerData[structformat] = PyCapsule_New(<void*>pdata, "int*", NULL)
@@ -167,7 +169,7 @@ cdef void _StructPacker(int* sizelist, PayloadBuffer buf, list arglist):
 
         if not (ri.rlocmode == 0 or (sizelist[i] == 4 and dpos % 4 == 0)):
             raise ut.EPError(
-                'Cannot write non-const in byte/word/nonalligned dword.'
+                _('Cannot write non-const in byte/word/nonalligned dword.')
             )
 
         if ri.rlocmode == 1:
@@ -188,6 +190,4 @@ cdef void _StructPacker(int* sizelist, PayloadBuffer buf, list arglist):
             (<uint32_t*>(data + dpos))[0] = ri.offset
             dpos += 4
 
-
     buf._datacur = dpos
-

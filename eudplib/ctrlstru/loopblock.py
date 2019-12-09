@@ -24,7 +24,8 @@ THE SOFTWARE.
 """
 
 from .. import core as c
-from eudplib import utils as ut
+from .. import utils as ut
+from ..localize import _
 from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 
@@ -155,7 +156,7 @@ def _GetLastLoopBlock():
         if _IsLoopBlock(block[1]):
             return block
 
-    raise ut.EPError("No loop block surrounding this code area")
+    raise ut.EPError(_("No loop block surrounding this code area"))
 
 
 def EUDLoopContinue():

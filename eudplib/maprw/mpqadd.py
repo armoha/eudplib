@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from .. import utils as ut
+from ..localize import _
 import ctypes
 import sys
 
@@ -64,10 +65,12 @@ def MPQAddFile(fname, content, isWave=False):
 
     ut.ep_assert(
         isinstance(content, bytes) or isinstance(content, bytearray) or content is None,
-        "Invalid content type",
+        _("Invalid content type"),
     )
 
-    ut.ep_assert(fname_key not in _addedFiles, 'MPQ filename duplicate : "%s"' % fname)
+    ut.ep_assert(
+        fname_key not in _addedFiles, _('MPQ filename duplicate : "{}"').format(fname)
+    )
 
     _addedFiles[fname_key] = (fname, content, isWave)
 
@@ -103,15 +106,14 @@ def UpdateMPQ(mpqw):
             else:
                 ret = mpqw.PutFile(ut.u2b(fname), content)
             if not ret:
-                print(
-                    "Failed adding file %s to mpq: May be duplicate" % fname,
-                    file=sys.stderr,
+                ut.ep_eprint(
+                    _("Failed adding file {} to mpq: May be duplicate").format(fname)
                 )
                 raise ctypes.WinError(ctypes.get_last_error())
 
 
 def GetAddedFiles():
     ret = set(fname for fname, content, isWave in _addedFiles.values())
-    ret.add("staredit\scenario.chk")
+    ret.add("staredit\\scenario.chk")
     ret.add("(listfile)")
     return ret

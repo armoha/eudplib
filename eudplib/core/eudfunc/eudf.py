@@ -28,6 +28,7 @@ import functools
 
 from .eudtypedfuncn import EUDTypedFuncN, applyTypes, EUDXTypedFuncN
 from ... import utils as ut
+from ...localize import _
 
 
 def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
@@ -35,11 +36,11 @@ def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
         argspec = inspect.getfullargspec(fdecl_func)
         argn = len(argspec[0])
         ut.ep_assert(
-            argspec[1] is None, "No variadic arguments (*args) allowed for EUDFunc."
+            argspec[1] is None, _("No variadic arguments (*args) allowed for EUDFunc.")
         )
         ut.ep_assert(
             argspec[2] is None,
-            "No variadic keyword arguments (*kwargs) allowed for EUDFunc.",
+            _("No variadic keyword arguments (**kwargs) allowed for EUDFunc."),
         )
 
         def caller(*args):
@@ -71,11 +72,11 @@ def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):
         argspec = inspect.getfullargspec(fdecl_func)
         argn = len(argspec[0])
         ut.ep_assert(
-            argspec[1] is None, "No variadic arguments (*args) allowed for EUDFunc."
+            argspec[1] is None, _("No variadic arguments (*args) allowed for EUDFunc.")
         )
         ut.ep_assert(
             argspec[2] is None,
-            "No variadic keyword arguments (*kwargs) allowed for EUDFunc.",
+            _("No variadic keyword arguments (**kwargs) allowed for EUDFunc."),
         )
 
         def caller(*args):

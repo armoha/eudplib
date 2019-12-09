@@ -38,11 +38,9 @@ class PVariable(c.EUDVArray(8)):
     def _eudset(self, i, value):
         nptr = c.Forward()
         cs.DoActions(
-            [
-                value.SetDest(self._epd + 348 // 4),
-                c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
-                c.SetNextPtr(value.GetVTable(), nptr),
-            ]
+            value.SetDest(self._epd + 348 // 4),
+            c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
+            c.SetNextPtr(value.GetVTable(), nptr),
         )
         for k in range(2, 0, -1):
             c.RawTrigger(

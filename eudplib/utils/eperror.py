@@ -24,10 +24,26 @@ THE SOFTWARE.
 """
 
 
+import sys
+import warnings
+
+
 class EPError(Exception):
+    pass
+
+
+class EPWarning(Warning):
     pass
 
 
 def ep_assert(statement, message="Assertion failed"):
     if not statement:
         raise EPError(message)
+
+
+def ep_eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
+def ep_warn(message):
+    warnings.warn(message, EPWarning)

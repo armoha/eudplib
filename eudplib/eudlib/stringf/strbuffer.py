@@ -27,7 +27,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.mapdata.stringmap import (
-    AddStringWithAddrMultipleOf4,
+    ForceAddString,
     ApplyStringMap,
     GetStringMap,
 )
@@ -41,10 +41,10 @@ from .strfunc import f_strlen_epd
 from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove
 
 
-@c.EUDTypedFunc([None, c.TrgString], [None, None])
+@c.EUDTypedFunc([None, c.TrgString])
 def DisplayTextAt(line, text):
     tp = f_gettextptr()
-    f_dwadd_epd(EPD(0x640B58), line)
+    c.VProc(line, line.QueueAddTo(ut.EPD(0x640B58)))
     c.RawTrigger(
         conditions=c.Memory(0x640B58, c.AtLeast, 11),
         actions=c.SetMemory(0x640B58, c.Subtract, 11),
@@ -80,7 +80,7 @@ class StringBuffer:
         else:
             content = ut.u2utf8(content)
         self.capacity = len(content)
-        self.StringIndex = AddStringWithAddrMultipleOf4(content)
+        self.StringIndex = ForceAddString(content)
         self.epd, self.pos = c.EUDVariable(), c.EUDVariable()
 
         try:

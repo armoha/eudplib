@@ -25,24 +25,25 @@ THE SOFTWARE.
 
 from ...utils import b2i2, b2i4, ep_assert, u2b, u2utf8, unProxy
 from . import tblformat
+from ...localize import _
 
 
 class StringIdMap:
     def __init__(self):
         self._s2id = {}
 
-    def AddItem(self, string, id):
+    def AddItem(self, string, strid):
         string = u2b(unProxy(string))
         if string in self._s2id:  # ambiguous string
             self._s2id[string] = None
 
         else:
-            self._s2id[string] = id
+            self._s2id[string] = strid
 
     def GetStringIndex(self, string):
         string = u2b(unProxy(string))
         retid = self._s2id[string]
-        ep_assert(retid is not None, "Ambigious string %s" % string)
+        ep_assert(retid is not None, _("Ambigious string {}").format(string))
         return retid
 
 
@@ -95,10 +96,6 @@ def ApplyStringMap(chkt):
 
 def ForceAddString(s):
     return strmap.ForceAddString(s) + 1
-
-
-def AddStringWithAddrMultipleOf4(s):
-    return strmap.AddStringWithAddrMultipleOf4(s) + 1
 
 
 def GetStringMap():

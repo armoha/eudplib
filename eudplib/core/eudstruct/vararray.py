@@ -26,6 +26,7 @@ THE SOFTWARE.
 from .. import rawtrigger as bt
 from ..allocator import Forward, ConstExpr, IsConstExpr
 
+from ...localize import _
 from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, ep_assert
 
 from ..variable import EUDVariable, SeqCompute, VProc
@@ -39,7 +40,10 @@ def EUDVArrayData(size):
     class _EUDVArrayData(ConstExpr):
         def __init__(self, initvars):
             super().__init__(self)
-            ep_assert(len(initvars) == size, "%d items expected" % size)
+            ep_assert(
+                len(initvars) == size,
+                _("{} items expected, got {}").format(size, len(initvars)),
+            )
             self._initvars = initvars
 
         def Evaluate(self):
@@ -90,7 +94,7 @@ def EUDVArray(size, basetype=None):
             if isUnproxyInstance(i, EUDVariable):
                 r = self._eudget(i)
             else:
-                ep_assert(i < size, "EUDVArray index out of bounds.")
+                ep_assert(i < size, _("EUDVArray index out of bounds."))
                 if isUnproxyInstance(self, EUDVariable):
                     r = self._get(i)
                 else:
@@ -196,7 +200,7 @@ def EUDVArray(size, basetype=None):
         def set(self, i, value):
             if IsConstExpr(self) and IsConstExpr(i):
                 if isUnproxyInstance(i, int):
-                    ep_assert(i < size, "EUDVArray index out of bounds.")
+                    ep_assert(i < size, _("EUDVArray index out of bounds."))
                 if isUnproxyInstance(value, EUDVariable):
                     self._consteudset(i, value)
                 else:
@@ -244,6 +248,6 @@ def EUDVArray(size, basetype=None):
             self.set(i, value)
 
         def __iter__(self):
-            raise NotImplementedError
+            raise ut.EPError(_("Can't iterate EUDVArray"))
 
     return _EUDVArray

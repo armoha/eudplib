@@ -73,10 +73,9 @@ def _DispatchInlineCode(nextptr, trigepd, prop):
             c.SetMemory(resetter + 20, c.SetTo, nt),
             c.SetNextPtr(t, end),
         ]
-        random.shuffle(acts)
         t << c.RawTrigger(
             conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, funcID, v)],
-            actions=acts,
+            actions=ut.RandList(acts),
         )
         nt << c.NextTrigger()
 
@@ -211,9 +210,7 @@ def CreateInjectFinalizer(chkt, root):
         curtime = c.EUDVariable()
         tmcheckt = c.Forward()
 
-        r = list(range(8))
-        random.shuffle(r)
-        for player in r:
+        for player in ut.RandList(range(8)):
             trs = rtt._runner_start[player]
             tre = rtt._runner_end[player]
 
@@ -250,9 +247,7 @@ def CreateInjectFinalizer(chkt, root):
                     prevtend_epd.AddNumber(1),
                     prevtend_epd.SetDest(ut.EPD(link_trs) + 4),
                 ]
-                random.shuffle(vs)
-                random.shuffle(acts)
-                c.VProc(vs, acts)
+                c.VProc(ut.RandList(vs), ut.RandList(acts))
                 c.VProc(
                     prevtstart,
                     [

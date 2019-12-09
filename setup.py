@@ -8,14 +8,15 @@ except ImportError:
         return None
 
 
-__version__ = "0.60.0"
+__version__ = "0.61.0"
 
 
 setup(
     name="eudplib",
     version=__version__,
     packages=find_packages(),
-    package_data={"": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst"]},
+    package_data={"": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst", "*.mo"]},
+    include_package_data=True,
     ext_modules=cythonize(["eudplib/**/*.pyx"]),
     python_requires=">=3",
     # metadata for upload to PyPI

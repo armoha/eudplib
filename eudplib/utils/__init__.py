@@ -42,9 +42,10 @@ from .etc import (
     cachedfunc,
     isStrict,
     setStrict,
+    RandList,
 )
 
-from .eperror import EPError, ep_assert
+from .eperror import EPError, EPWarning, ep_assert, ep_eprint, ep_warn
 
 from .exprproxy import ExprProxy, unProxy, isUnproxyInstance
 from .etc import find_data_file

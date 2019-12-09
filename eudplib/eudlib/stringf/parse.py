@@ -59,7 +59,7 @@ class _EUDParser(EUDByteReader):
         lastblock = ut.EUDGetLastBlock()[1]
         cont, end = c.Forward(), c.Forward()
 
-        cs.DoActions([c.SetNextPtr(jumper, end), c.SetNextPtr(cont, end)])
+        cs.DoActions(c.SetNextPtr(jumper, end), c.SetNextPtr(cont, end))
         c.RawTrigger(
             conditions=[b == ord("-")],
             actions=[
@@ -79,7 +79,7 @@ class _EUDParser(EUDByteReader):
         jumper, trim = c.Forward(), c.Forward()
         number, digits = self._number, self._digits
         cs.DoActions(
-            [number.SetNumber(0), digits.SetNumber(0), c.SetNextPtr(jumper, trim)]
+            number.SetNumber(0), digits.SetNumber(0), c.SetNextPtr(jumper, trim)
         )
         if cs.EUDInfLoop()():
             block = ut.EUDPeekBlock("infloopblock")[1]
@@ -131,7 +131,8 @@ class _EUDParser(EUDByteReader):
                 ]
             )
             c.RawTrigger(
-                conditions=digits.AtLeastX(11, (1 << 30) - 1), actions=digits.SetNumberX(10, (1 << 30) - 1)
+                conditions=digits.AtLeastX(11, (1 << 30) - 1),
+                actions=digits.SetNumberX(10, (1 << 30) - 1),
             )
         cs.EUDEndInfLoop()
 
@@ -151,11 +152,7 @@ class _EUDParser(EUDByteReader):
         jumper, trim = c.Forward(), c.Forward()
         number, digits = self._number, self._digits
         cs.DoActions(
-            [
-                number.SetNumber(0),
-                digits.SetNumber(0),
-                c.SetNextPtr(jumper, trim),
-            ]
+            number.SetNumber(0), digits.SetNumber(0), c.SetNextPtr(jumper, trim)
         )
         if cs.EUDInfLoop()():
             block = ut.EUDPeekBlock("infloopblock")[1]
@@ -172,10 +169,8 @@ class _EUDParser(EUDByteReader):
             assume_decimal, cont, is_alphanumeric = [c.Forward() for _ in range(3)]
 
             cs.DoActions(
-                [
-                    c.SetNextPtr(is_zero, assume_decimal),
-                    c.SetNextPtr(cont, is_alphanumeric),
-                ]
+                c.SetNextPtr(is_zero, assume_decimal),
+                c.SetNextPtr(cont, is_alphanumeric),
             )
             is_zero << c.RawTrigger(
                 nextptr=0,
@@ -205,7 +200,8 @@ class _EUDParser(EUDByteReader):
             )
             cutoff, cutlim = c.f_div(0xFFFFFFFF, radix)
             cont << c.RawTrigger(
-                nextptr=0, actions=[c.SetNextPtr(jumper, is_alphanumeric), cutlim.AddNumber(1)]
+                nextptr=0,
+                actions=[c.SetNextPtr(jumper, is_alphanumeric), cutlim.AddNumber(1)],
             )
 
             # [\da-zA-Z]+

@@ -29,6 +29,7 @@ import string
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
+from eudplib.localize import _
 from .cpprint import PColor, PName, f_cpstr_print, f_eprintln
 from .dbstr import DBString
 from .eudprint import ptr2s, epd2s, hptr, f_dbstr_print
@@ -48,7 +49,7 @@ class _EUDFormatter(string.Formatter):
         self, format_string, args, kwargs, used_args, recursion_depth, auto_arg_index=0
     ):
         if recursion_depth < 0:
-            raise ValueError("Max string recursion exceeded")
+            raise ValueError(_("Max string recursion exceeded"))
         result = []
         for literal_text, field_name, format_spec, conversion in self.parse(
             format_string
@@ -66,20 +67,12 @@ class _EUDFormatter(string.Formatter):
                 # handle arg indexing when empty field_names are given.
                 if field_name == "":
                     if auto_arg_index is False:
-                        raise ValueError(
-                            "cannot switch from manual field "
-                            "specification to automatic field "
-                            "numbering"
-                        )
+                        raise ValueError(_("cannot switch from manual field specification to automatic field numbering"))
                     field_name = str(auto_arg_index)
                     auto_arg_index += 1
                 elif field_name.isdigit():
                     if auto_arg_index:
-                        raise ValueError(
-                            "cannot switch from manual field "
-                            "specification to automatic field "
-                            "numbering"
-                        )
+                        raise ValueError(_("cannot switch from manual field specification to automatic field numbering"))
                     # disable auto arg incrementing, if it gets
                     # used later on, then an exception will be raised
                     auto_arg_index = False

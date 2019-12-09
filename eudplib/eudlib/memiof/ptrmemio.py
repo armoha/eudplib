@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import random
-
 from . import (
     dwepdio as dwm,
     cpmemio as cpm,
@@ -78,25 +76,21 @@ def f_bwrite(ptr, b):
 @c.EUDFunc
 def _dwread(ptr):
     ptr -= 0x58A364
-    epd, subp = c.f_div(ptr, 4)
-    dw = c.EUDVariable()
-    c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), dw.SetNumber(0)])
+    dw, subp = c.EUDCreateVariables(2)
+    c.f_div(ptr, 4, ret=[ut.EPD(0x6509B0), subp])
+    dw << 0  # TODO: merge this action to f_div call trigger
     cs.EUDSwitch(subp)
 
     # Case 0
     if cs.EUDSwitchCase()(0):
-        dw << cpm.f_dwread_cp(0)
+        cpm.f_dwread_cp(0, ret=[dw])
         cs.EUDBreak()
 
     # Else → Complex
-    s = list(range(1, 4))
-    random.shuffle(s)
-    for i in s:
+    for i in ut.RandList(range(1, 4)):
         cs.EUDSwitchCase()(i)
 
-        r = list(range(31, 8 * i - 1, -1))
-        random.shuffle(r)
-        for j in r:
+        for j in ut.RandList(range(8 * i, 32)):
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=dw.AddNumber(2 ** (j - 8 * i)),
@@ -104,9 +98,7 @@ def _dwread(ptr):
 
         c.SeqCompute([(ut.EPD(0x6509B0), c.Add, 1)])
 
-        r = list(range(8 * i - 1, -1, -1))
-        random.shuffle(r)
-        for j in r:
+        for j in ut.RandList(range(8 * i)):
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
                 actions=dw.AddNumber(2 ** (j + 32 - 8 * i)),

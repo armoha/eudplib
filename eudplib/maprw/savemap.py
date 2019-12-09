@@ -30,6 +30,8 @@ from .inlinecode.ilcprocesstrig import PreprocessInlineCode
 from .injector.mainloop import _MainStarter
 from .mpqadd import UpdateMPQ
 from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
+from ..localize import _
+from ..utils import ep_eprint
 import binascii
 
 traceHeader = None
@@ -55,7 +57,7 @@ def SaveMap(fname, rootf):
     :param rootf: Main entry function.
     """
 
-    print("Saving to %s..." % fname)
+    print(_("Saving to {}...").format(fname))
     chkt = mapdata.GetChkTokenized()
 
     _ResetTraceMap()
@@ -70,10 +72,18 @@ def SaveMap(fname, rootf):
 
     chkt.optimize()
     rawchk = chkt.savechk()
-    print("Output scenario.chk : %.3fMB" % (len(rawchk) / 1000000))
+    print(_("Output scenario.chk : {:.3}MB").format(len(rawchk) / 1000000))
 
     # Process by modifying existing mpqfile
-    open(fname, "wb").write(mapdata.GetRawFile())
+    try:
+        open(fname, "wb").write(mapdata.GetRawFile())
+    except PermissionError:
+        ep_eprint(
+            _("You lacks permission to get access rights for output map"),
+            _("Try to turn off antivirus or StarCraft"),
+            sep="\n",
+        )
+        raise
 
     mw = mpqapi.MPQ()
     mw.Open(fname)
@@ -84,7 +94,7 @@ def SaveMap(fname, rootf):
 
     if traceMap:
         traceFname = fname + ".epmap"
-        print("Writing trace file to %s" % traceFname)
+        print(_("Writing trace file to {}").format(traceFname))
         with open(traceFname, "w", encoding="utf-8") as wf:
             wf.write("H0: %s\n" % binascii.hexlify(traceHeader[0]).decode("ascii"))
             wf.write("H1: %s\n" % binascii.hexlify(traceHeader[1]).decode("ascii"))

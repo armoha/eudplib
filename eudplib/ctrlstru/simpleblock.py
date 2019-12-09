@@ -27,6 +27,7 @@ from .. import core as c
 from eudplib import utils as ut
 from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
+from eudplib.localize import _
 
 
 """
@@ -61,7 +62,7 @@ def EUDElseIf():
     def _header():
         block = ut.EUDPeekBlock("ifblock")[1]
         ut.ep_assert(
-            block["next_elseif"] is not None, "Cannot have EUDElseIf after EUDElse"
+            block["next_elseif"] is not None, _("Cannot have EUDElseIf after EUDElse")
         )
 
         # Finish previous if/elseif block
@@ -94,7 +95,7 @@ def EUDElse():
     def _footer():
         block = ut.EUDPeekBlock("ifblock")[1]
         ut.ep_assert(
-            block["next_elseif"] is not None, "Cannot have EUDElse after EUDElse"
+            block["next_elseif"] is not None, _("Cannot have EUDElse after EUDElse")
         )
 
         # Finish previous if/elseif block
@@ -134,7 +135,7 @@ def EUDExecuteOnce():
 
 def EUDEndExecuteOnce():
     lb = ut.EUDPopBlock("executeonceblock")
-    ut.ep_assert(lb[0] == "executeonceblock", "Block start/end mismatch")
+    ut.ep_assert(lb[0] == "executeonceblock", _("Block start/end mismatch"))
     block = lb[1]
     c.RawTrigger(actions=c.SetNextPtr(block["blockstart"], block["blockend"]))
     block["blockend"] << c.NextTrigger()

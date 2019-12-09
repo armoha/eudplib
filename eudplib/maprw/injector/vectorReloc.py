@@ -23,12 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import random
-
 from eudplib import utils as ut
 
 from ... import core as c
 from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
+from ...localize import _
 from ...trigtrg import trigtrg as tt
 
 """ Stage 1 : works in TRIG section.
@@ -53,9 +52,7 @@ def CopyDeaths(iplayer, oplayer, copyepd=False, initvalue=None):
 
     Trigger(actions=tt.SetDeaths(oplayer, tt.SetTo, initvalue, 0))
 
-    r = list(range(31, 1, -1))
-    random.shuffle(r)
-    for i in r:
+    for i in ut.RandList(range(2, 32)):
         if copyepd:
             subval = 2 ** (i - 2)
 
@@ -216,7 +213,7 @@ def CreateVectorRelocator(chkt, payload):
     oldmrgnraw = chkt.getsection("MRGN")
     mrgn_section = bytes(mrgn_trigger) + oldmrgnraw[2408 + 836 :]
     if len(mrgn_section) != 5100:
-        raise RuntimeError("MRGN section size bug")
+        raise RuntimeError(_("MRGN section size bug"))
     chkt.setsection("MRGN", mrgn_section)
 
     ##############
@@ -247,9 +244,7 @@ def CreateVectorRelocator(chkt, payload):
 
     # Init mrgn rawtrigger
     strs = 0x5993D4
-    r = list(range(31, 1, -1))
-    random.shuffle(r)
-    for e in r:
+    for e in ut.RandList(range(2, 32)):
         # prt table
         # player
         acts = [
@@ -264,8 +259,10 @@ def CreateVectorRelocator(chkt, payload):
             tt.SetMemory(mrgn + 4, tt.Add, 2 ** e),
             tt.SetMemory(mrgn_ort + 4, tt.Add, 2 ** e),
         ]
-        random.shuffle(acts)
-        Trigger(conditions=tt.MemoryX(strs, tt.AtLeast, 1, 2 ** e), actions=acts)
+        Trigger(
+            conditions=tt.MemoryX(strs, tt.AtLeast, 1, 2 ** e),
+            actions=ut.RandList(acts),
+        )
 
     # Payload update
     curpl = 0x6509B0
@@ -276,9 +273,7 @@ def CreateVectorRelocator(chkt, payload):
 
     pts = 0x51A280
 
-    r = list(range(8))
-    random.shuffle(r)
-    for player in r:
+    for player in ut.RandList(range(8)):
         triggerend = ~(0x51A284 + player * 12)
 
         Trigger(
@@ -290,9 +285,7 @@ def CreateVectorRelocator(chkt, payload):
         )
 
     # read pts[player].lasttrigger
-    r = list(range(31, 1, -1))
-    random.shuffle(r)
-    for e in r:
+    for e in ut.RandList(range(2, 32)):
         Trigger(
             conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2 ** e),
             actions=tt.SetDeaths(11, tt.Add, 2 ** e, 0),
@@ -305,9 +298,7 @@ def CreateVectorRelocator(chkt, payload):
             tt.SetMemory(curpl, tt.SetTo, ut.EPD(4)),
         ]
     )
-    r = list(range(31, 1, -1))
-    random.shuffle(r)
-    for e in r:
+    for e in ut.RandList(range(2, 32)):
         Trigger(
             conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2 ** e),
             actions=[

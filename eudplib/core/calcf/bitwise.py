@@ -23,14 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import random
-
 from .. import allocator as ac
 from .. import variable as ev
 from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .muldiv import f_mul
-from ...utils import EPD
+from ...utils import EPD, RandList
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ..variable.evcommon import _ev, _xv
 
@@ -154,9 +152,7 @@ def f_bitsplit(a):
 def _exp2_vv(n):
     ret = _exp2_vv._frets[0]
     ret << 0
-    r = list(range(32))
-    random.shuffle(r)
-    for i in r:
+    for i in RandList(range(32)):
         rt.RawTrigger(conditions=[n == i], actions=ret.SetNumber(2 ** i))
     # return ret
 

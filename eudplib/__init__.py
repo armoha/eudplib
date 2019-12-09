@@ -24,6 +24,8 @@ THE SOFTWARE.
 """
 
 
+from .localize import *
+
 oldGlobals = set(globals().keys())
 
 from .utils import *
@@ -43,7 +45,7 @@ from .trigtrg.runtrigtrg import (
 from .maprw import *
 
 
-__version__ = "0.60.0"
+__version__ = "0.61.0"
 
 import types
 

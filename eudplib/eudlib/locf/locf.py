@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from ... import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_posread_epd, f_setcurpl2cpcache, f_dwread_epd
+from ...localize import _
 
 _loct = ut.EPD(0x58DC60)
 
@@ -50,13 +51,13 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
         c.RawTrigger(
             nextptr=epd.GetVTable(),
             actions=[
-                [c.SetMemory(act + 20, c.Add, 1) if signed else []],
+                c.SetMemory(act + 20, c.Add, 1) if signed else [],
                 epd.AddNumber(2),
                 epd.AddDest(16),
                 x.AddDest(16),
                 c.SetNextPtr(x.GetVTable(), settb),
-            ]
-            + [c.SetMemory(x._varact + 24, c.Subtract, 0x02000000) if signed else []],
+                c.SetMemory(x._varact + 24, c.Subtract, 0x02000000) if signed else [],
+            ],
         )
         settb << c.NextTrigger()
         c.VProc(
@@ -75,13 +76,13 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
         c.RawTrigger(
             nextptr=epd.GetVTable(),
             actions=[
-                [c.SetMemory(act + 52, c.Add, 1) if signed else []],
+                c.SetMemory(act + 52, c.Add, 1) if signed else [],
                 epd.AddNumber(2),
                 epd.AddDest(16),
                 y.AddDest(16),
                 c.SetNextPtr(y.GetVTable(), setcoords),
-            ]
-            + [c.SetMemory(y._varact + 24, c.Subtract, 0x02000000) if signed else []],
+                c.SetMemory(y._varact + 24, c.Subtract, 0x02000000) if signed else [],
+            ],
         )
         setcoords << c.NextTrigger()
         c.RawTrigger(
@@ -116,23 +117,21 @@ def _locfgen4(mod1, mod2, mod3, mod4, signed=False):
         c.VProc(
             [epd, t],
             [
-                [c.SetMemory(act + 20, c.Add, 1) if signed else []],
+                c.SetMemory(act + 20, c.Add, 1) if signed else [],
                 epd.AddNumber(1),
                 epd.AddDest(8),
-            ]
-            + [
                 t.SetDest(ut.EPD(act) + 8 + 5)
                 if not signed
                 else [
                     c.SetMemory(act + 52, c.SetTo, ~0),
                     t.QueueSubtractTo(ut.EPD(act) + 8 + 5),
-                ]
+                ],
             ],
         )
         c.VProc(
             [epd, r],
             [
-                [c.SetMemory(act + 52, c.Add, 1) if signed else []],
+                c.SetMemory(act + 52, c.Add, 1) if signed else [],
                 epd.AddNumber(1),
                 epd.AddDest(8),
                 r.SetDest(ut.EPD(act) + 16 + 5),
@@ -163,8 +162,10 @@ _DilateLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add, signed=True)
 
 
 def f_setloc(locID, *coords):
-    if len(coords) != 2 and len(coords) != 4:
-        raise NotImplementedError("number of coordinates should be 2 or 4.")
+    ut.ep_assert(
+        len(coords) == 2 or len(coords) == 4,
+        _("number of coordinates should be 2 or 4."),
+    )
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
     if c.IsConstExpr(locID):
@@ -189,8 +190,10 @@ def f_setloc(locID, *coords):
 
 
 def f_addloc(locID, *coords):
-    if len(coords) != 2 and len(coords) != 4:
-        raise NotImplementedError("number of coordinates should be 2 or 4.")
+    ut.ep_assert(
+        len(coords) == 2 or len(coords) == 4,
+        _("number of coordinates should be 2 or 4."),
+    )
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
     if c.IsConstExpr(locID):
@@ -215,8 +218,10 @@ def f_addloc(locID, *coords):
 
 
 def f_dilateloc(locID, *coords):
-    if len(coords) != 2 and len(coords) != 4:
-        raise NotImplementedError("number of coordinates should be 2 or 4.")
+    ut.ep_assert(
+        len(coords) == 2 or len(coords) == 4,
+        _("number of coordinates should be 2 or 4."),
+    )
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
     if c.IsConstExpr(locID):

@@ -115,10 +115,8 @@ def _OptimizeSetPName():
             player_name = 36 * player
             playerid_epd = 9 * player
             cs.DoActions(
-                [
-                    player_name.AddNumber(0x57EEEB),
-                    playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
-                ]
+                player_name.AddNumber(0x57EEEB),
+                playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
             )
             idlen = f_strlen_epd(playerid_epd)
             nameDb = baseNames[player]
@@ -129,29 +127,23 @@ def _OptimizeSetPName():
             val_even1 = v1 + f_wread_epd(ut.EPD(nameDb) + 1, 0) * 0x10000
             con_odd, con_even = oddA[player], even1A[player]
             cs.DoActions(
-                [
-                    idlen.AddNumber(1),  # fix ":" not recognized
-                    player_name.AddNumber(1),
-                    c.SetMemoryEPD(con_odd + 2, c.SetTo, val_odd),
-                    c.SetMemoryEPD(even0A[player] + 2, c.SetTo, val_even0),
-                    c.SetMemoryEPD(con_even + 2, c.SetTo, val_even1),
-                ]
+                idlen.AddNumber(1),  # fix ":" not recognized
+                player_name.AddNumber(1),
+                c.SetMemoryEPD(con_odd + 2, c.SetTo, val_odd),
+                c.SetMemoryEPD(even0A[player] + 2, c.SetTo, val_even0),
+                c.SetMemoryEPD(con_even + 2, c.SetTo, val_even1),
             )
             f_dbstr_print(nameDb, ptr2s(player_name), ":")
             baselens[player] = idlen
             if cs.EUDIf()(idlen <= 4):
                 cs.DoActions(
-                    [
-                        c.SetMemoryEPD(con_even + 2, c.SetTo, 0),
-                        c.SetMemoryEPD(con_even + 3, c.SetTo, 0x0F000000),
-                    ]
+                    c.SetMemoryEPD(con_even + 2, c.SetTo, 0),
+                    c.SetMemoryEPD(con_even + 3, c.SetTo, 0x0F000000),
                 )
                 if cs.EUDIf()(idlen <= 2):
                     cs.DoActions(
-                        [
-                            c.SetMemoryEPD(con_odd + 2, c.SetTo, 0),
-                            c.SetMemoryEPD(con_odd + 3, c.SetTo, 0x0F000000),
-                        ]
+                        c.SetMemoryEPD(con_odd + 2, c.SetTo, 0),
+                        c.SetMemoryEPD(con_odd + 3, c.SetTo, 0x0F000000),
                     )
                 cs.EUDEndIf()
             cs.EUDEndIf()
@@ -160,10 +152,7 @@ def _OptimizeSetPName():
     once = c.Forward()
     cs.EUDJumpIf([once << c.Memory(0x57F23C, c.Exactly, ~0)], end_optimize)
     cs.DoActions(
-        [
-            isTxtPtrUnchanged.SetNumber(0),
-            c.SetMemory(once + 8, c.SetTo, f_getgametick()),
-        ]
+        isTxtPtrUnchanged.SetNumber(0), c.SetMemory(once + 8, c.SetTo, f_getgametick()),
     )
     c.RawTrigger(
         conditions=[prevTxtPtr << c.Memory(0x640B58, c.Exactly, 11)],
@@ -194,7 +183,7 @@ def SetPName(player, *name):
         isPNameInitialized = True
 
     start = c.Forward()
-    c.RawTrigger(nextptr=start_optimize, actions=[c.SetNextPtr(end_optimize, start)])
+    c.RawTrigger(nextptr=start_optimize, actions=c.SetNextPtr(end_optimize, start))
     start << c.NextTrigger()
 
     _end = c.Forward()
@@ -210,25 +199,21 @@ def SetPName(player, *name):
     global ptr, epd, odds_or_even
     origcp = f_getcurpl()
     cs.DoActions(
-        [
-            ptr.SetNumber(0x640B61),
-            epd.SetNumber(ut.EPD(0x640B60)),
-            odds_or_even.SetNumber(0),
-        ]
+        ptr.SetNumber(0x640B61),
+        epd.SetNumber(ut.EPD(0x640B60)),
+        odds_or_even.SetNumber(0),
     )
     if cs.EUDWhile()(ptr.AtMost(0x640B61 + 218 * 10)):
         cs.EUDContinueIf(f_check_id(player, epd))
         cs.EUDContinueIf(f_memcmp(basename, ptr, baselen) >= 1)
         cs.DoActions(
-            [c.SetCurrentPlayer(ut.EPD(temp_Db)), baselen.SubtractNumber(1)]
+            c.SetCurrentPlayer(ut.EPD(temp_Db)), baselen.SubtractNumber(1)
         )  # fix setpname save 1byte less chat contents
         f_cpstr_print(ptr2s(ptr + baselen), EOS=False)
         cs.DoActions(
-            [
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                baselen.AddNumber(1),
-                c.SetCurrentPlayer(epd),
-            ]
+            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            baselen.AddNumber(1),
+            c.SetCurrentPlayer(epd),
         )
         c.RawTrigger(
             conditions=odds_or_even.Exactly(1),
@@ -243,7 +228,7 @@ def SetPName(player, *name):
 
         cs.EUDSetContinuePoint()
         cs.DoActions(
-            [ptr.AddNumber(218), epd.AddNumber(54), odds_or_even.AddNumberX(1, 1)]
+            ptr.AddNumber(218), epd.AddNumber(54), odds_or_even.AddNumberX(1, 1)
         )
         c.RawTrigger(conditions=odds_or_even.Exactly(0), actions=epd.AddNumber(1))
     cs.EUDEndWhile()

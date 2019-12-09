@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from ..mapdata import GetPropertyIndex
 from ... import utils as ut
+from ...localize import _
 
 
 class _Unique:
@@ -183,7 +184,7 @@ def _EncodeConst(t, d, s, issueError):
         return d.get(s, s)
     except TypeError:  # unhashable type
         if issueError and isinstance(s, _Unique):
-            raise ut.EPError('[Warning] "%s" is not %s' % (s, t))
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
         return s
 
 

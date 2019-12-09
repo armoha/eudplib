@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from .eperror import ep_assert
+from ..localize import _
 
 
 class BlockStruManager:
@@ -70,7 +71,7 @@ def EUDGetLastBlockOfName(name):
 
 def EUDPeekBlock(name):
     lastblock = EUDGetLastBlock()
-    ep_assert(lastblock[0] == name, "Block starting/ending mismatch")
+    ep_assert(lastblock[0] == name, _("Block starting/ending mismatch"))
     return lastblock
 
 
@@ -81,12 +82,9 @@ def EUDPopBlock(name):
     lastblock = _blockstru.pop()
     ep_assert(
         lastblock[0] == name,
-        """\
-Block starting/ending mismatch:
-    - Started with %s
-    - Ended with %s\
-"""
-        % (lastblock[0], name),
+        _("Block starting/ending mismatch")
+        + ("\n" + _("    - Started with {}").format(lastblock[0]))
+        + ("\n" + _("    - Ended with {}").format(name)),
     )
     _lastblockdict[name].pop()
     return lastblock
