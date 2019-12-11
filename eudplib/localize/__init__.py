@@ -4,7 +4,6 @@ import os
 import sys
 from typing import Type
 from types import TracebackType
-from .ko_KR import _ko_LANG
 
 _lc = os.environ.get("LANG")
 if _lc is None:

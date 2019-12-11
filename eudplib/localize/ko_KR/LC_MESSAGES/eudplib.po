@@ -549,10 +549,6 @@ msgstr "파일 {}를 mpq에 추가하는데 실패: 중복된 파일일 수 있�
 msgid "Saving to {}..."
 msgstr "{}에 저장 중..."
 
-#: C:\Users\artan\eudplib\eudplib\maprw\savemap.py:75
-msgid "Output scenario.chk : {:.3}MB"
-msgstr "출력된 scenario.chk 크기 : {:.3}MB"
-
 #: C:\Users\artan\eudplib\eudplib\maprw\savemap.py:82
 msgid "You lacks permission to get access rights for output map"
 msgstr "사용자 계정이 output맵에 접근할 권한이 없습니다"

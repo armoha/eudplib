@@ -526,10 +526,6 @@ msgstr ""
 msgid "Saving to {}..."
 msgstr ""
 
-#: C:\Users\artan\eudplib\eudplib\maprw\savemap.py:75
-msgid "Output scenario.chk : {:.3}MB"
-msgstr ""
-
 #: C:\Users\artan\eudplib\eudplib\maprw\savemap.py:82
 msgid "You lacks permission to get access rights for output map"
 msgstr ""

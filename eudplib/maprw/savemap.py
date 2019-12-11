@@ -72,7 +72,7 @@ def SaveMap(fname, rootf):
 
     chkt.optimize()
     rawchk = chkt.savechk()
-    print(_("Output scenario.chk : {:.3}MB").format(len(rawchk) / 1000000))
+    print("Output scenario.chk : {:.3}MB".format(len(rawchk) / 1000000))
 
     # Process by modifying existing mpqfile
     try:
