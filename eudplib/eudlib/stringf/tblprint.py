@@ -50,4 +50,4 @@ def f_settblf(tblID, offset, format_string, *args):
 def f_settblf2(tblID, offset, format_string, *args):
     dst = GetTBLAddr(tblID)
     dst += offset
-    f_sprintf(dst, format_string, "", *args, EOS=False, eencoding="cp949")
+    f_sprintf(dst, format_string, *args, EOS=False, encoding="cp949")
