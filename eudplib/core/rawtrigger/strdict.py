@@ -27,7 +27,7 @@ DefLocationDict = dict(
     list({"Location %d" % (i + 1): i for i in range(255) if i != 63}.items()) + [("Anywhere", 63)]
 )
 
-DefSwitchDict = {"Switch %d" % (i + 1): i for i in range(255)}
+DefSwitchDict = {"Switch %d" % (i + 1): i for i in range(256)}
 
 # ======================================
 
