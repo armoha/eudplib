@@ -46,6 +46,24 @@ def UpdateFileListByListfile(mpqr):
         MPQAddFile(fname, None)
 
 
+def MPQCheckFile(fname):
+    """Check if filename is already exist.
+    
+    :param fname: Desired filename in mpq
+    """
+
+    # make fname case_insensitive
+    from ntpath import normpath, normcase
+
+    fname_key = ut.u2b(normpath(normcase(fname)))
+
+    ut.ep_assert(
+        fname_key not in _addedFiles, _('MPQ filename duplicate : "{}"').format(fname)
+    )
+
+    return fname_key
+
+
 def MPQAddFile(fname, content, isWave=False):
     """Add file/wave to output map.
 
@@ -60,17 +78,13 @@ def MPQAddFile(fname, content, isWave=False):
         them may be catched at UpdateMPQ(internal) function.
     """
 
-    # make fname case_insensitive
-    fname_key = ut.u2b(fname.upper())
-
     ut.ep_assert(
         isinstance(content, bytes) or isinstance(content, bytearray) or content is None,
         _("Invalid content type"),
     )
 
-    ut.ep_assert(
-        fname_key not in _addedFiles, _('MPQ filename duplicate : "{}"').format(fname)
-    )
+    # make fname case_insensitive
+    fname_key = MPQCheckFile(fname)
 
     _addedFiles[fname_key] = (fname, content, isWave)
 
