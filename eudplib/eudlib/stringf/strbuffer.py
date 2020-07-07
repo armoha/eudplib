@@ -182,6 +182,9 @@ class StringBuffer:
         end << c.NextTrigger()
 
     def print(self, *args):
+        if len(args) == 1 and isinstance(args[0], str) and len(args[0]) > 31:
+            cs.DoActions(c.DisplayText(args[0]))
+            return
         end, ontrue = StringBuffer.CPBranch()
         ontrue << c.NextTrigger()
         f_setcurpl(self.epd)
