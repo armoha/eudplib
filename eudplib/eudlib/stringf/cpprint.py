@@ -38,7 +38,7 @@ from ..memiof import (
     f_dwepdread_epd,
     f_wread_epd,
 )
-from ..rwcommon import br1
+from ..stringf.rwcommon import br1
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s

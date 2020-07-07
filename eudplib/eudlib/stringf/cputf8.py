@@ -14,7 +14,7 @@ from ...ctrlstru import (
     EUDBreakIf,
     DoActions,
 )
-from ..rwcommon import br1, bw1
+from ..stringf.rwcommon import br1, bw1
 from .cp949_table import cp949_table
 
 """

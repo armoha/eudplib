@@ -28,7 +28,7 @@ from ... import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from .eudprint import ptr2s, epd2s
 from .cpprint import f_cpstr_print, cw
-from ..rwcommon import br1
+from ..stringf.rwcommon import br1
 from ..utilf import f_getgametick
 
 

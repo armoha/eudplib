@@ -30,13 +30,7 @@ from . import (
     bwepdio as bwm,
     modcurpl as cp,
 )
-from ..rwcommon import br1, bw1
 from ... import core as c, ctrlstru as cs, utils as ut
-
-# Helper functions
-
-_br = br1
-_bw = bw1
 
 
 def _ptr2epd(ptr):
@@ -53,6 +47,9 @@ def f_dwwrite(ptr, dw):
         dwm.f_dwwrite_epd(ut.EPD(ptr), dw)
     else:
         chars = dwm.f_dwbreak(dw)[2:]
+        from ..stringf.rwcommon import br1, bw1
+
+        _bw = bw1
         _bw.seekoffset(ptr)
         _bw.writebyte(chars[0])
         _bw.writebyte(chars[1])

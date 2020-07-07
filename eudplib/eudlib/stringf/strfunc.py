@@ -27,7 +27,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ...utils import EPD
 
-from ..rwcommon import br1, br2, bw1, bs1
+from ..stringf.rwcommon import br1, br2, bw1, bs1
 from ..memiof import f_setcurpl2cpcache, f_dwread_epd
 
 
@@ -97,14 +97,16 @@ def f_strlen(src):
     ret = c.EUDVariable()
     epd, mod = c.f_div(src, 4)
     cs.DoActions(ret.SetNumber(0), epd.AddNumber(-0x58A364 // 4))
-    for i in range(1, 4):
-        if cs.EUDIf()(mod == i):
-            if cs.EUDIf()(c.MemoryXEPD(epd, c.Exactly, 0, 255 * (256 ** i))):
-                c.EUDReturn(ret)
+    if cs.EUDIf()(mod >= 1):
+        for i in range(1, 4):
+            if cs.EUDIf()(mod == i):
+                if cs.EUDIf()(c.MemoryXEPD(epd, c.Exactly, 0, 255 * (256 ** i))):
+                    c.EUDReturn(ret)
+                cs.EUDEndIf()
+                cs.DoActions(mod.AddNumber(1), ret.AddNumber(1))
             cs.EUDEndIf()
-            cs.DoActions(mod.AddNumber(1), ret.AddNumber(1))
-        cs.EUDEndIf()
-    epd += 1
+        epd += 1
+    cs.EUDEndIf()
     ret += f_strlen_epd(epd)
     c.EUDReturn(ret)
 

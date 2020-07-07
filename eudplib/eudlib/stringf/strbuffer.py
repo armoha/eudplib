@@ -103,9 +103,7 @@ class StringBuffer:
         cls._method_template << c.NextTrigger()
         localcp = f_getuserplayerid()
         cls._cpbranch << c.RawTrigger(
-            nextptr=0,
-            conditions=IsUserCP(),
-            actions=c.SetNextPtr(cls._cpbranch, 0),
+            nextptr=0, conditions=IsUserCP(), actions=c.SetNextPtr(cls._cpbranch, 0),
         )
         c.PopTriggerScope()
 
@@ -205,7 +203,8 @@ class StringBuffer:
         f_setcurpl(self.epd)
         f_cpstr_print(*args, EOS=False)
         cs.DoActions(
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0), c.SetCurrentPlayer(f_getuserplayerid())
+            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            c.SetCurrentPlayer(f_getuserplayerid()),
         )
         self.DisplayAt(line)
         end << c.NextTrigger()
@@ -277,7 +276,9 @@ class StringBuffer:
         self, format_string, *args, color=None, wait=1, reset=True, line=-1, tag=None
     ):
         fmtargs = _format_args(format_string, *args)
-        return self.fadeIn(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
+        return self.fadeIn(
+            *fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag
+        )
 
     def fadeOut(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
         if not StringBuffer._method_template.IsSet():
@@ -339,7 +340,9 @@ class StringBuffer:
         self, format_string, *args, color=None, wait=1, reset=True, line=-1, tag=None
     ):
         fmtargs = _format_args(format_string, *args)
-        return self.fadeOut(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
+        return self.fadeOut(
+            *fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag
+        )
 
     def length(self):
         return f_strlen_epd(self.epd)

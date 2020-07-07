@@ -34,7 +34,7 @@ from eudplib.core.mapdata.stringmap import GetStringSectionName
 def GetMapStringAddr(strId):
     add_STR_ptr, add_STR_epd = c.Forward(), c.Forward()
     if cs.EUDExecuteOnce()():
-        STR_ptr, STR_epd = f_dwepdread_epd(ut.EPD(0x5993D4))
+        STR_ptr, STR_epd = 0x191943C8, ut.EPD(0x191943C8)
         cs.DoActions(
             c.SetMemory(add_STR_ptr + 20, c.SetTo, STR_ptr),
             c.SetMemory(add_STR_epd + 20, c.SetTo, STR_epd),
@@ -86,7 +86,9 @@ class CPString:
         elif isinstance(content, str) or isinstance(content, bytes):
             self.content = _s2b(content)
         else:
-            raise ut.EPError(_("Unexpected type for CPString: {}").format(type(content)))
+            raise ut.EPError(
+                _("Unexpected type for CPString: {}").format(type(content))
+            )
 
         self.length = len(self.content) // 4
         self.trigger = list()

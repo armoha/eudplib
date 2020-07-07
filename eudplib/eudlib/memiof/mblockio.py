@@ -26,7 +26,6 @@ THE SOFTWARE.
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ..rwcommon import br1, br2, bw1
 
 from . import modcurpl as cp
 from . import byterw as bm
@@ -66,6 +65,8 @@ def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
 
 @c.EUDFunc
 def f_memcpy(dst, src, copylen):
+    from ..stringf.rwcommon import br1, bw1
+
     br1.seekoffset(src)
     bw1.seekoffset(dst)
 
@@ -78,6 +79,8 @@ def f_memcpy(dst, src, copylen):
 
 @c.EUDFunc
 def f_memcmp(buf1, buf2, count):
+    from ..stringf.rwcommon import br1, br2
+
     br1.seekoffset(buf1)
     br2.seekoffset(buf2)
 

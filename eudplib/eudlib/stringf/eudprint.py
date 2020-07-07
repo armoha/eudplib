@@ -28,7 +28,7 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 from eudplib.localize import _
 
-from ..rwcommon import br1, bw1
+from ..stringf.rwcommon import br1, bw1
 from .dbstr import DBString
 
 _conststr_dict = dict()
