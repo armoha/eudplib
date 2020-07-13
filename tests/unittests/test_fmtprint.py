@@ -10,6 +10,7 @@ def test_fmtprint():
     f_eprintf("{:s} gets {} {:t}.", name, amount, resource[0])
     errorline = 0x640B60 + 218 * 12
 
-    expect = "dpdkfah gets 336 minerals."
+    expect = "dpdkfah\r gets \r\r336\r \r\r\rminerals.\r\r\r"
     expectdb = Db(expect)
-    test_equality("f_eprintf test", f_memcmp(errorline, expectdb, len(expect)), 0)
+    test_equality("f_eprintf test1", f_strlen(errorline), len(expect))
+    test_equality("f_eprintf test2", f_memcmp(errorline, expectdb, len(expect)), 0)

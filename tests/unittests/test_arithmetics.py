@@ -21,7 +21,7 @@ def test_arithmetics():
 
     ev << v
     ev //= 0
-    test_equality(f"{v} //= 0", ev, (-1) & 0xFFFFFFF)
+    test_equality(f"{v} //= 0", ev, 0xFFFFFFFF)
     ev << v
     ev %= 0
     test_equality(f"{v} %= 0", ev, v)
