@@ -30,6 +30,7 @@ from ...utils.blockstru import BlockStruManager, SetCurrentBlockStruManager
 from .vectorReloc import CreateVectorRelocator
 from .payloadReloc import CreatePayloadRelocator
 from .injFinalizer import CreateInjectFinalizer
+from .payloadInit import InitializePayload
 
 
 skip_payload_relocator = False
@@ -51,8 +52,10 @@ def applyInjector(chkt, root):
     payload = c.CreatePayload(root)
     setPayloadLoggerMode(False)
 
-    if not skip_payload_relocator:
+    if skip_payload_relocator:
         payload = CreatePayloadRelocator(payload)
-    CreateVectorRelocator(chkt, payload)
+        CreateVectorRelocator(chkt, payload)
+    else:
+        InitializePayload(chkt, payload)
 
     SetCurrentBlockStruManager(prev_bsm)

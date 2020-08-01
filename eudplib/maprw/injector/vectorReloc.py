@@ -112,10 +112,8 @@ def CreateVectorRelocator(chkt, payload):
             + tt.Trigger(
                 players=[tt.AllPlayers],
                 actions=[
-                    [
-                        tt.SetMemory(mrgn + 328 + 32 * j + 16, tt.Add, pch[j])
-                        for j in range(packn)
-                    ]
+                    tt.SetMemory(mrgn + 328 + 32 * j + 16, tt.Add, pch[j])
+                    for j in range(packn)
                 ],
             )
         )
@@ -135,10 +133,8 @@ def CreateVectorRelocator(chkt, payload):
             + tt.Trigger(
                 players=[tt.AllPlayers],
                 actions=[
-                    [
-                        tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, pch[j])
-                        for j in range(packn)
-                    ]
+                    tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, pch[j])
+                    for j in range(packn)
                 ],
             )
         )
@@ -166,7 +162,7 @@ def CreateVectorRelocator(chkt, payload):
     str_sled = b"".join(str_sled)
 
     str_padding_length = -len(str_section) & 3
-    strsled_offset = len(str_section) + str_padding_length
+    strsled_offset = len(str_section) + str_padding_length + 0x191943C8
     payload_offset = strsled_offset + len(str_sled) + 4
     str_section = (
         str_section + bytes(str_padding_length) + str_sled + b"\0\0\0\0" + payload.data
@@ -221,57 +217,10 @@ def CreateVectorRelocator(chkt, payload):
     ##############
     trglist.clear()
 
-    """
-    # Check if epd is supported
-    Trigger(actions=[tt.SetDeaths(-12, tt.SetTo, 1, 1)])
-
-    Trigger(conditions=[tt.Deaths(0, tt.Exactly, 0, 0)], actions=[tt.Draw()])
-
-    # End trigger execution if EUDA is not supported
-    #  - using condition #115 twice.
-    Trigger(
-        conditions=[
-            tt.Deaths(0, tt.Exactly, 0, 0),
-            tt.Condition(0, 0, 0, 0, 0, 115, 0, 0),
-            tt.Condition(0, 0, 0, 0, 0, 115, 0, 0),
-        ]
-    )
-
-    Trigger(actions=[tt.SetDeaths(-12, tt.SetTo, 0, 1)])
-    """
-
-    # -------
-
-    # Init mrgn rawtrigger
-    strs = 0x5993D4
-    for e in ut.RandList(range(2, 32)):
-        # prt table
-        # player
-        acts = [
-            [
-                tt.SetMemory(mrgn + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2)),
-                tt.SetMemory(mrgn + 328 + 32 * i + 20, tt.Add, 2 ** (e - 2)),
-                tt.SetMemory(mrgn_ort + 328 + 32 * i + 16, tt.Add, 2 ** (e - 2)),
-                tt.SetMemory(mrgn_ort + 328 + 32 * i + 20, tt.Add, 2 ** e),
-            ]
-            for i in range(packn)
-        ] + [
-            tt.SetMemory(mrgn + 4, tt.Add, 2 ** e),
-            tt.SetMemory(mrgn_ort + 4, tt.Add, 2 ** e),
-        ]
-        Trigger(
-            conditions=tt.MemoryX(strs, tt.AtLeast, 1, 2 ** e),
-            actions=ut.RandList(acts),
-        )
-
-    # Payload update
-    curpl = 0x6509B0
-
-    # -------
-
     # pts[player].lasttrigger->next = value(strs) + strsled_offset
 
     pts = 0x51A280
+    curpl = 0x6509B0
 
     for player in ut.RandList(range(8)):
         triggerend = ~(0x51A284 + player * 12)
@@ -302,7 +251,7 @@ def CreateVectorRelocator(chkt, payload):
         Trigger(
             conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2 ** e),
             actions=[
-                tt.SetDeaths(11, tt.Subtract, 2 ** e, 0),
+                # tt.SetDeaths(11, tt.Subtract, 2 ** e, 0),
                 # used for nextptr recovery in stage 3
                 tt.SetDeaths(10, tt.Add, 2 ** (e - 2), 0),
                 tt.SetMemory(curpl, tt.Add, 2 ** (e - 2)),
@@ -311,7 +260,13 @@ def CreateVectorRelocator(chkt, payload):
 
     # now curpl = EPD(value(ptsprev) + 4)
     # value(EPD(value(ptsprev) + 4)) = strs + payload_offset
-    CopyDeaths(tt.EPD(strs), tt.CurrentPlayer, False, strsled_offset)
+    # CopyDeaths(tt.EPD(strs), tt.CurrentPlayer, False, strsled_offset)
+    Trigger(
+        actions=[
+            tt.SetDeaths(tt.CurrentPlayer, tt.SetTo, strsled_offset, 0),
+            tt.SetDeaths(11, tt.SetTo, 0, 0),
+        ]
+    )
 
     # Done!
     trigdata = b"".join(trglist)

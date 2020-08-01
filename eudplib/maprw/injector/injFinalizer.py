@@ -52,10 +52,7 @@ def _DispatchInlineCode(nextptr, trigepd, prop):
     v = random.randint(234, 65535)
     c.VProc(
         trigepd,
-        [
-            trigepd.AddNumber(-prop + 2 - 12 * v),
-            trigepd.SetDest(ut.EPD(0x6509B0)),
-        ],
+        [trigepd.AddNumber(-prop + 2 - 12 * v), trigepd.SetDest(ut.EPD(0x6509B0)),],
     )
 
     for funcID, func in GetInlineCodeList():
@@ -144,19 +141,18 @@ def _FlipProp(trigepd):
         u = random.randint(234, 65535)
         prop = (8 + 320 + 2048) // 4 - 12 * u
         c.VProc(
-            trigepd,
-            [
-                trigepd.AddNumber(prop - 1),
-                trigepd.SetDest(ut.EPD(0x6509B0)),
-            ],
+            trigepd, [trigepd.AddNumber(prop - 1), trigepd.SetDest(ut.EPD(0x6509B0)),],
         )
 
+        c.RawTrigger(actions=c.SetDeathsX(c.CurrentPlayer, c.Add, 8, u, 8))
+        """
         if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 4, u)):  # Preserved
             # Disable now
             cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 8, u))
         if cs.EUDElse()():
             cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.Subtract, 8, u))
         cs.EUDEndIf()
+        """
 
         # Dispatch inline code
         if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 0x10000000, u)):
@@ -192,10 +188,12 @@ def CreateInjectFinalizer(chkt, root):
             ],
         )
 
+        """
         # revert mrgndata
         mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
         mrgndata_db = c.Db(mrgndata)
         sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
+        """
 
         # Flip TRIG properties
         i = c.EUDVariable()
