@@ -62,6 +62,9 @@ def GetExecutingPlayers(bTrigger):
 def NoWaitAndPreserved(bTrigger):
     execOnce = True
     for i in range(64):
+        actionflag = bTrigger[320 + 32 * i + 28]
+        if not actionflag & 0b10:  # Enabled Flag
+            continue
         actionbyte = bTrigger[320 + 32 * i + 26]
         if actionbyte in (4, 7):  # Wait or Transmission
             return False
