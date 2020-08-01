@@ -38,7 +38,6 @@ from ..rawtrigger import (
     EncodeSwitchState,
     EncodeAIScript,
     EncodeLocation,
-    EncodeLocationIndex,
     EncodeUnit,
     EncodeString,
     EncodeSwitch,
@@ -69,7 +68,6 @@ TrgSwitchAction = createEncoder(EncodeSwitchAction)
 TrgSwitchState = createEncoder(EncodeSwitchState)
 TrgAIScript = createEncoder(EncodeAIScript)
 TrgLocation = createEncoder(EncodeLocation)
-TrgLocationIndex = createEncoder(EncodeLocationIndex)
 TrgString = createEncoder(EncodeString)
 TrgSwitch = createEncoder(EncodeSwitch)
 TrgUnit = createEncoder(EncodeUnit)

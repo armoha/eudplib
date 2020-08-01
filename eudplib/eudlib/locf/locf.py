@@ -27,7 +27,7 @@ from ... import core as c, ctrlstru as cs, utils as ut
 from ..memiof import f_posread_epd, f_setcurpl2cpcache, f_dwread_epd
 from ...localize import _
 
-_loct = ut.EPD(0x58DC60)
+_loct = ut.EPD(0x58DC60) - 5
 
 
 def _locfgen2(mod1, mod2, mod3, mod4, signed=False):

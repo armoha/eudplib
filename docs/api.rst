@@ -375,10 +375,12 @@ GetPropertyIndex에서는 해당하는 스트링이나 UPRP이 없는 경우 새
 -   **GetStringIndex**
 -   **GetPropertyIndex**
 
-.. warning::
+.. warning (eudplib 0.63.0 이전 버전만 해당)::
     Encode~ 함수와 Get~Index 함수를 혼동하면 안됩니다. 예를 들어서 Location 0의
     GetLocationIndex 결과는 0(0번 로케이션)인 반면에, EncodeLocation 결과는 1
     (트리거 조건/액션에서 실제로 쓰는 값)이 나옵니다. 둘은 다른 함수입니다.
+
+    eudplib 0.63.0 부터 EncodeLocation과 GetLocationIndex는 같은 값을 씁니다.
 
 
 

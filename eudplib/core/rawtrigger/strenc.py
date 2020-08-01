@@ -87,21 +87,8 @@ def _EncodeAny(t, f, dl, s, issueError, *, dlo=0):
         return s
 
 
-def EncodeLocationIndex(loc, issueError=False):
-    return _EncodeAny(
-        "locationIndex", GetLocationIndex, DefLocationDict, loc, issueError
-    )
-
-
 def EncodeLocation(loc, issueError=False):
-    return _EncodeAny(
-        "location",
-        lambda s: GetLocationIndex(s) + 1,
-        DefLocationDict,
-        loc,
-        issueError,
-        dlo=1,
-    )
+    return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc, issueError)
 
 
 def EncodeString(s, issueError=False):

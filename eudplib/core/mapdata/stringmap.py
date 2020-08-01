@@ -75,7 +75,7 @@ def InitStringMap(chkt):
 
 
 def GetLocationIndex(l):
-    return locmap.GetStringIndex(l)
+    return locmap.GetStringIndex(l) + 1
 
 
 def GetStringIndex(s):

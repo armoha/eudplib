@@ -58,9 +58,11 @@
 * EncodeSwitchAction(s)
 * EncodeSwitchState(s)
 * EncodeUnit(u)
-    이름을 트리거에서 쓰는 번호로 바꿉니다. ** 인덱스랑 차이가 있을 수 있습니다 ** :
+    이름을 트리거에서 쓰는 번호로 바꿉니다.
 
-        EncodeLocation('Location 0')  # 1
+        EncodeLocation('Location 0')  # NOT exist
+        EncodeLocation('Location 1')  # 1
+        EncodeLocation('Anywhere')    # 64
 
     EncodeString에 맵에 없는 스트링을 넣으면 알아서 스트링 테이블에 새 데이터를 넣고
     새로 만든 스트링의 오프셋을 반환합니다.
@@ -72,8 +74,11 @@
 * GetStringIndex(s)
 * GetSwitchIndex(s)
     이름을 인덱스로 바꿉니다. :
+    ** GetLocationIndex는 eudplib 0.63.0 이전 버전에서는 EncodeLocation보다 1 작습니다 ** :
 
-        GetLocationIndex('Location 0')  # 0
+        GetLocationIndex('Location 0')  # NOT exist
+        GetLocationIndex('Location 1')  # 1
+        GetLocationIndex('Anywhere')    # 64
 
 * GetPlayerInfo(player)
     player 플레이어의 정보를 나타냅니다. 자세한건 print해보세요.
