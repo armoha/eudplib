@@ -6,13 +6,13 @@
 #define EPSCRIPT_UTILS_H_H
 
 #include <string>
-std::string getFile(const std::string& fname);
+std::string getFile(const std::string &fname);
 
-#if defined (_WIN32)
+#if defined(_WIN32)
 #if defined(epScriptLib_EXPORTS)
-#define  EPS_EXPORT __declspec(dllexport)
+#define EPS_EXPORT __declspec(dllexport)
 #else
-#define  EPS_EXPORT
+#define EPS_EXPORT
 #endif
 #else
 #define EPS_EXPORT
