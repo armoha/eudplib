@@ -33,6 +33,7 @@ from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
 from ..localize import _
 from ..utils import ep_eprint
 import binascii
+import os
 
 traceHeader = None
 traceMap = []
@@ -50,7 +51,7 @@ def getTraceMap():
 RegisterCreatePayloadCallback(getTraceMap)
 
 
-def SaveMap(fname, rootf):
+def SaveMap(fname, rootf, *, sectorSize=None):
     """Save output map with root function.
 
     :param fname: Path for output map.
@@ -73,23 +74,43 @@ def SaveMap(fname, rootf):
     chkt.optimize()
     rawchk = chkt.savechk()
     print("Output scenario.chk : {:.3}MB".format(len(rawchk) / 1000000))
-
-    # Process by modifying existing mpqfile
-    try:
-        open(fname, "wb").write(mapdata.GetRawFile())
-    except PermissionError:
-        ep_eprint(
-            _("You lacks permission to get access rights for output map"),
-            _("Try to turn off antivirus or StarCraft"),
-            sep="\n",
-        )
-        raise
-
     mw = mpqapi.MPQ()
-    mw.Open(fname)
-    mw.PutFile("staredit\\scenario.chk", rawchk)
+
+    if sectorSize is None:
+        # Process by modifying existing mpqfile
+        try:
+            open(fname, "wb").write(mapdata.GetRawFile())
+        except PermissionError:
+            ep_eprint(
+                _("You lacks permission to get access rights for output map"),
+                _("Try to turn off antivirus or StarCraft"),
+                sep="\n",
+            )
+        if not mw.Open(fname):
+            ep_eprint("Fail to access output map")
+    elif isinstance(sectorSize, int):
+        if os.path.isfile(fname):
+            try:
+                os.remove(fname)
+            except PermissionError:
+                ep_eprint(
+                    _("You lacks permission to get access rights for output map"),
+                    _("Try to turn off antivirus or StarCraft"),
+                    sep="\n",
+                )
+        if not mw.Create(fname, sectorSize=sectorSize):
+            ep_eprint("Fail to access output map")
+        for n, f in mapdata.IterListFiles():
+            if f and not mw.PutFile(n, f):
+                ep_eprint("Fail to export input map data to output map")
+    else:
+        ep_eprint("sectorSize should be int. ({})".format(sectorSize))
+
+    if not mw.PutFile("staredit\\scenario.chk", rawchk):
+        ep_eprint("Fail to add scenario.chk")
     UpdateMPQ(mw)
-    mw.Compact()
+    if not mw.Compact():
+        ep_eprint("Fail to compact MPQ")
     mw.Close()
 
     if traceMap:

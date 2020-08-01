@@ -48,7 +48,7 @@ def UpdateFileListByListfile(mpqr):
 
 def MPQCheckFile(fname):
     """Check if filename is already exist.
-    
+
     :param fname: Desired filename in mpq
     """
 

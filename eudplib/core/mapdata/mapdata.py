@@ -31,13 +31,15 @@ _inited = False
 _chkt = None
 _origchkt = None
 _rawfile = None
+_listfiles = []
 
 
 def InitMapData(chkt, rawfile):
-    global _inited, _origchkt, _chkt, _rawfile
+    global _inited, _origchkt, _chkt, _rawfile, _listfiles
     _chkt = chkt
     _origchkt = chkt.clone()
     _rawfile = rawfile
+    _listfiles = []
 
     InitStringMap(chkt)
     InitPropertyMap(chkt)
@@ -48,6 +50,10 @@ def InitMapData(chkt, rawfile):
 def UpdateMapData():
     ApplyStringMap(_chkt)
     ApplyPropertyMap(_chkt)
+
+
+def AddListFiles(n, f):
+    _listfiles.append((n, f))
 
 
 def IsMapdataInitalized():
@@ -65,3 +71,8 @@ def GetOriginalChkTokenized():
 
 def GetRawFile():
     return _rawfile
+
+
+def IterListFiles():
+    for n, f in _listfiles:
+        yield n, f

@@ -23,7 +23,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ctypes import c_int, c_char_p, c_void_p, create_string_buffer, byref
+from ctypes import (
+    c_int,
+    c_char_p,
+    c_void_p,
+    create_string_buffer,
+    byref,
+    Structure,
+    POINTER,
+    sizeof,
+)
 import os
 import struct
 import platform
@@ -40,11 +49,26 @@ MPQ_FILE_COMPRESS = 0x00000200
 MPQ_FILE_ENCRYPTED = 0x00010000
 MPQ_FILE_FIX_KEY = 0x00020000
 MPQ_FILE_REPLACEEXISTING = 0x80000000
-
-MPQ_WAVE_QUALITY_MEDIUM = 0x1
-
+MPQ_COMP_ZLIB = 0x00000002
 
 libstorm = None
+
+
+class CreateInfo(Structure):
+    _fields_ = [
+        ("cbSize", c_int),
+        ("dwMpqVersion", c_int),
+        ("pvUserData", c_void_p),
+        ("cbUserData", c_int),
+        ("dwStreamFlags", c_int),
+        ("dwFileFlags1", c_int),
+        ("dwFileFlags2", c_int),
+        ("dwFileFlags3", c_int),
+        ("dwAttrFlags", c_int),
+        ("dwSectorSize", c_int),
+        ("dwRawChunkSize", c_int),
+        ("dwMaxFileCount", c_int),
+    ]
 
 
 def InitMpqLibrary():
@@ -96,14 +120,25 @@ def InitMpqLibrary():
 
         # for MpqWrite
         libstorm.SFileCompactArchive.restype = c_int
-        libstorm.SFileAddFile.restype = c_int
-        libstorm.SFileAddWave.restype = c_int
+        libstorm.SFileCreateArchive2.restype = c_int
+        libstorm.SFileAddFileEx.restype = c_int
         libstorm.SFileGetMaxFileCount.restype = c_int
         libstorm.SFileSetMaxFileCount.restype = c_int
 
         libstorm.SFileCompactArchive.argtypes = [c_void_p, c_char_p, c_int]
-        libstorm.SFileAddFile.argtypes = [c_void_p, c_char_p, c_char_p, c_int]
-        libstorm.SFileAddWave.argtypes = [c_void_p, c_char_p, c_char_p, c_int, c_int]
+        libstorm.SFileCreateArchive2.argtypes = [
+            c_char_p,
+            POINTER(CreateInfo),
+            c_void_p,
+        ]
+        libstorm.SFileAddFileEx.argtypes = [
+            c_void_p,
+            c_char_p,
+            c_char_p,
+            c_int,
+            c_int,
+            c_int,
+        ]
         libstorm.SFileGetMaxFileCount.argtypes = [c_void_p]
         libstorm.SFileSetMaxFileCount.argtypes = [c_void_p, c_int]
 
@@ -128,6 +163,31 @@ class MPQ:
 
         h = c_void_p()
         ret = self.libstorm.SFileOpenArchive(filename_u2b(fname), 0, 0, byref(h))
+        if not ret:
+            self.mpqh = None
+            return False
+
+        self.mpqh = h
+        return True
+
+    def Create(self, fname, *, sectorSize=3, fileCount=1024):
+        if self.mpqh is not None:
+            raise RuntimeError(_("Duplicate opening"))
+
+        cinfo = CreateInfo()
+        cinfo.cbSize = sizeof(CreateInfo)
+        cinfo.dwMpqVersion = 0
+        cinfo.dwStreamFlags = 0
+        cinfo.dwFileFlags1 = 0
+        cinfo.dwFileFlags2 = 0
+        cinfo.dwFileFlags3 = 0
+        cinfo.dwAttrFlags = 0
+        cinfo.dwSectorSize = 2 ** (9 + sectorSize)
+        cinfo.dwMaxFileCount = fileCount
+        h = c_void_p()
+        ret = self.libstorm.SFileCreateArchive2(
+            filename_u2b(fname), byref(cinfo), byref(h)
+        )
         if not ret:
             self.mpqh = None
             return False
@@ -184,7 +244,7 @@ class MPQ:
 
     # Writer
 
-    def PutFile(self, fname, buffer):
+    def PutFile(self, fname, buffer, *, cmp1=MPQ_COMP_ZLIB, cmp2=MPQ_COMP_ZLIB):
         if not self.mpqh:
             return None
 
@@ -195,16 +255,18 @@ class MPQ:
         f.close()
 
         # Add to mpq
-        ret = self.libstorm.SFileAddFile(
+        ret = self.libstorm.SFileAddFileEx(
             self.mpqh,
             filename_u2b(tmpfname),
             u2b(fname),
             MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED | MPQ_FILE_REPLACEEXISTING,
+            cmp1,
+            cmp2,
         )
         os.unlink(tmpfname)
         return ret
 
-    def PutWave(self, fname, buffer):
+    def PutWave(self, fname, buffer, *, cmp1=MPQ_COMP_ZLIB, cmp2=MPQ_COMP_ZLIB):
         if not self.mpqh:
             return None
 
@@ -215,12 +277,13 @@ class MPQ:
         f.close()
 
         # Add to mpq
-        ret = self.libstorm.SFileAddWave(
+        ret = self.libstorm.SFileAddFileEx(
             self.mpqh,
             filename_u2b(tmpfname),
             u2b(fname),
-            MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED | MPQ_FILE_FIX_KEY,
-            MPQ_WAVE_QUALITY_MEDIUM,
+            MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED,
+            cmp1,
+            cmp2,
         )
         os.unlink(tmpfname)
         return ret

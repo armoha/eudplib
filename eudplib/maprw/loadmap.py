@@ -45,13 +45,21 @@ def LoadMap(fname):
         ep_eprint(
             _("You lacks permission to get access rights for input map"),
             _("Try to turn off antivirus or StarCraft"),
-            sep="\n"
+            sep="\n",
         )
         raise
     mpqr = mpqapi.MPQ()
-    mpqr.Open(fname)
+    if not mpqr.Open(fname):
+        ep_eprint("Fail to open input map")
     chkt = chktok.CHK()
-    chkt.loadchk(mpqr.Extract("staredit\\scenario.chk"))
+    b = mpqr.Extract("staredit\\scenario.chk")
+    if b:
+        chkt.loadchk(b)
+    else:
+        ep_eprint("Fail to extract scenario.chk, maybe invalid scx")
     mapdata.InitMapData(chkt, rawfile)
     UpdateFileListByListfile(mpqr)
+    for f in mpqr.EnumFiles():
+        if not f in ("staredit\\scenario.chk", "(listfile)"):
+            mapdata.AddListFiles(f, mpqr.Extract(f))
     mpqr.Close()
