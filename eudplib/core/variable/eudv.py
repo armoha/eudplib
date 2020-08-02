@@ -221,10 +221,12 @@ class EUDVariable(VariableBase):
     # -------
 
     def __eq__(self, other):
-        if IsConstExpr(other):
+        try:
             return self.Exactly(other)
 
-        else:
+        except Exception as err:
+            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            traceback.print_stack()
             return (self - other).Exactly(0)
 
     def __ne__(self, other):
@@ -234,19 +236,23 @@ class EUDVariable(VariableBase):
             return (self - other).AtLeast(1)
 
     def __le__(self, other):
-        if IsConstExpr(other):
+        try:
             return self.AtMost(other)
 
-        else:
+        except Exception as err:
+            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            traceback.print_stack()
             t = EUDVariable()
             SeqCompute(((t, bt.SetTo, self), (t, bt.Subtract, other)))
             return t.Exactly(0)
 
     def __ge__(self, other):
-        if IsConstExpr(other):
+        try:
             return self.AtLeast(other)
 
-        else:
+        except Exception as err:
+            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            traceback.print_stack()
             t = EUDVariable()
             SeqCompute(((t, bt.SetTo, other), (t, bt.Subtract, self)))
             return t.Exactly(0)
@@ -257,10 +263,12 @@ class EUDVariable(VariableBase):
             traceback.print_stack()
             return [bt.Never()]  # No unsigned number is less than 0
 
-        if IsConstExpr(other):
+        try:
             return self.AtMost(other - 1)
 
-        else:
+        except Exception as err:
+            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            traceback.print_stack()
             t = EUDVariable()
             SeqCompute(((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other)))
             return t.Exactly(0)
@@ -271,10 +279,12 @@ class EUDVariable(VariableBase):
             traceback.print_stack()
             return [bt.Never()]  # No unsigned number is less than 0
 
-        if IsConstExpr(other):
+        try:
             return self.AtLeast(other + 1)
 
-        else:
+        except Exception as err:
+            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            traceback.print_stack()
             t = EUDVariable()
             SeqCompute(((t, bt.SetTo, self), (t, bt.Subtract, other)))
             return t.AtLeast(1)
@@ -347,13 +357,13 @@ def VProc(v, actions):
     actions = FlattenList(actions)
     end = Forward()
     triggers = list()
-    
+
     for cv, nv in zip(v, v[1:]):
         actions.append(bt.SetNextPtr(cv.GetVTable(), nv.GetVTable()))
     actions.append(bt.SetNextPtr(v[-1].GetVTable(), end))
 
     for i in range(0, len(actions), 64):
-        trg = bt.RawTrigger(actions=actions[i:i + 64])
+        trg = bt.RawTrigger(actions=actions[i : i + 64])
         triggers.append(trg)
     triggers[-1]._nextptr = v[0].GetVTable()
     end << bt.NextTrigger()
