@@ -1027,6 +1027,8 @@ switchcase_block ::= switchcase_header RPAREN LBRACKET case_chunks default_chunk
 
 switchcase_block ::= switchcase_header RPAREN LBRACKET case_chunks.
 
+switchcase_block ::= switchcase_header RPAREN LBRACKET.
+
 switchcase_stmt ::= switchcase_block RBRACKET. {
     ps->gen << "EUDEndSwitch()" << std::endl;
 }

@@ -125,6 +125,7 @@ State 1:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -332,6 +333,7 @@ State 2:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -538,6 +540,7 @@ State 3:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -744,6 +747,7 @@ State 4:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -949,6 +953,7 @@ State 5:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -1155,6 +1160,7 @@ State 6:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -1361,6 +1367,7 @@ State 7:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -1568,6 +1575,7 @@ State 8:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -1774,6 +1782,7 @@ State 9:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -1980,6 +1989,7 @@ State 10:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -2186,6 +2196,7 @@ State 11:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -2392,6 +2403,7 @@ State 12:
     (167) case_chunk ::= case_clause bodyStmtList *
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -2602,6 +2614,7 @@ State 13:
           case_chunk ::= case_clause * bodyStmtList
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -2810,6 +2823,7 @@ State 14:
     (172) default_chunk ::= default_clause bodyStmtList *
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -3018,6 +3032,7 @@ State 15:
           default_chunk ::= default_clause * bodyStmtList
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -3224,6 +3239,7 @@ State 16:
           switchcase_header ::= * SWITCHCASE LPAREN expr
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= * switchcase_header RPAREN LBRACKET case_chunks
+          switchcase_block ::= * switchcase_header RPAREN LBRACKET
           switchcase_stmt ::= * switchcase_block RBRACKET
           while_start ::= * WHILE
           while_header ::= * while_start LPAREN expr
@@ -3449,7 +3465,7 @@ State 18:
           for_init_stmt_nonEmpty ::= * assign_stmt
           for_init_stmt_nonEmpty ::= * for_init_stmt_nonEmpty COMMA for_init_stmt_nonEmpty
           for_init_stmt ::= * for_init_stmt_nonEmpty
-    (186) for_init_stmt ::= *
+    (187) for_init_stmt ::= *
           for_header1 ::= for_opener * for_init_stmt SEMICOLON
           expr ::= * CONDITIONNAME LPAREN fArgs RPAREN
           expr ::= * KILLS LPAREN fArgs RPAREN
@@ -3461,7 +3477,7 @@ State 18:
                         BITNOT shift  66
                         LPAREN shift  70
                     LSQBRACKET shift  44
-                     SEMICOLON reduce 186
+                     SEMICOLON reduce 187
                           NAME shift  205
                       FUNCTION shift  393
                            VAR shift  113
@@ -3676,7 +3692,7 @@ State 20:
           for_action_stmt_nonEmpty ::= * funcexprStmt
           for_action_stmt_nonEmpty ::= * assign_stmt
           for_action_stmt_nonEmpty ::= * for_action_stmt_nonEmpty COMMA for_action_stmt_nonEmpty
-    (190) for_action_stmt ::= *
+    (191) for_action_stmt ::= *
           for_action_stmt ::= * for_action_stmt_nonEmpty
           for_header ::= for_header2 * for_action_stmt
           expr ::= * CONDITIONNAME LPAREN fArgs RPAREN
@@ -3691,7 +3707,7 @@ State 20:
                     LSQBRACKET shift  44
                           NAME shift  205
                       FUNCTION shift  393
-                        RPAREN reduce 190
+                        RPAREN reduce 191
                         NUMBER shift  193
                          KILLS shift  192
                            L2V shift  377
@@ -5700,7 +5716,9 @@ State 46:
           case_chunks ::= * case_chunk
           switchcase_block ::= switchcase_header RPAREN LBRACKET * case_chunks default_chunk
           switchcase_block ::= switchcase_header RPAREN LBRACKET * case_chunks
+    (175) switchcase_block ::= switchcase_header RPAREN LBRACKET *
 
+                      RBRACKET reduce 175
                           CASE shift  245
                     case_start shift  34
                    case_clause shift  13
@@ -9731,349 +9749,349 @@ State 117:
                     ACTIONNAME reduce 162
 
 State 118:
-    (204) actionStmt ::= ACTIONNAME LPAREN fArgs RPAREN SEMICOLON *
+    (205) actionStmt ::= ACTIONNAME LPAREN fArgs RPAREN SEMICOLON *
 
-                             $ reduce 204
-                          ELSE reduce 204
-                         QMARK reduce 204
-                         COMMA reduce 204
-                           LOR reduce 204
-                          LAND reduce 204
-                          LNOT reduce 204
-                            EQ reduce 204
-                            LE reduce 204
-                            LT reduce 204
-                            GE reduce 204
-                            GT reduce 204
-                            NE reduce 204
-                         BITOR reduce 204
-                        BITXOR reduce 204
-                        BITAND reduce 204
-                        LSHIFT reduce 204
-                        RSHIFT reduce 204
-                          PLUS reduce 204
-                         MINUS reduce 204
-                        DIVIDE reduce 204
-                      MULTIPLY reduce 204
-                           MOD reduce 204
-                        BITNOT reduce 204
-                        LPAREN reduce 204
-                    LSQBRACKET reduce 204
-                        PERIOD reduce 204
-                     SEMICOLON reduce 204
-                          NAME reduce 204
-                        IMPORT reduce 204
-                         COLON reduce 204
-                      FUNCTION reduce 204
-                        RPAREN reduce 204
-                        OBJECT reduce 204
-                      LBRACKET reduce 204
-                           VAR reduce 204
-                      RBRACKET reduce 204
-                        NUMBER reduce 204
-                    RSQBRACKET reduce 204
-                         KILLS reduce 204
-                           L2V reduce 204
-                     MAPSTRING reduce 204
-                          UNIT reduce 204
-                        SWITCH reduce 204
-                      LOCATION reduce 204
-                    STATTXTTBL reduce 204
-                        VARRAY reduce 204
-                          LIST reduce 204
-                        STATIC reduce 204
-                         CONST reduce 204
-                           INC reduce 204
-                           DEC reduce 204
-                          ONCE reduce 204
-                            IF reduce 204
-                    SWITCHCASE reduce 204
-                          CASE reduce 204
-                       DEFAULT reduce 204
-                         WHILE reduce 204
-                           FOR reduce 204
-                       FOREACH reduce 204
-                      CONTINUE reduce 204
-                         BREAK reduce 204
-                        RETURN reduce 204
-                 CONDITIONNAME reduce 204
-                    ACTIONNAME reduce 204
+                             $ reduce 205
+                          ELSE reduce 205
+                         QMARK reduce 205
+                         COMMA reduce 205
+                           LOR reduce 205
+                          LAND reduce 205
+                          LNOT reduce 205
+                            EQ reduce 205
+                            LE reduce 205
+                            LT reduce 205
+                            GE reduce 205
+                            GT reduce 205
+                            NE reduce 205
+                         BITOR reduce 205
+                        BITXOR reduce 205
+                        BITAND reduce 205
+                        LSHIFT reduce 205
+                        RSHIFT reduce 205
+                          PLUS reduce 205
+                         MINUS reduce 205
+                        DIVIDE reduce 205
+                      MULTIPLY reduce 205
+                           MOD reduce 205
+                        BITNOT reduce 205
+                        LPAREN reduce 205
+                    LSQBRACKET reduce 205
+                        PERIOD reduce 205
+                     SEMICOLON reduce 205
+                          NAME reduce 205
+                        IMPORT reduce 205
+                         COLON reduce 205
+                      FUNCTION reduce 205
+                        RPAREN reduce 205
+                        OBJECT reduce 205
+                      LBRACKET reduce 205
+                           VAR reduce 205
+                      RBRACKET reduce 205
+                        NUMBER reduce 205
+                    RSQBRACKET reduce 205
+                         KILLS reduce 205
+                           L2V reduce 205
+                     MAPSTRING reduce 205
+                          UNIT reduce 205
+                        SWITCH reduce 205
+                      LOCATION reduce 205
+                    STATTXTTBL reduce 205
+                        VARRAY reduce 205
+                          LIST reduce 205
+                        STATIC reduce 205
+                         CONST reduce 205
+                           INC reduce 205
+                           DEC reduce 205
+                          ONCE reduce 205
+                            IF reduce 205
+                    SWITCHCASE reduce 205
+                          CASE reduce 205
+                       DEFAULT reduce 205
+                         WHILE reduce 205
+                           FOR reduce 205
+                       FOREACH reduce 205
+                      CONTINUE reduce 205
+                         BREAK reduce 205
+                        RETURN reduce 205
+                 CONDITIONNAME reduce 205
+                    ACTIONNAME reduce 205
 
 State 119:
-    (198) foreach_stmt ::= foreach_header RPAREN stmt *
+    (199) foreach_stmt ::= foreach_header RPAREN stmt *
 
-                             $ reduce 198
-                          ELSE reduce 198
-                         QMARK reduce 198
-                         COMMA reduce 198
-                           LOR reduce 198
-                          LAND reduce 198
-                          LNOT reduce 198
-                            EQ reduce 198
-                            LE reduce 198
-                            LT reduce 198
-                            GE reduce 198
-                            GT reduce 198
-                            NE reduce 198
-                         BITOR reduce 198
-                        BITXOR reduce 198
-                        BITAND reduce 198
-                        LSHIFT reduce 198
-                        RSHIFT reduce 198
-                          PLUS reduce 198
-                         MINUS reduce 198
-                        DIVIDE reduce 198
-                      MULTIPLY reduce 198
-                           MOD reduce 198
-                        BITNOT reduce 198
-                        LPAREN reduce 198
-                    LSQBRACKET reduce 198
-                        PERIOD reduce 198
-                     SEMICOLON reduce 198
-                          NAME reduce 198
-                        IMPORT reduce 198
-                         COLON reduce 198
-                      FUNCTION reduce 198
-                        RPAREN reduce 198
-                        OBJECT reduce 198
-                      LBRACKET reduce 198
-                           VAR reduce 198
-                      RBRACKET reduce 198
-                        NUMBER reduce 198
-                    RSQBRACKET reduce 198
-                         KILLS reduce 198
-                           L2V reduce 198
-                     MAPSTRING reduce 198
-                          UNIT reduce 198
-                        SWITCH reduce 198
-                      LOCATION reduce 198
-                    STATTXTTBL reduce 198
-                        VARRAY reduce 198
-                          LIST reduce 198
-                        STATIC reduce 198
-                         CONST reduce 198
-                           INC reduce 198
-                           DEC reduce 198
-                          ONCE reduce 198
-                            IF reduce 198
-                    SWITCHCASE reduce 198
-                          CASE reduce 198
-                       DEFAULT reduce 198
-                         WHILE reduce 198
-                           FOR reduce 198
-                       FOREACH reduce 198
-                      CONTINUE reduce 198
-                         BREAK reduce 198
-                        RETURN reduce 198
-                 CONDITIONNAME reduce 198
-                    ACTIONNAME reduce 198
+                             $ reduce 199
+                          ELSE reduce 199
+                         QMARK reduce 199
+                         COMMA reduce 199
+                           LOR reduce 199
+                          LAND reduce 199
+                          LNOT reduce 199
+                            EQ reduce 199
+                            LE reduce 199
+                            LT reduce 199
+                            GE reduce 199
+                            GT reduce 199
+                            NE reduce 199
+                         BITOR reduce 199
+                        BITXOR reduce 199
+                        BITAND reduce 199
+                        LSHIFT reduce 199
+                        RSHIFT reduce 199
+                          PLUS reduce 199
+                         MINUS reduce 199
+                        DIVIDE reduce 199
+                      MULTIPLY reduce 199
+                           MOD reduce 199
+                        BITNOT reduce 199
+                        LPAREN reduce 199
+                    LSQBRACKET reduce 199
+                        PERIOD reduce 199
+                     SEMICOLON reduce 199
+                          NAME reduce 199
+                        IMPORT reduce 199
+                         COLON reduce 199
+                      FUNCTION reduce 199
+                        RPAREN reduce 199
+                        OBJECT reduce 199
+                      LBRACKET reduce 199
+                           VAR reduce 199
+                      RBRACKET reduce 199
+                        NUMBER reduce 199
+                    RSQBRACKET reduce 199
+                         KILLS reduce 199
+                           L2V reduce 199
+                     MAPSTRING reduce 199
+                          UNIT reduce 199
+                        SWITCH reduce 199
+                      LOCATION reduce 199
+                    STATTXTTBL reduce 199
+                        VARRAY reduce 199
+                          LIST reduce 199
+                        STATIC reduce 199
+                         CONST reduce 199
+                           INC reduce 199
+                           DEC reduce 199
+                          ONCE reduce 199
+                            IF reduce 199
+                    SWITCHCASE reduce 199
+                          CASE reduce 199
+                       DEFAULT reduce 199
+                         WHILE reduce 199
+                           FOR reduce 199
+                       FOREACH reduce 199
+                      CONTINUE reduce 199
+                         BREAK reduce 199
+                        RETURN reduce 199
+                 CONDITIONNAME reduce 199
+                    ACTIONNAME reduce 199
 
 State 120:
-    (195) for_stmt ::= for_header RPAREN stmt *
+    (196) for_stmt ::= for_header RPAREN stmt *
 
-                             $ reduce 195
-                          ELSE reduce 195
-                         QMARK reduce 195
-                         COMMA reduce 195
-                           LOR reduce 195
-                          LAND reduce 195
-                          LNOT reduce 195
-                            EQ reduce 195
-                            LE reduce 195
-                            LT reduce 195
-                            GE reduce 195
-                            GT reduce 195
-                            NE reduce 195
-                         BITOR reduce 195
-                        BITXOR reduce 195
-                        BITAND reduce 195
-                        LSHIFT reduce 195
-                        RSHIFT reduce 195
-                          PLUS reduce 195
-                         MINUS reduce 195
-                        DIVIDE reduce 195
-                      MULTIPLY reduce 195
-                           MOD reduce 195
-                        BITNOT reduce 195
-                        LPAREN reduce 195
-                    LSQBRACKET reduce 195
-                        PERIOD reduce 195
-                     SEMICOLON reduce 195
-                          NAME reduce 195
-                        IMPORT reduce 195
-                         COLON reduce 195
-                      FUNCTION reduce 195
-                        RPAREN reduce 195
-                        OBJECT reduce 195
-                      LBRACKET reduce 195
-                           VAR reduce 195
-                      RBRACKET reduce 195
-                        NUMBER reduce 195
-                    RSQBRACKET reduce 195
-                         KILLS reduce 195
-                           L2V reduce 195
-                     MAPSTRING reduce 195
-                          UNIT reduce 195
-                        SWITCH reduce 195
-                      LOCATION reduce 195
-                    STATTXTTBL reduce 195
-                        VARRAY reduce 195
-                          LIST reduce 195
-                        STATIC reduce 195
-                         CONST reduce 195
-                           INC reduce 195
-                           DEC reduce 195
-                          ONCE reduce 195
-                            IF reduce 195
-                    SWITCHCASE reduce 195
-                          CASE reduce 195
-                       DEFAULT reduce 195
-                         WHILE reduce 195
-                           FOR reduce 195
-                       FOREACH reduce 195
-                      CONTINUE reduce 195
-                         BREAK reduce 195
-                        RETURN reduce 195
-                 CONDITIONNAME reduce 195
-                    ACTIONNAME reduce 195
+                             $ reduce 196
+                          ELSE reduce 196
+                         QMARK reduce 196
+                         COMMA reduce 196
+                           LOR reduce 196
+                          LAND reduce 196
+                          LNOT reduce 196
+                            EQ reduce 196
+                            LE reduce 196
+                            LT reduce 196
+                            GE reduce 196
+                            GT reduce 196
+                            NE reduce 196
+                         BITOR reduce 196
+                        BITXOR reduce 196
+                        BITAND reduce 196
+                        LSHIFT reduce 196
+                        RSHIFT reduce 196
+                          PLUS reduce 196
+                         MINUS reduce 196
+                        DIVIDE reduce 196
+                      MULTIPLY reduce 196
+                           MOD reduce 196
+                        BITNOT reduce 196
+                        LPAREN reduce 196
+                    LSQBRACKET reduce 196
+                        PERIOD reduce 196
+                     SEMICOLON reduce 196
+                          NAME reduce 196
+                        IMPORT reduce 196
+                         COLON reduce 196
+                      FUNCTION reduce 196
+                        RPAREN reduce 196
+                        OBJECT reduce 196
+                      LBRACKET reduce 196
+                           VAR reduce 196
+                      RBRACKET reduce 196
+                        NUMBER reduce 196
+                    RSQBRACKET reduce 196
+                         KILLS reduce 196
+                           L2V reduce 196
+                     MAPSTRING reduce 196
+                          UNIT reduce 196
+                        SWITCH reduce 196
+                      LOCATION reduce 196
+                    STATTXTTBL reduce 196
+                        VARRAY reduce 196
+                          LIST reduce 196
+                        STATIC reduce 196
+                         CONST reduce 196
+                           INC reduce 196
+                           DEC reduce 196
+                          ONCE reduce 196
+                            IF reduce 196
+                    SWITCHCASE reduce 196
+                          CASE reduce 196
+                       DEFAULT reduce 196
+                         WHILE reduce 196
+                           FOR reduce 196
+                       FOREACH reduce 196
+                      CONTINUE reduce 196
+                         BREAK reduce 196
+                        RETURN reduce 196
+                 CONDITIONNAME reduce 196
+                    ACTIONNAME reduce 196
 
 State 121:
-    (178) while_stmt ::= while_header RPAREN stmt *
+    (179) while_stmt ::= while_header RPAREN stmt *
 
-                             $ reduce 178
-                          ELSE reduce 178
-                         QMARK reduce 178
-                         COMMA reduce 178
-                           LOR reduce 178
-                          LAND reduce 178
-                          LNOT reduce 178
-                            EQ reduce 178
-                            LE reduce 178
-                            LT reduce 178
-                            GE reduce 178
-                            GT reduce 178
-                            NE reduce 178
-                         BITOR reduce 178
-                        BITXOR reduce 178
-                        BITAND reduce 178
-                        LSHIFT reduce 178
-                        RSHIFT reduce 178
-                          PLUS reduce 178
-                         MINUS reduce 178
-                        DIVIDE reduce 178
-                      MULTIPLY reduce 178
-                           MOD reduce 178
-                        BITNOT reduce 178
-                        LPAREN reduce 178
-                    LSQBRACKET reduce 178
-                        PERIOD reduce 178
-                     SEMICOLON reduce 178
-                          NAME reduce 178
-                        IMPORT reduce 178
-                         COLON reduce 178
-                      FUNCTION reduce 178
-                        RPAREN reduce 178
-                        OBJECT reduce 178
-                      LBRACKET reduce 178
-                           VAR reduce 178
-                      RBRACKET reduce 178
-                        NUMBER reduce 178
-                    RSQBRACKET reduce 178
-                         KILLS reduce 178
-                           L2V reduce 178
-                     MAPSTRING reduce 178
-                          UNIT reduce 178
-                        SWITCH reduce 178
-                      LOCATION reduce 178
-                    STATTXTTBL reduce 178
-                        VARRAY reduce 178
-                          LIST reduce 178
-                        STATIC reduce 178
-                         CONST reduce 178
-                           INC reduce 178
-                           DEC reduce 178
-                          ONCE reduce 178
-                            IF reduce 178
-                    SWITCHCASE reduce 178
-                          CASE reduce 178
-                       DEFAULT reduce 178
-                         WHILE reduce 178
-                           FOR reduce 178
-                       FOREACH reduce 178
-                      CONTINUE reduce 178
-                         BREAK reduce 178
-                        RETURN reduce 178
-                 CONDITIONNAME reduce 178
-                    ACTIONNAME reduce 178
+                             $ reduce 179
+                          ELSE reduce 179
+                         QMARK reduce 179
+                         COMMA reduce 179
+                           LOR reduce 179
+                          LAND reduce 179
+                          LNOT reduce 179
+                            EQ reduce 179
+                            LE reduce 179
+                            LT reduce 179
+                            GE reduce 179
+                            GT reduce 179
+                            NE reduce 179
+                         BITOR reduce 179
+                        BITXOR reduce 179
+                        BITAND reduce 179
+                        LSHIFT reduce 179
+                        RSHIFT reduce 179
+                          PLUS reduce 179
+                         MINUS reduce 179
+                        DIVIDE reduce 179
+                      MULTIPLY reduce 179
+                           MOD reduce 179
+                        BITNOT reduce 179
+                        LPAREN reduce 179
+                    LSQBRACKET reduce 179
+                        PERIOD reduce 179
+                     SEMICOLON reduce 179
+                          NAME reduce 179
+                        IMPORT reduce 179
+                         COLON reduce 179
+                      FUNCTION reduce 179
+                        RPAREN reduce 179
+                        OBJECT reduce 179
+                      LBRACKET reduce 179
+                           VAR reduce 179
+                      RBRACKET reduce 179
+                        NUMBER reduce 179
+                    RSQBRACKET reduce 179
+                         KILLS reduce 179
+                           L2V reduce 179
+                     MAPSTRING reduce 179
+                          UNIT reduce 179
+                        SWITCH reduce 179
+                      LOCATION reduce 179
+                    STATTXTTBL reduce 179
+                        VARRAY reduce 179
+                          LIST reduce 179
+                        STATIC reduce 179
+                         CONST reduce 179
+                           INC reduce 179
+                           DEC reduce 179
+                          ONCE reduce 179
+                            IF reduce 179
+                    SWITCHCASE reduce 179
+                          CASE reduce 179
+                       DEFAULT reduce 179
+                         WHILE reduce 179
+                           FOR reduce 179
+                       FOREACH reduce 179
+                      CONTINUE reduce 179
+                         BREAK reduce 179
+                        RETURN reduce 179
+                 CONDITIONNAME reduce 179
+                    ACTIONNAME reduce 179
 
 State 122:
-    (175) switchcase_stmt ::= switchcase_block RBRACKET *
+    (176) switchcase_stmt ::= switchcase_block RBRACKET *
 
-                             $ reduce 175
-                          ELSE reduce 175
-                         QMARK reduce 175
-                         COMMA reduce 175
-                           LOR reduce 175
-                          LAND reduce 175
-                          LNOT reduce 175
-                            EQ reduce 175
-                            LE reduce 175
-                            LT reduce 175
-                            GE reduce 175
-                            GT reduce 175
-                            NE reduce 175
-                         BITOR reduce 175
-                        BITXOR reduce 175
-                        BITAND reduce 175
-                        LSHIFT reduce 175
-                        RSHIFT reduce 175
-                          PLUS reduce 175
-                         MINUS reduce 175
-                        DIVIDE reduce 175
-                      MULTIPLY reduce 175
-                           MOD reduce 175
-                        BITNOT reduce 175
-                        LPAREN reduce 175
-                    LSQBRACKET reduce 175
-                        PERIOD reduce 175
-                     SEMICOLON reduce 175
-                          NAME reduce 175
-                        IMPORT reduce 175
-                         COLON reduce 175
-                      FUNCTION reduce 175
-                        RPAREN reduce 175
-                        OBJECT reduce 175
-                      LBRACKET reduce 175
-                           VAR reduce 175
-                      RBRACKET reduce 175
-                        NUMBER reduce 175
-                    RSQBRACKET reduce 175
-                         KILLS reduce 175
-                           L2V reduce 175
-                     MAPSTRING reduce 175
-                          UNIT reduce 175
-                        SWITCH reduce 175
-                      LOCATION reduce 175
-                    STATTXTTBL reduce 175
-                        VARRAY reduce 175
-                          LIST reduce 175
-                        STATIC reduce 175
-                         CONST reduce 175
-                           INC reduce 175
-                           DEC reduce 175
-                          ONCE reduce 175
-                            IF reduce 175
-                    SWITCHCASE reduce 175
-                          CASE reduce 175
-                       DEFAULT reduce 175
-                         WHILE reduce 175
-                           FOR reduce 175
-                       FOREACH reduce 175
-                      CONTINUE reduce 175
-                         BREAK reduce 175
-                        RETURN reduce 175
-                 CONDITIONNAME reduce 175
-                    ACTIONNAME reduce 175
+                             $ reduce 176
+                          ELSE reduce 176
+                         QMARK reduce 176
+                         COMMA reduce 176
+                           LOR reduce 176
+                          LAND reduce 176
+                          LNOT reduce 176
+                            EQ reduce 176
+                            LE reduce 176
+                            LT reduce 176
+                            GE reduce 176
+                            GT reduce 176
+                            NE reduce 176
+                         BITOR reduce 176
+                        BITXOR reduce 176
+                        BITAND reduce 176
+                        LSHIFT reduce 176
+                        RSHIFT reduce 176
+                          PLUS reduce 176
+                         MINUS reduce 176
+                        DIVIDE reduce 176
+                      MULTIPLY reduce 176
+                           MOD reduce 176
+                        BITNOT reduce 176
+                        LPAREN reduce 176
+                    LSQBRACKET reduce 176
+                        PERIOD reduce 176
+                     SEMICOLON reduce 176
+                          NAME reduce 176
+                        IMPORT reduce 176
+                         COLON reduce 176
+                      FUNCTION reduce 176
+                        RPAREN reduce 176
+                        OBJECT reduce 176
+                      LBRACKET reduce 176
+                           VAR reduce 176
+                      RBRACKET reduce 176
+                        NUMBER reduce 176
+                    RSQBRACKET reduce 176
+                         KILLS reduce 176
+                           L2V reduce 176
+                     MAPSTRING reduce 176
+                          UNIT reduce 176
+                        SWITCH reduce 176
+                      LOCATION reduce 176
+                    STATTXTTBL reduce 176
+                        VARRAY reduce 176
+                          LIST reduce 176
+                        STATIC reduce 176
+                         CONST reduce 176
+                           INC reduce 176
+                           DEC reduce 176
+                          ONCE reduce 176
+                            IF reduce 176
+                    SWITCHCASE reduce 176
+                          CASE reduce 176
+                       DEFAULT reduce 176
+                         WHILE reduce 176
+                           FOR reduce 176
+                       FOREACH reduce 176
+                      CONTINUE reduce 176
+                         BREAK reduce 176
+                        RETURN reduce 176
+                 CONDITIONNAME reduce 176
+                    ACTIONNAME reduce 176
 
 State 123:
     (159) if_block ::= if_block elif_header RPAREN stmt *
@@ -12568,66 +12586,66 @@ State 155:
                     ACTIONNAME reduce 76
 
 State 156:
-    (203) expr ::= KILLS LPAREN fArgs RPAREN *
+    (204) expr ::= KILLS LPAREN fArgs RPAREN *
 
-                         QMARK reduce 203
-                         COMMA reduce 203
-                           LOR reduce 203
-                          LAND reduce 203
-                          LNOT reduce 203
-                            EQ reduce 203
-                            LE reduce 203
-                            LT reduce 203
-                            GE reduce 203
-                            GT reduce 203
-                            NE reduce 203
-                         BITOR reduce 203
-                        BITXOR reduce 203
-                        BITAND reduce 203
-                        LSHIFT reduce 203
-                        RSHIFT reduce 203
-                          PLUS reduce 203
-                         MINUS reduce 203
-                        DIVIDE reduce 203
-                      MULTIPLY reduce 203
-                           MOD reduce 203
-                        BITNOT reduce 203
-                        LPAREN reduce 203
-                    LSQBRACKET reduce 203
-                        PERIOD reduce 203
-                     SEMICOLON reduce 203
-                          NAME reduce 203
-                         COLON reduce 203
-                      FUNCTION reduce 203
-                        RPAREN reduce 203
-                      LBRACKET reduce 203
-                           VAR reduce 203
-                        NUMBER reduce 203
-                    RSQBRACKET reduce 203
-                         KILLS reduce 203
-                           L2V reduce 203
-                     MAPSTRING reduce 203
-                          UNIT reduce 203
-                        SWITCH reduce 203
-                      LOCATION reduce 203
-                    STATTXTTBL reduce 203
-                        VARRAY reduce 203
-                          LIST reduce 203
-                        STATIC reduce 203
-                         CONST reduce 203
-                           INC reduce 203
-                           DEC reduce 203
-                          ONCE reduce 203
-                            IF reduce 203
-                    SWITCHCASE reduce 203
-                         WHILE reduce 203
-                           FOR reduce 203
-                       FOREACH reduce 203
-                      CONTINUE reduce 203
-                         BREAK reduce 203
-                        RETURN reduce 203
-                 CONDITIONNAME reduce 203
-                    ACTIONNAME reduce 203
+                         QMARK reduce 204
+                         COMMA reduce 204
+                           LOR reduce 204
+                          LAND reduce 204
+                          LNOT reduce 204
+                            EQ reduce 204
+                            LE reduce 204
+                            LT reduce 204
+                            GE reduce 204
+                            GT reduce 204
+                            NE reduce 204
+                         BITOR reduce 204
+                        BITXOR reduce 204
+                        BITAND reduce 204
+                        LSHIFT reduce 204
+                        RSHIFT reduce 204
+                          PLUS reduce 204
+                         MINUS reduce 204
+                        DIVIDE reduce 204
+                      MULTIPLY reduce 204
+                           MOD reduce 204
+                        BITNOT reduce 204
+                        LPAREN reduce 204
+                    LSQBRACKET reduce 204
+                        PERIOD reduce 204
+                     SEMICOLON reduce 204
+                          NAME reduce 204
+                         COLON reduce 204
+                      FUNCTION reduce 204
+                        RPAREN reduce 204
+                      LBRACKET reduce 204
+                           VAR reduce 204
+                        NUMBER reduce 204
+                    RSQBRACKET reduce 204
+                         KILLS reduce 204
+                           L2V reduce 204
+                     MAPSTRING reduce 204
+                          UNIT reduce 204
+                        SWITCH reduce 204
+                      LOCATION reduce 204
+                    STATTXTTBL reduce 204
+                        VARRAY reduce 204
+                          LIST reduce 204
+                        STATIC reduce 204
+                         CONST reduce 204
+                           INC reduce 204
+                           DEC reduce 204
+                          ONCE reduce 204
+                            IF reduce 204
+                    SWITCHCASE reduce 204
+                         WHILE reduce 204
+                           FOR reduce 204
+                       FOREACH reduce 204
+                      CONTINUE reduce 204
+                         BREAK reduce 204
+                        RETURN reduce 204
+                 CONDITIONNAME reduce 204
+                    ACTIONNAME reduce 204
 
 State 157:
      (87) funcexpr ::= NAME LPAREN fArgs RPAREN *
@@ -12878,128 +12896,128 @@ State 160:
                     ACTIONNAME reduce 93
 
 State 161:
-    (202) expr ::= CONDITIONNAME LPAREN fArgs RPAREN *
+    (203) expr ::= CONDITIONNAME LPAREN fArgs RPAREN *
 
-                         QMARK reduce 202
-                         COMMA reduce 202
-                           LOR reduce 202
-                          LAND reduce 202
-                          LNOT reduce 202
-                            EQ reduce 202
-                            LE reduce 202
-                            LT reduce 202
-                            GE reduce 202
-                            GT reduce 202
-                            NE reduce 202
-                         BITOR reduce 202
-                        BITXOR reduce 202
-                        BITAND reduce 202
-                        LSHIFT reduce 202
-                        RSHIFT reduce 202
-                          PLUS reduce 202
-                         MINUS reduce 202
-                        DIVIDE reduce 202
-                      MULTIPLY reduce 202
-                           MOD reduce 202
-                        BITNOT reduce 202
-                        LPAREN reduce 202
-                    LSQBRACKET reduce 202
-                        PERIOD reduce 202
-                     SEMICOLON reduce 202
-                          NAME reduce 202
-                         COLON reduce 202
-                      FUNCTION reduce 202
-                        RPAREN reduce 202
-                      LBRACKET reduce 202
-                           VAR reduce 202
-                        NUMBER reduce 202
-                    RSQBRACKET reduce 202
-                         KILLS reduce 202
-                           L2V reduce 202
-                     MAPSTRING reduce 202
-                          UNIT reduce 202
-                        SWITCH reduce 202
-                      LOCATION reduce 202
-                    STATTXTTBL reduce 202
-                        VARRAY reduce 202
-                          LIST reduce 202
-                        STATIC reduce 202
-                         CONST reduce 202
-                           INC reduce 202
-                           DEC reduce 202
-                          ONCE reduce 202
-                            IF reduce 202
-                    SWITCHCASE reduce 202
-                         WHILE reduce 202
-                           FOR reduce 202
-                       FOREACH reduce 202
-                      CONTINUE reduce 202
-                         BREAK reduce 202
-                        RETURN reduce 202
-                 CONDITIONNAME reduce 202
-                    ACTIONNAME reduce 202
+                         QMARK reduce 203
+                         COMMA reduce 203
+                           LOR reduce 203
+                          LAND reduce 203
+                          LNOT reduce 203
+                            EQ reduce 203
+                            LE reduce 203
+                            LT reduce 203
+                            GE reduce 203
+                            GT reduce 203
+                            NE reduce 203
+                         BITOR reduce 203
+                        BITXOR reduce 203
+                        BITAND reduce 203
+                        LSHIFT reduce 203
+                        RSHIFT reduce 203
+                          PLUS reduce 203
+                         MINUS reduce 203
+                        DIVIDE reduce 203
+                      MULTIPLY reduce 203
+                           MOD reduce 203
+                        BITNOT reduce 203
+                        LPAREN reduce 203
+                    LSQBRACKET reduce 203
+                        PERIOD reduce 203
+                     SEMICOLON reduce 203
+                          NAME reduce 203
+                         COLON reduce 203
+                      FUNCTION reduce 203
+                        RPAREN reduce 203
+                      LBRACKET reduce 203
+                           VAR reduce 203
+                        NUMBER reduce 203
+                    RSQBRACKET reduce 203
+                         KILLS reduce 203
+                           L2V reduce 203
+                     MAPSTRING reduce 203
+                          UNIT reduce 203
+                        SWITCH reduce 203
+                      LOCATION reduce 203
+                    STATTXTTBL reduce 203
+                        VARRAY reduce 203
+                          LIST reduce 203
+                        STATIC reduce 203
+                         CONST reduce 203
+                           INC reduce 203
+                           DEC reduce 203
+                          ONCE reduce 203
+                            IF reduce 203
+                    SWITCHCASE reduce 203
+                         WHILE reduce 203
+                           FOR reduce 203
+                       FOREACH reduce 203
+                      CONTINUE reduce 203
+                         BREAK reduce 203
+                        RETURN reduce 203
+                 CONDITIONNAME reduce 203
+                    ACTIONNAME reduce 203
 
 State 162:
-    (205) expr ::= ACTIONNAME LPAREN fArgs RPAREN *
+    (206) expr ::= ACTIONNAME LPAREN fArgs RPAREN *
 
-                         QMARK reduce 205
-                         COMMA reduce 205
-                           LOR reduce 205
-                          LAND reduce 205
-                          LNOT reduce 205
-                            EQ reduce 205
-                            LE reduce 205
-                            LT reduce 205
-                            GE reduce 205
-                            GT reduce 205
-                            NE reduce 205
-                         BITOR reduce 205
-                        BITXOR reduce 205
-                        BITAND reduce 205
-                        LSHIFT reduce 205
-                        RSHIFT reduce 205
-                          PLUS reduce 205
-                         MINUS reduce 205
-                        DIVIDE reduce 205
-                      MULTIPLY reduce 205
-                           MOD reduce 205
-                        BITNOT reduce 205
-                        LPAREN reduce 205
-                    LSQBRACKET reduce 205
-                        PERIOD reduce 205
-                     SEMICOLON reduce 205
-                          NAME reduce 205
-                         COLON reduce 205
-                      FUNCTION reduce 205
-                        RPAREN reduce 205
-                      LBRACKET reduce 205
-                           VAR reduce 205
-                        NUMBER reduce 205
-                    RSQBRACKET reduce 205
-                         KILLS reduce 205
-                           L2V reduce 205
-                     MAPSTRING reduce 205
-                          UNIT reduce 205
-                        SWITCH reduce 205
-                      LOCATION reduce 205
-                    STATTXTTBL reduce 205
-                        VARRAY reduce 205
-                          LIST reduce 205
-                        STATIC reduce 205
-                         CONST reduce 205
-                           INC reduce 205
-                           DEC reduce 205
-                          ONCE reduce 205
-                            IF reduce 205
-                    SWITCHCASE reduce 205
-                         WHILE reduce 205
-                           FOR reduce 205
-                       FOREACH reduce 205
-                      CONTINUE reduce 205
-                         BREAK reduce 205
-                        RETURN reduce 205
-                 CONDITIONNAME reduce 205
-                    ACTIONNAME reduce 205
+                         QMARK reduce 206
+                         COMMA reduce 206
+                           LOR reduce 206
+                          LAND reduce 206
+                          LNOT reduce 206
+                            EQ reduce 206
+                            LE reduce 206
+                            LT reduce 206
+                            GE reduce 206
+                            GT reduce 206
+                            NE reduce 206
+                         BITOR reduce 206
+                        BITXOR reduce 206
+                        BITAND reduce 206
+                        LSHIFT reduce 206
+                        RSHIFT reduce 206
+                          PLUS reduce 206
+                         MINUS reduce 206
+                        DIVIDE reduce 206
+                      MULTIPLY reduce 206
+                           MOD reduce 206
+                        BITNOT reduce 206
+                        LPAREN reduce 206
+                    LSQBRACKET reduce 206
+                        PERIOD reduce 206
+                     SEMICOLON reduce 206
+                          NAME reduce 206
+                         COLON reduce 206
+                      FUNCTION reduce 206
+                        RPAREN reduce 206
+                      LBRACKET reduce 206
+                           VAR reduce 206
+                        NUMBER reduce 206
+                    RSQBRACKET reduce 206
+                         KILLS reduce 206
+                           L2V reduce 206
+                     MAPSTRING reduce 206
+                          UNIT reduce 206
+                        SWITCH reduce 206
+                      LOCATION reduce 206
+                    STATTXTTBL reduce 206
+                        VARRAY reduce 206
+                          LIST reduce 206
+                        STATIC reduce 206
+                         CONST reduce 206
+                           INC reduce 206
+                           DEC reduce 206
+                          ONCE reduce 206
+                            IF reduce 206
+                    SWITCHCASE reduce 206
+                         WHILE reduce 206
+                           FOR reduce 206
+                       FOREACH reduce 206
+                      CONTINUE reduce 206
+                         BREAK reduce 206
+                        RETURN reduce 206
+                 CONDITIONNAME reduce 206
+                    ACTIONNAME reduce 206
 
 State 163:
           expr ::= expr * PERIOD NAME
@@ -16654,33 +16672,33 @@ State 213:
                     ACTIONNAME reduce 152
 
 State 214:
-    (179) for_opener ::= FOR LPAREN *
+    (180) for_opener ::= FOR LPAREN *
 
-                          LNOT reduce 179
-                          PLUS reduce 179
-                         MINUS reduce 179
-                        BITNOT reduce 179
-                        LPAREN reduce 179
-                    LSQBRACKET reduce 179
-                     SEMICOLON reduce 179
-                          NAME reduce 179
-                      FUNCTION reduce 179
-                           VAR reduce 179
-                        NUMBER reduce 179
-                         KILLS reduce 179
-                           L2V reduce 179
-                     MAPSTRING reduce 179
-                          UNIT reduce 179
-                        SWITCH reduce 179
-                      LOCATION reduce 179
-                    STATTXTTBL reduce 179
-                        VARRAY reduce 179
-                          LIST reduce 179
-                         CONST reduce 179
-                           INC reduce 179
-                           DEC reduce 179
-                 CONDITIONNAME reduce 179
-                    ACTIONNAME reduce 179
+                          LNOT reduce 180
+                          PLUS reduce 180
+                         MINUS reduce 180
+                        BITNOT reduce 180
+                        LPAREN reduce 180
+                    LSQBRACKET reduce 180
+                     SEMICOLON reduce 180
+                          NAME reduce 180
+                      FUNCTION reduce 180
+                           VAR reduce 180
+                        NUMBER reduce 180
+                         KILLS reduce 180
+                           L2V reduce 180
+                     MAPSTRING reduce 180
+                          UNIT reduce 180
+                        SWITCH reduce 180
+                      LOCATION reduce 180
+                    STATTXTTBL reduce 180
+                        VARRAY reduce 180
+                          LIST reduce 180
+                         CONST reduce 180
+                           INC reduce 180
+                           DEC reduce 180
+                 CONDITIONNAME reduce 180
+                    ACTIONNAME reduce 180
 
 State 215:
           expr ::= expr * PERIOD NAME
@@ -17509,58 +17527,58 @@ State 231:
 
 State 232:
           actionStmt ::= ACTIONNAME LPAREN fArgs RPAREN * SEMICOLON
-    (205) expr ::= ACTIONNAME LPAREN fArgs RPAREN *
+    (206) expr ::= ACTIONNAME LPAREN fArgs RPAREN *
 
-                         QMARK reduce 205
-                           LOR reduce 205
-                          LAND reduce 205
-                            EQ reduce 205
-                            LE reduce 205
-                            LT reduce 205
-                            GE reduce 205
-                            GT reduce 205
-                            NE reduce 205
-                         BITOR reduce 205
-                        BITXOR reduce 205
-                        BITAND reduce 205
-                        LSHIFT reduce 205
-                        RSHIFT reduce 205
-                          PLUS reduce 205
-                         MINUS reduce 205
-                        DIVIDE reduce 205
-                      MULTIPLY reduce 205
-                           MOD reduce 205
-                        LPAREN reduce 205
-                    LSQBRACKET reduce 205
-                        PERIOD reduce 205
+                         QMARK reduce 206
+                           LOR reduce 206
+                          LAND reduce 206
+                            EQ reduce 206
+                            LE reduce 206
+                            LT reduce 206
+                            GE reduce 206
+                            GT reduce 206
+                            NE reduce 206
+                         BITOR reduce 206
+                        BITXOR reduce 206
+                        BITAND reduce 206
+                        LSHIFT reduce 206
+                        RSHIFT reduce 206
+                          PLUS reduce 206
+                         MINUS reduce 206
+                        DIVIDE reduce 206
+                      MULTIPLY reduce 206
+                           MOD reduce 206
+                        LPAREN reduce 206
+                    LSQBRACKET reduce 206
+                        PERIOD reduce 206
                      SEMICOLON shift  118
 
 State 233:
-    (193) for_header2 ::= for_header1 expr SEMICOLON *
+    (194) for_header2 ::= for_header1 expr SEMICOLON *
 
-                          LNOT reduce 193
-                          PLUS reduce 193
-                         MINUS reduce 193
-                        BITNOT reduce 193
-                        LPAREN reduce 193
-                    LSQBRACKET reduce 193
-                          NAME reduce 193
-                      FUNCTION reduce 193
-                        RPAREN reduce 193
-                        NUMBER reduce 193
-                         KILLS reduce 193
-                           L2V reduce 193
-                     MAPSTRING reduce 193
-                          UNIT reduce 193
-                        SWITCH reduce 193
-                      LOCATION reduce 193
-                    STATTXTTBL reduce 193
-                        VARRAY reduce 193
-                          LIST reduce 193
-                           INC reduce 193
-                           DEC reduce 193
-                 CONDITIONNAME reduce 193
-                    ACTIONNAME reduce 193
+                          LNOT reduce 194
+                          PLUS reduce 194
+                         MINUS reduce 194
+                        BITNOT reduce 194
+                        LPAREN reduce 194
+                    LSQBRACKET reduce 194
+                          NAME reduce 194
+                      FUNCTION reduce 194
+                        RPAREN reduce 194
+                        NUMBER reduce 194
+                         KILLS reduce 194
+                           L2V reduce 194
+                     MAPSTRING reduce 194
+                          UNIT reduce 194
+                        SWITCH reduce 194
+                      LOCATION reduce 194
+                    STATTXTTBL reduce 194
+                        VARRAY reduce 194
+                          LIST reduce 194
+                           INC reduce 194
+                           DEC reduce 194
+                 CONDITIONNAME reduce 194
+                    ACTIONNAME reduce 194
 
 State 234:
           expr ::= expr * PERIOD NAME
@@ -17634,7 +17652,7 @@ State 235:
           expr ::= expr * GT expr
           expr ::= expr * LAND expr
           expr ::= expr * LOR expr
-    (177) while_header ::= while_start LPAREN expr *
+    (178) while_header ::= while_start LPAREN expr *
 
                          QMARK shift  91
                            LOR shift  72
@@ -17658,7 +17676,7 @@ State 235:
                         LPAREN shift  25
                     LSQBRACKET shift  94
                         PERIOD shift  394
-                        RPAREN reduce 177
+                        RPAREN reduce 178
 
 State 236:
           expr ::= expr * PERIOD NAME
@@ -18054,28 +18072,28 @@ State 243:
                         PERIOD shift  381
 
 State 244:
-    (192) for_header1 ::= for_opener for_init_stmt SEMICOLON *
+    (193) for_header1 ::= for_opener for_init_stmt SEMICOLON *
 
-                          LNOT reduce 192
-                          PLUS reduce 192
-                         MINUS reduce 192
-                        BITNOT reduce 192
-                        LPAREN reduce 192
-                    LSQBRACKET reduce 192
-                          NAME reduce 192
-                      FUNCTION reduce 192
-                        NUMBER reduce 192
-                         KILLS reduce 192
-                           L2V reduce 192
-                     MAPSTRING reduce 192
-                          UNIT reduce 192
-                        SWITCH reduce 192
-                      LOCATION reduce 192
-                    STATTXTTBL reduce 192
-                        VARRAY reduce 192
-                          LIST reduce 192
-                 CONDITIONNAME reduce 192
-                    ACTIONNAME reduce 192
+                          LNOT reduce 193
+                          PLUS reduce 193
+                         MINUS reduce 193
+                        BITNOT reduce 193
+                        LPAREN reduce 193
+                    LSQBRACKET reduce 193
+                          NAME reduce 193
+                      FUNCTION reduce 193
+                        NUMBER reduce 193
+                         KILLS reduce 193
+                           L2V reduce 193
+                     MAPSTRING reduce 193
+                          UNIT reduce 193
+                        SWITCH reduce 193
+                      LOCATION reduce 193
+                    STATTXTTBL reduce 193
+                        VARRAY reduce 193
+                          LIST reduce 193
+                 CONDITIONNAME reduce 193
+                    ACTIONNAME reduce 193
 
 State 245:
     (164) case_start ::= CASE *
@@ -18466,10 +18484,10 @@ State 284:
 
 State 285:
           exprList_nonEmpty ::= exprList_nonEmpty * COMMA expr
-    (197) foreach_header ::= foreach_opener nameList_nonEmpty COLON exprList_nonEmpty *
+    (198) foreach_header ::= foreach_opener nameList_nonEmpty COLON exprList_nonEmpty *
 
                          COMMA shift  95
-                        RPAREN reduce 197
+                        RPAREN reduce 198
 
 State 286:
           nameList_nonEmpty ::= nameList_nonEmpty * COMMA NAME
@@ -18480,69 +18498,69 @@ State 286:
 
 State 287:
           for_action_stmt_nonEmpty ::= for_action_stmt_nonEmpty * COMMA for_action_stmt_nonEmpty
-    (189) for_action_stmt_nonEmpty ::= for_action_stmt_nonEmpty COMMA for_action_stmt_nonEmpty *
+    (190) for_action_stmt_nonEmpty ::= for_action_stmt_nonEmpty COMMA for_action_stmt_nonEmpty *
 
                          COMMA shift  21  -- dropped by precedence
-                         COMMA reduce 189
-                        RPAREN reduce 189
+                         COMMA reduce 190
+                        RPAREN reduce 190
 
 State 288:
           for_action_stmt_nonEmpty ::= for_action_stmt_nonEmpty * COMMA for_action_stmt_nonEmpty
-    (191) for_action_stmt ::= for_action_stmt_nonEmpty *
+    (192) for_action_stmt ::= for_action_stmt_nonEmpty *
 
                          COMMA shift  21
-                        RPAREN reduce 191
+                        RPAREN reduce 192
 
 State 289:
-    (188) for_action_stmt_nonEmpty ::= assign_stmt *
+    (189) for_action_stmt_nonEmpty ::= assign_stmt *
+
+                         COMMA reduce 189
+                        RPAREN reduce 189
+
+State 290:
+    (188) for_action_stmt_nonEmpty ::= funcexprStmt *
 
                          COMMA reduce 188
                         RPAREN reduce 188
 
-State 290:
-    (187) for_action_stmt_nonEmpty ::= funcexprStmt *
-
-                         COMMA reduce 187
-                        RPAREN reduce 187
-
 State 291:
           for_init_stmt_nonEmpty ::= for_init_stmt_nonEmpty * COMMA for_init_stmt_nonEmpty
-    (184) for_init_stmt_nonEmpty ::= for_init_stmt_nonEmpty COMMA for_init_stmt_nonEmpty *
+    (185) for_init_stmt_nonEmpty ::= for_init_stmt_nonEmpty COMMA for_init_stmt_nonEmpty *
 
                          COMMA shift  19  -- dropped by precedence
-                         COMMA reduce 184
-                     SEMICOLON reduce 184
+                         COMMA reduce 185
+                     SEMICOLON reduce 185
 
 State 292:
           for_init_stmt_nonEmpty ::= for_init_stmt_nonEmpty * COMMA for_init_stmt_nonEmpty
-    (185) for_init_stmt ::= for_init_stmt_nonEmpty *
+    (186) for_init_stmt ::= for_init_stmt_nonEmpty *
 
                          COMMA shift  19
-                     SEMICOLON reduce 185
+                     SEMICOLON reduce 186
 
 State 293:
-    (183) for_init_stmt_nonEmpty ::= assign_stmt *
+    (184) for_init_stmt_nonEmpty ::= assign_stmt *
+
+                         COMMA reduce 184
+                     SEMICOLON reduce 184
+
+State 294:
+    (183) for_init_stmt_nonEmpty ::= cdef_stmt *
 
                          COMMA reduce 183
                      SEMICOLON reduce 183
 
-State 294:
-    (182) for_init_stmt_nonEmpty ::= cdef_stmt *
+State 295:
+    (182) for_init_stmt_nonEmpty ::= vdefAssign_stmt *
 
                          COMMA reduce 182
                      SEMICOLON reduce 182
 
-State 295:
-    (181) for_init_stmt_nonEmpty ::= vdefAssign_stmt *
+State 296:
+    (181) for_init_stmt_nonEmpty ::= vdef_stmt *
 
                          COMMA reduce 181
                      SEMICOLON reduce 181
-
-State 296:
-    (180) for_init_stmt_nonEmpty ::= vdef_stmt *
-
-                         COMMA reduce 180
-                     SEMICOLON reduce 180
 
 State 297:
           exprList_nonEmpty ::= exprList_nonEmpty * COMMA expr
@@ -18730,19 +18748,19 @@ State 327:
                         LPAREN shift  22
 
 State 328:
-    (201) return_stmt ::= RETURN exprList *
+    (202) return_stmt ::= RETURN exprList *
+
+                     SEMICOLON reduce 202
+
+State 329:
+    (201) break_stmt ::= BREAK *
 
                      SEMICOLON reduce 201
 
-State 329:
-    (200) break_stmt ::= BREAK *
+State 330:
+    (200) continue_stmt ::= CONTINUE *
 
                      SEMICOLON reduce 200
-
-State 330:
-    (199) continue_stmt ::= CONTINUE *
-
-                     SEMICOLON reduce 199
 
 State 331:
           foreach_stmt ::= foreach_header * RPAREN stmt
@@ -18750,9 +18768,9 @@ State 331:
                         RPAREN shift  5
 
 State 332:
-    (196) foreach_opener ::= FOREACH LPAREN *
+    (197) foreach_opener ::= FOREACH LPAREN *
 
-                          NAME reduce 196
+                          NAME reduce 197
 
 State 333:
           foreach_opener ::= FOREACH * LPAREN
@@ -18765,9 +18783,9 @@ State 334:
                         RPAREN shift  6
 
 State 335:
-    (194) for_header ::= for_header2 for_action_stmt *
+    (195) for_header ::= for_header2 for_action_stmt *
 
-                        RPAREN reduce 194
+                        RPAREN reduce 195
 
 State 336:
           for_header1 ::= for_opener for_init_stmt * SEMICOLON
@@ -18790,9 +18808,9 @@ State 339:
                         LPAREN shift  50
 
 State 340:
-    (176) while_start ::= WHILE *
+    (177) while_start ::= WHILE *
 
-                        LPAREN reduce 176
+                        LPAREN reduce 177
 
 State 341:
           switchcase_stmt ::= switchcase_block * RBRACKET
@@ -18802,12 +18820,14 @@ State 341:
 State 342:
           switchcase_block ::= switchcase_header RPAREN * LBRACKET case_chunks default_chunk
           switchcase_block ::= switchcase_header RPAREN * LBRACKET case_chunks
+          switchcase_block ::= switchcase_header RPAREN * LBRACKET
 
                       LBRACKET shift  46
 
 State 343:
           switchcase_block ::= switchcase_header * RPAREN LBRACKET case_chunks default_chunk
           switchcase_block ::= switchcase_header * RPAREN LBRACKET case_chunks
+          switchcase_block ::= switchcase_header * RPAREN LBRACKET
 
                         RPAREN shift  342
 

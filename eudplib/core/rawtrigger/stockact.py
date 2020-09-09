@@ -75,7 +75,10 @@ def UnpauseGame():
 
 
 def Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay=4):
-    ep_warn(_("Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"))
+    from ...epscript import IsSCDBMap
+
+    if not IsSCDBMap:
+        ep_warn(_("Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"))
     Unit = EncodeUnit(Unit, issueError=True)
     Where = EncodeLocation(Where, issueError=True)
     WAVName = EncodeString(WAVName, issueError=True)

@@ -37,6 +37,11 @@ import types
 
 
 lineno_regex = re.compile(b" *# \\(Line (\\d+)\\) .+")
+is_scdb_map = False
+
+
+def IsSCDBMap():
+    return is_scdb_map
 
 
 def modifyCodeLineno(codeobj, codeMap):
@@ -91,9 +96,12 @@ def modifyCodeLineno(codeobj, codeMap):
 class EPSLoader(SourceFileLoader):
     def get_data(self, path):
         """Return the data from path as raw bytes."""
+        global is_scdb_map
         fileData = open(path, "rb").read()
         if path.endswith(".pyc") or path.endswith(".pyo"):
             return fileData
+        if "SCDB.eps" in os.path.relpath(path):
+            is_scdb_map = True
         print(_('[epScript] Compiling "{}"...').format(os.path.relpath(path)))
         compiled = epsCompile(path, fileData)
         if compiled is None:
