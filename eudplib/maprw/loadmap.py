@@ -60,6 +60,6 @@ def LoadMap(fname):
     mapdata.InitMapData(chkt, rawfile)
     UpdateFileListByListfile(mpqr)
     for f in mpqr.EnumFiles():
-        if not f in ("staredit\\scenario.chk", "(listfile)"):
+        if f and not f in ("staredit\\scenario.chk", "(listfile)"):
             mapdata.AddListFiles(f, mpqr.Extract(f))
     mpqr.Close()
