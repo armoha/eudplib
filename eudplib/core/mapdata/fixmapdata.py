@@ -47,8 +47,8 @@ def FixUnitMap(chkt):
                 unit[i + 12] &= ~(2 ** k)
 
         # Remove disabled values
-        if unit[i + 14] & 1 == 0:
-            unit[i + 16] = 0
+        # if unit[i + 14] & 1 == 0:
+        #     unit[i + 16] = 0
         if unit[i + 14] & 2 == 0:
             unit[i + 17] = 0
         if unit[i + 14] & 4 == 0:
