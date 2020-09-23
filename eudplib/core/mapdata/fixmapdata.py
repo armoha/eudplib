@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from ...localize import _
+from ...utils import ep_warn
 
 
 def FixMapData(chkt):
@@ -114,7 +115,7 @@ def FixMTXM0_0Null(chkt):
             hasNull = True
 
     if hasNull:
-        print(_("[Warning] Input map has [0, 0] null tiles."))
+        ep_warn(_("[Warning] Input map has [0, 0] null tiles."))
         print(_("Overwrited them to [0, 1], because they cause desync."))
 
     chkt.setsection("MTXM", mtxm)
