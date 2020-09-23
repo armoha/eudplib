@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from ...localize import _
+
 
 def FixMapData(chkt):
     FixUnitMap(chkt)
@@ -100,3 +102,19 @@ def RemoveLocationStringInfo(chkt):
         mrgn[i + 16 : i + 18] = b"\0\0"
 
     chkt.setsection("MRGN", mrgn)
+
+
+def FixMTXM0_0Null(chkt):
+    mtxm = bytearray(chkt.getsection("MTXM"))
+
+    hasNull = False
+    for i in range(0, len(mtxm), 2):
+        if mtxm[i : i + 2] == b"\0\0":
+            mtxm[i : i + 2] == b"\x01\0"
+            hasNull = True
+
+    if hasNull:
+        print(_("[Warning] Input map has [0, 0] null tiles."))
+        print(_("Overwrited them to [0, 1], because they cause desync."))
+
+    chkt.setsection("MTXM", mtxm)

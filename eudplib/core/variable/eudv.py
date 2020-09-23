@@ -225,7 +225,7 @@ class EUDVariable(VariableBase):
             return self.Exactly(other)
 
         except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             return (self - other).Exactly(0)
 
@@ -240,7 +240,7 @@ class EUDVariable(VariableBase):
             return self.AtMost(other)
 
         except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             t = EUDVariable()
             SeqCompute(((t, bt.SetTo, self), (t, bt.Subtract, other)))
@@ -251,7 +251,7 @@ class EUDVariable(VariableBase):
             return self.AtLeast(other)
 
         except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             t = EUDVariable()
             SeqCompute(((t, bt.SetTo, other), (t, bt.Subtract, self)))
@@ -267,7 +267,7 @@ class EUDVariable(VariableBase):
             return self.AtMost(other - 1)
 
         except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             t = EUDVariable()
             SeqCompute(((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other)))
@@ -283,7 +283,7 @@ class EUDVariable(VariableBase):
             return self.AtLeast(other + 1)
 
         except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.".format(err)))
+            ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             t = EUDVariable()
             SeqCompute(((t, bt.SetTo, self), (t, bt.Subtract, other)))
