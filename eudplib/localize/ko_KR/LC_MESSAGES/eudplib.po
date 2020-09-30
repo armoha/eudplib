@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: eudplib 0.63.2\n"
+"Project-Id-Version: eudplib 0.63.3\n"
 "POT-Creation-Date: 2020-09-23 20:29+0900\n"
 "PO-Revision-Date: 2020-09-23 20:32+0900\n"
 "Last-Translator: Armoha <kein0011@naver.com>\n"

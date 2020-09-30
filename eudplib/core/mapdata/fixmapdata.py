@@ -32,6 +32,7 @@ def FixMapData(chkt):
     FixSettings(chkt)
     ApplyRemasteredChk(chkt)
     RemoveLocationStringInfo(chkt)
+    FixMTXM0_0Null(chkt)
 
 
 def FixUnitMap(chkt):
@@ -111,7 +112,7 @@ def FixMTXM0_0Null(chkt):
     hasNull = False
     for i in range(0, len(mtxm), 2):
         if mtxm[i : i + 2] == b"\0\0":
-            mtxm[i : i + 2] == b"\x01\0"
+            mtxm[i : i + 2] = b"\x01\0"
             hasNull = True
 
     if hasNull:
