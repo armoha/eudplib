@@ -62,5 +62,40 @@ def test_strbuffer():
     cmp_db = Db("SetPNameTest:\x07 테스트입니다.\r\r")  # 36
     f_dbstr_print(0x64107C, ptr2s(username), u2utf8(":\x07 테스트입니다."))
     SetPName(userid, "SetPNameTest")
-    test_assert("SetPName test", [f_memcmp(0x64107C, cmp_db, 40) == 0])
+    test_equality("SetPName test", f_memcmp(0x64107C, cmp_db, 40), 0)
+
+    name_db = Db(25)
+    name_var = EUDVariable(name_db)
+    f_dbstr_print(name_db, ptr2s(username))
+    ret = EUDVariable(0)
+    RawTrigger(
+        conditions=IsPName(P1, "Armo"), actions=ret.AddNumber(1),
+    )
+    RawTrigger(
+        conditions=IsPName(P1, "trgk"), actions=ret.AddNumber(16),
+    )
+    test_equality("IsPName test", ret, 0b1)
+    Trigger(
+        conditions=IsPName(f_getuserplayerid(), "Armo"), actions=ret.AddNumber(2),
+    )
+    Trigger(
+        conditions=IsPName(f_getuserplayerid(), "trgk"), actions=ret.AddNumber(16),
+    )
+    test_equality("IsPName test", ret, 0b11)
+    Trigger(
+        conditions=IsPName(P1, name_var), actions=ret.AddNumber(4),
+    )
+    Trigger(
+        conditions=IsPName(P1, Db("trgk")), actions=ret.AddNumber(16),
+    )
+    test_equality("IsPName test", ret, 0b111)
+    Trigger(
+        conditions=IsPName(f_getuserplayerid(), name_var), actions=ret.AddNumber(8),
+    )
+    Trigger(
+        conditions=IsPName(f_getuserplayerid(), EUDVariable(Db("trgk"))),
+        actions=ret.AddNumber(16),
+    )
+    test_equality("IsPName test", ret, 0b1111)
+
     f_setcurpl(origcp)

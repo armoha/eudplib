@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from ... import core as c, ctrlstru as cs, utils as ut
+from ...trigger import Trigger
 from ..memiof import (
     f_dwread_epd,
     f_wread_epd,
@@ -38,13 +39,99 @@ from .cpprint import f_cpstr_print, PName
 from .strfunc import f_strlen_epd
 from ..utilf import (
     f_playerexist,
-    EUDPlayerLoop,
-    EUDEndPlayerLoop,
     f_getgametick,
     EUDLoopPlayer,
 )
 from ..playerv import PVariable
 from ..eudarray import EUDArray
+from math import ceil
+
+PLVarUnit, PLVarMask = ceil((0x58F500 - 0x58A364) / 48), 0
+PLVarDict = {}
+
+
+def GetPlayerLightVariable():
+    global PLVarUnit, PLVarMask
+    ret = (PLVarUnit, 1 << PLVarMask)
+    PLVarMask += 1
+    if PLVarMask >= 32:
+        PLVarMask = 0
+        PLVarUnit += 1
+    return ret
+
+
+def compare_sequence(src, seq):
+    assert isinstance(src, int) and isinstance(seq, str)
+    seq += "\0"
+    ret = []
+    val, mask = 0, 0
+
+    def append_cmp():
+        nonlocal val, mask
+        ret.append(c.MemoryX(src - src % 4, c.Exactly, val, mask))
+        val, mask = 0, 0
+
+    for char in seq:
+        lsh = 8 * (src % 4)
+        val += ord(char) << lsh
+        mask += 0xFF << lsh
+        if src % 4 == 3:
+            append_cmp()
+        src += 1
+    if val and mask:
+        append_cmp()
+    return ret
+
+
+def GetIsPNameCondition(name, _plvars={}):
+    try:
+        init, end, params = _plvars[name]
+    except KeyError:
+        c.PushTriggerScope()
+        unit, mask = GetPlayerLightVariable()
+        init, params = c.NextTrigger(), (c.AtLeast, 1, unit, mask)
+        end = c.Forward()
+        _plvars[name] = (init, end, params)
+        if isinstance(name, str):
+            # TODO: only iterate human players
+            for player in range(8):
+                t = c.RawTrigger(
+                    conditions=compare_sequence(0x57EEEB + 36 * player, name),
+                    actions=c.SetDeaths(player, c.Add, mask, unit),
+                    preserved=False,
+                )
+        else:
+            # TODO: compare every names in a single loop
+            for player in EUDLoopPlayer(None):
+                equals = f_memcmp(0x57EEEB + 36 * player, name, 25)
+                Trigger(
+                    conditions=equals.Exactly(0),
+                    actions=c.SetDeaths(player, c.Add, mask, unit),
+                    preserved=False,
+                )
+            t = c.RawTrigger()
+        end << t
+        c.PopTriggerScope()
+    return init, end, params
+
+
+def IsPName(player, name):
+    player = c.EncodePlayer(player)
+    if (
+        isinstance(player, int)
+        and player != c.EncodePlayer(c.CurrentPlayer)
+        and isinstance(name, str)
+    ):
+        return compare_sequence(0x57EEEB + 36 * player, name)
+    init, end, params = GetIsPNameCondition(name)
+    if cs.EUDExecuteOnce()():
+        # TODO: initialize when game starts
+        nptr = c.Forward()
+        c.RawTrigger(nextptr=init, actions=c.SetNextPtr(end, nptr))
+        nptr << c.NextTrigger()
+    cs.EUDEndExecuteOnce()
+    return c.DeathsX(player, *params)
+
 
 isPNameInitialized = False
 

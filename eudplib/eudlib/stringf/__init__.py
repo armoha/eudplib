@@ -65,7 +65,7 @@ from .cpprint import (
 )
 
 from .cputf8 import f_cp949_to_utf8_cpy
-from .setpname import SetPName, SetPNamef
+from .pname import SetPName, SetPNamef, IsPName
 from .tblprint import f_settbl, f_settbl2, f_settblf, f_settblf2
 
 from .texteffect import (
