@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-09-23 20:29+0900\n"
+"POT-Creation-Date: 2020-10-15 15:33+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -181,11 +181,11 @@ msgstr ""
 msgid "Length of section name cannot be longer than 4"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:117
+#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:119
 msgid "[Warning] Input map has [0, 0] null tiles."
 msgstr ""
 
-#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:118
+#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:120
 msgid "Overwrited them to [0, 1], because they cause desync."
 msgstr ""
 
@@ -502,6 +502,10 @@ msgstr ""
 msgid "cannot switch from manual field specification to automatic field numbering"
 msgstr ""
 
+#: C:\eudplib\eudplib\eudlib\stringf\pname.py:125
+msgid "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
+msgstr ""
+
 #: C:\eudplib\eudplib\eudlib\utilf\listloop.py:54
 msgid "listloop mismatch"
 msgstr ""
@@ -526,6 +530,14 @@ msgstr ""
 #: C:\eudplib\eudplib\maprw\savemap.py:86
 #: C:\eudplib\eudplib\maprw\savemap.py:98
 msgid "Try to turn off antivirus or StarCraft"
+msgstr ""
+
+#: C:\eudplib\eudplib\maprw\loadmap.py:53
+msgid "Fail to open input map"
+msgstr ""
+
+#: C:\eudplib\eudplib\maprw\loadmap.py:59
+msgid "Fail to extract scenario.chk, maybe invalid scx"
 msgstr ""
 
 #: C:\eudplib\eudplib\maprw\mpqadd.py:61

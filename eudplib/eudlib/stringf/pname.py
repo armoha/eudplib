@@ -116,13 +116,15 @@ def GetIsPNameCondition(name, _plvars={}):
 
 
 def IsPName(player, name):
-    player = c.EncodePlayer(player)
-    if (
-        isinstance(player, int)
-        and player != c.EncodePlayer(c.CurrentPlayer)
-        and isinstance(name, str)
-    ):
-        return compare_sequence(0x57EEEB + 36 * player, name)
+    p = c.EncodePlayer(player)
+    if isinstance(p, int):
+        if p < 8 and isinstance(name, str):
+            return compare_sequence(0x57EEEB + 36 * p, name)
+        ut.ep_assert(
+            p == c.EncodePlayer(c.CurrentPlayer),
+            _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),
+        )
+
     init, end, params = GetIsPNameCondition(name)
     if cs.EUDExecuteOnce()():
         # TODO: initialize when game starts
@@ -130,7 +132,7 @@ def IsPName(player, name):
         c.RawTrigger(nextptr=init, actions=c.SetNextPtr(end, nptr))
         nptr << c.NextTrigger()
     cs.EUDEndExecuteOnce()
-    return c.DeathsX(player, *params)
+    return c.DeathsX(p, *params)
 
 
 isPNameInitialized = False

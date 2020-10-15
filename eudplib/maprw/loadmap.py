@@ -50,13 +50,13 @@ def LoadMap(fname):
         raise
     mpqr = mpqapi.MPQ()
     if not mpqr.Open(fname):
-        ep_eprint("Fail to open input map")
+        ep_eprint(_("Fail to open input map"))
     chkt = chktok.CHK()
     b = mpqr.Extract("staredit\\scenario.chk")
     if b:
         chkt.loadchk(b)
     else:
-        ep_eprint("Fail to extract scenario.chk, maybe invalid scx")
+        ep_eprint(_("Fail to extract scenario.chk, maybe invalid scx"))
     mapdata.InitMapData(chkt, rawfile)
     UpdateFileListByListfile(mpqr)
     for f in mpqr.EnumFiles():

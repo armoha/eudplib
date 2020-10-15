@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: eudplib 0.63.4\n"
-"POT-Creation-Date: 2020-09-23 20:29+0900\n"
-"PO-Revision-Date: 2020-09-23 20:32+0900\n"
+"Project-Id-Version: eudplib 0.63.5\n"
+"POT-Creation-Date: 2020-10-08 16:18+0900\n"
+"PO-Revision-Date: 2020-10-08 16:24+0900\n"
 "Last-Translator: Armoha <kein0011@naver.com>\n"
 "Language-Team: \n"
 "Language: ko\n"
@@ -187,11 +187,11 @@ msgstr "EUDVArray를 반복할 수 없습니다"
 msgid "Length of section name cannot be longer than 4"
 msgstr "단락 이름 길이는 4글자를 넘지 않습니다"
 
-#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:117
+#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:119
 msgid "[Warning] Input map has [0, 0] null tiles."
 msgstr "[경고] 입력 맵에 [0, 0] null 타일 지형이 있습니다."
 
-#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:118
+#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:120
 msgid "Overwrited them to [0, 1], because they cause desync."
 msgstr "방갈림 방지를 위해 [0, 1] null 타일로 대체하였습니다."
 
@@ -377,7 +377,7 @@ msgstr "좌변 변수의 값을 수정하려 시도하였습니다"
 #: C:\eudplib\eudplib\core\variable\eudv.py:270
 #: C:\eudplib\eudplib\core\variable\eudv.py:286
 msgid "{}: Comparing with temporary variable."
-msgstr ""
+msgstr "{}: 임시 변수를 생성해 비교합니다."
 
 #: C:\eudplib\eudplib\core\variable\eudv.py:262
 msgid "No unsigned number can be leq than {}"
@@ -519,6 +519,12 @@ msgid ""
 "cannot switch from manual field specification to automatic field numbering"
 msgstr "수동 필드 넘버링에서 자동 필드 넘버링으로 전환할 수 없습니다"
 
+#: C:\eudplib\eudplib\eudlib\stringf\pname.py:125
+msgid "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
+msgstr ""
+"IsPName의 플레이어는 {}가 아니라 Player1에서 Player8 사이 또는 CurrentPlayer"
+"이어야합니다."
+
 #: C:\eudplib\eudplib\eudlib\utilf\listloop.py:54
 msgid "listloop mismatch"
 msgstr "EUDListLoop 블럭 불일치"
@@ -578,7 +584,7 @@ msgstr "{}에 추적 파일 작성"
 
 #: C:\eudplib\eudplib\trigger\triggerdef.py:47
 msgid "preserved should be bool"
-msgstr "트리거 반복 여부(preserved)는 bool이어야합니다"
+msgstr "preserved(트리거 반복 여부)는 참 또는 거짓(bool)이어야합니다"
 
 #: C:\eudplib\eudplib\utils\blockstru.py:74
 #: C:\eudplib\eudplib\utils\blockstru.py:85
