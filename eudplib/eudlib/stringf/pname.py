@@ -42,6 +42,7 @@ from ..utilf import (
     f_getgametick,
     EUDLoopPlayer,
 )
+from ...localize import _
 from ..playerv import PVariable
 from ..eudarray import EUDArray
 from math import ceil
@@ -118,12 +119,14 @@ def GetIsPNameCondition(name, _plvars={}):
 def IsPName(player, name):
     p = c.EncodePlayer(player)
     if isinstance(p, int):
-        if p < 8 and isinstance(name, str):
-            return compare_sequence(0x57EEEB + 36 * p, name)
-        ut.ep_assert(
-            p == c.EncodePlayer(c.CurrentPlayer),
-            _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),
-        )
+        if p < 8:
+            if isinstance(name, str):
+                return compare_sequence(0x57EEEB + 36 * p, name)
+        else:
+            ut.ep_assert(
+                p == c.EncodePlayer(c.CurrentPlayer),
+                _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),
+            )
 
     init, end, params = GetIsPNameCondition(name)
     if cs.EUDExecuteOnce()():
