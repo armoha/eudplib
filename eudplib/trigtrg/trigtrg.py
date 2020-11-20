@@ -624,12 +624,14 @@ def SetAllianceStatus(Player, Status):
 
 # compound triggers
 def Memory(dest, cmptype, value):
-    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
+    if isinstance(dest, int):
+        ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return Deaths(EPD(dest), cmptype, value, 0)
 
 
 def SetMemory(dest, modtype, value):
-    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
+    if isinstance(dest, int):
+        ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return SetDeaths(EPD(dest), modtype, value, 0)
 
 
@@ -641,7 +643,8 @@ def DeathsX(Player, Comparison, Number, Unit, Mask):
 
 
 def MemoryX(dest, cmptype, value, mask):
-    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
+    if isinstance(dest, int):
+        ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
 
@@ -653,5 +656,6 @@ def SetDeathsX(Player, Modifier, Number, Unit, Mask):
 
 
 def SetMemoryX(dest, modtype, value, mask):
-    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
+    if isinstance(dest, int):
+        ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return SetDeathsX(EPD(dest), modtype, value, 0, mask)

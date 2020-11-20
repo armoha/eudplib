@@ -403,7 +403,8 @@ def SetAllianceStatus(Player, Status):
 
 
 def SetMemory(dest, modtype, value):
-    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
+    if isinstance(dest, int):
+        ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     modtype = EncodeModifier(modtype, issueError=True)
     return Action(0, 0, 0, 0, EPD(dest), value, 0, 45, modtype, 20)
 
@@ -426,7 +427,8 @@ def SetDeathsX(Player, Modifier, Number, Unit, Mask):
 
 
 def SetMemoryX(dest, modtype, value, mask):
-    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
+    if isinstance(dest, int):
+        ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return SetDeathsX(EPD(dest), modtype, value, 0, mask)
 
 
