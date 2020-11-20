@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-10-15 15:33+0900\n"
+"POT-Creation-Date: 2020-11-20 21:49+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -335,11 +335,22 @@ msgstr ""
 msgid "Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:445
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:406
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:429
+#: C:\eudplib\eudplib\core\rawtrigger\stockcond.py:192
+#: C:\eudplib\eudplib\core\rawtrigger\stockcond.py:208
+#: C:\eudplib\eudplib\trigtrg\trigtrg.py:627
+#: C:\eudplib\eudplib\trigtrg\trigtrg.py:632
+#: C:\eudplib\eudplib\trigtrg\trigtrg.py:644
+#: C:\eudplib\eudplib\trigtrg\trigtrg.py:656
+msgid "Address should be multiple of 4"
+msgstr ""
+
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:448
 msgid "SetKills Player should be only P1~P12 or CurrentPlayer"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:447
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:451
 msgid "SetKills Unit should be at most 227"
 msgstr ""
 
@@ -502,7 +513,7 @@ msgstr ""
 msgid "cannot switch from manual field specification to automatic field numbering"
 msgstr ""
 
-#: C:\eudplib\eudplib\eudlib\stringf\pname.py:125
+#: C:\eudplib\eudplib\eudlib\stringf\pname.py:128
 msgid "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
 msgstr ""
 

@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: eudplib 0.63.5\n"
-"POT-Creation-Date: 2020-10-08 16:18+0900\n"
-"PO-Revision-Date: 2020-10-08 16:24+0900\n"
+"Project-Id-Version: eudplib 0.64.0\n"
+"POT-Creation-Date: 2020-11-20 21:49+0900\n"
+"PO-Revision-Date: 2020-11-20 21:53+0900\n"
 "Last-Translator: Armoha <kein0011@naver.com>\n"
 "Language-Team: \n"
 "Language: ko\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Poedit 2.4.2\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: C:\eudplib\eudplib\core\allocator\constexpr.py:86
@@ -345,11 +345,22 @@ msgstr "액션이 너무 많습니다"
 msgid "Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"
 msgstr "자신이 무슨 일을 하는지 모르는 한 Wait 액션을 사용하지 마세요!"
 
-#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:445
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:406
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:429
+#: C:\eudplib\eudplib\core\rawtrigger\stockcond.py:192
+#: C:\eudplib\eudplib\core\rawtrigger\stockcond.py:208
+#: C:\eudplib\eudplib\trigtrg\trigtrg.py:627
+#: C:\eudplib\eudplib\trigtrg\trigtrg.py:632
+#: C:\eudplib\eudplib\trigtrg\trigtrg.py:644
+#: C:\eudplib\eudplib\trigtrg\trigtrg.py:656
+msgid "Address should be multiple of 4"
+msgstr "메모리 주소는 4의 배수여야 합니다."
+
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:448
 msgid "SetKills Player should be only P1~P12 or CurrentPlayer"
 msgstr "SetKills의 플레이어는 P1~12 또는 CurrentPlayer이어야합니다"
 
-#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:447
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:451
 msgid "SetKills Unit should be at most 227"
 msgstr "SetKills의 유닛은 227 이하여야합니다"
 
@@ -434,7 +445,7 @@ msgstr "잘못된 EUDSwitch 변수입니다"
 
 #: C:\eudplib\eudplib\ctrlstru\swblock.py:65
 msgid "Duplicate cases"
-msgstr "경우 중복"
+msgstr "case 경우 중복"
 
 #: C:\eudplib\eudplib\ctrlstru\swblock.py:79
 msgid "Duplicate default"
@@ -519,7 +530,7 @@ msgid ""
 "cannot switch from manual field specification to automatic field numbering"
 msgstr "수동 필드 넘버링에서 자동 필드 넘버링으로 전환할 수 없습니다"
 
-#: C:\eudplib\eudplib\eudlib\stringf\pname.py:125
+#: C:\eudplib\eudplib\eudlib\stringf\pname.py:128
 msgid "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
 msgstr ""
 "IsPName의 플레이어는 {}가 아니라 Player1에서 Player8 사이 또는 CurrentPlayer"
@@ -556,6 +567,14 @@ msgstr "사용자 계정이 input맵에 접근할 권한이 없습니다"
 #: C:\eudplib\eudplib\maprw\savemap.py:98
 msgid "Try to turn off antivirus or StarCraft"
 msgstr "백신 프로그램이나 스타크래프트를 종료해보세요"
+
+#: C:\eudplib\eudplib\maprw\loadmap.py:53
+msgid "Fail to open input map"
+msgstr "Input 맵을 여는데 실패했습니다."
+
+#: C:\eudplib\eudplib\maprw\loadmap.py:59
+msgid "Fail to extract scenario.chk, maybe invalid scx"
+msgstr "scenario.chk를 추출하는데 실패했습니다, 잘못된 scx 파일일 수 있습니다"
 
 #: C:\eudplib\eudplib\maprw\mpqadd.py:61
 msgid "MPQ filename duplicate : \"{}\""
