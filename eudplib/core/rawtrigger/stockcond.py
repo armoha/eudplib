@@ -35,7 +35,8 @@ from .constenc import (
 
 from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit
 
-from ...utils import EPD
+from ...localize import _
+from ...utils import EPD, ep_assert
 
 
 def CountdownTimer(Comparison, Time):
@@ -188,6 +189,7 @@ def Never():
 
 
 def Memory(dest, cmptype, value):
+    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return Deaths(EPD(dest), cmptype, value, 0)
 
 
@@ -203,6 +205,7 @@ def DeathsX(Player, Comparison, Number, Unit, Mask):
 
 
 def MemoryX(dest, cmptype, value, mask):
+    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
 

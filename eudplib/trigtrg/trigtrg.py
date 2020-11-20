@@ -25,7 +25,8 @@ THE SOFTWARE.
 
 from struct import pack
 from eudplib import utils as ut
-from ..utils import EPD, b2i2, u2b
+from ..localize import _
+from ..utils import EPD, b2i2, u2b, ep_assert
 from ..core.rawtrigger.constenc import *
 from ..core.rawtrigger.strenc import *
 
@@ -70,7 +71,18 @@ def Condition(
 
 
 def Action(
-    locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags, *, eudx=0
+    locid1,
+    strid,
+    wavid,
+    time,
+    player1,
+    player2,
+    unitid,
+    acttype,
+    amount,
+    flags,
+    *,
+    eudx=0
 ):
     player1 &= 0xFFFFFFFF
     player2 &= 0xFFFFFFFF
@@ -612,10 +624,12 @@ def SetAllianceStatus(Player, Status):
 
 # compound triggers
 def Memory(dest, cmptype, value):
+    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return Deaths(EPD(dest), cmptype, value, 0)
 
 
 def SetMemory(dest, modtype, value):
+    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return SetDeaths(EPD(dest), modtype, value, 0)
 
 
@@ -627,6 +641,7 @@ def DeathsX(Player, Comparison, Number, Unit, Mask):
 
 
 def MemoryX(dest, cmptype, value, mask):
+    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
 
@@ -638,4 +653,5 @@ def SetDeathsX(Player, Modifier, Number, Unit, Mask):
 
 
 def SetMemoryX(dest, modtype, value, mask):
+    ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return SetDeathsX(EPD(dest), modtype, value, 0, mask)
