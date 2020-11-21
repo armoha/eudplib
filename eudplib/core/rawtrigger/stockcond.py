@@ -37,7 +37,7 @@ from .constenc import (
 from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit
 
 from ...localize import _
-from ...utils import EPD, ep_assert
+from ...utils import EPD, ep_assert, unProxy
 
 
 def CountdownTimer(Comparison, Time):
@@ -191,7 +191,7 @@ def Never():
 
 def Memory(dest, cmptype, value):
     if isMemDestStrict and isinstance(dest, int):
-        ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
+        ep_assert(unProxy(dest) % 4 == 0, _("Address should be multiple of 4"))
     return Deaths(EPD(dest), cmptype, value, 0)
 
 
@@ -208,7 +208,7 @@ def DeathsX(Player, Comparison, Number, Unit, Mask):
 
 def MemoryX(dest, cmptype, value, mask):
     if isMemDestStrict and isinstance(dest, int):
-        ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
+        ep_assert(unProxy(dest) % 4 == 0, _("Address should be multiple of 4"))
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
 
