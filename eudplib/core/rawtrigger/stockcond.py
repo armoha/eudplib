@@ -31,6 +31,7 @@ from .constenc import (
     EncodeScore,
     EncodeSwitchState,
     Kills,  # for __calls__ binding
+    isMemDestStrict,
 )
 
 from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit
@@ -189,7 +190,7 @@ def Never():
 
 
 def Memory(dest, cmptype, value):
-    if isinstance(dest, int):
+    if isMemDestStrict and isinstance(dest, int):
         ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return Deaths(EPD(dest), cmptype, value, 0)
 
@@ -206,7 +207,7 @@ def DeathsX(Player, Comparison, Number, Unit, Mask):
 
 
 def MemoryX(dest, cmptype, value, mask):
-    if isinstance(dest, int):
+    if isMemDestStrict and isinstance(dest, int):
         ep_assert(dest % 4 == 0, _("Address should be multiple of 4"))
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
