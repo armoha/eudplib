@@ -175,8 +175,18 @@ class TBL:
             i += 1
             stringoffset = b2i(content, i * size)
             send = stringoffset
-            while content[send] != 0:
-                send += 1
+            try:
+                while content[send] != 0:
+                    send += 1
+            except IndexError:
+                if stringoffset == send:
+                    # invalid string offset
+                    # print("String[{}] has invalid string offset: {:X}".format(i, stringoffset))
+                    continue
+                else:
+                    # no null terminator
+                    # print("String[{}] has no null terminator: {}".format(i, content[stringoffset:send].decode("CP949")))
+                    pass
 
             string = content[stringoffset:send]
             if string == b"" or i in removed_str:
