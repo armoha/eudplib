@@ -232,7 +232,7 @@ class MPQ:
         # Get file size & allocate buffer
         # Note : this version only supports 32bit mpq file
         fsize = self.libstorm.SFileGetFileSize(fileh, 0)
-        if not fsize or fsize == 0:
+        if not fsize or fsize <= 0:
             return None
         fdata = create_string_buffer(fsize)
 
