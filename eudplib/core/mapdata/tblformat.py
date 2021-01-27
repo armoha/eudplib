@@ -28,6 +28,14 @@ THE SOFTWARE.
 from ... import utils as ut
 from ...localize import _
 
+unit_name_encoding = "cp949"
+
+
+def DecodeUnitNameAs(e):
+    global unit_name_encoding
+    " ".encode(e)
+    unit_name_encoding = e
+
 
 def IgnoreColor(s):
     return bytes(filter(lambda x: not (0x01 <= x <= 0x1F or x == 0x7F), s))
@@ -203,10 +211,10 @@ class TBL:
                     if nextstring != b"":
                         if j in unitdict:
                             try:
-                                nextstring = (nextstring.decode("cp949")).encode(
-                                    "utf-8"
-                                )
-                            except (UnicodeDecodeError):
+                                nextstring = (
+                                    nextstring.decode(unit_name_encoding)
+                                ).encode("utf-8")
+                            except UnicodeDecodeError:
                                 pass
                         self._emptystring.append((i - 1, nextstring))
                         break
@@ -216,8 +224,8 @@ class TBL:
             if string:
                 if i in unitdict:
                     try:
-                        string = (string.decode("cp949")).encode("utf-8")
-                    except (UnicodeDecodeError):
+                        string = (string.decode(unit_name_encoding)).encode("utf-8")
+                    except UnicodeDecodeError:
                         pass
                     unitmap.AddItem(string, unitdict[i])
                     if string != IgnoreColor(string):
