@@ -92,6 +92,11 @@ class CHK:
         for name, binary in self.sections.items():
             blist.append(name + ut.i2b4(len(binary)) + binary)
 
+        fake_section = [b"ISOM"]
+        import random
+
+        fake_name = random.sample(fake_section, 1)
+        blist.append(fake_name[0] + ut.i2b4(random.randint(0, 0xFFFFFFFF) | 0x80000000))
         return b"".join(blist)
 
     def enumsection(self):
@@ -131,6 +136,8 @@ class CHK:
         maph = ut.b2i2(dim, 2)
         terrainsize = mapw * maph
 
+        # Omit MASK and MTXM optimization. Game desync is reported if MTXM has shorter size.
+        """
         # MASK optimization : cancel 0xFFs.
         mask = self.getsection(b"MASK")
         if mask:
@@ -154,5 +161,6 @@ class CHK:
 
         mtxm = mtxm[: 2 * clippos]
         self.setsection(b"MTXM", mtxm)
+        """
 
         # More optimization would be possible, but I don't care.
