@@ -11,6 +11,7 @@ from .memiof import (
     f_dwwrite_epd,
     f_wwrite_epd,
     f_bwrite_epd,
+    f_posread_epd,
 )
 
 from .. import core as c, utils as ut
@@ -64,6 +65,11 @@ def EPDOffsetMap(ct):
             ut.ep_assert(size == 4, _("Only dword can be read as epd"))
             return f_dwepdread_epd(self._epd + offset // 4)
 
+        def getpos(self, name):
+            offset, size = addrTable[name]
+            ut.ep_assert(size == 4, _("Only dword can be read as position"))
+            return f_posread_epd(self._epd + offset // 4)
+
         def __setattr__(self, name, value):
             if name == "_epd":
                 super().__setattr__(name, value)
@@ -94,16 +100,21 @@ EPDCUnitMap = EPDOffsetMap(
         ("nextTargetWaypoint", 0x01C, 4),
         ("movementFlags", 0x020, 1),
         ("currentDirection1", 0x021, 1),
+        ("flingyTurnRadius", 0x022, 1),
         ("velocityDirection1", 0x023, 1),
         ("flingyID", 0x024, 2),
         ("_unknown_0x026", 0x026, 1),
         ("flingyMovementType", 0x027, 1),
         ("position", 0x028, 4),
-        ("halt", 0x02C, 4),
+        ("positionX", 0x028, 2),
+        ("positionY", 0x02A, 2),
+        ("haltX", 0x02C, 4),
+        ("haltY", 0x030, 4),
         ("flingyTopSpeed", 0x034, 4),
         ("current_speed1", 0x038, 4),
         ("current_speed2", 0x03C, 4),
-        ("current_speed", 0x040, 4),
+        ("current_speedX", 0x040, 4),
+        ("current_speedY", 0x044, 4),
         ("flingyAcceleration", 0x048, 2),
         ("currentDirection2", 0x04A, 1),
         ("velocityDirection2", 0x04B, 1),
@@ -191,7 +202,9 @@ EPDCUnitMap = EPDOffsetMap(
         ("upgradeLevel", 0x0CD, 1),
         ("__E", 0x0CE, 2),  # building
         ("pPowerup", 0x0C0, 4),
-        ("targetResource", 0x0C4, 4),
+        ("targetResourcePosition", 0x0C4, 4),
+        ("targetResourceX", 0x0C4, 2),
+        ("targetResourceY", 0x0C6, 2),
         ("targetResourceUnit", 0x0C8, 4),
         ("repairResourceLossTimer", 0x0CC, 2),
         ("isCarryingSomething", 0x0CE, 1),
