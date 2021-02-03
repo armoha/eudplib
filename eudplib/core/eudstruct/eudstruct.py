@@ -59,15 +59,15 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
     # Due to cyclic dependency we import objpool inside methods
     @classmethod
     def alloc(cls, *args, **kwargs):
-        from ...eudlib import objpool as pool
+        from ...eudlib.objpool import GetGlobalPool
 
-        return pool.globalPool.alloc(cls, *args, **kwargs)
+        return GetGlobalPool().alloc(cls, *args, **kwargs)
 
     @classmethod
     def free(cls, data):
-        from ...eudlib import objpool as pool
+        from ...eudlib.objpool import GetGlobalPool
 
-        return pool.globalPool.free(cls, data)
+        return GetGlobalPool().free(cls, data)
 
     # Constructor & Destructor of classes
     def constructor(self):

@@ -34,6 +34,7 @@ from .eudarray import EUDArray
 
 max_fieldn = 8
 max_object_num = 32768
+globalPool = None
 
 
 class _ObjPoolData(c.ConstExpr):
@@ -95,4 +96,13 @@ class ObjPool:
         self.remaining += 1
 
 
-globalPool = ObjPool(max_object_num)
+def SetGlobalPoolFieldN(fieldn):
+    global max_fieldn
+    max_fieldn = fieldn
+
+
+def GetGlobalPool():
+    global globalPool
+    if globalPool is None:
+        globalPool = ObjPool(max_object_num)
+    return globalPool
