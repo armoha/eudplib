@@ -27,12 +27,9 @@ from ..mapdata import GetPropertyIndex
 from ... import utils as ut
 from ...localize import _
 
-isMemDestStrict = True
-
 
 def EP_SetMemDestStrictMode(mode):
-    global isMemDestStrict
-    isMemDestStrict = mode
+    pass
 
 
 class _Unique:
