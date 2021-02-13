@@ -28,8 +28,14 @@ from .modcurpl import f_setcurpl, f_addcurpl, f_getcurpl, f_setcurpl2cpcache
 
 from .bwepdio import f_wwrite_epd, f_bwrite_epd, f_wread_epd, f_bread_epd
 
-from .dwepdio import (
+from .epddwio import (
     f_dwepdread_epd,
+    f_cunitepdread_epd,
+    f_dwepdread_cp,
+    f_cunitepdread_cp,
+)
+
+from .dwepdio import (
     f_dwread_epd,
     f_epdread_epd,
     f_flagread_epd,
@@ -38,7 +44,6 @@ from .dwepdio import (
     f_dwsubtract_epd,
     f_dwbreak,
     f_dwbreak2,
-    f_dwepdread_epd_safe,
     f_dwread_epd_safe,
     f_epdread_epd_safe,
 )
@@ -70,8 +75,6 @@ from .memifgen import (
     f_readgen_cp,
     f_cunitread_epd,
     f_cunitread_cp,
-    f_cunitepdread_epd,
-    f_cunitepdread_cp,
     f_maskread_epd,
     f_maskread_cp,
     f_posread_epd,
