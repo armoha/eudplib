@@ -111,7 +111,7 @@ def EncodeTBL(t, issueError=False):
             return DefTBLDict[s]
         except KeyError:
             sl = _("Cannot encode string {} as {}.").format(s, "stat_txt.tbl")
-            for match in difflib.get_close_matches(s, dl.keys()):
+            for match in difflib.get_close_matches(s, DefTBLDict.keys()):
                 sl += "\n" + _(" - Suggestion: {}").format(match)
             raise ut.EPError(sl)
         if issueError:
