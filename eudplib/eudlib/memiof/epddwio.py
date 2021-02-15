@@ -70,7 +70,7 @@ def f_dwepdread_epd(targetplayer):
 
 
 @c.EUDFunc
-def f_cunitepdread_cp():
+def _cunitepdread_cp():
     epd, ptr = c.EUDCreateVariables(2)
     acts = [
         epd.SetNumber(ut.EPD(0)),
@@ -88,6 +88,15 @@ def f_cunitepdread_cp():
     c.VProc([epd, ptr], [])  # 2 * epd
     c.VProc(ptr, ptr.AddNumber(0x58A364 // 2))  # ptr = 4 * epd + 0x58A364
 
+    return ptr, epd
+
+
+def f_cunitepdread_cp(cpo, **kwargs):
+    if not (isinstance(cpo, int) and cpo == 0):
+        cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
+    ptr, epd = _cunitepdread_cp(**kwargs)
+    if not (isinstance(cpo, int) and cpo == 0):
+        cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
     return ptr, epd
 
 
