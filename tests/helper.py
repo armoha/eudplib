@@ -125,7 +125,7 @@ class expect_eperror:
 ###############################################################
 
 
-perf_basecount = 100000
+perf_basecount = 200000
 
 
 def test_perf(testname, func, count):
