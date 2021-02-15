@@ -32,7 +32,32 @@ from .modcurpl import f_setcurpl2cpcache
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ...core.variable.evcommon import _ev
 from ...localize import _
-from .epddwio import f_dwepdread_epd
+
+
+@_EUDPredefineReturn(_ev[:2])
+@_EUDPredefineParam(_ev[2:3])
+@c.EUDFunc
+def f_dwepdread_epd(targetplayer):
+    ptr, epd = f_dwepdread_epd._frets
+    u = random.randint(234, 65535)
+    acts = [
+        ptr.SetNumber(0),
+        epd.SetNumber(ut.EPD(0)),
+        targetplayer.AddNumber(-12 * u),
+        targetplayer.SetDest(ut.EPD(0x6509B0)),
+    ]
+    c.VProc(targetplayer, ut.RandList(acts))
+
+    for i in ut.RandList(range(32)):
+        acts = [ptr.AddNumber(2 ** i), epd.AddNumber(2 ** (i - 2)) if i >= 2 else []]
+        c.RawTrigger(
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i),
+            actions=ut.RandList(acts),
+        )
+
+    f_setcurpl2cpcache()
+
+    # return ptr, epd
 
 
 @_EUDPredefineReturn(_ev[:1])
@@ -191,6 +216,14 @@ def f_dwbreak2(number):
 
 
 # backward compatibility functions
+
+
+def f_dwepdread_epd_safe(*args, **kwargs):
+    warnings.warn(
+        _("safe read functions are deprecated in 0.61 and will be removed in 0.63"),
+        DeprecationWarning,
+    )
+    return f_dwepdread_epd(*args, **kwargs)
 
 
 def f_dwread_epd_safe(*args, **kwargs):
