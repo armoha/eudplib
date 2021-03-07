@@ -24,6 +24,8 @@ THE SOFTWARE.
 """
 
 import weakref
+from typing import Optional
+from dataclasses import dataclass
 
 from .. import core as c, ctrlstru as cs, utils as ut
 from ..core.variable import eudv as ev
@@ -32,29 +34,28 @@ from ..localize import _
 from .eudarray import EUDArray
 
 
-max_fieldn = 8
-max_object_num = 32768
-globalPool = None
-
-
 class _ObjPoolData(c.ConstExpr):
-    def __init__(self, size):
+    def __init__(self, size: int, max_fieldn: int = 8):
         super().__init__(self)
         self._vdict = weakref.WeakKeyDictionary()
         self.size = size
+        self.max_fieldn = max_fieldn
 
     def Evaluate(self):
         evb = ev.GetCurrentVariableBuffer()
         try:
             return evb._vdict[self].Evaluate()
         except KeyError:
-            ret = evb.CreateMultipleVarTriggers(self, [0] * (max_fieldn * self.size))
+            ret = evb.CreateMultipleVarTriggers(
+                self, [0] * (self.max_fieldn * self.size)
+            )
             return ret.Evaluate()
 
 
 class ObjPool:
-    def __init__(self, size):
+    def __init__(self, size: int, max_fieldn: int = 8):
         self.size = size
+        self.max_fieldn = max_fieldn
         self.remaining = c.EUDVariable(size)
 
         self.baseobj = _ObjPoolData(size)
@@ -76,8 +77,10 @@ class ObjPool:
 
     def alloc(self, basetype, *args, **kwargs):
         ut.ep_assert(
-            len(basetype._fields_) <= max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(max_fieldn),
+            len(basetype._fields_) <= self.max_fieldn,
+            _("Only structs less than {} fields can be allocated").format(
+                self.max_fieldn
+            ),
         )
         data = self._alloc()
         data = basetype.cast(data)
@@ -86,8 +89,10 @@ class ObjPool:
 
     def free(self, basetype, data):
         ut.ep_assert(
-            len(basetype._fields_) <= max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(max_fieldn),
+            len(basetype._fields_) <= self.max_fieldn,
+            _("Only structs less than {} fields can be allocated").format(
+                self.max_fieldn
+            ),
         )
 
         data = basetype.cast(data)
@@ -96,13 +101,25 @@ class ObjPool:
         self.remaining += 1
 
 
-def SetGlobalPoolFieldN(fieldn):
-    global max_fieldn
-    max_fieldn = fieldn
+@dataclass
+class _GlobalObjPool:
+    pool: Optional[ObjPool]
+    max_fieldn: int = 8
+    max_object_num: int = 32768
+
+
+globalPool = _GlobalObjPool(pool=None, max_fieldn=8, max_object_num=32768)
+
+
+def SetGlobalPoolFieldN(fieldn: int):
+    global globalPool
+    ut.ep_assert(globalPool.pool is None, "Global object pool is already initialized.")
+    globalPool.max_fieldn = fieldn
 
 
 def GetGlobalPool():
     global globalPool
-    if globalPool is None:
-        globalPool = ObjPool(max_object_num)
-    return globalPool
+    if globalPool.pool is None:
+        size, max_fieldn = globalPool.max_object_num, globalPool.max_fieldn
+        globalPool.pool = ObjPool(size, max_fieldn)
+    return globalPool.pool

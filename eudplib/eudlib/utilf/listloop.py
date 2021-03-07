@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from dataclasses import dataclass
+
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import trigtrg as tt
@@ -31,7 +33,23 @@ from eudplib.localize import _
 
 from ..memiof import f_cunitepdread_epd, f_dwepdread_epd
 
-_unlimiter = False
+
+@dataclass
+class _UnlimiterBool:
+    is_unlimiter_on: bool = False
+
+
+_unlimiter = _UnlimiterBool(is_unlimiter_on=False)
+
+
+def _turnUnlimiterOn():
+    global _unlimiter
+    _unlimiter.is_unlimiter_on = True
+
+
+def _isUnlimiterOn():
+    global _unlimiter
+    return _unlimiter.is_unlimiter_on
 
 
 def EUDLoopList(header_offset, break_offset=None):
@@ -99,11 +117,12 @@ def EUDLoopUnit2():
     """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
     1700개 유닛을 도는 방식으로 작동합니다.
     """
+
     ptr, epd = c.EUDCreateVariables(2)
-    if not _unlimiter:  # orderID가 [0]Die면 없는 유닛으로 판단.
-        offset, cont = 0xC // 4, c.MemoryEPD(epd, c.Exactly, 0)
-    else:  # Sprite가 0이면 없는 유닛으로 판단.
+    if _isUnlimiterOn():  # orderID가 [0]Die면 없는 유닛으로 판단.
         offset, cont = 0x4C // 4, c.MemoryXEPD(epd, c.Exactly, 0, 0xFF00)
+    else:  # Sprite가 0이면 없는 유닛으로 판단.
+        offset, cont = 0xC // 4, c.MemoryEPD(epd, c.Exactly, 0)
     cs.DoActions(ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8) + offset))
     if cs.EUDLoopN()(1700):
         cs.EUDContinueIf(cont)
