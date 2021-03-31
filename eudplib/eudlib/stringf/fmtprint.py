@@ -102,10 +102,13 @@ class _EUDFormatter(string.Formatter):
 
     def eudformat_field(self, value, format_spec):
         if format_spec.endswith("s"):
-            if c.IsEUDVariable(value):
-                return ptr2s(value)
-            else:
-                return epd2s(ut.EPD(value))
+            if c.IsConstExpr(value):
+                try:
+                    if value % 4 == 0:
+                        return epd2s(ut.EPD(value))
+                except TypeError:
+                    return ptr2s(value)
+            return ptr2s(value)
         elif format_spec.endswith("t"):
             return epd2s(value)
         elif format_spec.endswith("x") or format_spec.endswith("X"):
