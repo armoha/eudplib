@@ -150,6 +150,6 @@ def QueueGameCommand_MergeArchon():
 
 @c.EUDFunc
 def QueueGameCommand_UseCheat(flags):
-    MUseCheatCommand = c.Db(b"...\x2ACCCC")
+    UseCheatCommand = c.Db(b"...\x12CCCC")
     c.SetVariables(ut.EPD(UseCheatCommand + 4), flags)
     QueueGameCommand(UseCheatCommand + 3, 5)
