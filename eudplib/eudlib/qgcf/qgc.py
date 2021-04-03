@@ -131,13 +131,6 @@ def QueueGameCommand_ResumeGame():
 
 
 @c.EUDFunc
-def QueueGameCommand_LeaveGame(type_):
-    LeaveGameCommand = c.Db(b"...\x57T...")
-    c.SetVariables(ut.EPD(LeaveGameCommand + 4), type_)
-    QueueGameCommand(LeaveGameCommand + 3, 2)
-
-
-@c.EUDFunc
 def QueueGameCommand_RestartGame():
     RestartGameCommand = c.Db(b"\x08")
     QueueGameCommand(RestartGameCommand, 1)

@@ -32,7 +32,6 @@ from .qgc import (
     QueueGameCommand_PauseGame,
     QueueGameCommand_ResumeGame,
     QueueGameCommand_RestartGame,
-    QueueGameCommand_LeaveGame,
     QueueGameCommand_UseCheat,
     QueueGameCommand_TrainUnit,
     QueueGameCommand_MergeDarkArchon,
