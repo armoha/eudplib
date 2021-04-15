@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from ..core.mapdata import chktok, mpqapi, mapdata
 from ..localize import _
-from ..utils import ep_eprint
+from ..utils import ep_eprint, ep_assert
 from .mpqadd import UpdateFileListByListfile
 
 
@@ -49,14 +49,11 @@ def LoadMap(fname):
         )
         raise
     mpqr = mpqapi.MPQ()
-    if not mpqr.Open(fname):
-        ep_eprint(_("Fail to open input map"))
+    ep_assert(mpqr.Open(fname), _("Fail to open input map"))
     chkt = chktok.CHK()
     b = mpqr.Extract("staredit\\scenario.chk")
-    if b:
-        chkt.loadchk(b)
-    else:
-        ep_eprint(_("Fail to extract scenario.chk, maybe invalid scx"))
+    ep_assert(b, _("Fail to extract scenario.chk, maybe invalid scx"))
+    chkt.loadchk(b)
     mapdata.InitMapData(chkt, rawfile)
     UpdateFileListByListfile(mpqr)
     for f in mpqr.EnumFiles():

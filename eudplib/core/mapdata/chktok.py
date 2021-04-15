@@ -104,7 +104,7 @@ class CHK:
 
     def getsection(self, sectionname):
         sectionname = sectionname_format(sectionname)
-        return self.sections[sectionname]  # Nameerror may be raised.
+        return self.sections[sectionname]  # KeyError may be raised.
 
     def setsection(self, sectionname, b):
         sectionname = sectionname_format(sectionname)

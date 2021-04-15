@@ -26,6 +26,7 @@ THE SOFTWARE.
 from ctypes import (
     c_int,
     c_char_p,
+    c_wchar_p,
     c_void_p,
     create_string_buffer,
     byref,
@@ -39,9 +40,6 @@ import platform
 from tempfile import NamedTemporaryFile
 from eudplib.localize import _
 from eudplib.utils import u2b, u2utf8, b2u, ep_eprint, find_data_file
-
-
-filename_u2b = None
 
 
 # Constants
@@ -72,7 +70,7 @@ class CreateInfo(Structure):
 
 
 def InitMpqLibrary():
-    global libstorm, filename_u2b
+    global libstorm
 
     try:
         platformName = platform.system()
@@ -87,14 +85,12 @@ def InitMpqLibrary():
                 libstorm = WinDLL(
                     find_data_file("StormLib64.dll", __file__), use_last_error=True
                 )
-            filename_u2b = u2b
 
         elif platformName == "Darwin":  # mac
             from ctypes import CDLL
 
             try:
                 libstorm = CDLL("libstorm.dylib", use_last_error=True)
-                filename_u2b = u2utf8
             except OSError as e:
                 ep_eprint(
                     _("You need to install stormlib before using eudplib."),
@@ -111,7 +107,7 @@ def InitMpqLibrary():
         libstorm.SFileReadFile.restype = c_int
         libstorm.SFileCloseFile.restype = c_int
 
-        libstorm.SFileOpenArchive.argtypes = [c_char_p, c_int, c_int, c_void_p]
+        libstorm.SFileOpenArchive.argtypes = [c_wchar_p, c_int, c_int, c_void_p]
         libstorm.SFileCloseArchive.argtypes = [c_void_p]
         libstorm.SFileOpenFileEx.argtypes = [c_void_p, c_char_p, c_int, c_void_p]
         libstorm.SFileGetFileSize.argtypes = [c_void_p, c_void_p]
@@ -127,7 +123,7 @@ def InitMpqLibrary():
 
         libstorm.SFileCompactArchive.argtypes = [c_void_p, c_char_p, c_int]
         libstorm.SFileCreateArchive2.argtypes = [
-            c_char_p,
+            c_wchar_p,
             POINTER(CreateInfo),
             c_void_p,
         ]
@@ -162,7 +158,7 @@ class MPQ:
             raise RuntimeError(_("Duplicate opening"))
 
         h = c_void_p()
-        ret = self.libstorm.SFileOpenArchive(filename_u2b(fname), 0, 0, byref(h))
+        ret = self.libstorm.SFileOpenArchive(fname, 0, 0, byref(h))
         if not ret:
             self.mpqh = None
             return False
@@ -186,7 +182,7 @@ class MPQ:
         cinfo.dwMaxFileCount = fileCount
         h = c_void_p()
         ret = self.libstorm.SFileCreateArchive2(
-            filename_u2b(fname), byref(cinfo), byref(h)
+            os.fsencode(fname), byref(cinfo), byref(h)
         )
         if not ret:
             self.mpqh = None
@@ -261,7 +257,7 @@ class MPQ:
         # Add to mpq
         ret = self.libstorm.SFileAddFileEx(
             self.mpqh,
-            filename_u2b(tmpfname),
+            os.fsencode(tmpfname),
             u2b(fname),
             MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED | MPQ_FILE_REPLACEEXISTING,
             cmp1,
@@ -283,7 +279,7 @@ class MPQ:
         # Add to mpq
         ret = self.libstorm.SFileAddFileEx(
             self.mpqh,
-            filename_u2b(tmpfname),
+            os.fsencode(tmpfname),
             u2b(fname),
             MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED,
             cmp1,

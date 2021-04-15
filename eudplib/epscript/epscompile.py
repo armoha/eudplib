@@ -30,9 +30,10 @@ from eudplib.utils import u2b, find_data_file
 import platform
 
 libFile = {
-    "windows": "libepScriptLib.dll",  # Windows
-    "darwin": "libepScriptLib.dylib",  # Mac
-}[platform.system().lower()]
+    "Linux": "libepScriptLib.so",  # Linux
+    "Windows": "libepScriptLib.dll",  # Windows
+    "Darwin": "libepScriptLib.dylib",  # Mac
+}[platform.system()]
 
 
 libeps = CDLL(find_data_file(libFile, __file__))
