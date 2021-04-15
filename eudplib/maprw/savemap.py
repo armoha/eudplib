@@ -31,7 +31,7 @@ from .injector.mainloop import _MainStarter
 from .mpqadd import UpdateMPQ
 from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
 from ..localize import _
-from ..utils import ep_eprint
+from ..utils import ep_eprint, ep_assert, EPError
 import binascii
 import os
 
@@ -57,6 +57,7 @@ def SaveMap(fname, rootf, *, sectorSize=None):
     :param fname: Path for output map.
     :param rootf: Main entry function.
     """
+    from ctypes import GetLastError
 
     print(_("Saving to {}...").format(fname))
     chkt = mapdata.GetChkTokenized()
@@ -76,19 +77,7 @@ def SaveMap(fname, rootf, *, sectorSize=None):
     print("Output scenario.chk : {:.3}MB".format(len(rawchk) / 1000000))
     mw = mpqapi.MPQ()
 
-    if sectorSize is None:
-        # Process by modifying existing mpqfile
-        try:
-            open(fname, "wb").write(mapdata.GetRawFile())
-        except PermissionError:
-            ep_eprint(
-                _("You lacks permission to get access rights for output map"),
-                _("Try to turn off antivirus or StarCraft"),
-                sep="\n",
-            )
-        if not mw.Open(fname):
-            ep_eprint("Fail to access output map")
-    elif isinstance(sectorSize, int):
+    if sectorSize and isinstance(sectorSize, int):
         if os.path.isfile(fname):
             try:
                 os.remove(fname)
@@ -98,19 +87,32 @@ def SaveMap(fname, rootf, *, sectorSize=None):
                     _("Try to turn off antivirus or StarCraft"),
                     sep="\n",
                 )
+                raise
         if not mw.Create(fname, sectorSize=sectorSize):
-            ep_eprint("Fail to access output map")
+            raise EPError(_("Fail to access output map ({})").format(GetLastError()))
         for n, f in mapdata.IterListFiles():
-            if f and not mw.PutFile(n, f):
-                ep_eprint("Fail to export input map data to output map")
+            if f:
+                ep_assert(
+                    mw.PutFile(n, f), _("Fail to export input map data to output map")
+                )
     else:
-        ep_eprint("sectorSize should be int. ({})".format(sectorSize))
+        # Process by modifying existing mpqfile
+        try:
+            open(fname, "wb").write(mapdata.GetRawFile())
+        except PermissionError:
+            ep_eprint(
+                _("You lacks permission to get access rights for output map"),
+                _("Try to turn off antivirus or StarCraft"),
+                sep="\n",
+            )
+            raise
+        if not mw.Open(fname):
+            raise EPError(_("Fail to access output map ({})").format(GetLastError()))
 
     if not mw.PutFile("staredit\\scenario.chk", rawchk):
-        ep_eprint("Fail to add scenario.chk")
+        raise EPError(_("Fail to add scenario.chk"))
     UpdateMPQ(mw)
-    if not mw.Compact():
-        ep_eprint("Fail to compact MPQ")
+    ep_assert(mw.Compact(), _("Fail to compact MPQ"))
     mw.Close()
 
     if traceMap:

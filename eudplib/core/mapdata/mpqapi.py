@@ -129,7 +129,7 @@ def InitMpqLibrary():
         ]
         libstorm.SFileAddFileEx.argtypes = [
             c_void_p,
-            c_char_p,
+            c_wchar_p,
             c_char_p,
             c_int,
             c_int,
@@ -181,9 +181,7 @@ class MPQ:
         cinfo.dwSectorSize = 2 ** (9 + sectorSize)
         cinfo.dwMaxFileCount = fileCount
         h = c_void_p()
-        ret = self.libstorm.SFileCreateArchive2(
-            os.fsencode(fname), byref(cinfo), byref(h)
-        )
+        ret = self.libstorm.SFileCreateArchive2(fname, byref(cinfo), byref(h))
         if not ret:
             self.mpqh = None
             return False
@@ -254,11 +252,16 @@ class MPQ:
         tmpfname = f.name
         f.close()
 
+        try:
+            fname = u2b(fname)
+        except UnicodeEncodeError:
+            fname = u2utf8(fname)
+
         # Add to mpq
         ret = self.libstorm.SFileAddFileEx(
             self.mpqh,
-            os.fsencode(tmpfname),
-            u2b(fname),
+            tmpfname,
+            fname,
             MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED | MPQ_FILE_REPLACEEXISTING,
             cmp1,
             cmp2,
