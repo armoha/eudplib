@@ -243,7 +243,10 @@ class TBL:
 
     def AddString(self, string):
         # Starcraft: Remastered uses both utf-8 and multibyte encoding.
-        string = ut.u2b(string)
+        try:
+            string = ut.u2b(string)
+        except UnicodeEncodeError:
+            string = ut.u2utf8(string)
         if not isinstance(string, bytes):
             raise ut.EPError(_("Invalid type for string"))
 
