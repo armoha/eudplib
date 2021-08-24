@@ -61,7 +61,7 @@ def roundup_by_4(num):
 
 
 class TBL:
-    def __init__(self, content=None, init_chkt=None, load_entry=2, save_entry=2):
+    def __init__(self, content=None, init_chkt=None, load_entry=2, save_entry=4):
         #
         # datatb : table of strings                       : string data table
         # dataindextb : string id -> data id              : string offset table
