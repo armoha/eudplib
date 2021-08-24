@@ -25,13 +25,14 @@ THE SOFTWARE.
 
 from .. import core as c, trigger as tg, utils as ut
 
-from .basicstru import EUDJumpIf, EUDJumpIfNot
+from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 
 
 class EUDSCAnd:
     def __init__(self):
+        self.const_cond = list()
         self.jb = c.Forward()
-        self.v = c.EUDVariable()
+        self.v = c.EUDLightVariable()
         self.v << 1
 
         if c.PushTriggerScope():
@@ -40,14 +41,25 @@ class EUDSCAnd:
 
     def __call__(self, cond=None, *, neg=False):
         if cond is None:
+            if self.const_cond:
+                EUDJumpIfNot(self.const_cond, self.fb)
+                self.const_cond.clear()
             self.jb << c.NextTrigger()
-            return self.v
+            return self.v.AtLeast(1)
 
         else:
             if neg:
+                if self.const_cond:
+                    EUDJumpIfNot(self.const_cond, self.fb)
+                    self.const_cond.clear()
                 EUDJumpIf(cond, self.fb)
             else:
-                EUDJumpIfNot(cond, self.fb)
+                self.const_cond.append(cond)
+                try:
+                    cond.CheckArgs(0)
+                except ut.EPError as e:
+                    EUDJumpIfNot(self.const_cond, self.fb)
+                    self.const_cond.clear()
             return self
 
 
