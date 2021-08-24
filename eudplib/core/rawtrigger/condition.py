@@ -133,3 +133,51 @@ class Condition(ConstExpr):
 
     def __bool__(self):
         raise RuntimeError(_("To prevent error, Condition can't be put into if."))
+
+    def TryNegate(self):
+        comparison_set = (1, 2, 3, 4, 5, 12, 14, 15, 21)
+        always_set = (0, 22)
+        never_set = (13, 23)
+
+        condtype = self.fields[5]
+        if condtype in always_set:
+            self.fields[5] = 23
+            return True
+        elif condtype in never_set:
+            self.fields[5] = 22
+            return True
+        elif condtype == 11:  # Switch
+            self.fields[4] ^= 1
+            return True
+        elif condtype in comparison_set:
+            comparison = self.fields[4]
+            amount = self.fields[2]
+            if condtype == 15 and self.fields[8] == ut.b2i2(ut.u2b("SC")):
+                amount = self.fields[2]
+                mask = self.fields[0]
+                # TODO: handle AtLeast/AtMost
+                if comparison == 10:
+                    if amount & mask == 0:
+                        self.fields[4] = 0  # AtLeast
+                        self.fields[2] = 1
+                        return True
+                    elif (amount & mask) == mask:
+                        self.fields[4] = 1  # AtMost
+                        self.fields[2] = mask - 1
+                        return True
+            elif comparison in (0, 1):
+                # TODO: Can be incorrect for Bring, CommandAt... (AtMost exceptions)
+                self.fields[4] ^= 1
+                self.fields[2] += -((-1) ** comparison)
+                return True
+            elif comparison == 10:
+                if amount == 0:
+                    self.fields[4] = 0  # AtLeast
+                    self.fields[2] = 1
+                    return True
+                elif (amount & 0xFFFFFFFF) == 0xFFFFFFFF:
+                    self.fields[4] = 1  # AtMost
+                    self.fields[2] = 0xFFFFFFFE
+                    return True
+
+        return False
