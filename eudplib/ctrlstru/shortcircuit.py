@@ -30,47 +30,35 @@ from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 
 class EUDSCAnd:
     def __init__(self):
-        self.const_cond = list()
         self.jb = c.Forward()
-        self.v = c.EUDLightVariable()
-        self.v << 1
+        self.v = c.EUDLightBool()
+        c.RawTrigger(actions=self.v.Set())
 
         if c.PushTriggerScope():
-            self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.SetNumber(0))
+            self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.Clear())
         c.PopTriggerScope()
 
     def __call__(self, cond=None, *, neg=False):
         if cond is None:
-            if self.const_cond:
-                EUDJumpIfNot(self.const_cond, self.fb)
-                self.const_cond.clear()
             self.jb << c.NextTrigger()
-            return self.v.AtLeast(1)
+            return self.v
 
         else:
             if neg:
-                if self.const_cond:
-                    EUDJumpIfNot(self.const_cond, self.fb)
-                    self.const_cond.clear()
                 EUDJumpIf(cond, self.fb)
             else:
-                self.const_cond.append(cond)
-                try:
-                    cond.CheckArgs(0)
-                except ut.EPError as e:
-                    EUDJumpIfNot(self.const_cond, self.fb)
-                    self.const_cond.clear()
+                EUDJumpIfNot(cond, self.fb)
             return self
 
 
 class EUDSCOr:
     def __init__(self):
         self.jb = c.Forward()
-        self.v = c.EUDVariable()
-        self.v << 0
+        self.v = c.EUDLightBool()
+        c.RawTrigger(actions=self.v.Clear())
 
         if c.PushTriggerScope():
-            self.tb = c.RawTrigger(nextptr=self.jb, actions=self.v.SetNumber(1))
+            self.tb = c.RawTrigger(nextptr=self.jb, actions=self.v.Set())
         c.PopTriggerScope()
 
     def __call__(self, cond=None, *, neg=False):

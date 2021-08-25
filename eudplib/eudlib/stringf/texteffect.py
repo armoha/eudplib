@@ -235,7 +235,7 @@ def TextFX_Remove(tag):
 
 _check_cp = c.Forward()
 _is_below_start = c.Forward()
-_cpbelowbuffer = c.EUDLightVariable()
+_cpbelowbuffer = c.EUDLightBool()
 
 
 def _is_CP_less_than_start(actions):
@@ -244,14 +244,14 @@ def _is_CP_less_than_start(actions):
         c.PushTriggerScope()
         _is_below_start << c.RawTrigger(
             conditions=[_check_cp << c.Memory(0x6509B0, c.AtMost, 1)],
-            actions=_cpbelowbuffer.SetNumber(1),
+            actions=_cpbelowbuffer.Set(),
         )
         c.PopTriggerScope()
     _next = c.Forward()
     c.RawTrigger(
         nextptr=_is_below_start,
         actions=[actions]
-        + [_cpbelowbuffer.SetNumber(0), c.SetNextPtr(_is_below_start, _next)],
+        + [_cpbelowbuffer.Clear(), c.SetNextPtr(_is_below_start, _next)],
     )
     _next << c.NextTrigger()
 
@@ -267,14 +267,14 @@ def R2L(colors, colors_dict={}):
             ret = c.EUDVariable()
             _is_CP_less_than_start([ret.SetNumber(1), c.SetNextPtr(_isend, _jump)])
             _isend << c.RawTrigger(
-                conditions=_cpbelowbuffer.Exactly(1),
+                conditions=_cpbelowbuffer,
                 actions=[ret.SetNumber(0), c.SetNextPtr(_isend, _end)],
             )
             _jump << c.NextTrigger()
             for color in reversed(colors):
                 _is_CP_less_than_start([])
                 c.RawTrigger(
-                    conditions=_cpbelowbuffer.Exactly(0),
+                    conditions=_cpbelowbuffer.IsCleared(),
                     actions=[
                         c.SetDeathsX(c.CurrentPlayer, c.SetTo, color, 0, 0xFF),
                         c.AddCurrentPlayer(-1),

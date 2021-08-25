@@ -155,10 +155,10 @@ odd, even0, even1 = [[c.Forward() for p in range(8)] for _ in range(3)]
 def _InitPName():
     global isTxtPtrUnchanged, temp_Db, ptr, epd, temp_Db, odds_or_even
     global baselens, baseNames
-    isTxtPtrUnchanged = c.EUDLightVariable()
+    isTxtPtrUnchanged = c.EUDLightBool()
     temp_Db = c.Db(218)
     ptr, epd = c.EUDVariable(), c.EUDVariable()
-    odds_or_even = c.EUDLightVariable()
+    odds_or_even = c.EUDLightBool()
     baselens = PVariable()
     NameDb = [c.Db(26) for _ in range(8)]
     baseNames = PVariable(NameDb)
@@ -173,13 +173,13 @@ def f_check_id(player, dst):
     for i in range(8):
         cs.EUDSwitchCase()(i)
         if cs.EUDIf()(
-            [odds_or_even.Exactly(0), odd[i] << c.MemoryEPD(dst, c.Exactly, 0)]
+            [odds_or_even.IsCleared(), odd[i] << c.MemoryEPD(dst, c.Exactly, 0)]
         ):
             ret << 0
 
         if cs.EUDElseIf()(
             [
-                odds_or_even.Exactly(1),
+                odds_or_even,
                 even0[i] << c.MemoryXEPD(dst, c.Exactly, 0, 0xFFFF0000),
                 even1[i] << c.MemoryEPD(dst + 1, c.Exactly, 0),
             ]
@@ -244,13 +244,13 @@ def _OptimizeSetPName():
     once = c.Forward()
     cs.EUDJumpIf([once << c.Memory(0x57F23C, c.Exactly, ~0)], end_optimize)
     cs.DoActions(
-        isTxtPtrUnchanged.SetNumber(0), c.SetMemory(once + 8, c.SetTo, f_getgametick()),
+        isTxtPtrUnchanged.Clear(), c.SetMemory(once + 8, c.SetTo, f_getgametick()),
     )
     c.RawTrigger(
         conditions=[prevTxtPtr << c.Memory(0x640B58, c.Exactly, 11)],
-        actions=isTxtPtrUnchanged.SetNumber(1),
+        actions=isTxtPtrUnchanged.Set(),
     )
-    cs.EUDJumpIf(isTxtPtrUnchanged.Exactly(1), _end)
+    cs.EUDJumpIf(isTxtPtrUnchanged, _end)
     cs.DoActions(c.SetMemory(prevTxtPtr + 8, c.SetTo, 0))
     for i in range(3, -1, -1):
         c.RawTrigger(
@@ -279,7 +279,7 @@ def SetPName(player, *name):
     start << c.NextTrigger()
 
     _end = c.Forward()
-    cs.EUDJumpIf(isTxtPtrUnchanged.Exactly(1), _end)
+    cs.EUDJumpIf(isTxtPtrUnchanged, _end)
     if ut.isUnproxyInstance(player, type(c.P1)):
         if player == c.CurrentPlayer:
             player = f_getcurpl()
@@ -291,9 +291,7 @@ def SetPName(player, *name):
     global ptr, epd, odds_or_even
     origcp = f_getcurpl()
     cs.DoActions(
-        ptr.SetNumber(0x640B61),
-        epd.SetNumber(ut.EPD(0x640B60)),
-        odds_or_even.SetNumber(0),
+        ptr.SetNumber(0x640B61), epd.SetNumber(ut.EPD(0x640B60)), odds_or_even.Clear(),
     )
     if cs.EUDWhile()(ptr.AtMost(0x640B61 + 218 * 10)):
         cs.EUDContinueIf(f_check_id(player, epd))
@@ -308,7 +306,7 @@ def SetPName(player, *name):
             c.SetCurrentPlayer(epd),
         )
         c.RawTrigger(
-            conditions=odds_or_even.Exactly(1),
+            conditions=odds_or_even.IsSet(),
             actions=[
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"\r" * 4), 0),
                 c.AddCurrentPlayer(1),
@@ -319,10 +317,8 @@ def SetPName(player, *name):
         f_cpstr_print(*name)
 
         cs.EUDSetContinuePoint()
-        cs.DoActions(
-            ptr.AddNumber(218), epd.AddNumber(54), odds_or_even.AddNumberX(1, 1)
-        )
-        c.RawTrigger(conditions=odds_or_even.Exactly(0), actions=epd.AddNumber(1))
+        cs.DoActions(ptr.AddNumber(218), epd.AddNumber(54), odds_or_even.Toggle())
+        c.RawTrigger(conditions=odds_or_even.IsCleared(), actions=epd.AddNumber(1))
     cs.EUDEndWhile()
     f_setcurpl(origcp)
 

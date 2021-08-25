@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from .. import rawtrigger as bt
 from ..eudobj import Db
 from ...utils import i2b4
 from .vbase import VariableBase
@@ -41,3 +42,39 @@ class EUDLightVariable(VariableBase):
 
     def __hash__(self):
         return id(self)
+
+
+class EUDLightBool:
+    _lv = EUDLightVariable()
+    _bit = 0
+
+    def __init__(self):
+        if EUDLightBool._bit < 32:
+            self._basev = EUDLightBool._lv
+            self._value = 1 << EUDLightBool._bit
+            EUDLightBool._bit += 1
+        else:
+            lv = EUDLightVariable()
+            EUDLightBool._lv = lv
+            self._basev = lv
+            self._value = 1
+            EUDLightBool._bit = 1
+        self._memaddr = self._basev._memaddr
+
+    def getValueAddr(self):
+        return self._memaddr
+
+    def Set(self):
+        return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, self._value, self._value)
+
+    def Clear(self):
+        return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, 0, self._value)
+
+    def Toggle(self):
+        return bt.SetMemoryX(self.getValueAddr(), bt.Add, self._value, self._value)
+
+    def IsSet(self):
+        return bt.MemoryX(self.getValueAddr(), bt.AtLeast, 1, self._value)
+
+    def IsCleared(self):
+        return bt.MemoryX(self.getValueAddr(), bt.Exactly, 0, self._value)

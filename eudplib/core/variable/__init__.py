@@ -34,5 +34,5 @@ from .eudv import (
     EP_SetRValueStrictMode,
 )
 
-from .eudlv import EUDLightVariable
+from .eudlv import EUDLightVariable, EUDLightBool
 from .eudxv import EUDXVariable

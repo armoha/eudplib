@@ -74,21 +74,21 @@ def test_strbuffer():
     RawTrigger(
         conditions=IsPName(P1, "trgk"), actions=ret.AddNumber(16),
     )
-    test_equality("IsPName test", ret, 0b1)
+    test_equality("IsPName test1", ret, 0b1)
     Trigger(
         conditions=IsPName(f_getuserplayerid(), "Armo"), actions=ret.AddNumber(2),
     )
     Trigger(
         conditions=IsPName(f_getuserplayerid(), "trgk"), actions=ret.AddNumber(16),
     )
-    test_equality("IsPName test", ret, 0b11)
+    test_equality("IsPName test2", ret, 0b11)
     Trigger(
         conditions=IsPName(P1, name_var), actions=ret.AddNumber(4),
     )
     Trigger(
         conditions=IsPName(P1, Db("trgk")), actions=ret.AddNumber(16),
     )
-    test_equality("IsPName test", ret, 0b111)
+    test_equality("IsPName test3", ret, 0b111)
     Trigger(
         conditions=IsPName(f_getuserplayerid(), name_var), actions=ret.AddNumber(8),
     )
@@ -96,6 +96,6 @@ def test_strbuffer():
         conditions=IsPName(f_getuserplayerid(), EUDVariable(Db("trgk"))),
         actions=ret.AddNumber(16),
     )
-    test_equality("IsPName test", ret, 0b1111)
+    test_equality("IsPName test4", ret, 0b1111)
 
     f_setcurpl(origcp)

@@ -70,6 +70,10 @@ actpt = [[-1], [-1], [-1], [-1], [-1], [-1], [0, 4, 5], [2, None, None, None]]
 def PatchCondition(cond):
     if ut.isUnproxyInstance(cond, c.EUDVariable):
         return cond >= 1
+    elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
+        return cond >= 1
+    elif ut.isUnproxyInstance(cond, c.EUDLightBool):
+        return cond.IsSet()
 
     # translate boolean condition
     elif isinstance(cond, bool):

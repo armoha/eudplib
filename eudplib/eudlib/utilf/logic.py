@@ -34,14 +34,14 @@ def EUDOr(cond1, *conds):
     :param conds: List of conditions
     """
 
-    v = c.EUDVariable()
+    v = c.EUDLightBool()
     if cs.EUDIf()(cond1):
-        v << 1
+        c.RawTrigger(actions=v.Set())
     for cond in conds:
         if cs.EUDElseIf()(cond):
-            v << 1
+            c.RawTrigger(actions=v.Set())
     if cs.EUDElse()():
-        v << 0
+        c.RawTrigger(actions=v.Clear())
     cs.EUDEndIf()
     return v
 
@@ -59,14 +59,14 @@ def EUDAnd(cond1, *conds):
     :param conds: List of conditions
     """
 
-    v = c.EUDVariable()
+    v = c.EUDLightBool()
     if cs.EUDIfNot()(cond1):
-        v << 0
+        c.RawTrigger(actions=v.Clear())
     for cond in conds:
         if cs.EUDElseIfNot()(cond):
-            v << 0
+            c.RawTrigger(actions=v.Clear())
     if cs.EUDElse()():
-        v << 1
+        c.RawTrigger(actions=v.Set())
     cs.EUDEndIf()
     return v
 
@@ -77,10 +77,10 @@ def EUDNot(cond):
     :param conds: Condition to negate
     """
 
-    v = c.EUDVariable()
+    v = c.EUDLightBool()
     if cs.EUDIf()(cond):
-        v << 0
+        c.RawTrigger(actions=v.Clear())
     if cs.EUDElse()():
-        v << 1
+        c.RawTrigger(actions=v.Set())
     cs.EUDEndIf()
     return v
