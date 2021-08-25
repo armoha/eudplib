@@ -36,12 +36,6 @@ from .filler import (
 
 
 def ApplyPatchTable(initepd, obj, patchTable):
-    def fieldSelector(fieldName):
-        if type(fieldName) is int:
-            return obj.fields[fieldName]
-        else:
-            return 0
-
     fieldName = 0
     for i, patchEntry in enumerate(patchTable):
         patchFields = patchEntry
@@ -55,7 +49,7 @@ def ApplyPatchTable(initepd, obj, patchTable):
                     4: _fillhibyte,
                     5: _fillmsbyte,
                 }[fieldSize]
-                field = fieldSelector(fieldName)
+                field = obj.fields[fieldName]
                 if ut.isUnproxyInstance(field, c.EUDVariable):
                     memoryFiller(initepd + i, field)
                     obj.fields[fieldName] = 0
@@ -95,3 +89,107 @@ def PatchCondition(cond):
 def PatchAction(act):
     ApplyPatchTable(ut.EPD(act), act, actpt)
     return act
+
+
+def IsConditionConst(cond):
+    if ut.isUnproxyInstance(cond, c.EUDVariable):
+        return True
+    elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
+        return True
+    elif ut.isUnproxyInstance(cond, c.EUDLightBool):
+        return True
+    elif isinstance(cond, bool):
+        return True
+    else:
+        try:
+            fieldName = 0
+            for condFields in condpt:
+                for fieldSize in condFields:
+                    if type(fieldSize) is int:
+                        field = cond.fields[fieldName]
+                        if ut.isUnproxyInstance(field, c.EUDVariable):
+                            return False
+                    fieldName += 1
+            return True
+        except AttributeError as e:
+            if c.IsConstExpr(cond):
+                return True
+            return False
+
+
+def IsConditionNegatable(cond):
+    if ut.isUnproxyInstance(cond, c.EUDVariable):
+        return True
+    elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
+        return True
+    elif ut.isUnproxyInstance(cond, c.EUDLightBool):
+        return True
+    elif isinstance(cond, bool):
+        return True
+    else:
+        try:
+            condtype = cond.fields[5]
+            comparison_set = (1, 2, 3, 4, 5, 12, 14, 15, 21)
+            always_or_never = (0, 22, 13, 23)
+            if condtype in always_or_never:
+                return True
+            if condtype == 11:  # Switch
+                return True
+            if condtype in comparison_set:
+                bring_or_command = (2, 3)
+                comparison = cond.fields[4]
+                amount = cond.fields[2] & 0xFFFFFFFF
+                if comparison == 10 and amount == 0:
+                    return True
+                if comparison == 0 and amount <= 1:
+                    return True
+                if condtype in bring_or_command:
+                    # AtMost and Exactly/AtLeast behaves differently in Bring or Command.
+                    # (ex. AtMost counts buildings on construction and does not count Egg/Cocoon)
+                    # So only exchanging (Exactly, 0) <-> (AtLeast, 1) is sound.
+                    #
+                    # See: https://cafe.naver.com/edac/book5095361/96809
+                    return False
+                if comparison in (0, 1):
+                    return True
+                elif comparison != 10:
+                    return False
+                elif condtype == 15 and cond.fields[8] == ut.b2i2(ut.u2b("SC")):
+                    mask = cond.fields[0] & 0xFFFFFFFF
+                    if amount & (~mask):  # never
+                        return True
+                    if amount == mask:
+                        return True
+                    return False
+                elif amount == 0xFFFFFFFF:
+                    return True
+            return False
+        except AttributeError as e:
+            if c.IsConstExpr(cond):
+                return True
+            return False
+
+
+def NegateCondition(cond):
+    if ut.isUnproxyInstance(cond, c.EUDVariable):
+        return cond == 0
+    elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
+        return cond == 0
+    elif ut.isUnproxyInstance(cond, c.EUDLightBool):
+        return cond.IsCleared()
+
+    # translate boolean condition
+    elif isinstance(cond, bool):
+        if cond:
+            return c.Never()
+        else:
+            return c.Always()
+
+    else:
+        try:
+            cond.Negate()
+            return cond
+        except AttributeError as e:
+            if c.IsConstExpr(cond):
+                return cond == 0
+            raise

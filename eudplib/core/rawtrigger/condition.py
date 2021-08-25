@@ -134,50 +134,54 @@ class Condition(ConstExpr):
     def __bool__(self):
         raise RuntimeError(_("To prevent error, Condition can't be put into if."))
 
-    def TryNegate(self):
+    def Negate(self):
+        condtype = self.fields[5]
         comparison_set = (1, 2, 3, 4, 5, 12, 14, 15, 21)
         always_set = (0, 22)
         never_set = (13, 23)
-
-        condtype = self.fields[5]
         if condtype in always_set:
             self.fields[5] = 23
-            return True
         elif condtype in never_set:
             self.fields[5] = 22
-            return True
         elif condtype == 11:  # Switch
             self.fields[4] ^= 1
-            return True
         elif condtype in comparison_set:
+            bring_or_command = (2, 3)
             comparison = self.fields[4]
-            amount = self.fields[2]
-            if condtype == 15 and self.fields[8] == ut.b2i2(ut.u2b("SC")):
-                amount = self.fields[2]
-                mask = self.fields[0]
-                # TODO: handle AtLeast/AtMost
-                if comparison == 10:
-                    if amount & mask == 0:
-                        self.fields[4] = 0  # AtLeast
-                        self.fields[2] = 1
-                        return True
-                    elif (amount & mask) == mask:
-                        self.fields[4] = 1  # AtMost
-                        self.fields[2] = mask - 1
-                        return True
+            amount = self.fields[2] & 0xFFFFFFFF
+            if comparison == 10 and amount == 0:
+                self.fields[4] = 0
+                self.fields[2] = 1
+            elif comparison == 0 and amount == 1:
+                self.fields[4] = 10
+                self.fields[2] = 0
+            elif comparison == 0 and amount == 0:
+                self.fields[5] = 23
+            elif condtype in bring_or_command:
+                # AtMost and Exactly/AtLeast behaves differently in Bring or Command.
+                # (ex. AtMost counts buildings on construction and does not count Egg/Cocoon)
+                # So only exchanging (Exactly, 0) <-> (AtLeast, 1) is sound.
+                #
+                # See: https://cafe.naver.com/edac/book5095361/96809
+                raise ut.EPError(_("Bring and Command can't exchange AtMost and Exactly/AtLeast"))
             elif comparison in (0, 1):
-                # TODO: Can be incorrect for Bring, CommandAt... (AtMost exceptions)
                 self.fields[4] ^= 1
                 self.fields[2] += -((-1) ** comparison)
-                return True
-            elif comparison == 10:
-                if amount == 0:
-                    self.fields[4] = 0  # AtLeast
-                    self.fields[2] = 1
-                    return True
-                elif (amount & 0xFFFFFFFF) == 0xFFFFFFFF:
-                    self.fields[4] = 1  # AtMost
-                    self.fields[2] = 0xFFFFFFFE
-                    return True
-
-        return False
+            elif comparison != 10:
+                raise ut.EPError(_('Invalid comparison "{}" in trigger index {}').format(comparison, 0))
+            elif condtype == 15 and self.fields[8] == ut.b2i2(ut.u2b("SC")):
+                mask = self.fields[0] & 0xFFFFFFFF
+                if amount & (~mask):  # never
+                    self.fields[5] = 23
+                elif amount == mask:
+                    self.fields[4] = 1
+                    self.fields[2] = mask - 1
+                else:
+                    raise ut.EPError(_("Can't negate EUDX condition"))
+            elif amount == 0xFFFFFFFF:
+                self.fields[4] = 1  # AtMost
+                self.fields[2] = 0xFFFFFFFE
+            else:
+                raise ut.EPError(_("Can't negate condition with comparison"))
+        else:
+            raise ut.EPError(_("Can't negate condition"))
