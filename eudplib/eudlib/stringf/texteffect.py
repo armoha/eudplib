@@ -267,7 +267,7 @@ def R2L(colors, colors_dict={}):
             ret = c.EUDVariable()
             _is_CP_less_than_start([ret.SetNumber(1), c.SetNextPtr(_isend, _jump)])
             _isend << c.RawTrigger(
-                conditions=_cpbelowbuffer,
+                conditions=_cpbelowbuffer.IsSet(),
                 actions=[ret.SetNumber(0), c.SetNextPtr(_isend, _end)],
             )
             _jump << c.NextTrigger()
