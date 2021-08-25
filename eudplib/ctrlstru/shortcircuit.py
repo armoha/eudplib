@@ -25,30 +25,81 @@ THE SOFTWARE.
 
 from .. import core as c, trigger as tg, utils as ut
 
-from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
+from .basicstru import EUDJumpIf, EUDJumpIfNot
 
 
 class EUDSCAnd:
     def __init__(self):
+        self.const = True
+        self.cond = list()
+        c.PushTriggerScope()
+        self.side_effect = c.NextTrigger()
+        self.scope = ut.EUDGetLastBlock()
+
+    def Patch(self):
+        self.const = False
         self.jb = c.Forward()
         self.v = c.EUDLightBool()
-        c.RawTrigger(actions=self.v.Set())
-
-        if c.PushTriggerScope():
-            self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.Clear())
+        self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.Clear())
         c.PopTriggerScope()
+        c.RawTrigger(actions=self.v.Set())
 
     def __call__(self, cond=None, *, neg=False):
         if cond is None:
+            if self.const:
+                c.PopTriggerScope()
+                return self.cond
+            elif self.cond:
+                EUDJumpIfNot(self.cond, self.fb)
             self.jb << c.NextTrigger()
             return self.v
 
-        else:
+        if not self.const:
             if neg:
                 EUDJumpIf(cond, self.fb)
             else:
                 EUDJumpIfNot(cond, self.fb)
-            return self
+        else:
+            is_const_cond = tg.tpatcher.IsConditionConst(cond)
+            nt_list = self.scope[1]["nexttrigger_list"]
+            if nt_list != [self.side_effect]:
+                # has side-effect
+                ifcond = c.Forward()
+                c.SetNextTrigger(ifcond)
+                self.Patch()
+                if self.cond:
+                    EUDJumpIfNot(self.cond, self.fb)
+                    self.cond.clear()
+                c.SetNextTrigger(self.side_effect)
+                ifcond << c.NextTrigger()
+                if neg:
+                    EUDJumpIf(cond, self.fb)
+                else:
+                    EUDJumpIfNot(cond, self.fb)
+            elif is_const_cond:
+                if neg:
+                    if tg.tpatcher.IsConditionNegatable(cond):
+                        cond = tg.tpatcher.NegateCondition(cond)
+                        self.cond.append(cond)
+                    else:
+                        self.Patch()
+                        if self.cond:
+                            EUDJumpIfNot(self.cond, self.fb)
+                            self.cond.clear()
+                        EUDJumpIf(cond, self.fb)
+                else:
+                    self.cond.append(cond)
+            else:
+                self.Patch()
+                # TODO: handle mixing of non/side-effect conditions
+                if self.cond:
+                    EUDJumpIfNot(self.cond, self.fb)
+                    self.cond.clear()
+                if neg:
+                    EUDJumpIf(cond, self.fb)
+                else:
+                    EUDJumpIfNot(cond, self.fb)
+        return self
 
 
 class EUDSCOr:
