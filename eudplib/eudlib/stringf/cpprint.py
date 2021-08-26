@@ -267,7 +267,7 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
             f_cpstr_addstr_epd(arg._value)
         elif ut.isUnproxyInstance(arg, DBString):
             f_cpstr_addstr_epd(ut.EPD(arg.GetStringMemoryAddr()))
-        elif ut.isUnproxyInstance(arg, c.EUDVariable) or c.IsConstExpr(arg):
+        elif c.IsEUDVariable(arg) or c.IsConstExpr(arg):
             f_cpstr_adddw(arg)
         elif ut.isUnproxyInstance(arg, hptr):
             f_cpstr_addptr(arg._value)

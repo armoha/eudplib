@@ -303,7 +303,7 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
             strlen = addf["epd"](*dstmsg(arg._value))
         elif ut.isUnproxyInstance(arg, ptr2s):
             strlen = addf["str"](*dstmsg(arg._value))
-        elif ut.isUnproxyInstance(arg, c.EUDVariable):
+        elif c.IsEUDVariable(arg):
             strlen = addf["dw"](*dstmsg(arg))
         elif c.IsConstExpr(arg):
             strlen = addf["dw"](*dstmsg(arg))

@@ -127,7 +127,7 @@ def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):
             f_cpchar_addstr(arg._value)
         elif ut.isUnproxyInstance(arg, epd2s):
             f_cpchar_addstr_epd(arg._value)
-        elif ut.isUnproxyInstance(arg, c.EUDVariable) or c.IsConstExpr(arg):
+        elif c.IsEUDVariable(arg) or c.IsConstExpr(arg):
             f_cpchar_adddw(arg)
         else:
             f_cpstr_print(arg, EOS=False, encoding=encoding)

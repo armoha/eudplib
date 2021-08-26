@@ -54,12 +54,10 @@ class PVariable(c.EUDVArray(8)):
         nptr << c.NextTrigger()
 
     def __setitem__(self, i, value):
-        if ut.isUnproxyInstance(i, c.EUDVariable) and ut.isUnproxyInstance(
-            value, c.EUDVariable
-        ):
+        if c.IsEUDVariable(i) and c.IsEUDVariable(value):
             self._eudset(i, value)
 
-        elif ut.isUnproxyInstance(i, c.EUDVariable):
+        elif c.IsEUDVariable(i):
             a0 = c.Forward()
             cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
             for k in range(2, -1, -1):

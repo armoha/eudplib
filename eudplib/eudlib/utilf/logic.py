@@ -23,7 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from eudplib.utils.eperror import EPError
 from eudplib import core as c, ctrlstru as cs
+from eudplib.trigger.tpatcher import NegateCondition
 
 
 def EUDOr(cond1, *conds):
@@ -77,6 +79,23 @@ def EUDNot(cond):
     :param conds: Condition to negate
     """
 
+    if c.IsEUDVariable(cond):
+        # TODO: better handle !v in conditional
+        v = c.EUDVariable()
+        v << 0
+        c.RawTrigger(
+            conditions=cond.Exactly(0), actions=v.SetNumber(1),
+        )
+        return v
+
+    if isinstance(cond, bool):
+        if cond:
+            return False
+        return True
+    try:
+        return NegateCondition(cond)
+    except (AttributeError, EPError):
+        pass
     v = c.EUDLightBool()
     if cs.EUDIf()(cond):
         c.RawTrigger(actions=v.Clear())

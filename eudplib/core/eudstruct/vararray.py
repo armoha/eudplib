@@ -29,7 +29,7 @@ from ..allocator import Forward, ConstExpr, IsConstExpr
 from ...localize import _
 from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, ep_assert
 
-from ..variable import EUDVariable, SeqCompute, VProc
+from ..variable import EUDVariable, SeqCompute, VProc, IsEUDVariable
 from ..variable.vbuf import GetCurrentVariableBuffer
 
 
@@ -91,11 +91,11 @@ def EUDVArray(size, basetype=None):
             self._basetype = basetype
 
         def get(self, i):
-            if isUnproxyInstance(i, EUDVariable):
+            if IsEUDVariable(i):
                 r = self._eudget(i)
             else:
                 ep_assert(i < size, _("EUDVArray index out of bounds."))
-                if isUnproxyInstance(self, EUDVariable):
+                if IsEUDVariable(self):
                     r = self._get(i)
                 else:
                     r = self._constget(i)
@@ -201,7 +201,7 @@ def EUDVArray(size, basetype=None):
             if IsConstExpr(self) and IsConstExpr(i):
                 if isUnproxyInstance(i, int):
                     ep_assert(i < size, _("EUDVArray index out of bounds."))
-                if isUnproxyInstance(value, EUDVariable):
+                if IsEUDVariable(value):
                     self._consteudset(i, value)
                 else:
                     self._constset(i, value)

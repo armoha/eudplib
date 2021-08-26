@@ -50,7 +50,7 @@ def ApplyPatchTable(initepd, obj, patchTable):
                     5: _fillmsbyte,
                 }[fieldSize]
                 field = obj.fields[fieldName]
-                if ut.isUnproxyInstance(field, c.EUDVariable):
+                if c.IsEUDVariable(field):
                     memoryFiller(initepd + i, field)
                     obj.fields[fieldName] = 0
             fieldName += 1
@@ -62,7 +62,7 @@ actpt = [[-1], [-1], [-1], [-1], [-1], [-1], [0, 4, 5], [2, None, None, None]]
 
 
 def PatchCondition(cond):
-    if ut.isUnproxyInstance(cond, c.EUDVariable):
+    if c.IsEUDVariable(cond):
         return cond >= 1
     elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
         return cond >= 1
@@ -92,7 +92,7 @@ def PatchAction(act):
 
 
 def IsConditionConst(cond):
-    if ut.isUnproxyInstance(cond, c.EUDVariable):
+    if c.IsEUDVariable(cond):
         return True
     elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
         return True
@@ -107,7 +107,7 @@ def IsConditionConst(cond):
                 for fieldSize in condFields:
                     if type(fieldSize) is int:
                         field = cond.fields[fieldName]
-                        if ut.isUnproxyInstance(field, c.EUDVariable):
+                        if c.IsEUDVariable(field):
                             return False
                     fieldName += 1
             return True
@@ -118,7 +118,7 @@ def IsConditionConst(cond):
 
 
 def IsConditionNegatable(cond):
-    if ut.isUnproxyInstance(cond, c.EUDVariable):
+    if c.IsEUDVariable(cond):
         return True
     elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
         return True
@@ -171,7 +171,7 @@ def IsConditionNegatable(cond):
 
 
 def NegateCondition(cond):
-    if ut.isUnproxyInstance(cond, c.EUDVariable):
+    if c.IsEUDVariable(cond):
         return cond == 0
     elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
         return cond == 0
@@ -189,7 +189,7 @@ def NegateCondition(cond):
         try:
             cond.Negate()
             return cond
-        except AttributeError as e:
+        except (AttributeError, ut.EPError) as e:
             if c.IsConstExpr(cond):
                 return cond == 0
             raise

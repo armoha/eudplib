@@ -34,7 +34,7 @@ from ... import core as c, ctrlstru as cs, utils as ut
 
 
 def _ptr2epd(ptr):
-    if ut.isUnproxyInstance(ptr, c.EUDVariable):
+    if c.IsEUDVariable(ptr):
         epd, subp = c.f_div(ptr + (-0x58A364), 4)
     else:
         dst = ptr + (-0x58A364)
