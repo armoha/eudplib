@@ -80,7 +80,7 @@ def PatchCondition(cond):
         try:
             ApplyPatchTable(ut.EPD(cond), cond, condpt)
             return cond
-        except AttributeError as e:
+        except AttributeError:
             if c.IsConstExpr(cond):
                 return cond != 0
             raise
@@ -111,7 +111,7 @@ def IsConditionConst(cond):
                             return False
                     fieldName += 1
             return True
-        except AttributeError as e:
+        except AttributeError:
             if c.IsConstExpr(cond):
                 return True
             return False
@@ -164,7 +164,7 @@ def IsConditionNegatable(cond):
                 elif amount == 0xFFFFFFFF:
                     return True
             return False
-        except AttributeError as e:
+        except AttributeError:
             if c.IsConstExpr(cond):
                 return True
             return False
@@ -189,7 +189,7 @@ def NegateCondition(cond):
         try:
             cond.Negate()
             return cond
-        except (AttributeError, ut.EPError) as e:
+        except (AttributeError, ut.EPError):
             if c.IsConstExpr(cond):
                 return cond == 0
             raise

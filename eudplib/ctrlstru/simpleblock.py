@@ -123,13 +123,27 @@ def EUDEndIf():
 
 
 def EUDExecuteOnce():
-    def _footer():
-        global _once_templv, _once_pow
-        block = {"blockstart": c.Forward(), "blockend": c.Forward()}
+    def _header():
+        block = {"blockstart": c.Forward(), "blockend": c.Forward(), "blockmode": None}
         ut.EUDCreateBlock("executeonceblock", block)
-        block["blockstart"] << c.RawTrigger()
+        block["blockstart"] << c.NextTrigger()
+
+    def _footer(conditions=None, *, neg=False):
+        block = ut.EUDPeekBlock("executeonceblock")[1]
+        if conditions is not None:
+            if neg:
+                block["blockmode"] = False
+                EUDJumpIf(conditions, block["blockend"])
+            else:
+                block["blockmode"] = True
+                skip = [
+                    c.SetNextPtr(block["blockstart"], block["blockend"]),
+                    c.SetMemory(block["blockstart"] + 2376, c.SetTo, 8),
+                ]
+                EUDJumpIfNot(conditions, block["blockend"], _actions=skip)
         return True
 
+    _header()
     return CtrlStruOpener(_footer)
 
 
@@ -137,5 +151,11 @@ def EUDEndExecuteOnce():
     lb = ut.EUDPopBlock("executeonceblock")
     ut.ep_assert(lb[0] == "executeonceblock", _("Block start/end mismatch"))
     block = lb[1]
-    c.RawTrigger(actions=c.SetNextPtr(block["blockstart"], block["blockend"]))
+    if (block["blockmode"] is None) or (block["blockmode"] is False):
+        c.RawTrigger(
+            actions=[
+                c.SetNextPtr(block["blockstart"], block["blockend"]),
+                c.SetMemory(block["blockstart"] + 2376, c.SetTo, 8),
+            ]
+        )
     block["blockend"] << c.NextTrigger()

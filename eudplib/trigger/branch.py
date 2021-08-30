@@ -28,7 +28,7 @@ from eudplib import utils as ut
 from .tpatcher import PatchCondition
 
 
-def _EUDBranchSub(conditions, ontrue, onfalse):
+def _EUDBranchSub(conditions, ontrue, onfalse, *, _actions=None):
     """
     Reduced version of EUDBranch with following restructions.
     - All fields of conditions/actions should be constant.
@@ -40,13 +40,16 @@ def _EUDBranchSub(conditions, ontrue, onfalse):
     brtrg = c.Forward()
     tjtrg = c.Forward()
     brtrg << c.RawTrigger(
-        nextptr=onfalse, conditions=conditions, actions=[c.SetNextPtr(brtrg, tjtrg)]
+        nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg)
     )
+    if _actions is None:
+        tjtrg << c.RawTrigger(nextptr=ontrue, actions=c.SetNextPtr(brtrg, onfalse))
+    else:
+        _actions.append(c.SetNextPtr(brtrg, onfalse))
+        tjtrg << c.RawTrigger(nextptr=ontrue, actions=_actions)
 
-    tjtrg << c.RawTrigger(nextptr=ontrue, actions=[c.SetNextPtr(brtrg, onfalse)])
 
-
-def EUDBranch(conditions, ontrue, onfalse):
+def EUDBranch(conditions, ontrue, onfalse, *, _actions=None):
     """Branch by whether conditions is satisfied or not.
 
     :param conditions: Nested list of conditions.
@@ -64,9 +67,15 @@ def EUDBranch(conditions, ontrue, onfalse):
     for i in range(0, len(conditions), 16):
         subontrue = c.Forward()
         subonfalse = onfalse
-        _EUDBranchSub(conditions[i : i + 16], subontrue, subonfalse)
 
         if i + 16 < len(conditions):
+            _EUDBranchSub(conditions[i : i + 16], subontrue, subonfalse)
             subontrue << c.NextTrigger()
         else:
+            if _actions is None:
+                _EUDBranchSub(conditions[i : i + 16], subontrue, subonfalse)
+            else:
+                _EUDBranchSub(
+                    conditions[i : i + 16], subontrue, subonfalse, _actions=_actions
+                )
             subontrue << ontrue

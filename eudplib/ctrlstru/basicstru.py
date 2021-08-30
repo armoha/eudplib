@@ -41,15 +41,15 @@ def EUDJump(nextptr):
         c.RawTrigger(nextptr=nextptr)
 
 
-def EUDJumpIf(conditions, ontrue):
+def EUDJumpIf(conditions, ontrue, *, _actions=None):
     onfalse = c.Forward()
-    tg.EUDBranch(conditions, ontrue, onfalse)
+    tg.EUDBranch(conditions, ontrue, onfalse, _actions=_actions)
     onfalse << c.NextTrigger()
 
 
-def EUDJumpIfNot(conditions, onfalse):
+def EUDJumpIfNot(conditions, onfalse, *, _actions=None):
     ontrue = c.Forward()
-    tg.EUDBranch(conditions, ontrue, onfalse)
+    tg.EUDBranch(conditions, ontrue, onfalse, _actions=_actions)
     ontrue << c.NextTrigger()
 
 
