@@ -915,12 +915,29 @@ assign_stmt ::= lvalue(A) IBXR expr(B). [ASSIGN] { writeTraceInfo(ps->gen, A); p
 //
 
 // Once block. This block gets exceuted only once.
-once_start ::= ONCE. {
-    ps->gen << "if EUDExecuteOnce()():" << std::endl;
-    ps->gen.indent();
+once_start(A) ::= ONCE(B). {
+    A = genTemp(B);
+    ps->gen << A->data << " = EUDExecuteOnce()" << std::endl;
+    delete B;
 }
 
-once_stmt ::= once_start stmt. {
+once_header ::= once_start(A) LPAREN expr(B). {
+    writeCsOpener(*pGen, A, B);
+    ps->gen.indent();
+    delete A; delete B;
+}
+
+once_block ::= once_header RPAREN stmt.
+
+once_nocond ::= once_start(A). {
+    ps->gen << "if " << A->data << "():" << std::endl;
+    ps->gen.indent();
+    delete A;
+}
+
+once_block ::= once_nocond stmt.
+
+once_stmt ::= once_block. {
     ps->gen.unindent(false);
     ps->gen << "EUDEndExecuteOnce()" << std::endl;
 }
