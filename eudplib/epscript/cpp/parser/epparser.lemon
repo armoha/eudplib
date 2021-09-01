@@ -88,8 +88,20 @@ chunk ::= blockStmt. {
 }
 
 // Import_chunk
-
+precedingDots(A) ::= PERIOD. {
+    A = genEmpty();
+    A->data = ".";
+}
+precedingDots(A) ::= precedingDots(B) PERIOD. {
+    B->data = B->data + ".";
+    A = B;
+}
 dottedName(A) ::= NAME(B). { A = B; }
+dottedName(A) ::= precedingDots(B) NAME(C). {
+    C->data = B->data + C->data;
+    delete B;
+    A = C;
+}
 dottedName(A) ::= dottedName(B) PERIOD NAME(C). {
     C->data = B->data + "." + C->data;
     delete B;
