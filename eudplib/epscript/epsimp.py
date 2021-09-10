@@ -94,6 +94,14 @@ def modifyCodeLineno(codeobj, codeMap):
 
 
 class EPSLoader(SourceFileLoader):
+    def create_module(self, spec):
+        module_name = spec.name
+        module = types.ModuleType(module_name)
+        module.__name__ = module_name
+        module.__loader__ = self
+        sys.modules[module_name] = module
+        return module
+
     def get_data(self, path):
         """Return the data from path as raw bytes."""
         global is_scdb_map
