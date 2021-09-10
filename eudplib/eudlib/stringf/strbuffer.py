@@ -219,6 +219,67 @@ class StringBuffer:
         fmtargs = _format_args(format_string, *args)
         self.printAt(line, *fmtargs)
 
+    def _display_at(self, prevpos, line):
+        f_setcurpl(f_getuserplayerid())
+        if isinstance(line, int):
+            if line == 10:
+                prevptr = f_gettextptr()
+                prevptr -= 1
+                if cs.EUDIf()(prevpos == prevptr):
+                    self.DisplayAt(10)
+                if cs.EUDElse()():
+                    self.Display()
+                cs.EUDEndIf()
+            elif 0 <= line < 10:
+                self.DisplayAt(line)
+            elif line >= -11:
+                if cs.EUDIf()(prevpos == -1):
+                    if line == -1:
+                        self.Display()
+                    else:
+                        self.DisplayAt(11 + line)
+                if cs.EUDElse()():
+                    prevptr = f_gettextptr()
+                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
+                    c.VProc(
+                        prevptr,
+                        [
+                            c.DisplayText(self.StringIndex),
+                            prevptr.SetDest(ut.EPD(0x640B58)),
+                        ],
+                    )
+                cs.EUDEndIf()
+        else:
+            if cs.EUDIf()(line == 10):
+                prevptr = f_gettextptr()
+                prevptr -= 1
+                if cs.EUDIf()(prevpos == prevptr):
+                    self.DisplayAt(10)
+                if cs.EUDElse()():
+                    self.Display()
+                cs.EUDEndIf()
+            if cs.EUDElseIf()(line < 10):
+                self.DisplayAt(line)
+            if cs.EUDElseIf()(line >= 0xFFFFFFF5):
+                if cs.EUDIf()(prevpos == -1):
+                    if cs.EUDIf()(line == -1):
+                        self.Display()
+                    if cs.EUDElse()():
+                        self.DisplayAt(11 + line)
+                    cs.EUDEndIf()
+                if cs.EUDElse()():
+                    prevptr = f_gettextptr()
+                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
+                    c.VProc(
+                        prevptr,
+                        [
+                            c.DisplayText(self.StringIndex),
+                            prevptr.SetDest(ut.EPD(0x640B58)),
+                        ],
+                    )
+                cs.EUDEndIf()
+            cs.EUDEndIf()
+
     def tagprint(self, format_string, *args, line=-1, tag=None):
         fmtargs = _format_args(format_string, *args)
         if tag is None:
@@ -243,42 +304,7 @@ class StringBuffer:
         f_setcurpl(self.epd)
         _, _, identifier = _get_TextFX_timer(tag)
         _TextFX_Print(*fmtargs, identifier=identifier)
-        f_setcurpl(f_getuserplayerid())
-        if isinstance(line, int):
-            if 0 <= line <= 10:
-                self.DisplayAt(line)
-            elif line >= -11:
-                if cs.EUDIf()(prevpos == -1):
-                    self.DisplayAt(11 + line)
-                if cs.EUDElse()():
-                    prevptr = f_gettextptr()
-                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
-                    c.VProc(
-                        prevptr,
-                        [
-                            c.DisplayText(self.StringIndex),
-                            prevptr.SetDest(ut.EPD(0x640B58)),
-                        ],
-                    )
-                cs.EUDEndIf()
-        else:
-            if cs.EUDIf()(line <= 10):
-                self.DisplayAt(line)
-            if cs.EUDElseIf()(line >= 0xFFFFFFF5):
-                if cs.EUDIf()(prevpos == -1):
-                    self.DisplayAt(11 + line)
-                if cs.EUDElse()():
-                    prevptr = f_gettextptr()
-                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
-                    c.VProc(
-                        prevptr,
-                        [
-                            c.DisplayText(self.StringIndex),
-                            prevptr.SetDest(ut.EPD(0x640B58)),
-                        ],
-                    )
-                cs.EUDEndIf()
-            cs.EUDEndIf()
+        self._display_at(prevpos, line)
         end << c.NextTrigger()
 
     def Play(self):
@@ -306,42 +332,7 @@ class StringBuffer:
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
         ret << TextFX_FadeIn(*args, color=color, wait=wait, reset=reset, tag=tag)
-        f_setcurpl(f_getuserplayerid())
-        if isinstance(line, int):
-            if 0 <= line <= 10:
-                self.DisplayAt(line)
-            elif line >= -11:
-                if cs.EUDIf()(prevpos == -1):
-                    self.DisplayAt(11 + line)
-                if cs.EUDElse()():
-                    prevptr = f_gettextptr()
-                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
-                    c.VProc(
-                        prevptr,
-                        [
-                            c.DisplayText(self.StringIndex),
-                            prevptr.SetDest(ut.EPD(0x640B58)),
-                        ],
-                    )
-                cs.EUDEndIf()
-        else:
-            if cs.EUDIf()(line <= 10):
-                self.DisplayAt(line)
-            if cs.EUDElseIf()(line >= 0xFFFFFFF5):
-                if cs.EUDIf()(prevpos == -1):
-                    self.DisplayAt(11 + line)
-                if cs.EUDElse()():
-                    prevptr = f_gettextptr()
-                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
-                    c.VProc(
-                        prevptr,
-                        [
-                            c.DisplayText(self.StringIndex),
-                            prevptr.SetDest(ut.EPD(0x640B58)),
-                        ],
-                    )
-                cs.EUDEndIf()
-            cs.EUDEndIf()
+        self._display_at(prevpos, line)
         end << c.NextTrigger()
         return ret
 
@@ -375,42 +366,7 @@ class StringBuffer:
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
         ret << TextFX_FadeOut(*args, color=color, wait=wait, reset=reset, tag=tag)
-        f_setcurpl(f_getuserplayerid())
-        if isinstance(line, int):
-            if 0 <= line <= 10:
-                self.DisplayAt(line)
-            elif line >= -11:
-                if cs.EUDIf()(prevpos == -1):
-                    self.DisplayAt(11 + line)
-                if cs.EUDElse()():
-                    prevptr = f_gettextptr()
-                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
-                    c.VProc(
-                        prevptr,
-                        [
-                            c.DisplayText(self.StringIndex),
-                            prevptr.SetDest(ut.EPD(0x640B58)),
-                        ],
-                    )
-                cs.EUDEndIf()
-        else:
-            if cs.EUDIf()(line <= 10):
-                self.DisplayAt(line)
-            if cs.EUDElseIf()(line >= 0xFFFFFFF5):
-                if cs.EUDIf()(prevpos == -1):
-                    self.DisplayAt(11 + line)
-                if cs.EUDElse()():
-                    prevptr = f_gettextptr()
-                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
-                    c.VProc(
-                        prevptr,
-                        [
-                            c.DisplayText(self.StringIndex),
-                            prevptr.SetDest(ut.EPD(0x640B58)),
-                        ],
-                    )
-                cs.EUDEndIf()
-            cs.EUDEndIf()
+        self._display_at(prevpos, line)
         end << c.NextTrigger()
         return ret
 

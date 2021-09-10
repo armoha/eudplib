@@ -109,4 +109,7 @@ def test_strbuffer():
     )
     test_equality("IsPName test4", ret, 0b1111)
 
+    s2.fadeIn("abc", line=10)
+    s2.fadeIn("abc", line=EUDVariable(-1))
+
     f_setcurpl(origcp)
