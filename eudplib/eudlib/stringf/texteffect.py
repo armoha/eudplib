@@ -149,9 +149,13 @@ def _add_TextFX_timer(tag):
         )
 
 
+def _get_TextFX_timer(tag):
+    return _TextFX_dict[tag]
+
+
 def TextFX_SetTimer(tag, modtype, value):
     _add_TextFX_timer(tag)
-    timer, _, _ = _TextFX_dict[tag]
+    timer, _, _ = _get_TextFX_timer(tag)
     cs.DoActions(c.SetMemory(timer.getValueAddr(), modtype, value))
 
 
@@ -224,8 +228,9 @@ def _remove_TextFX(o0, o1, e0, e1):
 
 
 def TextFX_Remove(tag):
+    ut.ep_assert(tag is not None, "tag should be not None")
     _add_TextFX_timer(tag)
-    _, _, identifier = _TextFX_dict[tag]
+    _, _, identifier = _get_TextFX_timer(tag)
     o0 = ut.b2i4(identifier[0:4])
     o1 = ut.b2i2(identifier[4:6])
     e0 = ut.b2i2(identifier[0:2]) * 0x10000
@@ -330,7 +335,7 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
             tag = args
 
     _add_TextFX_timer(tag)
-    timer, counter, identifier = _TextFX_dict[tag]
+    timer, counter, identifier = _get_TextFX_timer(tag)
 
     start = f_getcurpl()
     c.SeqCompute(
@@ -402,7 +407,7 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
             tag = args
 
     _add_TextFX_timer(tag)
-    timer, counter, identifier = _TextFX_dict[tag]
+    timer, counter, identifier = _get_TextFX_timer(tag)
 
     start = f_getcurpl()
     c.SeqCompute(

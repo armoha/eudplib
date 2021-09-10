@@ -22,6 +22,12 @@ def _ARR(items):
         k[i] = item
     return k
 
+def _VARR(items):
+    k = EUDVArray(len(items))()
+    for i, item in enumerate(items):
+        k[i] = item
+    return k
+
 def _SRET(v, klist):
     return List2Assignable([v[k] for k in klist])
 
@@ -48,9 +54,9 @@ class _ATTW:
         ov = getattr(self.obj, self.attrName)
         setattr(self.obj, self.attrName, ov * v)
 
-    def __idiv__(self, v):
+    def __ifloordiv__(self, v):
         ov = getattr(self.obj, self.attrName)
-        setattr(self.obj, self.attrName, ov / v)
+        setattr(self.obj, self.attrName, ov // v)
 
     def __iand__(self, v):
         ov = getattr(self.obj, self.attrName)
@@ -84,9 +90,9 @@ class _ARRW:
         ov = self.obj[self.index]
         self.obj[self.index] = ov * v
 
-    def __idiv__(self, v):
+    def __ifloordiv__(self, v):
         ov = self.obj[self.index]
-        self.obj[self.index] = ov / v
+        self.obj[self.index] = ov // v
 
     def __iand__(self, v):
         ov = self.obj[self.index]

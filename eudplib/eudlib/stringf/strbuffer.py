@@ -26,19 +26,20 @@ THE SOFTWARE.
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ...core.mapdata.stringmap import (
-    ForceAddString,
-    ApplyStringMap,
-    GetStringMap,
-)
-from ..eudarray import EUDArray
-from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl, f_wread_epd
+from ...core.mapdata.stringmap import ForceAddString
+from ..memiof import f_getcurpl, f_setcurpl
 from ..utilf import f_getuserplayerid, IsUserCP
 from .cpprint import f_cpstr_print, f_gettextptr
 from .cpstr import GetMapStringAddr
 from .fmtprint import _format_args
 from .strfunc import f_strlen_epd
-from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove
+from .texteffect import (
+    TextFX_FadeIn,
+    TextFX_FadeOut,
+    TextFX_Remove,
+    _get_TextFX_timer,
+    _TextFX_Print,
+)
 
 
 @c.EUDTypedFunc([None, c.TrgString])
@@ -72,7 +73,7 @@ class StringBuffer:
 
         :type content: str, bytes, int
         """
-        chkt = c.GetChkTokenized()
+        _chkt = c.GetChkTokenized()
         if content is None:
             content = "\r" * 218
         elif isinstance(content, int):
@@ -101,9 +102,11 @@ class StringBuffer:
     def _init_template(cls):
         c.PushTriggerScope()
         cls._method_template << c.NextTrigger()
-        localcp = f_getuserplayerid()
+        _localcp = f_getuserplayerid()
         cls._cpbranch << c.RawTrigger(
-            nextptr=0, conditions=IsUserCP(), actions=c.SetNextPtr(cls._cpbranch, 0),
+            nextptr=0,
+            conditions=IsUserCP(),
+            actions=c.SetNextPtr(cls._cpbranch, 0),
         )
         c.PopTriggerScope()
 
@@ -216,10 +219,77 @@ class StringBuffer:
         fmtargs = _format_args(format_string, *args)
         self.printAt(line, *fmtargs)
 
+    def tagprint(self, format_string, *args, line=-1, tag=None):
+        fmtargs = _format_args(format_string, *args)
+        if tag is None:
+            if len(fmtargs) == 1:
+                tag = fmtargs[0]
+            else:
+                tag = fmtargs
+        if not StringBuffer._method_template.IsSet():
+            StringBuffer._init_template()
+        end, ontrue = c.Forward(), c.Forward()
+        ret = c.EUDVariable()
+        c.RawTrigger(
+            nextptr=StringBuffer._method_template,
+            actions=[
+                c.SetNextPtr(StringBuffer._cpbranch, end),
+                c.SetMemory(StringBuffer._cpbranch + 348, c.SetTo, ontrue),
+                ret.SetNumber(-1),
+            ],
+        )
+        ontrue << c.NextTrigger()
+        prevpos = TextFX_Remove(tag)
+        f_setcurpl(self.epd)
+        _, _, identifier = _get_TextFX_timer(tag)
+        _TextFX_Print(*fmtargs, identifier=identifier)
+        f_setcurpl(f_getuserplayerid())
+        if isinstance(line, int):
+            if 0 <= line <= 10:
+                self.DisplayAt(line)
+            elif line >= -11:
+                if cs.EUDIf()(prevpos == -1):
+                    self.DisplayAt(11 + line)
+                if cs.EUDElse()():
+                    prevptr = f_gettextptr()
+                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
+                    c.VProc(
+                        prevptr,
+                        [
+                            c.DisplayText(self.StringIndex),
+                            prevptr.SetDest(ut.EPD(0x640B58)),
+                        ],
+                    )
+                cs.EUDEndIf()
+        else:
+            if cs.EUDIf()(line <= 10):
+                self.DisplayAt(line)
+            if cs.EUDElseIf()(line >= 0xFFFFFFF5):
+                if cs.EUDIf()(prevpos == -1):
+                    self.DisplayAt(11 + line)
+                if cs.EUDElse()():
+                    prevptr = f_gettextptr()
+                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
+                    c.VProc(
+                        prevptr,
+                        [
+                            c.DisplayText(self.StringIndex),
+                            prevptr.SetDest(ut.EPD(0x640B58)),
+                        ],
+                    )
+                cs.EUDEndIf()
+            cs.EUDEndIf()
+        end << c.NextTrigger()
+
     def Play(self):
         cs.DoActions(c.PlayWAV(self.StringIndex))
 
     def fadeIn(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
+        if tag is None:
+            if len(args) == 1:
+                tag = args[0]
+            else:
+                tag = args
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -237,7 +307,7 @@ class StringBuffer:
         f_setcurpl(self.epd)
         ret << TextFX_FadeIn(*args, color=color, wait=wait, reset=reset, tag=tag)
         f_setcurpl(f_getuserplayerid())
-        if type(line) == int:
+        if isinstance(line, int):
             if 0 <= line <= 10:
                 self.DisplayAt(line)
             elif line >= -11:
@@ -284,6 +354,11 @@ class StringBuffer:
         )
 
     def fadeOut(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
+        if tag is None:
+            if len(args) == 1:
+                tag = args[0]
+            else:
+                tag = args
         if not StringBuffer._method_template.IsSet():
             StringBuffer._init_template()
         end, ontrue = c.Forward(), c.Forward()
@@ -301,7 +376,7 @@ class StringBuffer:
         f_setcurpl(self.epd)
         ret << TextFX_FadeOut(*args, color=color, wait=wait, reset=reset, tag=tag)
         f_setcurpl(f_getuserplayerid())
-        if type(line) == int:
+        if isinstance(line, int):
             if 0 <= line <= 10:
                 self.DisplayAt(line)
             elif line >= -11:
