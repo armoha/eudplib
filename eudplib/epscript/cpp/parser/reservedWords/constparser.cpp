@@ -103,8 +103,8 @@ int parseConstantName(const std::string& name) {
         initConstmap();
     }
 
-    if(name.size() == 0 || name[0] != '$') return -1;
-    auto it = constMap.find(name.substr(1));
+    if(name.size() == 0) return -1;
+    auto it = constMap.find(name);
     if (it == constMap.end()) return -1;
     else return it->second;
 }

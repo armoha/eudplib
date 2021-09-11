@@ -35,6 +35,7 @@ int getConvertedType(int type) {
         case TOKEN_CONDITION: return CONDITIONNAME;
         case TOKEN_ACTION: return ACTIONNAME;
         case TOKEN_KILLS: return KILLS;
+        case TOKEN_TRGCONST: return TRGCONST;
 
         case TOKEN_UNITNAME: return UNIT;
         case TOKEN_LOCNAME: return LOCATION;
