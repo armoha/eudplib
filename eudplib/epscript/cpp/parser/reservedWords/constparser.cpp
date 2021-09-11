@@ -65,6 +65,8 @@ void initConstmap() {
     constMap.insert(std::make_pair("Force4", 21));
     constMap.insert(std::make_pair("NonAlliedVictoryPlayers", 26));
 
+    constMap.insert(std::make_pair("All", 0));
+
     //  PropStateDict
     constMap.insert(std::make_pair("Enable", 4));
     constMap.insert(std::make_pair("Disable", 5));
