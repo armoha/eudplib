@@ -76,8 +76,7 @@ chunks ::= chunks error. {
     throw_error(13494, "Chunk-level error");
 }
 
-chunk ::= relimp_chunk.
-chunk ::= import_chunk SEMICOLON.
+chunk ::= import_chunk.
 chunk ::= fdef_chunk.
 chunk ::= fdecl_chunk.
 chunk ::= object_chunk.
@@ -107,7 +106,7 @@ relimp_path(A) ::= relimp_path(B) PERIOD NAME(C). {
     delete B;
     A = C;
 }
-relimp_chunk ::= relimp_path(A) SEMICOLON. {
+import_chunk ::= relimp_path(A) SEMICOLON. {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
@@ -118,7 +117,7 @@ relimp_chunk ::= relimp_path(A) SEMICOLON. {
     ps->gen << impModname << " = _RELIMP(\"" << impPath << "\", \"" << impModname << "\")" << std::endl;
     delete A;
 }
-relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
+import_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
@@ -130,14 +129,14 @@ relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
     delete A; delete B;
 }
 
-dottedName(A) ::= NAME(B). { A = B; }
-dottedName(A) ::= dottedName(B) PERIOD NAME(C). {
+absimp_start(A) ::= IMPORT NAME(B). { A = B; }
+absimp_start(A) ::= absimp_start(B) PERIOD NAME(C). {
     C->data = B->data + "." + C->data;
     delete B;
     A = C;
 }
 
-import_chunk ::= IMPORT dottedName(A) AS NAME(B). {
+import_chunk ::= absimp_start(A) AS NAME(B) SEMICOLON. {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
@@ -150,7 +149,7 @@ import_chunk ::= IMPORT dottedName(A) AS NAME(B). {
     delete A; delete B;
 }
 
-import_chunk ::= IMPORT dottedName(A). {
+import_chunk ::= absimp_start(A) SEMICOLON. {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
