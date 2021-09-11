@@ -466,7 +466,7 @@ exprList_nonEmpty(A) ::= funcexpr(B) LSQBRACKET LSQBRACKET numList_nonEmpty(C) R
 }
 
 
-expr(A) ::= funcexpr(B) LSQBRACKET LSQBRACKET NUMBER(C) RSQBRACKET RSQBRACKET. [SUBSCRIPT] {
+nonConstExpr(A) ::= funcexpr(B) LSQBRACKET LSQBRACKET NUMBER(C) RSQBRACKET RSQBRACKET. [SUBSCRIPT] {
     C->data = B->data + "[" + C->data + "]";
     delete B;
     A = mkTokenTemp(C);
@@ -480,24 +480,24 @@ exprList(A) ::= . { A = genEmpty(); }
 exprList(A) ::= exprList_nonEmpty(B). { A = B; }
 
 // Related to expressions
-expr(A) ::= NUMBER(B). { A = B; }
-expr(A) ::= KILLS(B). {
+constExpr(A) ::= NUMBER(B). { A = B; }
+constExpr(A) ::= KILLS(B). {
     B->data = "4";
     A = B;
 }
 
-expr(A) ::= NAME(B). {
+nonConstExpr(A) ::= NAME(B). {
     checkIsRValue(B->data, B->line);
     A = B;
 }
 
-expr(A)::= expr(B) PERIOD NAME(C). [MEMBER] {
+nonConstExpr(A)::= nonConstExpr(B) PERIOD NAME(C). [MEMBER] {
     B->data = B->data + "." + C->data;
     delete C;
     A = mkTokenTemp(B);
 }
 
-expr(A)::= expr(B) LSQBRACKET expr(C) RSQBRACKET. [SUBSCRIPT] {
+nonConstExpr(A)::= nonConstExpr(B) LSQBRACKET expr(C) RSQBRACKET. [SUBSCRIPT] {
     B->data = B->data + "[" + C->data + "]";
     delete C;
     A = mkTokenTemp(B);
@@ -563,37 +563,57 @@ lambdaExprStart(A) ::= FUNCTION LPAREN typedNameList(args) RPAREN fdef_rettypes(
     A->data = funcname;
 }
 
-expr(A) ::= lambdaExprStart(B) stmt. {
+constExpr(A) ::= lambdaExprStart(B) stmt. {
     ps->gen.unindent(true);
     ps->closure.popScope();
     A = mkTokenTemp(B);
 }
+expr(A) ::= constExpr(B). { A = B; }
+expr(A) ::= nonConstExpr(B). { A = B; }
 
 
 // Function calls
-fArg(A) ::= expr(B). { A = B; }
-fArg(A) ::= STRING(B). { A = B; }
-fArg(A) ::= NAME(B) ASSIGN expr(C). {  // Keyword argument
+fNonConstArg(A) ::= nonConstExpr(B). { A = B; }
+fConstArg(A) ::= constExpr(B). { A = B; }
+fConstArg(A) ::= STRING(B). { A = B; }
+fConstArg(A) ::= NAME(B) ASSIGN expr(C). {  // Keyword argument
     C->data = B->data + "=" + C->data;
     C->type = TOKEN_TEMP;
     A = C;
     delete B;
 }
-fArg(A) ::= NAME(B) ASSIGN STRING(C). {  // Keyword argument
+fConstArg(A) ::= NAME(B) ASSIGN STRING(C). {  // Keyword argument
     C->data = B->data + "=" + C->data;
     C->type = TOKEN_TEMP;
     A = C;
     delete B;
 }
+fArg(A) ::= fConstArg(B). { A = B; }
+fArg(A) ::= fNonConstArg(B). { A = B; }
 
-fArgs_nonEmpty(A) ::= fArg(B). { A = B; }
-fArgs_nonEmpty(A) ::= fArgs_nonEmpty(B) COMMA fArg(C). {
+fConstArgs_nonEmpty(A) ::= fConstArg(B). { A = B; }
+fConstArgs_nonEmpty(A) ::= fConstArgs_nonEmpty(B) COMMA fConstArg(C). {
+    B->data = B->data + ", " + C->data;
+    B->type = TOKEN_TEMP;
+    A = B;
+    delete C;
+}
+fNonConstArgs_nonEmpty(A) ::= fNonConstArg(B). { A = B; }
+fNonConstArgs_nonEmpty(A) ::= fConstArgs_nonEmpty(B) COMMA fNonConstArg(C). {
+    B->data = B->data + ", " + C->data;
+    B->type = TOKEN_TEMP;
+    A = B;
+    delete C;
+}
+fNonConstArgs_nonEmpty(A) ::= fNonConstArgs_nonEmpty(B) COMMA fArg(C). {
     B->data = B->data + ", " + C->data;
     B->type = TOKEN_TEMP;
     A = B;
     delete C;
 }
 
+fArgs_nonEmpty(A) ::= fConstArgs_nonEmpty(B). { A = B; }
+fArgs_nonEmpty(A) ::= fNonConstArgs_nonEmpty(B). { A = B; }
 fArgs(A) ::= . { A = genEmpty(); }
 fArgs(A) ::= fArgs_nonEmpty(B). { A = B; }
 
@@ -611,7 +631,7 @@ funcexpr(out) ::= NAME(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
     delete exprs;
 }
 
-funcexpr(out) ::= expr(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
+funcexpr(out) ::= nonConstExpr(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
     // If calling function imported from another module, add f_ prefix to function name.
     static std::regex prefixedFuncNameRegex("^[a-z][_a-zA-Z0-9]*");
     std::string& nameStr = name->data;
@@ -636,9 +656,15 @@ funcexpr(out) ::= expr(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
 
 
 // Expressions
-expr(A) ::= funcexpr(B).  { A = B; }
+nonConstExpr(A) ::= funcexpr(B).  { A = B; }
 
-expr(A) ::= LPAREN expr(B) RPAREN. {
+constExpr(A) ::= LPAREN constExpr(B) RPAREN. {
+    A = genEmpty();
+    A->data = "(" + B->data + ")";
+    A->type = TOKEN_EXPR;
+    A->subToken[0] = B;
+}
+nonConstExpr(A) ::= LPAREN nonConstExpr(B) RPAREN. {
     A = genEmpty();
     A->data = "(" + B->data + ")";
     A->type = TOKEN_EXPR;
@@ -648,53 +674,53 @@ expr(A) ::= LPAREN expr(B) RPAREN. {
 commaSkippable ::= COMMA.
 commaSkippable ::= .
 
-expr(A) ::= LSQBRACKET exprList_nonEmpty(B) commaSkippable RSQBRACKET. {
+constExpr(A) ::= LSQBRACKET exprList_nonEmpty(B) commaSkippable RSQBRACKET. {
     B->data = "_ARR(FlattenList([" + B->data + "]))";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= L2V LPAREN expr(B) RPAREN. {
+nonConstExpr(A) ::= L2V LPAREN expr(B) RPAREN. {
     B->data = "_L2V(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= MAPSTRING LPAREN STRING(B) RPAREN. {
+constExpr(A) ::= MAPSTRING LPAREN STRING(B) RPAREN. {
     B->data = "GetStringIndex(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= UNIT LPAREN STRING(B) RPAREN. {
+constExpr(A) ::= UNIT LPAREN STRING(B) RPAREN. {
     B->data = "EncodeUnit(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= SWITCH LPAREN STRING(B) RPAREN. {
+constExpr(A) ::= SWITCH LPAREN STRING(B) RPAREN. {
     B->data = "EncodeSwitch(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= LOCATION LPAREN STRING(B) RPAREN. {
+constExpr(A) ::= LOCATION LPAREN STRING(B) RPAREN. {
     B->data = "GetLocationIndex(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= STATTXTTBL LPAREN STRING(B) RPAREN. {
+constExpr(A) ::= STATTXTTBL LPAREN STRING(B) RPAREN. {
     B->data = "EncodeTBL(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= VARRAY LPAREN exprList_nonEmpty(B) commaSkippable RPAREN. {
+constExpr(A) ::= VARRAY LPAREN exprList_nonEmpty(B) commaSkippable RPAREN. {
     B->data = "_VARR(FlattenList([" + B->data + "]))";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= LIST LPAREN exprList_nonEmpty(B) commaSkippable RPAREN. {
+constExpr(A) ::= LIST LPAREN exprList_nonEmpty(B) commaSkippable RPAREN. {
     B->data = "FlattenList([" + B->data + "])";
     A = mkTokenTemp(B);
 }
 
 // Ternary operators
-expr(A) ::= expr(L) QMARK expr(B) COLON expr(C). [QMARK] {
+nonConstExpr(A) ::= nonConstExpr(L) QMARK expr(B) COLON expr(C). [QMARK] {
     std::stringstream ss;
     ss << "EUDTernary";
     applyNegativeOptimization(ss, L);
@@ -706,38 +732,90 @@ expr(A) ::= expr(L) QMARK expr(B) COLON expr(C). [QMARK] {
 }
 
 // Binary operators
-expr(A) ::= expr(B) PLUS        expr(C). { A = binopConcat(B, "+",  C); }
-expr(A) ::= expr(B) MINUS       expr(C). { A = binopConcat(B, "-",  C); }
-expr(A) ::= expr(B) MULTIPLY    expr(C). { A = binopConcat(B, "*",  C); }
-expr(A) ::= expr(B) DIVIDE      expr(C). { A = binopConcat(B, "//", C); }
-expr(A) ::= expr(B) MOD         expr(C). { A = binopConcat(B, "%",  C); }
-expr(A) ::= expr(B) LSHIFT      expr(C). {
+constExpr(A)    ::= constExpr(B)    PLUS     constExpr(C).    { A = binopConcat(B, "+",  C); }
+nonConstExpr(A) ::= constExpr(B)    PLUS     nonConstExpr(C). { A = binopConcat(B, "+",  C); }
+nonConstExpr(A) ::= nonConstExpr(B) PLUS     expr(C).         { A = binopConcat(B, "+",  C); }
+constExpr(A)    ::= constExpr(B)    MINUS    constExpr(C).    { A = binopConcat(B, "-",  C); }
+nonConstExpr(A) ::= constExpr(B)    MINUS    nonConstExpr(C). { A = binopConcat(B, "-",  C); }
+nonConstExpr(A) ::= nonConstExpr(B) MINUS    expr(C).         { A = binopConcat(B, "-",  C); }
+constExpr(A)    ::= constExpr(B)    MULTIPLY constExpr(C).    { A = binopConcat(B, "*",  C); }
+nonConstExpr(A) ::= constExpr(B)    MULTIPLY nonConstExpr(C). { A = binopConcat(B, "*",  C); }
+nonConstExpr(A) ::= nonConstExpr(B) MULTIPLY expr(C).         { A = binopConcat(B, "*",  C); }
+constExpr(A)    ::= constExpr(B)    DIVIDE   constExpr(C).    { A = binopConcat(B, "//", C); }
+nonConstExpr(A) ::= constExpr(B)    DIVIDE   nonConstExpr(C). { A = binopConcat(B, "//", C); }
+nonConstExpr(A) ::= nonConstExpr(B) DIVIDE   expr(C).         { A = binopConcat(B, "//", C); }
+constExpr(A)    ::= constExpr(B)    MOD      constExpr(C).    { A = binopConcat(B, "%",  C); }
+nonConstExpr(A) ::= constExpr(B)    MOD      nonConstExpr(C). { A = binopConcat(B, "%",  C); }
+nonConstExpr(A) ::= nonConstExpr(B) MOD      expr(C).         { A = binopConcat(B, "%",  C); }
+constExpr(A)    ::= constExpr(B)    LSHIFT   constExpr(C).    {
     C->data = "_LSH(" + B->data + "," + C->data + ")";
     delete B;
     A = mkTokenTemp(C);
 }
-expr(A) ::= expr(B) RSHIFT      expr(C). { A = binopConcat(B, ">>", C); }
-expr(A) ::= expr(B) BITAND      expr(C). { A = binopConcat(B, "&",  C); }
-expr(A) ::= expr(B) BITOR       expr(C). { A = binopConcat(B, "|",  C); }
-expr(A) ::= expr(B) BITXOR      expr(C). { A = binopConcat(B, "^",  C); }
+nonConstExpr(A) ::= constExpr(B)    LSHIFT   nonConstExpr(C). {
+    C->data = "_LSH(" + B->data + "," + C->data + ")";
+    delete B;
+    A = mkTokenTemp(C);
+}
+nonConstExpr(A) ::= nonConstExpr(B) LSHIFT   expr(C).         {
+    C->data = "_LSH(" + B->data + "," + C->data + ")";
+    delete B;
+    A = mkTokenTemp(C);
+}
+constExpr(A)    ::= constExpr(B)    RSHIFT   constExpr(C).    { A = binopConcat(B, ">>", C); }
+nonConstExpr(A) ::= constExpr(B)    RSHIFT   nonConstExpr(C). { A = binopConcat(B, ">>", C); }
+nonConstExpr(A) ::= nonConstExpr(B) RSHIFT   expr(C).         { A = binopConcat(B, ">>", C); }
+constExpr(A)    ::= constExpr(B)    BITAND   constExpr(C).    { A = binopConcat(B, "&",  C); }
+nonConstExpr(A) ::= constExpr(B)    BITAND   nonConstExpr(C). { A = binopConcat(B, "&",  C); }
+nonConstExpr(A) ::= nonConstExpr(B) BITAND   expr(C).         { A = binopConcat(B, "&",  C); }
+constExpr(A)    ::= constExpr(B)    BITOR    constExpr(C).    { A = binopConcat(B, "|",  C); }
+nonConstExpr(A) ::= constExpr(B)    BITOR    nonConstExpr(C). { A = binopConcat(B, "|",  C); }
+nonConstExpr(A) ::= nonConstExpr(B) BITOR    expr(C).         { A = binopConcat(B, "|",  C); }
+constExpr(A)    ::= constExpr(B)    BITXOR   constExpr(C).    { A = binopConcat(B, "^",  C); }
+nonConstExpr(A) ::= constExpr(B)    BITXOR   nonConstExpr(C). { A = binopConcat(B, "^",  C); }
+nonConstExpr(A) ::= nonConstExpr(B) BITXOR   expr(C).         { A = binopConcat(B, "^",  C); }
 
 // Unary operators
-expr(A) ::= PLUS    expr(B). [UNARY] { B->data = "+" + B->data; A = mkTokenTemp(B); }
-expr(A) ::= MINUS   expr(B). [UNARY] { B->data = "-" + B->data; A = mkTokenTemp(B); }
-expr(A) ::= BITNOT  expr(B). [UNARY] { B->data = "~" + B->data; A = mkTokenTemp(B); }
+constExpr(A)    ::= PLUS   constExpr(B).    [UNARY] { B->data = "+" + B->data; A = mkTokenTemp(B); }
+nonConstExpr(A) ::= PLUS   nonConstExpr(B). [UNARY] { B->data = "+" + B->data; A = mkTokenTemp(B); }
+constExpr(A)    ::= MINUS  constExpr(B).    [UNARY] { B->data = "-" + B->data; A = mkTokenTemp(B); }
+nonConstExpr(A) ::= MINUS  nonConstExpr(B). [UNARY] { B->data = "-" + B->data; A = mkTokenTemp(B); }
+constExpr(A)    ::= BITNOT constExpr(B).    [UNARY] { B->data = "~" + B->data; A = mkTokenTemp(B); }
+nonConstExpr(A) ::= BITNOT nonConstExpr(B). [UNARY] { B->data = "~" + B->data; A = mkTokenTemp(B); }
 
 
 
-expr(A) ::= expr(B) EQ expr(C).   { A = binopConcat(B, "==", C); }
-expr(A) ::= expr(B) NE expr(C).   { A = negate(binopConcat(B, "==", C)); }
+nonConstExpr(A) ::= constExpr(B)    EQ expr(C).   { A = binopConcat(B, "==", C); }
+nonConstExpr(A) ::= nonConstExpr(B) EQ expr(C).   { A = binopConcat(B, "==", C); }
+nonConstExpr(A) ::= constExpr(B)    NE expr(C).   { A = negate(binopConcat(B, "==", C)); }
+nonConstExpr(A) ::= nonConstExpr(B) NE expr(C).   { A = negate(binopConcat(B, "==", C)); }
 
-expr(A) ::= expr(B) LE expr(C).   { A = binopConcat(B, "<=", C); }
-expr(A) ::= expr(B) GE expr(C).   { A = binopConcat(B, ">=", C); }
+nonConstExpr(A) ::= constExpr(B)    LE expr(C).   { A = binopConcat(B, "<=", C); }
+nonConstExpr(A) ::= nonConstExpr(B) LE expr(C).   { A = binopConcat(B, "<=", C); }
+nonConstExpr(A) ::= constExpr(B)    GE expr(C).   { A = binopConcat(B, ">=", C); }
+nonConstExpr(A) ::= nonConstExpr(B) GE expr(C).   { A = binopConcat(B, ">=", C); }
 
-expr(A) ::= expr(B) LT expr(C).   { A = negate(binopConcat(B, ">=", C)); }
-expr(A) ::= expr(B) GT expr(C).   { A = negate(binopConcat(B, "<=", C)); }
+nonConstExpr(A) ::= constExpr(B)    LT expr(C).   { A = negate(binopConcat(B, ">=", C)); }
+nonConstExpr(A) ::= nonConstExpr(B) LT expr(C).   { A = negate(binopConcat(B, ">=", C)); }
+nonConstExpr(A) ::= constExpr(B)    GT expr(C).   { A = negate(binopConcat(B, "<=", C)); }
+nonConstExpr(A) ::= nonConstExpr(B) GT expr(C).   { A = negate(binopConcat(B, "<=", C)); }
 
-expr(A) ::= expr(B) LAND expr(C).  {
+nonConstExpr(A) ::= constExpr(B) LAND expr(C).  {
+    A = genEmpty();
+    A->line = C->line;
+
+    // Generate data!
+    A->type = TOKEN_LAND;
+    A->subToken[0] = B;
+    A->subToken[1] = C;
+
+    std::stringstream ss;
+    ss << "EUDSCAnd()";
+    shortCircuitCondListGetter(ss, A, TOKEN_LAND);
+    ss << "()";
+    A->data = ss.str();
+}
+nonConstExpr(A) ::= nonConstExpr(B) LAND expr(C).  {
     A = genEmpty();
     A->line = C->line;
 
@@ -754,7 +832,22 @@ expr(A) ::= expr(B) LAND expr(C).  {
 }
 
 // OR operation is very costly, so we make some deliberate choice!
-expr(A) ::= expr(B) LOR expr(C).  {
+nonConstExpr(A) ::= constExpr(B) LOR expr(C).  {
+    A = genEmpty();
+    A->line = C->line;
+
+    // Generate data!
+    A->type = TOKEN_LOR;
+    A->subToken[0] = B;
+    A->subToken[1] = C;
+
+    std::stringstream ss;
+    ss << "EUDSCOr()";
+    shortCircuitCondListGetter(ss, A, TOKEN_LOR);
+    ss << "()";
+    A->data = ss.str();
+}
+nonConstExpr(A) ::= nonConstExpr(B) LOR expr(C).  {
     A = genEmpty();
     A->line = C->line;
 
@@ -770,7 +863,8 @@ expr(A) ::= expr(B) LOR expr(C).  {
     A->data = ss.str();
 }
 
-expr(A) ::= LNOT expr(B).  { A = negate(B); }
+constExpr(A)    ::= LNOT constExpr(B).    [UNARY] { A = negate(B); }
+nonConstExpr(A) ::= LNOT nonConstExpr(B). [UNARY] { A = negate(B); }
 
 
 // Statements
@@ -1225,25 +1319,50 @@ return_stmt ::= RETURN(X) exprList(exprs). {
 
 // Trigger statements
 
-expr(A) ::= CONDITIONNAME(B) LPAREN fArgs(C) RPAREN. {
+constExpr(A) ::= CONDITIONNAME(B) LPAREN fArgs(C) RPAREN. {
     B->data = B->data + "(" + C->data + ")";
     delete C;
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= KILLS(B) LPAREN fArgs(C) RPAREN. {
+constExpr(A) ::= KILLS(B) LPAREN fArgs(C) RPAREN. {
     B->data = B->data + "(" + C->data + ")";
     delete C;
     A = mkTokenTemp(B);
 }
 
-actionStmt ::= ACTIONNAME(A) LPAREN fArgs(B) RPAREN SEMICOLON. {
+actionStmt ::= ACTIONNAME(A) LPAREN fNonConstArgs_nonEmpty(B) RPAREN SEMICOLON. {
     writeTraceInfo(ps->gen, A);
     ps->gen << "DoActions(" << A->data << "(" << B->data << "))" << std::endl;
     delete A; delete B;
 }
 
-expr(A) ::= ACTIONNAME(B) LPAREN fArgs(C) RPAREN. {
+constAction(A) ::= ACTIONNAME(B) LPAREN fConstArgs_nonEmpty(C) RPAREN SEMICOLON. {
+    B->data = B->data + "(" + C->data + "),\n";
+    delete C;
+    A = mkTokenTemp(B);
+}
+constAction(A) ::= ACTIONNAME(B) LPAREN RPAREN SEMICOLON. {
+    B->data = B->data + "(),\n";
+    A = mkTokenTemp(B);
+}
+constActionList(A) ::= constAction(B). { A = B; }
+constActionList(A) ::= constActionList(B) constAction(C). {
+    B->data = B->data + C->data;
+    A = B;
+    delete C;
+}
+actionStmt ::= constActionList(A). {
+    writeTraceInfo(ps->gen, A);
+    ps->gen << "DoActions(" << std::endl;
+    ps->gen.indent();
+    ps->gen << A->data;
+    ps->gen.unindent(false);
+    ps->gen << ")" << std::endl;
+    delete A;
+}
+
+constExpr(A) ::= ACTIONNAME(B) LPAREN fArgs(C) RPAREN. {
     B->data = B->data + "(" + C->data + ")";
     delete C;
     A = mkTokenTemp(B);
