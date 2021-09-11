@@ -579,6 +579,12 @@ fArg(A) ::= NAME(B) ASSIGN expr(C). {  // Keyword argument
     A = C;
     delete B;
 }
+fArg(A) ::= NAME(B) ASSIGN STRING(C). {  // Keyword argument
+    C->data = B->data + "=" + C->data;
+    C->type = TOKEN_TEMP;
+    A = C;
+    delete B;
+}
 
 fArgs_nonEmpty(A) ::= fArg(B). { A = B; }
 fArgs_nonEmpty(A) ::= fArgs_nonEmpty(B) COMMA fArg(C). {
