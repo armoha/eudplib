@@ -38,7 +38,6 @@ from .texteffect import (
     TextFX_FadeOut,
     TextFX_Remove,
     _get_TextFX_timer,
-    _TextFX_Print,
 )
 
 
@@ -51,6 +50,35 @@ def DisplayTextAt(line, text):
         actions=c.SetMemory(0x640B58, c.Subtract, 11),
     )
     cs.DoActions(c.DisplayText(text), c.SetMemory(0x640B58, c.SetTo, tp))
+
+
+def _tag_print(identifier, *args, encoding="UTF-8"):
+    args = ut.FlattenList(args)
+    ut.ep_assert(len(args) > 0, "No text provided for tagprint")
+
+    try:
+        args[0] = identifier + args[0]
+    except TypeError:
+        try:
+            args[0] = identifier.decode("ascii") + args[0]
+        except TypeError:
+            args.insert(0, identifier)
+
+    for arg in args:
+        if isinstance(arg, bytes):
+            arg = arg.decode(encoding)
+        if isinstance(arg, str) and "\n" in arg:
+            new_arg = arg.split("\n")[0]
+            for line in arg.split("\n")[1:]:
+                if line == "":
+                    new_arg += "\n"
+                else:
+                    new_arg += "\n" + identifier.decode("ascii") + line
+            f_cpstr_print(new_arg, EOS=False, encoding=encoding)
+        else:
+            f_cpstr_print(arg, EOS=False, encoding=encoding)
+
+    cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
 
 
 class StringBuffer:
@@ -86,15 +114,13 @@ class StringBuffer:
 
         try:
             cs.EUDExecuteOnce()()
-            cs.DoActions(self.epd.SetNumber(ut.EPD(GetMapStringAddr(self.StringIndex))))
+            self.epd << ut.EPD(GetMapStringAddr(self.StringIndex))
             cs.EUDEndExecuteOnce()
         except IndexError:
             from ...maprw.injector.mainloop import EUDOnStart
 
             def _f():
-                cs.DoActions(
-                    self.epd.SetNumber(ut.EPD(GetMapStringAddr(self.StringIndex)))
-                )
+                self.epd << ut.EPD(GetMapStringAddr(self.StringIndex))
 
             EUDOnStart(_f)
 
@@ -104,9 +130,7 @@ class StringBuffer:
         cls._method_template << c.NextTrigger()
         _localcp = f_getuserplayerid()
         cls._cpbranch << c.RawTrigger(
-            nextptr=0,
-            conditions=IsUserCP(),
-            actions=c.SetNextPtr(cls._cpbranch, 0),
+            conditions=IsUserCP(), actions=c.SetNextPtr(cls._cpbranch, 0),
         )
         c.PopTriggerScope()
 
@@ -122,102 +146,88 @@ class StringBuffer:
                 c.SetMemory(StringBuffer._cpbranch + 348, c.SetTo, ontrue),
             ],
         )
-        return end, ontrue
+        ontrue << c.NextTrigger()
+        yield end
+        end << c.NextTrigger()
 
     def append(self, *args):
-        end, ontrue = StringBuffer.CPBranch()
-        ontrue << c.NextTrigger()
-        f_setcurpl(self.pos)
-        f_cpstr_print(*args)
-        f_getcurpl(ret=[self.pos])
-        f_setcurpl(f_getuserplayerid())
-        end << c.NextTrigger()
+        for _end in StringBuffer.CPBranch():
+            f_setcurpl(self.pos)
+            f_cpstr_print(*args)
+            f_getcurpl(ret=[self.pos])
+            f_setcurpl(f_getuserplayerid())
 
     def appendf(self, format_string, *args):
-        fmtargs = _format_args(format_string, *args)
-        self.append(*fmtargs)
+        self.append(*_format_args(format_string, *args))
 
     def insert(self, index, *args):
-        end, ontrue = StringBuffer.CPBranch()
-        ontrue << c.NextTrigger()
-        f_setcurpl(self.epd + index)
-        f_cpstr_print(*args, EOS=False)
-        f_getcurpl(ret=[self.pos])
-        f_setcurpl(f_getuserplayerid())
-        end << c.NextTrigger()
+        for _end in StringBuffer.CPBranch():
+            f_setcurpl(self.epd + index)
+            f_cpstr_print(*args, EOS=False)
+            f_getcurpl(ret=[self.pos])
+            f_setcurpl(f_getuserplayerid())
 
     def insertf(self, index, format_string, *args):
-        fmtargs = _format_args(format_string, *args)
-        self.insert(index, *fmtargs)
+        self.insert(index, *_format_args(format_string, *args))
 
     def delete(self, start, length=1):
-        end, ontrue = StringBuffer.CPBranch()
-        ontrue << c.NextTrigger()
-        self.pos << self.epd
-        self.pos += start
-        f_setcurpl(self.pos)
-        cs.DoActions(
-            [
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0x0D0D0D0D, 0),
-                c.AddCurrentPlayer(1),
-            ]
-            for _ in range(length)
-        )
-        f_setcurpl(f_getuserplayerid())
-        end << c.NextTrigger()
+        for _end in StringBuffer.CPBranch():
+            self.pos << self.epd
+            self.pos += start
+            f_setcurpl(self.pos)
+            cs.DoActions(
+                [
+                    c.SetDeaths(c.CurrentPlayer, c.SetTo, 0x0D0D0D0D, 0),
+                    c.AddCurrentPlayer(1),
+                ]
+                for _ in range(length)
+            )
+            f_setcurpl(f_getuserplayerid())
 
     def Display(self):
         cs.DoActions(c.DisplayText(self.StringIndex))
 
     def DisplayAt(self, line):
-        end, ontrue = StringBuffer.CPBranch()
-        ontrue << c.NextTrigger()
-        prevptr = f_gettextptr()
-        cs.DoActions(c.SetMemory(0x640B58, c.Add, line))
-        c.RawTrigger(
-            conditions=c.Memory(0x640B58, c.AtLeast, 11),
-            actions=c.SetMemory(0x640B58, c.Subtract, 11),
-        )
-        c.VProc(
-            prevptr,
-            [c.DisplayText(self.StringIndex), prevptr.SetDest(ut.EPD(0x640B58))],
-        )
-        end << c.NextTrigger()
+        for _end in StringBuffer.CPBranch():
+            prevptr = f_gettextptr()
+            cs.DoActions(c.SetMemory(0x640B58, c.Add, line))
+            c.RawTrigger(
+                conditions=c.Memory(0x640B58, c.AtLeast, 11),
+                actions=c.SetMemory(0x640B58, c.Subtract, 11),
+            )
+            c.VProc(
+                prevptr,
+                [c.DisplayText(self.StringIndex), prevptr.SetDest(ut.EPD(0x640B58))],
+            )
 
     def print(self, *args):
         if len(args) == 1 and isinstance(args[0], str) and len(args[0]) > 31:
             cs.DoActions(c.DisplayText(args[0]))
             return
-        end, ontrue = StringBuffer.CPBranch()
-        ontrue << c.NextTrigger()
-        f_setcurpl(self.epd)
-        f_cpstr_print(*args, EOS=False)
-        cs.DoActions(
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetCurrentPlayer(f_getuserplayerid()),
-            c.DisplayText(self.StringIndex),
-        )
-        end << c.NextTrigger()
+        for _end in StringBuffer.CPBranch():
+            f_setcurpl(self.epd)
+            f_cpstr_print(*args, EOS=False)
+            cs.DoActions(
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetCurrentPlayer(f_getuserplayerid()),
+                c.DisplayText(self.StringIndex),
+            )
 
     def printf(self, format_string, *args):
-        fmtargs = _format_args(format_string, *args)
-        self.print(*fmtargs)
+        self.print(*_format_args(format_string, *args))
 
     def printAt(self, line, *args):
-        end, ontrue = StringBuffer.CPBranch()
-        ontrue << c.NextTrigger()
-        f_setcurpl(self.epd)
-        f_cpstr_print(*args, EOS=False)
-        cs.DoActions(
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetCurrentPlayer(f_getuserplayerid()),
-        )
-        self.DisplayAt(line)
-        end << c.NextTrigger()
+        for _end in StringBuffer.CPBranch():
+            f_setcurpl(self.epd)
+            f_cpstr_print(*args, EOS=False)
+            cs.DoActions(
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetCurrentPlayer(f_getuserplayerid()),
+            )
+            self.DisplayAt(line)
 
     def printfAt(self, line, format_string, *args):
-        fmtargs = _format_args(format_string, *args)
-        self.printAt(line, *fmtargs)
+        self.printAt(line, *_format_args(format_string, *args))
 
     def _display_at(self, prevpos, line):
         f_setcurpl(f_getuserplayerid())
@@ -303,7 +313,7 @@ class StringBuffer:
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
         _, _, identifier = _get_TextFX_timer(tag)
-        _TextFX_Print(*fmtargs, identifier=identifier)
+        _tag_print(identifier, *fmtargs)
         self._display_at(prevpos, line)
         end << c.NextTrigger()
 
