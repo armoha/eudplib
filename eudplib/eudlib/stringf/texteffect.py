@@ -162,64 +162,70 @@ def TextFX_SetTimer(tag, modtype, value):
 @c.EUDFunc
 def _remove_TextFX(o0, o1, e0, e1):
     txtPtr = c.EUDVariable()
-    trg_o0, trg_o1, trg_e0, trg_e1 = [c.Forward() for _ in range(4)]
+    e0t, e1t, e_fail, o0t, o1t, o_fail = [c.Forward() for _ in range(6)]
     setPtr_o, setPtr_e = c.Forward(), c.Forward()
 
     c.VProc(
         [o0, o1, e0, e1],
         [
             txtPtr.SetNumber(-1),
-            c.SetMemory(0x6509B0, c.SetTo, ut.EPD(0x640B60)),
-            c.SetMemory(setPtr_o + 20, c.SetTo, 0),
-            c.SetMemory(setPtr_e + 20, c.SetTo, 1),
-            o0.SetDest(ut.EPD(trg_o0 + 16)),
-            o1.SetDest(ut.EPD(trg_o1 + 16)),
-            e0.SetDest(ut.EPD(trg_e0 + 16)),
-            e1.SetDest(ut.EPD(trg_e1 + 16)),
+            c.SetMemory(0x6509B0, c.SetTo, ut.EPD(0x640B60 + 218 * 11)),
+            c.SetMemory(setPtr_o + 20, c.SetTo, 10),
+            c.SetMemory(setPtr_e + 20, c.SetTo, 11),
+            o0.SetDest(ut.EPD(o0t + 16)),
+            o1.SetDest(ut.EPD(o1t + 16)),
+            e0.SetDest(ut.EPD(e0t + 16)),
+            e1.SetDest(ut.EPD(e1t + 16)),
         ],
     )
     if cs.EUDLoopN()(6):
-        incr_o, incr_e = c.Forward(), c.Forward()
-        trg_o0 << c.RawTrigger(
-            nextptr=incr_o,
-            conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0)],
-            actions=[c.SetMemory(0x6509B0, c.Add, 1), c.SetNextPtr(trg_o0, trg_o1)],
-        )
-        trg_o1 << c.RawTrigger(
-            conditions=[c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)],
-            actions=[
-                c.SetNextPtr(trg_o0, incr_o),
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                c.SetMemory(0x6509B0, c.Add, -1),
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                setPtr_o << txtPtr.SetNumber(0),
-            ],
-        )
-        incr_o << c.RawTrigger(
-            actions=[
-                c.SetMemory(0x6509B0, c.Add, 216 // 4),
-                c.SetMemory(setPtr_o + 20, c.Add, 2),
-            ]
-        )
-        trg_e0 << c.RawTrigger(
+        incr_e, incr_o = c.Forward(), c.Forward()
+        e0t << c.RawTrigger(
             nextptr=incr_e,
-            conditions=[c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000)],
-            actions=[c.SetMemory(0x6509B0, c.Add, 1), c.SetNextPtr(trg_e0, trg_e1)],
+            conditions=c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000),
+            actions=[c.SetMemory(0x6509B0, c.Add, 1), c.SetNextPtr(e0t, e1t)],
         )
-        trg_e1 << c.RawTrigger(
-            conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0)],
+        e1t << c.RawTrigger(
+            conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
             actions=[
-                c.SetNextPtr(trg_e0, incr_e),
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                c.SetMemory(0x6509B0, c.Add, -1),
+                c.SetMemory(0x6509B0, c.Subtract, 1),
                 c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
-                setPtr_e << txtPtr.SetNumber(1),
+                setPtr_e << txtPtr.SetNumber(0),
+                c.SetNextPtr(e1t, incr_e),
             ],
         )
+        e_fail << c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Subtract, 1))
         incr_e << c.RawTrigger(
             actions=[
-                c.SetMemory(0x6509B0, c.Add, 220 // 4),
-                c.SetMemory(setPtr_e + 20, c.Add, 2),
+                c.SetNextPtr(e0t, incr_e),
+                c.SetNextPtr(e1t, e_fail),
+                c.SetMemory(0x6509B0, c.Subtract, 216 // 4),
+                c.SetMemory(setPtr_e + 20, c.Subtract, 2),
+            ]
+        )
+        o0t << c.RawTrigger(
+            nextptr=incr_o,
+            conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
+            actions=[c.SetMemory(0x6509B0, c.Add, 1), c.SetNextPtr(o0t, o1t)],
+        )
+        o1t << c.RawTrigger(
+            conditions=c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF),
+            actions=[
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetMemory(0x6509B0, c.Subtract, 1),
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                setPtr_o << txtPtr.SetNumber(0),
+                c.SetNextPtr(o1t, incr_o),
+            ],
+        )
+        o_fail << c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Subtract, 1))
+        incr_o << c.RawTrigger(
+            actions=[
+                c.SetNextPtr(o0t, incr_o),
+                c.SetNextPtr(o1t, o_fail),
+                c.SetMemory(0x6509B0, c.Subtract, 220 // 4),
+                c.SetMemory(setPtr_o + 20, c.Subtract, 2),
             ]
         )
     cs.EUDEndLoopN()
@@ -228,7 +234,7 @@ def _remove_TextFX(o0, o1, e0, e1):
 
 
 def TextFX_Remove(tag):
-    ut.ep_assert(tag is not None, "tag should be not None")
+    ut.ep_assert(tag is not None, "tag should not be None")
     _add_TextFX_timer(tag)
     _, _, identifier = _get_TextFX_timer(tag)
     o0 = ut.b2i4(identifier[0:4])
@@ -300,11 +306,8 @@ def _TextFX_Print(*args, identifier=None, encoding="UTF-8"):
 
     args = ut.FlattenList(args)
     for arg in args:
-        if isinstance(arg, str):
+        if isinstance(arg, str) and "\n" in arg:
             line = arg.split("\n")
-            if len(line) == 1:
-                f_cpchar_print(line[0], EOS=False, encoding=encoding)
-                continue
             for s in line[:-1]:
                 f_cpchar_print(s, EOS=False, encoding=encoding)
                 f_cpstr_print(
