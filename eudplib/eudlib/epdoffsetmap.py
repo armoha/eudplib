@@ -227,6 +227,8 @@ EPDCUnitMap = EPDOffsetMap(
         ("harvestValueR", 0x0D4, 2),
         ("harvestValueB", 0x0D6, 2),  # hatchery
         ("origin", 0x0D0, 4),  # powerup
+        ("originX", 0x0D0, 2),  # powerup
+        ("originY", 0x0D2, 2),  # powerup
         ("harvestTarget", 0x0D0, 4),
         ("prevHarvestUnit", 0x0D4, 4),
         ("nextHarvestUnit", 0x0D8, 4),  # gatherer
@@ -237,10 +239,14 @@ EPDCUnitMap = EPDOffsetMap(
         ("recentOrderTimer", 0x0E3, 1),
         ("visibilityStatus", 0x0E4, 4),
         ("secondaryOrderPosition", 0x0E8, 4),
+        ("secondaryOrderX", 0x0E8, 2),
+        ("secondaryOrderY", 0x0EA, 2),
         ("currentBuildUnit", 0x0EC, 4),
         ("previousBurrowedUnit", 0x0F0, 4),
         ("nextBurrowedUnit", 0x0F4, 4),
         ("rallyPosition", 0x0F8, 4),  # 0x0F8 union
+        ("rallyX", 0x0F8, 2),  # 0x0F8 union
+        ("rallyY", 0x0FA, 2),  # 0x0F8 union
         ("rallyUnit", 0x0FC, 4),  # rally
         ("prevPsiProvider", 0x0F8, 4),
         ("nextPsiProvider", 0x0FC, 4),  # PsiProvider
