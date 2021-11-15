@@ -107,5 +107,10 @@ def test_strbuffer():
     s2.fadeOut("abc", line=EUDVariable(-1))
     s2.tagprint("dpdkfah")
     s2.tagprint("dpdkfah", line=EUDVariable(-1))
+    SetPName(userid, "TestPName{:c}{:n}", userid, userid)
+    SetPName(P1, "TestTest")
+    SetPName(P2, "TestTest")
+    SetPName(P4, "TestTest")
+    SetPNamef(userid, "SetPNameTest{}", userid)
 
     f_setcurpl(origcp)

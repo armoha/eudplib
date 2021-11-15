@@ -51,7 +51,7 @@ class EUDObject(ConstExpr):
         super().__init__(self)
 
     def DynamicConstructed(self):
-        """ Whether function is constructed dynamically.
+        """Whether function is constructed dynamically.
 
         Dynamically constructed EUDObject may have their dependency list
         generated during object construction. So their dependency list is
