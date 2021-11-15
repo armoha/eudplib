@@ -298,37 +298,65 @@ def f_raise_CCMU(player):
     cs.EUDEndIf()
 
 
-_eprintln_template = None
+_eprintln_template = c.Forward()
+_eprintln_desync = c.Forward()
 _eprintln_print = c.Forward()
 _eprintln_EOS = c.Forward()
 _eprintln_end = c.Forward()
 
 
-def f_eprintln(*args):
-    global _eprintln_template
-    if _eprintln_template is None:
-        _eprintln_template = c.Forward()
+def _eprint_init():
+    if _eprintln_template.IsSet():
+        return
+    c.PushTriggerScope()
+    _eprintln_template << c.NextTrigger()
+    f_raise_CCMU(c.CurrentPlayer)
+    if cs.EUDIf()(_eprintln_desync << IsUserCP()):
+        prevcp << f_getcurpl()
+        _eprintln_print << c.RawTrigger(
+            nextptr=0, actions=c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))
+        )
+        _eprintln_EOS << c.RawTrigger(
+            actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
+        )
+        f_setcurpl(prevcp)
+    cs.EUDEndIf()
+    _eprintln_end << c.RawTrigger(nextptr=0)
+    c.PopTriggerScope()
 
-        c.PushTriggerScope()
-        _eprintln_template << c.NextTrigger()
-        f_raise_CCMU(c.CurrentPlayer)
-        if cs.EUDIf()(IsUserCP()):
-            prevcp << f_getcurpl()
-            _eprintln_print << c.RawTrigger(
-                nextptr=0, actions=c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))
-            )
-            _eprintln_EOS << c.RawTrigger(
-                actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
-            )
-            f_setcurpl(prevcp)
-        cs.EUDEndIf()
-        _eprintln_end << c.RawTrigger(nextptr=0)
-        c.PopTriggerScope()
+
+def _eprintAll(*args):
+    _eprint_init()
 
     _print, _next = c.Forward(), c.Forward()
     c.RawTrigger(
         nextptr=_eprintln_template,
         actions=[
+            c.SetMemory(
+                _eprintln_template + 380, c.SetTo, c.EncodePlayer(c.AllPlayers)
+            ),
+            c.SetMemoryX(_eprintln_desync + 12, c.SetTo, 0, 0xFF000000),
+            c.SetNextPtr(_eprintln_print, _print),
+            c.SetNextPtr(_eprintln_end, _next),
+        ],
+    )
+    _print << c.NextTrigger()
+    f_cpstr_print(*args, EOS=False, encoding="UTF-8")
+    c.SetNextTrigger(_eprintln_EOS)
+    _next << c.NextTrigger()
+
+
+def f_eprintln(*args):
+    _eprint_init()
+
+    _print, _next = c.Forward(), c.Forward()
+    c.RawTrigger(
+        nextptr=_eprintln_template,
+        actions=[
+            c.SetMemory(
+                _eprintln_template + 380, c.SetTo, c.EncodePlayer(c.CurrentPlayer)
+            ),
+            c.SetMemoryX(_eprintln_desync + 12, c.SetTo, 15 << 24, 0xFF000000),
             c.SetNextPtr(_eprintln_print, _print),
             c.SetNextPtr(_eprintln_end, _next),
         ],

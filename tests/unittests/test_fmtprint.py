@@ -7,7 +7,7 @@ def test_fmtprint():
     amount = EUDVariable(336)
     resource = EUDArray([EPD(Db("minerals")), EPD(Db("gases"))])
     f_setcurpl(P1)
-    f_eprintf("{:s} gets {} {:t}.", name, amount, resource[0])
+    f_eprintAll("{:s} gets {} {:t}.", name, amount, resource[0])
     errorline = 0x640B60 + 218 * 12
 
     expect = "dpdkfah\r gets \r\r336\r \r\r\rminerals.\r\r\r"

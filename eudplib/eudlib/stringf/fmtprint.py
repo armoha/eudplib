@@ -30,7 +30,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 from eudplib.localize import _
-from .cpprint import PColor, PName, f_cpstr_print, f_eprintln
+from .cpprint import PColor, PName, f_cpstr_print, f_eprintln, _eprintAll
 from .dbstr import DBString
 from .eudprint import ptr2s, epd2s, hptr, f_dbstr_print
 
@@ -151,3 +151,7 @@ def f_sprintf_cp(format_string, *args, EOS=True, encoding="UTF-8"):
 def f_eprintf(format_string, *args):
     fmtargs = _format_args(format_string, *args)
     f_eprintln(*fmtargs)
+
+def f_eprintAll(format_string, *args):
+    fmtargs = _format_args(format_string, *args)
+    _eprintAll(*fmtargs)
