@@ -62,7 +62,9 @@ DefOperator("__or__", lambda x, y: f_bitor(x, y))
 DefOperator("__xor__", lambda x, y: f_bitxor(x, y))
 DefClsMethod("__neg__", lambda x: 0 - x)
 DefClsMethod("__invert__", lambda x: f_bitnot(x))
-DefClsMethod("__ilshift__", lambda x: f_bitlshift(x))
-DefClsMethod("__irshift__", lambda x: f_bitrshift(x))
+DefClsMethod("__ilshift__", lambda a, b: f_bitlshift(a, b))
+DefClsMethod("__irshift__", lambda a, b: f_bitrshift(a, b))
+DefClsMethod("__rlshift__", lambda a, b: f_bitlshift(b, a))
+DefClsMethod("__rrshift__", lambda a, b: f_bitrshift(b, a))
 
 # Shift operator is reserved for assigning, so we won't overload them.
