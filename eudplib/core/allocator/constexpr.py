@@ -53,7 +53,7 @@ class ConstExpr:
             return ConstExpr(
                 self.baseobj, self.offset + other.offset, self.rlocmode + other.rlocmode
             )
-        if not isinstance(other, int):
+        elif not isinstance(other, int):
             return NotImplemented
 
         return ConstExpr(self.baseobj, self.offset + other, self.rlocmode)
@@ -68,7 +68,7 @@ class ConstExpr:
             return ConstExpr(
                 self.baseobj, self.offset - other.offset, self.rlocmode - other.rlocmode
             )
-        if not isinstance(other, int):
+        elif not isinstance(other, int):
             return NotImplemented
 
         return ConstExpr(self.baseobj, self.offset - other, self.rlocmode)
@@ -80,7 +80,7 @@ class ConstExpr:
             return ConstExpr(
                 self.baseobj, other.offset - self.offset, other.rlocmode - self.rlocmode
             )
-        if not isinstance(other, int):
+        elif not isinstance(other, int):
             return NotImplemented
 
         return ConstExpr(self.baseobj, other - self.offset, -self.rlocmode)

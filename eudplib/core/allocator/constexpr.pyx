@@ -46,28 +46,48 @@ cdef class ConstExpr:
     cpdef RlocInt_C Evaluate(self):
         return self.baseobj.Evaluate() * self.rlocmode // 4 + self.offset
 
+    def _total_ord(self, other):
+        if isinstance(other, ConstExpr) and self.baseobj is other.baseobj:
+            return True
+        return False
+
     # Cython version!
 
     def __add__(self, other):
-        if not isinstance(other, int):
+        if self._total_ord(other):
+            if self.rlocmode + other.rlocmode == 0:
+                return self.offset + other.offset
+            return ConstExpr(
+                self.baseobj, self.offset + other.offset, self.rlocmode + other.rlocmode
+            )
+        elif not isinstance(other, int):
             return NotImplemented
 
         return ConstExpr(self.baseobj, self.offset + other, self.rlocmode)
 
     def __radd__(self, other):
-        if not isinstance(other, int):
-            return NotImplemented
-        
-        return ConstExpr(self.baseobj, self.offset + other, self.rlocmode)
+        return self.__add__(other)
 
     def __sub__(self, other):
-        if not isinstance(other, int):
+        if self._total_ord(other):
+            if self.rlocmode == other.rlocmode:
+                return self.offset - other.offset
+            return ConstExpr(
+                self.baseobj, self.offset - other.offset, self.rlocmode - other.rlocmode
+            )
+        elif not isinstance(other, int):
             return NotImplemented
 
         return ConstExpr(self.baseobj, self.offset - other, self.rlocmode)
 
     def __rsub__(self, other):
-        if not isinstance(other, int):
+        if self._total_ord(other):
+            if self.rlocmode == other.rlocmode:
+                return other.offset - self.offset
+            return ConstExpr(
+                self.baseobj, other.offset - self.offset, other.rlocmode - self.rlocmode
+            )
+        elif not isinstance(other, int):
             return NotImplemented
 
         return ConstExpr(self.baseobj, other - self.offset, -self.rlocmode)
@@ -89,7 +109,9 @@ cdef class ConstExpr:
             return NotImplemented
         ut.ep_assert(
             (self.rlocmode == 0) or (self.rlocmode % k == 0),
-            _('Address not divisible')
+            _("Address not divisible; {} is not a factor of {}").format(
+                k, self.rlocmode
+            ),
         )
         return ConstExpr(self.baseobj, self.offset // k, self.rlocmode // k)
 
@@ -98,6 +120,42 @@ cdef class ConstExpr:
             return NotImplemented
         ut.ep_assert(4 % k == 0 and self.rlocmode == 4)
         return self.offset % k
+
+    def __neg__(self):
+        return self.__mul__(-1)
+
+    def __eq__(self, other):
+        if self._total_ord(other):
+            return (self.offset == other.offset) and (self.rlocmode == other.rlocmode)
+        return NotImplemented
+
+    def __hash__(self):
+        return id(self)
+
+    def __ne__(self, other):
+        if self._total_ord(other):
+            return (self.offset != other.offset) or (self.rlocmode != other.rlocmode)
+        return NotImplemented
+
+    def __lt__(self, other):
+        if self._total_ord(other) and (self.rlocmode == other.rlocmode):
+            return self.offset < other.offset
+        return NotImplemented
+
+    def __gt__(self, other):
+        if self._total_ord(other) and (self.rlocmode == other.rlocmode):
+            return self.offset > other.offset
+        return NotImplemented
+
+    def __le__(self, other):
+        if self._total_ord(other) and (self.rlocmode == other.rlocmode):
+            return self.offset <= other.offset
+        return NotImplemented
+
+    def __ge__(self, other):
+        if self._total_ord(other) and (self.rlocmode == other.rlocmode):
+            return self.offset >= other.offset
+        return NotImplemented
 
 
 cdef class ConstExprInt(ConstExpr):
