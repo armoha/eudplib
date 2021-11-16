@@ -81,7 +81,7 @@ class UserCPBuffer(c.EUDObject):
 
 
 def _f_initisusercp():
-    """(internal)Initialize IsUserCP."""
+    """(internal) Initialize IsUserCP."""
     rb = UserCPBuffer()
     ptr = c.EUDVariable(ut.EPD(rb))
     userp = f_getuserplayerid()

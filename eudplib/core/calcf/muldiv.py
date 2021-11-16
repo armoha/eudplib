@@ -50,7 +50,7 @@ def f_mul(a, b, **kwargs):
 
 
 def f_div(a, b, **kwargs):
-    """Calculate (a//b, a%b) """
+    """Calculate (a//b, a%b)"""
     if isinstance(b, ev.EUDVariable):
         return _f_div(a, b, **kwargs)
 
@@ -150,7 +150,6 @@ def f_constdiv(number):
         def _div0(x):
             return -1, x
 
-
         @ef.EUDFunc
         def _div1(x):
             return x, 0
@@ -197,7 +196,7 @@ def _f_mul(a, b):
     endmul, reset_nptr = ac.Forward(), ac.Forward()
 
     # Init
-    rt.RawTrigger(actions=[ret.SetNumber(0), b.QueueAddTo(0)[1]])
+    rt.RawTrigger(actions=[ret.SetNumber(0), b.SetModifier(rt.Add)])
 
     # Run multiplication chain
     for i in range(32):

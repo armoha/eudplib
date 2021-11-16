@@ -115,7 +115,6 @@ class EUDFullFuncN(EUDFuncN):
         while len(arginitvals) < argn:
             arginitvals.append((0, bt.SetTo, 0, None))
         super().__init__(arginitvals, callerfunc, bodyfunc, traced=traced)
-        print(self._arginits)
         self._argtypes = argtypes
         self._rettypes = rettypes
 

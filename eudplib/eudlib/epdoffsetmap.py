@@ -24,10 +24,9 @@ rwdict = {2: (f_wread_epd, f_wwrite_epd), 1: (f_bread_epd, f_bwrite_epd)}
 
 
 def _checkEPDAddr(epd):
-    if c.IsConstExpr(epd):
-        if epd.rlocmode == 4:
-            ut.ep_warn(_("EPD check warning. Don't use raw pointer address"))
-            traceback.print_stack()
+    if c.IsConstExpr(epd) and epd.rlocmode == 4:
+        ut.ep_warn(_("EPD check warning. Don't use raw pointer address"))
+        traceback.print_stack()
 
 
 @functools.lru_cache(None)
