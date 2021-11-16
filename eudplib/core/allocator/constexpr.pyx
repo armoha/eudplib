@@ -30,6 +30,12 @@ from ... import utils as ut
 from ...localize import _
 
 
+def _total_ord(a, b):
+    if isinstance(a, ConstExpr) and isinstance(b, ConstExpr) and a.baseobj is b.baseobj:
+        return True
+    return False
+
+
 cdef class ConstExpr:
 
     ''' Class for general expression with rlocints.
@@ -46,51 +52,43 @@ cdef class ConstExpr:
     cpdef RlocInt_C Evaluate(self):
         return self.baseobj.Evaluate() * self.rlocmode // 4 + self.offset
 
-    def _total_ord(self, other):
-        if isinstance(other, ConstExpr) and self.baseobj is other.baseobj:
-            return True
-        return False
-
     # Cython version!
 
     def __add__(self, other):
-        if self._total_ord(other):
+        if isinstance(other, int):
+            return ConstExpr(self.baseobj, self.offset + other, self.rlocmode)
+        elif _total_ord(self, other):
             if self.rlocmode + other.rlocmode == 0:
                 return self.offset + other.offset
             return ConstExpr(
                 self.baseobj, self.offset + other.offset, self.rlocmode + other.rlocmode
             )
-        elif not isinstance(other, int):
-            return NotImplemented
-
-        return ConstExpr(self.baseobj, self.offset + other, self.rlocmode)
+        return NotImplemented
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        if self._total_ord(other):
+        if isinstance(other, int):
+            return ConstExpr(self.baseobj, self.offset - other, self.rlocmode)
+        elif _total_ord(self, other):
             if self.rlocmode == other.rlocmode:
                 return self.offset - other.offset
             return ConstExpr(
                 self.baseobj, self.offset - other.offset, self.rlocmode - other.rlocmode
             )
-        elif not isinstance(other, int):
-            return NotImplemented
-
-        return ConstExpr(self.baseobj, self.offset - other, self.rlocmode)
+        return NotImplemented
 
     def __rsub__(self, other):
-        if self._total_ord(other):
+        if isinstance(other, int):
+            return ConstExpr(self.baseobj, other - self.offset, -self.rlocmode)
+        elif _total_ord(self, other):
             if self.rlocmode == other.rlocmode:
                 return other.offset - self.offset
             return ConstExpr(
                 self.baseobj, other.offset - self.offset, other.rlocmode - self.rlocmode
             )
-        elif not isinstance(other, int):
-            return NotImplemented
-
-        return ConstExpr(self.baseobj, other - self.offset, -self.rlocmode)
+        return NotImplemented
 
     def __mul__(self, k):
         if not isinstance(k, int):
@@ -125,7 +123,7 @@ cdef class ConstExpr:
         return self.__mul__(-1)
 
     def __eq__(self, other):
-        if self._total_ord(other):
+        if _total_ord(self, other):
             return (self.offset == other.offset) and (self.rlocmode == other.rlocmode)
         return NotImplemented
 
@@ -133,27 +131,27 @@ cdef class ConstExpr:
         return id(self)
 
     def __ne__(self, other):
-        if self._total_ord(other):
+        if _total_ord(self, other):
             return (self.offset != other.offset) or (self.rlocmode != other.rlocmode)
         return NotImplemented
 
     def __lt__(self, other):
-        if self._total_ord(other) and (self.rlocmode == other.rlocmode):
+        if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
             return self.offset < other.offset
         return NotImplemented
 
     def __gt__(self, other):
-        if self._total_ord(other) and (self.rlocmode == other.rlocmode):
+        if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
             return self.offset > other.offset
         return NotImplemented
 
     def __le__(self, other):
-        if self._total_ord(other) and (self.rlocmode == other.rlocmode):
+        if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
             return self.offset <= other.offset
         return NotImplemented
 
     def __ge__(self, other):
-        if self._total_ord(other) and (self.rlocmode == other.rlocmode):
+        if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
             return self.offset >= other.offset
         return NotImplemented
 
