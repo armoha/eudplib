@@ -31,23 +31,21 @@ from . import modcurpl as cp
 from . import byterw as bm
 from . import cpmemio as cm
 
+_cpmoda = c.Forward()
 
-@c.EUDFunc
+
+@c.EUDFullFunc(
+    [(ut.EPD(_cpmoda), c.Add, 0, None), (ut.EPD(0x6509B0), c.SetTo, 0, None)],
+    [None, None, None],
+)
 def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
-    cpmoda = c.Forward()
+    global _cpmoda
 
-    c.VProc(
-        [dstepdp, srcepdp],
-        [
-            c.SetMemory(cpmoda, c.SetTo, -1),
-            dstepdp.QueueAddTo(ut.EPD(cpmoda)),
-            srcepdp.SetDest(ut.EPD(0x6509B0)),
-        ],
-    )
+    c.VProc([dstepdp, srcepdp], c.SetMemory(_cpmoda, c.SetTo, -1))
 
     if cs.EUDWhileNot()(copydwn == 0):
         cpmod = cm.f_dwread_cp(0)
-        cpmoda << cpmod.getDestAddr()
+        _cpmoda << cpmod.getDestAddr()
 
         c.VProc(
             cpmod,
