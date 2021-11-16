@@ -29,7 +29,7 @@ from ... import utils as ut
 from ...core.mapdata.stringmap import ForceAddString
 from ..memiof import f_getcurpl, f_setcurpl
 from ..utilf import f_getuserplayerid, IsUserCP
-from .cpprint import f_cpstr_print, f_gettextptr
+from .cpprint import f_cpstr_print, FixedText, f_gettextptr
 from .cpstr import GetMapStringAddr
 from .fmtprint import _format_args
 from .strfunc import f_strlen_epd
@@ -40,16 +40,20 @@ from .texteffect import (
     _get_TextFX_timer,
 )
 
+_display_text = c.DisplayText(0)
 
-@c.EUDTypedFunc([None, c.TrgString])
+
+@c.EUDFullFunc(
+    [(ut.EPD(0x640B58), c.Add, 0, None), (ut.EPD(_display_text) + 1, c.SetTo, 0, None)],
+    [None, c.TrgString],
+)
 def DisplayTextAt(line, text):
-    tp = f_gettextptr()
-    c.VProc(line, line.QueueAddTo(ut.EPD(0x640B58)))
-    c.RawTrigger(
-        conditions=c.Memory(0x640B58, c.AtLeast, 11),
-        actions=c.SetMemory(0x640B58, c.Subtract, 11),
-    )
-    cs.DoActions(c.DisplayText(text), c.SetMemory(0x640B58, c.SetTo, tp))
+    with FixedText(_display_text):
+        c.VProc([line, text], [])
+        c.RawTrigger(
+            conditions=c.Memory(0x640B58, c.AtLeast, 11),
+            actions=c.SetMemory(0x640B58, c.Subtract, 11),
+        )
 
 
 def _tag_print(identifier, *args, encoding="UTF-8"):
@@ -130,7 +134,8 @@ class StringBuffer:
         cls._method_template << c.NextTrigger()
         _localcp = f_getuserplayerid()
         cls._cpbranch << c.RawTrigger(
-            conditions=IsUserCP(), actions=c.SetNextPtr(cls._cpbranch, 0),
+            conditions=IsUserCP(),
+            actions=c.SetNextPtr(cls._cpbranch, 0),
         )
         c.PopTriggerScope()
 
@@ -187,18 +192,17 @@ class StringBuffer:
     def Display(self):
         cs.DoActions(c.DisplayText(self.StringIndex))
 
-    def DisplayAt(self, line):
+    def DisplayAt(self, line, _f={}):
         for _end in StringBuffer.CPBranch():
-            prevptr = f_gettextptr()
-            cs.DoActions(c.SetMemory(0x640B58, c.Add, line))
-            c.RawTrigger(
-                conditions=c.Memory(0x640B58, c.AtLeast, 11),
-                actions=c.SetMemory(0x640B58, c.Subtract, 11),
-            )
-            c.VProc(
-                prevptr,
-                [c.DisplayText(self.StringIndex), prevptr.SetDest(ut.EPD(0x640B58))],
-            )
+            with FixedText(c.DisplayText(self.StringIndex)):
+                if c.IsEUDVariable(line):
+                    c.VProc(line, line.QueueAddTo(ut.EPD(0x640B58)))
+                elif not isinstance(line, int) or line != 0:
+                    cs.DoActions(c.SetMemory(0x640B58, c.Add, line))
+                    c.RawTrigger(
+                        conditions=c.Memory(0x640B58, c.AtLeast, 11),
+                        actions=c.SetMemory(0x640B58, c.Subtract, 11),
+                    )
 
     def print(self, *args):
         if len(args) == 1 and isinstance(args[0], str) and len(args[0]) > 31:
@@ -249,15 +253,8 @@ class StringBuffer:
                     else:
                         self.DisplayAt(11 + line)
                 if cs.EUDElse()():
-                    prevptr = f_gettextptr()
-                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
-                    c.VProc(
-                        prevptr,
-                        [
-                            c.DisplayText(self.StringIndex),
-                            prevptr.SetDest(ut.EPD(0x640B58)),
-                        ],
-                    )
+                    with FixedText(c.DisplayText(self.StringIndex)):
+                        c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
                 cs.EUDEndIf()
         else:
             if cs.EUDIf()(line == 10):
@@ -278,15 +275,8 @@ class StringBuffer:
                         self.DisplayAt(11 + line)
                     cs.EUDEndIf()
                 if cs.EUDElse()():
-                    prevptr = f_gettextptr()
-                    c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
-                    c.VProc(
-                        prevptr,
-                        [
-                            c.DisplayText(self.StringIndex),
-                            prevptr.SetDest(ut.EPD(0x640B58)),
-                        ],
-                    )
+                    with FixedText(c.DisplayText(self.StringIndex)):
+                        c.VProc(prevpos, prevpos.SetDest(ut.EPD(0x640B58)))
                 cs.EUDEndIf()
             cs.EUDEndIf()
 
@@ -402,6 +392,7 @@ def GetGlobalStringBuffer():
     return _globalsb
 
 
+# FIXME: Optimize these functions to cache string contents
 def f_simpleprint(*args, spaced=True):
     # Add spaces between arguments
     if spaced:
@@ -426,3 +417,19 @@ def f_println(format_string, *args):
 def f_printAt(line, format_string, *args):
     gsb = GetGlobalStringBuffer()
     gsb.printfAt(line, format_string, *args)
+
+
+def f_printAll(format_string, *args):
+    oldcp = f_getcurpl()
+    f_setcurpl(f_getuserplayerid())
+    gsb = GetGlobalStringBuffer()
+    gsb.printf(format_string, *args)
+    f_setcurpl(oldcp)
+
+
+def f_printAllAt(line, format_string, *args):
+    oldcp = f_getcurpl()
+    f_setcurpl(f_getuserplayerid())
+    gsb = GetGlobalStringBuffer()
+    gsb.printfAt(line, format_string, *args)
+    f_setcurpl(oldcp)

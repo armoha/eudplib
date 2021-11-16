@@ -33,10 +33,11 @@ from .strbuffer import (
     StringBuffer,
     DisplayTextAt,
     GetGlobalStringBuffer,
-    f_gettextptr,
     f_simpleprint,
     f_println,
     f_printAt,
+    f_printAll,
+    f_printAllAt,
 )
 
 from .strfunc import f_strcpy, f_strcmp, f_strlen, f_strlen_epd, f_strnstr
@@ -62,6 +63,8 @@ from .cpprint import (
     GetTBLAddr,
     f_eprintln,
     f_eprintln2,
+    FixedText,
+    f_gettextptr,
 )
 
 from .cputf8 import f_cp949_to_utf8_cpy

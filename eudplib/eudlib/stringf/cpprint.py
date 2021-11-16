@@ -95,6 +95,19 @@ def PName(x):
     return ptr2s(0x57EEEB + 36 * x)
 
 
+class FixedText(object):
+    def __init__(self, actions_on_exit=[]):
+        self._actions_on_exit = ut.FlattenList([actions_on_exit])
+        self._txtptr = c.EUDVariable(ut.EPD(0x640B58), c.SetTo, 0)
+
+    def __enter__(self):
+        f_gettextptr(ret=[self._txtptr])
+        return self._txtptr
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        c.VProc(self._txtptr, self._actions_on_exit)
+
+
 @c.EUDFunc
 def f_gettextptr():
     ret = c.EUDVariable()
