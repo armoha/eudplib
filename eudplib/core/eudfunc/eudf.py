@@ -26,7 +26,7 @@ THE SOFTWARE.
 import inspect
 import functools
 
-from .eudtypedfuncn import EUDTypedFuncN, applyTypes, EUDXTypedFuncN
+from .eudtypedfuncn import EUDTypedFuncN, applyTypes, EUDXTypedFuncN, EUDFullFuncN
 from ... import utils as ut
 from ...localize import _
 
@@ -91,6 +91,38 @@ def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):
         return ret
 
     return _EUDXTypedFunc
+
+
+def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):
+    def _EUDFullFunc(fdecl_func):
+        argspec = inspect.getfullargspec(fdecl_func)
+        argn = len(argspec[0])
+        ut.ep_assert(
+            argn >= len(arginitvals),
+            _("Different number of variables({}) from initial values({})").format(
+                argn, len(arginitvals)
+            ),
+        )
+        ut.ep_assert(
+            argspec[1] is None, _("No variadic arguments (*args) allowed for EUDFunc.")
+        )
+        ut.ep_assert(
+            argspec[2] is None,
+            _("No variadic keyword arguments (**kwargs) allowed for EUDFunc."),
+        )
+
+        def caller(*args):
+            # Cast arguments to argtypes before callee code.
+            args = applyTypes(argtypes, args)
+            return fdecl_func(*args)
+
+        ret = EUDFullFuncN(
+            argn, arginitvals, caller, fdecl_func, argtypes, rettypes, traced=traced
+        )
+        functools.update_wrapper(ret, fdecl_func)
+        return ret
+
+    return _EUDFullFunc
 
 
 def _EUDPredefineParam(fargs):

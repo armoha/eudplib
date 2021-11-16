@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from ... import utils as ut
 from .. import variable as ev
+from .. import rawtrigger as bt
 
 from .eudfuncn import EUDFuncN
 from ...localize import _
@@ -104,3 +105,27 @@ class EUDXTypedFuncN(EUDTypedFuncN):
         )
         if self._fargs is None:
             self._fargs = [ev.EUDXVariable(0, mask) for mask in self._argmasks]
+
+
+class EUDFullFuncN(EUDFuncN):
+    def __init__(
+        self, argn, arginitvals, callerfunc, bodyfunc, argtypes, rettypes, *, traced
+    ):
+        arginitvals = list(arginitvals)
+        while len(arginitvals) < argn:
+            arginitvals.append((0, bt.SetTo, 0, None))
+        super().__init__(arginitvals, callerfunc, bodyfunc, traced=traced)
+        print(self._arginits)
+        self._argtypes = argtypes
+        self._rettypes = rettypes
+
+    def __call__(self, *args, ret=None):
+        # This layer is nessecary for function to accept non-EUDVariable object
+        # as argument. For instance, EUDFuncN.
+        args = applyTypes(self._argtypes, args)
+        rets = super().__call__(*args, ret=ret)
+
+        # Cast returns to rettypes before caller code.
+        rets = ut.Assignable2List(rets)
+        rets = applyTypes(self._rettypes, rets)
+        return ut.List2Assignable(rets)

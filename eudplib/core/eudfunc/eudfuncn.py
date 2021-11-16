@@ -60,17 +60,26 @@ def _setCurrentCompiledFunc(func):
 
 class EUDFuncN:
     def __init__(self, argn, callerfunc, bodyfunc, *, traced):
-        """ EUDFuncN
+        """EUDFuncN
 
         :param callerfunc: Function to be wrapped.
-        :param argn: Count of arguments got by callerfunc
+        :param argn: The number of arguments got by callerfunc
         :param bodyfunc: Where function should return to
         """
 
         if bodyfunc is None:
             bodyfunc = callerfunc
 
-        self._argn = argn
+        if isinstance(argn, int):
+            self._argn = argn
+            self._arginits = [(0, bt.SetTo, 0, None)] * argn
+        elif all(
+            isinstance(initvals, tuple) and len(initvals) == 4 for initvals in argn
+        ):
+            self._argn = len(argn)
+            self._arginits = argn
+        else:
+            raise ut.EPError("Invalid argn: {}".format(argn))
         self._retn = None
         self._callerfunc = callerfunc
         self._bodyfunc = bodyfunc
@@ -139,7 +148,13 @@ class EUDFuncN:
 
     def _CreateFuncArgs(self):
         if self._fargs is None:
-            self._fargs = [ev.EUDVariable() for _ in range(self._argn)]
+            self._fargs = []
+            for initvals in self._arginits:
+                if initvals[3] is None:
+                    argv = ev.EUDVariable(*initvals[:3])
+                else:
+                    argv = ev.EUDXVariable(*initvals)
+                self._fargs.append(argv)
 
     def _AddReturn(self, retv, needjump):
         retv = ut.FlattenList(retv)
@@ -177,7 +192,8 @@ class EUDFuncN:
 
         ut.ep_assert(
             len(args) == self._argn,
-            _("Argument number mismatch : ") + "len(%s) != %d" % (repr(args), self._argn),
+            _("Argument number mismatch : ")
+            + "len(%s) != %d" % (repr(args), self._argn),
         )
 
         fcallend = ac.Forward()

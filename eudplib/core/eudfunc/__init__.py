@@ -23,7 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .eudf import EUDFunc, EUDTracedFunc, EUDTypedFunc, EUDTracedTypedFunc, EUDXTypedFunc
+from .eudf import (
+    EUDFunc,
+    EUDTracedFunc,
+    EUDTypedFunc,
+    EUDTracedTypedFunc,
+    EUDXTypedFunc,
+    EUDFullFunc,
+)
 
 from .eudfptr import EUDFuncPtr, EUDTypedFuncPtr
 
