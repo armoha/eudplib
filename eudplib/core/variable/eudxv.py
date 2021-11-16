@@ -24,13 +24,39 @@ THE SOFTWARE.
 """
 
 from .. import rawtrigger as bt
-from ...utils import EPD
-from .eudv import EUDVariable, VariableTriggerForward
+from ...utils import EPD, EPError
+from .eudv import EUDVariable, VariableTriggerForward, _ProcessDest
 
 
 class EUDXVariable(EUDVariable):
-    def __init__(self, initval=0, mask=~0):
-        self._vartrigger = VariableTriggerForward(initval, mask)
+    def __init__(self, _initval=0, modifier=None, /, initval=None, mask=None):
+        # value (positional)
+        if modifier is None and initval is None and mask is None:
+            args = (0, bt.SetTo, _initval, ~0)
+        # value (keyword)
+        elif modifier is None and mask is None:
+            args = (0, bt.SetTo, initval, ~0)
+        # value, bitmask (positional)
+        elif initval is None and mask is None:
+            args = (0, bt.SetTo, _initval, modifier)
+        # value, bitmask (keyword)
+        elif modifier is None and initval is None:
+            args = (0, bt.SetTo, _initval, mask)
+        # value, bitmask, mask=bitmask (mixed)
+        elif initval is None:
+            raise ut.EPError(
+                "Ambiguous bitmask. Use EUDXVariable(initval, mask) or EUDXVariable(player, modifier, initval, mask)"
+            )
+        # value, initval=value, mask=bitmask (mixed)
+        # 3 positional args or value, modifier, initval=value
+        elif modifier is None or mask is None:
+            raise ut.EPError(
+                "Ambiguous initval. Use EUDXVariable(initval, mask) or EUDXVariable(player, modifier, initval, mask)"
+            )
+        else:
+            args = (_ProcessDest(_initval), modifier, initval, mask)
+
+        self._vartrigger = VariableTriggerForward(*args)
         self._varact = self._vartrigger + (8 + 320)
         self._rvalue = False
 

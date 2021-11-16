@@ -56,23 +56,30 @@ def _ProcessDest(dest):
         dest.checkNonRValue()
         dest = EPD(dest.getValueAddr())
     except AttributeError:
-        pass
+        if isinstance(dest, ConstExpr) and dest.rlocmode == 4:
+            dest = ConstExpr(dest.baseobj, dest.offset // 4, 1)
     return dest
 
 
 # Unused variable don't need to be allocated.
 class VariableTriggerForward(ConstExpr):
-    def __init__(self, initval, mask=None):
+    def __init__(self, initval, modifier=bt.SetTo, value=None, bitmask=None, /):
         super().__init__(self)
-        self._initval = initval
-        self._mask = mask
+        if value is None:
+            initval, value = 0, initval
+        self._dest = _ProcessDest(initval)
+        self._modifier = modifier
+        self._initval = value
+        self._bitmask = bitmask
 
     def Evaluate(self):
         evb = GetCurrentVariableBuffer()
         try:
             return evb._vdict[self].Evaluate()
         except KeyError:
-            vt = evb.CreateVarTrigger(self, self._initval, self._mask)
+            vt = evb.CreateVarTrigger(
+                self, self._dest, self._modifier, self._initval, self._bitmask
+            )
             return vt.Evaluate()
 
 
@@ -82,8 +89,10 @@ class EUDVariable(VariableBase):
     Full variable.
     """
 
-    def __init__(self, initval=0):
-        self._vartrigger = VariableTriggerForward(initval)
+    def __init__(self, _initval=0, modifier=bt.SetTo, /, initval=None):
+        if initval is None:
+            _initval, initval = 0, _initval
+        self._vartrigger = VariableTriggerForward(_initval, modifier, initval, None)
         self._varact = self._vartrigger + (8 + 320)
         self._rvalue = False
 
@@ -128,23 +137,26 @@ class EUDVariable(VariableBase):
 
     # -------
 
+    def SetModifier(self, modifier):
+        ep_assert(
+            modifier in (bt.SetTo, bt.Add, bt.Subtract),
+            "Unexpected modifier {}".format(modifier),
+        )
+        modifier = bt.EncodeModifier(modifier) << 24
+        return (
+            bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000),
+        )
+
+    # -------
+
     def QueueAssignTo(self, dest):
-        return [
-            self.SetDest(dest),
-            bt.SetDeaths(EPD(self._varact + 24), bt.SetTo, 0x072D0000, 0),
-        ]
+        return [self.SetDest(dest), self.SetModifier(bt.SetTo)]
 
     def QueueAddTo(self, dest):
-        return [
-            self.SetDest(dest),
-            bt.SetDeaths(EPD(self._varact + 24), bt.SetTo, 0x082D0000, 0),
-        ]
+        return [self.SetDest(dest), self.SetModifier(bt.Add)]
 
     def QueueSubtractTo(self, dest):
-        return [
-            self.SetDest(dest),
-            bt.SetDeaths(EPD(self._varact + 24), bt.SetTo, 0x092D0000, 0),
-        ]
+        return [self.SetDest(dest), self.SetModifier(bt.Subtract)]
 
     # -------
 

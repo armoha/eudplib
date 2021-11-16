@@ -30,6 +30,7 @@ from libc.string cimport memset
 from ..eudobj import EUDObject
 from ... import utils as ut
 from ..allocator import RegisterCreatePayloadCallback
+from .. import rawtrigger as bt
 
 
 class EUDVarBuffer(EUDObject):
@@ -43,24 +44,31 @@ class EUDVarBuffer(EUDObject):
 
         self._vdict = {}
         self._initvals = []
-        self._flags = []
 
     def DynamicConstructed(self):
         return True
 
-    def CreateVarTrigger(self, v, initval, flag=None):
+    def CreateVarTrigger(
+        self, v, initval, modifier=bt.SetTo, value=None, bitmask=None):
         ret = self + (72 * len(self._initvals))
-        self._initvals.append(initval)
-        self._flags.append(flag)
+        if value is None:
+            initval, value = 0, initval
+        modifier = bt.EncodeModifier(modifier)
+        self._initvals.append((initval, modifier, value, bitmask))
         self._vdict[v] = ret
         return ret
 
-    def CreateMultipleVarTriggers(self, v, initvals, flags=None):
+    def CreateMultipleVarTriggers(self, v, initvals):
         ret = self + (72 * len(self._initvals))
-        self._initvals.extend(initvals)
-        if flags is None:
-            flags = [None] * len(initvals)
-        self._flags.extend(flags)
+        for initval in initvals:
+            # initval: value | (dest, modifier, value, mask)
+            if isinstance(initval, tuple) and len(initval) == 4:
+                player, modifier, value, bitmask = initval
+                modifier = bt.EncodeModifier(modifier)
+                self._initvals.append((player, modifier, value, bitmask))
+            else:
+                modifier = bt.EncodeModifier(bt.SetTo)
+                self._initvals.append((0, modifier, initval, None))
         self._vdict[v] = ret
         return ret
 
@@ -68,39 +76,76 @@ class EUDVarBuffer(EUDObject):
         return 2408 + 72 * (len(self._initvals) - 1)
 
     def CollectDependency(self, emitbuffer):
-        for initval in self._initvals:
-            if type(initval) is not int:
-                emitbuffer.WriteDword(initval)
+        for initvals in self._initvals:
+            for initval in initvals:
+                if (initval is not None) and type(initval) is not int:
+                    emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer):
         cdef size_t i, heads, heade
         cdef size_t olen = 2408 + 72 * (len(self._initvals) - 1)
         cdef uint8_t * output = <uint8_t*> PyMem_Malloc(olen)
         memset(output, 0, olen)
-        cdef uint32_t iv2
+        cdef uint32_t bm2, pl2, iv2, mf2
 
         for i in range(len(self._initvals)):
             # 'preserve rawtrigger'
             ( < uint32_t*>(output + 72 * i + 2376))[0] = 4
             ( < uint32_t*>(output + 72 * i + 352))[0] = 0x072D0000
-        for i, flag in enumerate(self._flags):
-            if flag is None:
-                continue
-            ( < uint32_t*>(output + 72 * i + 328))[0] = (flag & 0xFFFFFFFF)
-            ( < uint32_t*>(output + 72 * i + 356))[0] = 0x43530000
 
         heads = 0
-        for i, initval in enumerate(self._initvals):
-            heade = 72 * i + 348
+        for i, initvals in enumerate(self._initvals):
+            player, modifier, initval, bitmask = initvals
+            heade = 72 * i + 328
+            if (bitmask is None) or (bitmask == 0):
+                pass
+            elif isinstance(bitmask, int):
+                bm2 = bitmask & 0xFFFFFFFF
+                ( < uint32_t*>(output + heade))[0] = bm2
+            else:
+                emitbuffer.WriteBytes(output[heads:heade])
+                emitbuffer.WriteDword(bitmask)
+                heads = heade + 4
+
+            heade += 16
+            if player == 0:
+                pass
+            elif isinstance(player, int):
+                pl2 = player & 0xFFFFFFFF
+                ( < uint32_t*>(output + heade))[0] = pl2
+            else:
+                emitbuffer.WriteBytes(output[heads:heade])
+                emitbuffer.WriteDword(player)
+                heads = heade + 4
+
+            heade += 4
             if initval == 0:
-                continue
+                pass
             elif isinstance(initval, int):
                 iv2 = initval & 0xFFFFFFFF
                 ( < uint32_t*>(output + heade))[0] = iv2
+            else:
+                emitbuffer.WriteBytes(output[heads:heade])
+                emitbuffer.WriteDword(initval)
+                heads = heade + 4
+    
+            heade += 4
+            if modifier == 7:  # SetTo
+                pass
+            elif isinstance(modifier, int):
+                mf2 = (0x2D0000 + (modifier << 24)) & 0xFFFFFFFF
+                ( < uint32_t*>(output + heade))[0] = mf2
+            else:
+                emitbuffer.WriteBytes(output[heads:heade])
+                emitbuffer.WriteWord(0)
+                emitbuffer.WriteByte(0x2D)
+                emitbuffer.WriteByte(modifier)
+                heads = heade + 4
+    
+            heade += 4
+            if bitmask is None:
                 continue
-            emitbuffer.WriteBytes(output[heads:heade])
-            emitbuffer.WriteDword(initval)
-            heads = heade + 4
+            ( < uint32_t*>(output + heade))[0] = 0x43530000
 
         emitbuffer.WriteBytes(output[heads:olen])
         PyMem_Free(output)
