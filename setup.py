@@ -4,7 +4,7 @@ try:
     from Cython.Build import cythonize
 except ImportError:
 
-    def cythonize(x):
+    def cythonize(x, **kwargs):
         return None
 
 
@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     package_data={"": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst", "*.mo"]},
     include_package_data=True,
-    ext_modules=cythonize(["eudplib/**/*.pyx"]),
+    ext_modules=cythonize(["eudplib/**/*.pyx"], language_level="3"),
     python_requires=">=3",
     # metadata for upload to PyPI
     author="Trgk",
