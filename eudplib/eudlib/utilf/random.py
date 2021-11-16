@@ -26,7 +26,7 @@ THE SOFTWARE.
 # This code uses simple LCG algorithm.
 
 from eudplib import core as c, ctrlstru as cs, utils as ut
-from ..memiof import f_dwbreak
+from ..memiof import f_wread_epd
 
 _seed = c.EUDVariable()
 
@@ -47,37 +47,32 @@ def f_randomize():
 
     # Store switch 1
     end = c.Forward()
-    c.RawTrigger(
-        conditions=c.Switch("Switch 1", c.Set),
-        actions=c.SetMemoryX(end + 328 + 24, c.SetTo, 4 << 24, 0xFF << 24),
-    )
-    c.RawTrigger(
-        conditions=c.Switch("Switch 1", c.Cleared),
-        actions=c.SetMemoryX(end + 328 + 24, c.SetTo, 5 << 24, 0xFF << 24),
-    )
-
-    dseed = c.EUDVariable()
     n = c.EUDLightVariable()
     c.RawTrigger(
         actions=[
             _seed.SetNumber(0),
-            dseed.SetNumber(1),
-            c.SetSwitch("Switch 1", c.Random),
+            _seed.QueueAddTo(_seed),
+            c.SetMemoryX(end + 328 + 24, c.SetTo, 5 << 24, 0xFF << 24),
             n.SetNumber(32),
         ]
     )
+    c.RawTrigger(
+        conditions=c.Switch("Switch 1", c.Set),
+        actions=c.SetMemoryX(end + 328 + 24, c.SetTo, 4 << 24, 0xFF << 24),
+    )
 
     if cs.EUDWhile()(n >= 1):
-        if cs.EUDIf()(c.Switch("Switch 1", c.Set)):
-            _seed += dseed
-        cs.EUDEndIf()
+        # _seed += _seed
         c.VProc(
-            dseed,
+            _seed,
             [
-                dseed.QueueAddTo(dseed),
                 c.SetSwitch("Switch 1", c.Random),
                 n.SubtractNumber(1),
             ],
+        )
+        c.RawTrigger(
+            conditions=c.Switch("Switch 1", c.Set),
+            actions=_seed.AddNumber(1),
         )
     cs.EUDEndWhile()
 
@@ -86,30 +81,30 @@ def f_randomize():
 
 @c.EUDFunc
 def f_rand():
-    seed = c.f_mul(_seed, 1103515245)
-    c.VProc(seed, [seed.AddNumber(12345), seed.SetDest(_seed)])
-    return f_dwbreak(_seed)[1]  # Only HIWORD is returned
+    global _seed
+    c.f_mul(_seed, 1103515245, ret=[_seed])
+    _seed += 12345
+    # Only HIWORD is returned
+    return f_wread_epd(ut.EPD(_seed.getValueAddr()), 2)
 
 
 @c.EUDFunc
 def f_dwrand():
-    seed1 = c.f_mul(_seed, 1103515245)
-    seed1 += 12345
-    seed2 = c.f_mul(seed1, 1103515245)
-    c.VProc(
-        seed2,
-        [
-            seed2.AddNumber(12345),
-            seed2.SetDest(_seed),
+    dseed = c.f_mul(_seed, 1103515245)
+    dseed += 12345
+    c.f_mul(dseed, 1103515245, ret=[_seed])
+    c.RawTrigger(
+        actions=[
+            _seed.AddNumber(12345),
             # HIWORD
-            seed1.SetNumberX(0, 0xFFFF),
+            dseed.SetNumberX(0, 0xFFFF),
         ],
     )
 
     # LOWORD
     for i in ut.RandList(range(16, 32)):
         c.RawTrigger(
-            conditions=seed2.AtLeastX(1, 2 ** i), actions=seed1.AddNumber(2 ** (i - 16))
+            conditions=_seed.AtLeastX(1, 2 ** i), actions=dseed.AddNumber(2 ** (i - 16))
         )
 
-    return seed1
+    return dseed

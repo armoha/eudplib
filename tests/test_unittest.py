@@ -1,6 +1,8 @@
 import profile_tool
 import helper
+import time
 
+start_time = time.time()
 DoCoverageTest = False
 
 if DoCoverageTest:
@@ -67,6 +69,7 @@ def f():
 
 # profile_tool.profile(f, "profile.json")
 f()
+print("--- %s seconds ---" % (time.time() - start_time))
 
 if DoCoverageTest:
     cov.stop()

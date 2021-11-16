@@ -28,7 +28,9 @@ def test_dwmemio():
 
     f_randomize()
     f_rand()
+    EP_SetRValueStrictMode(False)
     f_dwrand()
+    EP_SetRValueStrictMode(True)
 
     # Fixes https://cafe.naver.com/edac/81090
     SetKills(CurrentPlayer, SetTo, 0, 0)
