@@ -199,6 +199,7 @@ class StringBuffer:
                     c.VProc(line, line.QueueAddTo(ut.EPD(0x640B58)))
                 elif not isinstance(line, int) or line != 0:
                     cs.DoActions(c.SetMemory(0x640B58, c.Add, line))
+                if not isinstance(line, int) or line != 0:
                     c.RawTrigger(
                         conditions=c.Memory(0x640B58, c.AtLeast, 11),
                         actions=c.SetMemory(0x640B58, c.Subtract, 11),
