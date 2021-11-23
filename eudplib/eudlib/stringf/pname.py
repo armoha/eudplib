@@ -79,7 +79,7 @@ def compare_sequence(src, seq):
         if src % 4 == 3:
             append_cmp()
         src += 1
-    if val and mask:
+    if mask:
         append_cmp()
     return ret
 

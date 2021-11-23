@@ -345,7 +345,7 @@ def _eprintAll(*args):
     c.RawTrigger(
         nextptr=_eprintln_template,
         actions=[
-            c.SetMemory(
+            c.SetMemory(  # 348 + 32
                 _eprintln_template + 380, c.SetTo, c.EncodePlayer(c.AllPlayers)
             ),
             c.SetMemoryX(_eprintln_desync + 12, c.SetTo, 0, 0xFF000000),

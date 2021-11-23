@@ -36,7 +36,7 @@ cdef class RlocInt_C:
         self.offset, self.rlocmode = offset, rlocmode
 
     # http://stackoverflow.com/questions/18794169/pythons-radd-doesnt-work-for-c-defined-types
-    # Some obscure type can fludge into 'self' slot, so I called it'lhs'
+    # Some obscure type can fludge into 'self' slot, so I called it 'lhs'
     # rather than self.
     def __add__(lhs, rhs):
         if isinstance(lhs, RlocInt_C):  # Call from radd
