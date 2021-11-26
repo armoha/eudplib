@@ -37,101 +37,85 @@ def bits(n):
 
 def f_readgen_epd(mask, *args, docstring=None, _fdict={}):
     mask = mask & 0xFFFFFFFF
-    key = (  # use function's bytecode for equality
-        tuple(initval for initval, _ in args),
-        tuple(func.__code__.co_code for _, func in args),
+    if mask not in _fdict:
+        _fdict[mask] = dict()
+    _subfdict = _fdict[mask]
+
+    key = tuple(initval for initval, _ in args) + tuple(
+        tuple(func(i) for i in bits(mask)) for _, func in args
     )
+    if key not in _subfdict:
 
-    @c.EUDFunc
-    def f_read_epd_template(targetplayer):
-        ret = [c.EUDVariable() for _ in args]
+        @c.EUDFunc
+        def f_read_epd_template(targetplayer):
+            ret = [c.EUDVariable() for _ in args]
 
-        c.VProc(
-            targetplayer,
-            [
-                targetplayer.SetDest(ut.EPD(0x6509B0)),
-                [retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)],
-            ],
-        )
-
-        for i in bits(mask):
-            c.RawTrigger(
-                conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i)],
-                actions=[
-                    retv.AddNumber(arg[1](i)) if arg[1](i) != 0 else []
-                    for retv, arg in zip(ret, args)
+            c.VProc(
+                targetplayer,
+                [
+                    targetplayer.SetDest(ut.EPD(0x6509B0)),
+                    [retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)],
                 ],
             )
 
-        cp.f_setcurpl2cpcache()
+            for i in bits(mask):
+                c.RawTrigger(
+                    conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i)],
+                    actions=[
+                        retv.AddNumber(arg[1](i)) if arg[1](i) != 0 else []
+                        for retv, arg in zip(ret, args)
+                    ],
+                )
 
-        return ut.List2Assignable(ret)
+            cp.f_setcurpl2cpcache()
 
-    if docstring:
-        f_read_epd_template.__doc__ = docstring
+            return ut.List2Assignable(ret)
 
-    try:
-        _subfdict = _fdict[mask]
-    except KeyError:
-        # since it doesn't have a mask, won't have return values either.
-        _fdict[mask] = {key: f_read_epd_template}
-        _subfdict = _fdict[mask]
-    else:
-        try:
-            _subfdict[key]
-        except KeyError:
-            _subfdict[key] = f_read_epd_template
-
+        if docstring:
+            f_read_epd_template.__doc__ = docstring
+        _subfdict[key] = f_read_epd_template
     return _subfdict[key]
 
 
 def f_readgen_cp(mask, *args, docstring=None, _fdict={}):
     mask = mask & 0xFFFFFFFF
-    key = (  # use function's bytecode for equality
-        tuple(initval for initval, _ in args),
-        tuple(func.__code__.co_code for _, func in args),
+    if mask not in _fdict:
+        _fdict[mask] = dict()
+    _subfdict = _fdict[mask]
+
+    key = tuple(initval for initval, _ in args) + tuple(
+        tuple(func(i) for i in bits(mask)) for _, func in args
     )
+    if key not in _subfdict:
 
-    @c.EUDFunc
-    def readerf():
-        ret = [c.EUDVariable() for _ in args]
+        @c.EUDFunc
+        def readerf():
+            ret = [c.EUDVariable() for _ in args]
 
-        cs.DoActions([retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)])
+            cs.DoActions([retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)])
 
-        for i in bits(mask):
-            c.RawTrigger(
-                conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i)],
-                actions=[
-                    retv.AddNumber(arg[1](i)) if arg[1](i) != 0 else []
-                    for retv, arg in zip(ret, args)
-                ],
-            )
+            for i in bits(mask):
+                c.RawTrigger(
+                    conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i)],
+                    actions=[
+                        retv.AddNumber(arg[1](i)) if arg[1](i) != 0 else []
+                        for retv, arg in zip(ret, args)
+                    ],
+                )
 
-        return ut.List2Assignable(ret)
+            return ut.List2Assignable(ret)
 
-    def f_read_cp_template(cpo):
-        if not isinstance(cpo, int) or cpo != 0:
-            cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-        ret = [readerf()]
-        if not isinstance(cpo, int) or cpo != 0:
-            cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
-        return ut.List2Assignable(ret)
+        def f_read_cp_template(cpo):
+            if not isinstance(cpo, int) or cpo != 0:
+                cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
+            ret = [readerf()]
+            if not isinstance(cpo, int) or cpo != 0:
+                cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
+            return ut.List2Assignable(ret)
 
-    if docstring:
-        f_read_cp_template.__doc__ = docstring
-
-    try:
-        _subfdict = _fdict[mask]
-    except KeyError:
-        # since it doesn't have a mask, won't have return values either.
-        _fdict[mask] = {key: f_read_cp_template}
-        _subfdict = _fdict[mask]
-    else:
-        try:
-            _subfdict[key]
-        except KeyError:
-            _subfdict[key] = f_read_cp_template
-
+        if docstring:
+            f_read_cp_template.__doc__ = docstring
+        _subfdict[key] = f_read_cp_template
     return _subfdict[key]
 
 
