@@ -53,6 +53,7 @@ def Trigger(conditions=None, actions=None, preserved=True):
 
     conditions = ut.FlattenList(conditions)
     actions = ut.FlattenList(actions)
+    tstart = c.NextTrigger()
 
     # Normal
     if len(conditions) <= 16 and len(actions) <= 64:
@@ -64,7 +65,7 @@ def Trigger(conditions=None, actions=None, preserved=True):
         for act in actions:
             patched_actions.append(PatchAction(act))
 
-        c.RawTrigger(
+        tend = c.RawTrigger(
             conditions=patched_conds, actions=patched_actions, preserved=preserved
         )
 
@@ -94,8 +95,7 @@ def Trigger(conditions=None, actions=None, preserved=True):
 
         skipt = c.Forward()
         if not preserved:
-            a = c.RawTrigger()
-            c.RawTrigger(actions=c.SetNextPtr(a, skipt))
+            actions.append(c.SetNextPtr(start, skipt))
 
         # Execute actions
         for i in range(0, len(actions), 64):
@@ -104,14 +104,19 @@ def Trigger(conditions=None, actions=None, preserved=True):
             for act in acts:
                 patched_actions.append(PatchAction(act))
 
-            c.RawTrigger(actions=patched_actions)
+            tend = c.RawTrigger(actions=patched_actions)
 
         if not preserved:
-            skipt << c.NextTrigger()
+            c.SetNextTrigger(skipt)
 
         # Revert conditions
         cend << c.NextTrigger()
         for i in range(0, len(condts), 64):
-            c.RawTrigger(
+            tend = c.RawTrigger(
                 actions=[c.SetNextPtr(cts, cend) for cts in condts[i : i + 64]]
             )
+
+        if not preserved:
+            skipt << c.NextTrigger()
+
+    return (tstart, tend)
