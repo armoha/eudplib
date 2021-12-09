@@ -39,10 +39,20 @@ class EUDSCAnd:
     def Patch(self):
         self.const = False
         self.jb = c.Forward()
-        self.v = c.EUDLightBool()
-        self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.Clear())
-        c.PopTriggerScope()
-        c.RawTrigger(actions=self.v.Set())
+        try:
+            is_conditional = self.scope[1]["conditional"]
+        except KeyError:
+            is_conditional = False
+        if is_conditional:
+            self.v = c.EUDLightBool()
+            self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.Clear())
+            c.PopTriggerScope()
+            c.RawTrigger(actions=self.v.Set())
+        else:
+            self.v = c.EUDVariable()
+            self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.SetNumber(0))
+            c.PopTriggerScope()
+            self.v << True
 
     def __call__(self, cond=None, *, neg=False):
         if cond is None:

@@ -37,14 +37,15 @@ TODO : Remove code duplication if possible.
 
 
 def EUDIf():
-    def _footer(conditions, *, neg=False):
-        block = {"ifend": c.Forward(), "next_elseif": c.Forward()}
-        ut.EUDCreateBlock("ifblock", block)
+    block = {"ifend": c.Forward(), "next_elseif": c.Forward(), "conditional": True}
+    ut.EUDCreateBlock("ifblock", block)
 
+    def _footer(conditions, *, neg=False):
         if neg:
             EUDJumpIf(conditions, block["next_elseif"])
         else:
             EUDJumpIfNot(conditions, block["next_elseif"])
+        block["conditional"] = False
         return True
 
     return CtrlStruOpener(_footer)
@@ -70,6 +71,7 @@ def EUDElseIf():
 
         block["next_elseif"] << c.NextTrigger()
         block["next_elseif"] = c.Forward()
+        block["conditional"] = True
 
     def _footer(conditions, *, neg=False):
         block = ut.EUDPeekBlock("ifblock")[1]
@@ -77,6 +79,7 @@ def EUDElseIf():
             EUDJumpIf(conditions, block["next_elseif"])
         else:
             EUDJumpIfNot(conditions, block["next_elseif"])
+        block["conditional"] = False
         return True
 
     _header()
@@ -124,7 +127,12 @@ def EUDEndIf():
 
 def EUDExecuteOnce():
     def _header():
-        block = {"blockstart": c.Forward(), "blockend": c.Forward(), "blockmode": None}
+        block = {
+            "blockstart": c.Forward(),
+            "blockend": c.Forward(),
+            "blockmode": None,
+            "conditional": True,
+        }
         ut.EUDCreateBlock("executeonceblock", block)
         block["blockstart"] << c.NextTrigger()
 
@@ -141,6 +149,7 @@ def EUDExecuteOnce():
                     c.SetMemory(block["blockstart"] + 2376, c.SetTo, 8),
                 ]
                 EUDJumpIfNot(conditions, block["blockend"], _actions=skip)
+        block["conditional"] = False
         return True
 
     _header()

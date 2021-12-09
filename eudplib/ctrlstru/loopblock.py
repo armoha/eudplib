@@ -119,6 +119,7 @@ def EUDWhile():
             "loopstart": c.NextTrigger(),
             "loopend": c.Forward(),
             "contpoint": c.Forward(),
+            "conditional": True,
         }
 
         ut.EUDCreateBlock("whileblock", block)
@@ -129,6 +130,7 @@ def EUDWhile():
             EUDJumpIf(conditions, block["loopend"])
         else:
             EUDJumpIfNot(conditions, block["loopend"])
+        block["conditional"] = False
         return True
 
     _header()
