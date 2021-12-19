@@ -104,7 +104,7 @@ def QueueGameCommand_QueuedRightClick(xy):
 def QueueGameCommand_MinimapPing(xy):
     """Queue minimap ping action.
 
-    :param xy: (y * 65536) + x, where (x, y) is coordinate for right click.
+    :param xy: (y * 65536) + x, where (x, y) is coordinate for minimap ping.
     """
     MinimapPingCommand = c.Db(b"...\x58XXYY")
     c.SetVariables(ut.EPD(MinimapPingCommand + 4), xy)

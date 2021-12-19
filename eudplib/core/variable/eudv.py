@@ -609,6 +609,8 @@ def SetVariables(srclist, dstlist, mdtlist=None):
 
     if mdtlist is None:
         mdtlist = [bt.SetTo] * len(srclist)
+    else:
+        mdtlist = FlattenList(mdtlist)
 
     sqa = [(src, mdt, dst) for src, dst, mdt in zip(srclist, dstlist, mdtlist)]
     SeqCompute(sqa)

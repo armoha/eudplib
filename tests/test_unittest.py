@@ -16,6 +16,7 @@ helper.EP_SetRValueStrictMode(True)
 
 from unittests import (
     testblockstru,
+    testcondition,
     testcurpl,
     testpatch,
     testarray,
