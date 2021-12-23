@@ -286,9 +286,8 @@ def _SetLocEPD(loc, epd):
     set_xy = c.RawTrigger(
         actions=[
             set_x,
-            c.SetMemory(0x6509B0, c.Add, 2),
+            c.SetMemory(0x6509B0, c.Add, 1),
             c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetMemory(0x6509B0, c.Subtract, 1),
         ]
     )
     set_x_epd << ut.EPD(set_x) + 5
@@ -296,7 +295,10 @@ def _SetLocEPD(loc, epd):
     done = c.Forward()
     one_more = c.RawTrigger(
         nextptr=set_xy,
-        actions=c.SetNextPtr(set_xy, done),
+        actions=[
+            c.SetMemory(0x6509B0, c.Add, 1),
+            c.SetNextPtr(set_xy, done),
+        ],
     )
     done << f_setcurpl2cpcache(actions=c.SetNextPtr(set_xy, one_more))
 
