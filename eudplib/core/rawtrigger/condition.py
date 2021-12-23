@@ -131,7 +131,7 @@ class Condition(ConstExpr):
             msg.append(_("stack backtrace:"))
             for decl in reversed(self.decl):
                 errs = decl.filename, decl.lineno, decl.function
-                msg.append(_("\tFile {} Line {} in {}").format(*errs))
+                msg.append("\t" + _("File {} Line {} in {}").format(*errs))
             raise ut.EPError("\n".join(msg))
         return self.parenttrg.Evaluate() + 8 + self.condindex * 20
 
