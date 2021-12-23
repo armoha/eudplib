@@ -54,15 +54,15 @@ class Condition(ConstExpr):
     # fmt: off
     def __init__(self, locid, player, amount, unitid,
                  comparison, condtype, restype, flags, *, eudx=0):
-        self.decl = list()
-        for i in range(1, 9):
-            try:
-                decl = getframeinfo(stack()[i][0])
-            except IndexError:
-                break
-            if decl.filename.startswith("E:\\eudplib\\eudplib\\"):
-                continue
-            self.decl.append(decl)
+        # self.decl = list()
+        # for i in range(1, 9):
+        #     try:
+        #         decl = getframeinfo(stack()[i][0])
+        #     except IndexError:
+        #         break
+        #     if decl.filename.startswith("E:\\eudplib\\eudplib\\"):
+        #         continue
+        #     self.decl.append(decl)
         super().__init__(self)
 
         if isinstance(eudx, str):
@@ -128,10 +128,10 @@ class Condition(ConstExpr):
         if self.parenttrg is None:
             msg = []
             msg.append(_("Orphan condition. This often happens when you try to do arithmetics with conditions."))
-            msg.append(_("stack backtrace:"))
-            for decl in reversed(self.decl):
-                errs = decl.filename, decl.lineno, decl.function
-                msg.append("\t" + _("File {} Line {} in {}").format(*errs))
+            # msg.append(_("stack backtrace:"))
+            # for decl in reversed(self.decl):
+            #     errs = decl.filename, decl.lineno, decl.function
+            #     msg.append("\t" + _("File {} Line {} in {}").format(*errs))
             raise ut.EPError("\n".join(msg))
         return self.parenttrg.Evaluate() + 8 + self.condindex * 20
 
