@@ -221,7 +221,9 @@ class MPQ:
         fileh = c_void_p()
         ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2b(fname), 0, byref(fileh))
         if not ret:
-            return None
+            ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2utf8(fname), 0, byref(fileh))
+            if not ret:
+                return None
 
         # Get file size & allocate buffer
         # Note : this version only supports 32bit mpq file
