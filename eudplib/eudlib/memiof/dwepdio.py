@@ -30,12 +30,11 @@ from ... import core as c, ctrlstru as cs, utils as ut
 
 from .modcurpl import f_setcurpl2cpcache
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
-from ...core.variable.evcommon import _ev
 from ...localize import _
 
 
-@_EUDPredefineReturn(_ev[:2])
-@_EUDPredefineParam(_ev[2:3])
+@_EUDPredefineReturn(2)
+@_EUDPredefineParam(c.CurrentPlayer)
 @c.EUDFunc
 def f_dwepdread_epd(targetplayer):
     ptr, epd = f_dwepdread_epd._frets
@@ -43,10 +42,9 @@ def f_dwepdread_epd(targetplayer):
     acts = [
         ptr.SetNumber(0),
         epd.SetNumber(ut.EPD(0)),
-        targetplayer.AddNumber(-12 * u),
-        targetplayer.SetDest(ut.EPD(0x6509B0)),
+        c.SetMemory(0x6509B0, c.Add, -12 * u),
     ]
-    c.VProc(targetplayer, ut.RandList(acts))
+    cs.DoActions(ut.RandList(acts))
 
     for i in ut.RandList(range(32)):
         acts = [ptr.AddNumber(2 ** i), epd.AddNumber(2 ** (i - 2)) if i >= 2 else []]
@@ -60,18 +58,17 @@ def f_dwepdread_epd(targetplayer):
     # return ptr, epd
 
 
-@_EUDPredefineReturn(_ev[:1])
-@_EUDPredefineParam(_ev[1:2])
+@_EUDPredefineReturn(1)
+@_EUDPredefineParam(c.CurrentPlayer)
 @c.EUDFunc
 def f_dwread_epd(targetplayer):
     ptr = f_dwread_epd._frets[0]
     u = random.randint(234, 65535)
     acts = [
         ptr.SetNumber(0),
-        targetplayer.AddNumber(-12 * u),
-        targetplayer.SetDest(ut.EPD(0x6509B0)),
+        c.SetMemory(0x6509B0, c.Add, -12 * u),
     ]
-    c.VProc(targetplayer, ut.RandList(acts))
+    cs.DoActions(ut.RandList(acts))
     for i in ut.RandList(range(32)):
         c.RawTrigger(
             conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i),
@@ -95,18 +92,13 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
         readerf = _readerdict[flags]
     else:
         # Create reader function
+        @_EUDPredefineParam(c.CurrentPlayer)
         @c.EUDFunc
         def readerf(targetplayer):
-            flagsv = [c.EUDVariable() for _ in flags]
+            flagsv = c.EUDCreateVariables(len(flags))
 
             # All set to 0
-            c.VProc(
-                targetplayer,
-                [
-                    targetplayer.SetDest(ut.EPD(0x6509B0)),
-                    [flagv.SetNumber(0) for flagv in flagsv],
-                ],
-            )
+            cs.DoActions([flagv.SetNumber(0) for flagv in flagsv])
 
             # Fill flags
             for i in range(31, -1, -1):

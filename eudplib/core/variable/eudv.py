@@ -58,6 +58,8 @@ def _ProcessDest(dest):
     except AttributeError:
         if isinstance(dest, ConstExpr) and dest.rlocmode == 4:
             dest = ConstExpr(dest.baseobj, dest.offset // 4, 1)
+        else:
+            dest = bt.EncodePlayer(dest)
     return dest
 
 

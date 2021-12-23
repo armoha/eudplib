@@ -27,7 +27,6 @@ from .. import allocator as ac, rawtrigger as rt, variable as ev, eudfunc as ef
 
 from eudplib import utils as ut
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
-from ..variable.evcommon import _ev
 
 
 def f_mul(a, b, **kwargs):
@@ -120,8 +119,8 @@ def f_constmul(number):
         return mulfdict[number]
     except KeyError:
 
-        @_EUDPredefineParam(_ev[:1])
-        @_EUDPredefineReturn(_ev[1:2])
+        @_EUDPredefineParam(1)
+        @_EUDPredefineReturn(1, 2)
         @ef.EUDFunc
         def _mulf(a):
             ret = _mulf._frets[0]
@@ -162,8 +161,8 @@ def f_constdiv(number):
         return divfdict[number]
     except KeyError:
 
-        @_EUDPredefineReturn(_ev[:2])
-        @_EUDPredefineParam(_ev[1:2])
+        @_EUDPredefineReturn(2)
+        @_EUDPredefineParam(1, 2)
         @ef.EUDFunc
         def _divf(a):
             quotient = _divf._frets[0]
@@ -189,7 +188,7 @@ def f_constdiv(number):
 # -------
 
 
-@_EUDPredefineReturn(_ev[:1])
+@_EUDPredefineReturn(1)
 @ef.EUDFunc
 def _f_mul(a, b):
     ret = _f_mul._frets[0]

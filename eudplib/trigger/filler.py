@@ -26,7 +26,6 @@ THE SOFTWARE.
 from .. import core as c
 from .. import utils as ut
 from ..core.eudfunc.eudf import _EUDPredefineParam
-from ..core.variable.evcommon import _ev
 
 _lowordfilter = c.EUDXVariable(0, 0xFFFF)
 _lsbytefilter = c.EUDXVariable(0, 0xFF)
@@ -53,7 +52,7 @@ def _filllsbyte(dstepd, v1):
     )
 
 
-@_EUDPredefineParam(_ev[:1])
+@_EUDPredefineParam(1)
 @c.EUDFunc
 def _fill_b__(v1):
     _lobytefilter << 0
@@ -69,7 +68,7 @@ def _filllobyte(dstepd, v1):
     c.VProc(_lobytefilter, _lobytefilter.SetDest(dstepd))
 
 
-@_EUDPredefineParam(_ev[:1])
+@_EUDPredefineParam(1)
 @c.EUDFunc
 def _fill__b_(v1):
     _hibytefilter << 0
@@ -85,7 +84,7 @@ def _fillhibyte(dstepd, v1):
     c.VProc(_hibytefilter, _hibytefilter.SetDest(dstepd))
 
 
-@_EUDPredefineParam(_ev[:1])
+@_EUDPredefineParam(1)
 @c.EUDFunc
 def _fill___b(v1):
     _msbytefilter << 0

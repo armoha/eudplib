@@ -24,7 +24,9 @@ THE SOFTWARE.
 """
 
 from ... import core as c, ctrlstru as cs, utils as ut
-from ..memiof import f_posread_epd, f_setcurpl2cpcache, f_dwread_epd
+from ...core.eudfunc.eudf import _EUDPredefineParam
+from ...core.variable.evcommon import _cp
+from ..memiof import f_posread_cp, f_setcurpl2cpcache, f_dwread_epd
 from ...localize import _
 
 _loct = ut.EPD(0x58DC60) - 5
@@ -262,42 +264,41 @@ def f_getlocTL(locID, **kwargs):
     return _GetLocTL(locID * 5, **kwargs)
 
 
+_set_loc = c.SetMemory(0x6509B0, c.SetTo, 0)
+_setcp2loc = ut.EPD(_set_loc) + 5
+
+
+@_EUDPredefineParam((_setcp2loc,), c.CurrentPlayer)
 @c.EUDFunc
 def _SetLocEPD(loc, epd):
-    x, y = f_posread_epd(epd)
-
-    act, nptr = c.Forward(), c.Forward()
-
-    c.VProc(
-        [loc, x, y],
-        [
-            loc.SetDest(ut.EPD(0x6509B0)),
-            x.SetDest(ut.EPD(act + 32 * 0 + 20)),
-            y.SetDest(ut.EPD(act + 32 * 2 + 20)),
-        ],
-    )
+    global _setcp2loc
+    set_x_epd = c.Forward()
+    f_posread_cp(0, ret=[set_x_epd, set_x_epd + 16])
 
     c.RawTrigger(
-        nextptr=x.GetVTable(),
         actions=[
+            _set_loc,
             c.SetMemory(0x6509B0, c.Add, _loct),
-            x.SetDest(ut.EPD(act + 32 * 4 + 20)),
-            y.SetDest(ut.EPD(act + 32 * 6 + 20)),
-            c.SetNextPtr(y.GetVTable(), nptr),
-        ],
-    )
-    nptr << c.NextTrigger()
-    f_setcurpl2cpcache(
-        actions=[
-            act << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-            c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
         ]
     )
+
+    set_x = c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
+    set_xy = c.RawTrigger(
+        actions=[
+            set_x,
+            c.SetMemory(0x6509B0, c.Add, 2),
+            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            c.SetMemory(0x6509B0, c.Subtract, 1),
+        ]
+    )
+    set_x_epd << ut.EPD(set_x) + 5
+
+    done = c.Forward()
+    one_more = c.RawTrigger(
+        nextptr=set_xy,
+        actions=c.SetNextPtr(set_xy, done),
+    )
+    done << f_setcurpl2cpcache(actions=c.SetNextPtr(set_xy, one_more))
 
 
 def f_setloc_epd(locID, epd):

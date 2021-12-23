@@ -30,7 +30,7 @@ from .. import rawtrigger as rt
 from .muldiv import f_mul
 from ...utils import EPD, RandList
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
-from ..variable.evcommon import _ev, _xv
+from ..variable.evcommon import _xv
 
 _x = _xv[0]
 
@@ -146,8 +146,8 @@ def f_bitsplit(a):
 # -------
 
 
-@_EUDPredefineParam(_ev[:1])
-@_EUDPredefineReturn(_ev[1:2])
+@_EUDPredefineParam(1)
+@_EUDPredefineReturn(1, 2)
 @ef.EUDFunc
 def _exp2_vv(n):
     ret = _exp2_vv._frets[0]
@@ -186,7 +186,7 @@ def _f_bitlshift(a, b):
 
 
 def f_bitlshift(a, b, **kwargs):
-    """ Calculate a << b """
+    """Calculate a << b"""
     if isinstance(b, int):
         if 1 <= b <= 7:
             return _f_bitlshift(a, b, **kwargs)
@@ -196,7 +196,7 @@ def f_bitlshift(a, b, **kwargs):
 
 
 def f_bitrshift(a, b):
-    """ Calculate a >> b """
+    """Calculate a >> b"""
     if isinstance(b, int) and b >= 32:
         return 0
 

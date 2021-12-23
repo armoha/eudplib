@@ -168,16 +168,12 @@ class EUDFuncN:
             + _(" (From function %s)").format(self._bodyfunc.__name__),
         )
 
-        constAssigns = [
-            (fret, bt.SetTo, ret)
-            for fret, ret in zip(self._frets, retv)
-            if not ev.IsEUDVariable(ret)
-        ]
-        varAssigns = [
-            (fret, bt.SetTo, ret)
-            for fret, ret in zip(self._frets, retv)
-            if ev.IsEUDVariable(ret)
-        ]
+        varAssigns, constAssigns = list(), list()
+        for fret, ret in zip(self._frets, retv):
+            if ev.IsEUDVariable(ret):
+                varAssigns.append((fret, bt.SetTo, ret))
+            else:
+                constAssigns.append((fret, bt.SetTo, ret))
         if len(varAssigns) <= 2:
             ev.SeqCompute(constAssigns + varAssigns)
         else:
@@ -185,6 +181,43 @@ class EUDFuncN:
 
         if needjump:
             bt.SetNextTrigger(self._fend)
+
+    def _CallWithLastArgs(self, ret=None):
+        if self._fstart is None:
+            self._CreateFuncBody()
+
+        fcallend = ac.Forward()
+
+        # SeqCompute gets faster when const-assignments are in front of
+        # variable assignments.
+        if ret is None:
+            ret = ev.EUDCreateVariables(self._retn)
+        ret = ut.FlattenList(ret)
+        ut.ep_assert(
+            len(ret) == self._retn,
+            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
+        )
+        nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
+        if self._retn >= 1:
+            for fret, retv in zip(self._frets, ret):
+                try:
+                    retv = ut.EPD(retv.getValueAddr())
+                except AttributeError:
+                    pass
+                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
+
+        ev.SeqCompute(nextPtrAssignment)
+        bt.SetNextTrigger(self._fstart)
+
+        fcallend << bt.NextTrigger()
+
+        if self._frets is not None:
+            for retv in ret:
+                try:
+                    retv.makeR()
+                except AttributeError:
+                    pass
+            return ut.List2Assignable(ret)
 
     def __call__(self, *args, ret=None):
         if self._fstart is None:
@@ -201,8 +234,12 @@ class EUDFuncN:
         # SeqCompute gets faster when const-assignments are in front of
         # variable assignments.
         if ret is None:
-            ret = [ev.EUDVariable() for _ in range(self._retn)]
+            ret = ev.EUDCreateVariables(self._retn)
         ret = ut.FlattenList(ret)
+        ut.ep_assert(
+            len(ret) == self._retn,
+            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
+        )
         nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
             for fret, retv in zip(self._frets, ret):
@@ -211,16 +248,12 @@ class EUDFuncN:
                 except AttributeError:
                     pass
                 nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
-        constAssigns = [
-            (farg, bt.SetTo, arg)
-            for farg, arg in zip(self._fargs, args)
-            if not ev.IsEUDVariable(arg)
-        ]
-        varAssigns = [
-            (farg, bt.SetTo, arg)
-            for farg, arg in zip(self._fargs, args)
-            if ev.IsEUDVariable(arg)
-        ]
+        varAssigns, constAssigns = list(), list()
+        for farg, arg in zip(self._fargs, args):
+            if ev.IsEUDVariable(arg):
+                varAssigns.append((farg, bt.SetTo, arg))
+            else:
+                constAssigns.append((farg, bt.SetTo, arg))
         if len(varAssigns) <= 2:
             ev.SeqCompute(nextPtrAssignment + constAssigns + varAssigns)
         else:

@@ -27,8 +27,10 @@ import inspect
 import functools
 
 from .eudtypedfuncn import EUDTypedFuncN, applyTypes, EUDXTypedFuncN, EUDFullFuncN
+from ..rawtrigger import CurrentPlayer
 from ... import utils as ut
 from ...localize import _
+from ..variable.evcommon import _ev, _cp
 
 
 def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
@@ -125,7 +127,7 @@ def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):
     return _EUDFullFunc
 
 
-def _EUDPredefineParam(fargs):
+def _EUDPredefineParam(*args):
     """
     Use with cautions!
     1. Don't initialize value!
@@ -133,16 +135,31 @@ def _EUDPredefineParam(fargs):
     3. Always SetDest when assign to other variables!
     4. No EUDFunc call in function body!
     """
+    fnargs, slicer = list(), list()
+    for arg in args:
+        if arg is CurrentPlayer:
+            fnargs.append(ut.EPD(0x6509B0))
+        elif isinstance(arg, (list, tuple)):
+            fnargs.extend(arg)
+        else:
+            slicer.append(arg)
+    while slicer:
+        try:
+            fnargs.extend(ut.FlattenList(_ev[slice(*slicer)]))
+        except IndexError:
+            _ev.append(c.EUDVariable())
+        else:
+            break
 
     def wrapper(f):
-        f._fargs = fargs
-        f._argn = len(fargs)
+        f._fargs = fnargs
+        f._argn = len(fnargs)
         return f
 
     return wrapper
 
 
-def _EUDPredefineReturn(frets):
+def _EUDPredefineReturn(*frets):
     """
     Use with cautions!
     1. Always initialize value!
@@ -150,6 +167,13 @@ def _EUDPredefineReturn(frets):
     3. Don't modify Dest in function body!
     4. No EUDFunc call in function body!
     """
+    while frets:
+        try:
+            frets = ut.FlattenList(_ev[slice(*frets)])
+        except IndexError:
+            _ev.append(c.EUDVariable())
+        else:
+            break
 
     def wrapper(f):
         f._frets = frets
