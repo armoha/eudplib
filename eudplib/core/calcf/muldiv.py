@@ -196,14 +196,14 @@ def _f_mul(a, b):
 
     # Init
     rt.RawTrigger(actions=[ret.SetNumber(0), b.SetModifier(rt.Add)])
+    remaining_bits = 0xFFFFFFFF
 
     # Run multiplication chain
     for i in range(32):
+        remaining_bits -= 1 << i
         p1, p2, p3, p4 = [ac.Forward() for _ in range(4)]
         p1 << rt.RawTrigger(
-            nextptr=p2,
-            conditions=a.AtLeastX(1, 2 ** i),
-            actions=[a.SubtractNumber(2 ** i), rt.SetNextPtr(p1, p3)],
+            nextptr=p2, conditions=a.AtLeastX(1, 2 ** i), actions=rt.SetNextPtr(p1, p3),
         )
         p3 << ev.VProc(b, [b.SetDest(ret), rt.SetNextPtr(p1, p2)])
         p2 << rt.NextTrigger()
@@ -213,8 +213,12 @@ def _f_mul(a, b):
                 rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
                 rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
             ]
-            rt.RawTrigger(nextptr=p4, conditions=[a == 0], actions=ut.RandList(acts))
-            p4 << ev.VProc(b, b.SetDest(b))
+            rt.RawTrigger(
+                nextptr=p4,
+                conditions=a.ExactlyX(0, remaining_bits),
+                actions=ut.RandList(acts),
+            )
+            p4 << ev.VProc(b, b.SetDest(b))  # b += b
 
     endmul << rt.RawTrigger(actions=[reset_nptr << rt.SetNextPtr(p1, p2)])
     # return ret
