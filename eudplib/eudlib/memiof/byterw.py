@@ -108,6 +108,8 @@ class EUDByteWriter:
     def __init__(self):
         self._suboffset = c.EUDLightVariable()
         self._write = c.Forward()
+        self._const = [c.Forward() for _ in range(4)]
+        self._return = c.Forward()
 
     # -------
 
@@ -117,14 +119,14 @@ class EUDByteWriter:
             c.VProc(
                 epdoffset,
                 [
-                    epdoffset.QueueAssignTo(EPD(self._write) + 4),
+                    epdoffset.QueueAssignTo(EPD(self._write + 344)),
                     self._suboffset.SetNumber(0),
                 ],
             )
         else:
             c.RawTrigger(
                 actions=[
-                    c.SetMemory(self._write + 16, c.SetTo, epdoffset),
+                    c.SetMemory(self._write + 344, c.SetTo, epdoffset),
                     self._suboffset.SetNumber(0),
                 ]
             )
@@ -133,52 +135,83 @@ class EUDByteWriter:
     def seekoffset(self, offset):
         """Seek EUDByteWriter to specific address"""
         # convert offset to epd offset & suboffset
-        c.f_div(offset, 4, ret=[EPD(self._write) + 4, self._suboffset])
-        c.RawTrigger(actions=c.SetMemory(self._write + 16, c.Add, -(0x58A364 // 4)))
+        c.f_div(offset, 4, ret=[EPD(self._write + 344), self._suboffset])
+        c.RawTrigger(actions=c.SetMemory(self._write + 344, c.Add, -(0x58A364 // 4)))
 
     # -------
 
     @c.EUDMethod
+    def _writebyte(self, byte):
+        cs.EUDSwitch(self._suboffset)
+        if cs.EUDSwitchCase()(0):
+            c.VProc(
+                byte,
+                [
+                    byte.SetDest(EPD(self._write + 348)),
+                    c.SetMemory(self._write + 328, c.SetTo, 0xFF),
+                ],
+            )
+            cs.EUDBreak()
+        for i in range(1, 4):
+            cs.EUDSwitchCase()(i)
+            cs.DoActions(c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)))
+            for j in RandList(range(8)):
+                c.RawTrigger(
+                    conditions=byte.AtLeastX(1, 2 ** j),
+                    actions=c.SetMemory(self._write + 348, c.Add, 2 ** (j + i * 8)),
+                )
+            cs.EUDBreak()
+
+        cs.EUDEndSwitch()
+
+        self._write << c.RawTrigger(
+            actions=(
+                c.SetDeathsX(0, c.SetTo, 0, 0, 0xFF00),
+                self._suboffset.AddNumber(1),
+                c.SetMemory(self._write + 348, c.SetTo, 0),
+            )
+        )
+        c.RawTrigger(
+            conditions=[self._suboffset >= 4],
+            actions=[
+                self._suboffset.SetNumber(0),
+                c.SetMemory(self._write + 344, c.Add, 1),
+            ],
+        )
+        self._return << c.NextTrigger()
+
     def writebyte(self, byte):
         """Write byte to current position.
 
         Write a byte to current position of EUDByteWriter.
         ByteWriter will advance by 1 byte.
         """
-        cs.EUDSwitch(self._suboffset)
-        if cs.EUDSwitchCase()(0):
-            c.VProc(
-                byte,
-                [
-                    byte.SetDest(EPD(self._write) + 5),
-                    c.SetMemory(self._write, c.SetTo, 0xFF),
-                ],
-            )
-            cs.EUDBreak()
-        for i in range(1, 4):
-            cs.EUDSwitchCase()(i)
-            cs.DoActions(c.SetMemory(self._write, c.SetTo, 0xFF << (8 * i)))
-            for j in RandList(range(8)):
-                c.RawTrigger(
-                    conditions=byte.AtLeastX(1, 2 ** j),
-                    actions=c.SetMemory(self._write + 20, c.Add, 2 ** (j + i * 8)),
+        if c.IsEUDVariable(byte):
+            return self._writebyte(byte)
+        if not self._const[0].IsSet():
+            c.PushTriggerScope()
+            for i in range(4):
+                self._const[i] << c.RawTrigger(
+                    conditions=self._suboffset.Exactly(i),
+                    actions=[
+                        c.SetMemory(self._write + 348, c.SetTo, 0),
+                        c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)),
+                    ],
                 )
-            cs.EUDBreak()
-
-        cs.EUDEndSwitch()
-
-        cs.DoActions(
-            self._suboffset.AddNumber(1),
-            self._write << c.SetDeathsX(0, c.SetTo, 0, 0, 0xFF00),
-            c.SetMemory(self._write + 20, c.SetTo, 0),
-        )
+            c.SetNextTrigger(self._write)
+            c.PopTriggerScope()
+        nextptr = c.Forward()
         c.RawTrigger(
-            conditions=[self._suboffset >= 4],
-            actions=[self._suboffset.SetNumber(0), c.SetMemory(self._write + 16, c.Add, 1)],
+            nextptr=self._const[0],
+            actions=[
+                c.SetMemory(self._const[i] + 348, c.SetTo, byte << (8 * i))
+                for i in range(4)
+            ]
+            + [c.SetNextPtr(self._return, nextptr)],
         )
+        nextptr << c.NextTrigger()
 
-    @classmethod
-    def flushdword(cls):
+    def flushdword(self):
         pass
 
 
@@ -284,10 +317,7 @@ class EUDByteStream:
         if cs.EUDSwitchCase()(0):
             c.VProc(
                 byte,
-                [
-                    byte.SetDest(EPD(write) + 5),
-                    c.SetMemory(write, c.SetTo, 0xFF),
-                ],
+                [byte.SetDest(EPD(write) + 5), c.SetMemory(write, c.SetTo, 0xFF),],
             )
             cs.EUDBreak()
         for i in range(1, 4):
@@ -303,14 +333,12 @@ class EUDByteStream:
         cs.EUDEndSwitch()
 
         cs.DoActions(
-            self._suboffset.AddNumber(1),
-            write << c.SetDeathsX(0, c.SetTo, 0, 0, 0),
+            self._suboffset.AddNumber(1), write << c.SetDeathsX(0, c.SetTo, 0, 0, 0),
         )
         c.RawTrigger(
             conditions=[self._suboffset >= 4],
             actions=[self._offset.AddNumber(1), self._suboffset.SetNumber(0)],
         )
 
-    @classmethod
-    def flushdword(cls):
+    def flushdword(self):
         pass
