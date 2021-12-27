@@ -30,6 +30,7 @@ from ... import eudlib as sf
 from ... import utils as ut
 from ...trigtrg import runtrigtrg as rtt
 from ..inlinecode.ilcprocesstrig import GetInlineCodeList
+from ...eudlib.memiof.mblockio import _repaddsd_epd
 import random
 
 
@@ -165,7 +166,7 @@ def _FlipProp(trigepd):
     cs.EUDEndWhile()
 
 
-def CreateInjectFinalizer(chkt, root):
+def CreateInjectFinalizer(chkt, root, mrgndata):
     rtt.AllocTrigTriggerLink()
     c.EP_SetRValueStrictMode(False)
 
@@ -188,12 +189,9 @@ def CreateInjectFinalizer(chkt, root):
             ],
         )
 
-        """
         # revert mrgndata
-        mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
         mrgndata_db = c.Db(mrgndata)
-        sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
-        """
+        _repaddsd_epd(ut.EPD(mrgn) - 1, ut.EPD(mrgndata_db) - 1, len(mrgndata) // 4)
 
         # Flip TRIG properties
         i = c.EUDVariable()

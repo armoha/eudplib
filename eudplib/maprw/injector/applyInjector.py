@@ -32,6 +32,8 @@ from .payloadReloc import CreatePayloadRelocator
 from .injFinalizer import CreateInjectFinalizer
 from .payloadInit import InitializePayload
 
+from os import urandom
+
 
 skip_payload_relocator = False
 
@@ -45,8 +47,9 @@ def applyInjector(chkt, root):
     # Create injector triggers
     bsm = BlockStruManager()
     prev_bsm = SetCurrentBlockStruManager(bsm)
+    obfus_mrgn = urandom(5100)
 
-    root = CreateInjectFinalizer(chkt, root)
+    root = CreateInjectFinalizer(chkt, root, obfus_mrgn)
 
     setPayloadLoggerMode(True)
     payload = c.CreatePayload(root)
@@ -56,6 +59,6 @@ def applyInjector(chkt, root):
         payload = CreatePayloadRelocator(payload)
         CreateVectorRelocator(chkt, payload)
     else:
-        InitializePayload(chkt, payload)
+        InitializePayload(chkt, payload, obfus_mrgn)
 
     SetCurrentBlockStruManager(prev_bsm)

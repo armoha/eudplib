@@ -27,6 +27,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 
+from ...core.eudfunc.eudf import _EUDPredefineParam
 from . import modcurpl as cp
 from . import byterw as bm
 from . import cpmemio as cm
@@ -56,6 +57,29 @@ def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
             ],
         )
 
+    cs.EUDEndWhile()
+
+    cp.f_setcurpl2cpcache()
+
+
+_dstadder = c.EUDVariable(0, c.Add, 0)
+_adderdst = ut.EPD(_dstadder.getDestAddr())
+
+
+@_EUDPredefineParam((_adderdst, c.CurrentPlayer), 1)
+@c.EUDFunc
+def _repaddsd_epd(dstepdp, srcepdp, copydwn):
+    global _dstadder
+    if cs.EUDWhileNot()(copydwn == 0):
+        cm.f_dwread_cp(0, ret=[_dstadder])
+        c.VProc(
+            _dstadder,
+            [
+                _dstadder.AddDest(1),
+                c.SetMemory(0x6509B0, c.Add, 1),
+                copydwn.SubtractNumber(1),
+            ],
+        )
     cs.EUDEndWhile()
 
     cp.f_setcurpl2cpcache()

@@ -25,12 +25,14 @@ THE SOFTWARE.
 
 from ... import core as c, ctrlstru as cs, utils as ut
 from . import dwepdio as dwm
+from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...core.variable.evcommon import _ev
 
 
+@_EUDPredefineReturn(2)
 @c.EUDFunc
 def _reader():
-    ptr, epd = c.EUDVariable(), c.EUDVariable()
+    ptr, epd = _reader._frets
     cs.DoActions(ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)))
     for i in ut.RandList(range(32)):
         c.RawTrigger(
@@ -41,7 +43,7 @@ def _reader():
             ],
         )
 
-    return ptr, epd
+    # return ptr, epd
 
 
 def f_dwepdread_cp(cpo, **kwargs):
@@ -67,9 +69,10 @@ def f_epdread_cp(cpo, **kwargs):
     return f_dwepdread_cp(cpo, **kwargs)[1]
 
 
+@_EUDPredefineReturn(1)
 @c.EUDFunc
 def _wreader(subp):
-    w = c.EUDVariable()
+    w = _wreader._frets[0]
     w << 0
     cs.EUDSwitch(subp)
     for bits in ut.RandList(range(3)):
@@ -96,13 +99,13 @@ def _wreader(subp):
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, -1))
         cs.EUDBreak()
     cs.EUDEndSwitch()
-    return w
+    # return w
 
 
-def f_wread_cp(cpo, subp):
+def f_wread_cp(cpo, subp, **kwargs):
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    w = _wreader(subp)
+    w = _wreader(subp, **kwargs)
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
     return w
@@ -137,37 +140,25 @@ def f_bread_cp(cpo, subp):
 
 def f_dwwrite_cp(cpo, value):
     cs.DoActions(
-        []
-        if isinstance(cpo, int) and cpo == 0
-        else c.SetMemory(0x6509B0, c.Add, cpo),
+        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0),
-        []
-        if isinstance(cpo, int) and cpo == 0
-        else c.SetMemory(0x6509B0, c.Add, -cpo),
+        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
     )
 
 
 def f_dwadd_cp(cpo, value):
     cs.DoActions(
-        []
-        if isinstance(cpo, int) and cpo == 0
-        else c.SetMemory(0x6509B0, c.Add, cpo),
+        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.Add, value, 0),
-        []
-        if isinstance(cpo, int) and cpo == 0
-        else c.SetMemory(0x6509B0, c.Add, -cpo),
+        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
     )
 
 
 def f_dwsubtract_cp(cpo, value):
     cs.DoActions(
-        []
-        if isinstance(cpo, int) and cpo == 0
-        else c.SetMemory(0x6509B0, c.Add, cpo),
+        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0),
-        []
-        if isinstance(cpo, int) and cpo == 0
-        else c.SetMemory(0x6509B0, c.Add, -cpo),
+        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
     )
 
 

@@ -21,7 +21,7 @@ def Trigger(players=[tt.AllPlayers], *args, **kwargs):
     trglist.append(tt.Trigger(players=players, *args, **kwargs))
 
 
-def InitializePayload(chkt, payload):
+def InitializePayload(chkt, payload, obfus_mrgn):
     str_section = GetStringMap().SaveTBL()
     str_padding = -len(str_section) & 3
     payload_offset = 0x191943C8 + len(str_section) + str_padding
@@ -40,6 +40,17 @@ def InitializePayload(chkt, payload):
 
     str_section = str_section + bytes(str_padding) + new_payload
     chkt.setsection(GetStringSectionName(), str_section)
+
+    orig_mrgn = bytearray(chkt.getsection("MRGN"))
+    for i in range(0, len(orig_mrgn), 20):
+        orig_mrgn[i + 16 : i + 18] = bytes(2)  # remove name
+    mrgn_section = []
+    for i in range(0, len(orig_mrgn), 4):
+        obfus, orig = ut.b2i4(obfus_mrgn, i), ut.b2i4(orig_mrgn, i)
+        if obfus > orig:
+            orig += 1 << 32
+        mrgn_section.append(ut.i2b4(orig - obfus))
+    chkt.setsection("MRGN", b"".join(mrgn_section))
 
     ##############
     # TRIG SECTION
