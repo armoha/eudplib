@@ -191,7 +191,7 @@ def CreateInjectFinalizer(chkt, root, mrgndata=None):
 
         # revert mrgndata
         if mrgndata is None:
-            mrgndata = chkt.getsection("MRGN")
+            mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
             mrgndata_db = c.Db(mrgndata)
             sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
         else:

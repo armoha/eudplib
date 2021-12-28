@@ -21,7 +21,7 @@ def Trigger(players=[tt.AllPlayers], *args, **kwargs):
     trglist.append(tt.Trigger(players=players, *args, **kwargs))
 
 
-def InitializePayload(chkt, payload, obfus_mrgn):
+def InitializePayload(chkt, payload, mrgndata=None):
     str_section = GetStringMap().SaveTBL()
     str_padding = -len(str_section) & 3
     payload_offset = 0x191943C8 + len(str_section) + str_padding
@@ -41,16 +41,19 @@ def InitializePayload(chkt, payload, obfus_mrgn):
     str_section = str_section + bytes(str_padding) + new_payload
     chkt.setsection(GetStringSectionName(), str_section)
 
-    orig_mrgn = bytearray(chkt.getsection("MRGN"))
-    for i in range(0, len(orig_mrgn), 20):
-        orig_mrgn[i + 16 : i + 18] = bytes(2)  # remove name
-    mrgn_section = []
-    for i in range(0, len(orig_mrgn), 4):
-        obfus, orig = ut.b2i4(obfus_mrgn, i), ut.b2i4(orig_mrgn, i)
-        if obfus > orig:
-            orig += 1 << 32
-        mrgn_section.append(ut.i2b4(orig - obfus))
-    chkt.setsection("MRGN", b"".join(mrgn_section))
+    if mrgndata is not None:
+        orig_mrgn = chkt.getsection("MRGN")
+        mrgn_section = []
+        for i in range(0, len(orig_mrgn), 4):
+            if i % 20 == 16:  # remove name
+                orig = ut.b2i2(orig_mrgn, i + 2) << 16
+            else:
+                orig = ut.b2i4(orig_mrgn, i)
+            obfus = ut.b2i4(mrgndata, i)
+            if obfus > orig:
+                orig += 1 << 32
+            mrgn_section.append(ut.i2b4(orig - obfus))
+        chkt.setsection("MRGN", b"".join(mrgn_section))
 
     ##############
     # TRIG SECTION
