@@ -31,7 +31,6 @@ def FixMapData(chkt):
     FixUnitMap(chkt)
     FixSettings(chkt)
     ApplyRemasteredChk(chkt)
-    RemoveLocationStringInfo(chkt)
     FixMTXM0_0Null(chkt)
 
 
@@ -95,15 +94,6 @@ def FixSettings(chkt):
 
 def ApplyRemasteredChk(chkt):
     chkt.setsection("VER ", b"\xCE\0")
-
-
-def RemoveLocationStringInfo(chkt):
-    mrgn = bytearray(chkt.getsection("MRGN"))
-
-    for i in range(0, len(mrgn), 20):
-        mrgn[i + 16 : i + 18] = b"\0\0"
-
-    chkt.setsection("MRGN", mrgn)
 
 
 def FixMTXM0_0Null(chkt):
