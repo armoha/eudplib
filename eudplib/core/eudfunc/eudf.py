@@ -145,11 +145,14 @@ def _EUDPredefineParam(*args):
             slicer.append(arg)
     while slicer:
         try:
-            fnargs.extend(ut.FlattenList(_ev[slice(*slicer)]))
+            arg = ut.FlattenList(_ev[slice(*slicer)])
+            if arg:
+                fnargs.extend(arg)
+                break
         except IndexError:
             _ev.append(c.EUDVariable())
         else:
-            break
+            _ev.append(c.EUDVariable())
 
     def wrapper(f):
         f._fargs = fnargs
@@ -169,11 +172,14 @@ def _EUDPredefineReturn(*frets):
     """
     while frets:
         try:
-            frets = ut.FlattenList(_ev[slice(*frets)])
+            ret = ut.FlattenList(_ev[slice(*frets)])
+            if ret:
+                frets = ret
+                break
         except IndexError:
             _ev.append(c.EUDVariable())
         else:
-            break
+            _ev.append(c.EUDVariable())
 
     def wrapper(f):
         f._frets = frets
