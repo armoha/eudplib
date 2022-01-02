@@ -196,7 +196,7 @@ def CreateInjectFinalizer(chkt, root, mrgndata=None):
             sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
         else:
             mrgndata_db = c.Db(mrgndata)
-            _repaddsd_epd(ut.EPD(mrgn) - 1, ut.EPD(mrgndata_db) - 1, len(mrgndata) // 4)
+            _repaddsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
 
         # Flip TRIG properties
         i = c.EUDVariable()

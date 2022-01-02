@@ -33,6 +33,7 @@ from . import byterw as bm
 from . import cpmemio as cm
 
 _cpmoda = c.Forward()
+_cpadda = c.Forward()
 
 
 @c.EUDFullFunc(
@@ -62,24 +63,37 @@ def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
     cp.f_setcurpl2cpcache()
 
 
-_dstadder = c.EUDVariable(0, c.Add, 0)
-_adderdst = ut.EPD(_dstadder.getDestAddr())
-
-
-@_EUDPredefineParam((_adderdst, c.CurrentPlayer), 1)
-@c.EUDFunc
+@c.EUDFullFunc(
+    [(ut.EPD(_cpadda), c.Add, 0, None), (ut.EPD(0x6509B0), c.SetTo, 0, None)],
+    [None, None, None],
+)
 def _repaddsd_epd(dstepdp, srcepdp, copydwn):
-    global _dstadder
+    global _cpadda
+
+    c.VProc(
+        [dstepdp, srcepdp],
+        [
+            c.SetMemory(_cpadda, c.SetTo, -1),
+            # TODO: set Add modifier in compile-time
+            c.SetMemoryX(
+                _cpadda + 8, c.SetTo, c.EncodeModifier(c.Add) << 24, 0xFF000000
+            ),
+        ],
+    )
+
     if cs.EUDWhileNot()(copydwn == 0):
-        cm.f_dwread_cp(0, ret=[_dstadder])
+        cpadd = cm.f_dwread_cp(0)
+        _cpadda << cpadd.getDestAddr()
+
         c.VProc(
-            _dstadder,
+            cpadd,
             [
-                _dstadder.AddDest(1),
+                cpadd.AddDest(1),
                 c.SetMemory(0x6509B0, c.Add, 1),
                 copydwn.SubtractNumber(1),
             ],
         )
+
     cs.EUDEndWhile()
 
     cp.f_setcurpl2cpcache()
