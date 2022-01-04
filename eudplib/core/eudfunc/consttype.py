@@ -42,6 +42,8 @@ from ..rawtrigger import (
     EncodeString,
     EncodeSwitch,
     EncodeTBL,
+    EncodeImage,
+    EncodeIscript,
 )
 
 
@@ -71,4 +73,8 @@ TrgLocation = createEncoder(EncodeLocation)
 TrgString = createEncoder(EncodeString)
 TrgSwitch = createEncoder(EncodeSwitch)
 TrgUnit = createEncoder(EncodeUnit)
+
+# TODO: better name?
 TrgTBL = createEncoder(EncodeTBL)
+Image = createEncoder(EncodeImage)
+Iscript = createEncoder(EncodeIscript)

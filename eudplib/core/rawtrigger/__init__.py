@@ -91,4 +91,6 @@ from .strenc import (
     EncodeSwitch,
     EncodeUnit,
     EncodeTBL,
+    EncodeImage,
+    EncodeIscript,
 )

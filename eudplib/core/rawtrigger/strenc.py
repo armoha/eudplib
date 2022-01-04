@@ -34,6 +34,8 @@ from .strdict import (
     DefSwitchDict,
     DefUnitDict,
     DefTBLDict,
+    DefImageDict,
+    DefIscriptDict,
 )
 
 import difflib
@@ -49,12 +51,42 @@ def EncodeAIScript(ais, issueError=False):
         ut.ep_assert(len(ais) >= 4, _("AIScript name too short"))
 
         if len(ais) > 4:
-            return ut.b2i4(DefAIScriptDict[ais])
+            try:
+                return ut.b2i4(DefAIScriptDict[ais])
+            except KeyError:
+                sl = _("Cannot encode string {} as {}.").format(ais, "AIScript")
+                for match in difflib.get_close_matches(ais, DefAIScriptDict.keys()):
+                    sl += "\n" + _(" - Suggestion: {}").format(match)
+                raise ut.EPError(sl)
 
         elif len(ais) == 4:
             return ut.b2i4(ais)
 
     return ais
+
+
+def EncodeImage(image, issueError=False):
+    if isinstance(image, str):
+        try:
+            return DefImageDict[image]
+        except KeyError:
+            sl = _("Cannot encode string {} as {}.").format(image, "Image")
+            for match in difflib.get_close_matches(image, DefImageDict.keys()):
+                sl += "\n" + _(" - Suggestion: {}").format(match)
+            raise ut.EPError(sl)
+    return image
+
+
+def EncodeIscript(iscript, issueError=False):
+    if isinstance(iscript, str):
+        try:
+            return DefIscriptDict[iscript]
+        except KeyError:
+            sl = _("Cannot encode string {} as {}.").format(iscript, "Iscript")
+            for match in difflib.get_close_matches(iscript, DefIscriptDict.keys()):
+                sl += "\n" + _(" - Suggestion: {}").format(match)
+            raise ut.EPError(sl)
+    return iscript
 
 
 def _EncodeAny(t, f, dl, s, issueError, *, dlo=0):
@@ -104,6 +136,7 @@ def EncodeUnit(u, issueError=False):
 
 
 def EncodeTBL(t, issueError=False):
+    # TODO: handle custom stat_txt.tbl
     s = ut.unProxy(t)
 
     if isinstance(s, str):
