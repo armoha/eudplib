@@ -48,6 +48,7 @@ def InitPropertyMap(chkt):
     for i in range(64):
         if upus[i]:
             uprpdata = uprp[20 * i : 20 * i + 20]
+            # TODO: merge duplicates and fix existing CUWPs
             _uprpdict[uprpdata] = i
             _uprptable[i] = uprpdata
 

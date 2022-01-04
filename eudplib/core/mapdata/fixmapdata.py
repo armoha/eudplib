@@ -106,7 +106,10 @@ def FixMTXM0_0Null(chkt):
             hasNull = True
 
     if hasNull:
-        ep_warn(_("[Warning] Input map has 0000.00 null tiles"))
-        print(_("Replaced them to 0000.01, because they cause desync."))
+        ep_warn(
+            _("[Warning] Input map has 0000.00 null tiles")
+            + "\n"
+            + _("Replaced them to 0000.01, because they cause desync.")
+        )
 
     chkt.setsection("MTXM", mtxm)
