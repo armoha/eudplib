@@ -29,11 +29,16 @@ from eudplib import core as c, ctrlstru as cs, utils as ut
 from eudplib.eudlib.s import SetMemoryC
 
 
-def f_setcurpl(cp):
+def f_setcurpl(cp, *, actions=[], set_modifier=True):
     if c.IsEUDVariable(cp):
         cpcond = c.curpl.cpcacheMatchCond()
         cpcache = c.curpl.GetCPCache()
-        c.VProc(cp, cp.QueueAssignTo(cpcache))
+        c.VProc(
+            cp,
+            actions + cp.QueueAssignTo(cpcache)
+            if set_modifier
+            else [cp.SetDest(cpcache)],
+        )
         c.VProc(cp, cp.SetDest(ut.EPD(cpcond) + 2))
         c.VProc(cp, cp.SetDest(ut.EPD(0x6509B0)))
     else:

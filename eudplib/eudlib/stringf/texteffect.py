@@ -254,7 +254,7 @@ def _is_CP_less_than_start(actions):
     if not _is_below_start.IsSet():
         c.PushTriggerScope()
         _is_below_start << c.RawTrigger(
-            conditions=[_check_cp << c.Memory(0x6509B0, c.AtMost, 1)],
+            conditions=[_check_cp << c.Memory(0x6509B0, c.AtMost, 0)],
             actions=_cpbelowbuffer.Set(),
         )
         c.PopTriggerScope()
@@ -341,33 +341,35 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
     timer, counter, identifier = _get_TextFX_timer(tag)
 
     start = f_getcurpl()
-    c.SeqCompute(
-        [(ut.EPD(_check_cp) + 2, c.SetTo, 1), (ut.EPD(_check_cp) + 2, c.Add, start)]
+    c.VProc(
+        start,
+        [
+            start.AddNumber(1),
+            start.SetDest(ut.EPD(_check_cp) + 2),
+        ],
     )
     _TextFX_Print(*args, identifier=identifier, encoding=encoding)
-    f_setcurpl(start + (3 - len(color)))
+    f_setcurpl(start, actions=[start.AddNumber(2 - len(color))], set_modifier=False)
 
     if reset is True:
         check_gametick = c.Forward()
         if cs.EUDIf()([check_gametick << c.Memory(0x57F23C, c.AtLeast, 0)]):
             gametick = f_getgametick()
-            c.SeqCompute(
+            c.VProc(
+                gametick,
                 [
-                    (timer, c.SetTo, 0),
-                    (ut.EPD(check_gametick) + 2, c.SetTo, 1),
-                    (ut.EPD(check_gametick) + 2, c.Add, gametick),
-                ]
+                    timer.SetNumber(0),
+                    gametick.AddNumber(1),
+                    gametick.SetDest(ut.EPD(check_gametick) + 2),
+                ],
             )
         cs.EUDEndIf()
 
-    _end = c.Forward()
-    _is_finished, _draw_color = c.Forward(), c.Forward()
+    _is_finished, _draw_color, _end = [c.Forward() for _ in range(3)]
     ret = c.EUDVariable()
 
     cs.DoActions(
-        counter.AddNumber(1),
         c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else [],
-        ret.SetNumber(1),
         c.SetNextPtr(_is_finished, _draw_color),
         c.AddCurrentPlayer(timer),
     )
@@ -382,7 +384,13 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
             c.SetNextPtr(_is_finished, _end),
         ],
     )
-    _draw_color << c.RawTrigger(actions=c.AddCurrentPlayer(len(color) - 1))
+    _draw_color << c.RawTrigger(
+        actions=[
+            ret.SetNumber(1),
+            counter.AddNumber(1),
+            c.AddCurrentPlayer(len(color) - 1),
+        ]
+    )
     R2L(color)
     c.RawTrigger(
         conditions=counter.AtLeast(max(wait, 1)),
@@ -413,8 +421,12 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
     timer, counter, identifier = _get_TextFX_timer(tag)
 
     start = f_getcurpl()
-    c.SeqCompute(
-        [(ut.EPD(_check_cp) + 2, c.SetTo, 1), (ut.EPD(_check_cp) + 2, c.Add, start)]
+    c.VProc(
+        start,
+        [
+            start.AddNumber(1),
+            start.SetDest(ut.EPD(_check_cp) + 2),
+        ],
     )
     _TextFX_Print(*args, identifier=identifier, encoding=encoding)
 
@@ -422,22 +434,49 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
         check_gametick = c.Forward()
         if cs.EUDIf()([check_gametick << c.Memory(0x57F23C, c.AtLeast, 0)]):
             gametick = f_getgametick()
-            c.SeqCompute(
+            c.VProc(
+                gametick,
                 [
-                    (timer, c.SetTo, 0),
-                    (ut.EPD(check_gametick) + 2, c.SetTo, 1),
-                    (ut.EPD(check_gametick) + 2, c.Add, gametick),
-                ]
+                    timer.SetNumber(0),
+                    gametick.AddNumber(1),
+                    gametick.SetDest(ut.EPD(check_gametick) + 2),
+                ],
             )
         cs.EUDEndIf()
 
+    does_last_color_overwrite = color[-1] in {0, 5, 0x14}
+    increment_and_jump, paint_last_color = c.Forward(), c.Forward()
+
     cs.DoActions(
-        counter.AddNumber(1),
         c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else [],
         c.AddCurrentPlayer((len(color) - 1) - timer),
+        c.SetNextPtr(increment_and_jump, paint_last_color)
+        if does_last_color_overwrite
+        else [],
     )
     ret = R2L(color)
-    c.RawTrigger(conditions=ret.Exactly(0), actions=counter.SetNumber(0))
+    if does_last_color_overwrite:
+        skip = c.Forward()
+        increment_and_jump << c.RawTrigger(
+            conditions=ret.Exactly(1),
+            actions=[
+                counter.AddNumber(1),
+                c.SetNextPtr(increment_and_jump, skip),
+            ],
+        )
+        paint_last_color << c.VProc(
+            start,
+            [
+                start.AddNumber(1),
+                start.SetDest(ut.EPD(0x6509B0)),
+            ],
+        )
+        f_setcurpl2cpcache(
+            [], c.SetDeathsX(c.CurrentPlayer, c.SetTo, color[-1], 0, 0xFF)
+        )
+        skip << c.NextTrigger()
+    else:
+        c.RawTrigger(conditions=ret.Exactly(1), actions=counter.AddNumber(1))
     c.RawTrigger(
         conditions=counter.AtLeast(max(wait, 1)),
         actions=[counter.SetNumber(0), timer.AddNumber(1)],
