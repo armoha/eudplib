@@ -99,6 +99,14 @@ class VariableBase:
 
     # See: https://github.com/heinermann/llvm-bw/wiki/Instruction-Implementation
 
+    def __ior__(self, value):
+        bt.RawTrigger(actions=self.SetNumberX(0xFFFFFFFF, value))
+        return self
+
+    def __iand__(self, value):
+        bt.RawTrigger(actions=self.SetNumberX(0, ~value))
+        return self
+
     def __ixor__(self, value):
         bt.RawTrigger(
             actions=[
@@ -106,6 +114,7 @@ class VariableBase:
                 self.AddNumberX(value, 0xAAAAAAAA),  # A = 0b1010
             ]
         )
+        return self
 
     def __ilshift__(self, value):
         mask = (1 << (value + 1)) - 1
@@ -121,6 +130,7 @@ class VariableBase:
                 self.SetNumberX(0, mask >> 1),  # lowest n bits
             ]
         )
+        return self
 
     def __irshift__(self, value):
         mask = (1 << (value + 1)) - 1
@@ -133,6 +143,7 @@ class VariableBase:
                 ],
             ]
         )
+        return self
 
     # -------
 
