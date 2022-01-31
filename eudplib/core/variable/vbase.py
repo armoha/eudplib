@@ -82,18 +82,57 @@ class VariableBase:
     # -------
 
     def Assign(self, value):
-        bt.RawTrigger(actions=[bt.SetMemory(self.getValueAddr(), bt.SetTo, value)])
+        bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.SetTo, value))
 
     def __lshift__(self, value):
         self.Assign(value)
 
     def __iadd__(self, value):
-        bt.RawTrigger(actions=[bt.SetMemory(self.getValueAddr(), bt.Add, value)])
+        bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.Add, value))
         return self
 
     def __isub__(self, value):
-        bt.RawTrigger(actions=[bt.SetMemory(self.getValueAddr(), bt.Subtract, value)])
+        bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.Subtract, value))
         return self
+
+    # -------
+
+    # See: https://github.com/heinermann/llvm-bw/wiki/Instruction-Implementation
+
+    def __ixor__(self, value):
+        bt.RawTrigger(
+            actions=[
+                self.AddNumberX(value, 0x55555555),  # 5 = 0b0101
+                self.AddNumberX(value, 0xAAAAAAAA),  # A = 0b1010
+            ]
+        )
+
+    def __ilshift__(self, value):
+        mask = (1 << (value + 1)) - 1
+        bt.RawTrigger(
+            actions=[
+                [
+                    [
+                        self.SetNumberX(0, (mask >> 1) << (n + 1)),
+                        self.AddNumberX((mask >> 1) << n, mask << n),
+                    ]
+                    for n in reversed(range(32 - n))
+                ],
+                self.SetNumberX(0, mask >> 1),  # lowest n bits
+            ]
+        )
+
+    def __irshift__(self, value):
+        mask = (1 << (value + 1)) - 1
+        bt.RawTrigger(
+            actions=[
+                self.SetNumberX(0, mask >> 1),  # lowest n bits
+                [
+                    self.SubtractNumberX((mask >> 1) << n, mask << n)
+                    for n in range(32 - n)
+                ],
+            ]
+        )
 
     # -------
 

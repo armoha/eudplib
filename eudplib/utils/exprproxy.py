@@ -166,5 +166,5 @@ def isUnproxyInstance(x, cls):
         return True
     try:
         return isUnproxyInstance(x.getValue(), cls)
-    except AttributeError:
+    except (AttributeError, TypeError):
         return False
