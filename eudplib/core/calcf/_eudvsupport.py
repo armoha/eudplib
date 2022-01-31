@@ -36,14 +36,8 @@ def DefClsMethod(name, f):
     setattr(EUDVariable, name, f)
 
 
-def DefOperator(name, f):
+def DefBinOperator(name, f):
     DefClsMethod(name, f)
-
-    def iop(self, rhs):
-        self << f(self, rhs)
-        return self
-
-    DefClsMethod("__i%s" % name[2:], iop)
 
     def rop(self, lhs):
         return f(lhs, self)
@@ -51,19 +45,29 @@ def DefOperator(name, f):
     DefClsMethod("__r%s" % name[2:], rop)
 
 
-DefOperator("__mul__", lambda x, y: f_mul(x, y))
-DefOperator("__floordiv__", lambda x, y: f_div(x, y)[0])
-DefOperator("__mod__", lambda x, y: f_div(x, y)[1])
-DefOperator("__imul__", lambda x, y: f_mul(x, y, ret=[x]))
-DefOperator("__ifloordiv__", lambda x, y: f_div(x, y, ret=[x, _ev[4]])[0])
-DefOperator("__imod__", lambda x, y: f_div(x, y, ret=[_ev[4], x])[1])
-DefOperator("__and__", lambda x, y: f_bitand(x, y))
-DefOperator("__or__", lambda x, y: f_bitor(x, y))
-DefOperator("__xor__", lambda x, y: f_bitxor(x, y))
+def DefOperator(name, f):
+    DefBinOperator(name, f)
+
+    def iop(self, rhs):
+        self << f(self, rhs)
+        return self
+
+    DefClsMethod("__i%s" % name[2:], iop)
+
+
+DefBinOperator("__mul__", lambda x, y: f_mul(x, y))
+DefBinOperator("__floordiv__", lambda x, y: f_div(x, y)[0])
+DefBinOperator("__mod__", lambda x, y: f_div(x, y)[1])
+DefClsMethod("__imul__", lambda x, y: f_mul(x, y, ret=[x]))
+DefClsMethod("__ifloordiv__", lambda x, y: f_div(x, y, ret=[x, _ev[4]])[0])
+DefClsMethod("__imod__", lambda x, y: f_div(x, y, ret=[_ev[4], x])[1])
+DefBinOperator("__and__", lambda x, y: f_bitand(x, y))
+DefBinOperator("__or__", lambda x, y: f_bitor(x, y))
+DefOperator("__xor__", lambda x, y: f_bitxor(x, y))  # FIXME
 DefClsMethod("__neg__", lambda x: 0 - x)
 DefClsMethod("__invert__", lambda x: f_bitnot(x))
-DefClsMethod("__ilshift__", lambda a, b: f_bitlshift(a, b))
-DefClsMethod("__irshift__", lambda a, b: f_bitrshift(a, b))
+DefClsMethod("__ilshift__", lambda a, b: f_bitlshift(a, b, ret=[a]))  # FIXME
+DefClsMethod("__irshift__", lambda a, b: f_bitrshift(a, b, ret=[a]))  # FIXME
 DefClsMethod("__rlshift__", lambda a, b: f_bitlshift(b, a))
 DefClsMethod("__rrshift__", lambda a, b: f_bitrshift(b, a))
 

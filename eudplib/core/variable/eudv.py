@@ -234,6 +234,28 @@ class EUDVariable(VariableBase):
 
     # -------
 
+    def __ior__(self, other):
+        if IsConstExpr(other):
+            return super().__ior__(other)
+        write = self.SetNumberX(0xFFFFFFFF, 0)
+        SeqCompute(
+            [(EPD(write), bt.SetTo, other),]
+        )
+        bt.RawTrigger(actions=write)
+        return self
+
+    def __iand__(self, other):
+        if IsConstExpr(other):
+            return super().__iand__(other)
+        write = self.SetNumberX(0, 0xFFFFFFFF)
+        SeqCompute(
+            [(EPD(write), bt.SetTo, 0xFFFFFFFF), (EPD(write), bt.Subtract, other)]
+        )
+        bt.RawTrigger(actions=write)
+        return self
+
+    # -------
+
     def __eq__(self, other):
         try:
             return self.Exactly(other)
@@ -337,16 +359,10 @@ class EUDVariable(VariableBase):
     def __rand__(self, a):
         pass
 
-    def __iand__(self, a):
-        pass
-
     def __or__(self, a):
         pass
 
     def __ror__(self, a):
-        pass
-
-    def __ior__(self, a):
         pass
 
     def __xor__(self, a):
