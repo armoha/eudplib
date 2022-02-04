@@ -65,6 +65,8 @@ void initConstmap() {
     constMap.insert(std::make_pair("Force4", 21));
     constMap.insert(std::make_pair("NonAlliedVictoryPlayers", 26));
 
+    constMap.insert(std::make_pair("All", 0));
+
     //  PropStateDict
     constMap.insert(std::make_pair("Enable", 4));
     constMap.insert(std::make_pair("Disable", 5));
@@ -103,8 +105,8 @@ int parseConstantName(const std::string& name) {
         initConstmap();
     }
 
-    if(name.size() == 0 || name[0] != '$') return -1;
-    auto it = constMap.find(name.substr(1));
+    if(name.size() == 0) return -1;
+    auto it = constMap.find(name);
     if (it == constMap.end()) return -1;
     else return it->second;
 }
