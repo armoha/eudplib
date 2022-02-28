@@ -126,11 +126,10 @@ class TBL:
         chkt, unitmap, locmap, swmap = init_chkt
 
         unix = chkt.getsection("UNIx")
-        mrgn = chkt.getsection("MRGN")
         try:
             swnm = chkt.getsection("SWNM")
-        except (KeyError):
-            swnm = None  # Not Required
+        except KeyError:
+            swnm = None
         sprp = chkt.getsection("SPRP")
         forc = chkt.getsection("FORC")
 
@@ -139,12 +138,17 @@ class TBL:
         unitdict = dict()
 
         # Get location names
-        if mrgn:
-            locn = len(mrgn) // 20
-            for i in range(locn):
-                locstrid = ut.b2i2(mrgn, 20 * i + 16)
-                if locstrid:
-                    locdict[locstrid] = i
+        try:
+            mrgn = chkt.getsection("MRGN")
+        except KeyError:
+            pass  # Not Required for Melee
+        else:
+            if mrgn:
+                locn = len(mrgn) // 20
+                for i in range(locn):
+                    locstrid = ut.b2i2(mrgn, 20 * i + 16)
+                    if locstrid:
+                        locdict[locstrid] = i
 
         # Get switch names
         if swnm:
