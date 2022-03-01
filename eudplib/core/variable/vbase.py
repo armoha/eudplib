@@ -131,8 +131,8 @@ class VariableBase:
         )
         return self
 
-    def __ilshift__(self, value):
-        mask = (1 << (value + 1)) - 1
+    def __ilshift__(self, n):
+        mask = (1 << (n + 1)) - 1
         bt.RawTrigger(
             actions=[
                 [
@@ -145,8 +145,8 @@ class VariableBase:
         )
         return self
 
-    def __irshift__(self, value):
-        mask = (1 << (value + 1)) - 1
+    def __irshift__(self, n):
+        mask = (1 << (n + 1)) - 1
         bt.RawTrigger(
             actions=[self.SetNumberX(0, mask >> 1)]  # lowest n bits
             + [self.SubtractNumberX((mask >> 1) << n, mask << n) for n in range(32 - n)]

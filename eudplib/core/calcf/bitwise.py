@@ -30,7 +30,7 @@ from .. import rawtrigger as rt
 from .muldiv import f_mul
 from ...utils import EPD, RandList
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
-from ..variable.evcommon import _xv
+from ..variable.evcommon import _xv, _selfadder
 
 _x = _xv[0]
 
@@ -52,36 +52,18 @@ def f_bitxor(a, b):
 
 def f_bitnand(a, b):
     """Calculate ~(a & b)"""
-    ret = ev.EUDVariable()
-    assignPairs = [
-        (ret, rt.SetTo, ~0),
-        (_x, rt.SetTo, a),
-        (EPD(_x.getMaskAddr()), rt.SetTo, b),
-        (ret, rt.Subtract, _x),  # (~a & b) + (a & ~b)
-    ]
-    if not ev.IsEUDVariable(b):
-        assignPairs[1], assignPairs[2] = assignPairs[2], assignPairs[1]
-    ev.SeqCompute(assignPairs)
-
-    return ret
+    try:
+        return (a & b).iinvert()
+    except AttributeError:
+        return ~(a & b)
 
 
 def f_bitnor(a, b):
     """Calculate ~(a | b)"""
-    ret = ev.EUDVariable()
-
-    assignPairs = [
-        (ret, rt.SetTo, ~0),
-        (_x, rt.SetTo, 0),
-        (ret, rt.Subtract, a),
-        (EPD(_x.getMaskAddr()), rt.SetTo, b),
-        (ret, rt.SetTo, _x),
-    ]
-    if not ev.IsEUDVariable(b):
-        assignPairs[1], assignPairs[2] = assignPairs[2], assignPairs[1]
-    ev.SeqCompute(assignPairs)
-
-    return ret
+    try:
+        return (a | b).iinvert()
+    except AttributeError:
+        return ~(a | b)
 
 
 def f_bitnxor(a, b):
@@ -152,13 +134,56 @@ def _f_bitlshift(a, b):
     return a
 
 
-def f_bitlshift(a, b, **kwargs):
+def f_bitlshift(a, b, _fdict={}, **kwargs):
     """Calculate a << b"""
-    if isinstance(b, int):
-        if 1 <= b <= 7:
-            return _f_bitlshift(a, b, **kwargs)
+    if "ret" in kwargs:
+        ret = kwargs["ret"][0]
+        del kwargs["ret"]
+    else:
+        ret = ev.EUDVariable()
+    if ev.IsEUDVariable(a) and not ev.IsEUDVariable(b):
+        if b == 0:
+            if a is ret:
+                return a
+            ev.SeqCompute([(ret, rt.SetTo, a)])
+        elif 1 <= b <= 10:
+            try:
+                f = _fdict[b]
+            except KeyError:
+                set_ret = _selfadder.SetDest(0)
+
+                @_EUDPredefineParam((EPD(set_ret) + 4, _selfadder))
+                @ef.EUDFunc
+                def f(ret, adder):
+                    for i in range(b):
+                        ev.VProc(adder, [])
+                    ev.VProc(
+                        adder,
+                        [
+                            set_ret,
+                            adder.SetModifier(rt.SetTo),
+                        ],
+                    )
+                    rt.RawTrigger(
+                        actions=[
+                            adder.SetDest(EPD(adder.getValueAddr())),
+                            adder.SetModifier(rt.Add),
+                        ]
+                    )
+
+                _fdict[b] = f
+
+            if ev.IsEUDVariable(ret):
+                retarg = EPD(ret.getValueAddr())
+            else:
+                retarg = ret
+            f(retarg, a, **kwargs)
         else:
-            return f_mul(a, _exp2(b), **kwargs)
+            if a is not ret:
+                ev.SeqCompute([(ret, rt.SetTo, a)])
+            ev.vbase.VariableBase.__ilshift__(ret, b)
+        return ret
+
     return _f_bitlshift(a, b, **kwargs)
 
 

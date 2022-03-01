@@ -524,6 +524,12 @@ class EUDVariable(VariableBase):
     def __imod__(self, a):
         pass
 
+    def __ilshift__(self, a):
+        pass
+
+    def __irshift__(self, a):
+        pass
+
 
 def IsEUDVariable(x):
     return isUnproxyInstance(x, EUDVariable)

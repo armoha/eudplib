@@ -52,7 +52,7 @@ DefClsMethod("__imul__", lambda x, y: f_mul(x, y, ret=[x]))
 DefClsMethod("__ifloordiv__", lambda x, y: f_div(x, y, ret=[x, _ev[4]])[0])
 DefClsMethod("__imod__", lambda x, y: f_div(x, y, ret=[_ev[4], x])[1])
 DefClsMethod("__neg__", lambda x: 0 - x)
-DefClsMethod("__ilshift__", lambda a, b: f_bitlshift(a, b, ret=[a]))  # FIXME
+DefClsMethod("__ilshift__", lambda a, b: f_bitlshift(a, b, ret=[a]))
 DefClsMethod("__irshift__", lambda a, b: f_bitrshift(a, b, ret=[a]))  # FIXME
 DefClsMethod("__rlshift__", lambda a, b: f_bitlshift(b, a))
 DefClsMethod("__rrshift__", lambda a, b: f_bitrshift(b, a))
