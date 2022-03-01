@@ -116,6 +116,21 @@ class VariableBase:
         )
         return self
 
+    def iinvert(self):
+        "In-place invert (x << ~x)"
+        return self.__ixor__(0xFFFFFFFF)
+
+    def inot(self):
+        "In-place not (x << -x)"
+        bt.RawTrigger(
+            actions=[
+                self.AddNumberX(0xFFFFFFFF, 0x55555555),
+                self.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+                self.AddNumber(1),
+            ]
+        )
+        return self
+
     def __ilshift__(self, value):
         mask = (1 << (value + 1)) - 1
         bt.RawTrigger(

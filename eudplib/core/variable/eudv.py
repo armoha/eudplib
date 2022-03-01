@@ -255,36 +255,43 @@ class EUDVariable(VariableBase):
 
     def __sub__(self, other):
         t = EUDVariable()
-
-        # TODO: fix bug with freeing tests.
-        # if IsConstExpr(other):
-        #     SeqCompute(
-        #         [
-        #             (t, bt.SetTo, -other),
-        #             (t, bt.Add, self),
-        #         ]
-        #     )
-        # else:
-        SeqCompute(
-            [
-                (t, bt.SetTo, 0xFFFFFFFF),
-                (t, bt.Subtract, other),
-                (t, bt.Add, 1),
-                (t, bt.Add, self),
-            ]
-        )
+        if IsConstExpr(other):
+            SeqCompute(
+                [
+                    (t, bt.SetTo, -other),
+                    (t, bt.Add, self),
+                ]
+            )
+        else:
+            SeqCompute(
+                [
+                    (t, bt.SetTo, 0xFFFFFFFF),
+                    (t, bt.Subtract, other),
+                    (t, bt.Add, 1),
+                    (t, bt.Add, self),
+                ]
+            )
         return t.makeR()
 
     def __rsub__(self, other):
         t = EUDVariable()
-        SeqCompute(
-            [
-                (t, bt.SetTo, 0xFFFFFFFF),
-                (t, bt.Subtract, self),
-                (t, bt.Add, 1),
-                (t, bt.Add, other),
-            ]
-        )
+        if IsConstExpr(other):
+            SeqCompute(
+                [
+                    (t, bt.SetTo, 0xFFFFFFFF),
+                    (t, bt.Subtract, self),
+                    (t, bt.Add, other + 1),
+                ]
+            )
+        else:
+            SeqCompute(
+                [
+                    (t, bt.SetTo, 0xFFFFFFFF),
+                    (t, bt.Subtract, self),
+                    (t, bt.Add, 1),
+                    (t, bt.Add, other),
+                ]
+            )
         return t.makeR()
 
     def __neg__(self):
@@ -299,25 +306,123 @@ class EUDVariable(VariableBase):
 
     def __ior__(self, other):
         if IsConstExpr(other):
-            return super().__ior__(other)
+            return super().__ior__(other)  # 1A
         write = self.SetNumberX(0xFFFFFFFF, 0)
-        SeqCompute(
-            [
-                (EPD(write), bt.SetTo, other),
-            ]
-        )
-        bt.RawTrigger(actions=write)
+        SeqCompute([(EPD(write), bt.SetTo, other)])
+        bt.RawTrigger(actions=write)  # 1T 5A
         return self
 
     def __iand__(self, other):
         if IsConstExpr(other):
-            return super().__iand__(other)
+            return super().__iand__(other)  # 1A
         write = self.SetNumberX(0, 0xFFFFFFFF)
         SeqCompute(
             [(EPD(write), bt.SetTo, 0xFFFFFFFF), (EPD(write), bt.Subtract, other)]
         )
-        bt.RawTrigger(actions=write)
+        bt.RawTrigger(actions=write)  # 1T 6A
         return self
+
+    # -------
+
+    def __and__(self, other):
+        t = EUDVariable()
+        if IsConstExpr(other):
+            t << self
+            t &= other  # 1T 5A
+        else:
+            write = t.SetNumberX(0, 0xFFFFFFFF)
+            SeqCompute(
+                [
+                    (EPD(write), bt.SetTo, 0xFFFFFFFF),
+                    (t, bt.SetTo, self),
+                    (EPD(write), bt.Subtract, other),
+                ]
+            )
+            bt.RawTrigger(actions=write)  # 2T 10A
+        return t.makeR()
+
+    def __rand__(self, other):
+        t = EUDVariable()
+        if IsConstExpr(other):
+            t << self
+            t &= other  # 1T 5A
+        else:
+            write = t.SetNumberX(0, 0xFFFFFFFF)
+            SeqCompute(
+                [
+                    (EPD(write), bt.SetTo, 0xFFFFFFFF),
+                    (t, bt.SetTo, self),
+                    (EPD(write), bt.Subtract, other),
+                ]
+            )
+            bt.RawTrigger(actions=write)  # 2T 10A
+        return t.makeR()
+
+    def __or__(self, other):
+        t = EUDVariable()
+        if IsConstExpr(other):
+            t << self
+            t |= other  # 1T 5A
+        else:
+            write = t.SetNumberX(0xFFFFFFFF, 0)
+            SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, other)])
+            bt.RawTrigger(actions=write)  # 2T 9A
+        return t.makeR()
+
+    def __ror__(self, other):
+        t = EUDVariable()
+        if IsConstExpr(other):
+            t << self
+            t |= other  # 1T 5A
+        else:
+            write = t.SetNumberX(0xFFFFFFFF, 0)
+            SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, other)])
+            bt.RawTrigger(actions=write)  # 2T 9
+        return t.makeR()
+
+    # -------
+
+    def __ixor__(self, other):
+        if IsConstExpr(other):
+            return super().__ixor__(other)  # 2A
+        else:
+            SeqCompute(
+                [(EPD(other.getMaskAddr()), bt.SetTo, 0x55555555), (t, bt.Add, other)]
+            )
+            VProc(other, other.SetMask(0xAAAAAAAA))  # 3T 8A
+        return self
+
+    def __xor__(self, other):
+        t = EUDVariable()
+        if IsConstExpr(other):
+            t << self
+            t ^= other
+        else:
+            SeqCompute(
+                [
+                    (EPD(other.getMaskAddr()), bt.SetTo, 0x55555555),
+                    (t, bt.SetTo, self),
+                    (t, bt.Add, other),
+                ]
+            )
+            VProc(other, other.SetMask(0xAAAAAAAA))
+        return t.makeR()
+
+    def __rxor__(self, other):
+        t = EUDVariable()
+        if IsConstExpr(other):
+            t << self
+            t ^= other
+        else:
+            SeqCompute(
+                [
+                    (EPD(other.getMaskAddr()), bt.SetTo, 0x55555555),
+                    (t, bt.SetTo, self),
+                    (t, bt.Add, other),
+                ]
+            )
+            VProc(other, other.SetMask(0xAAAAAAAA))
+        return t.makeR()
 
     # -------
 
@@ -416,27 +521,6 @@ class EUDVariable(VariableBase):
         pass
 
     def __imod__(self, a):
-        pass
-
-    def __and__(self, a):
-        pass
-
-    def __rand__(self, a):
-        pass
-
-    def __or__(self, a):
-        pass
-
-    def __ror__(self, a):
-        pass
-
-    def __xor__(self, a):
-        pass
-
-    def __rxor__(self, a):
-        pass
-
-    def __ixor__(self, a):
         pass
 
 

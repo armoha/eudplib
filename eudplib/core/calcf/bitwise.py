@@ -37,50 +37,17 @@ _x = _xv[0]
 
 def f_bitand(a, b):
     """Calculate a & b"""
-    ret = ev.EUDVariable()
-
-    assignPairs = [
-        (ret, rt.SetTo, 0),
-        (_x, rt.SetTo, a),
-        (EPD(_x.getMaskAddr()), rt.SetTo, b),
-        (ret, rt.SetTo, _x),
-    ]
-    if not ev.IsEUDVariable(b):
-        assignPairs[1], assignPairs[2] = assignPairs[2], assignPairs[1]
-    ev.SeqCompute(assignPairs)
-
-    return ret
+    return a & b
 
 
 def f_bitor(a, b):
     """Calculate a | b"""
-    ret = ev.EUDVariable()
-
-    assignPairs = [
-        (_x, rt.SetTo, ~0),
-        (ret, rt.SetTo, a),
-        (EPD(_x.getMaskAddr()), rt.SetTo, b),
-        (ret, rt.SetTo, _x),
-    ]
-    if not ev.IsEUDVariable(b):
-        assignPairs[1], assignPairs[2] = assignPairs[2], assignPairs[1]
-    ev.SeqCompute(assignPairs)
-
-    return ret
+    return a | b
 
 
-@ef.EUDFunc
 def f_bitxor(a, b):
     """Calculate a ^ b"""
-    assignPairs = [
-        (_x, rt.SetTo, ~0),
-        (_x, rt.Subtract, a),
-        (EPD(_x.getMaskAddr()), rt.SetTo, b),
-        (a, rt.SetTo, _x),  # (~a & b) + (a & ~b)
-    ]
-    ev.SeqCompute(assignPairs)
-
-    return a
+    return a ^ b
 
 
 def f_bitnand(a, b):
@@ -119,12 +86,12 @@ def f_bitnor(a, b):
 
 def f_bitnxor(a, b):
     """Calculate ~(a ^ b)"""
-    return f_bitnot(f_bitxor(a, b))
+    return f_bitxor(a, ~b)
 
 
 def f_bitnot(a):
     """Calculate ~a"""
-    return 0xFFFFFFFF - a
+    return ~a
 
 
 # -------
@@ -139,7 +106,7 @@ def f_bitsplit(a):
     bits = ev.EUDCreateVariables(32)
     rt.RawTrigger(actions=[bits[i].SetNumber(0) for i in range(32)])
     for i in range(31, -1, -1):
-        rt.RawTrigger(conditions=a.AtLeastX(1, 2 ** i), actions=bits[i].SetNumber(1))
+        rt.RawTrigger(conditions=a.AtLeastX(1, 2**i), actions=bits[i].SetNumber(1))
     return bits
 
 
@@ -153,7 +120,7 @@ def _exp2_vv(n):
     ret = _exp2_vv._frets[0]
     ret << 0
     for i in RandList(range(32)):
-        rt.RawTrigger(conditions=[n == i], actions=ret.SetNumber(2 ** i))
+        rt.RawTrigger(conditions=[n == i], actions=ret.SetNumber(2**i))
     # return ret
 
 

@@ -45,25 +45,12 @@ def DefBinOperator(name, f):
     DefClsMethod("__r%s" % name[2:], rop)
 
 
-def DefOperator(name, f):
-    DefBinOperator(name, f)
-
-    def iop(self, rhs):
-        self << f(self, rhs)
-        return self
-
-    DefClsMethod("__i%s" % name[2:], iop)
-
-
 DefBinOperator("__mul__", lambda x, y: f_mul(x, y))
 DefBinOperator("__floordiv__", lambda x, y: f_div(x, y)[0])
 DefBinOperator("__mod__", lambda x, y: f_div(x, y)[1])
 DefClsMethod("__imul__", lambda x, y: f_mul(x, y, ret=[x]))
 DefClsMethod("__ifloordiv__", lambda x, y: f_div(x, y, ret=[x, _ev[4]])[0])
 DefClsMethod("__imod__", lambda x, y: f_div(x, y, ret=[_ev[4], x])[1])
-DefBinOperator("__and__", lambda x, y: f_bitand(x, y))
-DefBinOperator("__or__", lambda x, y: f_bitor(x, y))
-DefOperator("__xor__", lambda x, y: f_bitxor(x, y))  # FIXME
 DefClsMethod("__neg__", lambda x: 0 - x)
 DefClsMethod("__invert__", lambda x: f_bitnot(x))
 DefClsMethod("__ilshift__", lambda a, b: f_bitlshift(a, b, ret=[a]))  # FIXME
