@@ -255,7 +255,8 @@ class EUDVariable(VariableBase):
 
     def __sub__(self, other):
         t = EUDVariable()
-        if IsConstExpr(other):
+        # FIXME: unsupported EUD error after EUDStruct.free() with IsConstExpr
+        if isinstance(other, int):
             SeqCompute(
                 [
                     (t, bt.SetTo, -other),
