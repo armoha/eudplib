@@ -54,6 +54,8 @@ class EUDVarBuffer(EUDObject):
         if value is None:
             initval, value = 0, initval
         modifier = bt.EncodeModifier(modifier)
+        if bitmask is None:
+            bitmask = 0xFFFFFFFF
         self._initvals.append((initval, modifier, value, bitmask))
         self._vdict[v] = ret
         return ret
@@ -68,7 +70,7 @@ class EUDVarBuffer(EUDObject):
                 self._initvals.append((player, modifier, value, bitmask))
             else:
                 modifier = bt.EncodeModifier(bt.SetTo)
-                self._initvals.append((0, modifier, initval, None))
+                self._initvals.append((0, modifier, initval, 0xFFFFFFFF))
         self._vdict[v] = ret
         return ret
 
@@ -90,14 +92,16 @@ class EUDVarBuffer(EUDObject):
 
         for i in range(len(self._initvals)):
             # 'preserve rawtrigger'
-            ( < uint32_t*>(output + 72 * i + 2376))[0] = 4
+            ( < uint32_t*>(output + 72 * i + 328))[0] = 0xFFFFFFFF
             ( < uint32_t*>(output + 72 * i + 352))[0] = 0x072D0000
+            ( < uint32_t*>(output + 72 * i + 356))[0] = 0x43530000
+            ( < uint32_t*>(output + 72 * i + 2376))[0] = 4
 
         heads = 0
         for i, initvals in enumerate(self._initvals):
             player, modifier, initval, bitmask = initvals
             heade = 72 * i + 328
-            if (bitmask is None) or (bitmask == 0):
+            if bitmask == 0xFFFFFFFF:
                 pass
             elif isinstance(bitmask, int):
                 bm2 = bitmask & 0xFFFFFFFF
@@ -128,7 +132,7 @@ class EUDVarBuffer(EUDObject):
                 emitbuffer.WriteBytes(output[heads:heade])
                 emitbuffer.WriteDword(initval)
                 heads = heade + 4
-    
+
             heade += 4
             if modifier == 7:  # SetTo
                 pass
@@ -141,11 +145,6 @@ class EUDVarBuffer(EUDObject):
                 emitbuffer.WriteByte(0x2D)
                 emitbuffer.WriteByte(modifier)
                 heads = heade + 4
-    
-            heade += 4
-            if bitmask is None:
-                continue
-            ( < uint32_t*>(output + heade))[0] = 0x43530000
 
         emitbuffer.WriteBytes(output[heads:olen])
         PyMem_Free(output)

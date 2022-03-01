@@ -72,6 +72,8 @@ class VariableTriggerForward(ConstExpr):
         self._dest = _ProcessDest(initval)
         self._modifier = modifier
         self._initval = value
+        if bitmask is None:
+            bitmask = 0xFFFFFFFF
         self._bitmask = bitmask
 
     def Evaluate(self):
@@ -239,7 +241,9 @@ class EUDVariable(VariableBase):
             return super().__ior__(other)
         write = self.SetNumberX(0xFFFFFFFF, 0)
         SeqCompute(
-            [(EPD(write), bt.SetTo, other),]
+            [
+                (EPD(write), bt.SetTo, other),
+            ]
         )
         bt.RawTrigger(actions=write)
         return self

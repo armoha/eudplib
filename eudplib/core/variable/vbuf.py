@@ -51,6 +51,8 @@ class EUDVarBuffer(EUDObject):
         if value is None:
             initval, value = 0, initval
         modifier = bt.EncodeModifier(modifier)
+        if bitmask is None:
+            bitmask = 0xFFFFFFFF
         self._initvals.append((initval, modifier, value, bitmask))
         self._vdict[v] = ret
         return ret
@@ -65,7 +67,7 @@ class EUDVarBuffer(EUDObject):
                 self._initvals.append((player, modifier, value, bitmask))
             else:
                 modifier = bt.EncodeModifier(bt.SetTo)
-                self._initvals.append((0, modifier, initval, None))
+                self._initvals.append((0, modifier, initval, 0xFFFFFFFF))
         self._vdict[v] = ret
         return ret
 
@@ -83,14 +85,16 @@ class EUDVarBuffer(EUDObject):
 
         for i in range(len(self._initvals)):
             # 'preserve rawtrigger'
-            output[72 * i + 2376 : 72 * i + 2380] = b"\x04\0\0\0"
+            output[72 * i + 328 : 72 * i + 332] = b"\xFF\xFF\xFF\xFF"
             output[72 * i + 352 : 72 * i + 356] = b"\0\0\x2D\x07"
+            output[72 * i + 356 : 72 * i + 360] = b"\0\0SC"
+            output[72 * i + 2376 : 72 * i + 2380] = b"\x04\0\0\0"
 
         heads = 0
         for i, initvals in enumerate(self._initvals):
             player, modifier, initval, bitmask = initvals
             heade = 72 * i + 328
-            if (bitmask is None) or (bitmask == 0):
+            if bitmask == 0xFFFFFFFF:
                 pass
             elif isinstance(bitmask, int):
                 output[heade : heade + 4] = ut.i2b4(bitmask)
@@ -131,11 +135,6 @@ class EUDVarBuffer(EUDObject):
                 emitbuffer.WriteByte(0x2D)
                 emitbuffer.WriteByte(modifier)
                 heads = heade + 4
-
-            heade += 4
-            if bitmask is None:
-                continue
-            output[heade : heade + 4] = b"\0\0SC"
 
         emitbuffer.WriteBytes(output[heads:])
 
