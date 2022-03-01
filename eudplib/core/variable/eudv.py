@@ -103,6 +103,9 @@ class EUDVariable(VariableBase):
     def GetVTable(self):
         return self._vartrigger
 
+    def getMaskAddr(self):
+        return self._varact
+
     def getDestAddr(self):
         return self._varact + 16
 
@@ -127,6 +130,50 @@ class EUDVariable(VariableBase):
 
     # -------
 
+    def SetMask(self, value):
+        return bt.SetMemory(self.getMaskAddr(), bt.SetTo, value)
+
+    def AddMask(self, value):
+        return bt.SetMemory(self.getMaskAddr(), bt.Add, value)
+
+    def SubtractMask(self, value):
+        return bt.SetMemory(self.getMaskAddr(), bt.Subtract, value)
+
+    # -------
+
+    def SetMaskX(self, value, mask):
+        return bt.SetMemoryX(self.getMaskAddr(), bt.SetTo, value, mask)
+
+    def AddMaskX(self, value, mask):
+        return bt.SetMemoryX(self.getMaskAddr(), bt.Add, value, mask)
+
+    def SubtractMaskX(self, value, mask):
+        return bt.SetMemoryX(self.getMaskAddr(), bt.Subtract, value, mask)
+
+    # -------
+
+    def MaskAtLeast(self, value):
+        return bt.Memory(self.getMaskAddr(), bt.AtLeast, value)
+
+    def MaskAtMost(self, value):
+        return bt.Memory(self.getMaskAddr(), bt.AtMost, value)
+
+    def MaskExactly(self, value):
+        return bt.Memory(self.getMaskAddr(), bt.Exactly, value)
+
+    # -------
+
+    def MaskAtLeastX(self, value, mask):
+        return bt.MemoryX(self.getMaskAddr(), bt.AtLeast, value, mask)
+
+    def MaskAtMostX(self, value, mask):
+        return bt.MemoryX(self.getMaskAddr(), bt.AtMost, value, mask)
+
+    def MaskExactlyX(self, value, mask):
+        return bt.MemoryX(self.getMaskAddr(), bt.Exactly, value, mask)
+
+    # -------
+
     def SetDest(self, dest):
         dest = _ProcessDest(dest)
         return bt.SetMemory(self.getDestAddr(), bt.SetTo, dest)
@@ -138,6 +185,20 @@ class EUDVariable(VariableBase):
     def SubtractDest(self, dest):
         dest = _ProcessDest(dest)
         return bt.SetMemory(self.getDestAddr(), bt.Subtract, dest)
+
+    # -------
+
+    def SetDestX(self, dest, mask):
+        dest = _ProcessDest(dest)
+        return bt.SetMemoryX(self.getDestAddr(), bt.SetTo, dest, mask)
+
+    def AddDestX(self, dest, mask):
+        dest = _ProcessDest(dest)
+        return bt.SetMemoryX(self.getDestAddr(), bt.Add, dest, mask)
+
+    def SubtractDestX(self, dest, mask):
+        dest = _ProcessDest(dest)
+        return bt.SetMemoryX(self.getDestAddr(), bt.Subtract, dest, mask)
 
     # -------
 
