@@ -8,9 +8,9 @@ class Coord(EUDStruct):
 
 @TestInstance
 def test_pool():
-    from eudplib.eudlib.objpool import SetGlobalPoolFieldN
+    # from eudplib.eudlib.objpool import SetGlobalPoolFieldN
 
-    # SetGlobalPoolFieldN(16)
+    # FIXME: SetGlobalPoolFieldN(16)
 
     # Basic allocation
     a = Coord.alloc()

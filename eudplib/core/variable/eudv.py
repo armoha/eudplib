@@ -247,11 +247,13 @@ class EUDVariable(VariableBase):
 
     def __add__(self, other):
         t = EUDVariable()
-        SeqCompute([(t, bt.SetTo, self), (t, bt.Add, other)])
+        SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
     def __radd__(self, other):
-        return self + other
+        t = EUDVariable()
+        SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
+        return t.makeR()
 
     def __sub__(self, other):
         t = EUDVariable()
