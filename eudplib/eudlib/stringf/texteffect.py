@@ -298,7 +298,7 @@ def R2L(colors, colors_dict={}):
     return _f()
 
 
-def _TextFX_Print(*args, identifier=None, encoding="UTF-8"):
+def _TextFX_Print(*args, identifier, encoding="UTF-8"):
     f_cpstr_print(identifier, EOS=False, encoding=encoding)
     global color_code
     color_code = b"\x02"
