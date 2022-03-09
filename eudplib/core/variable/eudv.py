@@ -389,10 +389,17 @@ class EUDVariable(VariableBase):
         if IsConstExpr(other):
             return super().__ixor__(other)  # 2A
         else:
-            SeqCompute(
-                [(EPD(other.getMaskAddr()), bt.SetTo, 0x55555555), (t, bt.Add, other)]
+            VProc(
+                other,
+                [
+                    other.SetMask(0x55555555),
+                    other.QueueAddTo(self),
+                ],
             )
             VProc(other, other.SetMask(0xAAAAAAAA))  # 3T 8A
+            bt.RawTrigger(  # FIXME: restore to previous mask???
+                actions=other.SetMask(0xFFFFFFFF)
+            )
         return self
 
     def __xor__(self, other):
@@ -401,14 +408,18 @@ class EUDVariable(VariableBase):
             t << self
             t ^= other
         else:
-            SeqCompute(
+            VProc(
+                [self, other],
                 [
-                    (EPD(other.getMaskAddr()), bt.SetTo, 0x55555555),
-                    (t, bt.SetTo, self),
-                    (t, bt.Add, other),
-                ]
+                    other.SetMask(0x55555555),
+                    self.QueueAssignTo(t),
+                    other.QueueAddTo(t),
+                ],
             )
             VProc(other, other.SetMask(0xAAAAAAAA))
+            bt.RawTrigger(  # FIXME: restore to previous mask???
+                actions=other.SetMask(0xFFFFFFFF)
+            )
         return t.makeR()
 
     def __rxor__(self, other):
@@ -425,6 +436,9 @@ class EUDVariable(VariableBase):
                 ]
             )
             VProc(other, other.SetMask(0xAAAAAAAA))
+            bt.RawTrigger(  # FIXME: restore to previous mask???
+                actions=other.SetMask(0xFFFFFFFF)
+            )
         return t.makeR()
 
     # -------
