@@ -42,8 +42,10 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}, _check_empty=False):
         _fdict[mask] = dict()
     _subfdict = _fdict[mask]
 
-    key = tuple(initval for initval, _ in args) + tuple(
-        tuple(func(i) for i in bits(mask)) for _, func in args
+    key = (
+        tuple(initval for initval, _ in args)
+        + tuple(tuple(func(i) for i in bits(mask)) for _, func in args)
+        + (_check_empty,)
     )
     if key not in _subfdict:
 
@@ -89,8 +91,10 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}, _check_empty=False):
         _fdict[mask] = dict()
     _subfdict = _fdict[mask]
 
-    key = tuple(initval for initval, _ in args) + tuple(
-        tuple(func(i) for i in bits(mask)) for _, func in args
+    key = (
+        tuple(initval for initval, _ in args)
+        + tuple(tuple(func(i) for i in bits(mask)) for _, func in args)
+        + (_check_empty,)
     )
     if key not in _subfdict:
 
