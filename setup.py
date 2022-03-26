@@ -8,7 +8,7 @@ except ImportError:
         return None
 
 
-__version__ = "0.68.0"
+__version__ = "0.69.1"
 
 
 setup(
@@ -18,10 +18,12 @@ setup(
     package_data={"": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst", "*.mo"]},
     include_package_data=True,
     ext_modules=cythonize(["eudplib/**/*.pyx"], language_level="3"),
-    python_requires=">=3",
+    python_requires=">=3.10",
     # metadata for upload to PyPI
     author="Trgk",
     author_email="whyask37@naver.com",
+    maintainer="Armoha",
+    maintainer_email="kein0011@naver.com",
     description="EUD Trigger generator",
     license="MIT license",
     keywords="starcraft rawtrigger eud",
