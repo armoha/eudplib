@@ -809,13 +809,7 @@ vdefAssign_stmt ::= VAR(X) nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B). {
         }
     });
 
-    if(varCount == 1) {
-        ps->gen << s << " = EUDVariable()" << std::endl;
-        ps->gen << s << " << (" << B->data << ")" << std::endl;
-    }
-    else {
-        ps->gen << s << " = _MVAR([" << B->data << "])" << std::endl;
-    }
+    ps->gen << s << " = _LVAR([" << B->data << "])" << std::endl;
 
     delete A; delete B;
 }

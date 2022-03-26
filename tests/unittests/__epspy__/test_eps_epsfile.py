@@ -132,10 +132,18 @@ def _L2V(l):
     EUDEndIf()
     return ret
 
-def _MVAR(vs):
-    return List2Assignable([
-        v.makeL() if IsEUDVariable(v) else EUDVariable() << v
-        for v in FlattenList(vs)])
+def _LVAR(vs):
+    ret, ops = [], []
+    for v in FlattenList(vs):
+        if IsEUDVariable(v) and v.IsRValue():
+            ret.append(v.makeL())
+        else:
+            nv = EUDVariable()
+            ret.append(nv)
+            ops.append((nv, SetTo, v))
+    if ops:
+        SeqCompute(ops)
+    return List2Assignable(ret)
 
 def _LSH(l, r):
     if IsEUDVariable(l):  return f_bitlshift(l, r)

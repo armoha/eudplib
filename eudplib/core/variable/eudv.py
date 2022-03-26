@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from sys import getrefcount
 import traceback
 
 from .. import rawtrigger as bt
@@ -123,6 +124,9 @@ class EUDVariable(VariableBase):
     def makeR(self):
         self._rvalue = True
         return self
+
+    def IsRValue(self):
+        return getrefcount(self) == 3
 
     def checkNonRValue(self):
         if isRValueStrict and self._rvalue:

@@ -14,7 +14,7 @@ def test_arithmetics():
         ev *= case
         test_equality(f"{v} *= {case}", ev, (v * case) & 0xFFFFFFFF)
     for power in range(1, 8):
-        case = 2 ** power
+        case = 2**power
         ev << v
         ev *= case
         test_equality(f"{v} *= {case}", ev, (v * case) & 0xFFFFFFFF)

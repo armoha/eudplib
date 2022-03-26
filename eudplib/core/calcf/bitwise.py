@@ -152,7 +152,7 @@ def f_bitlshift(a, b, _fdict={}, **kwargs):
             except KeyError:
                 set_ret = _selfadder.SetDest(0)
 
-                @_EUDPredefineParam((EPD(set_ret) + 4, _selfadder))
+                @_EUDPredefineParam((EPD(set_ret) + 5, _selfadder))
                 @ef.EUDFunc
                 def f(ret, adder):
                     for i in range(b):
