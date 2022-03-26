@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ...utils import EPD
+from ...utils import EPD, EUDPeekBlock
 
 from ..stringf.rwcommon import br1, br2, bw1, bs1
 from ..memiof import f_setcurpl2cpcache, f_dwread_epd
@@ -74,41 +74,78 @@ def f_strcmp(s1, s2):
     cs.EUDEndInfLoop()
 
 
+def f_strlen_epd(epd, subp=0, /, **kwargs):
+    return _strlen_epd(epd, subp, **kwargs)
+
+
 @c.EUDFunc
-def f_strlen_epd(epd):
+def _strlen_epd(epd, subp):
     ret = c.EUDVariable()
-    c.VProc(epd, [epd.SetDest(EPD(0x6509B0)), ret.SetNumber(0)])
-    if cs.EUDWhile()(c.Deaths(c.CurrentPlayer, c.AtLeast, 1, 0)):
-        cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF))
-        ret += 1
-        cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF00))
-        ret += 1
-        cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF0000))
-        ret += 1
-        cs.EUDBreakIf(c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF000000))
-        cs.DoActions(ret.AddNumber(1), c.SetMemory(0x6509B0, c.Add, 1))
-    cs.EUDEndWhile()
+    b = [c.Forward() for _ in range(4)]
+    jump = c.SetNextPtr(epd.GetVTable(), 0)
+    loopend = c.Forward()
+    for i, t in enumerate(b):
+        c.RawTrigger(
+            conditions=subp.ExactlyX(i, 3),
+            actions=[
+                c.SetMemory(jump + 20, c.SetTo, t),
+                c.SetNextPtr(t, loopend),
+            ],
+        )
+    c.RawTrigger(
+        nextptr=epd.GetVTable(),
+        actions=[jump, epd.SetDest(EPD(0x6509B0)), ret.SetNumber(0)],
+    )
+    if cs.EUDInfLoop()():
+        loop = EUDPeekBlock("infloopblock")[1]
+        b[0] << c.RawTrigger(
+            nextptr=loopend,
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF),
+            actions=[
+                c.SetNextPtr(b[0], b[1]),
+                c.SetNextPtr(b[1], loopend),
+                ret.AddNumber(1),
+            ],
+        )
+        b[1] << c.RawTrigger(
+            nextptr=loopend,
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF00),
+            actions=[
+                c.SetNextPtr(b[1], b[2]),
+                c.SetNextPtr(b[2], loopend),
+                ret.AddNumber(1),
+            ],
+        )
+        b[2] << c.RawTrigger(
+            nextptr=loopend,
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF0000),
+            actions=[
+                c.SetNextPtr(b[2], b[3]),
+                c.SetNextPtr(b[3], loopend),
+                ret.AddNumber(1),
+            ],
+        )
+        b[3] << c.RawTrigger(
+            nextptr=loopend,
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF000000),
+            actions=[
+                c.SetNextPtr(b[3], b[0]),
+                c.SetNextPtr(b[0], loopend),
+                ret.AddNumber(1),
+                c.SetMemory(0x6509B0, c.Add, 1),
+            ],
+        )
+    cs.EUDEndInfLoop()
+    loopend << c.NextTrigger()
     f_setcurpl2cpcache()
     c.EUDReturn(ret)
 
 
-@c.EUDFunc
-def f_strlen(src):
+def f_strlen(src, /, **kwargs):
     ret = c.EUDVariable()
-    epd, mod = c.f_div(src, 4)
-    cs.DoActions(ret.SetNumber(0), epd.AddNumber(-0x58A364 // 4))
-    if cs.EUDIf()(mod >= 1):
-        for i in range(1, 4):
-            if cs.EUDIf()(mod == i):
-                if cs.EUDIf()(c.MemoryXEPD(epd, c.Exactly, 0, 255 * (256 ** i))):
-                    c.EUDReturn(ret)
-                cs.EUDEndIf()
-                cs.DoActions(mod.AddNumber(1), ret.AddNumber(1))
-            cs.EUDEndIf()
-        epd += 1
-    cs.EUDEndIf()
-    ret += f_strlen_epd(epd)
-    c.EUDReturn(ret)
+    epd, subp = c.f_div(src, 4)
+    epd += -0x58A364 // 4
+    return f_strlen_epd(epd, subp, **kwargs)
 
 
 @c.EUDFunc
