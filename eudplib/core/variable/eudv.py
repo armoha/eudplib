@@ -242,24 +242,55 @@ class EUDVariable(VariableBase):
         return self
 
     def __isub__(self, other):
-        if IsConstExpr(other):
-            return self.__iadd__(-other)
-        self << self - other
+        if isinstance(other, int):
+            return self.__iadd__(-other)  # 1A
+        try:
+            addor = EUDVariable.addor
+        except AttributeError:
+            addor = EUDVariable(0, bt.Add, 0)
+            EUDVariable.addor = addor
+        SeqCompute(
+            [  # (~0 - other) + (self + 1)
+                (self, bt.Add, 1),
+                (addor, bt.SetTo, 0xFFFFFFFF),
+                (addor, bt.Subtract, other),
+                (self, None, addor),
+            ]
+        )
         return self
 
     # -------
 
     def __add__(self, other):
+        if self.IsRValue():
+            return self.__iadd__(other)
+        if IsEUDVariable(other) and other.IsRValue():
+            return other.__iadd__(self)
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
     def __radd__(self, other):
+        if self.IsRValue():
+            return self.__iadd__(other)
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
     def __sub__(self, other):
+        if IsEUDVariable(other) and other.IsRValue():
+            VProc(
+                self,  # -other += self
+                [
+                    other.AddNumberX(0xFFFFFFFF, 0x55555555),
+                    other.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+                    other.AddNumber(1),
+                    self.QueueAddTo(other),
+                ],
+            )  # 1T 7A
+            return other
+        if self.IsRValue():
+            return self.__isub__(other)
         t = EUDVariable()
         # FIXME: unsupported EUD error after EUDStruct.free() with IsConstExpr
         if isinstance(other, int):
@@ -281,6 +312,15 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rsub__(self, other):
+        if self.IsRValue() and IsConstExpr(other):
+            bt.RawTrigger(  # -self += other
+                actions=[
+                    self.AddNumberX(0xFFFFFFFF, 0x55555555),
+                    self.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+                    self.AddNumber(other + 1),
+                ]
+            )
+            return self
         t = EUDVariable()
         if IsConstExpr(other):
             SeqCompute(
@@ -302,9 +342,13 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __neg__(self):
+        if self.IsRValue():
+            return self.ineg()
         return (0 - self).makeR()
 
     def __invert__(self):
+        if self.IsRValue():
+            return self.iinvert()
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, 0xFFFFFFFF), (t, bt.Subtract, self)])
         return t.makeR()
@@ -332,6 +376,10 @@ class EUDVariable(VariableBase):
     # -------
 
     def __and__(self, other):
+        if self.IsRValue():
+            return self.__iand__(other)
+        if IsEUDVariable(other) and other.IsRValue():
+            return other.__iand__(self)
         t = EUDVariable()
         if IsConstExpr(other):
             t << self
@@ -349,6 +397,8 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rand__(self, other):
+        if self.IsRValue():
+            return self.__iand__(other)
         t = EUDVariable()
         if IsConstExpr(other):
             t << self
@@ -366,6 +416,10 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __or__(self, other):
+        if self.IsRValue():
+            return self.__ior__(other)
+        if IsEUDVariable(other) and other.IsRValue():
+            return other.__ior__(self)
         t = EUDVariable()
         if IsConstExpr(other):
             t << self
@@ -377,6 +431,8 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __ror__(self, other):
+        if self.IsRValue():
+            return self.__ior__(other)
         t = EUDVariable()
         if IsConstExpr(other):
             t << self
@@ -384,7 +440,7 @@ class EUDVariable(VariableBase):
         else:
             write = t.SetNumberX(0xFFFFFFFF, 0)
             SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, other)])
-            bt.RawTrigger(actions=write)  # 2T 9
+            bt.RawTrigger(actions=write)  # 2T 9A
         return t.makeR()
 
     # -------
@@ -407,6 +463,10 @@ class EUDVariable(VariableBase):
         return self
 
     def __xor__(self, other):
+        if self.IsRValue():
+            return self.__ixor__(other)
+        if IsEUDVariable(other) and other.IsRValue():
+            return other.__ixor__(self)
         t = EUDVariable()
         if IsConstExpr(other):
             t << self
@@ -427,6 +487,8 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rxor__(self, other):
+        if self.IsRValue():
+            return self.__ixor__(other)
         t = EUDVariable()
         if IsConstExpr(other):
             t << self
@@ -457,10 +519,12 @@ class EUDVariable(VariableBase):
             return (self - other).Exactly(0)
 
     def __ne__(self, other):
-        if isinstance(other, int) and other == 0:
-            return self.AtLeast(1)
-        else:
-            return (self - other).AtLeast(1)
+        if isinstance(other, int):
+            if other & 0xFFFFFFFF == 0:
+                return self.AtLeast(1)
+            if other & 0xFFFFFFFF == 0xFFFFFFFF:
+                return self.AtMost(0xFFFFFFFE)
+        return (self - other).AtLeast(1)
 
     def __le__(self, other):
         try:
@@ -663,6 +727,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
             bt.SetTo: EUDVariable.QueueAssignTo,
             bt.Add: EUDVariable.QueueAddTo,
             bt.Subtract: EUDVariable.QueueSubtractTo,
+            None: EUDVariable.SetDest,
         }[mdt]
 
         nonConstActions.append(

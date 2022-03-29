@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from .. import rawtrigger as bt
+from ..allocator import IsConstExpr
 from eudplib import utils as ut
 from eudplib.localize import _
 
@@ -120,8 +121,8 @@ class VariableBase:
         "In-place invert (x << ~x)"
         return self.__ixor__(0xFFFFFFFF)
 
-    def inot(self):
-        "In-place not (x << -x)"
+    def ineg(self):
+        "In-place negate (x << -x)"
         bt.RawTrigger(
             actions=[
                 self.AddNumberX(0xFFFFFFFF, 0x55555555),
@@ -158,8 +159,26 @@ class VariableBase:
     def __eq__(self, other):
         return self.Exactly(other)
 
+    def __ne__(self, other):
+        if isinstance(other, int):
+            if other & 0xFFFFFFFF == 0:
+                return self.AtLeast(1)
+            if other & 0xFFFFFFFF == 0xFFFFFFFF:
+                return self.AtMost(0xFFFFFFFE)
+        return NotImplemented
+
     def __le__(self, other):
         return self.AtMost(other)
 
+    def __lt__(self, other):
+        if IsConstExpr(other):
+            return self.AtMost(other - 1)
+        return NotImplemented
+
     def __ge__(self, other):
         return self.AtLeast(other)
+
+    def __gt__(self, other):
+        if IsConstExpr(other):
+            return self.AtLeast(other + 1)
+        return NotImplemented
