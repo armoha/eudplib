@@ -32,10 +32,9 @@ from ... import core as c, ctrlstru as cs, utils as ut
 def _lshift(a, b):
     if c.IsEUDVariable(a):
         return c.f_bitlshift(a, b)
-    elif isinstance(b, int) and b == 0:
+    if isinstance(b, int) and b == 0:
         return a
-    else:
-        return a << b
+    return a << b
 
 
 @c.EUDFunc
