@@ -27,6 +27,7 @@ from ..core.mapdata import chktok, mpqapi, mapdata
 from ..localize import _
 from ..utils import ep_eprint, ep_assert
 from .mpqadd import UpdateFileListByListfile
+import os
 
 
 def LoadMap(fname):
@@ -36,6 +37,7 @@ def LoadMap(fname):
     """
 
     print(_("Loading map {}").format(fname))
+    assert os.path.isfile(fname), _("input path is not a map file")
     try:
         rawfile = open(fname, "rb").read()
     except FileNotFoundError:

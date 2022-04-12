@@ -68,6 +68,7 @@ class RawTrigger(EUDObject):
         actions=None,
         *args,
         preserved=True,
+        currentAction=None,
         trigSection=None
     ):
         super().__init__()
@@ -112,26 +113,43 @@ class RawTrigger(EUDObject):
 
             self._conditions = conditions
             self._actions = actions
-            self.preserved = preserved
+            self._flags = 4 if preserved else 0
+            self._currentAction = currentAction
+            if currentAction is not None:
+                self._flags |= 1
 
         # Uses trigger segment for initialization
         # NOTE : player information is lost inside eudplib.
         else:
             self._conditions, self._actions = [], []
             for i in range(16):
-                if trigSection[i * 20 + 15] == 22:  # Always
-                    continue
-                elif trigSection[i * 20 + 15] >= 1:
+                condtype = trigSection[i * 20 + 15]
+                if condtype == 22:
+                    continue  # ignore Always, no worry disable/enable
+                elif condtype >= 1:
                     self._conditions.append(Db(trigSection[i * 20 : i * 20 + 20]))
-            self.preserved = bool(trigSection[320 + 2048] & 4)
+            self._flags = trigSection[320 + 2048] & 5
             for i in range(64):
-                if trigSection[320 + i * 32 + 26] == 3:  # PreserveTrigger
-                    self.preserved = True
-                elif trigSection[320 + i * 32 + 26] == 47:  # Comment
+                acttype = trigSection[320 + i * 32 + 26]
+                if acttype == 3:  # PreserveTrigger
+                    self._flags |= 4
+                elif acttype == 47:  # Comment
                     continue
-                elif trigSection[320 + i * 32 + 26] >= 1:
+                elif acttype >= 1:
                     action = Db(trigSection[320 + i * 32 : 320 + i * 32 + 32])
                     self._actions.append(action)
+            self._currentAction = None if not (self._flags & 1) else trigSection[2399]
+
+    @property
+    def preserved(self):
+        return bool(self._flags & 4)
+
+    @preserved.setter
+    def preserved(self, preserved):
+        if preserved:
+            self._flags |= 4
+        else:
+            self._flags &= ~4
 
     def GetNextPtrMemory(self):
         return self + 4
@@ -169,11 +187,10 @@ class RawTrigger(EUDObject):
             pbuffer.WriteSpace(32 * (63 - len(self._actions)))
 
         # Preserved flag
-
-        if self.preserved:
-            pbuffer.WriteDword(4)
-        else:
-            pbuffer.WriteDword(0)
+        pbuffer.WriteDword(self._flags)
 
         pbuffer.WriteSpace(27)
-        pbuffer.WriteByte(0)
+        if self._currentAction is None:
+            pbuffer.WriteByte(0)
+        else:
+            pbuffer.WriteByte(self._currentAction)

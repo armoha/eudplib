@@ -180,8 +180,8 @@ def _posread_epd():
     return f
 
 
-def f_posread_epd(epd):
-    return _posread_epd()(epd)
+def f_posread_epd(epd, **kwargs):
+    return _posread_epd()(epd, **kwargs)
 
 
 def f_posread_cp(cpoffset, **kwargs):
@@ -196,13 +196,13 @@ def f_posread_cp(cpoffset, **kwargs):
     return _rf(cpoffset, **kwargs)
 
 
-def f_maskread_epd(targetplayer, mask, _fdict={}):
+def f_maskread_epd(targetplayer, mask, _fdict={}, **kwargs):
     if mask not in _fdict:
         _fdict[mask] = f_readgen_epd(mask, (0, lambda x: x))
-    return _fdict[mask](targetplayer)
+    return _fdict[mask](targetplayer, **kwargs)
 
 
-def f_maskread_cp(cpoffset, mask, _fdict={}):
+def f_maskread_cp(cpoffset, mask, _fdict={}, **kwargs):
     if mask not in _fdict:
         _fdict[mask] = f_readgen_cp(mask, (0, lambda x: x))
-    return _fdict[mask](cpoffset)
+    return _fdict[mask](cpoffset, **kwargs)
