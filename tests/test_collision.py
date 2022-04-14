@@ -9,11 +9,10 @@ from eudplib import *
 class Vector2D(EUDStruct):
     _fields_ = ["x", "y"]
 
-    def __init__(self, x=None, y=None):
-        if y is None:
-            super().__init__(x)
-        else:
-            super().__init__([x, y])
+    def constructor(self, x=None, y=None):
+        self.x = x
+        if y is not None:
+            self.y = y
 
     def lengthsq(self):
         return self.x * self.x + self.y * self.y
@@ -27,22 +26,22 @@ class Vector2D(EUDStruct):
     # Operator support
 
     def add(self, rhs):
-        t = self.clone()
+        t = self.copy()
         t += rhs
         return t
 
     def sub(self, rhs):
-        t = self.clone()
+        t = self.copy()
         t -= rhs
         return t
 
     def mul(self, rhs):
-        t = self.clone()
+        t = self.copy()
         t *= rhs
         return t
 
     def div(self, rhs):
-        t = self.clone()
+        t = self.copy()
         t //= rhs
         return t
 
@@ -83,18 +82,22 @@ radius = 100
 class CircleObj(EUDStruct):
     _fields_ = [("pos", Vector2D), ("velocity", Vector2D)]
 
+    def constructor(self, pos, velocity):
+        self.pos = pos
+        self.velocity = velocity
+
     def __init__(self, copyobj=None, *, pos=None, velocity=None):
         if copyobj is not None:
-            super().__init__(copyobj)
+            super().__init__(_from=copyobj)
 
         else:
             if pos is None:
                 pos = Vector2D()
             if velocity is None:
                 velocity = Vector2D()
-            super().__init__([pos, velocity])
+            super().__init__(pos, velocity)
 
-    @EUDFuncMethod
+    @EUDMethod
     def collides(self, rhs):
         self = CircleObj(self)
         rhs = CircleObj(rhs)
@@ -111,7 +114,7 @@ class CircleObj(EUDStruct):
     def step(self):
         self.pos += self.velocity
 
-    @EUDFuncMethod
+    @EUDMethod
     def applyCollision(self, rhs):
         self = CircleObj(self)
         rhs = CircleObj(rhs)
@@ -142,13 +145,13 @@ class CircleObj(EUDStruct):
                 new_veldiff = (
                     posdiff.mul(para_length).add(posdiff_perpend.mul(perp_length))
                 ).div(posdiff_length * posdiff_length)
-                new_veldiff.deepcopy(veldiff)
+                new_veldiff.copyto(veldiff)
 
                 veldiff_d2 = veldiff.div(2)
 
                 # Calculate self & rhs's velocity
-                velavg.sub(veldiff_d2).deepcopy(self.velocity)
-                velavg.add(veldiff_d2).deepcopy(rhs.velocity)
+                velavg.sub(veldiff_d2).copyto(self.velocity)
+                velavg.add(veldiff_d2).copyto(rhs.velocity)
             EUDEndIf()
         EUDEndIf()
 
