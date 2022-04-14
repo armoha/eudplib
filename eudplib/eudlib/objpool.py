@@ -58,7 +58,7 @@ class ObjPool:
         self.max_fieldn = max_fieldn
         self.remaining = c.EUDVariable(size)
 
-        self.baseobj = _ObjPoolData(size)
+        self.baseobj = _ObjPoolData(size, max_fieldn)
         self.data = EUDArray([72 * max_fieldn * i for i in range(size)])
 
     def full(self):
@@ -66,7 +66,7 @@ class ObjPool:
 
     @c.EUDMethod
     def _alloc(self):
-        """ Allocate one object from pool """
+        """Allocate one object from pool"""
         if cs.EUDIf()(self.full()):
             c.EUDReturn(0)
         cs.EUDEndIf()
@@ -115,6 +115,7 @@ def SetGlobalPoolFieldN(fieldn: int):
     global globalPool
     ut.ep_assert(globalPool.pool is None, "Global object pool is already initialized.")
     globalPool.max_fieldn = fieldn
+    globalPool.max_object_num = 8 * 32768 // fieldn
 
 
 def GetGlobalPool():
