@@ -89,7 +89,7 @@ class EUDVariable(VariableBase):
     """
 
     def __init__(self, _initval=0, modifier=bt.SetTo, /, initval=0, *, nextptr=0):
-        if modifier != bt.SetTo or initval is not 0 or nextptr is not 0:
+        if not (modifier == bt.SetTo and initval == 0 and nextptr == 0):
             modifier = ((bt.EncodeModifier(modifier) & 0xFF) << 24) + 0x2D0000
             # bitmask, player, #, modifier, nextptr
             _initval = (0xFFFFFFFF, _ProcessDest(_initval), initval, modifier, nextptr)
