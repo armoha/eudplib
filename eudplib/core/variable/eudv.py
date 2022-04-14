@@ -41,7 +41,7 @@ from ...utils import (
     RandList,
 )
 from .vbase import VariableBase
-from .vbuf import GetCurrentVariableBuffer
+from .vbuf import GetCurrentVariableBuffer, GetCurrentCustomVariableBuffer
 
 
 isRValueStrict = False
@@ -66,25 +66,19 @@ def _ProcessDest(dest):
 
 # Unused variable don't need to be allocated.
 class VariableTriggerForward(ConstExpr):
-    def __init__(self, initval, modifier=bt.SetTo, value=None, bitmask=None, /):
+    def __init__(self, initval):
         super().__init__(self)
-        if value is None:
-            initval, value = 0, initval
-        self._dest = _ProcessDest(initval)
-        self._modifier = modifier
-        self._initval = value
-        if bitmask is None:
-            bitmask = 0xFFFFFFFF
-        self._bitmask = bitmask
+        self._initval = initval
 
     def Evaluate(self):
-        evb = GetCurrentVariableBuffer()
+        if isinstance(self._initval, tuple):
+            evb = GetCurrentCustomVariableBuffer()
+        else:
+            evb = GetCurrentVariableBuffer()
         try:
             return evb._vdict[self].Evaluate()
         except KeyError:
-            vt = evb.CreateVarTrigger(
-                self, self._dest, self._modifier, self._initval, self._bitmask
-            )
+            vt = evb.CreateVarTrigger(self, self._initval)
             return vt.Evaluate()
 
 
@@ -94,10 +88,12 @@ class EUDVariable(VariableBase):
     Full variable.
     """
 
-    def __init__(self, _initval=0, modifier=bt.SetTo, /, initval=None):
-        if initval is None:
-            _initval, initval = 0, _initval
-        self._vartrigger = VariableTriggerForward(_initval, modifier, initval, None)
+    def __init__(self, _initval=0, modifier=bt.SetTo, /, initval=0, *, nextptr=0):
+        if modifier != bt.SetTo or initval is not 0 or nextptr is not 0:
+            modifier = ((bt.EncodeModifier(modifier) & 0xFF) << 24) + 0x2D0000
+            # bitmask, player, #, modifier, nextptr
+            _initval = (0xFFFFFFFF, _ProcessDest(_initval), initval, modifier, nextptr)
+        self._vartrigger = VariableTriggerForward(_initval)
         self._varact = self._vartrigger + (8 + 320)
         self._rvalue = False
 
