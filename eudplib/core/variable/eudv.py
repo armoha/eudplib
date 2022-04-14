@@ -88,9 +88,16 @@ class EUDVariable(VariableBase):
     Full variable.
     """
 
-    def __init__(self, _initval=0, modifier=bt.SetTo, /, initval=0, *, nextptr=0):
-        if not (modifier == bt.SetTo and initval == 0 and nextptr == 0):
-            modifier = ((bt.EncodeModifier(modifier) & 0xFF) << 24) + 0x2D0000
+    def __init__(self, _initval=0, modifier=None, /, initval=None, *, nextptr=None):
+        if not (modifier is None and initval is None and nextptr is None):
+            if modifier is None:
+                modifier = 0x072D0000
+            else:
+                modifier = ((bt.EncodeModifier(modifier) & 0xFF) << 24) | 0x2D0000
+            if initval is None:
+                initval = 0
+            if nextptr is None:
+                nextptr = 0
             # bitmask, player, #, modifier, nextptr
             _initval = (0xFFFFFFFF, _ProcessDest(_initval), initval, modifier, nextptr)
         self._vartrigger = VariableTriggerForward(_initval)
