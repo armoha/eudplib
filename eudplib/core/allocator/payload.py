@@ -203,6 +203,8 @@ def CollectObjects(root):
         ),
         flush=True,
     )
+    if not _payload_shuffle:
+        lprint(_("ShufflePayload has been turned off."), flush=True)
 
 
 # -------
