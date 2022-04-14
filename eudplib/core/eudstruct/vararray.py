@@ -30,7 +30,8 @@ from ...localize import _
 from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, ep_assert
 
 from ..variable import EUDVariable, SeqCompute, VProc, IsEUDVariable
-from ..variable.vbuf import GetCurrentVariableBuffer
+from ..variable.eudv import _ProcessDest
+from ..variable.vbuf import GetCurrentVariableBuffer, GetCurrentCustomVariableBuffer
 
 
 @cachedfunc
@@ -38,16 +39,24 @@ def EUDVArrayData(size):
     ep_assert(isinstance(size, int))
 
     class _EUDVArrayData(ConstExpr):
-        def __init__(self, initvars):
+        def __init__(self, initvars, *, dest=0, nextptr=0):
             super().__init__(self)
             ep_assert(
                 len(initvars) == size,
                 _("{} items expected, got {}").format(size, len(initvars)),
             )
+            if dest != 0 or nextptr != 0:
+                initvars = [
+                    (0xFFFFFFFF, _ProcessDest(dest), initvar, 0x072D0000, nextptr)
+                    for initvar in initvars
+                ]
             self._initvars = initvars
 
         def Evaluate(self):
-            evb = GetCurrentVariableBuffer()
+            if all(isinstance(var, tuple) for var in self._initvars):
+                evb = GetCurrentCustomVariableBuffer()
+            else:
+                evb = GetCurrentVariableBuffer()
             if self not in evb._vdict:
                 evb.CreateMultipleVarTriggers(self, self._initvars)
 
@@ -111,11 +120,11 @@ def EUDVArray(size, basetype=None):
 
                 for t in range(31, -1, -1):
                     _goto_getidx[t] << bt.RawTrigger(
-                        conditions=_index.AtLeastX(1, 2 ** t),
+                        conditions=_index.AtLeastX(1, 2**t),
                         actions=[
-                            bt.SetMemory(_end_getidx + 4, bt.Add, 72 * (2 ** t)),
-                            bt.SetMemory(_ret_getidx + 16, bt.Add, 18 * (2 ** t)),
-                            bt.SetMemory(_ret_getidx + 48, bt.Add, 18 * (2 ** t)),
+                            bt.SetMemory(_end_getidx + 4, bt.Add, 72 * (2**t)),
+                            bt.SetMemory(_ret_getidx + 16, bt.Add, 18 * (2**t)),
+                            bt.SetMemory(_ret_getidx + 48, bt.Add, 18 * (2**t)),
                         ],
                     )
                 _end_getidx << bt.RawTrigger(
