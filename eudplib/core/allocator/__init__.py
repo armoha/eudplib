@@ -31,5 +31,6 @@ from .payload import (
     GetObjectAddr,
     CreatePayload,
     CompressPayload,
+    ShufflePayload,
     RegisterCreatePayloadCallback,
 )

@@ -45,6 +45,7 @@ PHASE_WRITING = 3
 phase = None
 
 _payload_compress = False
+_payload_shuffle = True
 
 # -------
 
@@ -69,7 +70,7 @@ def lprint(text, flush=False, _endingdict={True: "\n", False: "\r"}):
 
 
 def CompressPayload(mode):
-    """ Set payload compression mode.
+    """Set payload compression mode.
 
     :param mode: If true, enable object stacking (compression). If false,
     disable it.
@@ -83,6 +84,23 @@ def CompressPayload(mode):
         _payload_compress = True
     else:
         _payload_compress = False
+
+
+def ShufflePayload(mode):
+    """Set payload shuffle mode.
+
+    :param mode: If true, enable object shuffling (compression). If false,
+    disable it.
+    """
+
+    global _payload_shuffle
+    if mode not in [True, False]:
+        raise ut.EPError(_("Invalid type"))
+
+    if mode:
+        _payload_shuffle = True
+    else:
+        _payload_shuffle = False
 
 
 class ObjCollector:
@@ -169,9 +187,10 @@ def CollectObjects(root):
     if len(_found_objects_set) == 0:
         raise ut.EPError(_("No object collected"))
 
-    # Shuffle objects -> Randomize(?) addresses
-    _found_objects_set.remove(_rootobj)
-    _found_objects = [_rootobj] + RandList(_found_objects_set)
+    if _payload_shuffle:
+        # Shuffle objects -> Randomize(?) addresses
+        _found_objects_set.remove(_rootobj)
+        _found_objects = [_rootobj] + RandList(_found_objects_set)
 
     # cleanup
     _found_objects_set = None
@@ -179,7 +198,9 @@ def CollectObjects(root):
 
     # Final
     lprint(
-        _(" - Collected {} / {} objects").format(len(_found_objects), len(_found_objects)),
+        _(" - Collected {} / {} objects").format(
+            len(_found_objects), len(_found_objects)
+        ),
         flush=True,
     )
 
@@ -313,8 +334,9 @@ def AllocObjects():
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
 
             raise ut.EPError(
-                _("Occupation map length ({}) & Object size mismatch for object ({})")
-                .format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
+                _(
+                    "Occupation map length ({}) & Object size mismatch for object ({})"
+                ).format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
             )
         lprint(_(" - Preprocessed {} / {} objects").format(i + 1, objn))
 
@@ -351,8 +373,9 @@ def ConstructPayload():
         written_bytes = pbuf.EndWrite()
         ut.ep_assert(
             written_bytes == objsize,
-            _("obj.GetDataSize()({}) != Real payload size({}) for object {}")
-            .format(objsize, written_bytes, obj),
+            _("obj.GetDataSize()({}) != Real payload size({}) for object {}").format(
+                objsize, written_bytes, obj
+            ),
         )
 
         lprint(_(" - Written {} / {} objects").format(i + 1, objn))
@@ -392,6 +415,7 @@ def GetObjectAddr(obj):
     if phase is PHASE_COLLECTING:
         if obj not in _found_objects_set:
             _untraversed_objects.append(obj)
+            _found_objects.append(obj)
             _found_objects_set.add(obj)
             if obj.DynamicConstructed():
                 _dynamic_objects_set.add(obj)

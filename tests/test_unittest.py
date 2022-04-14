@@ -62,6 +62,7 @@ from unittests import (
 )
 
 helper.CompressPayload(True)
+helper.ShufflePayload(False)
 
 
 def f():
