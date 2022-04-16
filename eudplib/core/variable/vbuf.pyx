@@ -214,6 +214,7 @@ class EUDCustomVarBuffer(EUDObject):
                 heads = heade + 4
 
         for initvals in self._5acts:
+            i += 1
             for initval, offset, initial in zip(initvals, offsets[:4], initials[:4]):
                 heade = 72 * i + offset
                 if initval == initial:
@@ -225,7 +226,6 @@ class EUDCustomVarBuffer(EUDObject):
                 emitbuffer.WriteBytes(output[heads:heade])
                 emitbuffer.WriteDword(initval)
                 heads = heade + 4
-            i += 1
 
         emitbuffer.WriteBytes(output[heads:olen])
         PyMem_Free(output)
