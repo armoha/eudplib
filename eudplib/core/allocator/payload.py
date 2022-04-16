@@ -267,13 +267,13 @@ class ObjAllocator:
         if structformat not in self._sizes:
             ssize = 0
             sizedict = {"B": 1, "H": 2, "I": 4}
-            for i in range(len(arglist)):
-                ssize += sizedict[structformat[i]]
+            for b in structformat:
+                ssize += sizedict[b]
             self._sizes[structformat] = ssize
 
         ssize = self._sizes[structformat]
 
-        # Add occupiation index
+        # Add occupation index
         self._occupmap.extend([1] * (ssize >> 2))
         ssize &= 3
         for i in range(ssize):
