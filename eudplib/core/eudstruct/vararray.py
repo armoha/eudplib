@@ -75,7 +75,7 @@ def EUDVArray(size, basetype=None):
     ep_assert(isinstance(size, int))
 
     class _EUDVArray(ExprProxy):
-        def __init__(self, initvars=None, *, _from=None):
+        def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None):
             # Initialization from value
             if _from is not None:
                 if IsConstExpr(_from):
@@ -92,7 +92,7 @@ def EUDVArray(size, basetype=None):
                     initvars = [0] * size
 
                 # For python iterables
-                baseobj = EUDVArrayData(size)(initvars)
+                baseobj = EUDVArrayData(size)(initvars, dest=dest, nextptr=nextptr)
 
             super().__init__(baseobj)
             self.dontFlatten = True
