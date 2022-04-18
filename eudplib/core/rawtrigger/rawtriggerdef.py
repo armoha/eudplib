@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from ..allocator import IsConstExpr
 from ..eudobj import EUDObject, Db
 from .triggerscope import NextTrigger, _RegisterTrigger
 from .condition import Condition
@@ -83,6 +84,8 @@ class RawTrigger(EUDObject):
             prevptr = 0
         if nextptr is None:
             nextptr = NextTrigger()  # (1)
+        else:
+            ut.ep_assert(IsConstExpr(nextptr), _("nextptr should be ConstExpr"))
 
         self._prevptr = prevptr
         self._nextptr = nextptr
