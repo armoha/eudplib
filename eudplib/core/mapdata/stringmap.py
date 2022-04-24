@@ -41,8 +41,10 @@ class StringIdMap:
             self._s2id[string] = strid
 
     def GetStringIndex(self, string):
-        string = u2b(unProxy(string))
-        retid = self._s2id[string]
+        byte = u2utf8(unProxy(string))
+        if byte not in self._s2id:
+            byte = u2b(unProxy(string))
+        retid = self._s2id[byte]
         ep_assert(retid is not None, _("Ambigious string {}").format(string))
         return retid
 
@@ -87,10 +89,7 @@ def GetSwitchIndex(s):
 
 
 def GetUnitIndex(u):
-    try:
-        return unitmap.GetStringIndex(u2utf8(u))
-    except KeyError:
-        return unitmap.GetStringIndex(u2b(u))
+    return unitmap.GetStringIndex(u)
 
 
 def ApplyStringMap(chkt):
