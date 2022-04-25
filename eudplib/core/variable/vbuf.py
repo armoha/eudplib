@@ -66,18 +66,31 @@ class EUDVarBuffer(EUDObject):
                 emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer):
-        output = bytearray(2408 + 72 * (len(self._initvals) - 1))
+        emitbuffer.WriteSpace(4)
+
+        for _ in range(4):
+            emitbuffer.WriteDword(0)  # nextptr
+            emitbuffer.WriteSpace(15)
+            emitbuffer.WriteByte(0)  # nocond
+            emitbuffer.WriteSpace(52)
+
+        emitbuffer.WriteDword(0)  # nextptr
+        emitbuffer.WriteSpace(15)
+        emitbuffer.WriteByte(0)  # nocond
+        emitbuffer.WriteSpace(16)
+
+        output = bytearray(72 * len(self._initvals))
 
         for i in range(len(self._initvals)):
             # 'preserve rawtrigger'
-            output[72 * i + 328 : 72 * i + 332] = b"\xFF\xFF\xFF\xFF"
-            output[72 * i + 352 : 72 * i + 356] = b"\0\0\x2D\x07"
-            output[72 * i + 356 : 72 * i + 360] = b"\0\0SC"
-            output[72 * i + 2376 : 72 * i + 2380] = b"\x04\0\0\0"
+            output[72 * i : 72 * i + 4] = b"\xFF\xFF\xFF\xFF"
+            output[72 * i + 24 : 72 * i + 28] = b"\0\0\x2D\x07"
+            output[72 * i + 28 : 72 * i + 32] = b"\0\0SC"
+            output[72 * i + 32 : 72 * i + 36] = b"\x04\0\0\0"
 
         heads = 0
         for i, initval in enumerate(self._initvals):
-            heade = 72 * i + 348
+            heade = 72 * i + 20
             if initval == 0:
                 continue
             elif isinstance(initval, int):
@@ -85,9 +98,20 @@ class EUDVarBuffer(EUDObject):
                 continue
             emitbuffer.WriteBytes(output[heads:heade])
             emitbuffer.WriteDword(initval)
-            heads = 72 * i + 352
+            heads = 72 * i + 24
 
         emitbuffer.WriteBytes(output[heads:])
+
+        emitbuffer.WriteSpace(32)
+        emitbuffer.WriteDword(4)  # flags
+        emitbuffer.WriteSpace(27)
+        emitbuffer.WriteByte(0)  # currentAction
+
+        for _ in range(27):
+            emitbuffer.WriteSpace(40)
+            emitbuffer.WriteDword(4)  # flags
+            emitbuffer.WriteSpace(27)
+            emitbuffer.WriteByte(0)  # currentAction
 
 
 _evb = None
