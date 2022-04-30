@@ -195,50 +195,41 @@ class EUDCustomVarBuffer(EUDObject):
 
     def WritePayload(self, emitbuffer):
         cdef size_t i, heads, heade
-        cdef size_t olen = 2408 + 72 * (len(self._actnptr_pairs) + len(self._5acts) - 1)
+        cdef size_t olen = 72 * (len(self._actnptr_pairs) + len(self._5acts))
         cdef uint8_t * output = <uint8_t*> PyMem_Malloc(olen)
         memset(output, 0, olen)
         cdef uint32_t iv2
 
+        emitbuffer.WriteSpace(4)
+
+        for i in range(5):
+            try:
+                emitbuffer.WriteDword(self._5nptrs[i])  # nextptr
+            except IndexError:
+                emitbuffer.WriteDword(0)
+            emitbuffer.WriteSpace(15)
+            emitbuffer.WriteByte(0)  # nocond
+            if i < 4:
+                emitbuffer.WriteSpace(52)
+            else:
+                emitbuffer.WriteSpace(16)
+
         for i in range(len(self._actnptr_pairs) + len(self._5acts)):
             # 'preserve rawtrigger'
-            ( < uint32_t*>(output + 72 * i + 328))[0] = 0xFFFFFFFF
-            ( < uint32_t*>(output + 72 * i + 352))[0] = 0x072D0000
-            ( < uint32_t*>(output + 72 * i + 356))[0] = 0x43530000
-            ( < uint32_t*>(output + 72 * i + 2376))[0] = 4
+            ( < uint32_t*>(output + 72 * i))[0] = 0xFFFFFFFF
+            ( < uint32_t*>(output + 72 * i + 24))[0] = 0x072D0000
+            ( < uint32_t*>(output + 72 * i + 28))[0] = 0x43530000
+            ( < uint32_t*>(output + 72 * i + 32))[0] = 4
 
         heads = 0
 
-        for i, nptr in enumerate(self._5nptrs):
-            heade = 72 * i + 4
-            if nptr == 0:
-                continue
-            elif isinstance(nptr, int):
-                iv2 = nptr & 0xFFFFFFFF
-                (<uint32_t*>(output + heade))[0] = iv2
-                continue
-            emitbuffer.WriteBytes(output[heads:heade])
-            emitbuffer.WriteDword(nptr)
-            heads = heade + 4
+        from itertools import chain
 
         # bitmask, player, initval, modifier, nptr
-        offsets = (328, 344, 348, 352, 364)
+        offsets = (0, 16, 20, 24, 36)
         initials = (0xFFFFFFFF, 0, 0, 0x072D0000, 0)
-        for i, initvals in enumerate(self._actnptr_pairs):
+        for i, initvals in enumerate(chain(self._actnptr_pairs, self._5acts)):
             for initval, offset, initial in zip(initvals, offsets, initials):
-                heade = 72 * i + offset
-                if initval == initial:
-                    continue
-                elif isinstance(initval, int):
-                    iv2 = initval & 0xFFFFFFFF
-                    (<uint32_t*>(output + heade))[0] = iv2
-                    continue
-                emitbuffer.WriteBytes(output[heads:heade])
-                emitbuffer.WriteDword(initval)
-                heads = heade + 4
-
-        for i, initvals in enumerate(self._5acts, start=len(self._actnptr_pairs)):
-            for initval, offset, initial in zip(initvals, offsets[:4], initials[:4]):
                 heade = 72 * i + offset
                 if initval == initial:
                     continue
@@ -252,6 +243,17 @@ class EUDCustomVarBuffer(EUDObject):
 
         emitbuffer.WriteBytes(output[heads:olen])
         PyMem_Free(output)
+
+        emitbuffer.WriteSpace(32)
+        emitbuffer.WriteDword(4)  # flags
+        emitbuffer.WriteSpace(27)
+        emitbuffer.WriteByte(0)  # currentAction
+
+        for _ in range(27):
+            emitbuffer.WriteSpace(40)
+            emitbuffer.WriteDword(4)  # flags
+            emitbuffer.WriteSpace(27)
+            emitbuffer.WriteByte(0)  # currentAction
 
 
 _ecvb = None

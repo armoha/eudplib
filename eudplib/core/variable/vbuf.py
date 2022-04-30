@@ -184,34 +184,37 @@ class EUDCustomVarBuffer(EUDObject):
                     emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer):
-        output = bytearray(
-            2408 + 72 * (len(self._actnptr_pairs) + len(self._5acts) - 1)
-        )
+        output = bytearray(72 * (len(self._actnptr_pairs) + len(self._5acts)))
+
+        emitbuffer.WriteSpace(4)
+
+        for i in range(5):
+            try:
+                emitbuffer.WriteDword(self._5nptrs[i])  # nextptr
+            except IndexError:
+                emitbuffer.WriteDword(0)
+            emitbuffer.WriteSpace(15)
+            emitbuffer.WriteByte(0)  # nocond
+            if i < 4:
+                emitbuffer.WriteSpace(52)
+            else:
+                emitbuffer.WriteSpace(16)
 
         for i in range(len(self._actnptr_pairs) + len(self._5acts)):
             # 'preserve rawtrigger'
-            output[72 * i + 328 : 72 * i + 332] = b"\xFF\xFF\xFF\xFF"
-            output[72 * i + 352 : 72 * i + 356] = b"\0\0\x2D\x07"
-            output[72 * i + 356 : 72 * i + 360] = b"\0\0SC"
-            output[72 * i + 2376 : 72 * i + 2380] = b"\x04\0\0\0"
+            output[72 * i : 72 * i + 4] = b"\xFF\xFF\xFF\xFF"
+            output[72 * i + 24 : 72 * i + 28] = b"\0\0\x2D\x07"
+            output[72 * i + 28 : 72 * i + 32] = b"\0\0SC"
+            output[72 * i + 32 : 72 * i + 36] = b"\x04\0\0\0"
 
         heads = 0
 
-        for i, nptr in enumerate(self._5nptrs):
-            heade = 72 * i + 4
-            if nptr == 0:
-                continue
-            elif isinstance(nptr, int):
-                output[heade : heade + 4] = ut.i2b4(nptr)
-                continue
-            emitbuffer.WriteBytes(output[heads:heade])
-            emitbuffer.WriteDword(nptr)
-            heads = 72 * i + 8
+        from itertools import chain
 
         # bitmask, player, initval, modifier, nptr
-        offsets = (328, 344, 348, 352, 364)
+        offsets = (0, 16, 20, 24, 36)
         initials = (0xFFFFFFFF, 0, 0, 0x072D0000, 0)
-        for i, initvals in enumerate(self._actnptr_pairs):
+        for i, initvals in enumerate(chain(self._actnptr_pairs, self._5acts)):
             for initval, offset, initial in zip(initvals, offsets, initials):
                 heade = 72 * i + offset
                 if initval == initial:
@@ -223,19 +226,18 @@ class EUDCustomVarBuffer(EUDObject):
                 emitbuffer.WriteDword(initval)
                 heads = 72 * i + offset + 4
 
-        for i, initvals in enumerate(self._5acts, start=len(self._actnptr_pairs)):
-            for initval, offset, initial in zip(initvals, offsets[:4], initials[:4]):
-                heade = 72 * i + offset
-                if initval == initial:
-                    continue
-                elif isinstance(initval, int):
-                    output[heade : heade + 4] = ut.i2b4(initval)
-                    continue
-                emitbuffer.WriteBytes(output[heads:heade])
-                emitbuffer.WriteDword(initval)
-                heads = 72 * i + offset + 4
-
         emitbuffer.WriteBytes(output[heads:])
+
+        emitbuffer.WriteSpace(32)
+        emitbuffer.WriteDword(4)  # flags
+        emitbuffer.WriteSpace(27)
+        emitbuffer.WriteByte(0)  # currentAction
+
+        for _ in range(27):
+            emitbuffer.WriteSpace(40)
+            emitbuffer.WriteDword(4)  # flags
+            emitbuffer.WriteSpace(27)
+            emitbuffer.WriteByte(0)  # currentAction
 
 
 _ecvb = None
