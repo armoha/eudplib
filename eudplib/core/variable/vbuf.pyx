@@ -213,8 +213,7 @@ class EUDCustomVarBuffer(EUDObject):
                 emitbuffer.WriteDword(initval)
                 heads = heade + 4
 
-        for initvals in self._5acts:
-            i += 1
+        for i, initvals in enumerate(self._5acts, start=len(self._actnptr_pairs)):
             for initval, offset, initial in zip(initvals, offsets[:4], initials[:4]):
                 heade = 72 * i + offset
                 if initval == initial:
