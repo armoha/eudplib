@@ -418,19 +418,3 @@ def f_println(format_string, *args):
 def f_printAt(line, format_string, *args):
     gsb = GetGlobalStringBuffer()
     gsb.printfAt(line, format_string, *args)
-
-
-def f_printAll(format_string, *args):
-    oldcp = f_getcurpl()
-    f_setcurpl(f_getuserplayerid())
-    gsb = GetGlobalStringBuffer()
-    gsb.printf(format_string, *args)
-    f_setcurpl(oldcp)
-
-
-def f_printAllAt(line, format_string, *args):
-    oldcp = f_getcurpl()
-    f_setcurpl(f_getuserplayerid())
-    gsb = GetGlobalStringBuffer()
-    gsb.printfAt(line, format_string, *args)
-    f_setcurpl(oldcp)
