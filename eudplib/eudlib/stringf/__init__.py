@@ -36,8 +36,15 @@ from .strbuffer import (
     f_simpleprint,
     f_println,
     f_printAt,
+)
+
+from .strall import (
     f_printAll,
+    DisplayTextAllAt,
     f_printAllAt,
+    f_playWavAll,
+    f_setMissionObjectivesAll,
+
 )
 
 from .strfunc import f_strcpy, f_strcmp, f_strlen, f_strlen_epd, f_strnstr
