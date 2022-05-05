@@ -89,9 +89,8 @@ def _f_initisusercp():
     c.VProc(userp, userp.SetDest(ut.EPD(write) + 5))
 
     if cs.EUDInfLoop()():
-        v = f_dwread_epd(ptr)
-        cs.EUDBreakIf(v == 0xFFFFFFFF)
-        c.VProc(v, v.SetDest(ut.EPD(write) + 4))
+        f_dwread_epd(ptr, ret=[ut.EPD(write) + 4])
+        cs.EUDBreakIf(c.Memory(write + 16, Exactly, 0xFFFFFFFF))
         c.RawTrigger(actions=[write << c.SetDeaths(0, c.SetTo, 0, 0), ptr.AddNumber(1)])
 
     cs.EUDEndInfLoop()
