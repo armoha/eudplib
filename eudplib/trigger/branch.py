@@ -43,10 +43,9 @@ def _EUDBranchSub(conditions, ontrue, onfalse, *, _actions=None):
         nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg)
     )
     if _actions is None:
-        tjtrg << c.RawTrigger(nextptr=ontrue, actions=c.SetNextPtr(brtrg, onfalse))
-    else:
-        _actions.append(c.SetNextPtr(brtrg, onfalse))
-        tjtrg << c.RawTrigger(nextptr=ontrue, actions=_actions)
+        _actions = []
+    _actions.append(c.SetNextPtr(brtrg, onfalse))
+    tjtrg << c.RawTrigger(nextptr=ontrue, actions=_actions)
 
 
 def EUDBranch(conditions, ontrue, onfalse, *, _actions=None):
@@ -71,11 +70,6 @@ def EUDBranch(conditions, ontrue, onfalse, *, _actions=None):
         if i + 16 < len(conditions):
             _EUDBranchSub(conditions[i : i + 16], subontrue, subonfalse)
             subontrue << c.NextTrigger()
-        else:
-            if _actions is None:
-                _EUDBranchSub(conditions[i : i + 16], subontrue, subonfalse)
-            else:
-                _EUDBranchSub(
-                    conditions[i : i + 16], subontrue, subonfalse, _actions=_actions
-                )
-            subontrue << ontrue
+            continue
+        _EUDBranchSub(conditions[i:], subontrue, subonfalse, _actions=_actions)
+        subontrue << ontrue

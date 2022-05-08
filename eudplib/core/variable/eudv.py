@@ -726,15 +726,18 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
         _RemoveDuplicateActions()
 
         vt_nextptr = Forward()
-        queuef = {
-            bt.SetTo: EUDVariable.QueueAssignTo,
-            bt.Add: EUDVariable.QueueAddTo,
-            bt.Subtract: EUDVariable.QueueSubtractTo,
-            None: EUDVariable.SetDest,
-        }[mdt]
+        nonConstAction = []
+        if dst is None:
+            nonConstAction.append([])
+        else:
+            nonConstAction.append(src.SetDest(dst))
+        if mdt is None:
+            nonConstAction.append([])
+        else:
+            nonConstAction.append(src.SetModifier(mdt))
 
         nonConstActions.append(
-            [queuef(src, dst), bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
+            [nonConstAction, bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
         )
         last_pairs = src, dst, mdt
 
