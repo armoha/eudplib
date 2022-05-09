@@ -62,15 +62,15 @@ actpt = [[-1], [-1], [-1], [-1], [-1], [-1], [0, 4, 5], [2, None, None, None]]
 
 
 def PatchCondition(cond):
-    if c.IsEUDVariable(cond):
-        return cond >= 1
-    elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
-        return cond >= 1
-    elif ut.isUnproxyInstance(cond, c.EUDLightBool):
+    if ut.isUnproxyInstance(cond, c.EUDLightBool):
         return cond.IsSet()
+    try:  # EUD(Light)Variable, Db
+        return c.Memory(cond.getValueAddr(), c.AtLeast, 1)
+    except AttributeError:
+        pass
 
     # translate boolean condition
-    elif isinstance(cond, bool):
+    if isinstance(cond, bool):
         if cond:
             return c.Always()
         else:
