@@ -51,13 +51,13 @@ class EUDLightBool:
     def __init__(self):
         if EUDLightBool._bit < 32:
             self._basev = EUDLightBool._lv
-            self._value = 1 << EUDLightBool._bit
+            self._mask = 1 << EUDLightBool._bit
             EUDLightBool._bit += 1
         else:
             lv = EUDLightVariable()
             EUDLightBool._lv = lv
             self._basev = lv
-            self._value = 1
+            self._mask = 1
             EUDLightBool._bit = 1
         self._memaddr = self._basev._memaddr
 
@@ -65,16 +65,16 @@ class EUDLightBool:
         return self._memaddr
 
     def Set(self):
-        return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, self._value, self._value)
+        return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, self._mask, self._mask)
 
     def Clear(self):
-        return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, 0, self._value)
+        return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, 0, self._mask)
 
     def Toggle(self):
-        return bt.SetMemoryX(self.getValueAddr(), bt.Add, self._value, self._value)
+        return bt.SetMemoryX(self.getValueAddr(), bt.Add, self._mask, self._mask)
 
     def IsSet(self):
-        return bt.MemoryX(self.getValueAddr(), bt.AtLeast, 1, self._value)
+        return bt.MemoryX(self.getValueAddr(), bt.AtLeast, 1, self._mask)
 
     def IsCleared(self):
-        return bt.MemoryX(self.getValueAddr(), bt.Exactly, 0, self._value)
+        return bt.MemoryX(self.getValueAddr(), bt.Exactly, 0, self._mask)
