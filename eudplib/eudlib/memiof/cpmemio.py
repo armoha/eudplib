@@ -36,9 +36,9 @@ def _reader():
     cs.DoActions(ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)))
     for i in ut.RandList(range(32)):
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i),
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i),
             actions=[
-                ptr.AddNumber(2 ** i),
+                ptr.AddNumber(2**i),
                 epd.AddNumber(2 ** (i - 2)) if i >= 2 else [],
             ],
         )
@@ -80,20 +80,20 @@ def _wreader(subp):
         byte = 8 * bits
         for power in ut.RandList(range(byte, byte + 16)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** power),
+                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
                 actions=w.AddNumber(2 ** (power - byte)),
             )
         cs.EUDBreak()
     if cs.EUDSwitchCase()(3):
         for power in ut.RandList(range(24, 32)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** power),
+                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
                 actions=w.AddNumber(2 ** (power - 24)),
             )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
         for power in ut.RandList(range(8)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** power),
+                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
                 actions=w.AddNumber(2 ** (power + 8)),
             )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, -1))
@@ -120,7 +120,7 @@ def _breader(subp):
         cs.EUDSwitchCase()(i)
         for j in ut.RandList(range(8 * i, 8 * i + 8)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
+                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
                 actions=b.AddNumber(2 ** (j - 8 * i)),
             )
 
@@ -129,10 +129,10 @@ def _breader(subp):
     return b
 
 
-def f_bread_cp(cpo, subp):
+def f_bread_cp(cpo, subp, **kwargs):
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    b = _breader(subp)
+    b = _breader(subp, **kwargs)
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
     return b
@@ -170,7 +170,7 @@ def _wwriter(subp, w):
         c.RawTrigger(
             actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i))
         )
-        c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256 ** i))])
+        c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256**i))])
         cs.EUDBreak()
 
     # Things gets complicated on this case.
@@ -190,7 +190,11 @@ def f_wwrite_cp(cpo, subp, w):
             if isinstance(cpo, int) and cpo == 0
             else c.SetMemory(0x6509B0, c.Add, cpo),
             c.SetDeathsX(
-                c.CurrentPlayer, c.SetTo, w * (256 ** subp), 0, 65535 << (8 * subp),
+                c.CurrentPlayer,
+                c.SetTo,
+                w * (256**subp),
+                0,
+                65535 << (8 * subp),
             ),
             []
             if isinstance(cpo, int) and cpo == 0
@@ -213,7 +217,7 @@ def _bwriter(subp, b):
             actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 << (8 * i))
         )
 
-        c.SeqCompute([(c.CurrentPlayer, c.Add, b * (256 ** i))])
+        c.SeqCompute([(c.CurrentPlayer, c.Add, b * (256**i))])
         cs.EUDBreak()
     cs.EUDEndSwitch()
     return b
@@ -226,7 +230,11 @@ def f_bwrite_cp(cpo, subp, b):
             if isinstance(cpo, int) and cpo == 0
             else c.SetMemory(0x6509B0, c.Add, cpo),
             c.SetDeathsX(
-                c.CurrentPlayer, c.SetTo, b * (256 ** subp), 0, 255 << (8 * subp),
+                c.CurrentPlayer,
+                c.SetTo,
+                b * (256**subp),
+                0,
+                255 << (8 * subp),
             ),
             []
             if isinstance(cpo, int) and cpo == 0
