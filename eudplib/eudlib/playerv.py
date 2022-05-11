@@ -44,7 +44,7 @@ class PVariable(c.EUDVArray(8)):
         )
         for k in range(2, 0, -1):
             c.RawTrigger(
-                conditions=i.AtLeastX(1, 2 ** k), actions=value.AddDest(18 * (2 ** k))
+                conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
             )
         c.RawTrigger(
             nextptr=value.GetVTable(),
@@ -54,6 +54,7 @@ class PVariable(c.EUDVArray(8)):
         nptr << c.NextTrigger()
 
     def __setitem__(self, i, value):
+        i = c.EncodePlayer(i)
         if c.IsEUDVariable(i) and c.IsEUDVariable(value):
             self._eudset(i, value)
 
@@ -62,10 +63,14 @@ class PVariable(c.EUDVArray(8)):
             cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
             for k in range(2, -1, -1):
                 c.RawTrigger(
-                    conditions=i.AtLeastX(1, 2 ** k),
-                    actions=c.SetMemory(a0 + 16, c.Add, 18 * (2 ** k)),
+                    conditions=i.AtLeastX(1, 2**k),
+                    actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
                 )
             c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
 
         else:
             self.set(i, value)
+
+    def __getitem__(self, i):
+        i = c.EncodePlayer(i)
+        return super().__getitem__(i)
