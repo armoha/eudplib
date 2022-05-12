@@ -62,6 +62,7 @@ actpt = [[-1], [-1], [-1], [-1], [-1], [-1], [0, 4, 5], [2, None, None, None]]
 
 
 def PatchCondition(cond):
+    assert not isinstance(cond, c.Action)
     if hasattr(cond, "getValueAddr"):
         try:  # EUDLightBool, EUDEntry
             return c.MemoryX(cond.getValueAddr(), c.AtLeast, 1, cond._mask)
