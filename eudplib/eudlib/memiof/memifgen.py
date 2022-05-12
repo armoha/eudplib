@@ -28,14 +28,6 @@ from ... import core as c, ctrlstru as cs, utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 
 
-def bits(n):
-    n = n & 0xFFFFFFFF
-    while n:
-        b = n & (~n + 1)
-        yield b
-        n ^= b
-
-
 def f_readgen_epd(mask, *args, docstring=None, _fdict={}, _check_empty=False):
     mask = mask & 0xFFFFFFFF
     if mask not in _fdict:
@@ -44,7 +36,7 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}, _check_empty=False):
 
     key = (
         tuple(initval for initval, _ in args)
-        + tuple(tuple(func(i) for i in bits(mask)) for _, func in args)
+        + tuple(tuple(func(i) for i in ut.bits(mask)) for _, func in args)
         + (_check_empty,)
     )
     if key not in _subfdict:
@@ -65,7 +57,7 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}, _check_empty=False):
                     ],
                 )
 
-            for i in bits(mask):
+            for i in ut.bits(mask):
                 if all(arg[1](i) == 0 for arg in args):
                     continue
                 c.RawTrigger(
@@ -93,7 +85,7 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}, _check_empty=False):
 
     key = (
         tuple(initval for initval, _ in args)
-        + tuple(tuple(func(i) for i in bits(mask)) for _, func in args)
+        + tuple(tuple(func(i) for i in ut.bits(mask)) for _, func in args)
         + (_check_empty,)
     )
     if key not in _subfdict:
@@ -113,7 +105,7 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}, _check_empty=False):
                     ],
                 )
 
-            for i in bits(mask):
+            for i in ut.bits(mask):
                 if all(arg[1](i) == 0 for arg in args):
                     continue
                 c.RawTrigger(

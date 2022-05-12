@@ -63,19 +63,19 @@ def GetCurrentJumpBuffer():
     return _jtb
 
 
-RegisterCreatePayloadCallback(RegisterNewJumpBuffer)
+c.RegisterCreatePayloadCallback(RegisterNewJumpBuffer)
 
 
 # Unused jump table don't need to be allocated.
 class JumpTriggerForward(c.ConstExpr):
-    def __init__(self, nextptr):
+    def __init__(self, nextptrs):
         super().__init__(self)
-        self._nextptr = nextptr
+        self._nextptrs = nextptrs
 
     def Evaluate(self):
         jtb = GetCurrentJumpBuffer()
         try:
             return jtb._jdict[self].Evaluate()
         except KeyError:
-            jt = evb.CreateJumpTrigger(self, self._nextptr)
+            jt = jtb.CreateMultipleJumpTriggers(self, self._nextptrs)
             return jt.Evaluate()

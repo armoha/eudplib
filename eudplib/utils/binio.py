@@ -48,3 +48,11 @@ def i2b2(i):
 def i2b4(i):
     i &= 0xFFFFFFFF
     return bytes((i & 0xFF, (i >> 8) & 0xFF, (i >> 16) & 0xFF, (i >> 24) & 0xFF))
+
+
+def bits(n):
+    n = n & 0xFFFFFFFF
+    while n:
+        b = n & (~n + 1)
+        yield b
+        n ^= b

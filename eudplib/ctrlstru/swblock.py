@@ -28,7 +28,9 @@ from .. import trigger as tg
 from eudplib import utils as ut
 from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
+from .jumptable import JumpTriggerForward
 from eudplib.localize import _
+from itertools import chain, combinations
 
 
 def _IsSwitchBlockId(idf):
@@ -110,33 +112,39 @@ def EUDEndSwitch():
     if not block["defaultbr"].IsSet():
         block["defaultbr"] << swend
 
-    # Create key selector
     casebrlist = block["casebrlist"]
     defbranch = block["defaultbr"]
     casekeylist = sorted(block["casebrlist"].keys())
     var = block["targetvar"]
 
-    def KeySelector(keys):
-        # Uses simple binary search
-        ret = c.NextTrigger()
-        if len(keys) == 1:  # Only one keys on the list
-            tg.EUDBranch(var == keys[0], casebrlist[keys[0]], defbranch)
+    keyand, keyor = casekeylist[0], 0
+    for key in casekeylist:
+        keyand &= key
+        keyor |= key
+    keyxor = keyor - keyand
+    keybits = list(ut.bits(keyxor))
 
-        elif len(keys) >= 2:
-            br1 = c.Forward()
-            br2 = c.Forward()
-            midpos = len(keys) // 2
-            midval = keys[midpos]
-            EUDJumpIf(var == midval, casebrlist[midval])
-            tg.EUDBranch(var <= midval, br1, br2)
-            br1 << KeySelector(keys[:midpos])
-            br2 << KeySelector(keys[midpos + 1 :])
+    def powerset(iterable):
+        "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+        s = list(iterable)
+        return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
-        else:  # len(keys) == 0
-            return defbranch
-
-        return ret
-
-    KeySelector(casekeylist)
+    EUDJumpIf(var.AtLeastX(1, (~keyor) & 0xFFFFFFFF), defbranch)
+    fullbrlist = []
+    for bits in powerset(keybits):
+        key = keyand + sum(bits)
+        if key in casebrlist:
+            fullbrlist.append(casebrlist[key])
+        else:
+            fullbrlist.append(defbranch)
+    jump_table = JumpTriggerForward(fullbrlist)
+    jumper = c.Forward()
+    c.RawTrigger(actions=c.SetNextPtr(jumper, jump_table))
+    for i, bit in enumerate(keybits):
+        lastbit = c.RawTrigger(
+            conditions=var.AtLeastX(1, bit),
+            actions=c.SetMemory(jumper + 4, c.Add, 12 * (1 << i)),
+        )
+    jumper << lastbit
 
     swend << c.NextTrigger()
