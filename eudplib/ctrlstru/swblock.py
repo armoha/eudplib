@@ -132,11 +132,7 @@ def EUDEndSwitch():
     EUDJumpIf(var.AtLeastX(1, (~keyor) & 0xFFFFFFFF), defbranch)
     fullbrlist = []
     for bits in powerset(keybits):
-        key = keyand + sum(bits)
-        if key in casebrlist:
-            fullbrlist.append(casebrlist[key])
-        else:
-            fullbrlist.append(defbranch)
+        fullbrlist.append(casebrlist.get(keyand + sum(bits), defbranch))
     jump_table = JumpTriggerForward(fullbrlist)
     jumper = c.Forward()
     c.RawTrigger(actions=c.SetNextPtr(jumper, jump_table))
