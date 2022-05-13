@@ -28,6 +28,7 @@ from ..mapdata import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitI
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from .constenc import _Unique
 from .strdict import (
     DefAIScriptDict,
     DefLocationDict,
@@ -62,6 +63,9 @@ def EncodeAIScript(ais, issueError=False):
         elif len(ais) == 4:
             return ut.b2i4(ais)
 
+    elif isinstance(s, _Unique):
+        raise ut.EPError(_('[Warning] "{}" is not a {}').format(ais, "AIScript"))
+
     return ais
 
 
@@ -74,6 +78,8 @@ def EncodeImage(image, issueError=False):
             for match in difflib.get_close_matches(image, DefImageDict.keys()):
                 sl += "\n" + _(" - Suggestion: {}").format(match)
             raise ut.EPError(sl)
+    elif isinstance(image, _Unique):
+        raise ut.EPError(_('[Warning] "{}" is not a {}').format(image, "image"))
     return image
 
 
@@ -86,10 +92,12 @@ def EncodeIscript(iscript, issueError=False):
             for match in difflib.get_close_matches(iscript, DefIscriptDict.keys()):
                 sl += "\n" + _(" - Suggestion: {}").format(match)
             raise ut.EPError(sl)
+    elif isinstance(iscript, _Unique):
+        raise ut.EPError(_('[Warning] "{}" is not a {}').format(iscript, "iscript"))
     return iscript
 
 
-def _EncodeAny(t, f, dl, s, issueError, *, dlo=0):
+def _EncodeAny(t, f, dl, s, issueError):
     s = ut.unProxy(s)
 
     if isinstance(s, str) or isinstance(s, bytes):
@@ -98,10 +106,7 @@ def _EncodeAny(t, f, dl, s, issueError, *, dlo=0):
         except KeyError:
             if isinstance(s, str):
                 try:
-                    ret = dl[s]
-                    if dlo:
-                        ret += dlo
-                    return ret
+                    return dl[s]
                 except KeyError:
                     sl = _("Cannot encode string {} as {}.").format(s, t)
                     for match in difflib.get_close_matches(s, dl.keys()):
@@ -111,6 +116,9 @@ def _EncodeAny(t, f, dl, s, issueError, *, dlo=0):
             if issueError:
                 raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
             return s
+
+    elif isinstance(s, _Unique):
+        raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
 
     try:
         return dl.get(s, s)
@@ -150,6 +158,9 @@ def EncodeTBL(t, issueError=False):
         if issueError:
             raise ut.EPError(_('[Warning] "{}" is not a {}').format(t, "stat_txt.tbl"))
         return s
+
+    elif isinstance(s, _Unique):
+        raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
 
     try:
         return DefTBLDict.get(s, s)
