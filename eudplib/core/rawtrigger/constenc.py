@@ -37,13 +37,13 @@ class _Unique:
         self._name = name
 
     def __repr__(self):
-        return "_Unique(%s)" % self._name
+        return self._name
 
     def __str__(self):
         return repr(self)
 
 
-class _KillsSpecialized:
+class _KillsSpecialized(_Unique):
     def __call__(self, a, b, c, d):
         return self._internalf(a, b, c, d)
 
@@ -108,7 +108,7 @@ UnitsAndBuildings = _Unique("UnitsAndBuildings")
 
 # Name 'Kills' is used for both condition type and score type.
 # To resolve conflict, we initialize Kills differently from others.
-Kills = _KillsSpecialized()
+Kills = _KillsSpecialized("Kills")
 Razings = _Unique("Razings")
 KillsAndRazings = _Unique("KillsAndRazings")
 Custom = _Unique("Custom")
