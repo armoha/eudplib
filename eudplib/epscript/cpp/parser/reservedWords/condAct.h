@@ -7,7 +7,8 @@
 
 #include <string>
 
-bool isConditionName(const std::string& name);
-bool isActionName(const std::string& name);
+bool isConditionName(const std::string &name);
+bool isActionName(const std::string &name);
+bool isActionAllpName(const std::string &name);
 
-#endif //EPSCRIPT_CONDACT_H
+#endif // EPSCRIPT_CONDACT_H

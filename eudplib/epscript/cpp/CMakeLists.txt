@@ -9,7 +9,10 @@ set(EUDDRAFT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../euddraft/")
 if (WIN32)
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s -static-libgcc -static")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -static-libgcc -static-libstdc++ -static")
-
+    set(CMAKE_CXX_FLAGS_RELEASE
+      "/DWIN32 /D_WINDOWS /EHsc /WX /wd4355 /wd4251 /wd4250 /wd4996"
+      CACHE STRING "Debug compiler flags" FORCE
+    )
     SET(CMAKE_AR  "gcc-ar")
     SET(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")
     SET(CMAKE_C_ARCHIVE_FINISH   true)

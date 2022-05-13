@@ -1237,12 +1237,23 @@ actionStmt ::= ACTIONNAME(A) LPAREN fArgs(B) RPAREN SEMICOLON. {
     delete A; delete B;
 }
 
+actionStmt ::= ACTIONALLPNAME(A) LPAREN fArgs(B) RPAREN SEMICOLON. {
+    writeTraceInfo(ps->gen, A);
+    ps->gen << "f_setcurpl2cpcache([], " << A->data << "(" << B->data << "))" << std::endl;
+    delete A; delete B;
+}
+
 expr(A) ::= ACTIONNAME(B) LPAREN fArgs(C) RPAREN. {
     B->data = B->data + "(" + C->data + ")";
     delete C;
     A = mkTokenTemp(B);
 }
 
+expr(A) ::= ACTIONALLPNAME(B) LPAREN fArgs(C) RPAREN. {
+    B->data = B->data + "(" + C->data + ")";
+    delete C;
+    A = mkTokenTemp(B);
+}
 
 // Program building block
 

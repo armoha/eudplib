@@ -176,6 +176,7 @@ Token* TokenizerImpl::getToken() {
 
         if(isConditionName(identifier)) return TK(TOKEN_CONDITION, identifier);
         if(isActionName(identifier)) return TK(TOKEN_ACTION, identifier);
+        if(isActionAllpName(identifier)) return TK(TOKEN_ACTION_ALLP, identifier);
         int c;
         if((c = parseConstantName(identifier)) != -1) return TK(TOKEN_NUMBER, std::to_string(c));
 
