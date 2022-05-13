@@ -27,6 +27,67 @@ from ..allocator import ConstExpr, IsConstExpr
 from eudplib import utils as ut
 from eudplib.localize import _
 
+_acttypes = {
+    0: "(no action)",
+    1: "Victory",
+    2: "Defeat",
+    3: "PreserveTrigger",
+    4: "Wait",
+    5: "PauseGame",
+    6: "UnpauseGame",
+    7: "Transmission",
+    8: "PlayWAV",
+    9: "DisplayText",
+    10: "CenterView",
+    11: "CreateUnitWithProperties",
+    12: "SetMissionObjectives",
+    13: "SetSwitch",
+    14: "SetCountdownTimer",
+    15: "RunAIScript",
+    16: "RunAIScriptAt",
+    17: "LeaderBoardControl",
+    18: "LeaderBoardControlAt",
+    19: "LeaderBoardResources",
+    20: "LeaderBoardKills",
+    21: "LeaderBoardScore",
+    22: "KillUnit",
+    23: "KillUnitAt",
+    24: "RemoveUnit",
+    25: "RemoveUnitAt",
+    26: "SetResources",
+    27: "SetScore",
+    28: "MinimapPing",
+    29: "TalkingPortrait",
+    30: "MuteUnitSpeech",
+    31: "UnMuteUnitSpeech",
+    32: "LeaderboardComputerPlayers",
+    33: "LeaderboardGoalControl",
+    34: "LeaderboardGoalControlAt",
+    35: "LeaderboardGoalResources",
+    36: "LeaderboardGoalKills",
+    37: "LeaderboardGoalScore",
+    38: "MoveLocation",
+    39: "MoveUnit",
+    40: "LeaderboardGreed",
+    41: "SetNextScenario",
+    42: "SetDoodadState",
+    43: "SetInvincibility",
+    44: "CreateUnit",
+    45: "SetDeaths",
+    46: "Order",
+    47: "Comment",
+    48: "GiveUnits",
+    49: "ModifyUnitHitPoints",
+    50: "ModifyUnitEnergy",
+    51: "ModifyUnitShields",
+    52: "ModifyUnitResourceAmount",
+    53: "ModifyUnitHangerCount",
+    54: "PauseTimer",
+    55: "UnpauseTimer",
+    56: "Draw",
+    57: "SetAllianceStatus",
+}
+
 
 class Action(ConstExpr):
 
@@ -74,46 +135,53 @@ class Action(ConstExpr):
     # -------
 
     def CheckArgs(self, i):
-        ut.ep_assert(
-            self.fields[0] is None or IsConstExpr(self.fields[0]),
-            _('Invalid locid1 "{}" in trigger index {}').format(self.fields[0], i),
-        )
-        ut.ep_assert(
-            self.fields[1] is None or IsConstExpr(self.fields[1]),
-            _('Invalid strid "{}" in trigger index {}').format(self.fields[1], i),
-        )
-        ut.ep_assert(
-            self.fields[2] is None or IsConstExpr(self.fields[2]),
-            _('Invalid wavid "{}" in trigger index {}').format(self.fields[2], i),
-        )
-        ut.ep_assert(
-            self.fields[3] is None or IsConstExpr(self.fields[3]),
-            _('Invalid time "{}" in trigger index {}').format(self.fields[3], i),
-        )
-        ut.ep_assert(
-            self.fields[4] is None or IsConstExpr(self.fields[4]),
-            _('Invalid player1 "{}" in trigger index {}').format(self.fields[4], i),
-        )
-        ut.ep_assert(
-            self.fields[5] is None or IsConstExpr(self.fields[5]),
-            _('Invalid player2 "{}" in trigger index {}').format(self.fields[5], i),
-        )
-        ut.ep_assert(
-            self.fields[6] is None or IsConstExpr(self.fields[6]),
-            _('Invalid unitid "{}" in trigger index {}').format(self.fields[6], i),
-        )
-        ut.ep_assert(
-            self.fields[7] is None or IsConstExpr(self.fields[7]),
-            _('Invalid acttype "{}" in trigger index {}').format(self.fields[7], i),
-        )
-        ut.ep_assert(
-            self.fields[8] is None or IsConstExpr(self.fields[8]),
-            _('Invalid amount "{}" in trigger index {}').format(self.fields[8], i),
-        )
-        ut.ep_assert(
-            self.fields[9] is None or IsConstExpr(self.fields[9]),
-            _('Invalid flags "{}" in trigger index {}').format(self.fields[9], i),
-        )
+        for n, field in enumerate(self.fields[:10]):
+            if field is None or IsConstExpr(field):
+                continue
+
+            params = ["locid", "strid", "wavid", "time", "player", "amount", "unitid", "acttype", "modifier", "flags"]
+            acttype = self.fields[7]
+            if isinstance(acttype, int):
+                if acttype == 45:
+                    params[0] = "bitmask"
+                elif acttype == 48:
+                    params[4] = "giver"
+                    params[5] = "taker"
+                elif acttype == 38:
+                    params[0] = "moveloc"
+                    params[5] = "destloc"
+                elif acttype in (39, 46):
+                    params[0] = "startloc"
+                    params[5] = "destloc"
+                elif acttype == 11:
+                    params[5] = "unitprop"
+                elif acttype in (15, 16):
+                    params[5] = "aiscript"
+                elif acttype == 13:
+                    params[5] = "switchid"
+
+                if acttype in (21, 27, 37):
+                    params[6] = "scoretype"
+                elif acttype in (19, 26, 35):
+                    params[6] = "resourcetype"
+                elif acttype == 57:
+                    params[6] = "allystatus"
+
+                if acttype in (23, 25, 39, 48, 49, 50, 51, 52, 53):
+                    params[8] = "count"
+                elif acttype in (32, 42, 43):
+                    params[8] = "propstate"
+                elif acttype == 13:
+                    params[8] = "switchaction"
+                elif acttype == 46:
+                    params[8] = "unitorder"
+
+            try:
+                acttype = _acttypes.get(acttype, "(unknown)")
+            except TypeError:  # unhashable type
+                acttype = "(unknown)"
+            raise ut.EPError(_('Invalid {} "{}" in action{} "{}"').format(params[n], field, i, acttype))
+
         return True
 
     def SetParentTrigger(self, trg, index):
