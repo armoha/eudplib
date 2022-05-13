@@ -46,7 +46,7 @@ from .strenc import (
     EncodeUnit,
 )
 from ...localize import _
-from ...utils import EPD, ep_warn, ep_assert, unProxy
+from ...utils import EPD, ep_warn, ep_assert, unProxy, EPError
 
 
 def Victory():
