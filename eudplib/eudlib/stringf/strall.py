@@ -4,7 +4,12 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
-from ..utilf import f_getuserplayerid, DisplayTextAll, PlayWAVAll, SetMissionObjectivesAll
+from ..utilf import (
+    f_getuserplayerid,
+    DisplayTextAll,
+    PlayWAVAll,
+    SetMissionObjectivesAll,
+)
 from .cpprint import FixedText, f_gettextptr
 from .cpstr import GetMapStringAddr
 from .fmtprint import _format_args
@@ -26,7 +31,10 @@ _display_text_all = DisplayTextAll(0)
 
 
 @c.EUDFullFunc(
-    [(ut.EPD(0x640B58), c.Add, 0, None), (ut.EPD(_display_text_all[1]) + 1, c.SetTo, 0, None)],
+    [
+        (ut.EPD(0x640B58), c.Add, 0, None),
+        (ut.EPD(_display_text_all[1]) + 1, c.SetTo, 0, None),
+    ],
     [None, c.TrgString],
 )
 def DisplayTextAllAt(line, text):
@@ -47,15 +55,3 @@ def f_printAllAt(line, format_string, *args):
     gsb = GetGlobalStringBuffer()
     gsb.printfAt(line, format_string, *args)
     f_setcurpl(oldcp)
-
-
-def f_playWavAll(format_string, *args):
-    if not args:
-        return f_setcurpl2cpcache([], PlayWAVAll(format_string))
-    raise NotImplementedError
-
-
-def f_setMissionObjectivesAll(format_string, *args):
-    if not args:
-        return f_setcurpl2cpcache([], SetMissionObjectivesAll(format_string))
-    raise NotImplementedError

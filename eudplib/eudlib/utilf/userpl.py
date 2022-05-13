@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 from eudplib import core as c, utils as ut, ctrlstru as cs
-from ..memiof import f_bread_epd
+from ..memiof import f_bread_epd, f_dwread_epd
 
 _userp = None
 _userp_forward = set()
@@ -85,7 +85,7 @@ def TalkingPortraitAll(unit, time):
     return _action_all(c.TalkingPortrait(unit, time))
 
 
-# TODO: should we add (Un)MuteUnitSpeechAll?
+# NOTE: should we add (Un)MuteUnitSpeechAll?
 
 
 class UserP_FW(c.ConstExpr):
@@ -136,7 +136,7 @@ def _f_initisusercp():
 
     if cs.EUDInfLoop()():
         f_dwread_epd(ptr, ret=[ut.EPD(write) + 4])
-        cs.EUDBreakIf(c.Memory(write + 16, Exactly, 0xFFFFFFFF))
+        cs.EUDBreakIf(c.Memory(write + 16, c.Exactly, 0xFFFFFFFF))
         c.RawTrigger(actions=[write << c.SetDeaths(0, c.SetTo, 0, 0), ptr.AddNumber(1)])
 
     cs.EUDEndInfLoop()
