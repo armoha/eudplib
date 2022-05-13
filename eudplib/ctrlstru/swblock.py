@@ -139,7 +139,7 @@ def EUDEndSwitch():
     for i, bit in enumerate(keybits):
         lastbit = c.RawTrigger(
             conditions=var.AtLeastX(1, bit),
-            actions=c.SetMemory(jumper + 4, c.Add, 12 * (1 << i)),
+            actions=c.SetMemory(jumper + 4, c.Add, 20 * (1 << i)),
         )
     jumper << lastbit
 

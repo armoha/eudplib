@@ -7,7 +7,7 @@ from .. import core as c
 class EUDJumpBuffer(c.EUDObject):
     """Jump table buffer
 
-    12 bytes per nextptr.
+    20 bytes per nextptr.
     """
 
     def __init__(self):
@@ -20,19 +20,19 @@ class EUDJumpBuffer(c.EUDObject):
         return True
 
     def CreateJumpTrigger(self, v, nextptr):
-        ret = self + (12 * len(self._nextptrs) - 4)
+        ret = self + (20 * len(self._nextptrs) - 4)
         self._nextptrs.append(nextptr)
         self._jdict[v] = ret
         return ret
 
     def CreateMultipleJumpTriggers(self, v, nextptrs):
-        ret = self + (12 * len(self._nextptrs) - 4)
+        ret = self + (20 * len(self._nextptrs) - 4)
         self._nextptrs.extend(nextptrs)
         self._jdict[v] = ret
         return ret
 
     def GetDataSize(self):
-        return 340 + 12 * len(self._nextptrs)
+        return 2356 + 20 * len(self._nextptrs)
 
     def CollectDependency(self, emitbuffer):
         for nextptr in self._nextptrs:
@@ -40,21 +40,29 @@ class EUDJumpBuffer(c.EUDObject):
                 emitbuffer.WriteDword(nextptr)
 
     def WritePayload(self, emitbuffer):
-        for nextptr in self._nextptrs[:1]:
+        for nextptr in self._nextptrs[:17]:
             emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(8)
-        for nextptr in self._nextptrs[1:29]:
-            emitbuffer.WriteDword(nextptr)  # nextptr
+            emitbuffer.WriteSpace(12)
             emitbuffer.WriteDword(0)  # nocond
+        for nextptr in self._nextptrs[17:118]:
+            emitbuffer.WriteDword(nextptr)  # nextptr
             emitbuffer.WriteSpace(4)
-        for nextptr in self._nextptrs[29:]:
-            emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteDword(0)  # nocond
             emitbuffer.WriteDword(0)  # noact
-        emitbuffer.WriteSpace(4)
-        emitbuffer.WriteDword(0)  # nocond
-        emitbuffer.WriteSpace(4 + 15 * 20 + 24)  # 328
+            emitbuffer.WriteSpace(4)
+            emitbuffer.WriteDword(0)  # nocond
+        for nextptr in self._nextptrs[118:]:
+            emitbuffer.WriteDword(nextptr)  # nextptr
+            emitbuffer.WriteSpace(4)
+            emitbuffer.WriteDword(0)  # noact
+            emitbuffer.WriteDword(0)  # flags
+            emitbuffer.WriteDword(0)  # nocond
+        emitbuffer.WriteSpace(8)
         emitbuffer.WriteDword(0)  # noact
+        emitbuffer.WriteDword(0)  # flags
+        for _ in range(117):
+            emitbuffer.WriteSpace(12)
+            emitbuffer.WriteDword(0)  # noact
+            emitbuffer.WriteDword(0)  # flags
 
 
 _jtb = None
