@@ -20,19 +20,19 @@ class EUDJumpBuffer(c.EUDObject):
         return True
 
     def CreateJumpTrigger(self, v, nextptr):
-        ret = self + (12 * len(self._nextptrs))
+        ret = self + (12 * len(self._nextptrs) - 4)
         self._nextptrs.append(nextptr)
         self._jdict[v] = ret
         return ret
 
     def CreateMultipleJumpTriggers(self, v, nextptrs):
-        ret = self + (12 * len(self._nextptrs))
+        ret = self + (12 * len(self._nextptrs) - 4)
         self._nextptrs.extend(nextptrs)
         self._jdict[v] = ret
         return ret
 
     def GetDataSize(self):
-        return 344 + 12 * len(self._nextptrs)
+        return 340 + 12 * len(self._nextptrs)
 
     def CollectDependency(self, emitbuffer):
         for nextptr in self._nextptrs:
@@ -40,8 +40,14 @@ class EUDJumpBuffer(c.EUDObject):
                 emitbuffer.WriteDword(nextptr)
 
     def WritePayload(self, emitbuffer):
-        emitbuffer.WriteSpace(4)
-        for nextptr in self._nextptrs:
+        for nextptr in self._nextptrs[:1]:
+            emitbuffer.WriteDword(nextptr)  # nextptr
+            emitbuffer.WriteSpace(8)
+        for nextptr in self._nextptrs[1:29]:
+            emitbuffer.WriteDword(nextptr)  # nextptr
+            emitbuffer.WriteDword(0)  # nocond
+            emitbuffer.WriteSpace(4)
+        for nextptr in self._nextptrs[29:]:
             emitbuffer.WriteDword(nextptr)  # nextptr
             emitbuffer.WriteDword(0)  # nocond
             emitbuffer.WriteDword(0)  # noact
