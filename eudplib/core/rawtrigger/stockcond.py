@@ -189,10 +189,12 @@ def Never():
 
 
 def Memory(dest, cmptype, value):
+    cmptype = EncodeComparison(cmptype, issueError=True)
     return Deaths(EPD(dest), cmptype, value, 0)
 
 
 def MemoryEPD(dest, cmptype, value):
+    cmptype = EncodeComparison(cmptype, issueError=True)
     return Deaths(dest, cmptype, value, 0)
 
 
@@ -204,8 +206,10 @@ def DeathsX(Player, Comparison, Number, Unit, Mask):
 
 
 def MemoryX(dest, cmptype, value, mask):
+    cmptype = EncodeComparison(cmptype, issueError=True)
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
 
 def MemoryXEPD(dest, cmptype, value, mask):
+    cmptype = EncodeComparison(cmptype, issueError=True)
     return DeathsX(dest, cmptype, value, 0, mask)

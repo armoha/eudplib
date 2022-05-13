@@ -185,8 +185,8 @@ SwitchStateDict = {Set: 2, Cleared: 3}
 def _EncodeConst(t, d, s, issueError):
     s = ut.unProxy(s)
     try:
-        return d.get(s, s)
-    except TypeError:  # unhashable type
+        return d[s]
+    except (KeyError, TypeError):  # unhashable type
         if issueError and isinstance(s, _Unique):
             raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
         return s
