@@ -187,7 +187,7 @@ def _EncodeConst(t, d, s, issueError):
     try:
         return d[s]
     except (KeyError, TypeError):  # unhashable type
-        if issueError and isinstance(s, _Unique):
+        if isinstance(s, _Unique):
             raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
         return s
 
@@ -323,8 +323,9 @@ def EncodeCount(s, issueError=False):
     s = ut.unProxy(s)
     if s is All:
         return 0
-    else:
-        return s
+    elif isinstance(s, _Unique):
+        raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, "count"))
+    return s
 
 
 # ========================
