@@ -28,6 +28,32 @@ from eudplib import utils as ut
 from eudplib.localize import _
 from inspect import getframeinfo, stack
 
+_condtypes = {
+    0: "(no condition)",
+    1: "CountdownTimer",
+    2: "Command",
+    3: "Bring",
+    4: "Accumulate",
+    5: "Kills",
+    6: "CommandMost",
+    7: "CommandMostAt",
+    8: "MostKills",
+    9: "HighestScore",
+    10: "MostResources",
+    11: "Switch",
+    12: "ElapsedTime",
+    14: "Opponents",
+    15: "Deaths",
+    16: "CommandLeast",
+    17: "CommandLeastAt",
+    18: "LeastKills",
+    19: "LowestScore",
+    20: "LeastResources",
+    21: "Score",
+    22: "Always",
+    23: "Never",
+}
+
 
 class Condition(ConstExpr):
 
@@ -79,38 +105,27 @@ class Condition(ConstExpr):
     # -------
 
     def CheckArgs(self, i):
-        ut.ep_assert(
-            self.fields[0] is None or IsConstExpr(self.fields[0]),
-            _('Invalid locid "{}" in trigger index {}').format(self.fields[0], i),
-        )
-        ut.ep_assert(
-            self.fields[1] is None or IsConstExpr(self.fields[1]),
-            _('Invalid player "{}" in trigger index {}').format(self.fields[1], i),
-        )
-        ut.ep_assert(
-            self.fields[2] is None or IsConstExpr(self.fields[2]),
-            _('Invalid amount "{}" in trigger index {}').format(self.fields[2], i),
-        )
-        ut.ep_assert(
-            self.fields[3] is None or IsConstExpr(self.fields[3]),
-            _('Invalid unitid "{}" in trigger index {}').format(self.fields[3], i),
-        )
-        ut.ep_assert(
-            self.fields[4] is None or IsConstExpr(self.fields[4]),
-            _('Invalid comparison "{}" in trigger index {}').format(self.fields[4], i),
-        )
-        ut.ep_assert(
-            self.fields[5] is None or IsConstExpr(self.fields[5]),
-            _('Invalid condtype "{}" in trigger index {}').format(self.fields[5], i),
-        )
-        ut.ep_assert(
-            self.fields[6] is None or IsConstExpr(self.fields[6]),
-            _('Invalid restype "{}" in trigger index {}').format(self.fields[6], i),
-        )
-        ut.ep_assert(
-            self.fields[7] is None or IsConstExpr(self.fields[7]),
-            _('Invalid flags "{}" in trigger index {}').format(self.fields[7], i),
-        )
+        for n, field in enumerate(self.fields[:8]):
+            if field is None or IsConstExpr(field):
+                continue
+
+            params = ["locid", "player", "amount", "unitid", "comparison", "condtype", "resource","flags"]
+            condtype = self.fields[5]
+            if isinstance(condtype, int):
+                if condtype == 15:
+                    params[0] = "bitmask"
+                elif condtype == 11:
+                    params[4] = "switchstate"
+                    params[6] = "switchid"
+                if condtype in (9, 19, 21):
+                    params[6] = "scoretype"
+
+            try:
+                condtype = _condtypes.get(condtype, "(unknown)")
+            except TypeError:  # unhashable type
+                condtype = "(unknown)"
+            raise ut.EPError(_('Invalid {} "{}" in condition{} "{}"').format(params[n], field, i, condtype))
+
         return True
 
     def SetParentTrigger(self, trg, index):
