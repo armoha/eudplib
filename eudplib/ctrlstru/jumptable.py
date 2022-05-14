@@ -59,9 +59,12 @@ class EUDJumpBuffer(c.EUDObject):
         emitbuffer.WriteSpace(8)
         emitbuffer.WriteDword(0)  # noact
         emitbuffer.WriteDword(0)  # flags
-        for _ in range(117):
+        for _ in range(16):
             emitbuffer.WriteSpace(12)
             emitbuffer.WriteDword(0)  # noact
+            emitbuffer.WriteDword(0)  # flags
+        for _ in range(117 - 16):
+            emitbuffer.WriteSpace(16)
             emitbuffer.WriteDword(0)  # flags
 
 
