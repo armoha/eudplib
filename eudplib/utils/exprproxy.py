@@ -130,7 +130,47 @@ class ExprProxy:
     def __gt__(self, k):
         return self._value > k
 
-    # TODO: add inplace operators
+    # Inplace operators
+
+    def __iadd__(self, k):
+        self._value += k
+        return self
+
+    def __iand__(self, k):
+        self._value &= k
+        return self
+
+    def __ifloordiv__(self, k):
+        self._value //= k
+        return self
+
+    def __ilshift__(self, k):
+        self._value <<= k
+        return self
+
+    def __imod__(self, k):
+        self._value %= k
+        return self
+
+    def __imul__(self, k):
+        self._value *= k
+        return self
+
+    def __ior__(self, k):
+        self._value |= k
+        return self
+
+    def __irshift__(self, k):
+        self._value >>= k
+        return self
+
+    def __isub__(self, k):
+        self._value -= k
+        return self
+
+    def __ixor__(self, k):
+        self._value ^= k
+        return self
 
     # Proxy other methods
     def __getattribute__(self, name):
