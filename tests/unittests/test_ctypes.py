@@ -4,13 +4,13 @@ from helper import *
 @TestInstance
 def test_ctypes():
     t = EPDOffsetMap(
-        (
-            ("a", 0x0000, 4),
-            ("b", 0x0000, 2),
-            ("c", 0x0002, 2),
-            ("d", 0x0004, 4),
-            ("e", 0x0007, 1),
-        )
+        {
+            "a": (4, 0x0000),
+            "b": (2, 0x0000),
+            "c": (2, 0x0002),
+            "d": (4, 0x0004),
+            "e": (1, 0x0007),
+        }
     )
 
     a = Db(b"\x00\x01\x02\x03\x04\x05\x06\x07")
@@ -32,5 +32,5 @@ def test_ctypes():
     test_equality(
         "Writing to EPDOffsetMap",
         [f_dwread_epd(EPD(a) + 0), f_dwread_epd(EPD(a) + 1)],
-        [0x03020B0A, 0x11060504]
+        [0x03020B0A, 0x11060504],
     )
