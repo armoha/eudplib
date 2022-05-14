@@ -34,3 +34,35 @@ def test_ctypes():
         [f_dwread_epd(EPD(a) + 0), f_dwread_epd(EPD(a) + 1)],
         [0x03020B0A, 0x11060504],
     )
+
+    ptr, epd = f_cunitepdread_epd(EPD(0x628438))
+    f_setloc("Anywhere", 0, 0)
+    DoActions(
+        CreateUnitWithProperties(
+            1,
+            "Protoss Scout",
+            "Anywhere",
+            P1,
+            UnitProperty(invincible=True),
+        ),
+        CreateUnit(1, "Protoss Scout", "Anywhere", P1),
+    )
+    cunit = EPDCUnitMap(epd)
+    test_equality(
+        "cunit.unitId",
+        [cunit.unitId],
+        [EncodeUnit("Protoss Scout")],
+    )
+    test_assert("cunit.unitId == Scout", cunit.unitId == EncodeUnit("Artanis"))
+    test_equality(
+        "cunit.owner",
+        [cunit.owner],
+        [EncodePlayer(P1)],
+    )
+    test_assert("cunit.owner == P1", cunit.owner == EncodePlayer(P1))
+    test_equality(
+        "cunit.statusFlags",
+        [cunit.statusFlags],
+        [0xC4110005],
+    )
+    test_assert("cunit.check_status_flag", cunit.check_status_flag(0x4110005))

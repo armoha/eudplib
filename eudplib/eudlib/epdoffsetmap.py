@@ -22,6 +22,7 @@ from .memiof import (
 )
 from .locf import f_setloc_epd
 
+from ..ctrlstru.cshelper import CtrlStruOpener
 from .. import core as c, utils as ut, ctrlstru as cs
 from ..localize import _
 
@@ -37,6 +38,214 @@ def _checkEPDAddr(epd):
     if c.IsConstExpr(epd) and epd.rlocmode == 4:
         ut.ep_warn(_("EPD check warning. Don't use raw pointer address"))
         traceback.print_stack()
+
+
+def _EUDMaybeExecute():
+    def _header():
+        block = {
+            "blockstart": c.Forward(),
+            "blockend": c.Forward(),
+            "nextptr": None,
+        }
+        ut.EUDCreateBlock("maybeexecuteblock", block)
+        block["blockstart"] << c.NextTrigger()
+
+    def _footer(*, neg=False):
+        return True
+
+    _header()
+    return CtrlStruOpener(_footer)
+
+
+def _EUDEndMaybeExecute():
+    lb = ut.EUDPopBlock("maybeexecuteblock")
+    ut.ep_assert(lb[0] == "maybeexecuteblock", _("Block start/end mismatch"))
+    block = lb[1]
+    block["nextptr"] = block["blockstart"]._nextptr
+    block["blockstart"]._nextptr = block["blockend"]
+    block["blockstart"]._flags |= 8
+    block["blockend"] << c.NextTrigger()
+
+
+class EPDEntry(ut.ExprProxy):
+    def __init__(self, epd, kind, size, offset):
+        self._epd = epd + offset // 4
+        self._kind = kind
+        self._size = size
+        self._shift = 8 * (offset % 4)
+        if isinstance(kind, int):
+            self._mask = ((1 << (8 * size)) - 1) << self._shift
+        elif kind == "cunit":
+            self._mask = 0x7FFFF8
+        elif kind == "sprite":
+            self._mask = 0x63FFFC
+        elif kind == "pos":
+            self._mask = 0x3FFF3FFF
+        elif kind == bool:
+            self._mask = 1 << self._shift
+        _EUDMaybeExecute()()
+        self._block = ut.EUDPeekBlock("maybeexecuteblock")[1]
+        if kind == "cunit":
+            self._value = f_cunitepdread_epd(self._epd)
+        elif kind == "sprite":
+            self._value = f_epdspriteread_epd(self._epd)
+        elif kind == "pos":
+            self._value = f_maskread_epd(self._epd, 0x3FFF3FFF)
+        elif size == 4:
+            self._value = f_dwread_epd(self._epd)
+        else:
+            self._value = rwdict[size][0](self._epd, offset % 4)
+        _EUDEndMaybeExecute()
+
+    def _relink_block(self):
+        self._block["blockstart"]._nextptr = self._block["nextptr"]
+        self._block["blockstart"]._flags &= ~8
+
+    def getValue(self):
+        self._relink_block()
+        return self._value
+
+    # Proxy arithmetic operators
+    def __lshift__(self, k):
+        self._relink_block()
+        return super().__lshift__(k)
+
+    def __rlshift__(self, k):
+        self._relink_block()
+        return super().__rlshift__(k)
+
+    def __rshift__(self, k):
+        self._relink_block()
+        return super().__rshift__(k)
+
+    def __rrshift__(self, k):
+        self._relink_block()
+        return super().__rrshift__(k)
+
+    def __add__(self, k):
+        self._relink_block()
+        return super().__add__(k)
+
+    def __radd__(self, k):
+        self._relink_block()
+        return super().__radd__(k)
+
+    def __sub__(self, k):
+        self._relink_block()
+        return super().__sub__(k)
+
+    def __rsub__(self, k):
+        self._relink_block()
+        return super().__rsub__(k)
+
+    def __mul__(self, k):
+        self._relink_block()
+        return super().__mul__(k)
+
+    def __rmul__(self, k):
+        self._relink_block()
+        return super().__rmul__(k)
+
+    def __floordiv__(self, k):
+        self._relink_block()
+        return super().__floordiv__(k)
+
+    def __rfloordiv__(self, k):
+        self._relink_block()
+        return super().__rfloordiv__(k)
+
+    def __and__(self, k):
+        self._relink_block()
+        return super().__and__(k)
+
+    def __rand__(self, k):
+        self._relink_block()
+        return super().__rand__(k)
+
+    def __or__(self, k):
+        self._relink_block()
+        return super().__or__(k)
+
+    def __ror__(self, k):
+        self._relink_block()
+        return super().__ror__(k)
+
+    def __xor__(self, k):
+        self._relink_block()
+        return super().__xor__(k)
+
+    def __rxor__(self, k):
+        self._relink_block()
+        return super().__rxor__(k)
+
+    def __neg__(self):
+        self._relink_block()
+        return super().__neg__()
+
+    def __invert__(self):
+        self._relink_block()
+        return super().__invert__()
+
+    def __bool__(self):
+        self._relink_block()
+        return super().__bool__()
+
+    def __eq__(self, k):
+        return c.MemoryXEPD(self._epd, c.Exactly, k << self._shift, self._mask)
+
+    def __ne__(self, k):
+        return c.EUDNot(self.__eq__(k))
+
+    def __le__(self, k):
+        return c.MemoryXEPD(self._epd, c.AtMost, k << self._shift, self._mask)
+
+    def __lt__(self, k):
+        return c.EUDNot(self.__ge__(k))
+
+    def __ge__(self, k):
+        return c.MemoryXEPD(self._epd, c.AtLeast, k << self._shift, self._mask)
+
+    def __gt__(self, k):
+        return c.EUDNot(self.__le__(k))
+
+    def __iadd__(self, k):
+        cs.DoActions(c.SetMemoryXEPD(self._epd, c.Add, k << self._shift, self._mask))
+        return self
+
+    def __iand__(self, k):
+        if isinstance(k, int):
+            cs.DoActions(
+                c.SetMemoryXEPD(self._epd, c.SetTo, 0, ~(k << self._shift) & self._mask)
+            )
+            return self
+        bitand = c.SetMemoryXEPD(self._epd, c.SetTo, 0, self._mask)
+        cs.DoActions(c.SetMemoryX(bitand, c.Subtract, k << self._shift, self._mask))
+        cs.DoActions(bitand)
+        return self
+
+    def __ifloordiv__(self, k):
+        raise NotImplementedError
+
+    def __ilshift__(self, k):
+        raise NotImplementedError
+
+    def __imod__(self, k):
+        raise NotImplementedError
+
+    def __imul__(self, k):
+        raise NotImplementedError
+
+    def __ior__(self, k):
+        raise NotImplementedError
+
+    def __irshift__(self, k):
+        raise NotImplementedError
+
+    def __isub__(self, k):
+        return self.__iadd__(-k)
+
+    def __ixor__(self, k):
+        raise NotImplementedError
 
 
 # @functools.lru_cache(None)
@@ -77,6 +286,8 @@ def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
             kind, size, offset = addrTable[name]
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
+            return EPDEntry(epd, kind, size, offset)
+            """
             if kind == "cunit":
                 return f_cunitepdread_epd(epd)
             if kind == "sprite":
@@ -86,6 +297,7 @@ def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
             if kind == bool:
                 return f_maskread_epd(epd, 1 << (8 * subp))
             return rwdict[size][0](epd, subp)
+            """
 
         def getepd(self, name):
             kind, size, offset = addrTable[name]
