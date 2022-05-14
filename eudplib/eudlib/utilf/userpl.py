@@ -42,14 +42,14 @@ def f_getuserplayerid():
 def IsUserCP():
     """Condition: check if CurrentPlayer equals to user player id (local)"""
     fw = c.Forward()
-    ret = c.Memory(0x6509B0, c.Exactly, fw)
+    ret = c.Memory(0x6509B0, c.Exactly, 0)
     fw << UserP_FW(ret + 8)
     return ret
 
 
 def _action_all(action):
     fw = c.Forward()
-    ret = [c.SetMemory(0x6509B0, c.SetTo, fw)]
+    ret = [c.SetMemory(0x6509B0, c.SetTo, 0)]
     ret.append(action)
     fw << UserP_FW(ret[0] + 20)
     return ret
@@ -131,12 +131,13 @@ def _f_initisusercp():
     rb = UserPBuffer()
     ptr = c.EUDVariable(ut.EPD(rb))
     userp = f_getuserplayerid()
-    write = c.Forward()
+    write = c.SetDeaths(0, c.SetTo, 0, 0)
     c.VProc(userp, userp.QueueAssignTo(ut.EPD(write) + 5))
 
     if cs.EUDInfLoop()():
-        f_dwread_epd(ptr, ret=[ut.EPD(write) + 4])
-        cs.EUDBreakIf(c.Memory(write + 16, c.Exactly, 0xFFFFFFFF))
-        c.RawTrigger(actions=[write << c.SetDeaths(0, c.SetTo, 0, 0), ptr.AddNumber(1)])
+        v = f_dwread_epd(ptr)
+        cs.EUDBreakIf(v == 0xFFFFFFFF)
+        c.VProc(v, v.SetDest(ut.EPD(write) + 4))
+        c.RawTrigger(actions=[write, ptr.AddNumber(1)])
 
     cs.EUDEndInfLoop()
