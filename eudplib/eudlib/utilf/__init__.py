@@ -25,7 +25,16 @@ THE SOFTWARE.
 
 from .logic import EUDAnd, EUDOr, EUDNot
 
-from .userpl import f_getuserplayerid, IsUserCP
+from .userpl import (
+    f_getuserplayerid,
+    IsUserCP,
+    DisplayTextAll,
+    PlayWAVAll,
+    MinimapPingAll,
+    CenterViewAll,
+    SetMissionObjectivesAll,
+    TalkingPortraitAll,
+)
 
 from .gametick import f_getgametick
 

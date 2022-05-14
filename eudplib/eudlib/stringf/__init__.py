@@ -36,7 +36,11 @@ from .strbuffer import (
     f_simpleprint,
     f_println,
     f_printAt,
+)
+
+from .strall import (
     f_printAll,
+    DisplayTextAllAt,
     f_printAllAt,
 )
 

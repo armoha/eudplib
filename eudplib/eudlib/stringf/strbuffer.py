@@ -206,9 +206,8 @@ class StringBuffer:
                     )
 
     def print(self, *args):
-        if len(args) == 1 and isinstance(args[0], str) and len(args[0]) > 31:
-            cs.DoActions(c.DisplayText(args[0]))
-            return
+        if len(args) == 1 and isinstance(args[0], str):
+            return cs.DoActions(c.DisplayText(args[0]))
         for _end in StringBuffer.CPBranch():
             f_setcurpl(self.epd)
             f_cpstr_print(*args, EOS=False)
@@ -222,6 +221,8 @@ class StringBuffer:
         self.print(*_format_args(format_string, *args))
 
     def printAt(self, line, *args):
+        if len(args) == 1 and isinstance(args[0], str):
+            return DisplayTextAt(line, args[0])
         for _end in StringBuffer.CPBranch():
             f_setcurpl(self.epd)
             f_cpstr_print(*args, EOS=False)
@@ -418,19 +419,3 @@ def f_println(format_string, *args):
 def f_printAt(line, format_string, *args):
     gsb = GetGlobalStringBuffer()
     gsb.printfAt(line, format_string, *args)
-
-
-def f_printAll(format_string, *args):
-    oldcp = f_getcurpl()
-    f_setcurpl(f_getuserplayerid())
-    gsb = GetGlobalStringBuffer()
-    gsb.printf(format_string, *args)
-    f_setcurpl(oldcp)
-
-
-def f_printAllAt(line, format_string, *args):
-    oldcp = f_getcurpl()
-    f_setcurpl(f_getuserplayerid())
-    gsb = GetGlobalStringBuffer()
-    gsb.printfAt(line, format_string, *args)
-    f_setcurpl(oldcp)
