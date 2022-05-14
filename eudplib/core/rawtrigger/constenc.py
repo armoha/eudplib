@@ -37,13 +37,13 @@ class _Unique:
         self._name = name
 
     def __repr__(self):
-        return "_Unique(%s)" % self._name
+        return self._name
 
     def __str__(self):
         return repr(self)
 
 
-class _KillsSpecialized:
+class _KillsSpecialized(_Unique):
     def __call__(self, a, b, c, d):
         return self._internalf(a, b, c, d)
 
@@ -108,7 +108,7 @@ UnitsAndBuildings = _Unique("UnitsAndBuildings")
 
 # Name 'Kills' is used for both condition type and score type.
 # To resolve conflict, we initialize Kills differently from others.
-Kills = _KillsSpecialized()
+Kills = _KillsSpecialized("Kills")
 Razings = _Unique("Razings")
 KillsAndRazings = _Unique("KillsAndRazings")
 Custom = _Unique("Custom")
@@ -185,9 +185,9 @@ SwitchStateDict = {Set: 2, Cleared: 3}
 def _EncodeConst(t, d, s, issueError):
     s = ut.unProxy(s)
     try:
-        return d.get(s, s)
-    except TypeError:  # unhashable type
-        if issueError and isinstance(s, _Unique):
+        return d[s]
+    except (KeyError, TypeError):  # unhashable type
+        if isinstance(s, _Unique):
             raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
         return s
 
@@ -323,8 +323,9 @@ def EncodeCount(s, issueError=False):
     s = ut.unProxy(s)
     if s is All:
         return 0
-    else:
-        return s
+    elif isinstance(s, _Unique):
+        raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, "count"))
+    return s
 
 
 # ========================

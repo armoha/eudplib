@@ -425,15 +425,18 @@ def SetDeathsX(Player, Modifier, Number, Unit, Mask):
 
 
 def SetMemoryX(dest, modtype, value, mask):
+    modtype = EncodeModifier(modtype, issueError=True)
     return SetDeathsX(EPD(dest), modtype, value, 0, mask)
 
 
 def SetMemoryXEPD(epd, modtype, value, mask):
+    modtype = EncodeModifier(modtype, issueError=True)
     return SetDeathsX(epd, modtype, value, 0, mask)
 
 
 def SetKills(Player, Modifier, Number, Unit):
     Player = EncodePlayer(Player, issueError=True)
+    Modifier = EncodeModifier(Modifier, issueError=True)
     Unit = EncodeUnit(Unit, issueError=True)
     if isinstance(Player, int) and Player >= 12:
         if Player == 13:
