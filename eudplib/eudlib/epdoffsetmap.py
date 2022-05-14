@@ -286,8 +286,7 @@ def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
             kind, size, offset = addrTable[name]
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
-            return EPDEntry(epd, kind, size, offset)
-            """
+            # return EPDEntry(epd, kind, size, offset)
             if kind == "cunit":
                 return f_cunitepdread_epd(epd)
             if kind == "sprite":
@@ -297,7 +296,6 @@ def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
             if kind == bool:
                 return f_maskread_epd(epd, 1 << (8 * subp))
             return rwdict[size][0](epd, subp)
-            """
 
         def getepd(self, name):
             kind, size, offset = addrTable[name]
