@@ -246,3 +246,11 @@ def f_bwrite_cp(cpo, subp, b):
         _bwriter(subp, b)
         if not (isinstance(cpo, int) and cpo == 0):
             cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
+
+
+def f_maskwrite_cp(cpo, value, mask):
+    cs.DoActions(
+        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
+        c.SetDeathsX(c.CurrentPlayer, c.SetTo, value, 0, mask),
+        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
+    )

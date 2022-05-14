@@ -158,6 +158,36 @@ f_cunitepdread_cp = f_readgen_cp(
     (0x100002 - 0x58A364 // 4, lambda y: y // 4),
     _check_empty=True,
 )
+f_epdcunitread_epd = f_readgen_epd(
+    0x3FFFF0,
+    (0x100002 - 0x58A364 // 4, lambda y: y // 4),
+    _check_empty=True,
+)
+f_epdcunitread_cp = f_readgen_cp(
+    0x3FFFF0,
+    (0x100002 - 0x58A364 // 4, lambda y: y // 4),
+    _check_empty=True,
+)
+f_epdspriteread_epd = f_readgen_epd(
+    0x1FFFC, (0x188000 - 0x58A364 // 4, lambda x: x // 4), _check_empty=True
+)
+f_epdspriteread_cp = f_readgen_cp(
+    0x1FFFC, (0x188000 - 0x58A364 // 4, lambda x: x // 4), _check_empty=True
+)
+f_spriteepdread_epd = f_readgen_epd(
+    0x1FFFC,
+    (0x620000, lambda x: x),
+    (0x188000 - 0x58A364 // 4, lambda y: y // 4),
+    _check_empty=True,
+)
+f_spriteepdread_cp = f_readgen_cp(
+    0x1FFFC,
+    (0x620000, lambda x: x),
+    (0x188000 - 0x58A364 // 4, lambda y: y // 4),
+    _check_empty=True,
+)
+f_spriteread_epd = lambda epd: f_spriteepdread_epd(epd)[0]
+f_spriteread_cp = lambda cpoffset: f_spriteepdread_cp(cpoffset)[0]
 
 
 def _posread_epd():

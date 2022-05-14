@@ -116,7 +116,7 @@ def f_wread_epd(epd, subp):
         cs.EUDSwitchCase()(i)
         for j in ut.RandList(range(8 * i, 8 * i + 16)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
+                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
                 actions=w.AddNumber(2 ** (j - 8 * i)),
             )
 
@@ -143,7 +143,7 @@ def f_bread_epd(epd, subp):
         cs.EUDSwitchCase()(i)
         for j in ut.RandList(range(8 * i, 8 * i + 8)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** j),
+                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
                 actions=b.AddNumber(2 ** (j - 8 * i)),
             )
 
@@ -151,3 +151,7 @@ def f_bread_epd(epd, subp):
     cs.EUDEndSwitch()
     cp.f_setcurpl2cpcache()
     return b
+
+
+def f_maskwrite_epd(epd, value, mask):
+    cs.DoActions(c.SetDeathsX(epd, c.SetTo, value, 0, mask))
