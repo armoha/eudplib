@@ -28,7 +28,7 @@ THE SOFTWARE.
 from ... import utils as ut
 from ...localize import _
 
-unit_name_encoding = "cp949"
+unit_name_encoding = None
 
 
 def DecodeUnitNameAs(e):
@@ -213,7 +213,7 @@ class TBL:
                         nextend += 1
                     nextstring = content[nextoffset:nextend]
                     if nextstring != b"":
-                        if j in unitdict:
+                        if j in unitdict and unit_name_encoding:
                             try:
                                 nextstring = (
                                     nextstring.decode(unit_name_encoding)
@@ -227,10 +227,11 @@ class TBL:
 
             if string:
                 if i in unitdict:
-                    try:
-                        string = (string.decode(unit_name_encoding)).encode("utf-8")
-                    except UnicodeDecodeError:
-                        pass
+                    if unit_name_encoding:
+                        try:
+                            string = (string.decode(unit_name_encoding)).encode("utf-8")
+                        except UnicodeDecodeError:
+                            pass
                     unitmap.AddItem(string, unitdict[i])
                     if string != IgnoreColor(string):
                         unitmap.AddItem(IgnoreColor(string), unitdict[i])
