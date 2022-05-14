@@ -6,4 +6,4 @@
 
 int getConvertedType(int type);
 
-#endif //EPSCRIPT_TOKENADAPTER_H
+#endif // EPSCRIPT_TOKENADAPTER_H

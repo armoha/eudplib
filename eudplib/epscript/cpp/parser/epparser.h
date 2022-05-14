@@ -80,3 +80,4 @@
 #define RETURN                          80
 #define CONDITIONNAME                   81
 #define ACTIONNAME                      82
+#define ACTIONALLPNAME                  83

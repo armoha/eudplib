@@ -170,6 +170,8 @@ def f_square(x):
 
 @EUDFunc
 def f_constv_thing():
-    # (Line 17) return a[0] + a[1] + a[2] + a[3] + a[4];
+    # (Line 17) DisplayTextAll("hi");
+    # (Line 18) return a[0] + a[1] + a[2] + a[3] + a[4];
+    f_setcurpl2cpcache([], DisplayTextAll("hi"))
     EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
-    # (Line 18) }
+    # (Line 19) }

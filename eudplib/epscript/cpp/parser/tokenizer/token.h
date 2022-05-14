@@ -44,6 +44,7 @@ enum TokenType
     TOKEN_STRING,
     TOKEN_CONDITION,
     TOKEN_ACTION,
+    TOKEN_ACTION_ALLP,
     TOKEN_KILLS,
 
     TOKEN_UNITNAME,
@@ -125,4 +126,4 @@ struct Token
     Token *subToken[MAX_SUBTOKEN_NUM];
 };
 
-#endif //EPSCRIPT_TOKEN_H
+#endif // EPSCRIPT_TOKEN_H
