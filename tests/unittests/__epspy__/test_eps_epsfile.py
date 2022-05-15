@@ -174,12 +174,17 @@ def f_square(x):
 def f_constv_thing():
     # (Line 17) var x;
     x = EUDVariable()
-    # (Line 18) switch (x) {
-    EUDSwitch(x)
-    # (Line 20) }
-    # (Line 21) DisplayTextAll("hi");
+    # (Line 18) epdswitch (x, 8765) {}
+    EPDSwitch(x, 8765)
+    # (Line 19) switch (x, 1234) {
     EUDEndSwitch()
+    EUDSwitch(x, 1234)
+    # (Line 20) case 0: DisplayTextAll("hi");
+    _t1 = EUDSwitchCase()
+    if _t1(0):
+        # (Line 21) }
+        f_setcurpl2cpcache([], DisplayTextAll("hi"))
     # (Line 22) return a[0] + a[1] + a[2] + a[3] + a[4];
-    f_setcurpl2cpcache([], DisplayTextAll("hi"))
+    EUDEndSwitch()
     EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
     # (Line 23) }

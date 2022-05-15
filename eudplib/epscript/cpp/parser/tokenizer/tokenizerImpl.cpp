@@ -169,6 +169,7 @@ Token* TokenizerImpl::getToken() {
         if(identifier == "continue") return TK(TOKEN_CONTINUE);
         if(identifier == "return") return TK(TOKEN_RETURN);
         if(identifier == "switch") return TK(TOKEN_SWITCHCASE);
+        if(identifier == "epdswitch") return TK(TOKEN_EPDSWITCH);
         if(identifier == "case") return TK(TOKEN_CASE);
         if(identifier == "default") return TK(TOKEN_DEFAULT);
 

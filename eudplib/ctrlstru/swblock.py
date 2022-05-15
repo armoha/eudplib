@@ -37,6 +37,21 @@ def _IsSwitchBlockId(idf):
     return idf == "swblock"
 
 
+def EPDSwitch(epd, mask=0xFFFFFFFF):
+    block = {
+        "targetepd": epd,
+        "bitmask": mask,
+        "casebrlist": {},
+        "defaultbr": c.Forward(),
+        "swend": c.Forward(),
+    }
+
+    c.PushTriggerScope()
+    ut.EUDCreateBlock("swblock", block)
+
+    return True
+
+
 def EUDSwitch(var, mask=0xFFFFFFFF):
     block = {
         "targetvar": var,
@@ -118,7 +133,10 @@ def EUDEndSwitch():
     casebrlist = block["casebrlist"]
     defbranch = block["defaultbr"]
     casekeylist = sorted(block["casebrlist"].keys())
-    var = block["targetvar"]
+    try:
+        epd = ut.EPD(block["targetvar"].getValueAddr())
+    except KeyError:
+        epd = block["targetepd"]
 
     if casekeylist:
 
@@ -134,18 +152,41 @@ def EUDEndSwitch():
             s = list(iterable)
             return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
-        EUDJumpIfNot(var.ExactlyX(keyand, (~keyor | keyand) & bitmask), defbranch)
+        check_invariant = c.MemoryXEPD(
+            epd, c.Exactly, keyand, (~keyor | keyand) & bitmask
+        )
+        EUDJumpIfNot(check_invariant, defbranch)
+
         keylist = sorted(map(sum, powerset(ut.bits(keyxor))))
         jump_table = JumpTriggerForward(
             [casebrlist.get(keyand + key, defbranch) for key in keylist]
         )
         jumper = c.Forward()
-        c.RawTrigger(actions=c.SetNextPtr(jumper, jump_table))
+
+        if c.IsEUDVariable(epd):
+            epd = c.EncodePlayer(c.CurrentPlayer)
+            epdvar = block["targetepd"]
+            c.VProc(
+                epdvar,
+                [
+                    epdvar.QueueAssignTo(ut.EPD(0x6509B0)),
+                    c.SetNextPtr(jumper, jump_table),
+                ],
+            )
+        else:
+            lastbit = c.RawTrigger(actions=c.SetNextPtr(jumper, jump_table))
+
         for i, bit in enumerate(keybits):
             lastbit = c.RawTrigger(
-                conditions=var.AtLeastX(1, bit),
+                conditions=c.MemoryXEPD(epd, c.AtLeast, 1, bit),
                 actions=c.SetMemory(jumper + 4, c.Add, 20 * (1 << i)),
             )
-        jumper << lastbit
+
+        if c.IsEUDVariable(epd):
+            cpcache = c.curpl.GetCPCache()
+            jumper << cpcache.GetVTable()
+            c.SetNextTrigger(cpcache.GetVTable())
+        else:
+            jumper << lastbit
 
     swend << c.NextTrigger()

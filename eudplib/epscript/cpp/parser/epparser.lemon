@@ -1033,7 +1033,12 @@ if_stmt ::= if_block else_header stmt. [ELSE] {
 
 // Switch Case block. Note that the naming convention is quite confusing - this is to avoid any name collision with the Switch condition.
 
-switchcase_header ::= SWITCHCASE LPAREN expr(A). { // RPAREN is at switchcase_stmt. see (2)
+switchcase_header ::= EPDSWITCH LPAREN exprList_nonEmpty(A). { // RPAREN is at switchcase_stmt. see (2)
+    writeTraceInfo(ps->gen, A);
+    ps->gen << "EPDSwitch(" << A->data << ")" << std::endl;
+}
+
+switchcase_header ::= SWITCHCASE LPAREN exprList_nonEmpty(A). { // RPAREN is at switchcase_stmt. see (2)
     writeTraceInfo(ps->gen, A);
     ps->gen << "EUDSwitch(" << A->data << ")" << std::endl;
 }

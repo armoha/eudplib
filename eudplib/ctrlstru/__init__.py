@@ -50,7 +50,7 @@ from .loopblock import (
 )
 
 from .jumptable import GetCurrentJumpBuffer
-from .swblock import EUDSwitch, EUDSwitchCase, EUDSwitchDefault, EUDEndSwitch
+from .swblock import EPDSwitch, EUDSwitch, EUDSwitchCase, EUDSwitchDefault, EUDEndSwitch
 
 from .breakcont import (
     EUDContinue,

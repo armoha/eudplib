@@ -34,6 +34,7 @@ const char *getTokenTypeString(int type)
         {TOKEN_CONTINUE, "TOKEN_CONTINUE"},
         {TOKEN_RETURN, "TOKEN_RETURN"},
         {TOKEN_SWITCHCASE, "TOKEN_SWITCHCASE"},
+        {TOKEN_EPDSWITCH, "TOKEN_EPDSWITCH"},
         {TOKEN_CASE, "TOKEN_CASE"},
         {TOKEN_DEFAULT, "TOKEN_DEFAULT"},
         {TOKEN_NAME, "TOKEN_NAME"},

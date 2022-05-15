@@ -25,6 +25,7 @@ int getConvertedType(int type) {
         case TOKEN_CONTINUE: return CONTINUE;
         case TOKEN_RETURN: return RETURN;
         case TOKEN_SWITCHCASE: return SWITCHCASE;
+        case TOKEN_EPDSWITCH: return EPDSWITCH;
         case TOKEN_CASE: return CASE;
         case TOKEN_DEFAULT: return DEFAULT;
 
