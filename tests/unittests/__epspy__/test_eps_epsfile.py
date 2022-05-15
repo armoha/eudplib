@@ -163,6 +163,8 @@ a = _CGFW(lambda: [_ARR(FlattenList([f_square(1), f_square(2), f_square(3), f_sq
 # (Line 11) function square(x) {
 @EUDFunc
 def f_square(x):
+    # (Line 12) const z = EUDArray(5);
+    z = EUDArray(5)
     # (Line 13) return x * x; // + z.k;
     EUDReturn(x * x)
     # (Line 14) }
@@ -170,8 +172,14 @@ def f_square(x):
 
 @EUDFunc
 def f_constv_thing():
-    # (Line 17) DisplayTextAll("hi");
-    # (Line 18) return a[0] + a[1] + a[2] + a[3] + a[4];
+    # (Line 17) var x;
+    x = EUDVariable()
+    # (Line 18) switch (x) {
+    EUDSwitch(x)
+    # (Line 20) }
+    # (Line 21) DisplayTextAll("hi");
+    EUDEndSwitch()
+    # (Line 22) return a[0] + a[1] + a[2] + a[3] + a[4];
     f_setcurpl2cpcache([], DisplayTextAll("hi"))
     EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
-    # (Line 19) }
+    # (Line 23) }

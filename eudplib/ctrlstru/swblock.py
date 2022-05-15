@@ -117,30 +117,32 @@ def EUDEndSwitch():
     casekeylist = sorted(block["casebrlist"].keys())
     var = block["targetvar"]
 
-    keyand, keyor = casekeylist[0], 0
-    for key in casekeylist:
-        keyand &= key
-        keyor |= key
-    keyxor = keyor - keyand
-    keybits = list(ut.bits(keyxor))
+    if casekeylist:
 
-    def powerset(iterable):
-        "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
-        s = list(iterable)
-        return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+        keyand, keyor = casekeylist[0], 0
+        for key in casekeylist:
+            keyand &= key
+            keyor |= key
+        keyxor = keyor - keyand
+        keybits = list(ut.bits(keyxor))
 
-    EUDJumpIf(var.AtLeastX(1, (~keyor) & 0xFFFFFFFF), defbranch)
-    keylist = sorted(map(sum, powerset(ut.bits(keyxor))))
-    jump_table = JumpTriggerForward(
-        [casebrlist.get(keyand + key, defbranch) for key in keylist]
-    )
-    jumper = c.Forward()
-    c.RawTrigger(actions=c.SetNextPtr(jumper, jump_table))
-    for i, bit in enumerate(keybits):
-        lastbit = c.RawTrigger(
-            conditions=var.AtLeastX(1, bit),
-            actions=c.SetMemory(jumper + 4, c.Add, 20 * (1 << i)),
+        def powerset(iterable):
+            "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+            s = list(iterable)
+            return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+
+        EUDJumpIf(var.AtLeastX(1, (~keyor) & 0xFFFFFFFF), defbranch)
+        keylist = sorted(map(sum, powerset(ut.bits(keyxor))))
+        jump_table = JumpTriggerForward(
+            [casebrlist.get(keyand + key, defbranch) for key in keylist]
         )
-    jumper << lastbit
+        jumper = c.Forward()
+        c.RawTrigger(actions=c.SetNextPtr(jumper, jump_table))
+        for i, bit in enumerate(keybits):
+            lastbit = c.RawTrigger(
+                conditions=var.AtLeastX(1, bit),
+                actions=c.SetMemory(jumper + 4, c.Add, 20 * (1 << i)),
+            )
+        jumper << lastbit
 
     swend << c.NextTrigger()
