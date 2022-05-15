@@ -37,9 +37,10 @@ def _IsSwitchBlockId(idf):
     return idf == "swblock"
 
 
-def EUDSwitch(var):
+def EUDSwitch(var, mask=0xFFFFFFFF):
     block = {
         "targetvar": var,
+        "bitmask": mask,
         "casebrlist": {},
         "defaultbr": c.Forward(),
         "swend": c.Forward(),
@@ -65,6 +66,7 @@ def EUDSwitchCase():
 
         for number in numbers:
             ut.ep_assert(number not in block["casebrlist"], _("Duplicate cases"))
+            ut.ep_assert(number & block["bitmask"] == number, _("cases out of mask"))
             block["casebrlist"][number] = c.NextTrigger()
 
         return True
@@ -112,6 +114,7 @@ def EUDEndSwitch():
     if not block["defaultbr"].IsSet():
         block["defaultbr"] << swend
 
+    bitmask = block["bitmask"]
     casebrlist = block["casebrlist"]
     defbranch = block["defaultbr"]
     casekeylist = sorted(block["casebrlist"].keys())
@@ -131,7 +134,7 @@ def EUDEndSwitch():
             s = list(iterable)
             return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
-        EUDJumpIf(var.AtLeastX(1, (~keyor) & 0xFFFFFFFF), defbranch)
+        EUDJumpIfNot(var.ExactlyX(keyand, (~keyor | keyand) & bitmask), defbranch)
         keylist = sorted(map(sum, powerset(ut.bits(keyxor))))
         jump_table = JumpTriggerForward(
             [casebrlist.get(keyand + key, defbranch) for key in keylist]
