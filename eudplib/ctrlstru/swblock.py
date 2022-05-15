@@ -38,6 +38,7 @@ def _IsSwitchBlockId(idf):
 
 
 def EPDSwitch(epd, mask=0xFFFFFFFF):
+    epd = c.EncodePlayer(epd)
     block = {
         "targetepd": epd,
         "bitmask": mask,
