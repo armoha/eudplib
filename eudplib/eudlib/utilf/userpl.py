@@ -27,7 +27,7 @@ from eudplib import core as c, utils as ut, ctrlstru as cs
 from ..memiof import f_bread_epd, f_dwread_epd
 
 _userp = None
-_userp_forward = set()
+_userp_fws = set()
 
 
 def f_getuserplayerid():
@@ -42,17 +42,16 @@ def f_getuserplayerid():
 def IsUserCP():
     """Condition: check if CurrentPlayer equals to user player id (local)"""
     fw = c.Forward()
-    ret = c.Memory(0x6509B0, c.Exactly, 0)
-    fw << UserP_FW(ret + 8)
+    ret = c.Memory(0x6509B0, c.Exactly, fw)
+    fw << UserP_FW(ret, 8)
     return ret
 
 
 def _action_all(action):
     fw = c.Forward()
-    ret = [c.SetMemory(0x6509B0, c.SetTo, 0)]
-    ret.append(action)
-    fw << UserP_FW(ret[0] + 20)
-    return ret
+    ret = c.SetMemory(0x6509B0, c.SetTo, fw)
+    fw << UserP_FW(ret, 20)
+    return [ret, action]
 
 
 def DisplayTextAll(text):
@@ -89,24 +88,24 @@ def TalkingPortraitAll(unit, time):
 
 
 class UserP_FW(c.ConstExpr):
-    def __init__(self, dest):
+    def __init__(self, dest, offset):
         super().__init__(self)
-        self._initobj = dest
+        self._initobj = (dest, offset)
 
     def Evaluate(self):
-        _RegisterUserP(ut.EPD(self._initobj))
+        _RegisterUserP(*self._initobj)
         return c.toRlocInt(0)
 
 
 def RCPC_ResetUserP():
-    _userp_forward.clear()
+    _userp_fws.clear()
 
 
 c.RegisterCreatePayloadCallback(RCPC_ResetUserP)
 
 
-def _RegisterUserP(epd):
-    _userp_forward.add(epd)
+def _RegisterUserP(dest, offset):
+    _userp_fws.add((dest, offset))
 
 
 class UserPBuffer(c.EUDObject):
@@ -114,15 +113,11 @@ class UserPBuffer(c.EUDObject):
         super().__init__()
 
     def GetDataSize(self):
-        return (len(_userp_forward) + 1) * 4
-
-    def CollectDependency(self, pbuffer):
-        for epd in _userp_forward:
-            pbuffer.WriteDword(epd)
+        return (len(_userp_fws) + 1) * 4
 
     def WritePayload(self, pbuf):
-        for epd in _userp_forward:
-            pbuf.WriteDword(epd)
+        for dest, offset in _userp_fws:
+            pbuf.WriteDword(ut.EPD(dest + offset))
         pbuf.WriteDword(0xFFFFFFFF)
 
 
