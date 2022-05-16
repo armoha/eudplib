@@ -138,6 +138,11 @@ def EUDEndSwitch():
         epd = ut.EPD(block["targetvar"].getValueAddr())
     except KeyError:
         epd = block["targetepd"]
+    except AttributeError:
+        if block["targetvar"] in casekeylist:
+            c.SetNextTrigger(casebrlist[block["targetvar"]])
+        else:
+            c.SetNextTrigger(defbranch)
 
     if casekeylist:
 
