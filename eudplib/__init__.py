@@ -45,7 +45,7 @@ from .trigtrg.runtrigtrg import (
 from .maprw import *
 
 
-__version__ = "0.69.5"
+__version__ = "0.69.6"
 
 import types
 

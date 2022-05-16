@@ -184,7 +184,15 @@ def f_constv_thing():
     if _t1(0):
         # (Line 21) }
         f_setcurpl2cpcache([], DisplayTextAll("hi"))
-    # (Line 22) return a[0] + a[1] + a[2] + a[3] + a[4];
+    # (Line 22) switch (7) {
+    EUDEndSwitch()
+    EUDSwitch(7)
+    # (Line 23) case 7: break;
+    _t2 = EUDSwitchCase()
+    if _t2(7):
+        EUDBreak()
+        # (Line 24) }
+    # (Line 25) return a[0] + a[1] + a[2] + a[3] + a[4];
     EUDEndSwitch()
     EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
-    # (Line 23) }
+    # (Line 26) }

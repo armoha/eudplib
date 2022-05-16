@@ -143,6 +143,8 @@ def EUDEndSwitch():
             c.SetNextTrigger(casebrlist[block["targetvar"]])
         else:
             c.SetNextTrigger(defbranch)
+        swend << c.NextTrigger()
+        return
 
     if casekeylist:
 
