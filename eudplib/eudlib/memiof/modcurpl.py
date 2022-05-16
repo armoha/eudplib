@@ -39,7 +39,7 @@ def f_setcurpl(cp, *, actions=[], set_modifier=True):
             if set_modifier
             else [cp.SetDest(cpcache)],
         )
-        c.VProc([cp, cpcache], cp.SetDest(ut.EPD(cpcond) + 2))
+        c.VProc([cp, cpcache], [cp.SetDest(ut.EPD(cpcond) + 2), cpcache.SetDest(ut.EPD(0x6509B0))])
     else:
         cs.DoActions(c.SetCurrentPlayer(cp))
 
@@ -47,9 +47,9 @@ def f_setcurpl(cp, *, actions=[], set_modifier=True):
 def f_setcurpl2cpcache(v=[], actions=[]):
     cpcache = c.curpl.GetCPCache()
     if v:
-        trg = c.VProc([v] + [cpcache], actions)
+        trg = c.VProc([v] + [cpcache], [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))])
     else:
-        trg = c.VProc(cpcache, actions)
+        trg = c.VProc(cpcache, [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))])
 
     return trg
 
@@ -67,7 +67,7 @@ def _f_updatecpcache():
             actions=SetMemoryC(cpcache.getValueAddr(), c.Add, 2**i),
         )
     c.VProc(cpcache, cpcache.SetDest(ut.EPD(cpcond) + 2))
-    f_setcurpl2cpcache([], cpcache.SetDest(ut.EPD(0x6509B0)))
+    f_setcurpl2cpcache()
 
 
 @c.EUDFunc
@@ -84,7 +84,7 @@ def f_getcurpl():
         _f_updatecpcache()
     cs.EUDEndIf()
 
-    return cpcache
+    return cpcache  # its dest can vary
 
 
 def f_addcurpl(cp):

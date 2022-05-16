@@ -30,7 +30,7 @@ from .rawtrigger import EncodePlayer, Memory, SetMemory, SetTo, Add, Exactly
 from ..utils import EPD
 
 
-_curpl_var = EUDVariable(EPD(0x6509B0), SetTo, 0)
+_curpl_var = EUDVariable()
 _curpl_checkcond = Forward()
 
 

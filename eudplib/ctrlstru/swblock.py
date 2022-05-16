@@ -172,9 +172,11 @@ def EUDEndSwitch():
         if c.IsEUDVariable(epd):
             epd = c.EncodePlayer(c.CurrentPlayer)
             epdvar = block["targetepd"]
+            cpcache = c.curpl.GetCPCache()
             c.VProc(
                 epdvar,
                 [
+                    cpcache.SetDest(ut.EPD(0x6509B0)),
                     epdvar.QueueAssignTo(ut.EPD(0x6509B0)),
                     c.SetNextPtr(jumper, jump_table),
                 ],
@@ -189,7 +191,6 @@ def EUDEndSwitch():
             )
 
         if c.IsEUDVariable(epd):
-            cpcache = c.curpl.GetCPCache()
             jumper << cpcache.GetVTable()
             c.SetNextTrigger(cpcache.GetVTable())
         else:
