@@ -35,3 +35,4 @@ from .eudgrp import EUDGrp
 from .eudstack import EUDStack
 from .epdoffsetmap import EPDOffsetMap, EPDCUnitMap
 from .playerv import PVariable
+from .unitgroup import UnitGroup

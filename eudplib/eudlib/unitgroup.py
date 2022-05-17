@@ -1,126 +1,11 @@
-from eudplib import *
+from ..core import Forward, NextTrigger, RawTrigger, SetNextPtr, EUDVariable, EUDVArray, SetTo, SeqCompute, Subtract, Add, AtLeast, VProc, PushTriggerScope, PopTriggerScope, Memory, SetNextTrigger, SetMemory, CurrentPlayer, ConstExpr, DeathsX, Exactly, IsEUDVariable
+from ..ctrlstru import CtrlStruOpener, DoActions, EUDSetContinuePoint, EUDEndWhile, EUDIf, EUDEndIf
+from ..utils import EPD, EUDCreateBlock, EUDPeekBlock, ep_assert
+
+_assign_helper = EUDVariable()
 
 
-def f_simpleprint(arg):
-    pass
-
-
-class Zerglings:
-    def __init__(self, capacity, max_pending):
-        self.max_pending = max_pending
-        self.unit_group = UnitGroup(capacity)
-        self.player_bits = (15, 30, 31)
-        self.xy = EUDVariable()
-        self._pop = Forward()
-        self.queue = EUDVArray(max_pending)(dest=self.xy, nextptr=self._pop)
-        self.head = Forward()
-        self.is_empty = Memory(self.head, Exactly, self.queue)
-
-    def loop(self):
-        for unit in self.unit_group:
-            with unit:
-                # 저글링이 죽으면 실행할 트리거
-                tail = SetMemory(self.queue + 348, SetTo, 0)
-                set_player = SetMemory(tail + 20, Add, 0)
-                for i, bit in enumerate(self.player_bits):
-                    Trigger(
-                        DeathsX(CurrentPlayer, AtLeast, 1, 0, 1 << i),
-                        SetMemory(set_player + 20, Add, 1 << bit),
-                    )
-                unit.move_cp(0x28 // 4)
-                f_maskread_cp(0, 0x1FFF1FFF, ret=[EPD(tail) + 5])
-                DoActions(
-                    set_player,
-                    tail,
-                    SetMemory(set_player + 20, SetTo, 0),
-                    SetMemory(tail + 16, Add, 18),
-                    SetMemory(self.is_empty + 8, Add, 72),
-                )
-                Trigger(
-                    Memory(
-                        tail + 16, AtLeast, EPD(self.queue) + 87 + 18 * self.max_pending
-                    ),
-                    [
-                        SetMemory(tail + 16, SetTo, EPD(self.queue) + 87),
-                        SetMemory(self.is_empty + 8, SetTo, self.queue),
-                    ],
-                )
-                f_simpleprint("글링 사망")
-            # 저글링이 살아있으면 실행할 트리거
-
-    def popleft(self, counter, actions):
-        check_player = DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF)
-        check_position = [
-            DeathsX(CurrentPlayer, AtLeast, 0, 0, 0x3FFF),
-            DeathsX(CurrentPlayer, AtLeast, 0, 0, 0x3FFF0000),
-            DeathsX(CurrentPlayer, AtMost, 0, 0, 0x3FFF),
-            DeathsX(CurrentPlayer, AtMost, 0, 0, 0x3FFF0000),
-        ]
-        set_cp = SetMemory(0x6509B0, SetTo, EPD(counter))
-        branch, branch_end = Forward(), Forward()
-        init_branch = SetMemory(branch + 4, SetTo, self.queue)
-        self.head << init_branch + 20
-        DoActions([init_branch] + actions)
-        branch << RawTrigger(
-            nextptr=self.queue,
-            conditions=self.is_empty,
-            actions=[
-                SetMemory(check_player + 8, SetTo, 255),
-                SetNextPtr(branch, branch_end),
-            ],
-        )
-        self._pop << RawTrigger(
-            actions=[
-                SetResources(AllPlayers, Add, 1, Gas),
-                SetMemory(check_player + 8, SetTo, 0),
-                SetMemory(self.head, Add, 72),
-                SetMemory(set_cp + 20, SetTo, EPD(counter)),
-            ]
-        )
-        Trigger(
-            Memory(self.head, AtLeast, self.queue + 72 * self.max_pending),
-            SetMemory(self.head, SetTo, self.queue),
-        )
-        for i, bit in enumerate(self.player_bits):
-            Trigger(
-                self.xy.AtLeastX(1, 1 << bit),
-                [
-                    SetMemory(check_player + 8, Add, 1 << i),
-                    SetMemory(set_cp + 20, Add, 1 << i),
-                ],
-            )
-        self.y = EUDXVariable(0, SetTo, 0, 0x3FFF0000)
-        VProc(
-            [self.xy, self.y],
-            [
-                self.xy.SetDest(self.y),
-                self.xy.SetMask(0x3FFF0000),
-                self.y.SetDest(EPD(check_position[1]) + 2),
-            ],
-        )
-        VProc(
-            [self.xy, self.y],
-            [
-                SetMemory(check_position[1] + 8, Subtract, 128 << 16),
-                self.xy.SetDest(EPD(check_position[0]) + 2),
-                self.xy.SetMask(0x3FFF),
-                self.y.SetDest(EPD(check_position[3]) + 2),
-            ],
-        )
-        VProc(
-            self.xy,
-            [
-                SetMemory(check_position[0] + 8, Subtract, 128),
-                SetMemory(check_position[3] + 8, Add, 128 << 16),
-                self.xy.SetDest(EPD(check_position[2]) + 2),
-            ],
-        )
-        f_dwadd_epd(EPD(check_position[2]) + 2, 128)
-        branch_end << NextTrigger()
-        return check_player, check_position, set_cp
-
-
-def UnsafeWhileNot():
+def _UnsafeWhileNot():
     def _header():
         block = {
             "loopstart": NextTrigger(),
@@ -145,7 +30,54 @@ def UnsafeWhileNot():
 
 
 class UnitGroup:
-    def __init__(self, capacity):
+    """Loop-efficient CUnit EPD collection
+
+    ```js
+    // epScript example
+
+    // UnitGroup Declaration
+    const zerglings = UnitGroup(1000, CurrentPlayer);
+    // max capacity = 1000, will use CPTrick
+
+    // Register Unit
+    zerglings.add(epd);
+
+    // Loop UnitGroup
+    foreach(unit : zerglings) {
+        // Run Triggers on **any** zerglings (alive or dead)
+        foreach(dead : unit.dying) {
+            // Run Triggers on dead zerglings
+        }  // <- dead zergling will be removed at end of *dying* block
+        // Run Triggers on alive zerglings
+    }
+
+    // example usage
+    function afterTriggerExec() {
+        const zerglings = UnitGroup(1000, CurrentPlayer);
+        foreach(ptr, epd : EUDLoopNewUnit()) {
+            const cunit = EPDCUnitMap(epd);
+            if (cunit.unitId = $U("Zerg Zergling")) {
+                zerglings.add(epd);
+            }
+        }
+        foreach(unit : zerglings) {
+            foreach(dead : unit.dying) {
+                // spawn Infested Terran when zergling dies
+                dead.move_cp(0x4C / 4);  // Owner
+                const owner = bread_cp(0, 0);
+                dead.move_cp(0x28 / 4);  // Unit Position
+                const x, y = posread_cp(0);
+
+                setloc("loc", x, y);
+                CreateUnit(1, "Infested Terran", "loc", owner);
+            }
+        }
+    }
+    ```
+    """
+    def __init__(self, capacity, target):
+        ep_assert(target == CurrentPlayer, "Currently UnitGroup targetvar only supports CurrentPlayer")
+        self._target = target
         self.capacity = capacity
         self.loopvar = EUDVariable(EPD(0x6509B0), SetTo, 0)
         self.varray = EUDVArray(capacity)(
@@ -155,18 +87,32 @@ class UnitGroup:
         self.pos = EUDVariable(EPD(self.varray) + 87 + 18 * capacity)
 
     def add(self, unit_epd):
-        SeqCompute(
-            [
-                (self.trg, Subtract, 72),
-                (self.pos, Subtract, 18),
-                (unit_epd, Add, 0x4C // 4),
-                (EPD(unit_epd.getDestAddr()), None, self.pos),
-                (None, SetTo, unit_epd),
-            ]
-        )
-        unit_epd -= 0x4C // 4
+        if IsEUDVariable(unit_epd):
+            # Occupy 2T, Run 4T 10A
+            SeqCompute(
+                [
+                    (self.trg, Subtract, 72),
+                    (self.pos, Subtract, 18),
+                    (unit_epd, Add, 0x4C // 4),
+                    (EPD(unit_epd.getDestAddr()), None, self.pos),
+                    (None, SetTo, unit_epd),
+                ]
+            )
+            unit_epd -= 0x4C // 4
+        else:
+            # Occupy 1T, Run 4T 9A
+            global _assign_helper
+            SeqCompute(
+                [
+                    (self.trg, Subtract, 72),
+                    (self.pos, Subtract, 18),
+                    (_assign_helper, SetTo, unit_epd + 0x4C // 4),
+                    (EPD(_assign_helper.getDestAddr()), None, self.pos),
+                    (None, SetTo, _assign_helper),
+                ]
+            )
 
-    def __iter__(self, on_death=None):
+    def __iter__(self):
         loopstart, pos, check_death = Forward(), Forward(), Forward()
         VProc(
             [self.trg, self.pos],
@@ -193,7 +139,7 @@ class UnitGroup:
             )
             nextptr << NextTrigger()
 
-        if UnsafeWhileNot()(
+        if _UnsafeWhileNot()(
             Memory(loopstart, AtLeast, self.varray + 72 * self.capacity)
         ):
             block = EUDPeekBlock("whileblock")[1]
@@ -222,25 +168,27 @@ class UnitGroup:
                 SetNextTrigger(block["contpoint"])
 
             # EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
-            yield CpHelper(0x4C // 4, reset_cp, remove)
+            yield _CpHelper(0x4C // 4, reset_cp, remove)
             EUDSetContinuePoint()
             DoActions(SetMemory(loopstart, Add, 72), SetMemory(pos, Add, 18))
         EUDEndWhile()
+        ep_assert(pos.IsSet(), "unit.dying must be added")
 
 
-class CpHelper:
+# TODO: Add EPDCUnitMap-like convenient methods
+class _CpHelper:
     def __init__(self, offset, resetf, removef):
         self.offset = offset
         self._reset = resetf
-        self.remove = removef
-
-    def __enter__(self):
-        EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00))
-
-    def __exit__(self, exc_type, exc_value, tb):
-        self.remove()
-        EUDEndIf()
-        self.offset = 19
+        class Dying:
+            def __iter__(nonself):
+                self.move_cp(0x4C // 4)
+                if EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
+                    yield self
+                    removef()
+                EUDEndIf()
+                self.offset = 19
+        self.dying = Dying()
 
     def set_cp(self, offset, *, action=False):
         self._reset()
