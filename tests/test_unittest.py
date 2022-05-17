@@ -23,6 +23,7 @@ from unittests import (
     testptrigger,
     testoperator,
     testptrjump,
+    test_unitgroup,
     testfptr,
     testprint,
     testswitch,

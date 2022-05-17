@@ -31,6 +31,34 @@ def test_unitgroup():
             f_dwwrite_cp(0, 1)
         unit.move_cp(0)  # unit and dead are same object
         f_dwwrite_cp(0, 2)  # Never happen
+
+    for unit in g:
+        # NEVER run since all units were already removed from group 'g'
+        f_dwadd_epd(EPD(0x6509B0), EPD(m))
+        f_dwwrite_cp(0, 2)
+        unit.move_cp(0)
+        f_dwwrite_cp(0, 2)
+        unit.remove()  # this call is mandatory.
     indexes = (0, 2, 3, 4, 6)
     result = [1 if i in indexes else 3 if (i - 19) in indexes else 0 for i in range(26)]
     test_equality("UnitGroup dying test", [m[i] for i in range(26)], result)
+
+    # test mandatory remove call
+    try:
+        u = UnitGroup(1)
+    except TypeError:
+        pass
+    else:
+        raise EPError("no default value on parameter 'target'")
+
+    if EUDIf()(False):
+        ug = UnitGroup(3, CurrentPlayer)
+        ug.add(7)
+        try:
+            for unit in ug:
+                pass
+        except EPError:
+            unit.remove()
+        else:
+            raise EPError("unit.remove() call is mandatory")
+    EUDEndIf()

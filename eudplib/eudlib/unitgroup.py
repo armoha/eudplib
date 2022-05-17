@@ -180,12 +180,13 @@ class _CpHelper:
     def __init__(self, offset, resetf, removef):
         self.offset = offset
         self._reset = resetf
+        self.remove = removef
         class Dying:
             def __iter__(nonself):
                 self.move_cp(0x4C // 4)
                 if EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
                     yield self
-                    removef()
+                    self.remove()
                 EUDEndIf()
                 self.offset = 19
         self.dying = Dying()
