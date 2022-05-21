@@ -139,6 +139,7 @@ def EUDEndSwitch():
     except KeyError:
         epd = block["targetepd"]
     except AttributeError:
+        # constant value switch
         if block["targetvar"] in casekeylist:
             c.SetNextTrigger(casebrlist[block["targetvar"]])
         else:
@@ -146,26 +147,31 @@ def EUDEndSwitch():
         swend << c.NextTrigger()
         return
 
-    if casekeylist:
+    if not casekeylist:
+        swend << c.NextTrigger()
+        return
 
-        keyand, keyor = casekeylist[0], 0
-        for key in casekeylist:
-            keyand &= key
-            keyor |= key
-        keyxor = keyor - keyand
-        keybits = list(ut.bits(keyxor))
+    keyand, keyor = casekeylist[0], 0
+    for key in casekeylist:
+        keyand &= key
+        keyor |= key
+    keyxor = keyor - keyand
+    keybits = list(ut.bits(keyxor))
 
-        def powerset(iterable):
-            "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
-            s = list(iterable)
-            return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+    def powerset(iterable):
+        "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+        s = list(iterable)
+        return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
+    keylist = sorted(map(sum, powerset(ut.bits(keyxor))))
+    density = len(casebrlist) / len(keylist)
+    if density >= 0.4:
+        # use JumpTable
         check_invariant = c.MemoryXEPD(
             epd, c.Exactly, keyand, (~keyor | keyand) & bitmask
         )
         EUDJumpIfNot(check_invariant, defbranch)
 
-        keylist = sorted(map(sum, powerset(ut.bits(keyxor))))
         jump_table = JumpTriggerForward(
             [casebrlist.get(keyand + key, defbranch) for key in keylist]
         )
@@ -197,5 +203,8 @@ def EUDEndSwitch():
             c.SetNextTrigger(cpcache.GetVTable())
         else:
             jumper << lastbit
+    else:
+        # use binary search
+        pass
 
     swend << c.NextTrigger()
