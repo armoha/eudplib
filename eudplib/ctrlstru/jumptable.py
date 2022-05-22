@@ -54,18 +54,18 @@ class EUDJumpBuffer(c.EUDObject):
             emitbuffer.WriteDword(nextptr)  # nextptr
             emitbuffer.WriteSpace(4)
             emitbuffer.WriteDword(0)  # noact
-            emitbuffer.WriteDword(0)  # flags
+            emitbuffer.WriteDword(8)  # flags
             emitbuffer.WriteDword(0)  # nocond
         emitbuffer.WriteSpace(8)
         emitbuffer.WriteDword(0)  # noact
-        emitbuffer.WriteDword(0)  # flags
+        emitbuffer.WriteDword(8)  # flags
         for _ in range(16):
             emitbuffer.WriteSpace(12)
             emitbuffer.WriteDword(0)  # noact
-            emitbuffer.WriteDword(0)  # flags
+            emitbuffer.WriteDword(8)  # flags
         for _ in range(117 - 16):
             emitbuffer.WriteSpace(16)
-            emitbuffer.WriteDword(0)  # flags
+            emitbuffer.WriteDword(8)  # flags
 
 
 _jtb = None
