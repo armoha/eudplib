@@ -3,13 +3,13 @@ from helper import *
 
 @TestInstance
 def test_unitgroup():
-    g = UnitGroup(1000, CurrentPlayer)
+    g = UnitGroup(1000)
     g.add(3)
     g.add(EUDVariable(2))
     g.add(EUDVariable(6))
 
     k = EUDArray(7)
-    for unit in g:  # 22, 21, 25
+    for unit in g.cploop:  # 22, 21, 25
         if EUDIf()(False):
             for dead in unit.dying:
                 pass
@@ -18,12 +18,14 @@ def test_unitgroup():
         unit.move_cp(0x4C // 4)  # NO-OP
         f_dwadd_epd(EPD(0x6509B0), EPD(k) - 19)
         f_dwwrite_cp(0, 1)
-    test_equality("Basic UnitGroup test", [k[i] for i in range(7)], [0, 0, 1, 1, 0, 0, 1])
+    test_equality(
+        "Basic UnitGroup test", [k[i] for i in range(7)], [0, 0, 1, 1, 0, 0, 1]
+    )
 
     g.add(4)
     g.add(EUDVariable(0))
     m = EUDArray(7 + 19)
-    for unit in g:
+    for unit in g.cploop:
         f_dwadd_epd(EPD(0x6509B0), EPD(m))
         for dead in unit.dying:
             f_dwwrite_cp(0, 3)
@@ -32,7 +34,7 @@ def test_unitgroup():
         unit.move_cp(0)  # unit and dead are same object
         f_dwwrite_cp(0, 2)  # Never happen
 
-    for unit in g:
+    for unit in g.cploop:
         # NEVER run since all units were already removed from group 'g'
         f_dwadd_epd(EPD(0x6509B0), EPD(m))
         f_dwwrite_cp(0, 2)
@@ -44,18 +46,11 @@ def test_unitgroup():
     test_equality("UnitGroup dying test", [m[i] for i in range(26)], result)
 
     # test mandatory remove call
-    try:
-        u = UnitGroup(1)
-    except TypeError:
-        pass
-    else:
-        raise EPError("no default value on parameter 'target'")
-
     if EUDIf()(False):
-        ug = UnitGroup(3, CurrentPlayer)
+        ug = UnitGroup(3)
         ug.add(7)
         try:
-            for unit in ug:
+            for unit in ug.cploop:
                 pass
         except EPError:
             unit.remove()
