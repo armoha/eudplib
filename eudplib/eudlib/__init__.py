@@ -33,6 +33,7 @@ from .mathf import *
 from .eudarray import EUDArray
 from .eudgrp import EUDGrp
 from .eudstack import EUDStack
+from .eudqueue import EUDQueue
 from .epdoffsetmap import EPDOffsetMap, EPDCUnitMap
 from .playerv import PVariable
 from .unitgroup import UnitGroup
