@@ -126,14 +126,21 @@ def EUDEndSwitch():
     EUDJump(swend)  # Exit switch block
     c.PopTriggerScope()
 
-    # If default block is not specified, skip it
-    if not block["defaultbr"].IsSet():
-        block["defaultbr"] << swend
-
     bitmask = block["bitmask"]
     casebrlist = block["casebrlist"]
     defbranch = block["defaultbr"]
     casekeylist = sorted(block["casebrlist"].keys())
+
+    # If default block is not specified, skip it.
+    if not defbranch.IsSet():
+        defbranch << swend
+
+    # If there is only the default destination, jump there directly.
+    if not casekeylist:
+        c.SetNextTrigger(defbranch)
+        swend << c.NextTrigger()
+        return
+
     try:
         epd = ut.EPD(block["targetvar"].getValueAddr())
     except KeyError:
@@ -147,7 +154,47 @@ def EUDEndSwitch():
         swend << c.NextTrigger()
         return
 
-    if not casekeylist:
+    if (
+        len(casekeylist) == 2
+        and casebrlist[casekeylist[0]] == casebrlist[casekeylist[1]]
+    ):
+
+        def popcount(x):
+            x -= (x >> 1) & 0x55555555
+            x = (x & 0x33333333) + ((x >> 2) & 0x33333333)
+            x = (x + (x >> 4)) & 0x0F0F0F0F
+            x += x >> 8
+            x += x >> 16
+            return x & 0x0000003F
+
+        keyand = casekeylist[0] & casekeylist[1]
+        keyxor = (casekeylist[0] | casekeylist[1]) - keyand
+        if popcount(keyxor) == 1:
+            tg.EUDBranch(
+                c.MemoryXEPD(epd, c.Exactly, keyand, ~keyxor & bitmask),
+                casebrlist[casekeylist[0]],
+                defbranch,
+            )
+            swend << c.NextTrigger()
+            return
+
+    if len(casekeylist) <= 3 and not c.IsEUDVariable(epd):
+        # use simple comparisons
+        branch, nextbranch = c.Forward(), c.Forward()
+        restore = c.SetMemory(branch + 4, c.SetTo, nextbranch)
+        c.RawTrigger(actions=restore)
+        for case in casekeylist:
+            branch << c.RawTrigger(
+                conditions=c.MemoryXEPD(epd, c.Exactly, case, bitmask),
+                actions=[
+                    c.SetNextPtr(branch, casebrlist[case]),
+                    c.SetMemory(restore + 16, c.SetTo, ut.EPD(branch) + 1),
+                    c.SetMemory(restore + 20, c.SetTo, nextbranch),
+                ],
+            )
+            nextbranch << c.NextTrigger()
+            branch, nextbranch = c.Forward(), c.Forward()
+        c.SetNextTrigger(defbranch)
         swend << c.NextTrigger()
         return
 
@@ -166,7 +213,7 @@ def EUDEndSwitch():
     keylist = sorted(map(sum, powerset(ut.bits(keyxor))))
     density = len(casebrlist) / len(keylist)
     if density >= 0.4:
-        # use JumpTable
+        # use jump table
         check_invariant = c.MemoryXEPD(
             epd, c.Exactly, keyand, (~keyor | keyand) & bitmask
         )
@@ -177,15 +224,15 @@ def EUDEndSwitch():
         )
         jumper = c.Forward()
 
+        cmpplayer = epd
         if c.IsEUDVariable(epd):
-            epd = c.EncodePlayer(c.CurrentPlayer)
-            epdvar = block["targetepd"]
+            cmpplayer = c.EncodePlayer(c.CurrentPlayer)
             cpcache = c.curpl.GetCPCache()
             c.VProc(
-                epdvar,
+                epd,
                 [
                     cpcache.SetDest(ut.EPD(0x6509B0)),
-                    epdvar.QueueAssignTo(ut.EPD(0x6509B0)),
+                    epd.QueueAssignTo(ut.EPD(0x6509B0)),
                     c.SetNextPtr(jumper, jump_table),
                 ],
             )
@@ -194,7 +241,7 @@ def EUDEndSwitch():
 
         for i, bit in enumerate(keybits):
             lastbit = c.RawTrigger(
-                conditions=c.MemoryXEPD(epd, c.AtLeast, 1, bit),
+                conditions=c.MemoryXEPD(cmpplayer, c.AtLeast, 1, bit),
                 actions=c.SetMemory(jumper + 4, c.Add, 20 * (1 << i)),
             )
 
@@ -203,8 +250,90 @@ def EUDEndSwitch():
             c.SetNextTrigger(cpcache.GetVTable())
         else:
             jumper << lastbit
+    elif c.IsEUDVariable(epd):
+        # use binary search with CP trick
+        cmpplayer = c.EncodePlayer(c.CurrentPlayer)
+        cpcache = c.curpl.GetCPCache()
+        c.VProc(
+            epd,
+            [
+                cpcache.SetDest(ut.EPD(0x6509B0)),
+                epd.QueueAssignTo(ut.EPD(0x6509B0)),
+                c.SetNextPtr(cpcache.GetVTable(), defbranch),
+            ],
+        )
+
+        def KeySelector(keys):
+            # Uses simple binary search
+            ret = c.NextTrigger()
+            if len(keys) == 1:  # Only one keys on the list
+                c.RawTrigger(
+                    nextptr=cpcache.GetVTable(),
+                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
+                    actions=c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
+                )
+
+            elif len(keys) >= 2:
+                br1 = c.Forward()
+                br2 = c.Forward()
+                midpos = len(keys) // 2
+                midval = keys[midpos]
+                br_midval, nptr_midval = c.Forward(), c.Forward()
+                c.PushTriggerScope()
+                jump_midval = c.RawTrigger(
+                    nextptr=cpcache.GetVTable(),
+                    actions=[
+                        c.SetNextPtr(cpcache.GetVTable(), casebrlist[midval]),
+                        c.SetNextPtr(br_midval, nptr_midval),
+                    ],
+                )
+                c.PopTriggerScope()
+                br_midval << c.RawTrigger(
+                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, midval, bitmask),
+                    actions=c.SetNextPtr(br_midval, jump_midval),
+                )
+                nptr_midval << c.NextTrigger()
+                tg.EUDBranch(
+                    c.MemoryXEPD(cmpplayer, c.AtMost, midval, bitmask), br1, br2
+                )
+                br1 << KeySelector(keys[:midpos])
+                br2 << KeySelector(keys[midpos + 1 :])
+
+            else:  # len(keys) == 0
+                return defbranch
+
+            return ret
+
+        KeySelector(casekeylist)
     else:
         # use binary search
-        pass
+        def KeySelector(keys):
+            # Uses simple binary search
+            ret = c.NextTrigger()
+            if len(keys) == 1:  # Only one keys on the list
+                tg.EUDBranch(
+                    c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
+                    casebrlist[keys[0]],
+                    defbranch,
+                )
+
+            elif len(keys) >= 2:
+                br1 = c.Forward()
+                br2 = c.Forward()
+                midpos = len(keys) // 2
+                midval = keys[midpos]
+                EUDJumpIf(
+                    c.MemoryXEPD(epd, c.Exactly, midval, bitmask), casebrlist[midval]
+                )
+                tg.EUDBranch(c.MemoryXEPD(epd, c.AtMost, midval, bitmask), br1, br2)
+                br1 << KeySelector(keys[:midpos])
+                br2 << KeySelector(keys[midpos + 1 :])
+
+            else:  # len(keys) == 0
+                return defbranch
+
+            return ret
+
+        KeySelector(casekeylist)
 
     swend << c.NextTrigger()
