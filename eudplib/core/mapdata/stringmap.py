@@ -87,7 +87,10 @@ def GetSwitchIndex(s):
 
 
 def GetUnitIndex(u):
-    return unitmap.GetStringIndex(u2utf8(u))
+    try:
+        return unitmap.GetStringIndex(u2utf8(u))
+    except KeyError:
+        return unitmap.GetStringIndex(u2b(u))
 
 
 def ApplyStringMap(chkt):
