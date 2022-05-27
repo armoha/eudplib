@@ -2,6 +2,12 @@ from helper import *
 
 
 @TestInstance
+def test_unitloop():
+    for ptr, epd in EUDLoopUnit2():
+        pass
+
+
+@TestInstance
 def test_unitgroup():
     g = UnitGroup(1000)
     g.add(3)

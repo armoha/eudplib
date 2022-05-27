@@ -31,6 +31,7 @@ from eudplib import trigtrg as tt
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from ...utils import EPD
 from ..memiof import f_cunitepdread_epd, f_dwepdread_epd
 
 
@@ -75,7 +76,7 @@ def EUDLoopList(header_offset, break_offset=None):
 def EUDLoopUnit():
     ut.EUDCreateBlock("unitloop", 0x628430)
 
-    ptr, epd = f_cunitepdread_epd(ut.EPD(0x628430))
+    ptr, epd = f_cunitepdread_epd(EPD(0x628430))
 
     if cs.EUDWhile()(ptr >= 1):
         yield ptr, epd
@@ -88,7 +89,7 @@ def EUDLoopUnit():
 
 
 def EUDLoopNewUnit(allowance=2):
-    firstUnitPtr = ut.EPD(0x628430)
+    firstUnitPtr = EPD(0x628430)
     ut.EUDCreateBlock("newunitloop", "newlo")
     tos0 = c.EUDLightVariable()
     tos0 << 0
@@ -118,18 +119,49 @@ def EUDLoopUnit2():
     1700개 유닛을 도는 방식으로 작동합니다.
     """
 
-    ptr, epd = c.EUDCreateVariables(2)
-    if _isUnlimiterOn():  # orderID가 [0]Die면 없는 유닛으로 판단.
-        offset, cont = 0x4C // 4, c.MemoryXEPD(epd, c.Exactly, 0, 0xFF00)
-    else:  # Sprite가 0이면 없는 유닛으로 판단.
-        offset, cont = 0xC // 4, c.MemoryEPD(epd, c.Exactly, 0)
-    cs.DoActions(ptr.SetNumber(0x59CCA8), epd.SetNumber(ut.EPD(0x59CCA8) + offset))
-    if cs.EUDLoopN()(1700):
-        cs.EUDContinueIf(cont)
-        yield ptr, epd - offset
+    offset = 0x4C // 4
+    is_dead = c.MemoryX(0x59CCA8 + 0x4C, c.Exactly, 0, 0xFF00)
+    ptr = c.EUDVariable()
+    epd = c.EUDVariable()
+    continue_if = c.Forward()
+
+    cs.DoActions(
+        ptr.SetNumber(0x59CCA8),
+        epd.SetNumber(EPD(0x59CCA8) + offset),
+        epd.QueueAssignTo(EPD(is_dead) + 1),
+        c.SetNextPtr(epd.GetVTable(), continue_if),
+    )
+    if cs.EUDWhileNot()(ptr >= 0x59CCA8 + 336 * 1699 + 1):
+        whileblock = ut.EUDPeekBlock("whileblock")[1]
+        c.SetNextTrigger(epd.GetVTable())
+        c.PushTriggerScope()
+        continue_okay = c.Forward()
+        continue_jump = c.RawTrigger(
+            nextptr=whileblock["contpoint"],
+            actions=c.SetNextPtr(continue_if, continue_okay),
+        )
+        c.PopTriggerScope()
+        continue_if << c.RawTrigger(
+            conditions=is_dead,
+            actions=[
+                c.SetNextPtr(continue_if, continue_jump),
+                epd.SubtractNumber(offset),
+            ],
+        )
+        continue_okay << c.RawTrigger(actions=epd.SubtractNumber(offset))
+        yield ptr, epd
+
         cs.EUDSetContinuePoint()
-        cs.DoActions(ptr.AddNumber(336), epd.AddNumber(336 // 4))
-    cs.EUDEndLoopN()
+        c.RawTrigger(
+            nextptr=whileblock["loopstart"],
+            actions=[
+                ptr.AddNumber(336),
+                epd.AddNumber(84 + offset),
+                epd.QueueAssignTo(EPD(is_dead) + 1),
+                c.SetNextPtr(epd.GetVTable(), continue_if),
+            ],
+        )
+    cs.EUDEndWhile()
 
 
 def EUDLoopPlayerUnit(player):

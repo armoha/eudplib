@@ -71,7 +71,12 @@ def EUDGetLastBlockOfName(name):
 
 def EUDPeekBlock(name):
     lastblock = EUDGetLastBlock()
-    ep_assert(lastblock[0] == name, _("Block starting/ending mismatch"))
+    ep_assert(
+        lastblock[0] == name,
+        _("Block starting/ending mismatch")
+        + ("\n" + _("    - Started with {}").format(lastblock[0]))
+        + ("\n" + _("    - Ended with {}").format(name)),
+    )
     return lastblock
 
 
