@@ -25,7 +25,7 @@ const char* actionList[] = {
     "ModifyUnitEnergy", "ModifyUnitShields", "ModifyUnitResourceAmount",
     "ModifyUnitHangarCount", "PauseTimer", "UnpauseTimer", "Draw",
     "SetAllianceStatus", "SetMemory", "SetNextPtr", "SetMemoryEPD", "SetCurrentPlayer",
-    "SetDeathsX", "SetMemoryX", "SetMemoryXEPD", "SetKills",
+    "SetDeathsX", "SetMemoryX", "SetMemoryXEPD", "SetKills", "AddCurrentPlayer",
 };
 
 const char* actionAllpList[] = {

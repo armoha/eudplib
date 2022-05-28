@@ -264,7 +264,6 @@ def EUDEndSwitch():
         )
 
         def KeySelector(keys):
-            # Uses simple binary search
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
                 c.RawTrigger(
@@ -308,7 +307,6 @@ def EUDEndSwitch():
     else:
         # use binary search
         def KeySelector(keys):
-            # Uses simple binary search
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
                 tg.EUDBranch(
