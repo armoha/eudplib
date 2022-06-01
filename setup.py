@@ -8,7 +8,7 @@ except ImportError:
         return None
 
 
-__version__ = "0.69.7"
+__version__ = "0.69.8"
 
 
 setup(
