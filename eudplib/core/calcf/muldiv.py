@@ -104,13 +104,13 @@ def f_constmul(number):
             0xFFFFFFFF: _mul_1,
             0: _mul0,
             1: _mul1,
-            2 ** 1: _mul_pow2(1),
-            2 ** 2: _mul_pow2(2),
-            2 ** 3: _mul_pow2(3),
-            2 ** 4: _mul_pow2(4),
-            2 ** 5: _mul_pow2(5),
-            2 ** 6: _mul_pow2(6),
-            2 ** 7: _mul_pow2(7),
+            2**1: _mul_pow2(1),
+            2**2: _mul_pow2(2),
+            2**3: _mul_pow2(3),
+            2**4: _mul_pow2(4),
+            2**5: _mul_pow2(5),
+            2**6: _mul_pow2(6),
+            2**7: _mul_pow2(7),
         }
 
     mulfdict = f_constmul.mulfdict
@@ -127,8 +127,8 @@ def f_constmul(number):
             ret << 0
             for i in ut.RandList(range(32)):
                 rt.RawTrigger(
-                    conditions=a.AtLeastX(1, 2 ** i),
-                    actions=ret.AddNumber(2 ** i * number),
+                    conditions=a.AtLeastX(1, 2**i),
+                    actions=ret.AddNumber(2**i * number),
                 )
             # return ret
 
@@ -169,14 +169,14 @@ def f_constdiv(number):
             quotient << 0
             for i in range(31, -1, -1):
                 # number too big
-                if 2 ** i * number >= 2 ** 32:
+                if 2**i * number >= 2**32:
                     continue
 
                 rt.RawTrigger(
-                    conditions=a.AtLeast(2 ** i * number),
+                    conditions=a.AtLeast(2**i * number),
                     actions=[
-                        a.SubtractNumber(2 ** i * number),
-                        quotient.AddNumber(2 ** i),
+                        a.SubtractNumber(2**i * number),
+                        quotient.AddNumber(2**i),
                     ],
                 )
             # return quotient, a
@@ -203,7 +203,9 @@ def _f_mul(a, b):
         remaining_bits -= 1 << i
         p1, p2, p3, p4 = [ac.Forward() for _ in range(4)]
         p1 << rt.RawTrigger(
-            nextptr=p2, conditions=a.AtLeastX(1, 2 ** i), actions=rt.SetNextPtr(p1, p3),
+            nextptr=p2,
+            conditions=a.AtLeastX(1, 2**i),
+            actions=rt.SetNextPtr(p1, p3),
         )
         p3 << ev.VProc(b, [b.SetDest(ret), rt.SetNextPtr(p1, p2)])
         p2 << rt.NextTrigger()
@@ -259,10 +261,35 @@ def _f_div(a, b):
         cx0, cx1 = ac.Forward(), ac.Forward()
         chain[i] << rt.RawTrigger(
             conditions=[cx0 << a.AtLeast(0)],
-            actions=[cx1 << a.SubtractNumber(0), ret.AddNumber(2 ** i)],
+            actions=[cx1 << a.SubtractNumber(0), ret.AddNumber(2**i)],
         )
 
         chain_x0[i] << cx0 + 8
         chain_x1[i] << cx1 + 20
 
     return ret, a  # a : remainder
+
+
+@ef.EUDFunc
+def _pow(a, b):
+    ret, _2n = c.EUDCreateVariables(2)
+    c.SetVariables([ret, _2n], [1, 1])
+    # 2^n < b 인 모든 a^(2^n) 구하기
+    if cs.EUDWhile()(_2n < b):
+        # b에 (2^n)이 있으면 답에 a^(2^n)을 곱한다
+        if cs.EUDIf()(b.AtLeastX(1, _2n)):
+            ret *= a
+        cs.EUDEndIf()
+        _2n += _2n
+        a *= a
+    cs.EUDEndWhile()
+    return ret
+
+
+def f_pow(a, b):
+    """
+    f_pow(a, b) calculates a ** b
+    """
+    if isinstance(a, int) and isinstance(b, int):
+        return a ** b
+    return _pow(a, b)

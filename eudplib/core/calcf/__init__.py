@@ -36,7 +36,7 @@ from .bitwise import (
     f_bitsplit,
 )
 
-from .muldiv import f_mul, f_div
+from .muldiv import f_mul, f_div, f_pow
 
 # Just run _eudvsupport. This won't be visible in user side.
 from . import _eudvsupport
