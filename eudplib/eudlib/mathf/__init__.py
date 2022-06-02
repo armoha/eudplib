@@ -26,3 +26,4 @@ THE SOFTWARE.
 from .lengthdir import f_lengthdir
 from .atan2 import f_atan2
 from .sqrt import f_sqrt
+from .pow import f_pow

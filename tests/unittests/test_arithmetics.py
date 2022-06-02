@@ -38,4 +38,10 @@ def test_arithmetics():
         ev *= r
         test_equality(f"{v} *= {r}", ev, (v * r) & 0xFFFFFFFF)
 
+    for _ in range(5):
+        r = random.randint(2, 0xFFFF)
+        ev << v
+        ev << f_pow(ev, r)
+        test_equality(f"{v} ** {r}", ev, (v**r) & 0xFFFFFFFF)
+
     EP_SetRValueStrictMode(True)

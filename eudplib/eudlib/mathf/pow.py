@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2014 trgk
+Copyright (c) 2022 Armoha
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,20 +23,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .bitwise import (
-    f_bitand,
-    f_bitor,
-    f_bitxor,
-    f_bitnand,
-    f_bitnor,
-    f_bitnxor,
-    f_bitnot,
-    f_bitlshift,
-    f_bitrshift,
-    f_bitsplit,
-)
+from eudplib import core as c, ctrlstru as cs, utils as ut
 
-from .muldiv import f_mul, f_div
 
-# Just run _eudvsupport. This won't be visible in user side.
-from . import _eudvsupport
+@c.EUDFunc
+def _pow(a, b):
+    ret, _2n = c.EUDCreateVariables(2)
+    c.SetVariables([ret, _2n], [1, 1])
+    # 2^n < b 인 모든 a^(2^n) 구하기
+    if cs.EUDWhile()(_2n < b):
+        # b에 (2^n)이 있으면 답에 a^(2^n)을 곱한다
+        if cs.EUDIf()(b.AtLeastX(1, _2n)):
+            ret *= a
+        cs.EUDEndIf()
+        _2n += _2n
+        a *= a
+    cs.EUDEndWhile()
+    return ret
+
+
+def f_pow(a, b):
+    """
+    f_pow(a, b) calculates a ** b
+    """
+    if isinstance(a, int) and isinstance(b, int):
+        return a**b
+    return _pow(a, b)
