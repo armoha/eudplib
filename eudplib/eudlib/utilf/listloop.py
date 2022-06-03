@@ -120,20 +120,21 @@ def EUDLoopUnit2():
     """
 
     offset = 0x4C // 4
-    is_dead = c.MemoryX(0x59CCA8 + 0x4C, c.Exactly, 0, 0xFF00)
+    is_dead = c.MemoryXEPD(0, c.Exactly, 0, 0xFF00)
     ptr = c.EUDVariable()
     epd = c.EUDVariable()
     continue_if = c.Forward()
+    set_ptr, set_epd = ptr.SetNumber(0), epd.SetNumber(0)
 
     cs.DoActions(
         ptr.SetNumber(0x59CCA8),
-        epd.SetNumber(EPD(0x59CCA8) + offset),
-        epd.QueueAssignTo(EPD(is_dead) + 1),
-        c.SetNextPtr(epd.GetVTable(), continue_if),
+        c.SetMemory(set_ptr + 20, c.SetTo, 0x59CCA8 + 336),
+        epd.SetNumber(EPD(0x59CCA8)),
+        c.SetMemory(is_dead + 4, c.SetTo, EPD(0x59CCA8) + 0x4C // 4),
+        c.SetMemory(set_epd + 20, c.SetTo, EPD(0x59CCA8) + 84),
     )
     if cs.EUDWhileNot()(ptr >= 0x59CCA8 + 336 * 1699 + 1):
         whileblock = ut.EUDPeekBlock("whileblock")[1]
-        c.SetNextTrigger(epd.GetVTable())
         c.PushTriggerScope()
         continue_okay = c.Forward()
         continue_jump = c.RawTrigger(
@@ -143,22 +144,20 @@ def EUDLoopUnit2():
         c.PopTriggerScope()
         continue_if << c.RawTrigger(
             conditions=is_dead,
-            actions=[
-                c.SetNextPtr(continue_if, continue_jump),
-                epd.SubtractNumber(offset),
-            ],
+            actions=c.SetNextPtr(continue_if, continue_jump),
         )
-        continue_okay << c.RawTrigger(actions=epd.SubtractNumber(offset))
+        continue_okay << c.NextTrigger()
         yield ptr, epd
 
         cs.EUDSetContinuePoint()
         c.RawTrigger(
             nextptr=whileblock["loopstart"],
             actions=[
-                ptr.AddNumber(336),
-                epd.AddNumber(84 + offset),
-                epd.QueueAssignTo(EPD(is_dead) + 1),
-                c.SetNextPtr(epd.GetVTable(), continue_if),
+                set_ptr,
+                c.SetMemory(set_ptr + 20, c.Add, 336),
+                c.SetMemory(is_dead + 4, c.Add, 84),
+                set_epd,
+                c.SetMemory(set_epd + 20, c.Add, 84),
             ],
         )
     cs.EUDEndWhile()
