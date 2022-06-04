@@ -262,41 +262,61 @@ def EUDEndSwitch():
                 c.SetNextPtr(cpcache.GetVTable(), defbranch),
             ],
         )
+        reset = []
+
+        def Reset():
+            nonlocal reset
+            return [c.SetNextPtr(trg, nptr) for trg, nptr in reset]
 
         def KeySelector(keys):
+            nonlocal reset
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
                 c.RawTrigger(
                     nextptr=cpcache.GetVTable(),
                     conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
-                    actions=c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
+                    actions=[
+                        c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
+                        Reset(),
+                    ],
                 )
 
-            elif len(keys) >= 2:
-                br1 = c.Forward()
-                br2 = c.Forward()
-                midpos = len(keys) // 2
-                midval = keys[midpos]
-                br_midval, nptr_midval = c.Forward(), c.Forward()
+            elif len(keys) == 2:
+                br1, br2 = c.Forward(), c.Forward()
                 c.PushTriggerScope()
-                jump_midval = c.RawTrigger(
+                jump1 = c.RawTrigger(
                     nextptr=cpcache.GetVTable(),
                     actions=[
-                        c.SetNextPtr(cpcache.GetVTable(), casebrlist[midval]),
-                        c.SetNextPtr(br_midval, nptr_midval),
+                        c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
+                        c.SetNextPtr(br1, br2),
                     ],
                 )
                 c.PopTriggerScope()
-                br_midval << c.RawTrigger(
-                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, midval, bitmask),
-                    actions=c.SetNextPtr(br_midval, jump_midval),
+
+                br1 << c.RawTrigger(
+                    nextptr=br2,
+                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
+                    actions=[c.SetNextPtr(br1, jump1), Reset()],
                 )
-                nptr_midval << c.NextTrigger()
-                tg.EUDBranch(
-                    c.MemoryXEPD(cmpplayer, c.AtMost, midval, bitmask), br1, br2
+                br2 << KeySelector(keys[1:])
+
+            elif len(keys) >= 3:
+                branch, br1, br2 = c.Forward(), c.Forward(), c.Forward()
+                midpos = len(keys) // 2
+                branch << c.RawTrigger(
+                    nextptr=br1,
+                    conditions=c.MemoryXEPD(
+                        cmpplayer, c.AtLeast, keys[midpos], bitmask
+                    ),
+                    actions=[
+                        c.SetNextPtr(branch, br2),
+                        Reset(),
+                    ],
                 )
                 br1 << KeySelector(keys[:midpos])
-                br2 << KeySelector(keys[midpos + 1 :])
+                reset.clear()
+                reset.append((branch, br1))
+                br2 << KeySelector(keys[midpos:])
 
             else:  # len(keys) == 0
                 return defbranch
@@ -304,28 +324,65 @@ def EUDEndSwitch():
             return ret
 
         KeySelector(casekeylist)
-    else:
-        # use binary search
+    else:  # use binary search
+        reset = []
+
+        def Reset():
+            nonlocal reset
+            return [c.SetNextPtr(trg, nptr) for trg, nptr in reset]
+
         def KeySelector(keys):
+            nonlocal reset
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
-                tg.EUDBranch(
-                    c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
-                    casebrlist[keys[0]],
-                    defbranch,
+                branch = c.Forward()
+                c.PushTriggerScope()
+                jump = c.RawTrigger(
+                    nextptr=casebrlist[keys[0]],
+                    actions=[c.SetNextPtr(branch, defbranch), Reset()],
+                )
+                c.PopTriggerScope()
+
+                branch << c.RawTrigger(
+                    nextptr=defbranch,
+                    conditions=c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
+                    actions=c.SetNextPtr(branch, jump),
                 )
 
-            elif len(keys) >= 2:
-                br1 = c.Forward()
-                br2 = c.Forward()
-                midpos = len(keys) // 2
-                midval = keys[midpos]
-                EUDJumpIf(
-                    c.MemoryXEPD(epd, c.Exactly, midval, bitmask), casebrlist[midval]
+            elif len(keys) == 2:
+                br1, br2 = c.Forward(), c.Forward()
+                c.PushTriggerScope()
+                jump1 = c.RawTrigger(
+                    nextptr=casebrlist[keys[0]],
+                    actions=[
+                        c.SetNextPtr(br1, br2),
+                        Reset(),
+                    ],
                 )
-                tg.EUDBranch(c.MemoryXEPD(epd, c.AtMost, midval, bitmask), br1, br2)
+                c.PopTriggerScope()
+
+                br1 << c.RawTrigger(
+                    nextptr=branch2,
+                    conditions=c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
+                    actions=c.SetNextPtr(br1, jump1),
+                )
+                br2 << KeySelector(keys[1:])
+
+            elif len(keys) >= 3:
+                branch, br1, br2 = c.Forward(), c.Forward(), c.Forward()
+                midpos = len(keys) // 2
+                branch << c.RawTrigger(
+                    nextptr=br1,
+                    conditions=c.MemoryXEPD(epd, c.AtLeast, keys[midpos], bitmask),
+                    actions=[
+                        c.SetNextPtr(branch, br2),
+                        Reset(),
+                    ],
+                )
                 br1 << KeySelector(keys[:midpos])
-                br2 << KeySelector(keys[midpos + 1 :])
+                reset.clear()
+                reset.append((branch, br1))
+                br2 << KeySelector(keys[midpos:])
 
             else:  # len(keys) == 0
                 return defbranch
