@@ -1,4 +1,5 @@
 from helper import *
+from random import sample, shuffle
 
 
 @TestInstance
@@ -29,5 +30,33 @@ def main():
 
         EUDEndSwitch()
     EUDEndWhile()
+    test_equality("Switch test", s, 34421)
 
-    test_assert("Switch test", s == 34421)
+    random_numbers = sample(range(8192), 32)
+    random_cases = random_numbers[:16]
+
+    @EUDFunc
+    def branch(x):
+        ret = EUDVariable()
+        ret << 0
+        EUDSwitch(x, 8191)
+        for case in random_cases:
+            if EUDSwitchCase()(case):
+                ret << 3 * case
+                EUDBreak()
+        if EUDSwitchDefault()():
+            ret << -1
+        EUDEndSwitch()
+        return ret
+
+    shuffle(random_numbers)
+    ra = EUDArray(random_numbers)
+    SetVariables([s, i], [0, 0])
+    if EUDWhile()(i < 32):
+        x = branch(ra[i])
+        SetVariables([i, s], [1, x], [Add, Add])
+    EUDEndWhile()
+
+    result = (-16 + 3 * sum(random_cases)) & 0xFFFFFFFF
+
+    test_equality("Switch binary search test", s, result)

@@ -272,31 +272,27 @@ def EUDEndSwitch():
             nonlocal reset
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
+                if reset:
+                    c.RawTrigger(actions=Reset())
                 c.RawTrigger(
                     nextptr=cpcache.GetVTable(),
                     conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
-                    actions=[
-                        c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
-                        Reset(),
-                    ],
+                    actions=c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
                 )
 
             elif len(keys) == 2:
-                br1, br2 = c.Forward(), c.Forward()
-                c.PushTriggerScope()
-                jump1 = c.RawTrigger(
+                br1, jump1, br2 = c.Forward(), c.Forward(), c.Forward()
+                br1 << c.RawTrigger(
+                    nextptr=br2,
+                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
+                    actions=[c.SetNextPtr(br1, jump1), Reset()],
+                )
+                jump1 << c.RawTrigger(
                     nextptr=cpcache.GetVTable(),
                     actions=[
                         c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
                         c.SetNextPtr(br1, br2),
                     ],
-                )
-                c.PopTriggerScope()
-
-                br1 << c.RawTrigger(
-                    nextptr=br2,
-                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
-                    actions=[c.SetNextPtr(br1, jump1), Reset()],
                 )
                 br2 << KeySelector(keys[1:])
 
@@ -335,36 +331,34 @@ def EUDEndSwitch():
             nonlocal reset
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
-                branch = c.Forward()
-                c.PushTriggerScope()
-                jump = c.RawTrigger(
-                    nextptr=casebrlist[keys[0]],
-                    actions=[c.SetNextPtr(branch, defbranch), Reset()],
-                )
-                c.PopTriggerScope()
-
+                branch, jump, goto_defbranch = c.Forward(), c.Forward(), c.Forward()
                 branch << c.RawTrigger(
-                    nextptr=defbranch,
+                    nextptr=goto_defbranch,
                     conditions=c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
-                    actions=c.SetNextPtr(branch, jump),
+                    actions=[c.SetNextPtr(branch, jump), Reset()],
                 )
+                jump << c.RawTrigger(
+                    nextptr=casebrlist[keys[0]],
+                    actions=c.SetNextPtr(branch, goto_defbranch),
+                )
+                if reset:
+                    goto_defbranch << c.RawTrigger(
+                        nextptr=defbranch,
+                        actions=Reset(),
+                    )
+                else:
+                    goto_defbranch << defbranch
 
             elif len(keys) == 2:
-                br1, br2 = c.Forward(), c.Forward()
-                c.PushTriggerScope()
-                jump1 = c.RawTrigger(
-                    nextptr=casebrlist[keys[0]],
-                    actions=[
-                        c.SetNextPtr(br1, br2),
-                        Reset(),
-                    ],
-                )
-                c.PopTriggerScope()
-
+                br1, jump1, br2 = c.Forward(), c.Forward(), c.Forward()
                 br1 << c.RawTrigger(
-                    nextptr=branch2,
+                    nextptr=br2,
                     conditions=c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
-                    actions=c.SetNextPtr(br1, jump1),
+                    actions=[c.SetNextPtr(br1, jump1), Reset()],
+                )
+                jump1 << c.RawTrigger(
+                    nextptr=casebrlist[keys[0]],
+                    actions=c.SetNextPtr(br1, br2),
                 )
                 br2 << KeySelector(keys[1:])
 
