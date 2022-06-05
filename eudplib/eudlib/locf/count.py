@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2019 Armoha
+Copyright (c) 2022 Armoha
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,5 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .count import f_bringcount
-from .locf import f_setloc, f_addloc, f_dilateloc, f_getlocTL, f_setloc_epd
+from ... import core as c, ctrlstru as cs, utils as ut
+
+
+def f_bringcount(player, unit, location):
+    player = c.EncodePlayer(player)
+    unit = c.EncodeUnit(unit)
+    location = c.EncodeLocation(location)
+    c.Bring(player, c.AtLeast, 128, unit, location)
