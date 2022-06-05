@@ -42,13 +42,13 @@ def _wwriter(epd, subp, w):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(3)):
-        cs.EUDSwitchCase()(i)
-        cs.DoActions(
-            c.SetDeathsX(
-                c.CurrentPlayer, c.SetTo, _lshift(w, 8 * i), 0, 0xFFFF << (8 * i)
+        if cs.EUDSwitchCase()(i):
+            cs.DoActions(
+                c.SetDeathsX(
+                    c.CurrentPlayer, c.SetTo, _lshift(w, 8 * i), 0, 0xFFFF << (8 * i)
+                )
             )
-        )
-        cs.EUDBreak()
+            cs.EUDBreak()
 
     # Things gets complicated on this case.
     # We won't hand-optimize this case. This is a very, very rare case
@@ -83,13 +83,13 @@ def _bwriter(epd, subp, b):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(4)):
-        cs.EUDSwitchCase()(i)
-        cs.DoActions(
-            c.SetDeathsX(
-                c.CurrentPlayer, c.SetTo, _lshift(b, 8 * i), 0, 0xFF << (8 * i)
+        if cs.EUDSwitchCase()(i):
+            cs.DoActions(
+                c.SetDeathsX(
+                    c.CurrentPlayer, c.SetTo, _lshift(b, 8 * i), 0, 0xFF << (8 * i)
+                )
             )
-        )
-        cs.EUDBreak()
+            cs.EUDBreak()
     cs.EUDEndSwitch()
     cp.f_setcurpl2cpcache()
     return b
@@ -113,14 +113,14 @@ def f_wread_epd(epd, subp):
     c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), w.SetNumber(0)])
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(3)):
-        cs.EUDSwitchCase()(i)
-        for j in ut.RandList(range(8 * i, 8 * i + 16)):
-            c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
-                actions=w.AddNumber(2 ** (j - 8 * i)),
-            )
+        if cs.EUDSwitchCase()(i):
+            for j in ut.RandList(range(8 * i, 8 * i + 16)):
+                c.RawTrigger(
+                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                    actions=w.AddNumber(2 ** (j - 8 * i)),
+                )
 
-        cs.EUDBreak()
+            cs.EUDBreak()
 
     # Things gets complicated on this case.
     # We won't hand-optimize this case. This is a very, very rare case
@@ -140,14 +140,14 @@ def f_bread_epd(epd, subp):
     c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), b.SetNumber(0)])
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(4)):
-        cs.EUDSwitchCase()(i)
-        for j in ut.RandList(range(8 * i, 8 * i + 8)):
-            c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
-                actions=b.AddNumber(2 ** (j - 8 * i)),
-            )
+        if cs.EUDSwitchCase()(i):
+            for j in ut.RandList(range(8 * i, 8 * i + 8)):
+                c.RawTrigger(
+                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                    actions=b.AddNumber(2 ** (j - 8 * i)),
+                )
 
-        cs.EUDBreak()
+            cs.EUDBreak()
     cs.EUDEndSwitch()
     cp.f_setcurpl2cpcache()
     return b

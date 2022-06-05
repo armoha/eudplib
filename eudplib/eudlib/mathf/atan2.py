@@ -89,20 +89,20 @@ def f_atan2(y, x):
     # ysign|      xyabscmp=0     ysign|      xyabscmp=1
 
     cs.EUDSwitch(signflags)
-    cs.EUDSwitchCase()(0)  # xsign, ysign, xyabscmp = 0, 0, 0
-    c.EUDReturn(atan_value)
-    cs.EUDSwitchCase()(1)  # xsign, ysign, xyabscmp = 1, 0, 0
-    c.EUDReturn(180 - atan_value)
-    cs.EUDSwitchCase()(2)  # xsign, ysign, xyabscmp = 0, 1, 0
-    c.EUDReturn(360 - atan_value)
-    cs.EUDSwitchCase()(3)  # xsign, ysign, xyabscmp = 1, 1, 0
-    c.EUDReturn(180 + atan_value)
-    cs.EUDSwitchCase()(4)  # xsign, ysign, xyabscmp = 0, 0, 1
-    c.EUDReturn(90 - atan_value)
-    cs.EUDSwitchCase()(5)  # xsign, ysign, xyabscmp = 1, 0, 1
-    c.EUDReturn(90 + atan_value)
-    cs.EUDSwitchCase()(6)  # xsign, ysign, xyabscmp = 0, 1, 1
-    c.EUDReturn(270 + atan_value)
-    cs.EUDSwitchCase()(7)  # xsign, ysign, xyabscmp = 1, 1, 1
-    c.EUDReturn(270 - atan_value)
+    if cs.EUDSwitchCase()(0):  # xsign, ysign, xyabscmp = 0, 0, 0
+        c.EUDReturn(atan_value)
+    if cs.EUDSwitchCase()(1):  # xsign, ysign, xyabscmp = 1, 0, 0
+        c.EUDReturn(180 - atan_value)
+    if cs.EUDSwitchCase()(2):  # xsign, ysign, xyabscmp = 0, 1, 0
+        c.EUDReturn(360 - atan_value)
+    if cs.EUDSwitchCase()(3):  # xsign, ysign, xyabscmp = 1, 1, 0
+        c.EUDReturn(180 + atan_value)
+    if cs.EUDSwitchCase()(4):  # xsign, ysign, xyabscmp = 0, 0, 1
+        c.EUDReturn(90 - atan_value)
+    if cs.EUDSwitchCase()(5):  # xsign, ysign, xyabscmp = 1, 0, 1
+        c.EUDReturn(90 + atan_value)
+    if cs.EUDSwitchCase()(6):  # xsign, ysign, xyabscmp = 0, 1, 1
+        c.EUDReturn(270 + atan_value)
+    if cs.EUDSwitchCase()(7):  # xsign, ysign, xyabscmp = 1, 1, 1
+        c.EUDReturn(270 - atan_value)
     cs.EUDEndSwitch()

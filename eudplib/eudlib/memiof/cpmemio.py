@@ -76,14 +76,14 @@ def _wreader(subp):
     w << 0
     cs.EUDSwitch(subp)
     for bits in ut.RandList(range(3)):
-        cs.EUDSwitchCase()(bits)
-        byte = 8 * bits
-        for power in ut.RandList(range(byte, byte + 16)):
-            c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
-                actions=w.AddNumber(2 ** (power - byte)),
-            )
-        cs.EUDBreak()
+        if cs.EUDSwitchCase()(bits):
+            byte = 8 * bits
+            for power in ut.RandList(range(byte, byte + 16)):
+                c.RawTrigger(
+                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
+                    actions=w.AddNumber(2 ** (power - byte)),
+                )
+            cs.EUDBreak()
     if cs.EUDSwitchCase()(3):
         for power in ut.RandList(range(24, 32)):
             c.RawTrigger(
@@ -117,14 +117,14 @@ def _breader(subp):
     b << 0
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(4)):
-        cs.EUDSwitchCase()(i)
-        for j in ut.RandList(range(8 * i, 8 * i + 8)):
-            c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
-                actions=b.AddNumber(2 ** (j - 8 * i)),
-            )
+        if cs.EUDSwitchCase()(i):
+            for j in ut.RandList(range(8 * i, 8 * i + 8)):
+                c.RawTrigger(
+                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                    actions=b.AddNumber(2 ** (j - 8 * i)),
+                )
 
-        cs.EUDBreak()
+            cs.EUDBreak()
     cs.EUDEndSwitch()
     return b
 
@@ -166,12 +166,12 @@ def f_dwsubtract_cp(cpo, value):
 def _wwriter(subp, w):
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(3)):
-        cs.EUDSwitchCase()(i)
-        c.RawTrigger(
-            actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i))
-        )
-        c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256**i))])
-        cs.EUDBreak()
+        if cs.EUDSwitchCase()(i):
+            c.RawTrigger(
+                actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i))
+            )
+            c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256**i))])
+            cs.EUDBreak()
 
     # Things gets complicated on this case.
     # We won't hand-optimize this case. This is a very, very rare case
@@ -212,13 +212,13 @@ def f_wwrite_cp(cpo, subp, w):
 def _bwriter(subp, b):
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(4)):
-        cs.EUDSwitchCase()(i)
-        c.RawTrigger(
-            actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 << (8 * i))
-        )
+        if cs.EUDSwitchCase()(i):
+            c.RawTrigger(
+                actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 << (8 * i))
+            )
 
-        c.SeqCompute([(c.CurrentPlayer, c.Add, b * (256**i))])
-        cs.EUDBreak()
+            c.SeqCompute([(c.CurrentPlayer, c.Add, b * (256**i))])
+            cs.EUDBreak()
     cs.EUDEndSwitch()
     return b
 

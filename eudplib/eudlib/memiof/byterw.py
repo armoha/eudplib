@@ -88,7 +88,7 @@ class EUDByteReader:
                     conditions=c.DeathsX(
                         c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)
                     ),
-                    actions=ret.AddNumber(2 ** j),
+                    actions=ret.AddNumber(2**j),
                 )
             if i < 3:
                 c.RawTrigger(nextptr=case[-1], actions=self._suboffset.AddNumber(1))
@@ -153,14 +153,14 @@ class EUDByteWriter:
             )
             cs.EUDBreak()
         for i in range(1, 4):
-            cs.EUDSwitchCase()(i)
-            cs.DoActions(c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)))
-            for j in RandList(range(8)):
-                c.RawTrigger(
-                    conditions=byte.AtLeastX(1, 2 ** j),
-                    actions=c.SetMemory(self._write + 348, c.Add, 2 ** (j + i * 8)),
-                )
-            cs.EUDBreak()
+            if cs.EUDSwitchCase()(i):
+                cs.DoActions(c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)))
+                for j in RandList(range(8)):
+                    c.RawTrigger(
+                        conditions=byte.AtLeastX(1, 2**j),
+                        actions=c.SetMemory(self._write + 348, c.Add, 2 ** (j + i * 8)),
+                    )
+                cs.EUDBreak()
 
         cs.EUDEndSwitch()
 
@@ -285,7 +285,7 @@ class EUDByteStream:
                     conditions=c.DeathsX(
                         c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)
                     ),
-                    actions=ret.AddNumber(2 ** j),
+                    actions=ret.AddNumber(2**j),
                 )
             if i < 3:
                 c.RawTrigger(nextptr=case[-1], actions=self._suboffset.AddNumber(1))
@@ -317,23 +317,27 @@ class EUDByteStream:
         if cs.EUDSwitchCase()(0):
             c.VProc(
                 byte,
-                [byte.SetDest(EPD(write) + 5), c.SetMemory(write, c.SetTo, 0xFF),],
+                [
+                    byte.SetDest(EPD(write) + 5),
+                    c.SetMemory(write, c.SetTo, 0xFF),
+                ],
             )
             cs.EUDBreak()
         for i in range(1, 4):
-            cs.EUDSwitchCase()(i)
-            cs.DoActions(c.SetMemory(write, c.SetTo, 0xFF << (8 * i)))
-            for j in RandList(range(8)):
-                c.RawTrigger(
-                    conditions=byte.AtLeastX(1, 2 ** j),
-                    actions=c.SetMemory(write + 20, c.Add, 2 ** (j + i * 8)),
-                )
-            cs.EUDBreak()
+            if cs.EUDSwitchCase()(i):
+                cs.DoActions(c.SetMemory(write, c.SetTo, 0xFF << (8 * i)))
+                for j in RandList(range(8)):
+                    c.RawTrigger(
+                        conditions=byte.AtLeastX(1, 2**j),
+                        actions=c.SetMemory(write + 20, c.Add, 2 ** (j + i * 8)),
+                    )
+                cs.EUDBreak()
 
         cs.EUDEndSwitch()
 
         cs.DoActions(
-            self._suboffset.AddNumber(1), write << c.SetDeathsX(0, c.SetTo, 0, 0, 0),
+            self._suboffset.AddNumber(1),
+            write << c.SetDeathsX(0, c.SetTo, 0, 0, 0),
         )
         c.RawTrigger(
             conditions=[self._suboffset >= 4],
