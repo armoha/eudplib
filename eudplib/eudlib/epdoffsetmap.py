@@ -429,7 +429,7 @@ class EPDCUnitMap(
         self.clear_status_flag(0x00100000)
 
     def is_dying(self):
-        return [self.order == 0, self.csprite >= 1]
+        return [self.order == 0, self.sprite >= 1]
 
     def is_completed(self):
         return self.check_status_flag(0x00000001)
