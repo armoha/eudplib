@@ -27,7 +27,7 @@ from eudplib import core as c, ctrlstru as cs
 
 
 def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF):
-    """ Find maximum x satisfying cond(x) using binary search
+    """Find maximum x satisfying cond(x) using binary search
 
     :param cond: Test condition
     :param minv: Minimum value in domain
@@ -41,11 +41,8 @@ def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF):
     .. note:: If none of the value satisfies condition, then this
         function will return maxv.
     """
-
-    x = c.EUDVariable()
-    x << minv
-
     if isinstance(minv, int) and isinstance(maxv, int):
+        assert minv <= maxv
         r = maxv - minv
         if r == 0:
             return minv
@@ -53,20 +50,29 @@ def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF):
     else:
         r = None
 
+    x = c.EUDVariable()
+    nth = 0
     for i in range(31, -1, -1):
-        if r and 2 ** i > r:
+        if r and 2**i > r:
             continue
 
-        cs.DoActions(x.AddNumber(2 ** i))
-        if cs.EUDIfNot()([x <= maxv, cond(x)]):
-            cs.DoActions(x.SubtractNumber(2 ** i))
-        cs.EUDEndIf()
+        if nth == 0:
+            x << minv + 2**i
+            if cs.EUDIfNot()(cond(x)):
+                cs.DoActions(x.SubtractNumber(2**i))
+            cs.EUDEndIf()
+        else:
+            x += 2**i
+            if cs.EUDIfNot()([x <= maxv, cond(x)]):
+                cs.DoActions(x.SubtractNumber(2**i))
+            cs.EUDEndIf()
+        nth += 1
 
     return x
 
 
 def EUDBinaryMin(cond, minv=0, maxv=0xFFFFFFFF):
-    """ Find minimum x satisfying cond(x) using binary search
+    """Find minimum x satisfying cond(x) using binary search
 
     :param cond: Test condition
     :param minv: Minimum value in domain
@@ -80,26 +86,32 @@ def EUDBinaryMin(cond, minv=0, maxv=0xFFFFFFFF):
     .. note:: If none of the value satisfies condition, then this
         function will return maxv.
     """
-    x = c.EUDVariable()
-    x << maxv
-
     if isinstance(minv, int) and isinstance(maxv, int):
+        assert minv <= maxv
         r = maxv - minv
         if r == 0:
             return minv
-
     else:
         r = None
 
+    x = c.EUDVariable()
+    nth = 0
     for i in range(31, -1, -1):
-        if r and 2 ** i > r:
+        if r and 2**i > r:
             continue
 
-        if cs.EUDIf()([x >= 2 ** i]):
-            cs.DoActions(x.SubtractNumber(2 ** i))
-            if cs.EUDIfNot()([x >= minv, cond(x)]):
-                cs.DoActions(x.AddNumber(2 ** i))
+        if nth == 0:
+            x << maxv - 2**i
+            if cs.EUDIfNot()(cond(x)):
+                x += 2**i
             cs.EUDEndIf()
-        cs.EUDEndIf()
+        else:
+            if cs.EUDIf()(x >= 2**i):
+                cs.DoActions(x.SubtractNumber(2**i))
+                if cs.EUDIfNot()([x >= minv, cond(x)]):
+                    x += 2**i
+                cs.EUDEndIf()
+            cs.EUDEndIf()
+        nth += 1
 
     return x
