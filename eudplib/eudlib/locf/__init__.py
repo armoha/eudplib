@@ -23,5 +23,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .count import f_bringcount
+from .bringcount import f_bringcount
 from .locf import f_setloc, f_addloc, f_dilateloc, f_getlocTL, f_setloc_epd
