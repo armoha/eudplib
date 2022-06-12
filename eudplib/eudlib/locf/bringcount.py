@@ -24,15 +24,29 @@ THE SOFTWARE.
 """
 
 from ... import core as c, ctrlstru as cs, utils as ut
+from ...core.eudfunc.eudf import _EUDPredefineParam
+
+
+bring = c.Bring(0, c.AtLeast, 0, 0, 0)
+
+
+@_EUDPredefineParam((ut.EPD(bring) + 1, ut.EPD(bring) + 3, ut.EPD(bring)))
+@c.EUDTypedFunc([c.TrgPlayer, c.TrgUnit, c.TrgLocation], [None])
+def _bringcount(player, unit, location):
+    cs.DoActions(
+        c.SetMemory(bring + 8, c.SetTo, 1024),
+        c.SetMemoryX(bring + 12, c.SetTo, 3 << 24, 0xFFFF0000),
+    )
+    c.RawTrigger(conditions=[bring, c.Memory(bring + 8, c.AtMost, 1700)])
 
 
 def f_bringcount(player, unit, location):
-    player = c.EncodePlayer(player)
-    unit = c.EncodeUnit(unit)
-    location = c.EncodeLocation(location)
-    bring = c.Bring(player, c.AtLeast, 128, unit, location)
-    set_count = c.SetMemory(bring + 8, c.Subtract, 64)
-    set_add = c.SetMemoryX(set_count + 24, c.SetTo, 8 << 24, 0xFF << 24)
-    set_subtract = c.SetMemoryX(set_count + 24, c.SetTo, 9 << 24, 0xFF << 24)
-    c.RawTrigger(conditions=bring, actions=set_add)
-    cs.DoActions(set_count, set_subtract)
+    if not any(IsEUDVariable(v) for v in (player, unit, location)):
+        cache = c.EUDVariable()
+        cache_bring = c.Bring(player, c.Exactly, 0, unit, location)
+        if cs.EUDIfNot()(cache_bring):
+            _bringcount(player, unit, location, _ret=[cache])
+            c.VProc(cache, cache.QueueAssignTo(ut.EPD(cache_bring) + 2))
+        cs.EUDEndIf()
+        return cache
+    return _bringcount(player, unit, location)
