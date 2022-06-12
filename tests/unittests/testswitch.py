@@ -25,6 +25,11 @@ def main():
             s += 1000
             EUDBreak()
 
+        # negative number is allowed only with full-ranged mask
+        if EUDSwitchCase()(-1, -3, -7):
+            s += -666
+            EUDBreak()
+
         if EUDSwitchDefault()():
             s += 10000
 

@@ -81,9 +81,12 @@ def EUDSwitchCase():
         block = lb[1]
 
         for number in numbers:
-            ut.ep_assert(number not in block["casebrlist"], _("Duplicate cases"))
-            ut.ep_assert(number & block["bitmask"] == number, _("cases out of mask"))
-            block["casebrlist"][number] = c.NextTrigger()
+            case = number & block["bitmask"]
+            ut.ep_assert(case not in block["casebrlist"], _("Duplicate cases"))
+            ut.ep_assert(
+                block["bitmask"] == 0xFFFFFFFF or case == number, _("cases out of mask")
+            )
+            block["casebrlist"][case] = c.NextTrigger()
 
         return True
 
@@ -205,13 +208,7 @@ def EUDEndSwitch():
     keyxor = keyor - keyand
     keybits = list(ut.bits(keyxor))
 
-    def powerset(iterable):
-        "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
-        s = list(iterable)
-        return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
-
-    keylist = sorted(map(sum, powerset(ut.bits(keyxor))))
-    density = len(casebrlist) / len(keylist)
+    density = len(casebrlist) / (2 ** len(keybits))
     if density >= 0.4:
         # use jump table
         check_invariant = c.MemoryXEPD(
@@ -219,6 +216,12 @@ def EUDEndSwitch():
         )
         EUDJumpIfNot(check_invariant, defbranch)
 
+        def powerset(iterable):
+            "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+            s = list(iterable)
+            return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+
+        keylist = sorted(map(sum, powerset(keybits)))
         jump_table = JumpTriggerForward(
             [casebrlist.get(keyand + key, defbranch) for key in keylist]
         )
