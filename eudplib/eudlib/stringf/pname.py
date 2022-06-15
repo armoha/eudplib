@@ -125,7 +125,9 @@ def IsPName(player, name):
         else:
             ut.ep_assert(
                 p == c.EncodePlayer(c.CurrentPlayer),
-                _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),
+                _(
+                    "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
+                ).format(player),
             )
 
     init, end, params = GetIsPNameCondition(name)
@@ -216,8 +218,8 @@ class _PlayerName:
         cs.DoActions(c.SetMemory(prevTxtPtr + 8, c.SetTo, 0))
         for i in range(3, -1, -1):
             c.RawTrigger(
-                conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2 ** i),
-                actions=c.SetMemory(prevTxtPtr + 8, c.Add, 2 ** i),
+                conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
+                actions=c.SetMemory(prevTxtPtr + 8, c.Add, 2**i),
             )
         _end << c.NextTrigger()
         self.optimize_end << c.RawTrigger()

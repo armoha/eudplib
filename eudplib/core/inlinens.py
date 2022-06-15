@@ -32,7 +32,7 @@ def EUDClearNamespace():
 
 
 def EUDRegisterObjectToNamespace(funcname, obj):
-    """ Register object to inline code namespace. """
+    """Register object to inline code namespace."""
     if funcname[0] != "_":
         if funcname in _objns:
             _objns[funcname] = None
@@ -43,10 +43,10 @@ def EUDRegisterObjectToNamespace(funcname, obj):
 
 
 def EUDRegistered(func):
-    """ Decoreator for registering class / function. """
+    """Decoreator for registering class / function."""
     return EUDRegisterObjectToNamespace(func.__name__, func)
 
 
 def GetEUDNamespace():
-    """ Get list of functions that inline code can use. """
+    """Get list of functions that inline code can use."""
     return _objns

@@ -39,7 +39,10 @@ def f_setcurpl(cp, *, actions=[], set_modifier=True):
             if set_modifier
             else [cp.SetDest(cpcache)],
         )
-        c.VProc([cp, cpcache], [cp.SetDest(ut.EPD(cpcond) + 2), cpcache.SetDest(ut.EPD(0x6509B0))])
+        c.VProc(
+            [cp, cpcache],
+            [cp.SetDest(ut.EPD(cpcond) + 2), cpcache.SetDest(ut.EPD(0x6509B0))],
+        )
     else:
         cs.DoActions(c.SetCurrentPlayer(cp))
 

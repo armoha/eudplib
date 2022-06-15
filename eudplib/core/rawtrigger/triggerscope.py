@@ -33,7 +33,7 @@ def PushTriggerScope():
 
 
 def SetNextTrigger(trg):
-    """ For optimization purpose, one may call this function directly """
+    """For optimization purpose, one may call this function directly"""
     nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
     for fw in nt_list:
         fw << trg

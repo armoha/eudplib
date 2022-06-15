@@ -29,7 +29,7 @@ from eudplib.trigger.tpatcher import NegateCondition
 
 
 def EUDOr(cond1, *conds):
-    """ cond1 || cond2 || ... || condn
+    """cond1 || cond2 || ... || condn
 
     .. warning:: Short circuiting is not supported
 
@@ -49,7 +49,7 @@ def EUDOr(cond1, *conds):
 
 
 def EUDAnd(cond1, *conds):
-    """ cond1 && cond2 && ... && condn
+    """cond1 && cond2 && ... && condn
 
     .. note::
         This function computes AND value of various conditions.
@@ -74,7 +74,7 @@ def EUDAnd(cond1, *conds):
 
 
 def EUDNot(cond):
-    """ !cond
+    """!cond
 
     :param conds: Condition to negate
     """
@@ -84,7 +84,8 @@ def EUDNot(cond):
         v = c.EUDVariable()
         v << 0
         c.RawTrigger(
-            conditions=cond.Exactly(0), actions=v.SetNumber(1),
+            conditions=cond.Exactly(0),
+            actions=v.SetNumber(1),
         )
         return v
 

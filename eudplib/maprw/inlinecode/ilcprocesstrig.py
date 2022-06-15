@@ -43,7 +43,7 @@ _cutoffRate = [1 + (i - 2) / 3 for i in range(9)]
 
 
 def PRT_SetInliningRate(rate):
-    """ Set how much triggers will be inlined into STR section. """
+    """Set how much triggers will be inlined into STR section."""
     global _inliningRate
     _inliningRate = rate
 
@@ -56,7 +56,7 @@ def PreprocessInlineCode(chkt):
 
 
 def PreprocessTrigSection(trigSection):
-    """ Fetch inline codes & compiles them """
+    """Fetch inline codes & compiles them"""
     ComputeBaseInlineCodeGlobals()
     if _inliningRate == 1:
         return ConsecutiveInlineTrigSection(trigSection)
@@ -149,7 +149,7 @@ def ConsecutiveInlineTrigSection(trigSection):
 
 
 def GetInlineCodeList():
-    """ Get list of compiled inline_eudplib code """
+    """Get list of compiled inline_eudplib code"""
     return _inlineCodes
 
 
@@ -170,7 +170,7 @@ def GetInlineCodePlayerList(bTrigger):
 
 
 def DispatchInlineCode(inlineCodes, trigger_bytes):
-    """ Check if trigger segment has special data. """
+    """Check if trigger segment has special data."""
     magicCode = ut.b2i4(trigger_bytes, 20)
     if magicCode != 0x10978D4A:
         return None
@@ -188,7 +188,7 @@ def DispatchInlineCode(inlineCodes, trigger_bytes):
 
 
 def InlinifyNormalTrigger(inlineCodes, trigger_bytes):
-    """ Inlinify normal binary triggers """
+    """Inlinify normal binary triggers"""
     playerCode = 0
     for i in range(27):
         if trigger_bytes[320 + 2048 + 4 + i]:
@@ -199,7 +199,7 @@ def InlinifyNormalTrigger(inlineCodes, trigger_bytes):
 
 
 def CreateInlineCodeDispatcher(inlineCodes, func, playerCode):
-    """ Create link from TRIG list to STR trigger. """
+    """Create link from TRIG list to STR trigger."""
     funcID = len(inlineCodes) + 1024
     inlineCodes.append((funcID, func))
 

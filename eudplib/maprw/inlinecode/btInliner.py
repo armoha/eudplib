@@ -76,7 +76,7 @@ def NoWaitAndPreserved(bTrigger):
 
 
 def InlineCodifyBinaryTrigger(bTrigger):
-    """ Inline codify raw(binary) trigger data.
+    """Inline codify raw(binary) trigger data.
 
     For minimal protection, eudplib make some of the trig-triggers to
     eudplib trigger. This function makes eudplib trigger out of raw
@@ -176,7 +176,7 @@ def TryToShareTrigger(bTrigger):
 
 
 def InlineCodifyMultipleBinaryTriggers(bTriggers):
-    """ Inline codify raw(binary) trigger data.
+    """Inline codify raw(binary) trigger data.
 
     For minimal protection, eudplib make some of the trig-triggers to
     eudplib trigger. This function makes eudplib trigger out of raw

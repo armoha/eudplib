@@ -114,8 +114,8 @@ def f_gettextptr():
     ret << 0
     for i in range(3, -1, -1):
         c.RawTrigger(
-            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2 ** i),
-            actions=ret.AddNumber(2 ** i),
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
+            actions=ret.AddNumber(2**i),
         )
     return ret
 
@@ -126,8 +126,8 @@ def f_getnextchatdst():
     ret << ut.EPD(0x640B60)
     for i in range(3, -1, -1):
         c.RawTrigger(
-            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2 ** i),
-            actions=ret.AddNumber(ceil((2 ** i) * 54.5)),
+            conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
+            actions=ret.AddNumber(ceil((2**i) * 54.5)),
         )
     return ret
 
@@ -228,7 +228,7 @@ def f_cpstr_addptr(number):
 
     for i in range(31, -1, -1):
         c.RawTrigger(
-            conditions=number.AtLeastX(1, 2 ** i),
+            conditions=number.AtLeastX(1, 2**i),
             actions=[
                 digit[i // 4].AddNumber(2 ** (i % 4)),
                 c.SetDeaths(c.CurrentPlayer, c.Add, f(i), 0),

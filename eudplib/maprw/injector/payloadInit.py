@@ -79,8 +79,8 @@ def InitializePayload(chkt, payload, mrgndata=None):
     # read pts[player].lasttrigger
     for e in ut.RandList(range(2, 32)):
         Trigger(
-            conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2 ** e),
-            actions=tt.SetDeaths(11, tt.Add, 2 ** e, 0),
+            conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2**e),
+            actions=tt.SetDeaths(11, tt.Add, 2**e, 0),
         )
 
     # apply to curpl
@@ -92,7 +92,7 @@ def InitializePayload(chkt, payload, mrgndata=None):
     )
     for e in ut.RandList(range(2, 32)):
         Trigger(
-            conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2 ** e),
+            conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2**e),
             actions=[
                 # tt.SetDeaths(11, tt.Subtract, 2 ** e, 0),
                 # used for nextptr recovery in stage 3

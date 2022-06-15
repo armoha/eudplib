@@ -221,7 +221,9 @@ class MPQ:
         fileh = c_void_p()
         ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2b(fname), 0, byref(fileh))
         if not ret:
-            ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2utf8(fname), 0, byref(fileh))
+            ret = self.libstorm.SFileOpenFileEx(
+                self.mpqh, u2utf8(fname), 0, byref(fileh)
+            )
             if not ret:
                 return None
 

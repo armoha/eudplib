@@ -53,7 +53,10 @@ def _DispatchInlineCode(nextptr, trigepd, prop):
     v = random.randint(234, 65535)
     c.VProc(
         trigepd,
-        [trigepd.AddNumber(-prop + 2 - 12 * v), trigepd.SetDest(ut.EPD(0x6509B0)),],
+        [
+            trigepd.AddNumber(-prop + 2 - 12 * v),
+            trigepd.SetDest(ut.EPD(0x6509B0)),
+        ],
     )
 
     for funcID, func in GetInlineCodeList():
@@ -142,7 +145,11 @@ def _FlipProp(trigepd):
         u = random.randint(234, 65535)
         prop = (8 + 320 + 2048) // 4 - 12 * u
         c.VProc(
-            trigepd, [trigepd.AddNumber(prop - 1), trigepd.SetDest(ut.EPD(0x6509B0)),],
+            trigepd,
+            [
+                trigepd.AddNumber(prop - 1),
+                trigepd.SetDest(ut.EPD(0x6509B0)),
+            ],
         )
 
         c.RawTrigger(actions=c.SetDeathsX(c.CurrentPlayer, c.Add, 8, u, 8))
