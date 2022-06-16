@@ -112,7 +112,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
     # Initializer
 
     def copy(self):
-        """ Create struct clone """
+        """Create struct clone"""
         basetype = type(self)
         inst = basetype()
         self.copyto(inst)
@@ -122,7 +122,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
         self.fill(values, assert_expected_values_len=len(self._fielddict))
 
     def copyto(self, inst):
-        """ Copy struct to other instance """
+        """Copy struct to other instance"""
         basetype = type(self)
         fields = basetype._fields_
         for i, nametype in enumerate(fields):

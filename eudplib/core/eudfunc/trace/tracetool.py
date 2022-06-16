@@ -95,8 +95,8 @@ def GetTraceStackDepth():
     v << 0
     for i in range(31, -1, -1):
         RawTrigger(
-            conditions=MemoryX(recordTraceAct + 16, AtLeast, 1, 2 ** i),
-            actions=v.AddNumber(2 ** i),
+            conditions=MemoryX(recordTraceAct + 16, AtLeast, 1, 2**i),
+            actions=v.AddNumber(2**i),
         )
     SeqCompute([(v, Subtract, traceToolDataEPD + 4)])
     return v

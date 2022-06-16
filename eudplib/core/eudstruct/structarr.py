@@ -66,14 +66,14 @@ class _EUDStruct_Metaclass(type):
                 self.dontFlatten = True
 
             def copy(self):
-                """ Create a shallow copy """
+                """Create a shallow copy"""
                 arraytype = type(self)
                 inst = arraytype()
                 self.copyTo(inst)
                 return inst
 
             def copyTo(self, inst):
-                """ Copy struct to other instance """
+                """Copy struct to other instance"""
                 for i in range(times):
                     inst[i] = self[i]
 

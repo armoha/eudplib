@@ -85,13 +85,13 @@ def AllocTrigTriggerLink():
 
 
 def GetFirstTrigTrigger(player):
-    """ Get dlist start of trig-trigger for player """
+    """Get dlist start of trig-trigger for player"""
     AllocTrigTriggerLink()
     return orig_tstart[player]
 
 
 def GetLastTrigTrigger(player):
-    """ Get dlist end of trig-trigger for player"""
+    """Get dlist end of trig-trigger for player"""
     AllocTrigTriggerLink()
     return orig_tend[player]
 

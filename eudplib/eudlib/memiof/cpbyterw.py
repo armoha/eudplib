@@ -72,8 +72,8 @@ class CPByteWriter:
         for k in ut.RandList(range(8, 32)):
             i, j = divmod(k, 8)
             c.RawTrigger(
-                conditions=self._b[i].AtLeastX(1, 2 ** j),
-                actions=c.SetDeaths(c.CurrentPlayer, c.Add, 2 ** k, 0),
+                conditions=self._b[i].AtLeastX(1, 2**j),
+                actions=c.SetDeaths(c.CurrentPlayer, c.Add, 2**k, 0),
             )
         cs.DoActions(
             c.AddCurrentPlayer(1),

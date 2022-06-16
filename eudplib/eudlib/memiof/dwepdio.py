@@ -47,9 +47,9 @@ def f_dwepdread_epd(targetplayer):
     cs.DoActions(ut.RandList(acts))
 
     for i in ut.RandList(range(32)):
-        acts = [ptr.AddNumber(2 ** i), epd.AddNumber(2 ** (i - 2)) if i >= 2 else []]
+        acts = [ptr.AddNumber(2**i), epd.AddNumber(2 ** (i - 2)) if i >= 2 else []]
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i),
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
             actions=ut.RandList(acts),
         )
 
@@ -71,8 +71,8 @@ def f_dwread_epd(targetplayer):
     cs.DoActions(ut.RandList(acts))
     for i in ut.RandList(range(32)):
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2 ** i),
-            actions=ptr.AddNumber(2 ** i),
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
+            actions=ptr.AddNumber(2**i),
         )
 
     f_setcurpl2cpcache()
@@ -102,15 +102,15 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
 
             # Fill flags
             for i in range(31, -1, -1):
-                bitandflags = [flag & (2 ** i) for flag in flags]
+                bitandflags = [flag & (2**i) for flag in flags]
                 if sum(bitandflags) == 0:
                     continue
                 c.RawTrigger(
-                    conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** i)],
+                    conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i)],
                     actions=[
-                        flagv.AddNumber(2 ** i)
+                        flagv.AddNumber(2**i)
                         for j, flagv in enumerate(flagsv)
-                        if flags[j] & (2 ** i)
+                        if flags[j] & (2**i)
                     ],
                 )
 
@@ -165,10 +165,10 @@ def f_dwbreak(number):
         wordexp = i % 16
 
         c.RawTrigger(
-            conditions=number.AtLeastX(1, 2 ** i),
+            conditions=number.AtLeastX(1, 2**i),
             actions=[
-                byte[byteidx].AddNumber(2 ** byteexp),
-                word[wordidx].AddNumber(2 ** wordexp) if wordidx == 1 else [],
+                byte[byteidx].AddNumber(2**byteexp),
+                word[wordidx].AddNumber(2**wordexp) if wordidx == 1 else [],
             ],
         )
 

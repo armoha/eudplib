@@ -40,21 +40,21 @@ from ..eudstruct import EUDStruct, EUDVArray
 
 
 def getArgStorage(argn, _argstorage_dict={}):
-    """ Get common arguments storage for argn """
+    """Get common arguments storage for argn"""
     if argn not in _argstorage_dict:
         _argstorage_dict[argn] = [EUDVariable() for _ in range(argn)]
     return _argstorage_dict[argn]
 
 
 def getRetStorage(retn, _retstorage_dict={}):
-    """ Get common returns storage for retn """
+    """Get common returns storage for retn"""
     if retn not in _retstorage_dict:
         _retstorage_dict[retn] = [EUDVariable() for _ in range(retn)]
     return _retstorage_dict[retn]
 
 
 def fillArguments(f):
-    """ Copy values from common argument storage to f._args """
+    """Copy values from common argument storage to f._args"""
     if f._argn:
         argStorage = getArgStorage(f._argn)
         for farg, arg in zip(f._fargs, argStorage):
@@ -62,7 +62,7 @@ def fillArguments(f):
 
 
 def fillReturns(f):
-    """ Copy values from f_rets to common returns storage """
+    """Copy values from f_rets to common returns storage"""
     if f._retn:
         retStorage = getRetStorage(f._retn)
         for fret, ret in zip(f._frets, retStorage):
@@ -70,7 +70,7 @@ def fillReturns(f):
 
 
 def callFuncBody(fstart, fend):
-    """ Call function's body triggers """
+    """Call function's body triggers"""
     fcallend = ac.Forward()
 
     rt.RawTrigger(nextptr=fstart, actions=[rt.SetNextPtr(fend, fcallend)])
@@ -79,7 +79,7 @@ def callFuncBody(fstart, fend):
 
 
 def createIndirectCaller(f, _caller_dict={}):
-    """ Create function caller using common argument/return storage """
+    """Create function caller using common argument/return storage"""
 
     # Cache function in _caller_dict. If uncached,
     if f not in _caller_dict:
@@ -137,7 +137,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):
             )
 
         def setFunc(self, f):
-            """ Set function pointer's target to function
+            """Set function pointer's target to function
 
             :param f: Target function
             """
@@ -156,7 +156,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):
             self.setFunc(rhs)
 
         def __call__(self, *args):
-            """ Call target function with given arguments """
+            """Call target function with given arguments"""
 
             args = applyTypes(argtypes, args)
 

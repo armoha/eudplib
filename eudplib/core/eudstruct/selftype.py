@@ -27,7 +27,7 @@ _selftype = None
 
 
 class selftype:
-    """ When used in EUDFuncMethod's type declaration, This is interpreted
+    """When used in EUDFuncMethod's type declaration, This is interpreted
     as the owning class itself
     """
 

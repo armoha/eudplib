@@ -68,7 +68,7 @@ def f_dwpatch_epd(dstepd, value):
 
 @c.EUDFunc
 def f_blockpatch_epd(dstepd, srcepd, dwn):
-    """ Patch 4*dwn bytes of memory at dstepd with memory of srcepd.
+    """Patch 4*dwn bytes of memory at dstepd with memory of srcepd.
 
     .. note::
         After calling this function, contents at srcepd memory may change.

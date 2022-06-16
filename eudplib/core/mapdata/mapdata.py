@@ -65,7 +65,7 @@ def GetChkTokenized():
 
 
 def GetOriginalChkTokenized():
-    """ NEVER MODIFY ANYTHING WITHIN THIS CHKTOK """
+    """NEVER MODIFY ANYTHING WITHIN THIS CHKTOK"""
     return _origchkt
 
 

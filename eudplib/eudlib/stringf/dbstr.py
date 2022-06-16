@@ -77,8 +77,7 @@ class DBString(ut.ExprProxy):
 
 
 class DBStringData(c.EUDObject):
-    """Object containing DBString data
-    """
+    """Object containing DBString data"""
 
     def __init__(self, content):
         """Constructor for DBString

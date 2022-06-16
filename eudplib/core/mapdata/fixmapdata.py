@@ -46,8 +46,8 @@ def FixUnitMap(chkt):
         if unit[i + 24 : i + 26] == b"\0\0":
             unit[i + 14] &= ~32
         for k in range(5):
-            if unit[i + 26] & (2 ** k) == 0:
-                unit[i + 12] &= ~(2 ** k)
+            if unit[i + 26] & (2**k) == 0:
+                unit[i + 12] &= ~(2**k)
 
         # Remove disabled values
         # if unit[i + 14] & 1 == 0:
@@ -63,8 +63,8 @@ def FixUnitMap(chkt):
         if unit[i + 14] & 32 == 0:
             unit[i + 24 : i + 26] = b"\0\0"
         for k in range(5):
-            if unit[i + 12] & (2 ** k) == 0:
-                unit[i + 26] &= ~(2 ** k)
+            if unit[i + 12] & (2**k) == 0:
+                unit[i + 26] &= ~(2**k)
 
     chkt.setsection("UNIT", unit)
 

@@ -59,7 +59,7 @@ class EUDArrayData(c.EUDObject):
     # --------
 
     def GetArraySize(self):
-        """ Get size of array """
+        """Get size of array"""
         return self._arrlen
 
     @c.EUDMethod
