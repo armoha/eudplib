@@ -35,29 +35,45 @@ class _EUDVariableFrom(c.EUDVariable):
 
 
 class PVariable(c.EUDVArray(8)):
-    def _eudset(self, i, value):
+    def _casteudset(self, i, value):
+        nptr = c.Forward()
+        c.VProc(
+            self._epd,
+            [
+                value.SetDest(348 // 4),
+                self._epd.QueueAddTo(ut.EPD(value.getDestAddr())),
+                c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
+                c.SetNextPtr(value.GetVTable(), nptr),
+            ],
+        )
+        for k in range(3):
+            c.RawTrigger(
+                conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
+            )
+        c.SetNextTrigger(value.GetVTable())
+        nptr << c.NextTrigger()
+
+    def _pveudset(self, i, value):
         nptr = c.Forward()
         cs.DoActions(
             value.SetDest(self._epd + 348 // 4),
             c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
             c.SetNextPtr(value.GetVTable(), nptr),
         )
-        for k in range(2, 0, -1):
+        for k in range(3):
             c.RawTrigger(
                 conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
             )
-        c.RawTrigger(
-            nextptr=value.GetVTable(),
-            conditions=i.AtLeastX(1, 1),
-            actions=value.AddDest(18),
-        )
+        c.SetNextTrigger(value.GetVTable())
         nptr << c.NextTrigger()
 
     def __setitem__(self, i, value):
         i = c.EncodePlayer(i)
-        if c.IsConstExpr(self) and c.IsEUDVariable(i):
+        if not c.IsEUDVariable(i):
+            return self.set(i, value)
+        if c.IsConstExpr(self):
             if c.IsEUDVariable(value):
-                self._eudset(i, value)
+                self._pveudset(i, value)
             else:
                 a0 = c.Forward()
                 cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
@@ -67,8 +83,23 @@ class PVariable(c.EUDVArray(8)):
                         actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
                     )
                 c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
+        elif c.IsEUDVariable(value):
+            self._casteudset(i, value)
         else:
-            self.set(i, value)
+            a0 = c.Forward()
+            c.VProc(
+                self._epd,
+                [
+                    c.SetMemory(a0 + 16, c.SetTo, 348 // 4),
+                    self._epd.QueueAddTo(ut.EPD(a0 + 16)),
+                ],
+            )
+            for k in range(3):
+                c.RawTrigger(
+                    conditions=i.AtLeastX(1, 2**k),
+                    actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
+                )
+            c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
 
     def __getitem__(self, i):
         i = c.EncodePlayer(i)
