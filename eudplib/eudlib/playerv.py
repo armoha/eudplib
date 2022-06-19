@@ -55,19 +55,18 @@ class PVariable(c.EUDVArray(8)):
 
     def __setitem__(self, i, value):
         i = c.EncodePlayer(i)
-        if c.IsEUDVariable(i) and c.IsEUDVariable(value):
-            self._eudset(i, value)
-
-        elif c.IsEUDVariable(i):
-            a0 = c.Forward()
-            cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
-            for k in range(2, -1, -1):
-                c.RawTrigger(
-                    conditions=i.AtLeastX(1, 2**k),
-                    actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
-                )
-            c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
-
+        if c.IsConstExpr(self) and c.IsEUDVariable(i):
+            if c.IsEUDVariable(value):
+                self._eudset(i, value)
+            else:
+                a0 = c.Forward()
+                cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
+                for k in range(2, -1, -1):
+                    c.RawTrigger(
+                        conditions=i.AtLeastX(1, 2**k),
+                        actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
+                    )
+                c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
         else:
             self.set(i, value)
 
