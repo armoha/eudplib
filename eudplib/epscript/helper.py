@@ -5,6 +5,7 @@ from ..core import (
     EUDVArray,
     IsEUDVariable,
     f_bitlshift,
+    SetTo,
 )
 from ..maprw import EUDOnStart
 from ..utils import ExprProxy, FlattenList, List2Assignable
