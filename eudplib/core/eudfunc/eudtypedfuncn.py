@@ -45,11 +45,14 @@ def applyTypes(typesdecl, varlist):
     if typesdecl is None:
         return varlist
 
+    if len(varlist) == len(typesdecl) + 1:
+        varlist = varlist[1:]
     ut.ep_assert(
         len(varlist) == len(typesdecl),
         _("Different number of variables({}) from type declarations({})").format(
             len(varlist), len(typesdecl)
-        ),
+        )
+        + f"argtypes: {typesdecl}, args: {varlist}",
     )
 
     rets = []
