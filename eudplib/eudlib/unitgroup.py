@@ -205,8 +205,18 @@ class UnitGroup:
                         )
                         SetNextTrigger(block["contpoint"])
 
+                    def get_epd():
+                        ret = EUDVariable()
+                        VProc(loopvar, loopvar.SetDest(ret))
+                        DoActions(
+                            SetNextPtr(loopvar.GetVTable(), check_death),
+                            loopvar.SetDest(EPD(0x6509B0)),
+                            ret.SubtractNumber(19),
+                        )
+                        return ret
+
                     # EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
-                    yield _CpHelper(0x4C // 4, reset_cp, remove)
+                    yield _CpHelper(0x4C // 4, reset_cp, remove, get_epd)
                     EUDSetContinuePoint()
                     DoActions(SetMemory(loopstart, Add, 72), SetMemory(pos, Add, 18))
                 EUDEndWhile()
@@ -244,10 +254,11 @@ class UnitGroup:
 
 # TODO: Add EPDCUnitMap-like convenient methods
 class _CpHelper:
-    def __init__(self, offset, resetf, removef):
+    def __init__(self, offset, resetf, removef, epdf):
         self.offset = offset
         self._reset = resetf
         self.remove = removef
+        self.get_epd = epdf
 
         class Dying:
             def __iter__(nonself):
@@ -259,6 +270,10 @@ class _CpHelper:
                 self.offset = 19
 
         self.dying = Dying()
+
+    @property  # read-only
+    def epd(self):
+        return self.get_epd()
 
     def set_cp(self, offset, *, action=False):
         self._reset()
