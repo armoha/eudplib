@@ -63,7 +63,7 @@ def EncodeAIScript(ais, issueError=False):
         elif len(ais) == 4:
             return ut.b2i4(ais)
 
-    elif isinstance(s, _Unique):
+    elif isinstance(ais, _Unique):
         raise ut.EPError(_('[Warning] "{}" is not a {}').format(ais, "AIScript"))
 
     return ais
