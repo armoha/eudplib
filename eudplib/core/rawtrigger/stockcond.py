@@ -71,6 +71,10 @@ def Command(Player, Comparison, Number, Unit):
 
 
 def Bring(Player, Comparison, Number, Unit, Location):
+    """Player brings quantity units to location.
+
+    This states that a player is required to bring ‘X’ number of units to a specific location. The units can be any player-controlled unit available in the game.
+    """
     Player = EncodePlayer(Player, issueError=True)
     Comparison = EncodeComparison(Comparison, issueError=True)
     Unit = EncodeUnit(Unit, issueError=True)
@@ -79,6 +83,10 @@ def Bring(Player, Comparison, Number, Unit, Location):
 
 
 def Accumulate(Player, Comparison, Number, ResourceType):
+    """Player accumulates quantity resources.
+
+    Accumulate requires that the player gather enough of a specific resource.
+    """
     Player = EncodePlayer(Player, issueError=True)
     Comparison = EncodeComparison(Comparison, issueError=True)
     ResourceType = EncodeResource(ResourceType, issueError=True)
@@ -98,49 +106,91 @@ Kills._internalf = __Kills__internal
 
 
 def CommandMost(Unit):
+    """Current player commands the most units.
+
+    Command the Most requires that you command the most of the defined units. These units can be any player-controlled unit available in the game. This condition compares all players in the game, including neutral and rescuable units.
+    """
     Unit = EncodeUnit(Unit, issueError=True)
     return Condition(0, 0, 0, Unit, 0, 6, 0, 0)
 
 
 def CommandMostAt(Unit, Location):
+    """Current player commands the most units at location.
+
+    Similar to the Command the Most, this condition compares the number of units at a specific location. The location can be restricted to certain elevations.
+    """
     Unit = EncodeUnit(Unit, issueError=True)
     Location = EncodeLocation(Location, issueError=True)
     return Condition(Location, 0, 0, Unit, 0, 7, 0, 0)
 
 
 def MostKills(Unit):
+    """Current player has most kills of unit.
+
+    This condition is considered true if the trigger’s owner has the most kills of the specified Unit.
+    """
     Unit = EncodeUnit(Unit, issueError=True)
     return Condition(0, 0, 0, Unit, 0, 8, 0, 0)
 
 
 def HighestScore(ScoreType):
+    """Current player has highest score points.
+
+    This condition is considered true if the trigger’s owner has the highest Score. Note that if this is used as the only condition in a trigger, it will activate immediately at the start of the scenario, since all players will be tied for the highest score.
+    """
     ScoreType = EncodeScore(ScoreType, issueError=True)
     return Condition(0, 0, 0, 0, 0, 9, ScoreType, 0)
 
 
 def MostResources(ResourceType):
+    """Current player has most resources.
+
+    Similar to Most Kills, this condition is considered true if the trigger’s owner has the most of the specified resource.
+    """
     ResourceType = EncodeResource(ResourceType, issueError=True)
     return Condition(0, 0, 0, 0, 0, 10, ResourceType, 0)
 
 
 def Switch(Switch, State):
+    """Switch is set.
+
+    This allows you to test against a switch value. Switches are on/off values that can be set with an action. Switches can be used to keep track of which triggers have been activated, to disable or enable certain triggers or to link multiple triggers together. You may also rename switches from this dialog box.
+    """
     Switch = EncodeSwitch(Switch, issueError=True)
     State = EncodeSwitchState(State, issueError=True)
     return Condition(0, 0, 0, 0, State, 11, Switch, 0)
 
 
 def ElapsedTime(Comparison, Time):
+    """Elapsed scenario time is duration game seconds.
+
+    This condition allows you to create triggers that occur after a specified number of game seconds have passed since the start of the scenario.
+    """
     Comparison = EncodeComparison(Comparison, issueError=True)
     return Condition(0, 0, Time, 0, Comparison, 12, 0, 0)
 
 
 def Opponents(Player, Comparison, Number):
+    """Player has quantity opponents remaining in the game.
+
+    -   This condition evaluates how many of the players are opponents of the trigger owner. By default, all of the other players are considered opponents. A player does not count as an opponent if either of the following conditions are met:
+
+    -   The player has been defeated. This condition only counts players that are still in the game.
+
+    -   The player is set for allied victory with the trigger owner, AND the player is set for allied victory with all other players set for allied victory with the trigger owner. (The enemy of an ally is still an enemy.)
+
+    As a result, if opponents equals zero, all of remaining players are set for allied victory with each other. Use this condition with the Victory action to create a scenario that allows for allied victory.
+    """
     Player = EncodePlayer(Player, issueError=True)
     Comparison = EncodeComparison(Comparison, issueError=True)
     return Condition(0, Player, Number, 0, Comparison, 14, 0, 0)
 
 
 def Deaths(Player, Comparison, Number, Unit):
+    """Player has suffered quantity deaths of unit.
+
+    Gives you the ability to create actions that are launched when a player has suffered a specific number of deaths of any of the units in the game.
+    """
     Player = EncodePlayer(Player, issueError=True)
     Comparison = EncodeComparison(Comparison, issueError=True)
     Unit = EncodeUnit(Unit, issueError=True)
@@ -148,32 +198,56 @@ def Deaths(Player, Comparison, Number, Unit):
 
 
 def CommandLeast(Unit):
+    """Current player commands the least units.
+
+    Command the Least allows you to define an action based on the player that commands the least units. You might use this to give advantages to slower players or to single out weakened players. Note that this condition checks all players, including neutral, computer controlled, and rescuable players.
+    """
     Unit = EncodeUnit(Unit, issueError=True)
     return Condition(0, 0, 0, Unit, 0, 16, 0, 0)
 
 
 def CommandLeastAt(Unit, Location):
+    """Current player commands the least units at location.
+
+    Command the Least At is similar to ‘Command the Least’, however, but only compares units at a particular location. The location can be restricted to certain elevations.
+    """
     Unit = EncodeUnit(Unit, issueError=True)
     Location = EncodeLocation(Location, issueError=True)
     return Condition(Location, 0, 0, Unit, 0, 17, 0, 0)
 
 
 def LeastKills(Unit):
+    """Current player has least kills of unit.
+
+    This condition is considered true if the trigger’s owner has the least kills of the specified Unit.
+    """
     Unit = EncodeUnit(Unit, issueError=True)
     return Condition(0, 0, 0, Unit, 0, 18, 0, 0)
 
 
 def LowestScore(ScoreType):
+    """Current player has lowest score points.
+
+    This condition evaluates the current Score and is considered true if the current player has the lowest or is tied for the lowest score. Lowest Score checks all players, including neutral and rescuable players.
+    """
     ScoreType = EncodeScore(ScoreType, issueError=True)
     return Condition(0, 0, 0, 0, 0, 19, ScoreType, 0)
 
 
 def LeastResources(ResourceType):
+    """Current player has least resources.
+
+    Similar to Least Kills, this condition is considered true if the trigger’s owner has the least of the specified resource. Note that Least Resources checks all players, including neutral, computer controlled and rescuable players.
+    """
     ResourceType = EncodeResource(ResourceType, issueError=True)
     return Condition(0, 0, 0, 0, 0, 20, ResourceType, 0)
 
 
 def Score(Player, ScoreType, Comparison, Number):
+    """Player score type score is quantity.
+
+    This condition allows you to analyze a player’s current Score and perform actions based on the value. You can reference any of the individual scoring types from score.
+    """
     Player = EncodePlayer(Player, issueError=True)
     ScoreType = EncodeScore(ScoreType, issueError=True)
     Comparison = EncodeComparison(Comparison, issueError=True)
@@ -181,10 +255,18 @@ def Score(Player, ScoreType, Comparison, Number):
 
 
 def Always():
+    """Always.
+
+    Accumulate requires that the player gather enough of a specific resource.z
+    """
     return Condition(0, 0, 0, 0, 0, 22, 0, 0)
 
 
 def Never():
+    """Never.
+
+    The Never condition can be used to temporarily disable actions for testing. A trigger with the Never condition will not activate at any point.
+    """
     return Condition(0, 0, 0, 0, 0, 23, 0, 0)
 
 
