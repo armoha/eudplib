@@ -139,6 +139,8 @@ def f_bread_cp(cpo, subp, **kwargs):
 
 
 def f_dwwrite_cp(cpo, value):
+    if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
+        return c.VProc(value, value.QueueAssignTo(c.CurrentPlayer))
     cs.DoActions(
         [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0),
@@ -147,6 +149,8 @@ def f_dwwrite_cp(cpo, value):
 
 
 def f_dwadd_cp(cpo, value):
+    if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
+        return c.VProc(value, value.QueueAddTo(c.CurrentPlayer))
     cs.DoActions(
         [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.Add, value, 0),
@@ -155,6 +159,8 @@ def f_dwadd_cp(cpo, value):
 
 
 def f_dwsubtract_cp(cpo, value):
+    if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
+        return c.VProc(value, value.QueueSubtractTo(c.CurrentPlayer))
     cs.DoActions(
         [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0),

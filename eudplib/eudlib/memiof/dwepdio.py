@@ -127,15 +127,48 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
 
 
 def f_dwwrite_epd(targetplayer, value):
-    cs.DoActions(c.SetDeaths(targetplayer, c.SetTo, value, 0))
+    if not c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
+        c.VProc(value, value.QueueAssignTo(targetplayer))
+    elif c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
+        c.VProc(
+            [targetplayer, value],
+            [
+                targetplayer.QueueAssignTo(ut.EPD(value.getDestAddr())),
+                value.SetModifier(c.SetTo),
+            ],
+        )
+    else:
+        cs.DoActions(c.SetDeaths(targetplayer, c.SetTo, value, 0))
 
 
 def f_dwadd_epd(targetplayer, value):
-    cs.DoActions(c.SetDeaths(targetplayer, c.Add, value, 0))
+    if not c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
+        c.VProc(value, value.QueueAddTo(targetplayer))
+    elif c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
+        c.VProc(
+            [targetplayer, value],
+            [
+                targetplayer.QueueAssignTo(ut.EPD(value.getDestAddr())),
+                value.SetModifier(c.Add),
+            ],
+        )
+    else:
+        cs.DoActions(c.SetDeaths(targetplayer, c.Add, value, 0))
 
 
 def f_dwsubtract_epd(targetplayer, value):
-    cs.DoActions(c.SetDeaths(targetplayer, c.Subtract, value, 0))
+    if not c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
+        c.VProc(value, value.QueueSubtractTo(targetplayer))
+    elif c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
+        c.VProc(
+            [targetplayer, value],
+            [
+                targetplayer.QueueAssignTo(ut.EPD(value.getDestAddr())),
+                value.SetModifier(c.Subtract),
+            ],
+        )
+    else:
+        cs.DoActions(c.SetDeaths(targetplayer, c.Subtract, value, 0))
 
 
 # Dword breaking functions
