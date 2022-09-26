@@ -91,49 +91,88 @@ class _ATTW:
             self.obj.iaddattr(self.attrName)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
-            setattr(self.obj, self.attrName, ov + v)
+            ov += v
+            setattr(self.obj, self.attrName, ov)
 
     def __isub__(self, v):
         try:
             self.obj.isubattr(self.attrName)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
-            setattr(self.obj, self.attrName, ov - v)
+            ov -= v
+            setattr(self.obj, self.attrName, ov)
 
     def __imul__(self, v):
         try:
             self.obj.imulattr(self.attrName)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
-            setattr(self.obj, self.attrName, ov * v)
+            ov *= v
+            setattr(self.obj, self.attrName, ov)
 
     def __ifloordiv__(self, v):
         try:
             self.obj.ifloordivattr(self.attrName)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
-            setattr(self.obj, self.attrName, ov // v)
+            ov //= v
+            setattr(self.obj, self.attrName, ov)
+
+    def __imod__(self, v):
+        try:
+            self.obj.imodattr(self.attrName, val)
+        except AttributeError:
+            ov = getattr(self.obj, self.attrName)
+            ov %= v
+            setattr(self.obj, self.attrName, ov)
+
+    def __ilshift__(self, v):
+        try:
+            self.obj.ilshiftattr(self.attrName, val)
+        except AttributeError:
+            ov = getattr(self.obj, self.attrName)
+            ov <<= v
+            setattr(self.obj, self.attrName, ov)
+
+    def __irshift__(self, v):
+        try:
+            self.obj.irshiftattr(self.attrName, val)
+        except AttributeError:
+            ov = getattr(self.obj, self.attrName)
+            ov >>= v
+            setattr(self.obj, self.attrName, ov)
+
+    def __ipow__(self, v):
+        try:
+            self.obj.ipowattr(self.attrName, val)
+        except AttributeError:
+            ov = getattr(self.obj, self.attrName)
+            ov **= v
+            setattr(self.obj, self.attrName, ov)
 
     def __iand__(self, v):
         try:
             self.obj.iandattr(self.attrName)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
-            setattr(self.obj, self.attrName, ov & v)
+            ov &= v
+            setattr(self.obj, self.attrName, ov)
 
     def __ior__(self, v):
         try:
             self.obj.iorattr(self.attrName)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
-            setattr(self.obj, self.attrName, ov | v)
+            ov |= v
+            setattr(self.obj, self.attrName, ov)
 
     def __ixor__(self, v):
         try:
             self.obj.ixorattr(self.attrName)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
-            setattr(self.obj, self.attrName, ov ^ v)
+            ov ^= v
+            setattr(self.obj, self.attrName, ov)
 
 
 class _ARRW:
@@ -174,6 +213,38 @@ class _ARRW:
         except AttributeError:
             ov = self.obj[self.index]
             ov //= v
+            self.obj[self.index] = ov
+
+    def __imod__(self, val):
+        try:
+            self.obj.imoditem(self.index, val)
+        except AttributeError:
+            ov = self.obj[self.index]
+            ov %= v
+            self.obj[self.index] = ov
+
+    def __ilshift__(self, val):
+        try:
+            self.obj.ilshiftitem(self.index, val)
+        except AttributeError:
+            ov = self.obj[self.index]
+            ov <<= v
+            self.obj[self.index] = ov
+
+    def __irshift__(self, val):
+        try:
+            self.obj.irshiftitem(self.index, val)
+        except AttributeError:
+            ov = self.obj[self.index]
+            ov >>= v
+            self.obj[self.index] = ov
+
+    def __ipow__(self, val):
+        try:
+            self.obj.ipowitem(self.index, val)
+        except AttributeError:
+            ov = self.obj[self.index]
+            ov **= v
             self.obj[self.index] = ov
 
     def __iand__(self, v):

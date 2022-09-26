@@ -192,58 +192,91 @@ class ItemProxy:
         return id(self)
 
     # in-place item operations
+    # FIXME: should we raise AttributeError for unsupported arguments?
     def __iadd__(self, val):
-        if hasattr(self._parent, "iadditem"):
+        try:
             self._parent.iadditem(self._key, val)
-        else:
+        except AttributeError:
             ov = self._parent[self._key]
             ov += v
             self._parent[self._key] = ov
 
     def __isub__(self, val):
-        if hasattr(self._parent, "isubitem"):
+        try:
             self._parent.isubitem(self._key, val)
-        else:
+        except AttributeError:
             ov = self._parent[self._key]
             ov -= v
             self._parent[self._key] = ov
 
     def __imul__(self, val):
-        if hasattr(self._parent, "imulitem"):
+        try:
             self._parent.imulitem(self._key, val)
-        else:
+        except AttributeError:
             ov = self._parent[self._key]
             ov *= v
             self._parent[self._key] = ov
 
     def __ifloordiv__(self, val):
-        if hasattr(self._parent, "ifloordivitem"):
+        try:
             self._parent.ifloordivitem(self._key, val)
-        else:
+        except AttributeError:
             ov = self._parent[self._key]
             ov //= v
             self._parent[self._key] = ov
 
+    def __imod__(self, val):
+        try:
+            self._parent.imoditem(self._key, val)
+        except AttributeError:
+            ov = self._parent[self._key]
+            ov %= v
+            self._parent[self._key] = ov
+
+    def __ilshift__(self, val):
+        try:
+            self._parent.ilshiftitem(self._key, val)
+        except AttributeError:
+            ov = self._parent[self._key]
+            ov <<= v
+            self._parent[self._key] = ov
+
+    def __irshift__(self, val):
+        try:
+            self._parent.irshiftitem(self._key, val)
+        except AttributeError:
+            ov = self._parent[self._key]
+            ov >>= v
+            self._parent[self._key] = ov
+
+    def __ipow__(self, val):
+        try:
+            self._parent.ipowitem(self._key, val)
+        except AttributeError:
+            ov = self._parent[self._key]
+            ov **= v
+            self._parent[self._key] = ov
+
     def __iand__(self, val):
-        if hasattr(self._parent, "ianditem"):
+        try:
             self._parent.ianditem(self._key, val)
-        else:
+        except AttributeError:
             ov = self._parent[self._key]
             ov &= v
             self._parent[self._key] = ov
 
     def __ior__(self, val):
-        if hasattr(self._parent, "ioritem"):
+        try:
             self._parent.ioritem(self._key, val)
-        else:
+        except AttributeError:
             ov = self._parent[self._key]
             ov |= v
             self._parent[self._key] = ov
 
     def __ixor__(self, val):
-        if hasattr(self._parent, "ixoritem"):
+        try:
             self._parent.ixoritem(self._key, val)
-        else:
+        except AttributeError:
             ov = self._parent[self._key]
             ov ^= v
             self._parent[self._key] = ov
