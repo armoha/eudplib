@@ -199,7 +199,6 @@ class ItemProxy:
             ov = self._parent[self._key]
             ov += v
             self._parent[self._key] = ov
-        return self
 
     def __isub__(self, val):
         if hasattr(self._parent, "isubitem"):
@@ -208,7 +207,6 @@ class ItemProxy:
             ov = self._parent[self._key]
             ov -= v
             self._parent[self._key] = ov
-        return self
 
     def __imul__(self, val):
         if hasattr(self._parent, "imulitem"):
@@ -217,7 +215,6 @@ class ItemProxy:
             ov = self._parent[self._key]
             ov *= v
             self._parent[self._key] = ov
-        return self
 
     def __ifloordiv__(self, val):
         if hasattr(self._parent, "ifloordivitem"):
@@ -226,7 +223,6 @@ class ItemProxy:
             ov = self._parent[self._key]
             ov //= v
             self._parent[self._key] = ov
-        return self
 
     def __iand__(self, val):
         if hasattr(self._parent, "ianditem"):
@@ -235,7 +231,6 @@ class ItemProxy:
             ov = self._parent[self._key]
             ov &= v
             self._parent[self._key] = ov
-        return self
 
     def __ior__(self, val):
         if hasattr(self._parent, "ioritem"):
@@ -244,7 +239,6 @@ class ItemProxy:
             ov = self._parent[self._key]
             ov |= v
             self._parent[self._key] = ov
-        return self
 
     def __ixor__(self, val):
         if hasattr(self._parent, "ixoritem"):
@@ -253,7 +247,6 @@ class ItemProxy:
             ov = self._parent[self._key]
             ov ^= v
             self._parent[self._key] = ov
-        return self
 
     # Proxy arithmetic operators
     def __lshift__(self, k):
