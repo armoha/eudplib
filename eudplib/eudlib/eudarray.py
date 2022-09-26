@@ -62,18 +62,24 @@ class EUDArrayData(c.EUDObject):
         """Get size of array"""
         return self._arrlen
 
+    # FIXME: are these methods really used?
+
     @c.EUDMethod
     def get(self, key):
+        assert False
         return f_dwread_epd(ut.EPD(self) + key)
 
     def __getitem__(self, key):
+        assert False
         return self.get(key)
 
     @c.EUDMethod
     def set(self, key, item):
+        assert False
         return f_dwwrite_epd(ut.EPD(self) + key, item)
 
     def __setitem__(self, key, item):
+        assert False
         return self.set(key, item)
 
     def __iter__(self):
