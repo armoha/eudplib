@@ -704,8 +704,8 @@ eudplib의 핵심 개념 중 하나가 변수와 함수의 개념입니다.
         자바랑 비슷하게 생각하시면 편할것같습니다.
 
 * unProxy(x)  ** 고급 **
-    x에 여러가지 타입을 적용할 수 있는데, unProxy는 x에서 이러한 타입을 모두 뗴는
-    연산이니다. 아래와 같이 두 변수를 비교할 때 씁니다. ::
+    x에 여러가지 타입을 적용할 수 있는데, unProxy는 x에서 이러한 타입을 모두 떼는
+    연산입니다. 아래와 같이 두 변수를 비교할 때 씁니다. ::
 
         a = EUDStack()
         b = EUDVariable(a)
@@ -752,24 +752,21 @@ eudplib의 핵심 개념 중 하나가 변수와 함수의 개념입니다.
 * f_dwepdread_epd(targetplayer)
 * f_dwread_epd(targetplayer)
 * f_epdread_epd(targetplayer)
-    EPD 플레이어에게서 dword/epd값을 읽는 함수입니다. 위 함수들은 언제나
-    dword랑 epd를 동시에 읽기 때문에 포인터를 읽을때는 dwepdread 함수를 활용해
-    dword랑 epd값을 동시에 읽는게 효율적입니다.
+    EPD 플레이어에게서 dword/epd값을 읽는 함수입니다.
+    포인터를 읽을때는 dwepdread 함수를 활용해 dword랑 epd값을 동시에 읽는게 효율적입니다.
 
 
 * f_dwepdread_epd_safe(targetplayer)
 * f_dwread_epd_safe(targetplayer)
-* f_epdread_epd_safe(targetplayer)
-    위 함수들의 safe 버젼입니다. safe 버젼은 targetplayer에 해당하는 메모리를
-    전혀 손대지 않고 값을 읽습니다. Write 권한이 없는 메모리를 읽을 때 유용하게
-    사용할 수 있습니다. _safe가 없는 버젼보다 2배정도 느립니다.
+* f_epdread_epd_safe(targetplayer)  **Deprecated**
+    위 함수들과 똑같으며 이름만 다릅니다.
 
 
 * f_dwepdread_cp(cpo)
 * f_dwread_cp(cpo)
 * f_epdread_cp(cpo)
-    Current Player를 기준으로 하는 함수입니다. _epd가 붙은 함수들보다 2배 빠릅니다.
-    cpo는 Current Player를 기준으로 읽을 메모리가 얼마나 떨어져있는지를 나타냅니다.
+    CurrentPlayer를 기준으로 하는 함수입니다. _epd가 붙은 함수들보다 2배 빠릅니다.
+    cpo는 CurrentPlayer를 기준으로 읽을 메모리가 얼마나 떨어져있는지를 나타냅니다.
 
 
 * f_getcurpl()
