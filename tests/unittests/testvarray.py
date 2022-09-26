@@ -5,19 +5,31 @@ from helper import *
 def test_varray():
     a = EUDVArray(10)([5, 5, 5, 5, 5, 5, 5, 5, 5, 5])
     for i in range(8):
-        a[i] = 2 ** i
+        a[i] = 2**i
 
-    test_equality("VArray test1", [a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]], [1, 2, 4, 8, 16, 32, 64, 128, 5, 5])
+    test_equality(
+        "VArray test1",
+        [a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]],
+        [1, 2, 4, 8, 16, 32, 64, 128, 5, 5],
+    )
 
     for i in EUDLoopRange(3, 6):
         a[i] = i * i * i
 
-    test_equality("VArray test2", [a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]], [1, 2, 4, 27, 64, 125, 64, 128, 5, 5])
+    test_equality(
+        "VArray test2",
+        [a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]],
+        [1, 2, 4, 27, 64, 125, 64, 128, 5, 5],
+    )
 
     b = EUDVariable(a)
     c = EUDVArray(8).cast(b)
 
-    test_equality("VArray test3", [c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]], [1, 2, 4, 27, 64, 125, 64, 128])
+    test_equality(
+        "VArray test3",
+        [c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]],
+        [1, 2, 4, 27, 64, 125, 64, 128],
+    )
 
     v_sum1 = EUDVariable()
     v_sum1 << 0

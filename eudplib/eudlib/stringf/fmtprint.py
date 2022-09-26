@@ -61,9 +61,9 @@ class _EUDFormatter(string.Formatter):
 
             # if there's a field, output it
             if field_name is not None:
-                # this is some markup, find the object and do
-                #  the formatting
+                # this is some markup, find the object and do the formatting
 
+                # fmt: off
                 # handle arg indexing when empty field_names are given.
                 if field_name == "":
                     if auto_arg_index is False:
@@ -77,6 +77,7 @@ class _EUDFormatter(string.Formatter):
                     # used later on, then an exception will be raised
                     auto_arg_index = False
 
+                # fmt: on
                 # given the field_name, find the object it references
                 #  and the argument it came from
                 obj, arg_used = self.get_field(field_name, args, kwargs)
@@ -151,6 +152,7 @@ def f_sprintf_cp(format_string, *args, EOS=True, encoding="UTF-8"):
 def f_eprintf(format_string, *args):
     fmtargs = _format_args(format_string, *args)
     f_eprintln(*fmtargs)
+
 
 def f_eprintAll(format_string, *args):
     fmtargs = _format_args(format_string, *args)

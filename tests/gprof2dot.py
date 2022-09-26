@@ -91,7 +91,7 @@ def fail(a, b):
     assert False
 
 
-tol = 2 ** -23
+tol = 2**-23
 
 
 def ratio(numerator, denominator):
@@ -212,7 +212,7 @@ class Object(object):
 
 class Call(Object):
     """A call between functions.
-    
+
     There should be at most one call object for every pair of functions.
     """
 
@@ -1611,7 +1611,7 @@ class AXEParser(Parser):
 
 class CallgrindParser(LineParser):
     """Parser for valgrind's callgrind tool.
-    
+
     See also:
     - http://valgrind.org/docs/manual/cl-format.html
     """
@@ -2051,7 +2051,7 @@ class PerfParser(LineParser):
 
 class OprofileParser(LineParser):
     """Parser for oprofile callgraph output.
-    
+
     See also:
     - http://oprofile.sourceforge.net/doc/opreport.html#opreport-callgraph
     """
@@ -2222,7 +2222,7 @@ class OprofileParser(LineParser):
 
 class HProfParser(LineParser):
     """Parser for java hprof output
-    
+
     See also:
     - http://java.sun.com/developer/technicalArticles/Programming/HPROF.html
     """
@@ -2319,9 +2319,14 @@ class HProfParser(LineParser):
         self.consume()
 
         while not self.lookahead().startswith("CPU"):
-            rank, percent_self, percent_accum, count, traceid, method = (
-                self.lookahead().split()
-            )
+            (
+                rank,
+                percent_self,
+                percent_accum,
+                count,
+                traceid,
+                method,
+            ) = self.lookahead().split()
             self.samples[int(traceid)] = (int(count), method)
             self.consume()
 
@@ -2443,8 +2448,7 @@ class SysprofParser(XmlParser):
 
 
 class XPerfParser(Parser):
-    """Parser for CSVs generted by XPerf, from Microsoft Windows Performance Tools.
-    """
+    """Parser for CSVs generted by XPerf, from Microsoft Windows Performance Tools."""
 
     def __init__(self, stream):
         Parser.__init__(self)
@@ -2826,7 +2830,7 @@ class Theme:
         return 0.5 * math.sqrt(self.edge_penwidth(weight))
 
     def fontsize(self, weight):
-        return max(weight ** 2 * self.maxfontsize, self.minfontsize)
+        return max(weight**2 * self.maxfontsize, self.minfontsize)
 
     def color(self, weight):
         weight = min(max(weight, 0.0), 1.0)
@@ -2842,9 +2846,9 @@ class Theme:
             l = lmin + weight * (lmax - lmin)
         else:
             base = self.skew
-            h = hmin + ((hmax - hmin) * (-1.0 + (base ** weight)) / (base - 1.0))
-            s = smin + ((smax - smin) * (-1.0 + (base ** weight)) / (base - 1.0))
-            l = lmin + ((lmax - lmin) * (-1.0 + (base ** weight)) / (base - 1.0))
+            h = hmin + ((hmax - hmin) * (-1.0 + (base**weight)) / (base - 1.0))
+            s = smin + ((smax - smin) * (-1.0 + (base**weight)) / (base - 1.0))
+            l = lmin + ((lmax - lmin) * (-1.0 + (base**weight)) / (base - 1.0))
 
         return self.hsl_to_rgb(h, s, l)
 

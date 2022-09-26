@@ -14,7 +14,10 @@ def test_locf():
     test_equality("f_getlocTL test", [L, T], [44, 70])
     test_equality(
         "Location functions test",
-        [f_dwread_epd(EPD(0x58DC68)), f_dwread_epd(EPD(0x58DC6C)),],
+        [
+            f_dwread_epd(EPD(0x58DC68)),
+            f_dwread_epd(EPD(0x58DC6C)),
+        ],
         [52, 74],
     )
 

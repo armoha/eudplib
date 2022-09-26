@@ -17,4 +17,4 @@ def test_atan2():
     )
 
 
-test_operator("Square root", f_sqrt, lambda x: int(x ** 0.5))
+test_operator("Square root", f_sqrt, lambda x: int(x**0.5))
