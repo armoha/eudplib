@@ -12,6 +12,7 @@ from ..utils import ExprProxy, FlattenList, List2Assignable
 from ..eudlib import EUDArray
 from ..ctrlstru import EUDIf, EUDElse, EUDEndIf
 from .epsimp import EPSLoader
+from ..core.variable.eudv import IsRValue
 
 
 def _RELIMP(path, mod_name):
@@ -206,7 +207,7 @@ def _L2V(l):
 def _LVAR(vs):
     ret, ops = [], []
     for v in FlattenList(vs):
-        if IsEUDVariable(v) and v.IsRValue():
+        if IsEUDVariable(v) and IsRValue(v):
             ret.append(v.makeL())
         else:
             nv = EUDVariable()

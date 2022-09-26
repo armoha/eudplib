@@ -64,6 +64,11 @@ def _ProcessDest(dest):
     return dest
 
 
+def IsRValue(obj):
+    # FIXME: Can we handle wrapped (ExprProxy) variables?
+    return getrefcount(unProxy(obj)) == 3
+
+
 # Unused variable don't need to be allocated.
 class VariableTriggerForward(ConstExpr):
     def __init__(self, initval):
@@ -127,9 +132,6 @@ class EUDVariable(VariableBase):
     def makeR(self):
         self._rvalue = True
         return self
-
-    def IsRValue(self):
-        return getrefcount(self) == 3
 
     def checkNonRValue(self):
         if isRValueStrict and self._rvalue:
@@ -265,23 +267,23 @@ class EUDVariable(VariableBase):
     # -------
 
     def __add__(self, other):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__iadd__(other)
-        if IsEUDVariable(other) and other.IsRValue():
+        if IsEUDVariable(other) and IsRValue(other):
             return other.__iadd__(self)
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
     def __radd__(self, other):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__iadd__(other)
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
     def __sub__(self, other):
-        if IsEUDVariable(other) and other.IsRValue():
+        if IsEUDVariable(other) and IsRValue(other):
             VProc(
                 self,  # -other += self
                 [
@@ -292,7 +294,7 @@ class EUDVariable(VariableBase):
                 ],
             )  # 1T 7A
             return other
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__isub__(other)
         t = EUDVariable()
         # FIXME: unsupported EUD error after EUDStruct.free() with IsConstExpr
@@ -315,7 +317,7 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rsub__(self, other):
-        if self.IsRValue() and IsConstExpr(other):
+        if IsRValue(self) and IsConstExpr(other):
             bt.RawTrigger(  # -self += other
                 actions=[
                     self.AddNumberX(0xFFFFFFFF, 0x55555555),
@@ -345,12 +347,12 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __neg__(self):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.ineg()
         return (0 - self).makeR()
 
     def __invert__(self):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.iinvert()
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, 0xFFFFFFFF), (t, bt.Subtract, self)])
@@ -379,9 +381,9 @@ class EUDVariable(VariableBase):
     # -------
 
     def __and__(self, other):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__iand__(other)
-        if IsEUDVariable(other) and other.IsRValue():
+        if IsEUDVariable(other) and IsRValue(other):
             return other.__iand__(self)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -400,7 +402,7 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rand__(self, other):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__iand__(other)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -419,9 +421,9 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __or__(self, other):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__ior__(other)
-        if IsEUDVariable(other) and other.IsRValue():
+        if IsEUDVariable(other) and IsRValue(other):
             return other.__ior__(self)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -434,7 +436,7 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __ror__(self, other):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__ior__(other)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -466,9 +468,9 @@ class EUDVariable(VariableBase):
         return self
 
     def __xor__(self, other):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__ixor__(other)
-        if IsEUDVariable(other) and other.IsRValue():
+        if IsEUDVariable(other) and IsRValue(other):
             return other.__ixor__(self)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -490,7 +492,7 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rxor__(self, other):
-        if self.IsRValue():
+        if IsRValue(self):
             return self.__ixor__(other)
         t = EUDVariable()
         if IsConstExpr(other):
