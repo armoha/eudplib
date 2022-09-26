@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from .. import core as c
 from .. import utils as ut
-from .memiof import f_dwread_epd, f_dwwrite_epd
+from .memiof import f_dwread_epd, f_dwwrite_epd, f_dwadd_epd
 from ..localize import _
 
 
@@ -113,3 +113,11 @@ class EUDArray(ut.ExprProxy):
 
     def __iter__(self):
         raise EPError(_("Can't iterate EUDArray"))
+
+    # in-place item operations
+    def iadditem(self, key, item):
+        f_dwadd_epd(self._epd + key, item)
+
+    # TODO: support f_dwsubtract_epd
+    def isubitem(self, key, item):
+        f_dwadd_epd(self._epd + key, -item)

@@ -149,49 +149,56 @@ class _ARRW:
             self.obj.iadditem(self.index)
         except AttributeError:
             ov = self.obj[self.index]
-            self.obj[self.index] = ov + v
+            ov += v
+            self.obj[self.index] = ov
 
     def __isub__(self, v):
         try:
             self.obj.isubitem(self.index)
         except AttributeError:
             ov = self.obj[self.index]
-            self.obj[self.index] = ov - v
+            ov -= v
+            self.obj[self.index] = ov
 
     def __imul__(self, v):
         try:
             self.obj.imulitem(self.index)
         except AttributeError:
             ov = self.obj[self.index]
-            self.obj[self.index] = ov * v
+            ov *= v
+            self.obj[self.index] = ov
 
     def __ifloordiv__(self, v):
         try:
             self.obj.ifloordivitem(self.index)
         except AttributeError:
             ov = self.obj[self.index]
-            self.obj[self.index] = ov // v
+            ov //= v
+            self.obj[self.index] = ov
 
     def __iand__(self, v):
         try:
             self.obj.ianditem(self.index)
         except AttributeError:
             ov = self.obj[self.index]
-            self.obj[self.index] = ov & v
+            ov &= v
+            self.obj[self.index] = ov
 
     def __ior__(self, v):
         try:
             self.obj.ioritem(self.index)
         except AttributeError:
             ov = self.obj[self.index]
-            self.obj[self.index] = ov | v
+            ov |= v
+            self.obj[self.index] = ov
 
     def __ixor__(self, v):
         try:
             self.obj.ixoritem(self.index)
         except AttributeError:
             ov = self.obj[self.index]
-            self.obj[self.index] = ov ^ v
+            ov ^= v
+            self.obj[self.index] = ov
 
 
 def _L2V(l):
