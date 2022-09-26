@@ -40,6 +40,7 @@ from .memiof import (
     f_wwrite_epd,
     f_bwrite_epd,
     f_posread_epd,
+    f_maskread_epd,
     f_maskwrite_epd,
 )
 from .locf import f_setloc_epd
