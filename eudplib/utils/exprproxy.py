@@ -144,6 +144,7 @@ class ExprProxy:
     def __call__(self, *args, **kwargs):
         return self._value(*args, **kwargs)
 
+    # TODO: add AttrProxy for specialized in-place operations and comparison
     def __getattr__(self, name):
         return getattr(self._value, name)
 
@@ -282,6 +283,7 @@ class ItemProxy:
             self._parent[self._key] = ov
 
     # Proxy arithmetic operators
+
     def __lshift__(self, k):
         return self._parent[self._key] << k
 
@@ -345,22 +347,43 @@ class ItemProxy:
     # Proxy comparison operator
 
     def __eq__(self, k):
-        return self._parent[self._key] == k
+        try:
+            return self._parent.eqitem(self._key, k)
+        except AttributeError:
+            return self._parent[self._key] == k
 
     def __ne__(self, k):
-        return self._parent[self._key] != k
+        try:
+            return self._parent.neitem(self._key, k)
+        except AttributeError:
+            return self._parent[self._key] != k
 
     def __le__(self, k):
-        return self._parent[self._key] <= k
+        try:
+            return self._parent.leitem(self._key, k)
+        except AttributeError:
+            return self._parent[self._key] <= k
 
     def __lt__(self, k):
-        return self._parent[self._key] < k
+        try:
+            return self._parent.ltitem(self._key, k)
+        except AttributeError:
+            return self._parent[self._key] < k
 
     def __ge__(self, k):
-        return self._parent[self._key] >= k
+        try:
+            return self._parent.geitem(self._key, k)
+        except AttributeError:
+            return self._parent[self._key] >= k
 
     def __gt__(self, k):
-        return self._parent[self._key] > k
+        try:
+            return self._parent.gtitem(self._key, k)
+        except AttributeError:
+            return self._parent[self._key] > k
 
     def __bool__(self):
-        return bool(self._parent[self._key])
+        try:
+            return self._parent.boolitem(self._key, k)
+        except AttributeError:
+            return bool(self._parent[self._key])

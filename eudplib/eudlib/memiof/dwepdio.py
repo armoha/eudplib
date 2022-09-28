@@ -126,49 +126,36 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
 # Writing functions
 
 
-def f_dwwrite_epd(targetplayer, value):
-    if not c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
-        c.VProc(value, value.QueueAssignTo(targetplayer))
-    elif c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
-        c.VProc(
-            [targetplayer, value],
+def setdw_epd(targetplayer, modifier, value):
+    if c.IsEUDVariable(value):
+        if c.IsEUDVariable(targetplayer):
+            return c.VProc(
+                [targetplayer, value],
+                [
+                    targetplayer.QueueAssignTo(ut.EPD(value.getDestAddr())),
+                    value.SetModifier(modifier),
+                ],
+            )
+        return c.VProc(
+            value,
             [
-                targetplayer.QueueAssignTo(ut.EPD(value.getDestAddr())),
-                value.SetModifier(c.SetTo),
+                value.SetDest(targetplayer),
+                value.SetModifier(modifier),
             ],
         )
-    else:
-        cs.DoActions(c.SetDeaths(targetplayer, c.SetTo, value, 0))
+    cs.DoActions(c.SetDeaths(targetplayer, modifier, value, 0))
+
+
+def f_dwwrite_epd(targetplayer, value):
+    setdw_epd(targetplayer, c.SetTo, value)
 
 
 def f_dwadd_epd(targetplayer, value):
-    if not c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
-        c.VProc(value, value.QueueAddTo(targetplayer))
-    elif c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
-        c.VProc(
-            [targetplayer, value],
-            [
-                targetplayer.QueueAssignTo(ut.EPD(value.getDestAddr())),
-                value.SetModifier(c.Add),
-            ],
-        )
-    else:
-        cs.DoActions(c.SetDeaths(targetplayer, c.Add, value, 0))
+    setdw_epd(targetplayer, c.Add, value)
 
 
 def f_dwsubtract_epd(targetplayer, value):
-    if not c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
-        c.VProc(value, value.QueueSubtractTo(targetplayer))
-    elif c.IsEUDVariable(targetplayer) and c.IsEUDVariable(value):
-        c.VProc(
-            [targetplayer, value],
-            [
-                targetplayer.QueueAssignTo(ut.EPD(value.getDestAddr())),
-                value.SetModifier(c.Subtract),
-            ],
-        )
-    else:
-        cs.DoActions(c.SetDeaths(targetplayer, c.Subtract, value, 0))
+    setdw_epd(targetplayer, c.Subtract, value)
 
 
 # Dword breaking functions
