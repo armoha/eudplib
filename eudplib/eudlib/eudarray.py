@@ -22,10 +22,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-
+from math import log2
 from .. import core as c
 from .. import utils as ut
-from .memiof import f_dwread_epd, f_dwwrite_epd, f_dwadd_epd
+from .memiof import f_dwread_epd, f_dwwrite_epd, f_dwadd_epd, f_setcurpl2cpcache
+from .memiof.inplacecw import iset
 from ..localize import _
 
 
@@ -62,29 +63,6 @@ class EUDArrayData(c.EUDObject):
         """Get size of array"""
         return self._arrlen
 
-    # FIXME: are these methods really used?
-
-    @c.EUDMethod
-    def get(self, key):
-        assert False
-        return f_dwread_epd(ut.EPD(self) + key)
-
-    def __getitem__(self, key):
-        assert False
-        return self.get(key)
-
-    @c.EUDMethod
-    def set(self, key, item):
-        assert False
-        return f_dwwrite_epd(ut.EPD(self) + key, item)
-
-    def __setitem__(self, key, item):
-        assert False
-        return self.set(key, item)
-
-    def __iter__(self):
-        raise EPError(_("Can't iterate EUDArray"))
-
 
 class EUDArray(ut.ExprProxy):
     def __init__(self, initval=None, *, _from=None):
@@ -106,7 +84,7 @@ class EUDArray(ut.ExprProxy):
         return self.get(key)
 
     def set(self, key, item):
-        return f_dwwrite_epd(self._epd + key, item)
+        return iset(self._epd, key, c.SetTo, item)
 
     def __setitem__(self, key, item):
         return self.set(key, item)
@@ -115,9 +93,141 @@ class EUDArray(ut.ExprProxy):
         raise EPError(_("Can't iterate EUDArray"))
 
     # in-place item operations
-    def iadditem(self, key, item):
-        f_dwadd_epd(self._epd + key, item)
+    # Total 6 cases = 3 × 2
+    # [0, 1, 2] of (self._epd, key) are variable
+    #  × val is variable or not
+    def iadditem(self, key, val):
+        return iset(self._epd, key, c.Add, val)
 
-    # TODO: support f_dwsubtract_epd
-    def isubitem(self, key, item):
-        f_dwadd_epd(self._epd + key, -item)
+    # FIXME: add operator for f_dwsubtract_epd
+    def isubtractitem(self, key, val):
+        return iset(self._epd, key, c.Subtract, val)
+
+    def isubitem(self, key, val):
+        if not c.IsEUDVariable(val):
+            return iset(self._epd, key, c.Add, -val)
+        dst = c.EncodePlayer(c.CurrentPlayer)
+        trg = f_setcurpl2cpcache
+        if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
+            dst = self._epd + key
+            trg = c.RawTrigger
+            # x - b = -(-x + b) = ~(~x + 1 + b) + 1
+            # Run 3 triggers, 10 actions
+        elif c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
+            c.VProc(
+                [self._epd, key],
+                [
+                    self._epd.QueueAssignTo(ut.EPD(0x6509B0)),
+                    key.QueueAddTo(ut.EPD(0x6509B0)),
+                ],
+            )
+        else:
+            ev, cn = self._epd, key
+            if c.IsEUDVariable(key):
+                ev, cn = key, self._epd
+            c.VProc(
+                ev,
+                [
+                    c.SetMemory(0x6509B0, c.SetTo, cn),
+                    ev.QueueAddTo(ut.EPD(0x6509B0)),
+                ],
+            )
+        c.VProc(
+            val,
+            [
+                c.SetMemoryXEPD(dst, Add, -1, 0x55555555),
+                c.SetMemoryXEPD(dst, Add, -1, 0xAAAAAAAA),
+                c.SetMemoryEPD(dst, Add, 1),
+                val.QueueAddTo(dst),
+            ],
+        )
+        return trg(
+            actions=[
+                c.SetMemoryXEPD(dst, Add, -1, 0x55555555),
+                c.SetMemoryXEPD(dst, Add, -1, 0xAAAAAAAA),
+                c.SetMemoryEPD(dst, Add, 1),
+            ],
+        )
+
+    # defined when val is power of 2
+    def imulitem(self, key, val):
+        if not isinstance(val, int):
+            raise AttributeError
+        if val == 0:
+            return f_dwwrite_epd(self._epd + key, 0)
+        # val is power of 2
+        if val & (val - 1) == 0:
+            return self.ilshiftitem(key, int(log2(val)))
+        # val is negation of power of 2
+        if -val & (-val - 1) == 0:
+            pass
+        raise AttributeError
+
+    # defined when val is power of 2
+    def ifloordivitem(self, key, val):
+        if not isinstance(val, int):
+            raise AttributeError
+        if val == 0:
+            raise ZeroDivisionError
+        # val is power of 2
+        if val & (val - 1) == 0:
+            return self.irshiftitem(key, int(log2(val)))
+        # val is negation of power of 2
+        if -val & (-val - 1) == 0:
+            pass
+        raise AttributeError
+
+    # defined when val is power of 2
+    def imoditem(self, key, val):
+        if not isinstance(val, int):
+            raise AttributeError
+        if val == 0:
+            raise ZeroDivisionError
+        # val is power of 2
+        if val & (val - 1) == 0:
+            return self.ianditem(key, val - 1)
+        raise AttributeError
+
+    def ilshiftitem(self, key, val):
+        raise AttributeError
+
+    def irshiftitem(self, key, val):
+        raise AttributeError
+
+    def ipowitem(self, key, val):
+        raise AttributeError
+
+    def ianditem(self, key, val):
+        raise AttributeError
+
+    def ioritem(self, key, val):
+        raise AttributeError
+
+    def ixoritem(self, key, val):
+        raise AttributeError
+
+    # FIXME: Add operator?
+    def iinvert(self, key):
+        return self.ixoritem(key, 0xFFFFFFFF)
+
+    def inot(self, key):
+        raise AttributeError
+
+    # item comparisons
+    def eqitem(self, key, val):
+        return c.MemoryEPD(self._epd + key, c.Exactly, val)
+
+    def leitem(self, key, val):
+        return c.MemoryEPD(self._epd + key, c.AtMost, val)
+
+    def geitem(self, key, val):
+        return c.MemoryEPD(self._epd + key, c.AtLeast, val)
+
+    def neitem(self, key, val):
+        return ut.EUDNot(c.MemoryEPD(self._epd + key, c.Exactly, val))
+
+    def ltitem(self, key, val):
+        return ut.EUDNot(c.MemoryEPD(self._epd + key, c.AtMost, val))
+
+    def gtitem(self, key, val):
+        return ut.EUDNot(c.MemoryEPD(self._epd + key, c.AtLeast, val))
