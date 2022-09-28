@@ -15,7 +15,7 @@ from .epsimp import EPSLoader
 from ..core.variable.eudv import IsRValue
 
 
-def _RELIMP(path, mod_name):
+def _RELIMP(path, mod_name):  # relative path import
     import inspect, pathlib, importlib.util
 
     p = pathlib.Path(inspect.getabsfile(inspect.currentframe())).parent
@@ -56,14 +56,14 @@ def _CGFW(exprf, retn):
     return rets
 
 
-def _ARR(items):
+def _ARR(items):  # EUDArray initialization
     k = EUDArray(len(items))
     for i, item in enumerate(items):
         k[i] = item
     return k
 
 
-def _VARR(items):
+def _VARR(items):  # EUDVArray initialization
     k = EUDVArray(len(items))()
     for i, item in enumerate(items):
         k[i] = item
@@ -78,7 +78,7 @@ def _SV(dL, sL):
     [d << s for d, s in zip(FlattenList(dL), FlattenList(sL))]
 
 
-class _ATTW:
+class _ATTW:  # attribute write
     def __init__(self, obj, attrName):
         self.obj = obj
         self.attrName = attrName
@@ -175,7 +175,7 @@ class _ATTW:
             setattr(self.obj, self.attrName, ov)
 
 
-class _ARRW:
+class _ARRW:  # array write
     def __init__(self, obj, index):
         self.obj = obj
         self.index = index
@@ -272,7 +272,7 @@ class _ARRW:
             self.obj[self.index] = ov
 
 
-def _L2V(l):
+def _L2V(l):  # logic to value
     ret = EUDVariable()
     if EUDIf()(l):
         ret << 1
