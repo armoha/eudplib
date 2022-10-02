@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl
+from ...localize import _
 
 from eudplib import core as c, ctrlstru as cs, utils as ut
 
@@ -70,6 +71,16 @@ def EUDLoopPlayer(ptype="Human", force=None, race=None):
         ):
             plist.append(p)
     ut.EUDCreateBlock("loopplayerblock", None)
+    if not plist:
+        errmsg = _("No player met condition for input map settings:")
+        if ptype:
+            errmsg += _(" type {}").format(ptype)
+        if force:
+            errmsg += _(" force {}").format(force)
+        if race:
+            errmsg += _(" race {}").format(race)
+        errmsg += "\n" + _("Check out whether Start Locations are placed correctly.")
+        raise ut.EPError(errmsg)
     start, end = min(plist), max(plist)
 
     v = c.EUDVariable()
