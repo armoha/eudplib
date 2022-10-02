@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2022-05-14 03:24+0900\n"
+"POT-Creation-Date: 2022-10-03 00:00+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -164,11 +164,11 @@ msgstr ""
 msgid "Argument number mismatch : "
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:50
+#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:52
 msgid "Different number of variables({}) from type declarations({})"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:104
+#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:107
 msgid "Different number of arguments({}) from mask declarations({})."
 msgstr ""
 
@@ -236,17 +236,17 @@ msgstr ""
 msgid "Unit property table overflow"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:46
+#: E:\eudplib\eudplib\core\mapdata\stringmap.py:48
 msgid "Ambigious string {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:255
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:353
+#: E:\eudplib\eudplib\core\mapdata\tblformat.py:256
+#: E:\eudplib\eudplib\core\mapdata\tblformat.py:354
 msgid "Invalid type for string"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:294
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:366
+#: E:\eudplib\eudplib\core\mapdata\tblformat.py:295
+#: E:\eudplib\eudplib\core\mapdata\tblformat.py:367
 msgid "String table overflow"
 msgstr ""
 
@@ -327,16 +327,16 @@ msgstr ""
 msgid "Too many actions"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:65
 #: E:\eudplib\eudplib\core\rawtrigger\stockact.py:81
+#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:111
 msgid "Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:449
+#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:690
 msgid "SetKills Player should be only P1~P12 or CurrentPlayer"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:452
+#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:693
 msgid "SetKills Unit should be at most 227"
 msgstr ""
 
@@ -360,31 +360,31 @@ msgstr ""
 msgid " - Suggestion: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:136
+#: E:\eudplib\eudplib\core\variable\eudv.py:138
 msgid "Trying to modify value of l-value variable"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:520
-#: E:\eudplib\eudplib\core\variable\eudv.py:537
-#: E:\eudplib\eudplib\core\variable\eudv.py:548
-#: E:\eudplib\eudplib\core\variable\eudv.py:564
-#: E:\eudplib\eudplib\core\variable\eudv.py:580
+#: E:\eudplib\eudplib\core\variable\eudv.py:522
+#: E:\eudplib\eudplib\core\variable\eudv.py:539
+#: E:\eudplib\eudplib\core\variable\eudv.py:550
+#: E:\eudplib\eudplib\core\variable\eudv.py:566
+#: E:\eudplib\eudplib\core\variable\eudv.py:582
 msgid "{}: Comparing with temporary variable."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:556
+#: E:\eudplib\eudplib\core\variable\eudv.py:558
 msgid "No unsigned number can be leq than {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:572
+#: E:\eudplib\eudplib\core\variable\eudv.py:574
 msgid "No unsigned number can be greater than {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:853
+#: E:\eudplib\eudplib\core\variable\eudv.py:855
 msgid "dst and src have intersection"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:873
+#: E:\eudplib\eudplib\core\variable\eudv.py:875
 msgid "Input/output size mismatch"
 msgstr ""
 
@@ -412,20 +412,24 @@ msgid "Cannot have EUDElse after EUDElse"
 msgstr ""
 
 #: E:\eudplib\eudplib\ctrlstru\simpleblock.py:161
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:63
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:78
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:80
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:99
 msgid "Block start/end mismatch"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:59
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:76
 msgid "Invalid selector start for EUDSwitch"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:67
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:85
 msgid "Duplicate cases"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:81
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:87
+msgid "cases out of mask"
+msgstr ""
+
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:102
 msgid "Duplicate default"
 msgstr ""
 
@@ -437,29 +441,29 @@ msgstr ""
 msgid " - Compiled failed for {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:28
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:61
 msgid "EPD check warning. Don't use raw pointer address"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:37
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:87
 msgid "EPDOffsetMap member size should be in 4, 2, 1"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:39
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:90
 msgid "EPDOffsetMap members should be aligned"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:59
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:64
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:115
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:125
 msgid "Only dword can be read as epd"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:69
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:135
 msgid "Only dword can be read as position"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\eudarray.py:80
-#: E:\eudplib\eudplib\eudlib\eudarray.py:109
+#: E:\eudplib\eudplib\eudlib\eudarray.py:86
+#: E:\eudplib\eudplib\eudlib\eudarray.py:115
 msgid "Can't iterate EUDArray"
 msgstr ""
 
@@ -473,9 +477,9 @@ msgstr ""
 msgid "copyto target should be EUDByteReader/Writer/Stream"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:215
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:223
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:231
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:248
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:256
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:264
 msgid "safe read functions are deprecated in 0.61 and will be removed in 0.63"
 msgstr ""
 
@@ -505,12 +509,32 @@ msgstr ""
 msgid "cannot switch from manual field specification to automatic field numbering"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\stringf\pname.py:128
+#: E:\eudplib\eudplib\eudlib\stringf\pname.py:129
 msgid "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\utilf\listloop.py:72
+#: E:\eudplib\eudplib\eudlib\utilf\listloop.py:73
 msgid "listloop mismatch"
+msgstr ""
+
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:75
+msgid "No player met condition for input map settings:"
+msgstr ""
+
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:77
+msgid " type {}"
+msgstr ""
+
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:79
+msgid " force {}"
+msgstr ""
+
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:81
+msgid " race {}"
+msgstr ""
+
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:82
+msgid "Check out whether Start Locations are placed correctly."
 msgstr ""
 
 #: E:\eudplib\eudplib\maprw\injector\vectorReloc.py:212
@@ -593,20 +617,23 @@ msgstr ""
 msgid "preserved should be bool"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\blockstru.py:74
-#: E:\eudplib\eudplib\utils\blockstru.py:85
+#: E:\eudplib\eudplib\utils\blockstru.py:76
+#: E:\eudplib\eudplib\utils\blockstru.py:90
 msgid "Block starting/ending mismatch"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\blockstru.py:86
+#: E:\eudplib\eudplib\utils\blockstru.py:77
+#: E:\eudplib\eudplib\utils\blockstru.py:91
 msgid "    - Started with {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\blockstru.py:87
+#: E:\eudplib\eudplib\utils\blockstru.py:78
+#: E:\eudplib\eudplib\utils\blockstru.py:92
 msgid "    - Ended with {}"
 msgstr ""
 
 #: E:\eudplib\eudplib\utils\exprproxy.py:41
+#: E:\eudplib\eudplib\utils\exprproxy.py:186
 msgid "Type {} is not castable"
 msgstr ""
 
