@@ -249,3 +249,16 @@ def f_switch_test():
     # (Line 129) return ret;
     EUDReturn(ret)
     # (Line 130) }
+    # (Line 131) const ack = PVariable();
+
+ack = _CGFW(lambda: [PVariable()], 1)[0]
+# (Line 132) const ackMax = 8;
+ackMax = _CGFW(lambda: [8], 1)[0]
+# (Line 133) function test_array() {
+@EUDFunc
+def f_test_array():
+    # (Line 134) var p = 1;
+    p = _LVAR([1])
+    # (Line 135) return ack[p] % ackMax > 1 ? 0 : 1;
+    EUDReturn(EUDTernary(ack[p] % ackMax <= 1, neg=True)(0)(1))
+    # (Line 136) }

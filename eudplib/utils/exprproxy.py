@@ -320,6 +320,12 @@ class ItemProxy:
     def __rfloordiv__(self, k):
         return k // self._parent[self._key]
 
+    def __mod__(self, val):
+        return self._parent[self._key] % val
+
+    def __rmod__(self, val):
+        return val % self._parent[self._key]
+
     def __and__(self, k):
         return self._parent[self._key] & k
 

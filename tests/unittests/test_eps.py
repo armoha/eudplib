@@ -1,4 +1,4 @@
-from .test_eps_epsfile import f_square, f_constv_thing, f_switch_test
+from .test_eps_epsfile import f_square, f_constv_thing, f_test_array, f_switch_test
 from helper import *
 
 
@@ -11,4 +11,9 @@ def test_epscript():
         "epScript switch test",
         [a[0], a[1], a[2], a[3], a[4], a[5]],
         [1239, 1243, 1246, 1256, 1258, 1260],
+    )
+    test_equality(
+        "epScript array test",
+        f_test_array(),
+        1,
     )

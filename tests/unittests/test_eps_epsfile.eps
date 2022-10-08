@@ -128,3 +128,9 @@ function switch_test(): EUDArray {
     ret[5] = x;  // 1260
     return ret;
 }
+const ack = PVariable();
+const ackMax = 8;
+function test_array() {
+    var p = 1;
+    return ack[p] % ackMax > 1 ? 0 : 1;
+}
