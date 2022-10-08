@@ -178,6 +178,7 @@ class ItemProxy:
     def __init__(self, parent, key):
         self._parent = parent
         self._key = key
+        self._value = None
 
     @classmethod
     def cast(cls, _from):
@@ -187,7 +188,15 @@ class ItemProxy:
             raise TypeError(_("Type {} is not castable").format(cls.__name__), e)
 
     def getValue(self):
-        return self._parent[self._key]
+        if self._value is None:
+            from ..core.variable import EUDVariable
+
+            self._value = self._parent[self._key]
+            self.__class__ = EUDVariable
+            self._vartrigger = self._value._vartrigger
+            self._varact = self._value._varact
+            self._rvalue = self._value._rvalue
+        return self._value
 
     def __hash__(self):
         return id(self)
@@ -198,7 +207,7 @@ class ItemProxy:
         try:
             self._parent.iadditem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov += v
             self._parent[self._key] = ov
 
@@ -206,7 +215,7 @@ class ItemProxy:
         try:
             self._parent.isubitem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov -= v
             self._parent[self._key] = ov
 
@@ -214,7 +223,7 @@ class ItemProxy:
         try:
             self._parent.imulitem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov *= v
             self._parent[self._key] = ov
 
@@ -222,7 +231,7 @@ class ItemProxy:
         try:
             self._parent.ifloordivitem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov //= v
             self._parent[self._key] = ov
 
@@ -230,7 +239,7 @@ class ItemProxy:
         try:
             self._parent.imoditem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov %= v
             self._parent[self._key] = ov
 
@@ -238,7 +247,7 @@ class ItemProxy:
         try:
             self._parent.ilshiftitem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov <<= v
             self._parent[self._key] = ov
 
@@ -246,7 +255,7 @@ class ItemProxy:
         try:
             self._parent.irshiftitem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov >>= v
             self._parent[self._key] = ov
 
@@ -254,7 +263,7 @@ class ItemProxy:
         try:
             self._parent.ipowitem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov **= v
             self._parent[self._key] = ov
 
@@ -262,7 +271,7 @@ class ItemProxy:
         try:
             self._parent.ianditem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov &= v
             self._parent[self._key] = ov
 
@@ -270,7 +279,7 @@ class ItemProxy:
         try:
             self._parent.ioritem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov |= v
             self._parent[self._key] = ov
 
@@ -278,118 +287,132 @@ class ItemProxy:
         try:
             self._parent.ixoritem(self._key, val)
         except AttributeError:
-            ov = self._parent[self._key]
+            ov = self.getValue()
             ov ^= v
             self._parent[self._key] = ov
 
     # Proxy arithmetic operators
 
     def __lshift__(self, k):
-        return self._parent[self._key] << k
+        return self.getValue() << k
 
     def __rlshift__(self, k):
-        return k << self._parent[self._key]
+        return k << self.getValue()
 
     def __rshift__(self, k):
-        return self._parent[self._key] >> k
+        return self.getValue() >> k
 
     def __rrshift__(self, k):
-        return k >> self._parent[self._key]
+        return k >> self.getValue()
 
     def __add__(self, k):
-        return self._parent[self._key] + k
+        return self.getValue() + k
 
     def __radd__(self, k):
-        return k + self._parent[self._key]
+        return k + self.getValue()
 
     def __sub__(self, k):
-        return self._parent[self._key] - k
+        return self.getValue() - k
 
     def __rsub__(self, k):
-        return k - self._parent[self._key]
+        return k - self.getValue()
 
     def __mul__(self, k):
-        return self._parent[self._key] * k
+        return self.getValue() * k
 
     def __rmul__(self, k):
-        return k * self._parent[self._key]
+        return k * self.getValue()
 
     def __floordiv__(self, k):
-        return self._parent[self._key] // k
+        return self.getValue() // k
 
     def __rfloordiv__(self, k):
-        return k // self._parent[self._key]
+        return k // self.getValue()
 
     def __mod__(self, val):
-        return self._parent[self._key] % val
+        return self.getValue() % val
 
     def __rmod__(self, val):
-        return val % self._parent[self._key]
+        return val % self.getValue()
 
     def __and__(self, k):
-        return self._parent[self._key] & k
+        return self.getValue() & k
 
     def __rand__(self, k):
-        return k & self._parent[self._key]
+        return k & self.getValue()
 
     def __or__(self, k):
-        return self._parent[self._key] | k
+        return self.getValue() | k
 
     def __ror__(self, k):
-        return k | self._parent[self._key]
+        return k | self.getValue()
 
     def __xor__(self, k):
-        return self._parent[self._key] ^ k
+        return self.getValue() ^ k
 
     def __rxor__(self, k):
-        return k ^ self._parent[self._key]
+        return k ^ self.getValue()
 
     def __neg__(self):
-        return -self._parent[self._key]
+        return -self.getValue()
 
     def __invert__(self):
-        return ~self._parent[self._key]
+        return ~self.getValue()
 
     # Proxy comparison operator
 
     def __eq__(self, k):
-        try:
-            return self._parent.eqitem(self._key, k)
-        except AttributeError:
-            return self._parent[self._key] == k
+        if self._value is None:
+            try:
+                return self._parent.eqitem(self._key, k)
+            except AttributeError:
+                pass
+        return self.getValue() == k
 
     def __ne__(self, k):
-        try:
-            return self._parent.neitem(self._key, k)
-        except AttributeError:
-            return self._parent[self._key] != k
+        if self._value is None:
+            try:
+                return self._parent.neitem(self._key, k)
+            except AttributeError:
+                pass
+        return self.getValue() != k
 
     def __le__(self, k):
-        try:
-            return self._parent.leitem(self._key, k)
-        except AttributeError:
-            return self._parent[self._key] <= k
+        if self._value is None:
+            try:
+                return self._parent.leitem(self._key, k)
+            except AttributeError:
+                pass
+        return self.getValue() <= k
 
     def __lt__(self, k):
-        try:
-            return self._parent.ltitem(self._key, k)
-        except AttributeError:
-            return self._parent[self._key] < k
+        if self._value is None:
+            try:
+                return self._parent.ltitem(self._key, k)
+            except AttributeError:
+                pass
+        return self.getValue() < k
 
     def __ge__(self, k):
-        try:
-            return self._parent.geitem(self._key, k)
-        except AttributeError:
-            return self._parent[self._key] >= k
+        if self._value is None:
+            try:
+                return self._parent.geitem(self._key, k)
+            except AttributeError:
+                pass
+        return self.getValue() >= k
 
     def __gt__(self, k):
-        try:
-            return self._parent.gtitem(self._key, k)
-        except AttributeError:
-            return self._parent[self._key] > k
+        if self._value is None:
+            try:
+                return self._parent.gtitem(self._key, k)
+            except AttributeError:
+                pass
+        return self.getValue() > k
 
     def __bool__(self):
-        try:
-            return self._parent.boolitem(self._key, k)
-        except AttributeError:
-            return bool(self._parent[self._key])
+        if self._value is None:
+            try:
+                return self._parent.boolitem(self._key, k)
+            except AttributeError:
+                pass
+        return bool(self.getValue())
