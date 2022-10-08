@@ -24,7 +24,33 @@ THE SOFTWARE.
 """
 
 from . import dwepdio as dwm
+from .modcurpl import f_setcurpl2cpcache
 from eudplib import core as c, utils as ut
+
+
+def cpset(a, b):
+    if not (c.IsEUDVariable(a) or c.IsEUDVariable(b)):
+        return a + b, c.RawTrigger
+    elif c.IsEUDVariable(a) and c.IsEUDVariable(b):
+        c.VProc(
+            [a, b],
+            [
+                a.QueueAssignTo(ut.EPD(0x6509B0)),
+                b.QueueAddTo(ut.EPD(0x6509B0)),
+            ],
+        )
+    else:
+        ev, cn = a, b
+        if c.IsEUDVariable(b):
+            ev, cn = b, a
+        c.VProc(
+            ev,
+            [
+                c.SetMemory(0x6509B0, c.SetTo, cn),
+                ev.QueueAddTo(ut.EPD(0x6509B0)),
+            ],
+        )
+    return c.EncodePlayer(c.CurrentPlayer), f_setcurpl2cpcache
 
 
 def iset(a, b, modifier, v):
