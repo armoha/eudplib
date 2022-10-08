@@ -40,14 +40,13 @@ def cpset(a, b):
             ],
         )
     else:
-        ev, cn = a, b
         if c.IsEUDVariable(b):
-            ev, cn = b, a
+            a, b = b, a
         c.VProc(
-            ev,
+            a,
             [
-                c.SetMemory(0x6509B0, c.SetTo, cn),
-                ev.QueueAddTo(ut.EPD(0x6509B0)),
+                c.SetMemory(0x6509B0, c.SetTo, b),
+                a.QueueAddTo(ut.EPD(0x6509B0)),
             ],
         )
     return c.EncodePlayer(c.CurrentPlayer), f_setcurpl2cpcache
@@ -82,8 +81,8 @@ def iset(a, b, modifier, v):
         c.VProc(
             [a, b],
             [
-                a.QueueAssignTo(ut.EPD(set_v)),
-                b.QueueAddTo(ut.EPD(set_v)),
+                a.QueueAssignTo(ut.EPD(set_v) + 4),
+                b.QueueAddTo(ut.EPD(set_v) + 4),
             ],
         )
     else:
@@ -92,8 +91,8 @@ def iset(a, b, modifier, v):
         c.VProc(
             a,
             [
-                c.SetMemory(set_v + 4, c.SetTo, b),
-                a.QueueAddTo(ut.EPD(set_v) + 1),
+                c.SetMemory(set_v + 16, c.SetTo, b),
+                a.QueueAddTo(ut.EPD(set_v) + 4),
             ],
         )
     return c.RawTrigger(actions=set_v)
