@@ -247,9 +247,13 @@ def EUDVArray(size, basetype=None):
             nptr << bt.NextTrigger()
             return r
 
-        def set(self, i, value):
+        def set(self, i, val):
+            self._set(i, bt.SetTo, val)
+
+        def _set(self, i, modifier, val):
             if not IsEUDVariable(i):
-                return iset(self._epd, 18 * i + 348 // 4, bt.SetTo, value)
+                return iset(self._epd, 18 * i + 348 // 4, modifier, val)
+            modifier = bt.EncodeModifier(modifier) << 24
 
             bitstrg = BitsTrg("varrset")
             for trg in bitstrg:
@@ -266,15 +270,18 @@ def EUDVArray(size, basetype=None):
 
             bits = max((size - 1).bit_length() - 1, 0)
             nptr = Forward()
-            if IsEUDVariable(self._epd) and IsEUDVariable(value):
+            if IsEUDVariable(self._epd) and IsEUDVariable(val):
                 bt.RawTrigger(
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
                         self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
-                        bt.SetNextPtr(self._epd.GetVTable(), value.GetVTable()),
-                        value.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
-                        bt.SetNextPtr(value.GetVTable(), i.GetVTable()),
+                        bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
+                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        bt.SetMemoryX(
+                            bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
+                        ),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
@@ -287,19 +294,25 @@ def EUDVArray(size, basetype=None):
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
                         self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
-                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, value),
+                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
+                        bt.SetMemoryX(
+                            bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
+                        ),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
                 )
-            elif IsEUDVariable(value):
+            elif IsEUDVariable(val):
                 bt.RawTrigger(
-                    nextptr=value.GetVTable(),
+                    nextptr=val.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
-                        value.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
-                        bt.SetNextPtr(value.GetVTable(), i.GetVTable()),
+                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        bt.SetMemoryX(
+                            bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
+                        ),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
@@ -310,7 +323,10 @@ def EUDVArray(size, basetype=None):
                     nextptr=i.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
-                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, value),
+                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
+                        bt.SetMemoryX(
+                            bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
+                        ),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
@@ -336,6 +352,130 @@ def EUDVArray(size, basetype=None):
             self.set(i, value)
 
         def __iter__(self):
+            # FIXME: add EUDVArray iterator
             raise ut.EPError(_("Can't iterate EUDVArray"))
+
+        def iadditem(self, i, val):
+            self._set(i, bt.Add, val)
+
+        # FIXME: add operator for Subtract
+        def isubtractitem(self, i, val):
+            self._set(i, bt.Subtract, val)
+
+        def isubitem(self, i, val):
+            if not IsEUDVariable(val):
+                return self._set(i, bt.Add, -val)
+            raise AttributeError
+
+        # defined when val is power of 2
+        def imulitem(self, i, val):
+            if not isinstance(val, int):
+                raise AttributeError
+            if val == 0:
+                return self.set(i, 0)
+            # val is power of 2
+            if val & (val - 1) == 0:
+                return self.ilshiftitem(i, int(log2(val)))
+            # val is negation of power of 2
+            if -val & (-val - 1) == 0:
+                pass
+            raise AttributeError
+
+        # defined when val is power of 2
+        def ifloordivitem(self, i, val):
+            if not isinstance(val, int):
+                raise AttributeError
+            if val == 0:
+                raise ZeroDivisionError
+            # val is power of 2
+            if val & (val - 1) == 0:
+                return self.irshiftitem(i, int(log2(val)))
+            # val is negation of power of 2
+            if -val & (-val - 1) == 0:
+                pass
+            raise AttributeError
+
+        # defined when val is power of 2
+        def imoditem(self, i, val):
+            if not isinstance(val, int):
+                raise AttributeError
+            if val == 0:
+                raise ZeroDivisionError
+            # val is power of 2
+            if val & (val - 1) == 0:
+                return self.ianditem(i, val - 1)
+            raise AttributeError
+
+        # FIXME: merge logic with EUDVariable and VariableBase
+
+        def ilshiftitem(self, i, val):
+            if isinstance(val, int):
+                if val == 0:
+                    return
+            raise AttributeError
+
+        def irshiftitem(self, i, val):
+            if isinstance(val, int):
+                if val == 0:
+                    return
+            raise AttributeError
+
+        def ipowitem(self, i, val):
+            if isinstance(val, int) and val == 1:
+                return
+            raise AttributeError
+
+        def ianditem(self, i, val):
+            raise AttributeError
+
+        def ioritem(self, i, val):
+            raise AttributeError
+
+        def ixoritem(self, i, val):
+            raise AttributeError
+
+        # FIXME: Add operator?
+        def iinvert(self, i):
+            return self.ixoritem(i, 0xFFFFFFFF)
+
+        def inot(self, i):
+            raise AttributeError
+
+        # item comparisons
+        def eqitem(self, i, val):
+            if not IsEUDVariable(i):
+                return bt.MemoryEPD(18 * i + 87 + self._epd, bt.Exactly, val)
+            raise AttributeError
+
+        def leitem(self, i, val):
+            if not IsEUDVariable(i):
+                return bt.MemoryEPD(18 * i + 87 + self._epd, bt.AtMost, val)
+            raise AttributeError
+
+        def geitem(self, i, val):
+            if not IsEUDVariable(i):
+                return bt.MemoryEPD(18 * i + 87 + self._epd, bt.AtLeast, val)
+            raise AttributeError
+
+        def neitem(self, i, val):
+            if not IsEUDVariable(i):
+                from ...eudlib.utilf import EUDNot
+
+                return EUDNot(bt.MemoryEPD(18 * i + 87 + self._epd, bt.Exactly, val))
+            raise AttributeError
+
+        def ltitem(self, i, val):
+            if not IsEUDVariable(i):
+                from ...eudlib.utilf import EUDNot
+
+                return EUDNot(bt.MemoryEPD(18 * i + 87 + self._epd, bt.AtMost, val))
+            raise AttributeError
+
+        def gtitem(self, i, val):
+            if not IsEUDVariable(i):
+                from ...eudlib.utilf import EUDNot
+
+                return EUDNot(bt.MemoryEPD(18 * i + 87 + self._epd, bt.AtLeast, val))
+            raise AttributeError
 
     return _EUDVArray

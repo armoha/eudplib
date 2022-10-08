@@ -192,6 +192,8 @@ class EUDArray(ut.ExprProxy):
 
     def ilshiftitem(self, key, val):
         if isinstance(val, int):
+            if val == 0:
+                return
             n = val
             mask = (1 << (n + 1)) - 1
             dst, trg = cpset(self._epd, key)
@@ -210,6 +212,8 @@ class EUDArray(ut.ExprProxy):
 
     def irshiftitem(self, key, val):
         if isinstance(val, int):
+            if val == 0:
+                return
             n = val
             mask = (1 << (n + 1)) - 1
             dst, trg = cpset(self._epd, key)
@@ -221,6 +225,8 @@ class EUDArray(ut.ExprProxy):
         raise AttributeError
 
     def ipowitem(self, key, val):
+        if isinstance(val, int) and val == 1:
+            return
         raise AttributeError
 
     def ianditem(self, key, val):
@@ -407,10 +413,16 @@ class EUDArray(ut.ExprProxy):
         return c.MemoryEPD(self._epd + key, c.AtLeast, val)
 
     def neitem(self, key, val):
-        return ut.EUDNot(c.MemoryEPD(self._epd + key, c.Exactly, val))
+        from .utilf import EUDNot
+
+        return EUDNot(c.MemoryEPD(self._epd + key, c.Exactly, val))
 
     def ltitem(self, key, val):
-        return ut.EUDNot(c.MemoryEPD(self._epd + key, c.AtMost, val))
+        from .utilf import EUDNot
+
+        return EUDNot(c.MemoryEPD(self._epd + key, c.AtMost, val))
 
     def gtitem(self, key, val):
-        return ut.EUDNot(c.MemoryEPD(self._epd + key, c.AtLeast, val))
+        from .utilf import EUDNot
+
+        return EUDNot(c.MemoryEPD(self._epd + key, c.AtLeast, val))
