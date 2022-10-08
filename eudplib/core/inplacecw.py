@@ -23,76 +23,87 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from . import dwepdio as dwm
-from .modcurpl import f_setcurpl2cpcache
-from eudplib import core as c, utils as ut
+from ..utils import EPD
+from .variable import IsEUDVariable, VProc
+from .rawtrigger import (
+    RawTrigger,
+    SetMemory,
+    SetTo,
+    EncodePlayer,
+    CurrentPlayer,
+    SetDeaths,
+)
 
 
 def cpset(a, b):
-    if not (c.IsEUDVariable(a) or c.IsEUDVariable(b)):
-        return a + b, c.RawTrigger
-    elif c.IsEUDVariable(a) and c.IsEUDVariable(b):
-        c.VProc(
+    if not (IsEUDVariable(a) or IsEUDVariable(b)):
+        return a + b, RawTrigger
+    elif IsEUDVariable(a) and IsEUDVariable(b):
+        VProc(
             [a, b],
             [
-                a.QueueAssignTo(ut.EPD(0x6509B0)),
-                b.QueueAddTo(ut.EPD(0x6509B0)),
+                a.QueueAssignTo(EPD(0x6509B0)),
+                b.QueueAddTo(EPD(0x6509B0)),
             ],
         )
     else:
-        if c.IsEUDVariable(b):
+        if IsEUDVariable(b):
             a, b = b, a
-        c.VProc(
+        VProc(
             a,
             [
-                c.SetMemory(0x6509B0, c.SetTo, b),
-                a.QueueAddTo(ut.EPD(0x6509B0)),
+                SetMemory(0x6509B0, SetTo, b),
+                a.QueueAddTo(EPD(0x6509B0)),
             ],
         )
-    return c.EncodePlayer(c.CurrentPlayer), f_setcurpl2cpcache
+    from ..eudlib.memiof.modcurpl import f_setcurpl2cpcache
+
+    return EncodePlayer(CurrentPlayer), f_setcurpl2cpcache
 
 
 def iset(a, b, modifier, v):
     """f_dwwrite_epd(a + b, v)"""
-    if not (c.IsEUDVariable(a) or c.IsEUDVariable(b)):
-        return dwm.setdw_epd(a + b, modifier, v)
-    if c.IsEUDVariable(v):
-        if c.IsEUDVariable(a) and c.IsEUDVariable(b):
-            return c.VProc(
+    if not (IsEUDVariable(a) or IsEUDVariable(b)):
+        from ..eudlib.memiof.dwepdio import setdw_epd
+
+        return setdw_epd(a + b, modifier, v)
+    if IsEUDVariable(v):
+        if IsEUDVariable(a) and IsEUDVariable(b):
+            return VProc(
                 [a, b, v],
                 [
-                    a.QueueAssignTo(ut.EPD(v.getDestAddr())),
-                    b.QueueAddTo(ut.EPD(v.getDestAddr())),
+                    a.QueueAssignTo(EPD(v.getDestAddr())),
+                    b.QueueAddTo(EPD(v.getDestAddr())),
                     v.SetModifier(modifier),
                 ],
             )
-        if c.IsEUDVariable(b):
+        if IsEUDVariable(b):
             a, b = b, a
-        return c.VProc(
+        return VProc(
             [a, v],
             [
                 v.SetDest(b),
-                a.QueueAddTo(ut.EPD(v.getDestAddr())),
+                a.QueueAddTo(EPD(v.getDestAddr())),
                 v.SetModifier(modifier),
             ],
         )
-    set_v = c.SetDeaths(0, modifier, v, 0)
-    if c.IsEUDVariable(a) and c.IsEUDVariable(b):
-        c.VProc(
+    set_v = SetDeaths(0, modifier, v, 0)
+    if IsEUDVariable(a) and IsEUDVariable(b):
+        VProc(
             [a, b],
             [
-                a.QueueAssignTo(ut.EPD(set_v) + 4),
-                b.QueueAddTo(ut.EPD(set_v) + 4),
+                a.QueueAssignTo(EPD(set_v) + 4),
+                b.QueueAddTo(EPD(set_v) + 4),
             ],
         )
     else:
-        if c.IsEUDVariable(b):
+        if IsEUDVariable(b):
             a, b = b, a
-        c.VProc(
+        VProc(
             a,
             [
-                c.SetMemory(set_v + 16, c.SetTo, b),
-                a.QueueAddTo(ut.EPD(set_v) + 4),
+                SetMemory(set_v + 16, SetTo, b),
+                a.QueueAddTo(EPD(set_v) + 4),
             ],
         )
-    return c.RawTrigger(actions=set_v)
+    return RawTrigger(actions=set_v)

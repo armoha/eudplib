@@ -26,7 +26,7 @@ from math import log2
 from .. import core as c
 from .. import utils as ut
 from .memiof import f_dwread_epd, f_dwwrite_epd, f_dwadd_epd, f_setcurpl2cpcache
-from .memiof.inplacecw import iset, cpset
+from ..core.inplacecw import iset, cpset
 from ..localize import _
 
 

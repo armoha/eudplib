@@ -27,16 +27,17 @@ from .. import rawtrigger as bt
 from ..allocator import Forward, ConstExpr, IsConstExpr
 
 from ...localize import _
+from ..inplacecw import iset, cpset
 from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, ep_assert
 
-from ..variable import EUDVariable, SeqCompute, VProc, IsEUDVariable
+from ..variable import EUDVariable, EUDLightVariable, SeqCompute, VProc, IsEUDVariable
 from ..variable.eudv import _ProcessDest
 from ..variable.vbuf import GetCurrentVariableBuffer, GetCurrentCustomVariableBuffer
 
 
 @cachedfunc
 def EUDVArrayData(size):
-    ep_assert(isinstance(size, int))
+    ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
     class _EUDVArrayData(ConstExpr):
         def __init__(self, initvars, *, dest=0, nextptr=0):
@@ -68,14 +69,35 @@ def EUDVArrayData(size):
     return _EUDVArrayData
 
 
-_index = EUDVariable()
-_goto_getidx = [Forward() for _ in range(32)]
-_ret_getidx, _end_getidx = Forward(), Forward()
+_index = EUDLightVariable()
+
+
+class BitsTrg:
+    cache = {}
+
+    def __init__(self, key):
+        self._key = key
+
+    def __bool__(self):
+        return self._key in BitsTrg.cache
+
+    def __iter__(self):
+        if not self:
+            BitsTrg.cache[self._key] = {i: Forward() for i in range(28)}
+            bt.PushTriggerScope()
+            yield BitsTrg.cache[self._key]
+            bt.PopTriggerScope()
+
+    def __getitem__(self, index):
+        return BitsTrg.cache[self._key][index]
+
+    def __setitem__(self, index, item):
+        BitsTrg.cache[self._key][index] = item
 
 
 @cachedfunc
 def EUDVArray(size, basetype=None):
-    ep_assert(isinstance(size, int))
+    ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
     class _EUDVArray(ExprProxy):
         def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None):
@@ -102,145 +124,199 @@ def EUDVArray(size, basetype=None):
             self._epd = EPD(self)
             self._basetype = basetype
 
-        def get(self, i):
+        def get(self, i, **kwargs):
             if IsEUDVariable(i):
-                r = self._eudget(i)
+                r = self._eudget(i, **kwargs)
             else:
                 ep_assert(i < size, _("EUDVArray index out of bounds."))
                 if IsEUDVariable(self):
-                    r = self._get(i)
+                    r = self._get(i, **kwargs)
                 else:
-                    r = self._constget(i)
+                    r = self._constget(i, **kwargs)
 
             if self._basetype:
                 r = self._basetype.cast(r)
             return r
 
-        def _eudget(self, i):
-            global _goto_getidx, _ret_getidx, _end_getidx
-            if not _end_getidx.IsSet():
-                bt.PushTriggerScope()
-
-                for t in range(31, -1, -1):
-                    _goto_getidx[t] << bt.RawTrigger(
+        def _eudget(self, i, **kwargs):
+            bitstrg = BitsTrg("varrget")
+            for trg in bitstrg:
+                trg["end"], trg["ret"] = Forward(), Forward()
+                for t in range(27, -1, -1):
+                    trg[t] << bt.RawTrigger(
                         conditions=_index.AtLeastX(1, 2**t),
                         actions=[
-                            bt.SetMemory(_end_getidx + 4, bt.Add, 72 * (2**t)),
-                            bt.SetMemory(_ret_getidx + 16, bt.Add, 18 * (2**t)),
-                            bt.SetMemory(_ret_getidx + 48, bt.Add, 18 * (2**t)),
+                            bt.SetMemory(trg["end"] + 4, bt.Add, 72 * (2**t)),
+                            bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
+                            bt.SetMemory(trg["ret"] + 48, bt.Add, 18 * (2**t)),
                         ],
                     )
-                _end_getidx << bt.RawTrigger(
+                trg["end"] << bt.RawTrigger(
                     nextptr=0,
                     actions=[
-                        _ret_getidx << bt.SetDeaths(0, bt.SetTo, 0, 0),
+                        trg["ret"] << bt.SetDeaths(0, bt.SetTo, 0, 0),
                         bt.SetDeaths(0, bt.SetTo, 0, 0),
                     ],
                 )
-                bt.PopTriggerScope()
 
-            r = EUDVariable()
+            r = kwargs["ret"][0] if "ret" in kwargs else EUDVariable()
+            dst = EPD(r.getValueAddr()) if IsEUDVariable(r) else r
             bits = max((size - 1).bit_length() - 1, 0)
             nptr = Forward()
-
-            SeqCompute(
-                [
-                    (EPD(_end_getidx + 4), bt.SetTo, self),
-                    (EPD(_ret_getidx + 16), bt.SetTo, self._epd + 344 // 4),
-                    (EPD(_ret_getidx + 48), bt.SetTo, self._epd + 1),
-                ]
-            )
-            bt.RawTrigger(
-                nextptr=i.GetVTable(),
-                actions=[
-                    i.QueueAssignTo(_index),
-                    bt.SetNextPtr(i.GetVTable(), _goto_getidx[bits]),
-                    bt.SetMemory(_ret_getidx + 20, bt.SetTo, EPD(r.getValueAddr())),
-                    bt.SetMemory(_ret_getidx + 52, bt.SetTo, nptr),
-                ],
-            )
-
+            if not IsEUDVariable(self._epd):
+                bt.RawTrigger(
+                    nextptr=i.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["end"] + 4, bt.SetTo, self),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 86),
+                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, dst),
+                        bt.SetMemory(bitstrg["ret"] + 48, bt.SetTo, self._epd + 1),
+                        bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, nptr),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                    ],
+                )
+            else:
+                VProc(
+                    [self, self._epd],
+                    [
+                        self.QueueAssignTo(EPD(bitstrg["end"]) + 1),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 86),
+                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, dst),
+                    ],
+                )
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 48, bt.SetTo, 1),
+                        self._epd.SetDest(EPD(bitstrg["ret"]) + 12),
+                        bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, nptr),
+                        bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                    ],
+                )
             nptr << bt.NextTrigger()
             return r
 
-        def _get(self, i):
-            # This function is hand-optimized
-
-            r = EUDVariable()
+        def _get(self, i, **kwargs):
+            r = kwargs["ret"][0] if "ret" in kwargs else EUDVariable()
+            dst = EPD(r.getValueAddr()) if IsEUDVariable(r) else r
             vtproc = Forward()
             nptr = Forward()
             a0, a2 = Forward(), Forward()
 
-            SeqCompute(
+            VProc(
+                [self, self._epd],
                 [
-                    (EPD(vtproc + 4), bt.SetTo, self + 72 * i),
-                    (EPD(a0 + 16), bt.SetTo, self._epd + (18 * i + 344 // 4)),
-                    (EPD(a2 + 16), bt.SetTo, self._epd + (18 * i + 1)),
-                ]
+                    bt.SetMemory(vtproc + 4, bt.SetTo, 72 * i),
+                    self.QueueAddTo(EPD(vtproc) + 1),
+                    bt.SetMemory(a0 + 16, bt.SetTo, 18 * i + 344 // 4),
+                    self._epd.QueueAddTo(EPD(a0) + 4),
+                ],
+            )
+            VProc(
+                self._epd,
+                [
+                    a0 << bt.SetDeaths(0, bt.SetTo, dst, 0),
+                    bt.SetMemory(a2 + 16, bt.SetTo, 18 * i + 1),
+                    self._epd.SetDest(EPD(a2) + 4),
+                ],
             )
             vtproc << bt.RawTrigger(
                 nextptr=0,
-                actions=[
-                    a0 << bt.SetDeaths(0, bt.SetTo, EPD(r.getValueAddr()), 0),
-                    a2 << bt.SetDeaths(0, bt.SetTo, nptr, 0),
-                ],
+                actions=[a2 << bt.SetDeaths(0, bt.SetTo, nptr, 0)],
             )
 
             nptr << bt.NextTrigger()
             return r
 
-        def _constget(self, i):
-            r = EUDVariable()
+        def _constget(self, i, **kwargs):
+            r = kwargs["ret"][0] if "ret" in kwargs else EUDVariable()
+            dst = EPD(r.getValueAddr()) if IsEUDVariable(r) else r
             nptr = Forward()
 
             bt.RawTrigger(
                 nextptr=self + 72 * i,
                 actions=[
-                    bt.SetDeaths(
-                        self._epd + (18 * i + 344 // 4),
-                        bt.SetTo,
-                        EPD(r.getValueAddr()),
-                        0,
-                    ),
-                    bt.SetDeaths(self._epd + (18 * i + 1), bt.SetTo, nptr, 0),
+                    bt.SetDeaths(self._epd + 18 * i + 86, bt.SetTo, dst, 0),
+                    bt.SetDeaths(self._epd + 18 * i + 1, bt.SetTo, nptr, 0),
                 ],
             )
-
             nptr << bt.NextTrigger()
             return r
 
         def set(self, i, value):
-            if IsConstExpr(self) and IsConstExpr(i):
-                if isUnproxyInstance(i, int):
-                    ep_assert(i < size, _("EUDVArray index out of bounds."))
-                if IsEUDVariable(value):
-                    self._consteudset(i, value)
-                else:
-                    self._constset(i, value)
-            else:
-                self._set(i, value)
+            if not IsEUDVariable(i):
+                return iset(self._epd, 18 * i + 348 // 4, bt.SetTo, value)
 
-        def _set(self, i, value):
-            # This function is hand-optimized
-
-            a0, t = Forward(), Forward()
-            SeqCompute(
-                [
-                    (EPD(a0 + 16), bt.SetTo, self._epd + (18 * i + 348 // 4)),
-                    (EPD(a0 + 20), bt.SetTo, value),
-                ]
-            )
-            t << bt.RawTrigger(actions=[a0 << bt.SetDeaths(0, bt.SetTo, 0, 0)])
-
-        def _consteudset(self, i, value):
-            VProc(value, [value.QueueAssignTo(self._epd + (18 * i + 348 // 4))])
-
-        def _constset(self, i, value):
-            bt.RawTrigger(
-                actions=bt.SetDeaths(
-                    self._epd + (18 * i + 348 // 4), bt.SetTo, value, 0
+            bitstrg = BitsTrg("varrset")
+            for trg in bitstrg:
+                trg["end"], trg["ret"] = Forward(), Forward()
+                for t in range(27, -1, -1):
+                    trg[t] << bt.RawTrigger(
+                        conditions=_index.AtLeastX(1, 2**t),
+                        actions=bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
+                    )
+                trg["end"] << bt.RawTrigger(
+                    nextptr=0,
+                    actions=[trg["ret"] << bt.SetDeaths(0, bt.SetTo, 0, 0)],
                 )
-            )
+
+            bits = max((size - 1).bit_length() - 1, 0)
+            nptr = Forward()
+            if IsEUDVariable(self._epd) and IsEUDVariable(value):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        bt.SetNextPtr(self._epd.GetVTable(), value.GetVTable()),
+                        value.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        bt.SetNextPtr(value.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            elif IsEUDVariable(self._epd):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
+                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, value),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            elif IsEUDVariable(value):
+                bt.RawTrigger(
+                    nextptr=value.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
+                        value.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        bt.SetNextPtr(value.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            else:
+                bt.RawTrigger(
+                    nextptr=i.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
+                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, value),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            nptr << bt.NextTrigger()
 
         def fill(self, values, *, assert_expected_values_len=None):
             if assert_expected_values_len:
