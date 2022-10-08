@@ -188,6 +188,8 @@ class EUDArray(ut.ExprProxy):
             return self.ianditem(key, val - 1)
         raise AttributeError
 
+    # FIXME: merge logic with EUDVariable and VariableBase
+
     def ilshiftitem(self, key, val):
         raise AttributeError
 
@@ -198,13 +200,193 @@ class EUDArray(ut.ExprProxy):
         raise AttributeError
 
     def ianditem(self, key, val):
-        raise AttributeError
+        if not c.IsEUDVariable(val):
+            if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
+                return c.RawTrigger(
+                    actions=SetMemoryXEPD(self._epd + key, c.SetTo, 0, ~val)
+                )
+
+            write = c.SetMemoryXEPD(0, c.SetTo, 0, ~val)
+            if c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
+                c.VProc(
+                    [self._epd, key],
+                    [
+                        self._epd.QueueAssignTo(ut.EPD(write) + 4),
+                        key.QueueAddTo(ut.EPD(write) + 4),
+                    ],
+                )
+            else:
+                ev, cn = self._epd, key
+                if c.IsEUDVariable(key):
+                    ev, cn = key, self._epd
+                c.VProc(
+                    ev,
+                    [
+                        c.SetMemory(write + 16, c.SetTo, cn),
+                        ev.QueueAddTo(ut.EPD(write) + 4),
+                    ],
+                )
+            return c.RawTrigger(actions=write)
+
+        if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
+            write = c.SetMemoryXEPD(self._epd + key, c.SetTo, 0, 0)
+            c.VProc(val, val.QueueAssignTo(ut.EPD(write)))
+        elif c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
+            write = c.SetMemoryXEPD(0, c.SetTo, ~0, 0)
+            c.VProc(
+                [self._epd, key, val],
+                [
+                    self._epd.QueueAssignTo(ut.EPD(write) + 4),
+                    key.QueueAddTo(ut.EPD(write) + 4),
+                    val.QueueAssignTo(ut.EPD(write)),
+                ],
+            )
+        else:
+            write = c.SetMemoryXEPD(0, c.SetTo, ~0, 0)
+            ev, cn = self._epd, key
+            if c.IsEUDVariable(key):
+                ev, cn = key, self._epd
+            c.VProc(
+                [ev, val],
+                [
+                    c.SetMemory(write + 16, c.SetTo, cn),
+                    ev.QueueAddTo(ut.EPD(write) + 4),
+                    val.QueueAssignTo(ut.EPD(write)),
+                ],
+            )
+        return c.RawTrigger(
+            actions=[
+                c.SetMemory(write, c.Add, -1, 0x55555555),
+                c.SetMemory(write, c.Add, -1, 0xAAAAAAAA),
+                write,
+            ],
+        )
 
     def ioritem(self, key, val):
-        raise AttributeError
+        if not c.IsEUDVariable(val):
+            if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
+                return c.RawTrigger(
+                    actions=SetMemoryXEPD(self._epd + key, c.SetTo, ~0, val)
+                )
+
+            write = c.SetMemoryXEPD(0, c.SetTo, ~0, val)
+            if c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
+                c.VProc(
+                    [self._epd, key],
+                    [
+                        self._epd.QueueAssignTo(ut.EPD(write) + 4),
+                        key.QueueAddTo(ut.EPD(write) + 4),
+                    ],
+                )
+            else:
+                ev, cn = self._epd, key
+                if c.IsEUDVariable(key):
+                    ev, cn = key, self._epd
+                c.VProc(
+                    ev,
+                    [
+                        c.SetMemory(write + 16, c.SetTo, cn),
+                        ev.QueueAddTo(ut.EPD(write) + 4),
+                    ],
+                )
+            return c.RawTrigger(actions=write)
+
+        if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
+            write = c.SetMemoryXEPD(self._epd + key, c.SetTo, ~0, 0)
+            c.VProc(val, val.QueueAssignTo(ut.EPD(write)))
+            return c.RawTrigger(actions=write)
+
+        write = c.SetMemoryXEPD(0, c.SetTo, ~0, 0)
+        if c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
+            c.VProc(
+                [self._epd, key, val],
+                [
+                    self._epd.QueueAssignTo(ut.EPD(write) + 4),
+                    key.QueueAddTo(ut.EPD(write) + 4),
+                    val.QueueAssignTo(ut.EPD(write)),
+                ],
+            )
+        else:
+            ev, cn = self._epd, key
+            if c.IsEUDVariable(key):
+                ev, cn = key, self._epd
+            c.VProc(
+                [ev, val],
+                [
+                    c.SetMemory(write + 16, c.SetTo, cn),
+                    ev.QueueAddTo(ut.EPD(write) + 4),
+                    val.QueueAssignTo(ut.EPD(write)),
+                ],
+            )
+        return c.RawTrigger(actions=write)
 
     def ixoritem(self, key, val):
-        raise AttributeError
+        if not c.IsEUDVariable(val):
+            dst = c.EncodePlayer(c.CurrentPlayer)
+            trg = f_setcurpl2cpcache
+            if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
+                dst = self._epd + key
+                trg = c.RawTrigger
+            elif c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
+                c.VProc(
+                    [self._epd, key],
+                    [
+                        self._epd.QueueAssignTo(ut.EPD(0x6509B0)),
+                        key.QueueAddTo(ut.EPD(0x6509B0)),
+                    ],
+                )
+            else:
+                ev, cn = self._epd, key
+                if c.IsEUDVariable(key):
+                    ev, cn = key, self._epd
+                c.VProc(
+                    ev,
+                    [
+                        c.SetMemory(0x6509B0, c.SetTo, cn),
+                        ev.QueueAddTo(ut.EPD(0x6509B0)),
+                    ],
+                )
+            return trg(
+                actions=[
+                    c.SetMemoryXEPD(dst, Add, val, 0x55555555),
+                    c.SetMemoryXEPD(dst, Add, val, 0xAAAAAAAA),
+                ],
+            )
+
+        dst = ut.EPD(val.getDestAddr())
+        if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
+            c.VProc(
+                val,
+                [
+                    val.QueueAddTo(self._epd + key),
+                    val.SetMask(0x55555555),
+                ],
+            )
+        elif c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
+            c.VProc(
+                [self._epd, key, val],
+                [
+                    self._epd.QueueAssignTo(dst),
+                    key.QueueAddTo(dst),
+                    val.SetMask(0x55555555),
+                    val.SetModifier(c.Add),
+                ],
+            )
+        else:
+            ev, cn = self._epd, key
+            if c.IsEUDVariable(key):
+                ev, cn = key, self._epd
+            c.VProc(
+                [ev, val],
+                [
+                    ev.QueueAddTo(dst),
+                    val.QueueAddTo(cn),
+                    val.SetMask(0x55555555),
+                ],
+            )
+        c.VProc(val, val.SetMask(0xAAAAAAAA))
+        # FIXME: restore to previous mask???
+        return c.RawTrigger(actions=val.SetMask(0xFFFFFFFF))
 
     # FIXME: Add operator?
     def iinvert(self, key):
