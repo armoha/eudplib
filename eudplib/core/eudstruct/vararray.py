@@ -27,7 +27,7 @@ from .. import rawtrigger as bt
 from ..allocator import Forward, ConstExpr, IsConstExpr
 
 from ...localize import _
-from ..inplacecw import iset, cpset
+from ..inplacecw import iset, cpset, iand, ior, ixor, ilshift, irshift
 from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, ep_assert
 
 from ..variable import EUDVariable, EUDLightVariable, SeqCompute, VProc, IsEUDVariable
@@ -409,15 +409,13 @@ def EUDVArray(size, basetype=None):
         # FIXME: merge logic with EUDVariable and VariableBase
 
         def ilshiftitem(self, i, val):
-            if isinstance(val, int):
-                if val == 0:
-                    return
+            if not IsEUDVariable(i):
+                return ilshift(self._epd, 18 * i + 87, val)
             raise AttributeError
 
         def irshiftitem(self, i, val):
-            if isinstance(val, int):
-                if val == 0:
-                    return
+            if not IsEUDVariable(i):
+                return irshift(self._epd, 18 * i + 87, val)
             raise AttributeError
 
         def ipowitem(self, i, val):
@@ -426,12 +424,18 @@ def EUDVArray(size, basetype=None):
             raise AttributeError
 
         def ianditem(self, i, val):
+            if not IsEUDVariable(i):
+                return iand(self._epd, 18 * i + 87, val)
             raise AttributeError
 
         def ioritem(self, i, val):
+            if not IsEUDVariable(i):
+                return ior(self._epd, 18 * i + 87, val)
             raise AttributeError
 
         def ixoritem(self, i, val):
+            if not IsEUDVariable(i):
+                return ixor(self._epd, 18 * i + 87, val)
             raise AttributeError
 
         # FIXME: Add operator?
