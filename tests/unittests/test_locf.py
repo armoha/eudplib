@@ -21,6 +21,16 @@ def test_locf():
         [52, 74],
     )
 
+    f_setloc(1, EUDVariable(51), EUDVariable(76))
+    test_equality(
+        "f_setloc test",
+        [
+            f_dwread_epd(EPD(0x58DC68)),
+            f_dwread_epd(EPD(0x58DC6C)),
+        ],
+        [51, 76],
+    )
+
     Pos = Db(i2b4(0x6FE05BD))
     f_setloc_epd(loc, EPD(Pos))
     L, T = f_getlocTL(loc)
