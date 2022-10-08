@@ -29,9 +29,12 @@ from .rawtrigger import (
     RawTrigger,
     SetMemory,
     SetTo,
+    Add,
     EncodePlayer,
     CurrentPlayer,
     SetDeaths,
+    SetMemoryXEPD,
+    Subtract,
 )
 
 
@@ -62,7 +65,7 @@ def cpset(a, b):
 
 
 def iset(a, b, modifier, v):
-    """f_dwwrite_epd(a + b, v)"""
+    """SetMemoryEPD(a + b, modifier, v)"""
     if not (IsEUDVariable(a) or IsEUDVariable(b)):
         from ..eudlib.memiof.dwepdio import setdw_epd
 
@@ -107,3 +110,189 @@ def iset(a, b, modifier, v):
             ],
         )
     return RawTrigger(actions=set_v)
+
+
+def iand(a, b, v):
+    if not IsEUDVariable(v):
+        if not (IsEUDVariable(a) or IsEUDVariable(b)):
+            return RawTrigger(actions=SetMemoryXEPD(a + b, SetTo, 0, ~v))
+
+        write = SetMemoryXEPD(0, SetTo, 0, ~v)
+        if IsEUDVariable(a) and IsEUDVariable(b):
+            VProc(
+                [a, b],
+                [
+                    a.QueueAssignTo(EPD(write) + 4),
+                    b.QueueAddTo(EPD(write) + 4),
+                ],
+            )
+        else:
+            if IsEUDVariable(b):
+                a, b = b, a
+            VProc(
+                a,
+                [
+                    SetMemory(write + 16, SetTo, b),
+                    a.QueueAddTo(EPD(write) + 4),
+                ],
+            )
+        return RawTrigger(actions=write)
+
+    if not (IsEUDVariable(a) or IsEUDVariable(b)):
+        write = SetMemoryXEPD(a + b, SetTo, 0, 0)
+        VProc(v, v.QueueAssignTo(EPD(write)))
+    elif IsEUDVariable(a) and IsEUDVariable(b):
+        write = SetMemoryXEPD(0, SetTo, ~0, 0)
+        VProc(
+            [a, b, v],
+            [
+                a.QueueAssignTo(EPD(write) + 4),
+                b.QueueAddTo(EPD(write) + 4),
+                v.QueueAssignTo(EPD(write)),
+            ],
+        )
+    else:
+        write = SetMemoryXEPD(0, SetTo, ~0, 0)
+        if IsEUDVariable(b):
+            a, b = b, a
+        VProc(
+            [a, v],
+            [
+                SetMemory(write + 16, SetTo, b),
+                a.QueueAddTo(EPD(write) + 4),
+                v.QueueAssignTo(EPD(write)),
+            ],
+        )
+    return RawTrigger(
+        actions=[
+            SetMemory(write, Add, -1, 0x55555555),
+            SetMemory(write, Add, -1, 0xAAAAAAAA),
+            write,
+        ],
+    )
+
+
+def ior(a, b, v):
+    if not IsEUDVariable(v):
+        if not (IsEUDVariable(a) or IsEUDVariable(b)):
+            return RawTrigger(actions=SetMemoryXEPD(a + b, SetTo, ~0, v))
+
+        write = SetMemoryXEPD(0, SetTo, ~0, v)
+        if IsEUDVariable(a) and IsEUDVariable(b):
+            VProc(
+                [a, b],
+                [
+                    a.QueueAssignTo(EPD(write) + 4),
+                    b.QueueAddTo(EPD(write) + 4),
+                ],
+            )
+        else:
+            if IsEUDVariable(b):
+                a, b = b, a
+            VProc(
+                a,
+                [
+                    SetMemory(write + 16, SetTo, b),
+                    a.QueueAddTo(EPD(write) + 4),
+                ],
+            )
+        return RawTrigger(actions=write)
+
+    if not (IsEUDVariable(a) or IsEUDVariable(b)):
+        write = SetMemoryXEPD(a + b, SetTo, ~0, 0)
+        VProc(v, v.QueueAssignTo(EPD(write)))
+        return RawTrigger(actions=write)
+
+    write = SetMemoryXEPD(0, SetTo, ~0, 0)
+    if IsEUDVariable(a) and IsEUDVariable(b):
+        VProc(
+            [a, b, v],
+            [
+                a.QueueAssignTo(EPD(write) + 4),
+                b.QueueAddTo(EPD(write) + 4),
+                v.QueueAssignTo(EPD(write)),
+            ],
+        )
+    else:
+        if IsEUDVariable(b):
+            a, b = b, a
+        VProc(
+            [a, v],
+            [
+                SetMemory(write + 16, SetTo, b),
+                a.QueueAddTo(EPD(write) + 4),
+                v.QueueAssignTo(EPD(write)),
+            ],
+        )
+    return RawTrigger(actions=write)
+
+
+def ixor(a, b, v):
+    if not IsEUDVariable(v):
+        dst, trg = cpset(a, b)
+        return trg(
+            actions=[
+                SetMemoryXEPD(dst, Add, v, 0x55555555),
+                SetMemoryXEPD(dst, Add, v, 0xAAAAAAAA),
+            ],
+        )
+
+    dst = EPD(v.getDestAddr())
+    if not (IsEUDVariable(a) or IsEUDVariable(b)):
+        VProc(v, [v.QueueAddTo(a + b), v.SetMask(0x55555555)])
+    elif IsEUDVariable(a) and IsEUDVariable(b):
+        VProc(
+            [a, b, v],
+            [
+                a.QueueAssignTo(dst),
+                b.QueueAddTo(dst),
+                v.SetMask(0x55555555),
+                v.SetModifier(Add),
+            ],
+        )
+    else:
+        if IsEUDVariable(b):
+            a, b = b, a
+        VProc(
+            [a, v],
+            [
+                a.QueueAddTo(dst),
+                v.QueueAddTo(b),
+                v.SetMask(0x55555555),
+            ],
+        )
+    VProc(v, v.SetMask(0xAAAAAAAA))
+    # FIXME: restore to previous mask???
+    return RawTrigger(actions=v.SetMask(0xFFFFFFFF))
+
+
+def ilshift(a, b, n):
+    assert isinstance(n, int)
+    if n == 0:
+        return
+    mask = (1 << (n + 1)) - 1
+    dst, trg = cpset(a, b)
+    itemw = lambda mod, value, mask: SetMemoryXEPD(dst, mod, value, mask)
+    return trg(
+        actions=[
+            [
+                itemw(SetTo, 0, (mask >> 1) << (n + 1)),
+                itemw(Add, (mask >> 1) << n, mask << n),
+            ]
+            for n in reversed(range(32 - n))
+        ]
+        + [itemw(SetTo, 0, mask >> 1)]  # lowest n bits
+    )
+
+
+def irshift(a, b, n):
+    assert isinstance(n, int)
+    if n == 0:
+        return
+    mask = (1 << (n + 1)) - 1
+    dst, trg = cpset(a, b)
+    sub = lambda value, mask: SetMemoryXEPD(dst, Subtract, value, mask)
+    return trg(
+        actions=[SetMemoryXEPD(dst, SetTo, 0, mask >> 1)]  # lowest n bits
+        + [sub((mask >> 1) << n, mask << n) for n in range(32 - n)]
+    )

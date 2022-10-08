@@ -26,7 +26,7 @@ from math import log2
 from .. import core as c
 from .. import utils as ut
 from .memiof import f_dwread_epd, f_dwwrite_epd, f_dwadd_epd, f_setcurpl2cpcache
-from ..core.inplacecw import iset, cpset
+from ..core.inplacecw import iset, cpset, iand, ior, ixor, ilshift, irshift
 from ..localize import _
 
 
@@ -192,36 +192,12 @@ class EUDArray(ut.ExprProxy):
 
     def ilshiftitem(self, key, val):
         if isinstance(val, int):
-            if val == 0:
-                return
-            n = val
-            mask = (1 << (n + 1)) - 1
-            dst, trg = cpset(self._epd, key)
-            itemw = lambda mod, value, mask: c.SetMemoryXEPD(dst, mod, value, mask)
-            return trg(
-                actions=[
-                    [
-                        itemw(c.SetTo, 0, (mask >> 1) << (n + 1)),
-                        itemw(c.Add, (mask >> 1) << n, mask << n),
-                    ]
-                    for n in reversed(range(32 - n))
-                ]
-                + [itemw(c.SetTo, 0, mask >> 1)]  # lowest n bits
-            )
+            return ilshift(self._epd, key, val)
         raise AttributeError
 
     def irshiftitem(self, key, val):
         if isinstance(val, int):
-            if val == 0:
-                return
-            n = val
-            mask = (1 << (n + 1)) - 1
-            dst, trg = cpset(self._epd, key)
-            sub = lambda value, mask: c.SetMemoryXEPD(dst, c.Subtract, value, mask)
-            return trg(
-                actions=[c.SetMemoryXEPD(dst, c.SetTo, 0, mask >> 1)]  # lowest n bits
-                + [sub((mask >> 1) << n, mask << n) for n in range(32 - n)]
-            )
+            return irshift(self._epd, key, val)
         raise AttributeError
 
     def ipowitem(self, key, val):
@@ -230,170 +206,13 @@ class EUDArray(ut.ExprProxy):
         raise AttributeError
 
     def ianditem(self, key, val):
-        if not c.IsEUDVariable(val):
-            if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
-                return c.RawTrigger(
-                    actions=SetMemoryXEPD(self._epd + key, c.SetTo, 0, ~val)
-                )
-
-            write = c.SetMemoryXEPD(0, c.SetTo, 0, ~val)
-            if c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
-                c.VProc(
-                    [self._epd, key],
-                    [
-                        self._epd.QueueAssignTo(ut.EPD(write) + 4),
-                        key.QueueAddTo(ut.EPD(write) + 4),
-                    ],
-                )
-            else:
-                ev, cn = self._epd, key
-                if c.IsEUDVariable(key):
-                    ev, cn = key, self._epd
-                c.VProc(
-                    ev,
-                    [
-                        c.SetMemory(write + 16, c.SetTo, cn),
-                        ev.QueueAddTo(ut.EPD(write) + 4),
-                    ],
-                )
-            return c.RawTrigger(actions=write)
-
-        if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
-            write = c.SetMemoryXEPD(self._epd + key, c.SetTo, 0, 0)
-            c.VProc(val, val.QueueAssignTo(ut.EPD(write)))
-        elif c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
-            write = c.SetMemoryXEPD(0, c.SetTo, ~0, 0)
-            c.VProc(
-                [self._epd, key, val],
-                [
-                    self._epd.QueueAssignTo(ut.EPD(write) + 4),
-                    key.QueueAddTo(ut.EPD(write) + 4),
-                    val.QueueAssignTo(ut.EPD(write)),
-                ],
-            )
-        else:
-            write = c.SetMemoryXEPD(0, c.SetTo, ~0, 0)
-            ev, cn = self._epd, key
-            if c.IsEUDVariable(key):
-                ev, cn = key, self._epd
-            c.VProc(
-                [ev, val],
-                [
-                    c.SetMemory(write + 16, c.SetTo, cn),
-                    ev.QueueAddTo(ut.EPD(write) + 4),
-                    val.QueueAssignTo(ut.EPD(write)),
-                ],
-            )
-        return c.RawTrigger(
-            actions=[
-                c.SetMemory(write, c.Add, -1, 0x55555555),
-                c.SetMemory(write, c.Add, -1, 0xAAAAAAAA),
-                write,
-            ],
-        )
+        iand(self._epd, key, val)
 
     def ioritem(self, key, val):
-        if not c.IsEUDVariable(val):
-            if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
-                return c.RawTrigger(
-                    actions=SetMemoryXEPD(self._epd + key, c.SetTo, ~0, val)
-                )
-
-            write = c.SetMemoryXEPD(0, c.SetTo, ~0, val)
-            if c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
-                c.VProc(
-                    [self._epd, key],
-                    [
-                        self._epd.QueueAssignTo(ut.EPD(write) + 4),
-                        key.QueueAddTo(ut.EPD(write) + 4),
-                    ],
-                )
-            else:
-                ev, cn = self._epd, key
-                if c.IsEUDVariable(key):
-                    ev, cn = key, self._epd
-                c.VProc(
-                    ev,
-                    [
-                        c.SetMemory(write + 16, c.SetTo, cn),
-                        ev.QueueAddTo(ut.EPD(write) + 4),
-                    ],
-                )
-            return c.RawTrigger(actions=write)
-
-        if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
-            write = c.SetMemoryXEPD(self._epd + key, c.SetTo, ~0, 0)
-            c.VProc(val, val.QueueAssignTo(ut.EPD(write)))
-            return c.RawTrigger(actions=write)
-
-        write = c.SetMemoryXEPD(0, c.SetTo, ~0, 0)
-        if c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
-            c.VProc(
-                [self._epd, key, val],
-                [
-                    self._epd.QueueAssignTo(ut.EPD(write) + 4),
-                    key.QueueAddTo(ut.EPD(write) + 4),
-                    val.QueueAssignTo(ut.EPD(write)),
-                ],
-            )
-        else:
-            ev, cn = self._epd, key
-            if c.IsEUDVariable(key):
-                ev, cn = key, self._epd
-            c.VProc(
-                [ev, val],
-                [
-                    c.SetMemory(write + 16, c.SetTo, cn),
-                    ev.QueueAddTo(ut.EPD(write) + 4),
-                    val.QueueAssignTo(ut.EPD(write)),
-                ],
-            )
-        return c.RawTrigger(actions=write)
+        ior(self._epd, key, val)
 
     def ixoritem(self, key, val):
-        if not c.IsEUDVariable(val):
-            dst, trg = cpset(self._epd, key)
-            return trg(
-                actions=[
-                    c.SetMemoryXEPD(dst, Add, val, 0x55555555),
-                    c.SetMemoryXEPD(dst, Add, val, 0xAAAAAAAA),
-                ],
-            )
-
-        dst = ut.EPD(val.getDestAddr())
-        if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
-            c.VProc(
-                val,
-                [
-                    val.QueueAddTo(self._epd + key),
-                    val.SetMask(0x55555555),
-                ],
-            )
-        elif c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
-            c.VProc(
-                [self._epd, key, val],
-                [
-                    self._epd.QueueAssignTo(dst),
-                    key.QueueAddTo(dst),
-                    val.SetMask(0x55555555),
-                    val.SetModifier(c.Add),
-                ],
-            )
-        else:
-            ev, cn = self._epd, key
-            if c.IsEUDVariable(key):
-                ev, cn = key, self._epd
-            c.VProc(
-                [ev, val],
-                [
-                    ev.QueueAddTo(dst),
-                    val.QueueAddTo(cn),
-                    val.SetMask(0x55555555),
-                ],
-            )
-        c.VProc(val, val.SetMask(0xAAAAAAAA))
-        # FIXME: restore to previous mask???
-        return c.RawTrigger(actions=val.SetMask(0xFFFFFFFF))
+        ixor(self._epd, key, val)
 
     # FIXME: Add operator?
     def iinvert(self, key):
