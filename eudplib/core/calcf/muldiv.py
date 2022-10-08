@@ -41,7 +41,7 @@ def f_mul(a, b, **kwargs):
         return f_constmul(a)(b, **kwargs)
 
     try:
-        ret = kwargs["ret"]
+        ret = kwargs["ret"][0]
     except KeyError:
         ret = ev.EUDVariable()
     ret << a * b
