@@ -88,7 +88,7 @@ class _ATTW:  # attribute write
 
     def __iadd__(self, v):
         try:
-            self.obj.iaddattr(self.attrName)
+            self.obj.iaddattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov += v
@@ -96,7 +96,7 @@ class _ATTW:  # attribute write
 
     def __isub__(self, v):
         try:
-            self.obj.isubattr(self.attrName)
+            self.obj.isubattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov -= v
@@ -104,7 +104,7 @@ class _ATTW:  # attribute write
 
     def __imul__(self, v):
         try:
-            self.obj.imulattr(self.attrName)
+            self.obj.imulattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov *= v
@@ -112,7 +112,7 @@ class _ATTW:  # attribute write
 
     def __ifloordiv__(self, v):
         try:
-            self.obj.ifloordivattr(self.attrName)
+            self.obj.ifloordivattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov //= v
@@ -120,7 +120,7 @@ class _ATTW:  # attribute write
 
     def __imod__(self, v):
         try:
-            self.obj.imodattr(self.attrName, val)
+            self.obj.imodattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov %= v
@@ -128,7 +128,7 @@ class _ATTW:  # attribute write
 
     def __ilshift__(self, v):
         try:
-            self.obj.ilshiftattr(self.attrName, val)
+            self.obj.ilshiftattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov <<= v
@@ -136,7 +136,7 @@ class _ATTW:  # attribute write
 
     def __irshift__(self, v):
         try:
-            self.obj.irshiftattr(self.attrName, val)
+            self.obj.irshiftattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov >>= v
@@ -144,7 +144,7 @@ class _ATTW:  # attribute write
 
     def __ipow__(self, v):
         try:
-            self.obj.ipowattr(self.attrName, val)
+            self.obj.ipowattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov **= v
@@ -152,7 +152,7 @@ class _ATTW:  # attribute write
 
     def __iand__(self, v):
         try:
-            self.obj.iandattr(self.attrName)
+            self.obj.iandattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov &= v
@@ -160,7 +160,7 @@ class _ATTW:  # attribute write
 
     def __ior__(self, v):
         try:
-            self.obj.iorattr(self.attrName)
+            self.obj.iorattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov |= v
@@ -168,7 +168,7 @@ class _ATTW:  # attribute write
 
     def __ixor__(self, v):
         try:
-            self.obj.ixorattr(self.attrName)
+            self.obj.ixorattr(self.attrName, v)
         except AttributeError:
             ov = getattr(self.obj, self.attrName)
             ov ^= v
@@ -185,7 +185,7 @@ class _ARRW:  # array write
 
     def __iadd__(self, v):
         try:
-            self.obj.iadditem(self.index)
+            self.obj.iadditem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov += v
@@ -193,7 +193,7 @@ class _ARRW:  # array write
 
     def __isub__(self, v):
         try:
-            self.obj.isubitem(self.index)
+            self.obj.isubitem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov -= v
@@ -201,7 +201,7 @@ class _ARRW:  # array write
 
     def __imul__(self, v):
         try:
-            self.obj.imulitem(self.index)
+            self.obj.imulitem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov *= v
@@ -209,39 +209,39 @@ class _ARRW:  # array write
 
     def __ifloordiv__(self, v):
         try:
-            self.obj.ifloordivitem(self.index)
+            self.obj.ifloordivitem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov //= v
             self.obj[self.index] = ov
 
-    def __imod__(self, val):
+    def __imod__(self, v):
         try:
-            self.obj.imoditem(self.index, val)
+            self.obj.imoditem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov %= v
             self.obj[self.index] = ov
 
-    def __ilshift__(self, val):
+    def __ilshift__(self, v):
         try:
-            self.obj.ilshiftitem(self.index, val)
+            self.obj.ilshiftitem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov <<= v
             self.obj[self.index] = ov
 
-    def __irshift__(self, val):
+    def __irshift__(self, v):
         try:
-            self.obj.irshiftitem(self.index, val)
+            self.obj.irshiftitem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov >>= v
             self.obj[self.index] = ov
 
-    def __ipow__(self, val):
+    def __ipow__(self, v):
         try:
-            self.obj.ipowitem(self.index, val)
+            self.obj.ipowitem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov **= v
@@ -249,7 +249,7 @@ class _ARRW:  # array write
 
     def __iand__(self, v):
         try:
-            self.obj.ianditem(self.index)
+            self.obj.ianditem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov &= v
@@ -257,7 +257,7 @@ class _ARRW:  # array write
 
     def __ior__(self, v):
         try:
-            self.obj.ioritem(self.index)
+            self.obj.ioritem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov |= v
@@ -265,7 +265,7 @@ class _ARRW:  # array write
 
     def __ixor__(self, v):
         try:
-            self.obj.ixoritem(self.index)
+            self.obj.ixoritem(self.index, v)
         except AttributeError:
             ov = self.obj[self.index]
             ov ^= v
