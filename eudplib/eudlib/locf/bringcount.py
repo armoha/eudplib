@@ -37,11 +37,16 @@ def _bringcount(player, unit, location):
         c.SetMemory(bring + 8, c.SetTo, 1024),
         c.SetMemoryX(bring + 12, c.SetTo, 3 << 24, 0xFFFF0000),
     )
-    c.RawTrigger(conditions=[bring, c.Memory(bring + 8, c.AtMost, 1700)])
+    c.RawTrigger(
+        conditions=[
+            bring,
+            c.Memory(bring + 8, c.AtMost, 1700)
+        ]
+    )
 
 
 def f_bringcount(player, unit, location):
-    if not any(IsEUDVariable(v) for v in (player, unit, location)):
+    if c.IsEUDVariable(player):
         cache = c.EUDVariable()
         cache_bring = c.Bring(player, c.Exactly, 0, unit, location)
         if cs.EUDIfNot()(cache_bring):
@@ -49,4 +54,23 @@ def f_bringcount(player, unit, location):
             c.VProc(cache, cache.QueueAssignTo(ut.EPD(cache_bring) + 2))
         cs.EUDEndIf()
         return cache
-    return _bringcount(player, unit, location)
+
+    if any(c.IsEUDVariable(v) for v in (player, unit, location)):
+        return _bringcount(player, unit, location)
+
+    count = c.EUDVariable()
+    cache_bring = c.Bring(player, c.Exactly, 0, unit, location)
+    check_cache, reload_check, update_cache, skip = [c.Forward() for _ in range(4)]
+
+    check_cache << c.RawTrigger(
+        nextptr=update_cache,
+        conditions=cache_bring,
+        actions=c.SetNextPtr(check_cache, reload_check)
+    )
+    reload_check << c.RawTrigger(
+        nextptr=skip,
+        actions=c.SetNextPtr(check_cache, update_cache)
+    )
+    update_cache << c.NextTrigger()
+    skip << c.NextTrigger()
+    return count
