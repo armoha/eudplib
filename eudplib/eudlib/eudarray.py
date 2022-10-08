@@ -26,7 +26,7 @@ from math import log2
 from .. import core as c
 from .. import utils as ut
 from .memiof import f_dwread_epd, f_dwwrite_epd, f_dwadd_epd, f_setcurpl2cpcache
-from .memiof.inplacecw import iset
+from .memiof.inplacecw import iset, cpset
 from ..localize import _
 
 
@@ -191,9 +191,33 @@ class EUDArray(ut.ExprProxy):
     # FIXME: merge logic with EUDVariable and VariableBase
 
     def ilshiftitem(self, key, val):
+        if isinstance(val, int):
+            n = val
+            mask = (1 << (n + 1)) - 1
+            dst, trg = cpset(self._epd, key)
+            itemw = lambda mod, value, mask: c.SetMemoryXEPD(dst, mod, value, mask)
+            return trg(
+                actions=[
+                    [
+                        itemw(c.SetTo, 0, (mask >> 1) << (n + 1)),
+                        itemw(c.Add, (mask >> 1) << n, mask << n),
+                    ]
+                    for n in reversed(range(32 - n))
+                ]
+                + [itemw(c.SetTo, 0, mask >> 1)]  # lowest n bits
+            )
         raise AttributeError
 
     def irshiftitem(self, key, val):
+        if isinstance(val, int):
+            n = val
+            mask = (1 << (n + 1)) - 1
+            dst, trg = cpset(self._epd, key)
+            sub = lambda value, mask: c.SetMemoryXEPD(dst, c.Subtract, value, mask)
+            return trg(
+                actions=[c.SetMemoryXEPD(dst, c.SetTo, 0, mask >> 1)]  # lowest n bits
+                + [sub((mask >> 1) << n, mask << n) for n in range(32 - n)]
+            )
         raise AttributeError
 
     def ipowitem(self, key, val):
@@ -322,30 +346,7 @@ class EUDArray(ut.ExprProxy):
 
     def ixoritem(self, key, val):
         if not c.IsEUDVariable(val):
-            dst = c.EncodePlayer(c.CurrentPlayer)
-            trg = f_setcurpl2cpcache
-            if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
-                dst = self._epd + key
-                trg = c.RawTrigger
-            elif c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
-                c.VProc(
-                    [self._epd, key],
-                    [
-                        self._epd.QueueAssignTo(ut.EPD(0x6509B0)),
-                        key.QueueAddTo(ut.EPD(0x6509B0)),
-                    ],
-                )
-            else:
-                ev, cn = self._epd, key
-                if c.IsEUDVariable(key):
-                    ev, cn = key, self._epd
-                c.VProc(
-                    ev,
-                    [
-                        c.SetMemory(0x6509B0, c.SetTo, cn),
-                        ev.QueueAddTo(ut.EPD(0x6509B0)),
-                    ],
-                )
+            dst, trg = cpset(self._epd, key)
             return trg(
                 actions=[
                     c.SetMemoryXEPD(dst, Add, val, 0x55555555),
