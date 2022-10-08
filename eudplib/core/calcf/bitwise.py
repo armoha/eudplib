@@ -27,10 +27,10 @@ from .. import allocator as ac
 from .. import variable as ev
 from .. import eudfunc as ef
 from .. import rawtrigger as rt
-from .muldiv import f_mul
+from .muldiv import f_mul, f_div
 from ...utils import EPD, RandList
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
-from ..variable.evcommon import _xv, _selfadder
+from ..variable.evcommon import _xv, _selfadder, _ev
 
 _x = _xv[0]
 
@@ -187,9 +187,11 @@ def f_bitlshift(a, b, _fdict={}, **kwargs):
     return _f_bitlshift(a, b, **kwargs)
 
 
-def f_bitrshift(a, b):
+def f_bitrshift(a, b, **kwargs):
     """Calculate a >> b"""
     if isinstance(b, int) and b >= 32:
         return 0
-
-    return a // _exp2(b)
+    ret = kwargs.get("ret")
+    if ret is not None:
+        ret.append(_ev[4])
+    return f_div(a, _exp2(b), **kwargs)[0]
