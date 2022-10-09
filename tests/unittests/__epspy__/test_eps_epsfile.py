@@ -285,6 +285,32 @@ def f_test_array():
     _ARRW(arr, p).__ixor__(ack[p])
     # (Line 150) arr[p] <<= ack[p];
     _ARRW(arr, p).__ilshift__(ack[p])
-    # (Line 152) return p;
+    # (Line 151) switch(arr[p]) {
+    EUDSwitch(arr[p])
+    # (Line 152) case 0:
+    _t1 = EUDSwitchCase()
+    # (Line 153) case 1:
+    if _t1(0):
+        pass
+    _t2 = EUDSwitchCase()
+    # (Line 154) break;
+    if _t2(1):
+        EUDBreak()
+        # (Line 155) }
+    # (Line 156) switch(ack[p]) {
+    EUDEndSwitch()
+    EUDSwitch(ack[p])
+    # (Line 157) case 0:
+    _t3 = EUDSwitchCase()
+    # (Line 158) case 1:
+    if _t3(0):
+        pass
+    _t4 = EUDSwitchCase()
+    # (Line 159) break;
+    if _t4(1):
+        EUDBreak()
+        # (Line 160) }
+    # (Line 162) return p;
+    EUDEndSwitch()
     EUDReturn(p)
-    # (Line 153) }
+    # (Line 163) }

@@ -148,6 +148,16 @@ function test_array() {
     arr[p] |= ack[p];
     arr[p] ^= ack[p];
     arr[p] <<= ack[p];
+    switch(arr[p]) {
+        case 0:
+        case 1:
+        break;
+    }
+    switch(ack[p]) {
+        case 0:
+        case 1:
+        break;
+    }
 
     return p;
 }

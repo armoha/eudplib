@@ -39,6 +39,7 @@ def _IsSwitchBlockId(idf):
 
 def EPDSwitch(epd, mask=0xFFFFFFFF):
     epd = c.EncodePlayer(epd)
+    epd = ut.unProxy(epd)
     block = {
         "targetepd": epd,
         "bitmask": mask,
@@ -54,6 +55,7 @@ def EPDSwitch(epd, mask=0xFFFFFFFF):
 
 
 def EUDSwitch(var, mask=0xFFFFFFFF):
+    var = ut.unProxy(var)
     block = {
         "targetvar": var,
         "bitmask": mask,
