@@ -27,14 +27,16 @@ from ..utils import EPD
 from .variable import IsEUDVariable, VProc
 from .rawtrigger import (
     RawTrigger,
-    SetMemory,
     SetTo,
     Add,
+    Subtract,
     EncodePlayer,
     CurrentPlayer,
     SetDeaths,
+    SetMemory,
+    SetMemoryX,
+    SetMemoryEPD,
     SetMemoryXEPD,
-    Subtract,
 )
 
 
@@ -112,6 +114,28 @@ def iset(a, b, modifier, v):
     return RawTrigger(actions=set_v)
 
 
+def isub(a, b, v):
+    if not IsEUDVariable(v):
+        return iset(a, b, Add, -v)
+    dst, trg = cpset(a, b)
+    VProc(
+        v,
+        [
+            SetMemoryXEPD(dst, Add, -1, 0x55555555),
+            SetMemoryXEPD(dst, Add, -1, 0xAAAAAAAA),
+            SetMemoryEPD(dst, Add, 1),
+            v.QueueAddTo(dst),
+        ],
+    )
+    return trg(
+        actions=[
+            SetMemoryXEPD(dst, Add, -1, 0x55555555),
+            SetMemoryXEPD(dst, Add, -1, 0xAAAAAAAA),
+            SetMemoryEPD(dst, Add, 1),
+        ],
+    )
+
+
 def iand(a, b, v):
     if not IsEUDVariable(v):
         if not (IsEUDVariable(a) or IsEUDVariable(b)):
@@ -165,8 +189,8 @@ def iand(a, b, v):
         )
     return RawTrigger(
         actions=[
-            SetMemory(write, Add, -1, 0x55555555),
-            SetMemory(write, Add, -1, 0xAAAAAAAA),
+            SetMemoryX(write, Add, -1, 0x55555555),
+            SetMemoryX(write, Add, -1, 0xAAAAAAAA),
             write,
         ],
     )

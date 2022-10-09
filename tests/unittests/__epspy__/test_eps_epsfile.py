@@ -259,6 +259,32 @@ ackMax = _CGFW(lambda: [8], 1)[0]
 def f_test_array():
     # (Line 134) var p = 1;
     p = _LVAR([1])
-    # (Line 135) return ack[p] % ackMax > 1 ? 0 : 1;
-    EUDReturn(EUDTernary(ack[p] % ackMax <= 1, neg=True)(0)(1))
-    # (Line 136) }
+    # (Line 135) p = ack[p] % ackMax > 1 ? 0 : 1;
+    p << (EUDTernary(ack[p] % ackMax <= 1, neg=True)(0)(1))
+    # (Line 136) const arr = EUDArray(8);
+    arr = EUDArray(8)
+    # (Line 138) ack[0] %= arr[p];
+    _ARRW(ack, 0).__imod__(arr[p])
+    # (Line 140) ack[p] &= 1;
+    _ARRW(ack, p).__iand__(1)
+    # (Line 141) ack[p] &= arr[p];
+    _ARRW(ack, p).__iand__(arr[p])
+    # (Line 142) arr[p] -= ack[p];
+    _ARRW(arr, p).__isub__(ack[p])
+    # (Line 143) arr[1] += ack[p];
+    _ARRW(arr, 1).__iadd__(ack[p])
+    # (Line 144) const x = ack[p];
+    x = ack[p]
+    # (Line 145) ack[p] = x & arr[p];
+    _ARRW(ack, p) << (x & arr[p])
+    # (Line 146) arr[p] &= ack[p];
+    _ARRW(arr, p).__iand__(ack[p])
+    # (Line 148) arr[p] |= ack[p];
+    _ARRW(arr, p).__ior__(ack[p])
+    # (Line 149) arr[p] ^= ack[p];
+    _ARRW(arr, p).__ixor__(ack[p])
+    # (Line 150) arr[p] <<= ack[p];
+    _ARRW(arr, p).__ilshift__(ack[p])
+    # (Line 152) return p;
+    EUDReturn(p)
+    # (Line 153) }

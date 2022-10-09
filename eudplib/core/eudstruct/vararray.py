@@ -27,7 +27,7 @@ from .. import rawtrigger as bt
 from ..allocator import Forward, ConstExpr, IsConstExpr
 
 from ...localize import _
-from ..inplacecw import iset, cpset, iand, ior, ixor, ilshift, irshift
+from ..inplacecw import iset, cpset, isub, iand, ior, ixor, ilshift, irshift
 from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, ep_assert
 
 from ..variable import EUDVariable, EUDLightVariable, SeqCompute, VProc, IsEUDVariable
@@ -365,7 +365,55 @@ def EUDVArray(size, basetype=None):
         def isubitem(self, i, val):
             if not IsEUDVariable(val):
                 return self._set(i, bt.Add, -val)
-            raise AttributeError
+            if not IsEUDVariable(i):
+                return isub(self._epd, 18 * i + 87, val)
+            bitstrg = BitsTrg("varrsub")
+            for trg in bitstrg:
+                trg["end"], trg["ret"] = Forward(), Forward()
+                for t in range(27, -1, -1):
+                    trg[t] << bt.RawTrigger(
+                        conditions=_index.AtLeastX(1, 2**t),
+                        actions=bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
+                    )
+                trg["end"] << bt.RawTrigger(
+                    nextptr=0,
+                    actions=[
+                        bt.SetMemoryX(trg["ret"] + 20, bt.Add, -1, 0x55555555),
+                        bt.SetMemoryX(trg["ret"] + 20, bt.Add, -1, 0xAAAAAAAA),
+                        bt.SetMemoryEPD(trg["ret"] + 20, bt.Add, 1),
+                        trg["ret"] << bt.SetDeaths(0, bt.Add, 0, 0),
+                    ],
+                )
+
+            bits = max((size - 1).bit_length() - 1, 0)
+            nptr = Forward()
+            if IsEUDVariable(self._epd):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
+                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            else:
+                bt.RawTrigger(
+                    nextptr=val.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
+                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            nptr << bt.NextTrigger()
 
         # defined when val is power of 2
         def imulitem(self, i, val):
@@ -408,15 +456,115 @@ def EUDVArray(size, basetype=None):
 
         # FIXME: merge logic with EUDVariable and VariableBase
 
-        def ilshiftitem(self, i, val):
+        def ilshiftitem(self, i, n):
+            if not isinstance(n, int):
+                raise AttributeError
             if not IsEUDVariable(i):
-                return ilshift(self._epd, 18 * i + 87, val)
-            raise AttributeError
+                return ilshift(self._epd, 18 * i + 87, n)
+            if n == 0:
+                return
+            bitstrg = BitsTrg(f"varrlshift{n}")
+            cp = bt.EncodePlayer(bt.CurrentPlayer)
+            for trg in bitstrg:
+                trg["end"] = Forward()
+                for t in range(27, -1, -1):
+                    trg[t] << bt.RawTrigger(
+                        conditions=_index.AtLeastX(1, 2**t),
+                        actions=bt.SetMemory(0x6509B0, bt.Add, 18 * (2**t)),
+                    )
+                itemw = lambda mod, value, mask: bt.SetMemoryXEPD(cp, mod, value, mask)
+                trg["end"] << bt.RawTrigger(
+                    nextptr=GetCPCache().GetVTable(),
+                    actions=[
+                        [
+                            itemw(bt.SetTo, 0, (mask >> 1) << (k + 1)),
+                            itemw(bt.Add, (mask >> 1) << k, mask << k),
+                        ]
+                        for k in reversed(range(32 - n))
+                    ]
+                    + [
+                        itemw(bt.SetTo, 0, mask >> 1),
+                        GetCPCache().SetDest(EPD(0x6509B0)),
+                    ],
+                )
 
-        def irshiftitem(self, i, val):
+            bits = max((size - 1).bit_length() - 1, 0)
+            nptr = Forward()
+            if IsEUDVariable(self._epd):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(0x6509B0, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(0x6509B0)),
+                        bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                    ],
+                )
+            else:
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                    ],
+                )
+            nptr << bt.NextTrigger()
+
+        def irshiftitem(self, i, n):
+            if not isinstance(n, int):
+                raise AttributeError
             if not IsEUDVariable(i):
-                return irshift(self._epd, 18 * i + 87, val)
-            raise AttributeError
+                return irshift(self._epd, 18 * i + 87, n)
+            if n == 0:
+                return
+            bitstrg = BitsTrg(f"varrrshift{n}")
+            cp = bt.EncodePlayer(bt.CurrentPlayer)
+            for trg in bitstrg:
+                trg["end"] = Forward()
+                for t in range(27, -1, -1):
+                    trg[t] << bt.RawTrigger(
+                        conditions=_index.AtLeastX(1, 2**t),
+                        actions=bt.SetMemory(0x6509B0, bt.Add, 18 * (2**t)),
+                    )
+                sub = lambda value, mask: bt.SetMemoryXEPD(cp, bt.Subtract, value, mask)
+                trg["end"] << bt.RawTrigger(
+                    nextptr=GetCPCache().GetVTable(),
+                    actions=[
+                        bt.SetMemoryXEPD(cp, bt.SetTo, 0, mask >> 1),
+                        GetCPCache().SetDest(EPD(0x6509B0)),
+                    ]
+                    + [sub((mask >> 1) << k, mask << k) for k in range(32 - n)],
+                )
+
+            bits = max((size - 1).bit_length() - 1, 0)
+            nptr = Forward()
+            if IsEUDVariable(self._epd):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(0x6509B0, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(0x6509B0)),
+                        bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                    ],
+                )
+            else:
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                    ],
+                )
+            nptr << bt.NextTrigger()
 
         def ipowitem(self, i, val):
             if isinstance(val, int) and val == 1:
@@ -426,23 +574,245 @@ def EUDVArray(size, basetype=None):
         def ianditem(self, i, val):
             if not IsEUDVariable(i):
                 return iand(self._epd, 18 * i + 87, val)
-            raise AttributeError
+            bitstrg = BitsTrg("varrand")
+            for trg in bitstrg:
+                trg["end"], trg["ret"] = Forward(), Forward()
+                for t in range(27, -1, -1):
+                    trg[t] << bt.RawTrigger(
+                        conditions=_index.AtLeastX(1, 2**t),
+                        actions=bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
+                    )
+                trg["end"] << bt.RawTrigger(
+                    nextptr=0,
+                    actions=[
+                        bt.SetMemoryX(trg["ret"], bt.Add, -1, 0x55555555),
+                        bt.SetMemoryX(trg["ret"], bt.Add, -1, 0xAAAAAAAA),
+                        trg["ret"] << bt.SetMemoryXEPD(0, bt.SetTo, 0, 0),
+                    ],
+                )
+
+            bits = max((size - 1).bit_length() - 1, 0)
+            nptr = Forward()
+            if IsEUDVariable(self._epd) and IsEUDVariable(val):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
+                        val.QueueAssignTo(EPD(bitstrg["ret"])),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            elif IsEUDVariable(self._epd):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
+                        bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            elif IsEUDVariable(val):
+                bt.RawTrigger(
+                    nextptr=val.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
+                        val.QueueAssignTo(EPD(bitstrg["ret"])),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            else:
+                bt.RawTrigger(
+                    nextptr=i.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
+                        bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            nptr << bt.NextTrigger()
 
         def ioritem(self, i, val):
             if not IsEUDVariable(i):
                 return ior(self._epd, 18 * i + 87, val)
-            raise AttributeError
+            bitstrg = BitsTrg("varror")
+            for trg in bitstrg:
+                trg["end"], trg["ret"] = Forward(), Forward()
+                for t in range(27, -1, -1):
+                    trg[t] << bt.RawTrigger(
+                        conditions=_index.AtLeastX(1, 2**t),
+                        actions=bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
+                    )
+                trg["end"] << bt.RawTrigger(
+                    nextptr=0,
+                    actions=[trg["ret"] << bt.SetMemoryXEPD(0, bt.SetTo, ~0, 0)],
+                )
+
+            bits = max((size - 1).bit_length() - 1, 0)
+            nptr = Forward()
+            if IsEUDVariable(self._epd) and IsEUDVariable(val):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
+                        val.QueueAssignTo(EPD(bitstrg["ret"])),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            elif IsEUDVariable(self._epd):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
+                        bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            elif IsEUDVariable(val):
+                bt.RawTrigger(
+                    nextptr=val.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
+                        val.QueueAssignTo(EPD(bitstrg["ret"])),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            else:
+                bt.RawTrigger(
+                    nextptr=i.GetVTable(),
+                    actions=[
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
+                        bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(bitstrg["end"], nptr),
+                    ],
+                )
+            nptr << bt.NextTrigger()
 
         def ixoritem(self, i, val):
+            from ..curpl import GetCPCache
+
             if not IsEUDVariable(i):
                 return ixor(self._epd, 18 * i + 87, val)
-            raise AttributeError
+            bitstrg = BitsTrg("varrxor")
+            for trg in bitstrg:
+                trg["end"], trg["ret"] = Forward(), Forward()
+                for t in range(27, -1, -1):
+                    trg[t] << bt.RawTrigger(
+                        conditions=_index.AtLeastX(1, 2**t),
+                        actions=bt.SetMemory(0x6509B0, bt.Add, 18 * (2**t)),
+                    )
+                trg["end"] << bt.RawTrigger(
+                    nextptr=GetCPCache().GetVTable(),
+                    actions=[
+                        trg["ret"]
+                        << bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0x55555555),
+                        bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0xAAAAAAAA),
+                        GetCPCache().SetDest(EPD(0x6509B0)),
+                    ],
+                )
+
+            bits = max((size - 1).bit_length() - 1, 0)
+            nptr, trg1, trg2 = Forward(), Forward(), Forward()
+            if IsEUDVariable(self._epd) and IsEUDVariable(val):
+                trg1 << bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(0x6509B0, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(0x6509B0)),
+                        bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
+                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        bt.SetNextPtr(val.GetVTable(), trg2),
+                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                    ],
+                )
+                trg2 << bt.RawTrigger(
+                    nextptr=val.GetVTable(),
+                    actions=[
+                        val.SetDest(EPD(bitstrg["ret"]) + 13),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                    ],
+                )
+            elif IsEUDVariable(self._epd):
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(0x6509B0, bt.SetTo, 87),
+                        self._epd.QueueAddTo(EPD(0x6509B0)),
+                        bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
+                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
+                        bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, val),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                    ],
+                )
+            elif IsEUDVariable(val):
+                trg1 << bt.RawTrigger(
+                    nextptr=val.GetVTable(),
+                    actions=[
+                        bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
+                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        bt.SetNextPtr(val.GetVTable(), trg2),
+                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                    ],
+                )
+                trg2 << bt.RawTrigger(
+                    nextptr=val.GetVTable(),
+                    actions=[
+                        val.SetDest(EPD(bitstrg["ret"]) + 13),
+                        bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                    ],
+                )
+            else:
+                bt.RawTrigger(
+                    nextptr=self._epd.GetVTable(),
+                    actions=[
+                        bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
+                        bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
+                        bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, val),
+                        i.QueueAssignTo(_index),
+                        bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
+                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                    ],
+                )
+            nptr << bt.NextTrigger()
 
         # FIXME: Add operator?
-        def iinvert(self, i):
+        def iinvertitem(self, i):
             return self.ixoritem(i, 0xFFFFFFFF)
 
-        def inot(self, i):
+        def inotitem(self, i):
             raise AttributeError
 
         # item comparisons

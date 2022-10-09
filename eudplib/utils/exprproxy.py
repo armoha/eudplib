@@ -203,93 +203,104 @@ class ItemProxy:
 
     # in-place item operations
     # FIXME: should we raise AttributeError for unsupported arguments?
-    def __iadd__(self, val):
+    def __iadd__(self, v):
         try:
-            self._parent.iadditem(self._key, val)
+            self._parent.iadditem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov += v
             self._parent[self._key] = ov
+        return self
 
-    def __isub__(self, val):
+    def __isub__(self, v):
         try:
-            self._parent.isubitem(self._key, val)
+            self._parent.isubitem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov -= v
             self._parent[self._key] = ov
+        return self
 
-    def __imul__(self, val):
+    def __imul__(self, v):
         try:
-            self._parent.imulitem(self._key, val)
+            self._parent.imulitem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov *= v
             self._parent[self._key] = ov
+        return self
 
-    def __ifloordiv__(self, val):
+    def __ifloordiv__(self, v):
         try:
-            self._parent.ifloordivitem(self._key, val)
+            self._parent.ifloordivitem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov //= v
             self._parent[self._key] = ov
+        return self
 
-    def __imod__(self, val):
+    def __imod__(self, v):
         try:
-            self._parent.imoditem(self._key, val)
+            self._parent.imoditem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov %= v
             self._parent[self._key] = ov
+        return self
 
-    def __ilshift__(self, val):
+    def __ilshift__(self, v):
         try:
-            self._parent.ilshiftitem(self._key, val)
+            self._parent.ilshiftitem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov <<= v
             self._parent[self._key] = ov
+        return self
 
-    def __irshift__(self, val):
+    def __irshift__(self, v):
         try:
-            self._parent.irshiftitem(self._key, val)
+            self._parent.irshiftitem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov >>= v
             self._parent[self._key] = ov
+        return self
 
-    def __ipow__(self, val):
+    def __ipow__(self, v):
         try:
-            self._parent.ipowitem(self._key, val)
+            self._parent.ipowitem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov **= v
             self._parent[self._key] = ov
+        return self
 
-    def __iand__(self, val):
+    def __iand__(self, v):
         try:
-            self._parent.ianditem(self._key, val)
+            self._parent.ianditem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov &= v
             self._parent[self._key] = ov
+        return self
 
-    def __ior__(self, val):
+    def __ior__(self, v):
         try:
-            self._parent.ioritem(self._key, val)
+            self._parent.ioritem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov |= v
             self._parent[self._key] = ov
+        return self
 
-    def __ixor__(self, val):
+    def __ixor__(self, v):
         try:
-            self._parent.ixoritem(self._key, val)
+            self._parent.ixoritem(self._key, v)
         except AttributeError:
             ov = self.getValue()
             ov ^= v
             self._parent[self._key] = ov
+        return self
 
     # Proxy arithmetic operators
 
@@ -329,11 +340,11 @@ class ItemProxy:
     def __rfloordiv__(self, k):
         return k // self.getValue()
 
-    def __mod__(self, val):
-        return self.getValue() % val
+    def __mod__(self, k):
+        return self.getValue() % k
 
-    def __rmod__(self, val):
-        return val % self.getValue()
+    def __rmod__(self, k):
+        return k % self.getValue()
 
     def __and__(self, k):
         return self.getValue() & k

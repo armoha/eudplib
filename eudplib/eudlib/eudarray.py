@@ -26,7 +26,7 @@ from math import log2
 from .. import core as c
 from .. import utils as ut
 from .memiof import f_dwread_epd, f_dwwrite_epd, f_dwadd_epd, f_setcurpl2cpcache
-from ..core.inplacecw import iset, cpset, iand, ior, ixor, ilshift, irshift
+from ..core.inplacecw import iset, cpset, isub, iand, ior, ixor, ilshift, irshift
 from ..localize import _
 
 
@@ -104,50 +104,7 @@ class EUDArray(ut.ExprProxy):
         return iset(self._epd, key, c.Subtract, val)
 
     def isubitem(self, key, val):
-        if not c.IsEUDVariable(val):
-            return iset(self._epd, key, c.Add, -val)
-        dst = c.EncodePlayer(c.CurrentPlayer)
-        trg = f_setcurpl2cpcache
-        if not (c.IsEUDVariable(self._epd) or c.IsEUDVariable(key)):
-            dst = self._epd + key
-            trg = c.RawTrigger
-            # x - b = -(-x + b) = ~(~x + 1 + b) + 1
-            # Run 3 triggers, 10 actions
-        elif c.IsEUDVariable(self._epd) and c.IsEUDVariable(key):
-            c.VProc(
-                [self._epd, key],
-                [
-                    self._epd.QueueAssignTo(ut.EPD(0x6509B0)),
-                    key.QueueAddTo(ut.EPD(0x6509B0)),
-                ],
-            )
-        else:
-            ev, cn = self._epd, key
-            if c.IsEUDVariable(key):
-                ev, cn = key, self._epd
-            c.VProc(
-                ev,
-                [
-                    c.SetMemory(0x6509B0, c.SetTo, cn),
-                    ev.QueueAddTo(ut.EPD(0x6509B0)),
-                ],
-            )
-        c.VProc(
-            val,
-            [
-                c.SetMemoryXEPD(dst, Add, -1, 0x55555555),
-                c.SetMemoryXEPD(dst, Add, -1, 0xAAAAAAAA),
-                c.SetMemoryEPD(dst, Add, 1),
-                val.QueueAddTo(dst),
-            ],
-        )
-        return trg(
-            actions=[
-                c.SetMemoryXEPD(dst, Add, -1, 0x55555555),
-                c.SetMemoryXEPD(dst, Add, -1, 0xAAAAAAAA),
-                c.SetMemoryEPD(dst, Add, 1),
-            ],
-        )
+        return isub(self._epd, key, val)
 
     # defined when val is power of 2
     def imulitem(self, key, val):

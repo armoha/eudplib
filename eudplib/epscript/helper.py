@@ -93,6 +93,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov += v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __isub__(self, v):
         try:
@@ -101,6 +102,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov -= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __imul__(self, v):
         try:
@@ -109,6 +111,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov *= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __ifloordiv__(self, v):
         try:
@@ -117,6 +120,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov //= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __imod__(self, v):
         try:
@@ -125,6 +129,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov %= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __ilshift__(self, v):
         try:
@@ -133,6 +138,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov <<= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __irshift__(self, v):
         try:
@@ -141,6 +147,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov >>= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __ipow__(self, v):
         try:
@@ -149,6 +156,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov **= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __iand__(self, v):
         try:
@@ -157,6 +165,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov &= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __ior__(self, v):
         try:
@@ -165,6 +174,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov |= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
     def __ixor__(self, v):
         try:
@@ -173,6 +183,7 @@ class _ATTW:  # attribute write
             ov = getattr(self.obj, self.attrName)
             ov ^= v
             setattr(self.obj, self.attrName, ov)
+        return self
 
 
 class _ARRW:  # array write
@@ -190,6 +201,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov += v
             self.obj[self.index] = ov
+        return self
 
     def __isub__(self, v):
         try:
@@ -198,6 +210,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov -= v
             self.obj[self.index] = ov
+        return self
 
     def __imul__(self, v):
         try:
@@ -206,6 +219,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov *= v
             self.obj[self.index] = ov
+        return self
 
     def __ifloordiv__(self, v):
         try:
@@ -214,6 +228,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov //= v
             self.obj[self.index] = ov
+        return self
 
     def __imod__(self, v):
         try:
@@ -222,6 +237,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov %= v
             self.obj[self.index] = ov
+        return self
 
     def __ilshift__(self, v):
         try:
@@ -230,6 +246,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov <<= v
             self.obj[self.index] = ov
+        return self
 
     def __irshift__(self, v):
         try:
@@ -238,6 +255,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov >>= v
             self.obj[self.index] = ov
+        return self
 
     def __ipow__(self, v):
         try:
@@ -246,6 +264,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov **= v
             self.obj[self.index] = ov
+        return self
 
     def __iand__(self, v):
         try:
@@ -254,6 +273,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov &= v
             self.obj[self.index] = ov
+        return self
 
     def __ior__(self, v):
         try:
@@ -262,6 +282,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov |= v
             self.obj[self.index] = ov
+        return self
 
     def __ixor__(self, v):
         try:
@@ -270,6 +291,7 @@ class _ARRW:  # array write
             ov = self.obj[self.index]
             ov ^= v
             self.obj[self.index] = ov
+        return self
 
 
 def _L2V(l):  # logic to value
