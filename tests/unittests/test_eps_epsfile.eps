@@ -148,6 +148,10 @@ function test_array() {
     arr[p] |= ack[p];
     arr[p] ^= ack[p];
     arr[p] <<= ack[p];
+
+    if (ack[p] > ack[p]) {}
+    dwwrite_epd(ack[p] + p / 2, 0);
+
     switch(arr[p]) {
         case 0:
         case 1:

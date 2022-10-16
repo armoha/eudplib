@@ -2676,7 +2676,7 @@ State 12:
                          error shift  433
                      vdef_stmt shift  431
                      blockStmt shift  157
-                          stmt shift  173
+                          stmt shift  179
                       bodyStmt shift  161
                       lbracket shift  1
                   blockStmtSub shift  127
@@ -5240,8 +5240,8 @@ State 31:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  314
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                       exprList shift  365
                lambdaExprStart shift  12
 
@@ -5436,8 +5436,8 @@ State 34:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  309
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 35:
@@ -5522,8 +5522,8 @@ State 35:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  311
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 36:
@@ -5608,8 +5608,8 @@ State 36:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  315
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 37:
@@ -5694,8 +5694,8 @@ State 37:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  327
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 38:
@@ -5780,8 +5780,8 @@ State 38:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  328
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 39:
@@ -5866,8 +5866,8 @@ State 39:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  329
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 40:
@@ -6124,8 +6124,8 @@ State 42:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  299
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 43:
@@ -6296,8 +6296,8 @@ State 44:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  332
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 45:
@@ -6382,8 +6382,8 @@ State 45:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  334
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 46:
@@ -6468,8 +6468,8 @@ State 46:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  336
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 47:
@@ -6554,8 +6554,8 @@ State 47:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  116
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 48:
@@ -6640,8 +6640,8 @@ State 48:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  117
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 49:
@@ -6726,8 +6726,8 @@ State 49:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  118
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 50:
@@ -6812,8 +6812,8 @@ State 50:
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
              exprList_nonEmpty shift  226
-                          expr shift  195
-                      funcexpr shift  196
+                          expr shift  196
+                      funcexpr shift  197
                lambdaExprStart shift  12
 
 State 51:
@@ -8473,7 +8473,7 @@ State 71:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  174
+                          expr shift  163
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -8555,7 +8555,7 @@ State 72:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  175
+                          expr shift  164
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -8637,7 +8637,7 @@ State 73:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  176
+                          expr shift  165
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -8719,7 +8719,7 @@ State 74:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  177
+                          expr shift  166
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -8801,7 +8801,7 @@ State 75:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  178
+                          expr shift  167
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -8883,7 +8883,7 @@ State 76:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  183
+                          expr shift  184
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -8965,7 +8965,7 @@ State 77:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  184
+                          expr shift  185
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -9047,7 +9047,7 @@ State 78:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  185
+                          expr shift  186
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -9129,7 +9129,7 @@ State 79:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  186
+                          expr shift  187
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -9375,7 +9375,7 @@ State 82:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  198
+                          expr shift  168
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -9710,7 +9710,7 @@ State 86:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  163
+                          expr shift  169
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -9792,7 +9792,7 @@ State 87:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  164
+                          expr shift  170
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -9874,7 +9874,7 @@ State 88:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  165
+                          expr shift  171
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -9956,7 +9956,7 @@ State 89:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  166
+                          expr shift  172
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -10038,7 +10038,7 @@ State 90:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  167
+                          expr shift  173
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -10120,7 +10120,7 @@ State 91:
                  CONDITIONNAME shift  398
                     ACTIONNAME shift  397
                 ACTIONALLPNAME shift  395
-                          expr shift  168
+                          expr shift  174
                       funcexpr shift  218
                lambdaExprStart shift  12
 
@@ -14194,6 +14194,690 @@ State 163:
           expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
           expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
           expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
+    (129) expr ::= expr LSQBRACKET expr RSQBRACKET GT expr *
+          expr ::= expr * EQ expr
+          expr ::= expr * NE expr
+          expr ::= expr * LE expr
+          expr ::= expr * GE expr
+          expr ::= expr * LT expr
+          expr ::= expr * GT expr
+          expr ::= expr * LAND expr
+          expr ::= expr * LOR expr
+
+                         QMARK shift  103 -- dropped by precedence
+                         QMARK reduce 129
+                         COMMA reduce 129
+                           LOR shift  84  -- dropped by precedence
+                           LOR reduce 129
+                          LAND shift  85  -- dropped by precedence
+                          LAND reduce 129
+                          LNOT reduce 129
+                            EQ error
+                            EQ reduce 129
+                            LE error
+                            LE reduce 129
+                            LT error
+                            LT reduce 129
+                            GE error
+                            GE reduce 129
+                            GT error
+                            GT reduce 129
+                            NE error
+                            NE reduce 129
+                         BITOR shift  93
+                         BITOR reduce 129 -- dropped by precedence
+                        BITXOR shift  92
+                        BITXOR reduce 129 -- dropped by precedence
+                        BITAND shift  94
+                        BITAND reduce 129 -- dropped by precedence
+                        LSHIFT shift  96
+                        LSHIFT reduce 129 -- dropped by precedence
+                        RSHIFT shift  95
+                        RSHIFT reduce 129 -- dropped by precedence
+                          PLUS shift  101
+                          PLUS reduce 129 -- dropped by precedence
+                         MINUS shift  100
+                         MINUS reduce 129 -- dropped by precedence
+                        DIVIDE shift  98
+                        DIVIDE reduce 129 -- dropped by precedence
+                      MULTIPLY shift  99
+                      MULTIPLY reduce 129 -- dropped by precedence
+                           MOD shift  97
+                           MOD reduce 129 -- dropped by precedence
+                        BITNOT reduce 129
+                        LPAREN shift  28
+                        LPAREN reduce 129 -- dropped by precedence
+                    LSQBRACKET shift  105
+                    LSQBRACKET reduce 129 -- dropped by precedence
+                        PERIOD shift  435
+                        PERIOD reduce 129 -- dropped by precedence
+                     SEMICOLON reduce 129
+                          NAME reduce 129
+                         COLON reduce 129
+                      FUNCTION reduce 129
+                        RPAREN reduce 129
+                      LBRACKET reduce 129
+                           VAR reduce 129
+                        NUMBER reduce 129
+                    RSQBRACKET reduce 129
+                         KILLS reduce 129
+                           L2V reduce 129
+                     MAPSTRING reduce 129
+                          UNIT reduce 129
+                        SWITCH reduce 129
+                      LOCATION reduce 129
+                    STATTXTTBL reduce 129
+                        VARRAY reduce 129
+                          LIST reduce 129
+                        STATIC reduce 129
+                         CONST reduce 129
+                           INC reduce 129
+                           DEC reduce 129
+                          ONCE reduce 129
+                            IF reduce 129
+                     EPDSWITCH reduce 129
+                    SWITCHCASE reduce 129
+                         WHILE reduce 129
+                           FOR reduce 129
+                       FOREACH reduce 129
+                      CONTINUE reduce 129
+                         BREAK reduce 129
+                        RETURN reduce 129
+                 CONDITIONNAME reduce 129
+                    ACTIONNAME reduce 129
+                ACTIONALLPNAME reduce 129
+
+State 164:
+          expr ::= expr * PERIOD NAME
+          expr ::= expr * LSQBRACKET expr RSQBRACKET
+          funcexpr ::= expr * LPAREN fArgs RPAREN
+          expr ::= expr * QMARK expr COLON expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * MINUS expr
+          expr ::= expr * MULTIPLY expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * MOD expr
+          expr ::= expr * LSHIFT expr
+          expr ::= expr * RSHIFT expr
+          expr ::= expr * BITAND expr
+          expr ::= expr * BITOR expr
+          expr ::= expr * BITXOR expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
+    (128) expr ::= expr LSQBRACKET expr RSQBRACKET LT expr *
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NE expr
+          expr ::= expr * LE expr
+          expr ::= expr * GE expr
+          expr ::= expr * LT expr
+          expr ::= expr * GT expr
+          expr ::= expr * LAND expr
+          expr ::= expr * LOR expr
+
+                         QMARK shift  103 -- dropped by precedence
+                         QMARK reduce 128
+                         COMMA reduce 128
+                           LOR shift  84  -- dropped by precedence
+                           LOR reduce 128
+                          LAND shift  85  -- dropped by precedence
+                          LAND reduce 128
+                          LNOT reduce 128
+                            EQ error
+                            EQ reduce 128
+                            LE error
+                            LE reduce 128
+                            LT error
+                            LT reduce 128
+                            GE error
+                            GE reduce 128
+                            GT error
+                            GT reduce 128
+                            NE error
+                            NE reduce 128
+                         BITOR shift  93
+                         BITOR reduce 128 -- dropped by precedence
+                        BITXOR shift  92
+                        BITXOR reduce 128 -- dropped by precedence
+                        BITAND shift  94
+                        BITAND reduce 128 -- dropped by precedence
+                        LSHIFT shift  96
+                        LSHIFT reduce 128 -- dropped by precedence
+                        RSHIFT shift  95
+                        RSHIFT reduce 128 -- dropped by precedence
+                          PLUS shift  101
+                          PLUS reduce 128 -- dropped by precedence
+                         MINUS shift  100
+                         MINUS reduce 128 -- dropped by precedence
+                        DIVIDE shift  98
+                        DIVIDE reduce 128 -- dropped by precedence
+                      MULTIPLY shift  99
+                      MULTIPLY reduce 128 -- dropped by precedence
+                           MOD shift  97
+                           MOD reduce 128 -- dropped by precedence
+                        BITNOT reduce 128
+                        LPAREN shift  28
+                        LPAREN reduce 128 -- dropped by precedence
+                    LSQBRACKET shift  105
+                    LSQBRACKET reduce 128 -- dropped by precedence
+                        PERIOD shift  435
+                        PERIOD reduce 128 -- dropped by precedence
+                     SEMICOLON reduce 128
+                          NAME reduce 128
+                         COLON reduce 128
+                      FUNCTION reduce 128
+                        RPAREN reduce 128
+                      LBRACKET reduce 128
+                           VAR reduce 128
+                        NUMBER reduce 128
+                    RSQBRACKET reduce 128
+                         KILLS reduce 128
+                           L2V reduce 128
+                     MAPSTRING reduce 128
+                          UNIT reduce 128
+                        SWITCH reduce 128
+                      LOCATION reduce 128
+                    STATTXTTBL reduce 128
+                        VARRAY reduce 128
+                          LIST reduce 128
+                        STATIC reduce 128
+                         CONST reduce 128
+                           INC reduce 128
+                           DEC reduce 128
+                          ONCE reduce 128
+                            IF reduce 128
+                     EPDSWITCH reduce 128
+                    SWITCHCASE reduce 128
+                         WHILE reduce 128
+                           FOR reduce 128
+                       FOREACH reduce 128
+                      CONTINUE reduce 128
+                         BREAK reduce 128
+                        RETURN reduce 128
+                 CONDITIONNAME reduce 128
+                    ACTIONNAME reduce 128
+                ACTIONALLPNAME reduce 128
+
+State 165:
+          expr ::= expr * PERIOD NAME
+          expr ::= expr * LSQBRACKET expr RSQBRACKET
+          funcexpr ::= expr * LPAREN fArgs RPAREN
+          expr ::= expr * QMARK expr COLON expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * MINUS expr
+          expr ::= expr * MULTIPLY expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * MOD expr
+          expr ::= expr * LSHIFT expr
+          expr ::= expr * RSHIFT expr
+          expr ::= expr * BITAND expr
+          expr ::= expr * BITOR expr
+          expr ::= expr * BITXOR expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
+    (127) expr ::= expr LSQBRACKET expr RSQBRACKET GE expr *
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NE expr
+          expr ::= expr * LE expr
+          expr ::= expr * GE expr
+          expr ::= expr * LT expr
+          expr ::= expr * GT expr
+          expr ::= expr * LAND expr
+          expr ::= expr * LOR expr
+
+                         QMARK shift  103 -- dropped by precedence
+                         QMARK reduce 127
+                         COMMA reduce 127
+                           LOR shift  84  -- dropped by precedence
+                           LOR reduce 127
+                          LAND shift  85  -- dropped by precedence
+                          LAND reduce 127
+                          LNOT reduce 127
+                            EQ error
+                            EQ reduce 127
+                            LE error
+                            LE reduce 127
+                            LT error
+                            LT reduce 127
+                            GE error
+                            GE reduce 127
+                            GT error
+                            GT reduce 127
+                            NE error
+                            NE reduce 127
+                         BITOR shift  93
+                         BITOR reduce 127 -- dropped by precedence
+                        BITXOR shift  92
+                        BITXOR reduce 127 -- dropped by precedence
+                        BITAND shift  94
+                        BITAND reduce 127 -- dropped by precedence
+                        LSHIFT shift  96
+                        LSHIFT reduce 127 -- dropped by precedence
+                        RSHIFT shift  95
+                        RSHIFT reduce 127 -- dropped by precedence
+                          PLUS shift  101
+                          PLUS reduce 127 -- dropped by precedence
+                         MINUS shift  100
+                         MINUS reduce 127 -- dropped by precedence
+                        DIVIDE shift  98
+                        DIVIDE reduce 127 -- dropped by precedence
+                      MULTIPLY shift  99
+                      MULTIPLY reduce 127 -- dropped by precedence
+                           MOD shift  97
+                           MOD reduce 127 -- dropped by precedence
+                        BITNOT reduce 127
+                        LPAREN shift  28
+                        LPAREN reduce 127 -- dropped by precedence
+                    LSQBRACKET shift  105
+                    LSQBRACKET reduce 127 -- dropped by precedence
+                        PERIOD shift  435
+                        PERIOD reduce 127 -- dropped by precedence
+                     SEMICOLON reduce 127
+                          NAME reduce 127
+                         COLON reduce 127
+                      FUNCTION reduce 127
+                        RPAREN reduce 127
+                      LBRACKET reduce 127
+                           VAR reduce 127
+                        NUMBER reduce 127
+                    RSQBRACKET reduce 127
+                         KILLS reduce 127
+                           L2V reduce 127
+                     MAPSTRING reduce 127
+                          UNIT reduce 127
+                        SWITCH reduce 127
+                      LOCATION reduce 127
+                    STATTXTTBL reduce 127
+                        VARRAY reduce 127
+                          LIST reduce 127
+                        STATIC reduce 127
+                         CONST reduce 127
+                           INC reduce 127
+                           DEC reduce 127
+                          ONCE reduce 127
+                            IF reduce 127
+                     EPDSWITCH reduce 127
+                    SWITCHCASE reduce 127
+                         WHILE reduce 127
+                           FOR reduce 127
+                       FOREACH reduce 127
+                      CONTINUE reduce 127
+                         BREAK reduce 127
+                        RETURN reduce 127
+                 CONDITIONNAME reduce 127
+                    ACTIONNAME reduce 127
+                ACTIONALLPNAME reduce 127
+
+State 166:
+          expr ::= expr * PERIOD NAME
+          expr ::= expr * LSQBRACKET expr RSQBRACKET
+          funcexpr ::= expr * LPAREN fArgs RPAREN
+          expr ::= expr * QMARK expr COLON expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * MINUS expr
+          expr ::= expr * MULTIPLY expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * MOD expr
+          expr ::= expr * LSHIFT expr
+          expr ::= expr * RSHIFT expr
+          expr ::= expr * BITAND expr
+          expr ::= expr * BITOR expr
+          expr ::= expr * BITXOR expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
+    (126) expr ::= expr LSQBRACKET expr RSQBRACKET LE expr *
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NE expr
+          expr ::= expr * LE expr
+          expr ::= expr * GE expr
+          expr ::= expr * LT expr
+          expr ::= expr * GT expr
+          expr ::= expr * LAND expr
+          expr ::= expr * LOR expr
+
+                         QMARK shift  103 -- dropped by precedence
+                         QMARK reduce 126
+                         COMMA reduce 126
+                           LOR shift  84  -- dropped by precedence
+                           LOR reduce 126
+                          LAND shift  85  -- dropped by precedence
+                          LAND reduce 126
+                          LNOT reduce 126
+                            EQ error
+                            EQ reduce 126
+                            LE error
+                            LE reduce 126
+                            LT error
+                            LT reduce 126
+                            GE error
+                            GE reduce 126
+                            GT error
+                            GT reduce 126
+                            NE error
+                            NE reduce 126
+                         BITOR shift  93
+                         BITOR reduce 126 -- dropped by precedence
+                        BITXOR shift  92
+                        BITXOR reduce 126 -- dropped by precedence
+                        BITAND shift  94
+                        BITAND reduce 126 -- dropped by precedence
+                        LSHIFT shift  96
+                        LSHIFT reduce 126 -- dropped by precedence
+                        RSHIFT shift  95
+                        RSHIFT reduce 126 -- dropped by precedence
+                          PLUS shift  101
+                          PLUS reduce 126 -- dropped by precedence
+                         MINUS shift  100
+                         MINUS reduce 126 -- dropped by precedence
+                        DIVIDE shift  98
+                        DIVIDE reduce 126 -- dropped by precedence
+                      MULTIPLY shift  99
+                      MULTIPLY reduce 126 -- dropped by precedence
+                           MOD shift  97
+                           MOD reduce 126 -- dropped by precedence
+                        BITNOT reduce 126
+                        LPAREN shift  28
+                        LPAREN reduce 126 -- dropped by precedence
+                    LSQBRACKET shift  105
+                    LSQBRACKET reduce 126 -- dropped by precedence
+                        PERIOD shift  435
+                        PERIOD reduce 126 -- dropped by precedence
+                     SEMICOLON reduce 126
+                          NAME reduce 126
+                         COLON reduce 126
+                      FUNCTION reduce 126
+                        RPAREN reduce 126
+                      LBRACKET reduce 126
+                           VAR reduce 126
+                        NUMBER reduce 126
+                    RSQBRACKET reduce 126
+                         KILLS reduce 126
+                           L2V reduce 126
+                     MAPSTRING reduce 126
+                          UNIT reduce 126
+                        SWITCH reduce 126
+                      LOCATION reduce 126
+                    STATTXTTBL reduce 126
+                        VARRAY reduce 126
+                          LIST reduce 126
+                        STATIC reduce 126
+                         CONST reduce 126
+                           INC reduce 126
+                           DEC reduce 126
+                          ONCE reduce 126
+                            IF reduce 126
+                     EPDSWITCH reduce 126
+                    SWITCHCASE reduce 126
+                         WHILE reduce 126
+                           FOR reduce 126
+                       FOREACH reduce 126
+                      CONTINUE reduce 126
+                         BREAK reduce 126
+                        RETURN reduce 126
+                 CONDITIONNAME reduce 126
+                    ACTIONNAME reduce 126
+                ACTIONALLPNAME reduce 126
+
+State 167:
+          expr ::= expr * PERIOD NAME
+          expr ::= expr * LSQBRACKET expr RSQBRACKET
+          funcexpr ::= expr * LPAREN fArgs RPAREN
+          expr ::= expr * QMARK expr COLON expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * MINUS expr
+          expr ::= expr * MULTIPLY expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * MOD expr
+          expr ::= expr * LSHIFT expr
+          expr ::= expr * RSHIFT expr
+          expr ::= expr * BITAND expr
+          expr ::= expr * BITOR expr
+          expr ::= expr * BITXOR expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
+    (125) expr ::= expr LSQBRACKET expr RSQBRACKET NE expr *
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NE expr
+          expr ::= expr * LE expr
+          expr ::= expr * GE expr
+          expr ::= expr * LT expr
+          expr ::= expr * GT expr
+          expr ::= expr * LAND expr
+          expr ::= expr * LOR expr
+
+                         QMARK shift  103 -- dropped by precedence
+                         QMARK reduce 125
+                         COMMA reduce 125
+                           LOR shift  84  -- dropped by precedence
+                           LOR reduce 125
+                          LAND shift  85  -- dropped by precedence
+                          LAND reduce 125
+                          LNOT reduce 125
+                            EQ error
+                            EQ reduce 125
+                            LE error
+                            LE reduce 125
+                            LT error
+                            LT reduce 125
+                            GE error
+                            GE reduce 125
+                            GT error
+                            GT reduce 125
+                            NE error
+                            NE reduce 125
+                         BITOR shift  93
+                         BITOR reduce 125 -- dropped by precedence
+                        BITXOR shift  92
+                        BITXOR reduce 125 -- dropped by precedence
+                        BITAND shift  94
+                        BITAND reduce 125 -- dropped by precedence
+                        LSHIFT shift  96
+                        LSHIFT reduce 125 -- dropped by precedence
+                        RSHIFT shift  95
+                        RSHIFT reduce 125 -- dropped by precedence
+                          PLUS shift  101
+                          PLUS reduce 125 -- dropped by precedence
+                         MINUS shift  100
+                         MINUS reduce 125 -- dropped by precedence
+                        DIVIDE shift  98
+                        DIVIDE reduce 125 -- dropped by precedence
+                      MULTIPLY shift  99
+                      MULTIPLY reduce 125 -- dropped by precedence
+                           MOD shift  97
+                           MOD reduce 125 -- dropped by precedence
+                        BITNOT reduce 125
+                        LPAREN shift  28
+                        LPAREN reduce 125 -- dropped by precedence
+                    LSQBRACKET shift  105
+                    LSQBRACKET reduce 125 -- dropped by precedence
+                        PERIOD shift  435
+                        PERIOD reduce 125 -- dropped by precedence
+                     SEMICOLON reduce 125
+                          NAME reduce 125
+                         COLON reduce 125
+                      FUNCTION reduce 125
+                        RPAREN reduce 125
+                      LBRACKET reduce 125
+                           VAR reduce 125
+                        NUMBER reduce 125
+                    RSQBRACKET reduce 125
+                         KILLS reduce 125
+                           L2V reduce 125
+                     MAPSTRING reduce 125
+                          UNIT reduce 125
+                        SWITCH reduce 125
+                      LOCATION reduce 125
+                    STATTXTTBL reduce 125
+                        VARRAY reduce 125
+                          LIST reduce 125
+                        STATIC reduce 125
+                         CONST reduce 125
+                           INC reduce 125
+                           DEC reduce 125
+                          ONCE reduce 125
+                            IF reduce 125
+                     EPDSWITCH reduce 125
+                    SWITCHCASE reduce 125
+                         WHILE reduce 125
+                           FOR reduce 125
+                       FOREACH reduce 125
+                      CONTINUE reduce 125
+                         BREAK reduce 125
+                        RETURN reduce 125
+                 CONDITIONNAME reduce 125
+                    ACTIONNAME reduce 125
+                ACTIONALLPNAME reduce 125
+
+State 168:
+          expr ::= expr * PERIOD NAME
+          expr ::= expr * LSQBRACKET expr RSQBRACKET
+          funcexpr ::= expr * LPAREN fArgs RPAREN
+          expr ::= expr * QMARK expr COLON expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * MINUS expr
+          expr ::= expr * MULTIPLY expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * MOD expr
+          expr ::= expr * LSHIFT expr
+          expr ::= expr * RSHIFT expr
+          expr ::= expr * BITAND expr
+          expr ::= expr * BITOR expr
+          expr ::= expr * BITXOR expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
+    (124) expr ::= expr LSQBRACKET expr RSQBRACKET EQ expr *
+          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NE expr
+          expr ::= expr * LE expr
+          expr ::= expr * GE expr
+          expr ::= expr * LT expr
+          expr ::= expr * GT expr
+          expr ::= expr * LAND expr
+          expr ::= expr * LOR expr
+
+                         QMARK shift  103 -- dropped by precedence
+                         QMARK reduce 124
+                         COMMA reduce 124
+                           LOR shift  84  -- dropped by precedence
+                           LOR reduce 124
+                          LAND shift  85  -- dropped by precedence
+                          LAND reduce 124
+                          LNOT reduce 124
+                            EQ error
+                            EQ reduce 124
+                            LE error
+                            LE reduce 124
+                            LT error
+                            LT reduce 124
+                            GE error
+                            GE reduce 124
+                            GT error
+                            GT reduce 124
+                            NE error
+                            NE reduce 124
+                         BITOR shift  93
+                         BITOR reduce 124 -- dropped by precedence
+                        BITXOR shift  92
+                        BITXOR reduce 124 -- dropped by precedence
+                        BITAND shift  94
+                        BITAND reduce 124 -- dropped by precedence
+                        LSHIFT shift  96
+                        LSHIFT reduce 124 -- dropped by precedence
+                        RSHIFT shift  95
+                        RSHIFT reduce 124 -- dropped by precedence
+                          PLUS shift  101
+                          PLUS reduce 124 -- dropped by precedence
+                         MINUS shift  100
+                         MINUS reduce 124 -- dropped by precedence
+                        DIVIDE shift  98
+                        DIVIDE reduce 124 -- dropped by precedence
+                      MULTIPLY shift  99
+                      MULTIPLY reduce 124 -- dropped by precedence
+                           MOD shift  97
+                           MOD reduce 124 -- dropped by precedence
+                        BITNOT reduce 124
+                        LPAREN shift  28
+                        LPAREN reduce 124 -- dropped by precedence
+                    LSQBRACKET shift  105
+                    LSQBRACKET reduce 124 -- dropped by precedence
+                        PERIOD shift  435
+                        PERIOD reduce 124 -- dropped by precedence
+                     SEMICOLON reduce 124
+                          NAME reduce 124
+                         COLON reduce 124
+                      FUNCTION reduce 124
+                        RPAREN reduce 124
+                      LBRACKET reduce 124
+                           VAR reduce 124
+                        NUMBER reduce 124
+                    RSQBRACKET reduce 124
+                         KILLS reduce 124
+                           L2V reduce 124
+                     MAPSTRING reduce 124
+                          UNIT reduce 124
+                        SWITCH reduce 124
+                      LOCATION reduce 124
+                    STATTXTTBL reduce 124
+                        VARRAY reduce 124
+                          LIST reduce 124
+                        STATIC reduce 124
+                         CONST reduce 124
+                           INC reduce 124
+                           DEC reduce 124
+                          ONCE reduce 124
+                            IF reduce 124
+                     EPDSWITCH reduce 124
+                    SWITCHCASE reduce 124
+                         WHILE reduce 124
+                           FOR reduce 124
+                       FOREACH reduce 124
+                      CONTINUE reduce 124
+                         BREAK reduce 124
+                        RETURN reduce 124
+                 CONDITIONNAME reduce 124
+                    ACTIONNAME reduce 124
+                ACTIONALLPNAME reduce 124
+
+State 169:
+          expr ::= expr * PERIOD NAME
+          expr ::= expr * LSQBRACKET expr RSQBRACKET
+          funcexpr ::= expr * LPAREN fArgs RPAREN
+          expr ::= expr * QMARK expr COLON expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * MINUS expr
+          expr ::= expr * MULTIPLY expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * MOD expr
+          expr ::= expr * LSHIFT expr
+          expr ::= expr * RSHIFT expr
+          expr ::= expr * BITAND expr
+          expr ::= expr * BITOR expr
+          expr ::= expr * BITXOR expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
+          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
           expr ::= expr * EQ expr
           expr ::= expr * NE expr
           expr ::= expr * LE expr
@@ -14287,7 +14971,7 @@ State 163:
                     ACTIONNAME reduce 135
                 ACTIONALLPNAME reduce 135
 
-State 164:
+State 170:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -14401,7 +15085,7 @@ State 164:
                     ACTIONNAME reduce 134
                 ACTIONALLPNAME reduce 134
 
-State 165:
+State 171:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -14515,7 +15199,7 @@ State 165:
                     ACTIONNAME reduce 133
                 ACTIONALLPNAME reduce 133
 
-State 166:
+State 172:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -14629,7 +15313,7 @@ State 166:
                     ACTIONNAME reduce 132
                 ACTIONALLPNAME reduce 132
 
-State 167:
+State 173:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -14743,7 +15427,7 @@ State 167:
                     ACTIONNAME reduce 131
                 ACTIONALLPNAME reduce 131
 
-State 168:
+State 174:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -14857,7 +15541,7 @@ State 168:
                     ACTIONNAME reduce 130
                 ACTIONALLPNAME reduce 130
 
-State 169:
+State 175:
      (83) expr ::= expr LSQBRACKET expr RSQBRACKET *
           expr ::= expr LSQBRACKET expr RSQBRACKET * EQ expr
           expr ::= expr LSQBRACKET expr RSQBRACKET * NE expr
@@ -14933,7 +15617,7 @@ State 169:
                     ACTIONNAME reduce 83
                 ACTIONALLPNAME reduce 83
 
-State 170:
+State 176:
     (223) expr ::= KILLS LPAREN fArgs RPAREN *
 
                          QMARK reduce 223
@@ -14997,7 +15681,7 @@ State 170:
                     ACTIONNAME reduce 223
                 ACTIONALLPNAME reduce 223
 
-State 171:
+State 177:
      (95) funcexpr ::= NAME LPAREN fArgs RPAREN *
 
                          QMARK reduce 95
@@ -15061,7 +15745,7 @@ State 171:
                     ACTIONNAME reduce 95
                 ACTIONALLPNAME reduce 95
 
-State 172:
+State 178:
      (96) funcexpr ::= expr LPAREN fArgs RPAREN *
 
                          QMARK reduce 96
@@ -15125,7 +15809,7 @@ State 172:
                     ACTIONNAME reduce 96
                 ACTIONALLPNAME reduce 96
 
-State 173:
+State 179:
      (85) expr ::= lambdaExprStart stmt *
 
                          QMARK reduce 85
@@ -15189,577 +15873,7 @@ State 173:
                     ACTIONNAME reduce 85
                 ACTIONALLPNAME reduce 85
 
-State 174:
-          expr ::= expr * PERIOD NAME
-          expr ::= expr * LSQBRACKET expr RSQBRACKET
-          funcexpr ::= expr * LPAREN fArgs RPAREN
-          expr ::= expr * QMARK expr COLON expr
-          expr ::= expr * PLUS expr
-          expr ::= expr * MINUS expr
-          expr ::= expr * MULTIPLY expr
-          expr ::= expr * DIVIDE expr
-          expr ::= expr * MOD expr
-          expr ::= expr * LSHIFT expr
-          expr ::= expr * RSHIFT expr
-          expr ::= expr * BITAND expr
-          expr ::= expr * BITOR expr
-          expr ::= expr * BITXOR expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
-    (129) expr ::= expr LSQBRACKET expr RSQBRACKET GT expr *
-          expr ::= expr * EQ expr
-          expr ::= expr * NE expr
-          expr ::= expr * LE expr
-          expr ::= expr * GE expr
-          expr ::= expr * LT expr
-          expr ::= expr * GT expr
-          expr ::= expr * LAND expr
-          expr ::= expr * LOR expr
-
-                         QMARK shift  103 -- dropped by precedence
-                         QMARK reduce 129
-                         COMMA reduce 129
-                           LOR shift  84  -- dropped by precedence
-                           LOR reduce 129
-                          LAND shift  85  -- dropped by precedence
-                          LAND reduce 129
-                          LNOT reduce 129
-                            EQ shift  91  -- dropped by precedence
-                            EQ reduce 129
-                            LE shift  89  -- dropped by precedence
-                            LE reduce 129
-                            LT shift  87  -- dropped by precedence
-                            LT reduce 129
-                            GE shift  88  -- dropped by precedence
-                            GE reduce 129
-                            GT shift  86  -- dropped by precedence
-                            GT reduce 129
-                            NE shift  90  -- dropped by precedence
-                            NE reduce 129
-                         BITOR shift  93  -- dropped by precedence
-                         BITOR reduce 129
-                        BITXOR shift  92  -- dropped by precedence
-                        BITXOR reduce 129
-                        BITAND shift  94  -- dropped by precedence
-                        BITAND reduce 129
-                        LSHIFT shift  96  -- dropped by precedence
-                        LSHIFT reduce 129
-                        RSHIFT shift  95  -- dropped by precedence
-                        RSHIFT reduce 129
-                          PLUS shift  101 -- dropped by precedence
-                          PLUS reduce 129
-                         MINUS shift  100 -- dropped by precedence
-                         MINUS reduce 129
-                        DIVIDE shift  98  -- dropped by precedence
-                        DIVIDE reduce 129
-                      MULTIPLY shift  99  -- dropped by precedence
-                      MULTIPLY reduce 129
-                           MOD shift  97  -- dropped by precedence
-                           MOD reduce 129
-                        BITNOT reduce 129
-                        LPAREN shift  28  -- dropped by precedence
-                        LPAREN reduce 129
-                    LSQBRACKET shift  105 -- dropped by precedence
-                    LSQBRACKET reduce 129
-                        PERIOD shift  435 -- dropped by precedence
-                        PERIOD reduce 129
-                     SEMICOLON reduce 129
-                          NAME reduce 129
-                         COLON reduce 129
-                      FUNCTION reduce 129
-                        RPAREN reduce 129
-                      LBRACKET reduce 129
-                           VAR reduce 129
-                        NUMBER reduce 129
-                    RSQBRACKET reduce 129
-                         KILLS reduce 129
-                           L2V reduce 129
-                     MAPSTRING reduce 129
-                          UNIT reduce 129
-                        SWITCH reduce 129
-                      LOCATION reduce 129
-                    STATTXTTBL reduce 129
-                        VARRAY reduce 129
-                          LIST reduce 129
-                        STATIC reduce 129
-                         CONST reduce 129
-                           INC reduce 129
-                           DEC reduce 129
-                          ONCE reduce 129
-                            IF reduce 129
-                     EPDSWITCH reduce 129
-                    SWITCHCASE reduce 129
-                         WHILE reduce 129
-                           FOR reduce 129
-                       FOREACH reduce 129
-                      CONTINUE reduce 129
-                         BREAK reduce 129
-                        RETURN reduce 129
-                 CONDITIONNAME reduce 129
-                    ACTIONNAME reduce 129
-                ACTIONALLPNAME reduce 129
-
-State 175:
-          expr ::= expr * PERIOD NAME
-          expr ::= expr * LSQBRACKET expr RSQBRACKET
-          funcexpr ::= expr * LPAREN fArgs RPAREN
-          expr ::= expr * QMARK expr COLON expr
-          expr ::= expr * PLUS expr
-          expr ::= expr * MINUS expr
-          expr ::= expr * MULTIPLY expr
-          expr ::= expr * DIVIDE expr
-          expr ::= expr * MOD expr
-          expr ::= expr * LSHIFT expr
-          expr ::= expr * RSHIFT expr
-          expr ::= expr * BITAND expr
-          expr ::= expr * BITOR expr
-          expr ::= expr * BITXOR expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
-    (128) expr ::= expr LSQBRACKET expr RSQBRACKET LT expr *
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
-          expr ::= expr * EQ expr
-          expr ::= expr * NE expr
-          expr ::= expr * LE expr
-          expr ::= expr * GE expr
-          expr ::= expr * LT expr
-          expr ::= expr * GT expr
-          expr ::= expr * LAND expr
-          expr ::= expr * LOR expr
-
-                         QMARK shift  103 -- dropped by precedence
-                         QMARK reduce 128
-                         COMMA reduce 128
-                           LOR shift  84  -- dropped by precedence
-                           LOR reduce 128
-                          LAND shift  85  -- dropped by precedence
-                          LAND reduce 128
-                          LNOT reduce 128
-                            EQ shift  91  -- dropped by precedence
-                            EQ reduce 128
-                            LE shift  89  -- dropped by precedence
-                            LE reduce 128
-                            LT shift  87  -- dropped by precedence
-                            LT reduce 128
-                            GE shift  88  -- dropped by precedence
-                            GE reduce 128
-                            GT shift  86  -- dropped by precedence
-                            GT reduce 128
-                            NE shift  90  -- dropped by precedence
-                            NE reduce 128
-                         BITOR shift  93  -- dropped by precedence
-                         BITOR reduce 128
-                        BITXOR shift  92  -- dropped by precedence
-                        BITXOR reduce 128
-                        BITAND shift  94  -- dropped by precedence
-                        BITAND reduce 128
-                        LSHIFT shift  96  -- dropped by precedence
-                        LSHIFT reduce 128
-                        RSHIFT shift  95  -- dropped by precedence
-                        RSHIFT reduce 128
-                          PLUS shift  101 -- dropped by precedence
-                          PLUS reduce 128
-                         MINUS shift  100 -- dropped by precedence
-                         MINUS reduce 128
-                        DIVIDE shift  98  -- dropped by precedence
-                        DIVIDE reduce 128
-                      MULTIPLY shift  99  -- dropped by precedence
-                      MULTIPLY reduce 128
-                           MOD shift  97  -- dropped by precedence
-                           MOD reduce 128
-                        BITNOT reduce 128
-                        LPAREN shift  28  -- dropped by precedence
-                        LPAREN reduce 128
-                    LSQBRACKET shift  105 -- dropped by precedence
-                    LSQBRACKET reduce 128
-                        PERIOD shift  435 -- dropped by precedence
-                        PERIOD reduce 128
-                     SEMICOLON reduce 128
-                          NAME reduce 128
-                         COLON reduce 128
-                      FUNCTION reduce 128
-                        RPAREN reduce 128
-                      LBRACKET reduce 128
-                           VAR reduce 128
-                        NUMBER reduce 128
-                    RSQBRACKET reduce 128
-                         KILLS reduce 128
-                           L2V reduce 128
-                     MAPSTRING reduce 128
-                          UNIT reduce 128
-                        SWITCH reduce 128
-                      LOCATION reduce 128
-                    STATTXTTBL reduce 128
-                        VARRAY reduce 128
-                          LIST reduce 128
-                        STATIC reduce 128
-                         CONST reduce 128
-                           INC reduce 128
-                           DEC reduce 128
-                          ONCE reduce 128
-                            IF reduce 128
-                     EPDSWITCH reduce 128
-                    SWITCHCASE reduce 128
-                         WHILE reduce 128
-                           FOR reduce 128
-                       FOREACH reduce 128
-                      CONTINUE reduce 128
-                         BREAK reduce 128
-                        RETURN reduce 128
-                 CONDITIONNAME reduce 128
-                    ACTIONNAME reduce 128
-                ACTIONALLPNAME reduce 128
-
-State 176:
-          expr ::= expr * PERIOD NAME
-          expr ::= expr * LSQBRACKET expr RSQBRACKET
-          funcexpr ::= expr * LPAREN fArgs RPAREN
-          expr ::= expr * QMARK expr COLON expr
-          expr ::= expr * PLUS expr
-          expr ::= expr * MINUS expr
-          expr ::= expr * MULTIPLY expr
-          expr ::= expr * DIVIDE expr
-          expr ::= expr * MOD expr
-          expr ::= expr * LSHIFT expr
-          expr ::= expr * RSHIFT expr
-          expr ::= expr * BITAND expr
-          expr ::= expr * BITOR expr
-          expr ::= expr * BITXOR expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
-    (127) expr ::= expr LSQBRACKET expr RSQBRACKET GE expr *
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
-          expr ::= expr * EQ expr
-          expr ::= expr * NE expr
-          expr ::= expr * LE expr
-          expr ::= expr * GE expr
-          expr ::= expr * LT expr
-          expr ::= expr * GT expr
-          expr ::= expr * LAND expr
-          expr ::= expr * LOR expr
-
-                         QMARK shift  103 -- dropped by precedence
-                         QMARK reduce 127
-                         COMMA reduce 127
-                           LOR shift  84  -- dropped by precedence
-                           LOR reduce 127
-                          LAND shift  85  -- dropped by precedence
-                          LAND reduce 127
-                          LNOT reduce 127
-                            EQ shift  91  -- dropped by precedence
-                            EQ reduce 127
-                            LE shift  89  -- dropped by precedence
-                            LE reduce 127
-                            LT shift  87  -- dropped by precedence
-                            LT reduce 127
-                            GE shift  88  -- dropped by precedence
-                            GE reduce 127
-                            GT shift  86  -- dropped by precedence
-                            GT reduce 127
-                            NE shift  90  -- dropped by precedence
-                            NE reduce 127
-                         BITOR shift  93  -- dropped by precedence
-                         BITOR reduce 127
-                        BITXOR shift  92  -- dropped by precedence
-                        BITXOR reduce 127
-                        BITAND shift  94  -- dropped by precedence
-                        BITAND reduce 127
-                        LSHIFT shift  96  -- dropped by precedence
-                        LSHIFT reduce 127
-                        RSHIFT shift  95  -- dropped by precedence
-                        RSHIFT reduce 127
-                          PLUS shift  101 -- dropped by precedence
-                          PLUS reduce 127
-                         MINUS shift  100 -- dropped by precedence
-                         MINUS reduce 127
-                        DIVIDE shift  98  -- dropped by precedence
-                        DIVIDE reduce 127
-                      MULTIPLY shift  99  -- dropped by precedence
-                      MULTIPLY reduce 127
-                           MOD shift  97  -- dropped by precedence
-                           MOD reduce 127
-                        BITNOT reduce 127
-                        LPAREN shift  28  -- dropped by precedence
-                        LPAREN reduce 127
-                    LSQBRACKET shift  105 -- dropped by precedence
-                    LSQBRACKET reduce 127
-                        PERIOD shift  435 -- dropped by precedence
-                        PERIOD reduce 127
-                     SEMICOLON reduce 127
-                          NAME reduce 127
-                         COLON reduce 127
-                      FUNCTION reduce 127
-                        RPAREN reduce 127
-                      LBRACKET reduce 127
-                           VAR reduce 127
-                        NUMBER reduce 127
-                    RSQBRACKET reduce 127
-                         KILLS reduce 127
-                           L2V reduce 127
-                     MAPSTRING reduce 127
-                          UNIT reduce 127
-                        SWITCH reduce 127
-                      LOCATION reduce 127
-                    STATTXTTBL reduce 127
-                        VARRAY reduce 127
-                          LIST reduce 127
-                        STATIC reduce 127
-                         CONST reduce 127
-                           INC reduce 127
-                           DEC reduce 127
-                          ONCE reduce 127
-                            IF reduce 127
-                     EPDSWITCH reduce 127
-                    SWITCHCASE reduce 127
-                         WHILE reduce 127
-                           FOR reduce 127
-                       FOREACH reduce 127
-                      CONTINUE reduce 127
-                         BREAK reduce 127
-                        RETURN reduce 127
-                 CONDITIONNAME reduce 127
-                    ACTIONNAME reduce 127
-                ACTIONALLPNAME reduce 127
-
-State 177:
-          expr ::= expr * PERIOD NAME
-          expr ::= expr * LSQBRACKET expr RSQBRACKET
-          funcexpr ::= expr * LPAREN fArgs RPAREN
-          expr ::= expr * QMARK expr COLON expr
-          expr ::= expr * PLUS expr
-          expr ::= expr * MINUS expr
-          expr ::= expr * MULTIPLY expr
-          expr ::= expr * DIVIDE expr
-          expr ::= expr * MOD expr
-          expr ::= expr * LSHIFT expr
-          expr ::= expr * RSHIFT expr
-          expr ::= expr * BITAND expr
-          expr ::= expr * BITOR expr
-          expr ::= expr * BITXOR expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
-    (126) expr ::= expr LSQBRACKET expr RSQBRACKET LE expr *
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
-          expr ::= expr * EQ expr
-          expr ::= expr * NE expr
-          expr ::= expr * LE expr
-          expr ::= expr * GE expr
-          expr ::= expr * LT expr
-          expr ::= expr * GT expr
-          expr ::= expr * LAND expr
-          expr ::= expr * LOR expr
-
-                         QMARK shift  103 -- dropped by precedence
-                         QMARK reduce 126
-                         COMMA reduce 126
-                           LOR shift  84  -- dropped by precedence
-                           LOR reduce 126
-                          LAND shift  85  -- dropped by precedence
-                          LAND reduce 126
-                          LNOT reduce 126
-                            EQ shift  91  -- dropped by precedence
-                            EQ reduce 126
-                            LE shift  89  -- dropped by precedence
-                            LE reduce 126
-                            LT shift  87  -- dropped by precedence
-                            LT reduce 126
-                            GE shift  88  -- dropped by precedence
-                            GE reduce 126
-                            GT shift  86  -- dropped by precedence
-                            GT reduce 126
-                            NE shift  90  -- dropped by precedence
-                            NE reduce 126
-                         BITOR shift  93  -- dropped by precedence
-                         BITOR reduce 126
-                        BITXOR shift  92  -- dropped by precedence
-                        BITXOR reduce 126
-                        BITAND shift  94  -- dropped by precedence
-                        BITAND reduce 126
-                        LSHIFT shift  96  -- dropped by precedence
-                        LSHIFT reduce 126
-                        RSHIFT shift  95  -- dropped by precedence
-                        RSHIFT reduce 126
-                          PLUS shift  101 -- dropped by precedence
-                          PLUS reduce 126
-                         MINUS shift  100 -- dropped by precedence
-                         MINUS reduce 126
-                        DIVIDE shift  98  -- dropped by precedence
-                        DIVIDE reduce 126
-                      MULTIPLY shift  99  -- dropped by precedence
-                      MULTIPLY reduce 126
-                           MOD shift  97  -- dropped by precedence
-                           MOD reduce 126
-                        BITNOT reduce 126
-                        LPAREN shift  28  -- dropped by precedence
-                        LPAREN reduce 126
-                    LSQBRACKET shift  105 -- dropped by precedence
-                    LSQBRACKET reduce 126
-                        PERIOD shift  435 -- dropped by precedence
-                        PERIOD reduce 126
-                     SEMICOLON reduce 126
-                          NAME reduce 126
-                         COLON reduce 126
-                      FUNCTION reduce 126
-                        RPAREN reduce 126
-                      LBRACKET reduce 126
-                           VAR reduce 126
-                        NUMBER reduce 126
-                    RSQBRACKET reduce 126
-                         KILLS reduce 126
-                           L2V reduce 126
-                     MAPSTRING reduce 126
-                          UNIT reduce 126
-                        SWITCH reduce 126
-                      LOCATION reduce 126
-                    STATTXTTBL reduce 126
-                        VARRAY reduce 126
-                          LIST reduce 126
-                        STATIC reduce 126
-                         CONST reduce 126
-                           INC reduce 126
-                           DEC reduce 126
-                          ONCE reduce 126
-                            IF reduce 126
-                     EPDSWITCH reduce 126
-                    SWITCHCASE reduce 126
-                         WHILE reduce 126
-                           FOR reduce 126
-                       FOREACH reduce 126
-                      CONTINUE reduce 126
-                         BREAK reduce 126
-                        RETURN reduce 126
-                 CONDITIONNAME reduce 126
-                    ACTIONNAME reduce 126
-                ACTIONALLPNAME reduce 126
-
-State 178:
-          expr ::= expr * PERIOD NAME
-          expr ::= expr * LSQBRACKET expr RSQBRACKET
-          funcexpr ::= expr * LPAREN fArgs RPAREN
-          expr ::= expr * QMARK expr COLON expr
-          expr ::= expr * PLUS expr
-          expr ::= expr * MINUS expr
-          expr ::= expr * MULTIPLY expr
-          expr ::= expr * DIVIDE expr
-          expr ::= expr * MOD expr
-          expr ::= expr * LSHIFT expr
-          expr ::= expr * RSHIFT expr
-          expr ::= expr * BITAND expr
-          expr ::= expr * BITOR expr
-          expr ::= expr * BITXOR expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
-    (125) expr ::= expr LSQBRACKET expr RSQBRACKET NE expr *
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
-          expr ::= expr * EQ expr
-          expr ::= expr * NE expr
-          expr ::= expr * LE expr
-          expr ::= expr * GE expr
-          expr ::= expr * LT expr
-          expr ::= expr * GT expr
-          expr ::= expr * LAND expr
-          expr ::= expr * LOR expr
-
-                         QMARK shift  103 -- dropped by precedence
-                         QMARK reduce 125
-                         COMMA reduce 125
-                           LOR shift  84  -- dropped by precedence
-                           LOR reduce 125
-                          LAND shift  85  -- dropped by precedence
-                          LAND reduce 125
-                          LNOT reduce 125
-                            EQ shift  91  -- dropped by precedence
-                            EQ reduce 125
-                            LE shift  89  -- dropped by precedence
-                            LE reduce 125
-                            LT shift  87  -- dropped by precedence
-                            LT reduce 125
-                            GE shift  88  -- dropped by precedence
-                            GE reduce 125
-                            GT shift  86  -- dropped by precedence
-                            GT reduce 125
-                            NE shift  90  -- dropped by precedence
-                            NE reduce 125
-                         BITOR shift  93  -- dropped by precedence
-                         BITOR reduce 125
-                        BITXOR shift  92  -- dropped by precedence
-                        BITXOR reduce 125
-                        BITAND shift  94  -- dropped by precedence
-                        BITAND reduce 125
-                        LSHIFT shift  96  -- dropped by precedence
-                        LSHIFT reduce 125
-                        RSHIFT shift  95  -- dropped by precedence
-                        RSHIFT reduce 125
-                          PLUS shift  101 -- dropped by precedence
-                          PLUS reduce 125
-                         MINUS shift  100 -- dropped by precedence
-                         MINUS reduce 125
-                        DIVIDE shift  98  -- dropped by precedence
-                        DIVIDE reduce 125
-                      MULTIPLY shift  99  -- dropped by precedence
-                      MULTIPLY reduce 125
-                           MOD shift  97  -- dropped by precedence
-                           MOD reduce 125
-                        BITNOT reduce 125
-                        LPAREN shift  28  -- dropped by precedence
-                        LPAREN reduce 125
-                    LSQBRACKET shift  105 -- dropped by precedence
-                    LSQBRACKET reduce 125
-                        PERIOD shift  435 -- dropped by precedence
-                        PERIOD reduce 125
-                     SEMICOLON reduce 125
-                          NAME reduce 125
-                         COLON reduce 125
-                      FUNCTION reduce 125
-                        RPAREN reduce 125
-                      LBRACKET reduce 125
-                           VAR reduce 125
-                        NUMBER reduce 125
-                    RSQBRACKET reduce 125
-                         KILLS reduce 125
-                           L2V reduce 125
-                     MAPSTRING reduce 125
-                          UNIT reduce 125
-                        SWITCH reduce 125
-                      LOCATION reduce 125
-                    STATTXTTBL reduce 125
-                        VARRAY reduce 125
-                          LIST reduce 125
-                        STATIC reduce 125
-                         CONST reduce 125
-                           INC reduce 125
-                           DEC reduce 125
-                          ONCE reduce 125
-                            IF reduce 125
-                     EPDSWITCH reduce 125
-                    SWITCHCASE reduce 125
-                         WHILE reduce 125
-                           FOR reduce 125
-                       FOREACH reduce 125
-                      CONTINUE reduce 125
-                         BREAK reduce 125
-                        RETURN reduce 125
-                 CONDITIONNAME reduce 125
-                    ACTIONNAME reduce 125
-                ACTIONALLPNAME reduce 125
-
-State 179:
+State 180:
     (101) expr ::= LSQBRACKET exprList_nonEmpty commaSkippable RSQBRACKET *
 
                          QMARK reduce 101
@@ -15823,7 +15937,7 @@ State 179:
                     ACTIONNAME reduce 101
                 ACTIONALLPNAME reduce 101
 
-State 180:
+State 181:
     (222) expr ::= CONDITIONNAME LPAREN fArgs RPAREN *
 
                          QMARK reduce 222
@@ -15887,7 +16001,7 @@ State 180:
                     ACTIONNAME reduce 222
                 ACTIONALLPNAME reduce 222
 
-State 181:
+State 182:
     (227) expr ::= ACTIONALLPNAME LPAREN fArgs RPAREN *
 
                          QMARK reduce 227
@@ -15951,7 +16065,7 @@ State 181:
                     ACTIONNAME reduce 227
                 ACTIONALLPNAME reduce 227
 
-State 182:
+State 183:
     (226) expr ::= ACTIONNAME LPAREN fArgs RPAREN *
 
                          QMARK reduce 226
@@ -16015,7 +16129,7 @@ State 182:
                     ACTIONNAME reduce 226
                 ACTIONALLPNAME reduce 226
 
-State 183:
+State 184:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -16129,7 +16243,7 @@ State 183:
                     ACTIONNAME reduce 138
                 ACTIONALLPNAME reduce 138
 
-State 184:
+State 185:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -16243,7 +16357,7 @@ State 184:
                     ACTIONNAME reduce 123
                 ACTIONALLPNAME reduce 123
 
-State 185:
+State 186:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -16357,7 +16471,7 @@ State 185:
                     ACTIONNAME reduce 122
                 ACTIONALLPNAME reduce 122
 
-State 186:
+State 187:
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
           funcexpr ::= expr * LPAREN fArgs RPAREN
@@ -16471,7 +16585,7 @@ State 186:
                     ACTIONNAME reduce 121
                 ACTIONALLPNAME reduce 121
 
-State 187:
+State 188:
     (109) expr ::= LIST LPAREN exprList_nonEmpty commaSkippable RPAREN *
 
                          QMARK reduce 109
@@ -16535,7 +16649,7 @@ State 187:
                     ACTIONNAME reduce 109
                 ACTIONALLPNAME reduce 109
 
-State 188:
+State 189:
     (108) expr ::= VARRAY LPAREN exprList_nonEmpty commaSkippable RPAREN *
 
                          QMARK reduce 108
@@ -16599,7 +16713,7 @@ State 188:
                     ACTIONNAME reduce 108
                 ACTIONALLPNAME reduce 108
 
-State 189:
+State 190:
     (107) expr ::= STATTXTTBL LPAREN STRING RPAREN *
 
                          QMARK reduce 107
@@ -16663,7 +16777,7 @@ State 189:
                     ACTIONNAME reduce 107
                 ACTIONALLPNAME reduce 107
 
-State 190:
+State 191:
     (106) expr ::= LOCATION LPAREN STRING RPAREN *
 
                          QMARK reduce 106
@@ -16727,7 +16841,7 @@ State 190:
                     ACTIONNAME reduce 106
                 ACTIONALLPNAME reduce 106
 
-State 191:
+State 192:
     (105) expr ::= SWITCH LPAREN STRING RPAREN *
 
                          QMARK reduce 105
@@ -16791,7 +16905,7 @@ State 191:
                     ACTIONNAME reduce 105
                 ACTIONALLPNAME reduce 105
 
-State 192:
+State 193:
     (104) expr ::= UNIT LPAREN STRING RPAREN *
 
                          QMARK reduce 104
@@ -16855,7 +16969,7 @@ State 192:
                     ACTIONNAME reduce 104
                 ACTIONALLPNAME reduce 104
 
-State 193:
+State 194:
     (103) expr ::= MAPSTRING LPAREN STRING RPAREN *
 
                          QMARK reduce 103
@@ -16919,7 +17033,7 @@ State 193:
                     ACTIONNAME reduce 103
                 ACTIONALLPNAME reduce 103
 
-State 194:
+State 195:
     (102) expr ::= L2V LPAREN expr RPAREN *
 
                          QMARK reduce 102
@@ -16983,7 +17097,7 @@ State 194:
                     ACTIONNAME reduce 102
                 ACTIONALLPNAME reduce 102
 
-State 195:
+State 196:
      (75) exprList_nonEmpty ::= expr *
           expr ::= expr * PERIOD NAME
           expr ::= expr * LSQBRACKET expr RSQBRACKET
@@ -17079,7 +17193,7 @@ State 195:
                     ACTIONNAME reduce 75
                 ACTIONALLPNAME reduce 75
 
-State 196:
+State 197:
           exprList_nonEmpty ::= funcexpr * LSQBRACKET LSQBRACKET numList_nonEmpty RSQBRACKET RSQBRACKET
           expr ::= funcexpr * LSQBRACKET LSQBRACKET NUMBER RSQBRACKET RSQBRACKET
      (97) expr ::= funcexpr *
@@ -17146,7 +17260,7 @@ State 196:
                     ACTIONNAME reduce 97
                 ACTIONALLPNAME reduce 97
 
-State 197:
+State 198:
      (98) expr ::= LPAREN expr RPAREN *
 
                          QMARK reduce 98
@@ -17209,120 +17323,6 @@ State 197:
                  CONDITIONNAME reduce 98
                     ACTIONNAME reduce 98
                 ACTIONALLPNAME reduce 98
-
-State 198:
-          expr ::= expr * PERIOD NAME
-          expr ::= expr * LSQBRACKET expr RSQBRACKET
-          funcexpr ::= expr * LPAREN fArgs RPAREN
-          expr ::= expr * QMARK expr COLON expr
-          expr ::= expr * PLUS expr
-          expr ::= expr * MINUS expr
-          expr ::= expr * MULTIPLY expr
-          expr ::= expr * DIVIDE expr
-          expr ::= expr * MOD expr
-          expr ::= expr * LSHIFT expr
-          expr ::= expr * RSHIFT expr
-          expr ::= expr * BITAND expr
-          expr ::= expr * BITOR expr
-          expr ::= expr * BITXOR expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET EQ expr
-    (124) expr ::= expr LSQBRACKET expr RSQBRACKET EQ expr *
-          expr ::= expr * LSQBRACKET expr RSQBRACKET NE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GE expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET LT expr
-          expr ::= expr * LSQBRACKET expr RSQBRACKET GT expr
-          expr ::= expr * EQ expr
-          expr ::= expr * NE expr
-          expr ::= expr * LE expr
-          expr ::= expr * GE expr
-          expr ::= expr * LT expr
-          expr ::= expr * GT expr
-          expr ::= expr * LAND expr
-          expr ::= expr * LOR expr
-
-                         QMARK shift  103 -- dropped by precedence
-                         QMARK reduce 124
-                         COMMA reduce 124
-                           LOR shift  84  -- dropped by precedence
-                           LOR reduce 124
-                          LAND shift  85  -- dropped by precedence
-                          LAND reduce 124
-                          LNOT reduce 124
-                            EQ shift  91  -- dropped by precedence
-                            EQ reduce 124
-                            LE shift  89  -- dropped by precedence
-                            LE reduce 124
-                            LT shift  87  -- dropped by precedence
-                            LT reduce 124
-                            GE shift  88  -- dropped by precedence
-                            GE reduce 124
-                            GT shift  86  -- dropped by precedence
-                            GT reduce 124
-                            NE shift  90  -- dropped by precedence
-                            NE reduce 124
-                         BITOR shift  93  -- dropped by precedence
-                         BITOR reduce 124
-                        BITXOR shift  92  -- dropped by precedence
-                        BITXOR reduce 124
-                        BITAND shift  94  -- dropped by precedence
-                        BITAND reduce 124
-                        LSHIFT shift  96  -- dropped by precedence
-                        LSHIFT reduce 124
-                        RSHIFT shift  95  -- dropped by precedence
-                        RSHIFT reduce 124
-                          PLUS shift  101 -- dropped by precedence
-                          PLUS reduce 124
-                         MINUS shift  100 -- dropped by precedence
-                         MINUS reduce 124
-                        DIVIDE shift  98  -- dropped by precedence
-                        DIVIDE reduce 124
-                      MULTIPLY shift  99  -- dropped by precedence
-                      MULTIPLY reduce 124
-                           MOD shift  97  -- dropped by precedence
-                           MOD reduce 124
-                        BITNOT reduce 124
-                        LPAREN shift  28  -- dropped by precedence
-                        LPAREN reduce 124
-                    LSQBRACKET shift  105 -- dropped by precedence
-                    LSQBRACKET reduce 124
-                        PERIOD shift  435 -- dropped by precedence
-                        PERIOD reduce 124
-                     SEMICOLON reduce 124
-                          NAME reduce 124
-                         COLON reduce 124
-                      FUNCTION reduce 124
-                        RPAREN reduce 124
-                      LBRACKET reduce 124
-                           VAR reduce 124
-                        NUMBER reduce 124
-                    RSQBRACKET reduce 124
-                         KILLS reduce 124
-                           L2V reduce 124
-                     MAPSTRING reduce 124
-                          UNIT reduce 124
-                        SWITCH reduce 124
-                      LOCATION reduce 124
-                    STATTXTTBL reduce 124
-                        VARRAY reduce 124
-                          LIST reduce 124
-                        STATIC reduce 124
-                         CONST reduce 124
-                           INC reduce 124
-                           DEC reduce 124
-                          ONCE reduce 124
-                            IF reduce 124
-                     EPDSWITCH reduce 124
-                    SWITCHCASE reduce 124
-                         WHILE reduce 124
-                           FOR reduce 124
-                       FOREACH reduce 124
-                      CONTINUE reduce 124
-                         BREAK reduce 124
-                        RETURN reduce 124
-                 CONDITIONNAME reduce 124
-                    ACTIONNAME reduce 124
-                ACTIONALLPNAME reduce 124
 
 State 199:
           expr ::= expr * PERIOD NAME
@@ -21025,7 +21025,7 @@ State 254:
                         LPAREN shift  28
                     LSQBRACKET shift  105
                         PERIOD shift  435
-                    RSQBRACKET shift  169
+                    RSQBRACKET shift  175
 
 State 255:
           actionStmt ::= ACTIONALLPNAME LPAREN fArgs RPAREN * SEMICOLON
@@ -21411,7 +21411,7 @@ State 262:
                         LPAREN shift  28
                     LSQBRACKET shift  105
                         PERIOD shift  435
-                        RPAREN shift  194
+                        RPAREN shift  195
 
 State 263:
           expr ::= expr * PERIOD NAME
@@ -21466,7 +21466,7 @@ State 263:
                         LPAREN shift  28
                     LSQBRACKET shift  105
                         PERIOD shift  435
-                        RPAREN shift  197
+                        RPAREN shift  198
 
 State 264:
           expr ::= expr * PERIOD NAME
@@ -22369,17 +22369,17 @@ State 353:
 State 354:
           expr ::= KILLS LPAREN fArgs * RPAREN
 
-                        RPAREN shift  170
+                        RPAREN shift  176
 
 State 355:
           funcexpr ::= NAME LPAREN fArgs * RPAREN
 
-                        RPAREN shift  171
+                        RPAREN shift  177
 
 State 356:
           funcexpr ::= expr LPAREN fArgs * RPAREN
 
-                        RPAREN shift  172
+                        RPAREN shift  178
 
 State 357:
           lambdaExprStart ::= FUNCTION LPAREN typedNameList * RPAREN fdef_rettypes
@@ -22567,17 +22567,17 @@ State 391:
 State 392:
           expr ::= LSQBRACKET exprList_nonEmpty commaSkippable * RSQBRACKET
 
-                    RSQBRACKET shift  179
+                    RSQBRACKET shift  180
 
 State 393:
           expr ::= CONDITIONNAME LPAREN fArgs * RPAREN
 
-                        RPAREN shift  180
+                        RPAREN shift  181
 
 State 394:
           expr ::= ACTIONALLPNAME LPAREN fArgs * RPAREN
 
-                        RPAREN shift  181
+                        RPAREN shift  182
 
 State 395:
           expr ::= ACTIONALLPNAME * LPAREN fArgs RPAREN
@@ -22587,7 +22587,7 @@ State 395:
 State 396:
           expr ::= ACTIONNAME LPAREN fArgs * RPAREN
 
-                        RPAREN shift  182
+                        RPAREN shift  183
 
 State 397:
           expr ::= ACTIONNAME * LPAREN fArgs RPAREN
@@ -22602,7 +22602,7 @@ State 398:
 State 399:
           expr ::= LIST LPAREN exprList_nonEmpty commaSkippable * RPAREN
 
-                        RPAREN shift  187
+                        RPAREN shift  188
 
 State 400:
           expr ::= LIST * LPAREN exprList_nonEmpty commaSkippable RPAREN
@@ -22612,7 +22612,7 @@ State 400:
 State 401:
           expr ::= VARRAY LPAREN exprList_nonEmpty commaSkippable * RPAREN
 
-                        RPAREN shift  188
+                        RPAREN shift  189
 
 State 402:
           expr ::= VARRAY * LPAREN exprList_nonEmpty commaSkippable RPAREN
@@ -22622,7 +22622,7 @@ State 402:
 State 403:
           expr ::= STATTXTTBL LPAREN STRING * RPAREN
 
-                        RPAREN shift  189
+                        RPAREN shift  190
 
 State 404:
           expr ::= STATTXTTBL LPAREN * STRING RPAREN
@@ -22637,7 +22637,7 @@ State 405:
 State 406:
           expr ::= LOCATION LPAREN STRING * RPAREN
 
-                        RPAREN shift  190
+                        RPAREN shift  191
 
 State 407:
           expr ::= LOCATION LPAREN * STRING RPAREN
@@ -22652,7 +22652,7 @@ State 408:
 State 409:
           expr ::= SWITCH LPAREN STRING * RPAREN
 
-                        RPAREN shift  191
+                        RPAREN shift  192
 
 State 410:
           expr ::= SWITCH LPAREN * STRING RPAREN
@@ -22667,7 +22667,7 @@ State 411:
 State 412:
           expr ::= UNIT LPAREN STRING * RPAREN
 
-                        RPAREN shift  192
+                        RPAREN shift  193
 
 State 413:
           expr ::= UNIT LPAREN * STRING RPAREN
@@ -22682,7 +22682,7 @@ State 414:
 State 415:
           expr ::= MAPSTRING LPAREN STRING * RPAREN
 
-                        RPAREN shift  193
+                        RPAREN shift  194
 
 State 416:
           expr ::= MAPSTRING LPAREN * STRING RPAREN
