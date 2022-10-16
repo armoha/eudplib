@@ -727,6 +727,42 @@ expr(A) ::= MINUS   expr(B). [UNARY] { B->data = "-" + B->data; A = mkTokenTemp(
 expr(A) ::= BITNOT  expr(B). [UNARY] { B->data = "~" + B->data; A = mkTokenTemp(B); }
 
 
+expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET EQ expr(D). {
+    C->data = "_ARRC(" + B->data + ", " + C->data + ").__eq__(" + D->data + ")";
+    A = mkTokenTemp(C);
+    delete B;
+    delete D;
+}
+expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET NE expr(D). {
+    C->data = "_ARRC(" + B->data + ", " + C->data + ").__ne__(" + D->data + ")";
+    A = mkTokenTemp(C);
+    delete B;
+    delete D;
+}
+expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET LE expr(D). {
+    C->data = "_ARRC(" + B->data + ", " + C->data + ").__le__(" + D->data + ")";
+    A = mkTokenTemp(C);
+    delete B;
+    delete D;
+}
+expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET GE expr(D). {
+    C->data = "_ARRC(" + B->data + ", " + C->data + ").__ge__(" + D->data + ")";
+    A = mkTokenTemp(C);
+    delete B;
+    delete D;
+}
+expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET LT expr(D). {
+    C->data = "_ARRC(" + B->data + ", " + C->data + ").__lt__(" + D->data + ")";
+    A = mkTokenTemp(C);
+    delete B;
+    delete D;
+}
+expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET GT expr(D). {
+    C->data = "_ARRC(" + B->data + ", " + C->data + ").__gt__(" + D->data + ")";
+    A = mkTokenTemp(C);
+    delete B;
+    delete D;
+}
 
 expr(A) ::= expr(B) EQ expr(C).   { A = binopConcat(B, "==", C); }
 expr(A) ::= expr(B) NE expr(C).   { A = negate(binopConcat(B, "==", C)); }

@@ -294,6 +294,48 @@ class _ARRW:  # array write
         return self
 
 
+class _ARRC:  # array comparison
+    def __init__(self, obj, index):
+        self.obj = obj
+        self.index = index
+
+    def __eq__(self, k):
+        try:
+            return self.obj.eqitem(self.index, k)
+        except AttributeError:
+            return self.obj[self.index] == k
+
+    def __ne__(self, k):
+        try:
+            return self.obj.neitem(self.index, k)
+        except AttributeError:
+            return self.obj[self.index] != k
+
+    def __le__(self, k):
+        try:
+            return self.obj.leitem(self.index, k)
+        except AttributeError:
+            return self.obj[self.index] <= k
+
+    def __lt__(self, k):
+        try:
+            return self.obj.ltitem(self.index, k)
+        except AttributeError:
+            return self.obj[self.index] < k
+
+    def __ge__(self, k):
+        try:
+            return self.obj.geitem(self.index, k)
+        except AttributeError:
+            return self.obj[self.index] >= k
+
+    def __gt__(self, k):
+        try:
+            return self.obj.gtitem(self.index, k)
+        except AttributeError:
+            return self.obj[self.index] > k
+
+
 def _L2V(l):  # logic to value
     ret = EUDVariable()
     if EUDIf()(l):
