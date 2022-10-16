@@ -135,7 +135,9 @@ class RawTrigger(EUDObject):
             for i in range(64):
                 acttype = trigSection[320 + i * 32 + 26]
                 if acttype == 3:  # PreserveTrigger
-                    self._flags |= 4
+                    actflag = trigSection[320 + i * 32 + 28]
+                    if actflag & 0b10:
+                        self._flags |= 4
                 elif acttype == 47:  # Comment
                     continue
                 elif acttype >= 1:
