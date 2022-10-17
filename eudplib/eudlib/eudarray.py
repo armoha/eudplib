@@ -182,23 +182,23 @@ class EUDArray(ut.ExprProxy):
     def eqitem(self, key, val):
         return c.MemoryEPD(self._epd + key, c.Exactly, val)
 
+    def neitem(self, key, val):
+        from .utilf import EUDNot
+
+        return EUDNot(c.MemoryEPD(self._epd + key, c.Exactly, val))
+
     def leitem(self, key, val):
         return c.MemoryEPD(self._epd + key, c.AtMost, val)
 
     def geitem(self, key, val):
         return c.MemoryEPD(self._epd + key, c.AtLeast, val)
 
-    def neitem(self, key, val):
-        from .utilf import EUDNot
-
-        return EUDNot(c.MemoryEPD(self._epd + key, c.Exactly, val))
-
     def ltitem(self, key, val):
         from .utilf import EUDNot
 
-        return EUDNot(c.MemoryEPD(self._epd + key, c.AtMost, val))
+        return EUDNot(c.MemoryEPD(self._epd + key, c.AtLeast, val))
 
     def gtitem(self, key, val):
         from .utilf import EUDNot
 
-        return EUDNot(c.MemoryEPD(self._epd + key, c.AtLeast, val))
+        return EUDNot(c.MemoryEPD(self._epd + key, c.AtMost, val))

@@ -265,58 +265,64 @@ def f_test_array():
     arr = EUDArray(8)
     # (Line 138) ack[0] %= arr[p];
     _ARRW(ack, 0).__imod__(arr[p])
-    # (Line 140) ack[p] &= 1;
+    # (Line 139) p = p >> 1;
+    p << (p >> 1)
+    # (Line 141) ack[p] &= 1;
     _ARRW(ack, p).__iand__(1)
-    # (Line 141) ack[p] &= arr[p];
+    # (Line 142) ack[p] &= arr[p];
     _ARRW(ack, p).__iand__(arr[p])
-    # (Line 142) arr[p] -= ack[p];
+    # (Line 143) arr[p] -= ack[p];
     _ARRW(arr, p).__isub__(ack[p])
-    # (Line 143) arr[1] += ack[p];
+    # (Line 144) arr[1] += ack[p];
     _ARRW(arr, 1).__iadd__(ack[p])
-    # (Line 144) const x = ack[p];
+    # (Line 145) const x = ack[p];
     x = ack[p]
-    # (Line 145) ack[p] = x & arr[p];
+    # (Line 146) ack[p] = x & arr[p];
     _ARRW(ack, p) << (x & arr[p])
-    # (Line 146) arr[p] &= ack[p];
+    # (Line 147) arr[p] &= ack[p];
     _ARRW(arr, p).__iand__(ack[p])
-    # (Line 148) arr[p] |= ack[p];
+    # (Line 149) arr[p] |= ack[p];
     _ARRW(arr, p).__ior__(ack[p])
-    # (Line 149) arr[p] ^= ack[p];
+    # (Line 150) arr[p] ^= ack[p];
     _ARRW(arr, p).__ixor__(ack[p])
-    # (Line 150) arr[p] <<= ack[p];
+    # (Line 151) arr[p] <<= ack[p];
     _ARRW(arr, p).__ilshift__(ack[p])
-    # (Line 152) if (ack[p] > ack[p]) {}
-    if EUDIf()(_ARRC(ack, p).__gt__(ack[p])):
-        # (Line 153) dwwrite_epd(ack[p] + p / 2, 0);
+    # (Line 153) if (ack[p] > ack[p]) {}
+    if EUDIf()(_ARRC(ack, p) <= ack[p], neg=True):
+        # (Line 154) if (ack[p] > 1) {}
+        pass
+    EUDEndIf()
+    if EUDIf()(_ARRC(ack, p) <= 1, neg=True):
+        # (Line 155) dwwrite_epd(ack[p] + p / 2, 0);
         pass
     EUDEndIf()
     f_dwwrite_epd(ack[p] + p // 2, 0)
-    # (Line 155) switch(arr[p]) {
+    # (Line 157) switch(arr[p]) {
     EUDSwitch(arr[p])
-    # (Line 156) case 0:
-    _t2 = EUDSwitchCase()
-    # (Line 157) case 1:
-    if _t2(0):
-        pass
+    # (Line 158) case 0:
     _t3 = EUDSwitchCase()
-    # (Line 158) break;
-    if _t3(1):
+    # (Line 159) case 1:
+    if _t3(0):
+        pass
+    _t4 = EUDSwitchCase()
+    # (Line 160) break;
+    if _t4(1):
         EUDBreak()
-        # (Line 159) }
-    # (Line 160) switch(ack[p]) {
+        # (Line 161) }
+    # (Line 162) switch(ack[p]) {
     EUDEndSwitch()
     EUDSwitch(ack[p])
-    # (Line 161) case 0:
-    _t4 = EUDSwitchCase()
-    # (Line 162) case 1:
-    if _t4(0):
-        pass
+    # (Line 163) case 0:
     _t5 = EUDSwitchCase()
-    # (Line 163) break;
-    if _t5(1):
+    # (Line 164) case 1:
+    if _t5(0):
+        pass
+    _t6 = EUDSwitchCase()
+    # (Line 165) break;
+    if _t6(1):
         EUDBreak()
-        # (Line 164) }
-    # (Line 166) return p;
+        # (Line 166) }
+    # (Line 168) return p;
     EUDEndSwitch()
     EUDReturn(p)
-    # (Line 167) }
+    # (Line 169) }

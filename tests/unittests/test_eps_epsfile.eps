@@ -136,6 +136,7 @@ function test_array() {
     const arr = EUDArray(8);
 
     ack[0] %= arr[p];
+    p = p >> 1;
 
     ack[p] &= 1;
     ack[p] &= arr[p];
@@ -150,6 +151,7 @@ function test_array() {
     arr[p] <<= ack[p];
 
     if (ack[p] > ack[p]) {}
+    if (ack[p] > 1) {}
     dwwrite_epd(ack[p] + p / 2, 0);
 
     switch(arr[p]) {

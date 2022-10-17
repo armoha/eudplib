@@ -821,6 +821,13 @@ def EUDVArray(size, basetype=None):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val)
             raise AttributeError
 
+        def neitem(self, i, val):
+            if not IsEUDVariable(i):
+                from ...eudlib.utilf import EUDNot
+
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val))
+            raise AttributeError
+
         def leitem(self, i, val):
             if not IsEUDVariable(i):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val)
@@ -831,25 +838,18 @@ def EUDVArray(size, basetype=None):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val)
             raise AttributeError
 
-        def neitem(self, i, val):
-            if not IsEUDVariable(i):
-                from ...eudlib.utilf import EUDNot
-
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val))
-            raise AttributeError
-
         def ltitem(self, i, val):
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val))
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val))
             raise AttributeError
 
         def gtitem(self, i, val):
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val))
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val))
             raise AttributeError
 
     return _EUDVArray
