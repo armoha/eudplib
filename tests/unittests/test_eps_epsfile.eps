@@ -21,6 +21,10 @@ function switch_test(): EUDArray {
     const ret = EUDArray(6);
     static var x = 1234;
     static var s = EPD(x.getValueAddr());
+    // empty switch statements should not raise error
+    switch(x) {}
+    epdswitch(s) {}
+
     // binary search with CP trick
     epdswitch (s, 240) {
         case 96:
@@ -128,42 +132,46 @@ function switch_test(): EUDArray {
     ret[5] = x;  // 1260
     return ret;
 }
-const ack = PVariable();
+
+const ack = PVariable(list(1, 2, 3, 4, 5, 6, 7, 8));
 const ackMax = 8;
 function test_array() {
-    var p = 1;
-    p = ack[p] % ackMax > 1 ? 0 : 1;
-    const arr = EUDArray(8);
+    var ret = 0;
+    const p = EUDVariable(1);
+    ret += ack[p] % ackMax > 4 ? 1 : 2;  // ret = 2
 
+    const arr = [1, 2, 3, 4, 5, 6, 7, 8];
     ack[0] %= arr[p];
-    p = p >> 1;
+    ret = ret >> 0;  // ret = 2
 
-    ack[p] &= 1;
+    ack[p] &= 1;  // ack[1] = 0
     ack[p] &= arr[p];
-    arr[p] -= ack[p];
-    arr[1] += ack[p];
+    ack[p] -= -2;  // ack[1] = 2
     const x = ack[p];
-    ack[p] = x & arr[p];
+    ack[p] = x & arr[p];  // 2 & 2
     arr[p] &= ack[p];
+    ret *= ack[p] * arr[p];  // ret = 8
 
-    arr[p] |= ack[p];
-    arr[p] ^= ack[p];
-    arr[p] <<= ack[p];
+    arr[p] ^= ack[p];  // arr[1] = 0
+    arr[p] |= ack[0];  // arr[1] = 1
+    arr[p] <<= ack[p];  // arr[1] = 4
+    ret |= arr[p];  // ret = 12
 
-    if (ack[p] > ack[p]) {}
-    if (ack[p] > 1) {}
-    dwwrite_epd(ack[p] + p / 2, 0);
+    if (ack[p] > arr[p]) ret = 0;
+    if (arr[p]) ret <<= 1;  // ret = 24
+    ret -= ack[p] + p / 2;  // ret = 22
 
     switch(arr[p]) {
-        case 0:
-        case 1:
-        break;
+      case 4:  // fall-through
+      case 1:
+        ret += 1;  // ret = 23
     }
     switch(ack[p]) {
-        case 0:
-        case 1:
+      case 2:
         break;
+      default:
+        ret = 0;
     }
 
-    return p;
+    return ret;  // ret = 23
 }

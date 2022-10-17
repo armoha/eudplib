@@ -45,16 +45,26 @@ def DefBinOperator(name, f):
     DefClsMethod("__r%s" % name[2:], rop)
 
 
+def DefInplaceOperator(name, f):
+    def iop(self, other):
+        rvalue = self._rvalue
+        ret = f(self, other)
+        if not rvalue:
+            ret.makeL()
+        return ret
+
+    DefClsMethod(name, iop)
+
+
 DefBinOperator("__mul__", lambda x, y: f_mul(x, y))
 DefBinOperator("__floordiv__", lambda x, y: f_div(x, y)[0])
 DefBinOperator("__mod__", lambda x, y: f_div(x, y)[1])
 DefBinOperator("__rshift__", lambda x, y: f_bitrshift(x, y))
-DefClsMethod("__imul__", lambda x, y: f_mul(x, y, ret=[x]))
-DefClsMethod("__ifloordiv__", lambda x, y: f_div(x, y, ret=[x, _ev[4]])[0])
-DefClsMethod("__imod__", lambda x, y: f_div(x, y, ret=[_ev[4], x])[1])
-DefClsMethod("__neg__", lambda x: 0 - x)
-DefClsMethod("__ilshift__", lambda a, b: f_bitlshift(a, b, ret=[a]))
-DefClsMethod("__irshift__", lambda a, b: f_bitrshift(a, b, ret=[a]))  # FIXME
+DefInplaceOperator("__imul__", lambda x, y: f_mul(x, y, ret=[x]))
+DefInplaceOperator("__ifloordiv__", lambda x, y: f_div(x, y, ret=[x, _ev[4]])[0])
+DefInplaceOperator("__imod__", lambda x, y: f_div(x, y, ret=[_ev[4], x])[1])
+DefInplaceOperator("__ilshift__", lambda a, b: f_bitlshift(a, b, ret=[a]))
+DefInplaceOperator("__irshift__", lambda a, b: f_bitrshift(a, b, ret=[a]))  # FIXME
 DefClsMethod("__rlshift__", lambda a, b: f_bitlshift(b, a))
 
 # Shift operator is reserved for assigning, so we won't overload them.

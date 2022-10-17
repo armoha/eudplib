@@ -587,37 +587,37 @@ class EUDVariable(VariableBase):
 
     # operator placeholders
     def __mul__(self, a):
-        pass
+        raise NotImplementedError
 
     def __rmul__(self, a):
-        pass
+        raise NotImplementedError
 
     def __imul__(self, a):
-        pass
+        raise NotImplementedError
 
     def __floordiv__(self, a):
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def __rfloordiv__(self, a):
-        pass
+        raise NotImplementedError
 
     def __ifloordiv__(self, a):
-        pass
+        raise NotImplementedError
 
     def __mod__(self, a):
-        pass
+        raise NotImplementedError
 
     def __rmod__(self, a):
-        pass
+        raise NotImplementedError
 
     def __imod__(self, a):
-        pass
+        raise NotImplementedError
 
     def __ilshift__(self, a):
-        pass
+        raise NotImplementedError
 
     def __irshift__(self, a):
-        pass
+        raise NotImplementedError
 
 
 def IsEUDVariable(x):

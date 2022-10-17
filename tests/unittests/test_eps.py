@@ -15,5 +15,5 @@ def test_epscript():
     test_equality(
         "epScript array test",
         f_test_array(),
-        1,
+        23,
     )
