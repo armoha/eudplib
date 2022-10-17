@@ -67,12 +67,20 @@ class _EUDFormatter(string.Formatter):
                 # handle arg indexing when empty field_names are given.
                 if field_name == "":
                     if auto_arg_index is False:
-                        raise ValueError(_("cannot switch from manual field specification to automatic field numbering"))
+                        raise ValueError(
+                            _(
+                                "cannot switch from manual field specification to automatic field numbering"
+                            )
+                        )
                     field_name = str(auto_arg_index)
                     auto_arg_index += 1
                 elif field_name.isdigit():
                     if auto_arg_index:
-                        raise ValueError(_("cannot switch from manual field specification to automatic field numbering"))
+                        raise ValueError(
+                            _(
+                                "cannot switch from manual field specification to automatic field numbering"
+                            )
+                        )
                     # disable auto arg incrementing, if it gets
                     # used later on, then an exception will be raised
                     auto_arg_index = False

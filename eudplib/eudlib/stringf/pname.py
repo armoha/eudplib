@@ -126,7 +126,9 @@ def IsPName(player, name):
             # fmt: off
             ut.ep_assert(
                 p == c.EncodePlayer(c.CurrentPlayer),
-                _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),
+                _(
+                    "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
+                ).format(player),
             )
             # fmt: on
 
