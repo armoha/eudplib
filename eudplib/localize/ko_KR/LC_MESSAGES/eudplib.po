@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: eudplib 0.64.0\n"
-"POT-Creation-Date: 2022-10-03 00:00+0900\n"
-"PO-Revision-Date: 2022-10-03 00:02+0900\n"
+"POT-Creation-Date: 2022-10-17 16:42+0900\n"
+"PO-Revision-Date: 2022-10-17 16:43+0900\n"
 "Last-Translator: Armoha <kein0011@naver.com>\n"
 "Language-Team: \n"
 "Language: ko\n"
@@ -186,26 +186,25 @@ msgstr "알 수 없는 필드 이름 {}"
 msgid "Cannot reassign another value to eudstruct."
 msgstr "EUD구조체를 다른 값으로 재설정할 수 없습니다."
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:46
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:47
 msgid "{} items expected, got {}"
 msgstr "{} 개 항목이 예상됨, {}개 받음"
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:49
-#: E:\eudplib\eudplib\eudlib\eudarray.py:48
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:50
+#: E:\eudplib\eudplib\eudlib\eudarray.py:49
 msgid "Invalid item #{}"
 msgstr "{}번째 항목이 잘못됨"
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:51
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:52
 #: E:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:88
 msgid "nextptr should be ConstExpr"
 msgstr "nextptr은 상수표현식(ConstExpr)이어야 합니다"
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:109
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:215
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:131
 msgid "EUDVArray index out of bounds."
 msgstr "EUDVArray 인덱스가 범위를 벗어남."
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:263
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:356
 msgid "Can't iterate EUDVArray"
 msgstr "EUDVArray를 반복할 수 없습니다"
 
@@ -297,24 +296,24 @@ msgstr ""
 msgid "To prevent error, Condition can't be put into if."
 msgstr "파이썬 if문에 트리거 조건을 넣을 수 없습니다. EUDIf를 사용하세요."
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:195
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:198
 msgid "Bring and Command can't exchange AtMost and Exactly/AtLeast"
 msgstr ""
 "Bring과 Command는 AtMost와 Exactly/AtLeast가 아예 달라서 교체할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:200
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:203
 msgid "Invalid comparison \"{}\" in trigger index {}"
 msgstr "트리거 조건 인덱스 {1}의 comparison \"{0}\"이 잘못됨"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:209
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:212
 msgid "Can't negate EUDX condition"
 msgstr "EUDX 조건의 부정 조건을 구할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:214
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:217
 msgid "Can't negate condition with comparison"
 msgstr "비교 조건의 부정 조건을 구할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:216
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:219
 msgid "Can't negate condition"
 msgstr "부정 조건을 구할 수 없습니다"
 
@@ -427,24 +426,24 @@ msgid "Cannot have EUDElse after EUDElse"
 msgstr "EUDElse를 EUDElse 이후에 사용할 수 없습니다"
 
 #: E:\eudplib\eudplib\ctrlstru\simpleblock.py:161
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:80
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:99
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:82
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:101
 msgid "Block start/end mismatch"
 msgstr "블럭의 시작과 끝이 일치하지 않습니다"
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:76
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:78
 msgid "Invalid selector start for EUDSwitch"
 msgstr "잘못된 EUDSwitch 변수입니다"
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:85
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:87
 msgid "Duplicate cases"
 msgstr "switch문 case 경우 중복"
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:87
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:89
 msgid "cases out of mask"
-msgstr ""
+msgstr "case 경우가 비트마스크 바깥에 있습니다"
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:102
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:104
 msgid "Duplicate default"
 msgstr "default 중복"
 
@@ -477,8 +476,7 @@ msgstr "크기가 4인 멤버만 epd로 읽어올 수 있습니다"
 msgid "Only dword can be read as position"
 msgstr "크기가 4인 멤버만 위치로 읽어올 수 있습니다"
 
-#: E:\eudplib\eudplib\eudlib\eudarray.py:86
-#: E:\eudplib\eudplib\eudlib\eudarray.py:115
+#: E:\eudplib\eudplib\eudlib\eudarray.py:93
 msgid "Can't iterate EUDArray"
 msgstr "EUDArray를 반복할 수 없습니다"
 
@@ -492,9 +490,9 @@ msgstr "로케이션 좌표 인자 개수는 2 또는 4개여야합니다."
 msgid "copyto target should be EUDByteReader/Writer/Stream"
 msgstr "copyto할 대상은 EUDByteReader/Writer/Stream만 사용할 수 있습니다"
 
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:248
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:256
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:264
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:235
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:243
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:251
 msgid "safe read functions are deprecated in 0.61 and will be removed in 0.63"
 msgstr ""
 "_safe 읽기 함수는 0.61에 deprecated(사용이 권장되지 않으며, 0.61에 삭제될 예"
@@ -639,6 +637,10 @@ msgstr "MPQ 밀집에 실패했습니다"
 msgid "Writing trace file to {}"
 msgstr "{}에 추적 파일 작성"
 
+#: E:\eudplib\eudplib\trigger\tpatcher.py:67
+msgid "Can't put Action in conditionals: {}"
+msgstr "액션을 조건문에 넣을 수 없습니다: {}"
+
 #: E:\eudplib\eudplib\trigger\triggerdef.py:47
 msgid "preserved should be bool"
 msgstr "preserved(트리거 반복 여부)는 참 또는 거짓(bool)이어야합니다"
@@ -659,7 +661,6 @@ msgid "    - Ended with {}"
 msgstr "    - {}로 끝남"
 
 #: E:\eudplib\eudplib\utils\exprproxy.py:41
-#: E:\eudplib\eudplib\utils\exprproxy.py:186
 msgid "Type {} is not castable"
 msgstr "타입 {}는 캐스팅할 수 없습니다"
 

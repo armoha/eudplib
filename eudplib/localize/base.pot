@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2022-10-03 00:00+0900\n"
+"POT-Creation-Date: 2022-10-17 16:42+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -180,26 +180,25 @@ msgstr ""
 msgid "Cannot reassign another value to eudstruct."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:46
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:47
 msgid "{} items expected, got {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:49
-#: E:\eudplib\eudplib\eudlib\eudarray.py:48
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:50
+#: E:\eudplib\eudplib\eudlib\eudarray.py:49
 msgid "Invalid item #{}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:51
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:52
 #: E:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:88
 msgid "nextptr should be ConstExpr"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:109
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:215
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:131
 msgid "EUDVArray index out of bounds."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:263
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:356
 msgid "Can't iterate EUDVArray"
 msgstr ""
 
@@ -287,23 +286,23 @@ msgstr ""
 msgid "To prevent error, Condition can't be put into if."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:195
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:198
 msgid "Bring and Command can't exchange AtMost and Exactly/AtLeast"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:200
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:203
 msgid "Invalid comparison \"{}\" in trigger index {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:209
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:212
 msgid "Can't negate EUDX condition"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:214
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:217
 msgid "Can't negate condition with comparison"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:216
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:219
 msgid "Can't negate condition"
 msgstr ""
 
@@ -412,24 +411,24 @@ msgid "Cannot have EUDElse after EUDElse"
 msgstr ""
 
 #: E:\eudplib\eudplib\ctrlstru\simpleblock.py:161
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:80
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:99
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:82
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:101
 msgid "Block start/end mismatch"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:76
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:78
 msgid "Invalid selector start for EUDSwitch"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:85
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:87
 msgid "Duplicate cases"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:87
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:89
 msgid "cases out of mask"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:102
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:104
 msgid "Duplicate default"
 msgstr ""
 
@@ -462,8 +461,7 @@ msgstr ""
 msgid "Only dword can be read as position"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\eudarray.py:86
-#: E:\eudplib\eudplib\eudlib\eudarray.py:115
+#: E:\eudplib\eudplib\eudlib\eudarray.py:93
 msgid "Can't iterate EUDArray"
 msgstr ""
 
@@ -477,9 +475,9 @@ msgstr ""
 msgid "copyto target should be EUDByteReader/Writer/Stream"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:248
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:256
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:264
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:235
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:243
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:251
 msgid "safe read functions are deprecated in 0.61 and will be removed in 0.63"
 msgstr ""
 
@@ -613,6 +611,10 @@ msgstr ""
 msgid "Writing trace file to {}"
 msgstr ""
 
+#: E:\eudplib\eudplib\trigger\tpatcher.py:67
+msgid "Can't put Action in conditionals: {}"
+msgstr ""
+
 #: E:\eudplib\eudplib\trigger\triggerdef.py:47
 msgid "preserved should be bool"
 msgstr ""
@@ -633,7 +635,6 @@ msgid "    - Ended with {}"
 msgstr ""
 
 #: E:\eudplib\eudplib\utils\exprproxy.py:41
-#: E:\eudplib\eudplib\utils\exprproxy.py:186
 msgid "Type {} is not castable"
 msgstr ""
 

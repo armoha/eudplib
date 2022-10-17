@@ -1,1 +1,0 @@
-python E:\P\Tools\i18n\pygettext.py -d E:\eudplib\eudplib\localize\base E:\eudplib\eudplib

@@ -33,6 +33,7 @@ from .filler import (
     _fillhibyte,
     _fillmsbyte,
 )
+from eudplib.localize import _
 
 
 def ApplyPatchTable(initepd, obj, patchTable):
@@ -62,7 +63,8 @@ actpt = [[-1], [-1], [-1], [-1], [-1], [-1], [0, 4, 5], [2, None, None, None]]
 
 
 def PatchCondition(cond):
-    assert not isinstance(cond, c.Action)
+    if isinstance(cond, c.Action):
+        raise ut.EPError(_("Can't put Action in conditionals: {}").format(cond))
     if hasattr(cond, "getValueAddr"):
         try:  # EUDLightBool, EUDEntry
             return c.MemoryX(cond.getValueAddr(), c.AtLeast, 1, cond._mask)
