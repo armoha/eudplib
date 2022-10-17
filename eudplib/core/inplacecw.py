@@ -166,7 +166,7 @@ def iand(a, b, v):
         write = SetMemoryXEPD(a + b, SetTo, 0, 0)
         VProc(v, v.QueueAssignTo(EPD(write)))
     elif IsEUDVariable(a) and IsEUDVariable(b):
-        write = SetMemoryXEPD(0, SetTo, ~0, 0)
+        write = SetMemoryXEPD(0, SetTo, 0, 0)
         VProc(
             [a, b, v],
             [
@@ -176,7 +176,7 @@ def iand(a, b, v):
             ],
         )
     else:
-        write = SetMemoryXEPD(0, SetTo, ~0, 0)
+        write = SetMemoryXEPD(0, SetTo, 0, 0)
         if IsEUDVariable(b):
             a, b = b, a
         VProc(
