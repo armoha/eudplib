@@ -185,11 +185,8 @@ def NegateCondition(cond):
         else:
             return c.Always()
 
-    else:
-        try:
-            cond.Negate()
-            return cond
-        except (AttributeError, ut.EPError):
-            if c.IsConstExpr(cond):
-                return cond == 0
-            raise
+    try:
+        cond.Negate()
+        return cond
+    except (AttributeError, ut.EPError):
+        raise

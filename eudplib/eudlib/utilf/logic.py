@@ -98,9 +98,8 @@ def EUDNot(cond):
     except (AttributeError, EPError):
         pass
     v = c.EUDLightBool()
+    c.RawTrigger(actions=v.Set())
     if cs.EUDIf()(cond):
         c.RawTrigger(actions=v.Clear())
-    if cs.EUDElse()():
-        c.RawTrigger(actions=v.Set())
     cs.EUDEndIf()
     return v

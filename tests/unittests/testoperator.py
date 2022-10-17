@@ -29,4 +29,4 @@ def test_variable_inequal():
     test_assert("__lt__", a < c)
     test_assert("__le__", a <= c)
     test_assert("__le__", a <= b)
-    test_assert("__le__", EUDNot(c <= a))
+    test_assert("__le__", EUDNot(c <= a))  # a < c
