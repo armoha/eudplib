@@ -1,2 +1,5 @@
 [files]
 extend-exclude = [".*__epspy__.*"]
+
+[default.extend-words]
+inot = "inot"

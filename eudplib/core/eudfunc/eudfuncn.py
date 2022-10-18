@@ -108,7 +108,7 @@ class EUDFuncN:
         # Prevent double compilication
         ut.ep_assert(self._fstart is None)
 
-        # Initalize new namespace
+        # Initialize new namespace
         f_bsm = BlockStruManager()
         prev_bsm = SetCurrentBlockStruManager(f_bsm)
         bt.PushTriggerScope()

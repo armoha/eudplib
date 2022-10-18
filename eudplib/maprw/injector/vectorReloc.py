@@ -288,7 +288,7 @@ def CreateVectorRelocator(chkt, payload):
         if flag & 8:  # Trigger already disabled
             pass
 
-        flag ^= 8  # Disable it temporarilly. It will be re-enabled at stage 3
+        flag ^= 8  # Disable it temporarily. It will be re-enabled at stage 3
         trig[320 + 2048 : 320 + 2048 + 4] = ut.i2b4(flag)
         proc_trigs.append(bytes(trig))
 

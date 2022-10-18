@@ -788,7 +788,7 @@ def SeqCompute(assignpairs):
         dst = bt.EncodePlayer(unProxy(dst))
         src = unProxy(src)
 
-        # Flush action set before preceeding
+        # Flush action set before proceeding
         if IsEUDVariable(src):
             if src in dstvarset:
                 FlushPairs()

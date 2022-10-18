@@ -36,7 +36,7 @@
 맵 데이터
 ^^^^^^^^
 
-* IsMapdataInitalized()
+* IsMapdataInitialized()
     LoadMap 함수로 맵 데이터를 로드했는지를 확인합니다. 아직 맵 데이터가
     초기화가 덜 됬으면 아래 함수들이 동작하지 않을 수도 있습니다.
 

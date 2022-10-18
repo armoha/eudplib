@@ -3,7 +3,7 @@
 
 import os
 
-begining_str = """\
+beginning_str = """\
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
@@ -20,9 +20,9 @@ for root, dirs, files in os.walk("../eudplib"):
             finalpath = os.path.join(root, f)
             code = open(finalpath, "r", encoding="utf-8").read()
 
-            if not code.startswith(begining_str):
+            if not code.startswith(beginning_str):
                 print("%s" % finalpath)
-                code = begining_str + "\n" + code
+                code = beginning_str + "\n" + code
                 open(finalpath, "w", encoding="utf-8").write(code)
 
 print("end")

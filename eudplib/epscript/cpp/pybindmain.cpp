@@ -18,8 +18,8 @@ void EPS_EXPORT setDebugMode(int set) {
     MAP_DEBUG = set != 0;
 }
 
-void EPS_EXPORT registerPlibConstants(const char* zeroSeperatedStrings) {
-    const char* p = zeroSeperatedStrings;
+void EPS_EXPORT registerPlibConstants(const char* zeroSeparatedStrings) {
+    const char* p = zeroSeparatedStrings;
     std::vector<std::string> vector;
 
     do {
@@ -55,7 +55,7 @@ const char *EPS_EXPORT compileString(
         s[parsed.size()] = '\0';
         return s;
     } catch (std::runtime_error e) {
-        fprintf(stderr, "Error occured : %s\n", e.what());
+        fprintf(stderr, "Error occurred : %s\n", e.what());
         return nullptr;
     }
 }

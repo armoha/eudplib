@@ -416,7 +416,7 @@ bytes - DWORD / WORD / BYTE 변환
 eudplib로 유틸리티를 만들 때
 ============================
 
--   **IsMapdataInitalized**
+-   **IsMapdataInitialized**
 -   **EPError**
 -   **ep_assert**
 

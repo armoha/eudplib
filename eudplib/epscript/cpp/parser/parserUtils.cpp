@@ -19,7 +19,7 @@ void throw_error(int code, const std::string& message, int line) {
         std::cerr << "[Error " << code << "] Module \"" << currentModule << "\" Line " << line << " : " << message << std::endl;
         (*pGen) << "# [Error " << code << "] Line " << line << " : " << message << std::endl;
         if (++errorn == 100) {
-            std::cerr << " - More than 100 errors occured. Stop printing errors" << std::endl;
+            std::cerr << " - More than 100 errors occurred. Stop printing errors" << std::endl;
         }
     }
 }

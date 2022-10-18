@@ -27,7 +27,7 @@ from .stringmap import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnit
 
 from .proptable import GetPropertyIndex
 from .unitprp import UnitProperty
-from .mapdata import IsMapdataInitalized, GetChkTokenized
+from .mapdata import IsMapdataInitialized, GetChkTokenized
 
 from .tblformat import TBL
 

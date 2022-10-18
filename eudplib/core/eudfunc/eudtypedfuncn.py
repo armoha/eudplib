@@ -37,7 +37,7 @@ def applyTypes(typesdecl, varlist):
 
     :param typesdecl: List of types. Can be set to None if you don't want
         to typecast anything. Each item of the list can also be None which is
-        equivilant to EUDVariable here.
+        equivalent to EUDVariable here.
     :param varlist: List of variables.
 
     :returns: List of casted variables.
@@ -78,7 +78,7 @@ class EUDTypedFuncN(EUDFuncN):
         self._rettypes = rettypes
 
     def __call__(self, *args, ret=None):
-        # This layer is nessecary for function to accept non-EUDVariable object
+        # This layer is necessary for function to accept non-EUDVariable object
         # as argument. For instance, EUDFuncN.
         args = applyTypes(self._argtypes, args)
         rets = super().__call__(*args, ret=ret)
@@ -122,7 +122,7 @@ class EUDFullFuncN(EUDFuncN):
         self._rettypes = rettypes
 
     def __call__(self, *args, ret=None):
-        # This layer is nessecary for function to accept non-EUDVariable object
+        # This layer is necessary for function to accept non-EUDVariable object
         # as argument. For instance, EUDFuncN.
         args = applyTypes(self._argtypes, args)
         rets = super().__call__(*args, ret=ret)

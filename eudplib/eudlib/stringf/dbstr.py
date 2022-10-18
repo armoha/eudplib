@@ -31,7 +31,7 @@ from .cpstr import GetMapStringAddr
 class DBString(ut.ExprProxy):
     """Object for storing single modifiable string.
 
-    Manipluating STR section is hard. DBString stores only one string, so that
+    Manipulating STR section is hard. DBString stores only one string, so that
     modifying its structure is substantially easier than modifying entire STR
     section. You can do anything you would do with normal string with DBString.
     """

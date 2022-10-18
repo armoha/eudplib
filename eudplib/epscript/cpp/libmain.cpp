@@ -20,9 +20,9 @@ extern "C"
         MAP_DEBUG = set != 0;
     }
 
-    void EPS_EXPORT registerPlibConstants(const char *zeroSeperatedStrings)
+    void EPS_EXPORT registerPlibConstants(const char *zeroSeparatedStrings)
     {
-        const char *p = zeroSeperatedStrings;
+        const char *p = zeroSeparatedStrings;
         std::vector<std::string> vector;
 
         do
@@ -65,7 +65,7 @@ extern "C"
         }
         catch (std::runtime_error e)
         {
-            fprintf(stderr, "Error occured : %s\n", e.what());
+            fprintf(stderr, "Error occurred : %s\n", e.what());
             return nullptr;
         }
     }

@@ -34,7 +34,7 @@ from ..memiof import f_setcurpl2cpcache, f_dwread_epd
 @c.EUDFunc
 def f_strcpy(dst, src):
     """
-    Strcpy equivilant in eudplib. Copy C-style string.
+    Strcpy equivalent in eudplib. Copy C-style string.
 
     :param dst: Destination address (Not EPD player)
     :param src: Source address (Not EPD player)

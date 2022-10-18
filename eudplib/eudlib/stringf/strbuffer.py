@@ -88,7 +88,7 @@ def _tag_print(identifier, *args, encoding="UTF-8"):
 class StringBuffer:
     """Object for storing single modifiable string.
 
-    Manipluating STR section is easy. :)
+    Manipulating STR section is easy. :)
     You can do anything you would do with normal string with StringBuffer.
     """
 

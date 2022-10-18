@@ -56,7 +56,7 @@ def AddListFiles(n, f):
     _listfiles.append((n, f))
 
 
-def IsMapdataInitalized():
+def IsMapdataInitialized():
     return _inited
 
 

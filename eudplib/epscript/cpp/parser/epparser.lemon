@@ -178,7 +178,7 @@ fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_retty
     currentFunction = name->data;
 
     // Register variables.
-    // args->data is a comma-seperated list of (name, type). To pair names and types,
+    // args->data is a comma-separated list of (name, type). To pair names and types,
     // we store varname in odd loops and define variables on even loops.
     std::string argname;
     std::vector<std::string> argnames, types;

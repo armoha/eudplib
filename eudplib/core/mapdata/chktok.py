@@ -60,7 +60,7 @@ class CHK:
         #  - invalid section length (too high)
         #  - unused sections
 
-        t = self.sections  # temporarilly store
+        t = self.sections  # temporarily store
         self.sections = {}
 
         index = 0
