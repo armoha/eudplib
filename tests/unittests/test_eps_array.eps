@@ -1,26 +1,49 @@
 import py_random;
-import tests.unittests.test_eps_randhelper as helper;
+import py_itertools;
 function test_write() {
     const ret = py_list();
 
-    const num = helper.GetValues();
-    const numV = EUDArray(helper.GetValues());
+    const u32 = py_eval("lambda: random.randint(1, 0xFFFFFFFF)");
+    const shift = py_eval("lambda: random.randint(0, 31)");
+
+    const num = u32(), u32(), u32(), u32(), u32(), u32(),
+        shift(), shift(), u32(), u32(), u32();
+    const numV = EUDArray(num);
     const numS = num, numV;
+    setcurpl(getuserplayerid());
+    const dbg = StringBuffer(3000);
+    dbg.insert(0);
     foreach(vals : numS) {
-        var expect;
-        expect = vals[0];
+        var expect = vals[0];
         expect += vals[1];
         expect -= vals[2];
+        dbg.appendf("\n\x07{:x}\x02 *= {:x}", expect, vals[3]);
         expect *= vals[3];
+        var temp = expect;
+        dbg.appendf(" -> \x07{:x}\x02 /= {:x}", expect, vals[4]);
         expect /= vals[4];
+        temp += expect;
+        dbg.appendf(" -> \x07{}\x02 %= {:x}", expect, vals[5]);
         expect %= vals[5];
+        temp += expect;
+        dbg.appendf(" -> \x07{}\x02 <<= {}", expect, vals[6]);
         expect <<= vals[6];
+        temp += expect;
+        dbg.appendf(" -> \x07{:x}\x02 >>= {}", expect, vals[7]);
         expect >>= vals[7];
+        temp += expect;
         // expect **= ;
+        // temp += expect;
+        dbg.appendf(" -> \x07{}\x02 &= {:x}", expect, vals[8]);
         expect &= vals[8];
+        temp += expect;
+        dbg.appendf(" -> \x07{}\x02 |= {:x}", expect, vals[9]);
         expect |= vals[9];
+        temp += expect;
+        dbg.appendf(" -> \x07{:x}", expect);
         expect ^= vals[10];
-        ret.append(expect);
+        temp += expect;
+        ret.append(temp);
     }
     const pvar, arr = PVariable(), EUDArray(8);
     var v1, v2 = pvar, arr;
@@ -28,29 +51,63 @@ function test_write() {
 
     const index = py_eval("random.randint(0, 7)");
     var indexV = index;
-    const testmap = py_list();
-    foreach(a : list(pvar, arr, pvarV, arrV)) {
-        foreach(i : list(index, indexV)) {
-            foreach(vlist : numS) {
-                const pair = a, i, vlist;
-                testmap.append(pair);
-            }
-        }
-    }
-    foreach(arr, i, vals : testmap) {
+
+    foreach(arr, i, vals : py_eval("itertools.product(\
+        (pvar, arr, pvarV, arrV), (index, indexV), (num, numV)\
+    )")) {
         arr[i] = vals[0];
         arr[i] += vals[1];
         arr[i] -= vals[2];
         arr[i] *= vals[3];
+        var temp = arr[i];
         arr[i] /= vals[4];
+        temp += arr[i];
         arr[i] %= vals[5];
+        temp += arr[i];
         arr[i] <<= vals[6];
+        temp += arr[i];
         arr[i] >>= vals[7];
+        temp += arr[i];
         // arr[i] **= ;
+        // temp += arr[i];
         arr[i] &= vals[8];
+        temp += arr[i];
         arr[i] |= vals[9];
+        temp += arr[i];
         arr[i] ^= vals[10];
-        ret.append(arr[i]);
+        temp += arr[i];
+        ret.append(temp);
+    }
+    dbg.Display();
+
+    return List2Assignable(ret);
+}
+function test_compare() {
+    const ret = py_list();
+    const u32 = py_eval("lambda: random.randint(1, 0xFFFFFFFF)");
+
+    const num = u32(), u32(), u32(), u32(), u32(), u32(), u32();
+    const numV = EUDArray(num);
+
+    const pvar, arr = PVariable(), EUDArray(8);
+    var v1, v2 = pvar, arr;
+    const pvarV, arrV = PVariable.cast(v1), EUDArray.cast(v2);
+
+    const index = py_eval("random.randint(0, 7)");
+    var indexV = index;
+
+    foreach(arr, i, vals : py_eval("itertools.product(\
+        (pvar, arr, pvarV, arrV), (index, indexV), (num, numV)\
+    )")) {
+        var temp = 0;
+        arr[i] = vals[0];
+        if (arr[i] == vals[1]) temp += 1 << 1;
+        if (arr[i] != vals[2]) temp += 1 << 2;
+        if (arr[i] >= vals[3]) temp += 1 << 3;
+        if (arr[i] <= vals[4]) temp += 1 << 4;
+        if (arr[i] > vals[5]) temp += 1 << 5;
+        if (arr[i] < vals[6]) temp += 1 << 6;
+        ret.append(temp);
     }
 
     return List2Assignable(ret);

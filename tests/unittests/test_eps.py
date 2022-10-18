@@ -1,5 +1,5 @@
 from .test_eps_epsfile import f_square, f_constv_thing, f_test_array, f_switch_test
-from .test_eps_array import f_test_write
+from .test_eps_array import f_test_write, f_test_compare
 from helper import *
 
 
@@ -20,7 +20,13 @@ def test_epscript():
     )
     v = f_test_write()
     test_equality(
-        "epScript array test",
+        "epScript array write test",
         v[1:],
         [v[0]] * (len(v) - 1),
+    )
+    c = f_test_compare()
+    test_equality(
+        "epScript array compare test",
+        c[1:],
+        [c[0]] * (len(c) - 1),
     )
