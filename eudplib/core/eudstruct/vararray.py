@@ -33,6 +33,7 @@ from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, e
 from ..variable import EUDVariable, EUDLightVariable, SeqCompute, VProc, IsEUDVariable
 from ..variable.eudv import _ProcessDest
 from ..variable.vbuf import GetCurrentVariableBuffer, GetCurrentCustomVariableBuffer
+from ..curpl import GetCPCache
 
 
 @cachedfunc
@@ -463,6 +464,7 @@ def EUDVArray(size, basetype=None):
                 return ilshift(self._epd, 18 * i + 87, n)
             if n == 0:
                 return
+            mask = (1 << (n + 1)) - 1
             bitstrg = BitsTrg(f"varrlshift{n}")
             cp = bt.EncodePlayer(bt.CurrentPlayer)
             for trg in bitstrg:
@@ -521,6 +523,7 @@ def EUDVArray(size, basetype=None):
                 return irshift(self._epd, 18 * i + 87, n)
             if n == 0:
                 return
+            mask = (1 << (n + 1)) - 1
             bitstrg = BitsTrg(f"varrrshift{n}")
             cp = bt.EncodePlayer(bt.CurrentPlayer)
             for trg in bitstrg:
@@ -716,8 +719,6 @@ def EUDVArray(size, basetype=None):
             nptr << bt.NextTrigger()
 
         def ixoritem(self, i, val):
-            from ..curpl import GetCPCache
-
             if not IsEUDVariable(i):
                 return ixor(self._epd, 18 * i + 87, val)
             bitstrg = BitsTrg("varrxor")
@@ -732,8 +733,8 @@ def EUDVArray(size, basetype=None):
                     nextptr=GetCPCache().GetVTable(),
                     actions=[
                         trg["ret"]
-                        << bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0x55555555),
-                        bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0xAAAAAAAA),
+                        << bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0x55555555),
+                        bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0xAAAAAAAA),
                         GetCPCache().SetDest(EPD(0x6509B0)),
                     ],
                 )

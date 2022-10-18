@@ -1,0 +1,57 @@
+import py_random;
+import tests.unittests.test_eps_randhelper as helper;
+function test_write() {
+    const ret = py_list();
+
+    const num = helper.GetValues();
+    const numV = EUDArray(helper.GetValues());
+    const numS = num, numV;
+    foreach(vals : numS) {
+        var expect;
+        expect = vals[0];
+        expect += vals[1];
+        expect -= vals[2];
+        expect *= vals[3];
+        expect /= vals[4];
+        expect %= vals[5];
+        expect <<= vals[6];
+        expect >>= vals[7];
+        // expect **= ;
+        expect &= vals[8];
+        expect |= vals[9];
+        expect ^= vals[10];
+        ret.append(expect);
+    }
+    const pvar, arr = PVariable(), EUDArray(8);
+    var v1, v2 = pvar, arr;
+    const pvarV, arrV = PVariable.cast(v1), EUDArray.cast(v2);
+
+    const index = py_eval("random.randint(0, 7)");
+    var indexV = index;
+    const testmap = py_list();
+    foreach(a : list(pvar, arr, pvarV, arrV)) {
+        foreach(i : list(index, indexV)) {
+            foreach(vlist : numS) {
+                const pair = a, i, vlist;
+                testmap.append(pair);
+            }
+        }
+    }
+    foreach(arr, i, vals : testmap) {
+        arr[i] = vals[0];
+        arr[i] += vals[1];
+        arr[i] -= vals[2];
+        arr[i] *= vals[3];
+        arr[i] /= vals[4];
+        arr[i] %= vals[5];
+        arr[i] <<= vals[6];
+        arr[i] >>= vals[7];
+        // arr[i] **= ;
+        arr[i] &= vals[8];
+        arr[i] |= vals[9];
+        arr[i] ^= vals[10];
+        ret.append(arr[i]);
+    }
+
+    return List2Assignable(ret);
+}
