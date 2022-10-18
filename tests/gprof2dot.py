@@ -3259,7 +3259,7 @@ def main():
         if not args:
             fp = sys.stdin
         else:
-            fp = open(args[0], "rt")
+            fp = open(args[0], "rt", encoding="UTF-8")
         parser = Format(fp)
     elif Format.multipleInput:
         if not args:
