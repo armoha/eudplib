@@ -136,11 +136,7 @@ def _f_bitlshift(a, b):
 
 def f_bitlshift(a, b, _fdict={}, **kwargs):
     """Calculate a << b"""
-    if "ret" in kwargs:
-        ret = kwargs["ret"][0]
-        del kwargs["ret"]
-    else:
-        ret = ev.EUDVariable()
+    ret = kwargs["ret"][0] if "ret" in kwargs else ev.EUDVariable()
     if ev.IsEUDVariable(a) and not ev.IsEUDVariable(b):
         if b == 0:
             if a is ret:
@@ -177,6 +173,8 @@ def f_bitlshift(a, b, _fdict={}, **kwargs):
                 retarg = EPD(ret.getValueAddr())
             else:
                 retarg = ret
+            if "ret" in kwargs:
+                del kwargs["ret"]
             f(retarg, a, **kwargs)
         else:
             if a is not ret:
