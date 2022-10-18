@@ -24,20 +24,20 @@ THE SOFTWARE.
 """
 
 from ..utils import EPD
-from .variable import IsEUDVariable, VProc
 from .rawtrigger import (
-    RawTrigger,
-    SetTo,
     Add,
-    Subtract,
-    EncodePlayer,
     CurrentPlayer,
+    EncodePlayer,
+    RawTrigger,
     SetDeaths,
     SetMemory,
-    SetMemoryX,
     SetMemoryEPD,
+    SetMemoryX,
     SetMemoryXEPD,
+    SetTo,
+    Subtract,
 )
+from .variable import IsEUDVariable, VProc
 
 
 def cpset(a, b):

@@ -23,11 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 from math import log2
+
 from .. import core as c
 from .. import utils as ut
-from .memiof import f_dwread_epd, f_dwwrite_epd, f_dwadd_epd, f_setcurpl2cpcache
-from ..core.inplacecw import iset, cpset, isub, iand, ior, ixor, ilshift, irshift
+from ..core.inplacecw import cpset, iand, ilshift, ior, irshift, iset, isub, ixor
 from ..localize import _
+from .memiof import f_dwadd_epd, f_dwread_epd, f_dwwrite_epd, f_setcurpl2cpcache
 
 
 class EUDArrayData(c.EUDObject):

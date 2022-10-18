@@ -23,7 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ... import core as c, ctrlstru as cs, utils as ut
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from .cpprint import GetTBLAddr
 from .eudprint import f_dbstr_print
 from .fmtprint import f_sprintf

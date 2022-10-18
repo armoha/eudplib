@@ -112,8 +112,7 @@ def CreateVectorRelocator(chkt, payload):
             + tt.Trigger(
                 players=[tt.AllPlayers],
                 actions=[
-                    tt.SetMemory(mrgn + 328 + 32 * j + 16, tt.Add, pch[j])
-                    for j in range(packn)
+                    tt.SetMemory(mrgn + 328 + 32 * j + 16, tt.Add, pch[j]) for j in range(packn)
                 ],
             )
         )
@@ -148,9 +147,7 @@ def CreateVectorRelocator(chkt, payload):
             players=[tt.AllPlayers],
             actions=[
                 [
-                    tt.SetMemory(
-                        mrgn_ort + 328 + 32 * j + 16, tt.Add, 0xFFFFFFFF - prevoffset[j]
-                    )
+                    tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, 0xFFFFFFFF - prevoffset[j])
                     for j in range(packn)
                 ],
                 tt.SetMemory(mrgn_ort + 4, tt.Add, 4),  # skip garbage area
@@ -164,9 +161,7 @@ def CreateVectorRelocator(chkt, payload):
     str_padding_length = -len(str_section) & 3
     strsled_offset = len(str_section) + str_padding_length + 0x191943C8
     payload_offset = strsled_offset + len(str_sled) + 4
-    str_section = (
-        str_section + bytes(str_padding_length) + str_sled + b"\0\0\0\0" + payload.data
-    )
+    str_section = str_section + bytes(str_padding_length) + str_sled + b"\0\0\0\0" + payload.data
     chkt.setsection(GetStringSectionName(), str_section)
 
     ##############
@@ -195,10 +190,7 @@ def CreateVectorRelocator(chkt, payload):
         + tt.Trigger(
             players=[tt.AllPlayers],
             actions=[
-                [
-                    tt.SetMemory(payload_offset - 4, tt.Add, payload_offset)
-                    for _ in range(packn)
-                ],
+                [tt.SetMemory(payload_offset - 4, tt.Add, payload_offset) for _ in range(packn)],
                 tt.SetMemory(mrgn_ort + 4, tt.Add, 2408),
             ],
         )

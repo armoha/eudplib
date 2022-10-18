@@ -28,22 +28,20 @@ from .localize import *
 
 oldGlobals = set(globals().keys())
 
-from .utils import *
 from .core import *
-from .trigger import *
 from .ctrlstru import *
-from .eudlib import *
 from .epscript import *
+from .eudlib import *
+from .maprw import *
+from .trigger import *
 from .trigtrg.runtrigtrg import (
-    RunTrigTrigger,
     GetFirstTrigTrigger,
     GetLastTrigTrigger,
+    RunTrigTrigger,
     TrigTriggerBegin,
     TrigTriggerEnd,
 )
-
-from .maprw import *
-
+from .utils import *
 
 __version__ = "0.70.12"
 

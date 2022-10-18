@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from ...utils import i2b4
 from .. import rawtrigger as bt
 from ..eudobj import Db
-from ...utils import i2b4
 from .vbase import VariableBase
 
 

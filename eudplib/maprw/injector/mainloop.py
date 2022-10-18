@@ -26,8 +26,8 @@ THE SOFTWARE.
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
-from ...eudlib.utilf.userpl import _f_initisusercp
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
+from ...eudlib.utilf.userpl import _f_initisusercp
 
 jumper = None
 startFunctionList = []

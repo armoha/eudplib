@@ -23,44 +23,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .cshelper import CtrlStruOpener
-
 from .basicstru import DoActions, EUDJump, EUDJumpIf, EUDJumpIfNot, EUDTernary
-
-from .simpleblock import (
-    EUDIf,
-    EUDIfNot,
-    EUDElseIf,
-    EUDElseIfNot,
-    EUDElse,
-    EUDEndIf,
-    EUDExecuteOnce,
-    EUDEndExecuteOnce,
-)
-
-from .loopblock import (
-    EUDInfLoop,
-    EUDEndInfLoop,
-    EUDLoopN,
-    EUDEndLoopN,
-    EUDLoopRange,
-    EUDWhile,
-    EUDWhileNot,
-    EUDEndWhile,
-)
-
-from .jumptable import GetCurrentJumpBuffer
-from .swblock import EPDSwitch, EUDSwitch, EUDSwitchCase, EUDSwitchDefault, EUDEndSwitch
-
 from .breakcont import (
-    EUDContinue,
-    EUDContinueIf,
-    EUDContinueIfNot,
-    EUDSetContinuePoint,
-    EUDIsContinuePointSet,
     EUDBreak,
     EUDBreakIf,
     EUDBreakIfNot,
+    EUDContinue,
+    EUDContinueIf,
+    EUDContinueIfNot,
+    EUDIsContinuePointSet,
+    EUDSetContinuePoint,
 )
-
-from .shortcircuit import EUDSCOr, EUDSCAnd
+from .cshelper import CtrlStruOpener
+from .jumptable import GetCurrentJumpBuffer
+from .loopblock import (
+    EUDEndInfLoop,
+    EUDEndLoopN,
+    EUDEndWhile,
+    EUDInfLoop,
+    EUDLoopN,
+    EUDLoopRange,
+    EUDWhile,
+    EUDWhileNot,
+)
+from .shortcircuit import EUDSCAnd, EUDSCOr
+from .simpleblock import (
+    EUDElse,
+    EUDElseIf,
+    EUDElseIfNot,
+    EUDEndExecuteOnce,
+    EUDEndIf,
+    EUDExecuteOnce,
+    EUDIf,
+    EUDIfNot,
+)
+from .swblock import EPDSwitch, EUDEndSwitch, EUDSwitch, EUDSwitchCase, EUDSwitchDefault

@@ -23,14 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from ...utils import EPD, RandList
 from .. import allocator as ac
-from .. import variable as ev
 from .. import eudfunc as ef
 from .. import rawtrigger as rt
-from .muldiv import f_mul, f_div
-from ...utils import EPD, RandList
+from .. import variable as ev
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
-from ..variable.evcommon import _xv, _selfadder, _ev
+from ..variable.evcommon import _ev, _selfadder, _xv
+from .muldiv import f_div, f_mul
 
 _x = _xv[0]
 

@@ -26,11 +26,10 @@ THE SOFTWARE.
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-
 from ...core.eudfunc.eudf import _EUDPredefineParam
-from . import modcurpl as cp
 from . import byterw as bm
 from . import cpmemio as cm
+from . import modcurpl as cp
 
 _cpmoda = c.Forward()
 _cpadda = c.Forward()
@@ -75,9 +74,7 @@ def _repaddsd_epd(dstepdp, srcepdp, copydwn):
         [
             c.SetMemory(_cpadda, c.SetTo, -1),
             # TODO: set Add modifier in compile-time
-            c.SetMemoryX(
-                _cpadda + 8, c.SetTo, c.EncodeModifier(c.Add) << 24, 0xFF000000
-            ),
+            c.SetMemoryX(_cpadda + 8, c.SetTo, c.EncodeModifier(c.Add) << 24, 0xFF000000),
         ],
     )
 

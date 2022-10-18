@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from eudplib import core as c
+
 from ..utilf import EUDBinaryMax
 
 

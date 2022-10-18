@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 from eudplib import utils as ut
 from eudplib.localize import _
+
 from .unitprp import UnitProperty
 
 _uprpdict = {}

@@ -1,22 +1,24 @@
 from ..core import (
     EUDVariable,
-    SeqCompute,
-    SetVariables,
     EUDVArray,
     IsEUDVariable,
-    f_bitlshift,
+    SeqCompute,
     SetTo,
+    SetVariables,
+    f_bitlshift,
 )
+from ..core.variable.eudv import IsRValue
+from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
+from ..eudlib import EUDArray
 from ..maprw import EUDOnStart
 from ..utils import ExprProxy, FlattenList, List2Assignable
-from ..eudlib import EUDArray
-from ..ctrlstru import EUDIf, EUDElse, EUDEndIf
 from .epsimp import EPSLoader
-from ..core.variable.eudv import IsRValue
 
 
 def _RELIMP(path, mod_name):  # relative path import
-    import inspect, pathlib, importlib.util
+    import importlib.util
+    import inspect
+    import pathlib
 
     p = pathlib.Path(inspect.getabsfile(inspect.currentframe())).parent
     for s in path.split("."):

@@ -23,7 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from eudplib import core as c, ctrlstru as cs
+from eudplib import core as c
+from eudplib import ctrlstru as cs
 
 
 def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF):

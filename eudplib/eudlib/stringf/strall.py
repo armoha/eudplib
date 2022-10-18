@@ -5,10 +5,10 @@ from ... import ctrlstru as cs
 from ... import utils as ut
 from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from ..utilf import (
-    f_getuserplayerid,
     DisplayTextAll,
     PlayWAVAll,
     SetMissionObjectivesAll,
+    f_getuserplayerid,
 )
 from .cpprint import FixedText, f_gettextptr
 from .cpstr import GetMapStringAddr

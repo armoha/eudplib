@@ -69,8 +69,7 @@ class RlocInt_C:
             other = other.offset
         ut.ep_assert(other != 0, _("Divide by zero"))
         ut.ep_assert(
-            (self.rlocmode == 0)
-            or (self.rlocmode % other == 0 and self.offset % other == 0),
+            (self.rlocmode == 0) or (self.rlocmode % other == 0 and self.offset % other == 0),
             _("RlocInt not divisible by {}").format(other),
         )
         return RlocInt_C((self.offset // other) & 0xFFFFFFFF, self.rlocmode // other)

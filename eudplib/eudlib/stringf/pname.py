@@ -23,29 +23,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ... import core as c, ctrlstru as cs, utils as ut
-from ...trigger import Trigger
-from ..memiof import (
-    f_dwread_epd,
-    f_wread_epd,
-    f_dwbreak,
-    f_getcurpl,
-    f_setcurpl,
-    f_memcmp,
-)
-from .eudprint import f_dbstr_print, ptr2s, epd2s
-from .fmtprint import _format_args
-from .cpprint import f_cpstr_print, PName
-from .strfunc import f_strlen_epd
-from ..utilf import (
-    f_playerexist,
-    f_getgametick,
-    EUDLoopPlayer,
-)
-from ...localize import _
-from ..playerv import PVariable
-from ..eudarray import EUDArray
 from math import ceil
+
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
+from ...localize import _
+from ...trigger import Trigger
+from ..eudarray import EUDArray
+from ..memiof import (
+    f_dwbreak,
+    f_dwread_epd,
+    f_getcurpl,
+    f_memcmp,
+    f_setcurpl,
+    f_wread_epd,
+)
+from ..playerv import PVariable
+from ..utilf import EUDLoopPlayer, f_getgametick, f_playerexist
+from .cpprint import PName, f_cpstr_print
+from .eudprint import epd2s, f_dbstr_print, ptr2s
+from .fmtprint import _format_args
+from .strfunc import f_strlen_epd
 
 PLVarUnit, PLVarMask = ceil((0x58F500 - 0x58A364) / 48), 0
 PLVarDict = {}

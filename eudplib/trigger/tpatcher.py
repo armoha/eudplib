@@ -23,17 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from eudplib.localize import _
+
 from .. import core as c
 from .. import utils as ut
 from .filler import (
     _filldw,
+    _fillhibyte,
+    _filllobyte,
     _fillloword,
     _filllsbyte,
-    _filllobyte,
-    _fillhibyte,
     _fillmsbyte,
 )
-from eudplib.localize import _
 
 
 def ApplyPatchTable(initepd, obj, patchTable):

@@ -23,8 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .eperror import EPError
 from ..localize import _
+from .eperror import EPError
 
 g_encoding = "cp949"
 

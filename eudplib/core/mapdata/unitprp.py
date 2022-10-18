@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from ctypes import *
+
 from eudplib import utils as ut
 
 
@@ -78,14 +79,10 @@ class UnitProperty(LittleEndianStructure):
 
         >>> UnitProperty(hitpoint = 50, burrowed = True) # HP 50%, burrowed
         """
-        ut.ep_assert(
-            hitpoint is None or (isinstance(hitpoint, int) and 0 <= hitpoint <= 100)
-        )
+        ut.ep_assert(hitpoint is None or (isinstance(hitpoint, int) and 0 <= hitpoint <= 100))
         ut.ep_assert(shield is None or (isinstance(shield, int) and 0 <= shield <= 100))
         ut.ep_assert(energy is None or (isinstance(energy, int) and 0 <= energy <= 100))
-        ut.ep_assert(
-            resource is None or (isinstance(resource, int) and 0 <= resource <= 65535)
-        )
+        ut.ep_assert(resource is None or (isinstance(resource, int) and 0 <= resource <= 65535))
         ut.ep_assert(hanger is None or (isinstance(hanger, int) and 0 <= hanger <= 255))
 
         ut.ep_assert(cloaked in [None, True, False])

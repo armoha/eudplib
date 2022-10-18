@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .vararray import EUDVArray
 from ...utils import ExprProxy
 from .selftype import selftype
+from .vararray import EUDVArray
 
 
 class _EUDStruct_Metaclass(type):

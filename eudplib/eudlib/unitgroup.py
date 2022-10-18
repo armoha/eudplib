@@ -24,36 +24,36 @@ THE SOFTWARE.
 """
 
 from ..core import (
-    Forward,
-    NextTrigger,
-    RawTrigger,
-    SetNextPtr,
-    EUDVariable,
-    EUDVArray,
-    SetTo,
-    SeqCompute,
-    Subtract,
     Add,
     AtLeast,
-    VProc,
-    PushTriggerScope,
-    PopTriggerScope,
-    Memory,
-    SetNextTrigger,
-    SetMemory,
-    CurrentPlayer,
     ConstExpr,
+    CurrentPlayer,
     DeathsX,
+    EUDVariable,
+    EUDVArray,
     Exactly,
+    Forward,
     IsEUDVariable,
+    Memory,
+    NextTrigger,
+    PopTriggerScope,
+    PushTriggerScope,
+    RawTrigger,
+    SeqCompute,
+    SetMemory,
+    SetNextPtr,
+    SetNextTrigger,
+    SetTo,
+    Subtract,
+    VProc,
 )
 from ..ctrlstru import (
     CtrlStruOpener,
     DoActions,
-    EUDSetContinuePoint,
+    EUDEndIf,
     EUDEndWhile,
     EUDIf,
-    EUDEndIf,
+    EUDSetContinuePoint,
 )
 from ..utils import EPD, EUDCreateBlock, EUDPeekBlock, ep_assert
 
@@ -134,9 +134,7 @@ class UnitGroup:
     def __init__(self, capacity):
         self.capacity = capacity
         self.loopvar = EUDVariable(EPD(0x6509B0), SetTo, 0)
-        varray = EUDVArray(capacity)(
-            dest=self.loopvar, nextptr=self.loopvar.GetVTable()
-        )
+        varray = EUDVArray(capacity)(dest=self.loopvar, nextptr=self.loopvar.GetVTable())
         self.varray = varray
         self.trg = EUDVariable(self.varray + 72 * capacity)
         self.pos = EUDVariable(EPD(self.varray) + 87 + 18 * capacity)
@@ -177,9 +175,7 @@ class UnitGroup:
                     )
                     nextptr << NextTrigger()
 
-                if _UnsafeWhileNot()(
-                    Memory(loopstart, AtLeast, varray + 72 * capacity)
-                ):
+                if _UnsafeWhileNot()(Memory(loopstart, AtLeast, varray + 72 * capacity)):
                     block = EUDPeekBlock("whileblock")[1]
                     loopstart << block["loopstart"] + 4
                     check_death << NextTrigger()

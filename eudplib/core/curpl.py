@@ -24,11 +24,10 @@ THE SOFTWARE.
 """
 
 
-from .allocator import Forward
-from .variable import EUDVariable
-from .rawtrigger import EncodePlayer, Memory, SetMemory, SetTo, Add, Exactly
 from ..utils import EPD
-
+from .allocator import Forward
+from .rawtrigger import Add, EncodePlayer, Exactly, Memory, SetMemory, SetTo
+from .variable import EUDVariable
 
 _curpl_var = EUDVariable()
 _curpl_checkcond = Forward()

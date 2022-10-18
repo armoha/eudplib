@@ -23,10 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl
-from ...localize import _
+from eudplib import core as c
+from eudplib import ctrlstru as cs
+from eudplib import utils as ut
 
-from eudplib import core as c, ctrlstru as cs, utils as ut
+from ...localize import _
+from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl
 
 
 @c.EUDFunc

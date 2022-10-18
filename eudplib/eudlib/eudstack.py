@@ -23,8 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .eudarray import EUDArray
 from .. import core as c
+from .eudarray import EUDArray
 
 
 def EUDStack(basetype=None):

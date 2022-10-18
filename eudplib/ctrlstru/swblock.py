@@ -23,14 +23,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from itertools import chain, combinations
+
+from eudplib import utils as ut
+from eudplib.localize import _
+
 from .. import core as c
 from .. import trigger as tg
-from eudplib import utils as ut
 from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 from .jumptable import JumpTriggerForward
-from eudplib.localize import _
-from itertools import chain, combinations
 
 
 def _IsSwitchBlockId(idf):
@@ -85,9 +87,7 @@ def EUDSwitchCase():
         for number in numbers:
             case = number & block["bitmask"]
             ut.ep_assert(case not in block["casebrlist"], _("Duplicate cases"))
-            ut.ep_assert(
-                block["bitmask"] == 0xFFFFFFFF or case == number, _("cases out of mask")
-            )
+            ut.ep_assert(block["bitmask"] == 0xFFFFFFFF or case == number, _("cases out of mask"))
             block["casebrlist"][case] = c.NextTrigger()
 
         return True
@@ -159,10 +159,7 @@ def EUDEndSwitch():
         swend << c.NextTrigger()
         return
 
-    if (
-        len(casekeylist) == 2
-        and casebrlist[casekeylist[0]] == casebrlist[casekeylist[1]]
-    ):
+    if len(casekeylist) == 2 and casebrlist[casekeylist[0]] == casebrlist[casekeylist[1]]:
 
         def popcount(x):
             x -= (x >> 1) & 0x55555555
@@ -213,9 +210,7 @@ def EUDEndSwitch():
     density = len(casebrlist) / (2 ** len(keybits))
     if density >= 0.4:
         # use jump table
-        check_invariant = c.MemoryXEPD(
-            epd, c.Exactly, keyand, (~keyor | keyand) & bitmask
-        )
+        check_invariant = c.MemoryXEPD(epd, c.Exactly, keyand, (~keyor | keyand) & bitmask)
         EUDJumpIfNot(check_invariant, defbranch)
 
         def powerset(iterable):
@@ -306,9 +301,7 @@ def EUDEndSwitch():
                 midpos = len(keys) // 2
                 branch << c.RawTrigger(
                     nextptr=br1,
-                    conditions=c.MemoryXEPD(
-                        cmpplayer, c.AtLeast, keys[midpos], bitmask
-                    ),
+                    conditions=c.MemoryXEPD(cmpplayer, c.AtLeast, keys[midpos], bitmask),
                     actions=[
                         c.SetNextPtr(branch, br2),
                         Reset(),

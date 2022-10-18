@@ -23,12 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .stringmap import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
-
-from .proptable import GetPropertyIndex
-from .unitprp import UnitProperty
-from .mapdata import IsMapdataInitialized, GetChkTokenized
-
-from .tblformat import TBL
-
+from .mapdata import GetChkTokenized, IsMapdataInitialized
 from .playerinfo import GetPlayerInfo
+from .proptable import GetPropertyIndex
+from .stringmap import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
+from .tblformat import TBL
+from .unitprp import UnitProperty

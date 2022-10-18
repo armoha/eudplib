@@ -23,10 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import core as c
-from .tpatcher import PatchCondition, PatchAction
 from eudplib import utils as ut
 from eudplib.localize import _
+
+from .. import core as c
+from .tpatcher import PatchAction, PatchCondition
 
 
 def Trigger(conditions=None, actions=None, preserved=True):
@@ -65,9 +66,7 @@ def Trigger(conditions=None, actions=None, preserved=True):
         for act in actions:
             patched_actions.append(PatchAction(act))
 
-        tend = c.RawTrigger(
-            conditions=patched_conds, actions=patched_actions, preserved=preserved
-        )
+        tend = c.RawTrigger(conditions=patched_conds, actions=patched_actions, preserved=preserved)
 
     else:
         # Extended trigger
@@ -112,9 +111,7 @@ def Trigger(conditions=None, actions=None, preserved=True):
         # Revert conditions
         cend << c.NextTrigger()
         for i in range(0, len(condts), 64):
-            tend = c.RawTrigger(
-                actions=[c.SetNextPtr(cts, cend) for cts in condts[i : i + 64]]
-            )
+            tend = c.RawTrigger(actions=[c.SetNextPtr(cts, cend) for cts in condts[i : i + 64]])
 
         if not preserved:
             skipt << c.NextTrigger()

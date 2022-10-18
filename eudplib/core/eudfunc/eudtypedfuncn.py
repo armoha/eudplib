@@ -24,11 +24,10 @@ THE SOFTWARE.
 """
 
 from ... import utils as ut
-from .. import variable as ev
-from .. import rawtrigger as bt
-
-from .eudfuncn import EUDFuncN
 from ...localize import _
+from .. import rawtrigger as bt
+from .. import variable as ev
+from .eudfuncn import EUDFuncN
 
 
 def applyTypes(typesdecl, varlist):
@@ -95,9 +94,7 @@ class EUDXTypedFuncN(EUDTypedFuncN):
     EUDFuncN specialization for EUDX.
     """
 
-    def __init__(
-        self, argn, callerfunc, bodyfunc, argtypes, rettypes, argmasks, *, traced
-    ):
+    def __init__(self, argn, callerfunc, bodyfunc, argtypes, rettypes, argmasks, *, traced):
         super().__init__(argn, callerfunc, bodyfunc, argtypes, rettypes, traced=traced)
         self._argmasks = argmasks
 
@@ -111,9 +108,7 @@ class EUDXTypedFuncN(EUDTypedFuncN):
 
 
 class EUDFullFuncN(EUDFuncN):
-    def __init__(
-        self, argn, arginitvals, callerfunc, bodyfunc, argtypes, rettypes, *, traced
-    ):
+    def __init__(self, argn, arginitvals, callerfunc, bodyfunc, argtypes, rettypes, *, traced):
         arginitvals = list(arginitvals)
         while len(arginitvals) < argn:
             arginitvals.append((0, bt.SetTo, 0, None))

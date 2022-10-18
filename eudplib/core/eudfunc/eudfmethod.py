@@ -27,10 +27,10 @@ import functools
 import inspect
 
 from ... import utils as ut
-from .. import variable as ev
-from .eudtypedfuncn import EUDTypedFuncN, applyTypes
-from ..eudstruct.selftype import selftype, SetSelfType
 from ...localize import _
+from .. import variable as ev
+from ..eudstruct.selftype import SetSelfType, selftype
+from .eudtypedfuncn import EUDTypedFuncN, applyTypes
 
 _mth_classtype = {}
 
@@ -39,9 +39,7 @@ def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):
     def _EUDTypedMethod(method):
         # Get argument number of fdecl_func
         argspec = inspect.getfullargspec(method)
-        ut.ep_assert(
-            argspec[1] is None, _("No variadic arguments (*args) allowed for EUDFunc.")
-        )
+        ut.ep_assert(argspec[1] is None, _("No variadic arguments (*args) allowed for EUDFunc."))
         ut.ep_assert(
             argspec[2] is None,
             _("No variadic keyword arguments (**kwargs) allowed for EUDFunc."),

@@ -30,9 +30,10 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 from eudplib.localize import _
-from .cpprint import PColor, PName, f_cpstr_print, f_eprintln, _eprintAll
+
+from .cpprint import PColor, PName, _eprintAll, f_cpstr_print, f_eprintln
 from .dbstr import DBString
-from .eudprint import ptr2s, epd2s, hptr, f_dbstr_print
+from .eudprint import epd2s, f_dbstr_print, hptr, ptr2s
 
 
 class _EUDFormatter(string.Formatter):
@@ -51,9 +52,7 @@ class _EUDFormatter(string.Formatter):
         if recursion_depth < 0:
             raise ValueError(_("Max string recursion exceeded"))
         result = []
-        for literal_text, field_name, format_spec, conversion in self.parse(
-            format_string
-        ):
+        for literal_text, field_name, format_spec, conversion in self.parse(format_string):
 
             # output the literal text
             if literal_text:

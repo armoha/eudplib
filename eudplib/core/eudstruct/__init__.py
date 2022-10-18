@@ -23,6 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .vararray import EUDVArray
 from .eudstruct import EUDStruct
 from .selftype import selftype
+from .vararray import EUDVArray

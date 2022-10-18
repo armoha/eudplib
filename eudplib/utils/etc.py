@@ -23,12 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import functools
 import collections
+import functools
 import itertools
+import os.path
 import random
 import sys
-import os.path
 
 
 def EPD(p):

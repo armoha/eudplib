@@ -30,11 +30,11 @@ from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 from libc.string cimport memset, memcpy
 from libc.stdint cimport uint32_t, uint16_t
 
-from .rlocint cimport RlocInt_C
-
-from . import constexpr
 from eudplib import utils as ut
 from eudplib.localize import _
+
+from . import constexpr
+from .rlocint cimport RlocInt_C
 
 
 class Payload:

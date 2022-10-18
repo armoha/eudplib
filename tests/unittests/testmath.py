@@ -12,9 +12,7 @@ def test_atan2():
 
     # Value of atan2 may vary by 1 due to rounding error.
     # Here we check similarity.
-    test_assert(
-        "atan2 test", [atanarray[angle] - angle + 1 <= 2 for angle in range(360)]
-    )
+    test_assert("atan2 test", [atanarray[angle] - angle + 1 <= 2 for angle in range(360)])
 
 
 test_operator("Square root", f_sqrt, lambda x: int(x**0.5))

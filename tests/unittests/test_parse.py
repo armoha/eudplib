@@ -1,5 +1,6 @@
-from helper import *
 import random
+
+from helper import *
 
 
 @TestInstance
@@ -8,9 +9,7 @@ def test_parse():
 
     a = Db("dpdkfah")
     number, digit = f_parse(a)
-    test_equality(
-        "#0. Error handling: Not a number - return (0, 0)", [number, digit], [0, 0]
-    )
+    test_equality("#0. Error handling: Not a number - return (0, 0)", [number, digit], [0, 0])
 
     a = Db(" \t\n07285AC")
     number, digit = f_parse(a, 7)
@@ -28,9 +27,7 @@ def test_parse():
         [-0b1101 & 0xFFFFFFFF, 4],
     )
     number, digit = f_parse(a, 16)
-    test_equality(
-        "#5. -Hexadecimal number", [number, digit], [-0xB1101BF & 0xFFFFFFFF, 7]
-    )
+    test_equality("#5. -Hexadecimal number", [number, digit], [-0xB1101BF & 0xFFFFFFFF, 7])
 
     a = Db("  \r +0o7426 -f")
     number, digit = f_parse(a, 0)

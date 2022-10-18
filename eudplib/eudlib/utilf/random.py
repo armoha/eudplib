@@ -25,7 +25,10 @@ THE SOFTWARE.
 
 # This code uses simple LCG algorithm.
 
-from eudplib import core as c, ctrlstru as cs, utils as ut
+from eudplib import core as c
+from eudplib import ctrlstru as cs
+from eudplib import utils as ut
+
 from ..memiof import f_wread_epd
 
 _seed = c.EUDVariable()
@@ -103,8 +106,6 @@ def f_dwrand():
 
     # LOWORD
     for i in ut.RandList(range(16, 32)):
-        c.RawTrigger(
-            conditions=_seed.AtLeastX(1, 2**i), actions=dseed.AddNumber(2 ** (i - 16))
-        )
+        c.RawTrigger(conditions=_seed.AtLeastX(1, 2**i), actions=dseed.AddNumber(2 ** (i - 16)))
 
     return dseed

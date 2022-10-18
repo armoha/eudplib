@@ -25,7 +25,9 @@ THE SOFTWARE.
 
 import random
 
-from eudplib import core as c, ctrlstru as cs, utils as ut
+from eudplib import core as c
+from eudplib import ctrlstru as cs
+from eudplib import utils as ut
 from eudplib.eudlib.s import SetMemoryC
 
 
@@ -35,9 +37,7 @@ def f_setcurpl(cp, *, actions=[], set_modifier=True):
         cpcache = c.curpl.GetCPCache()
         c.VProc(
             cp,
-            actions + cp.QueueAssignTo(cpcache)
-            if set_modifier
-            else [cp.SetDest(cpcache)],
+            actions + cp.QueueAssignTo(cpcache) if set_modifier else [cp.SetDest(cpcache)],
         )
         c.VProc(
             [cp, cpcache],

@@ -23,10 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import core as c
-from .triggerdef import Trigger
 from eudplib import utils as ut
 
+from .. import core as c
+from .triggerdef import Trigger
 
 _pt_db = c.Db
 _pinfos = None
@@ -112,9 +112,7 @@ def PTrigger(players, conditions=None, actions=None):
 
     Trigger(conditions, actions)
 
-    c.RawTrigger(
-        actions=[c.SetNextPtr(t2, t3), c.SetMemory(offset_curpl, c.Add, ut.EPD(pdb))]
-    )
+    c.RawTrigger(actions=[c.SetNextPtr(t2, t3), c.SetMemory(offset_curpl, c.Add, ut.EPD(pdb))])
 
     t3 << c.RawTrigger(
         actions=[

@@ -23,9 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from . import modcurpl as cp
-from ... import core as c, ctrlstru as cs, utils as ut
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from . import modcurpl as cp
 
 
 def f_readgen_epd(mask, *args, docstring=None, _fdict={}, _check_empty=False):
@@ -52,8 +54,7 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}, _check_empty=False):
                 c.RawTrigger(
                     conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
                     actions=[
-                        retv.SetNumber(0) if arg[0] != 0 else []
-                        for retv, arg in zip(ret, args)
+                        retv.SetNumber(0) if arg[0] != 0 else [] for retv, arg in zip(ret, args)
                     ],
                 )
 
@@ -100,8 +101,7 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}, _check_empty=False):
                 c.RawTrigger(
                     conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
                     actions=[
-                        retv.SetNumber(0) if arg[0] != 0 else []
-                        for retv, arg in zip(ret, args)
+                        retv.SetNumber(0) if arg[0] != 0 else [] for retv, arg in zip(ret, args)
                     ],
                 )
 

@@ -23,16 +23,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from .eudlv import EUDLightBool, EUDLightVariable
 from .eudv import (
-    EUDVariable,
-    VProc,
-    IsEUDVariable,
-    EUDCreateVariables,
-    SeqCompute,
-    NonSeqCompute,
-    SetVariables,
     EP_SetRValueStrictMode,
+    EUDCreateVariables,
+    EUDVariable,
+    IsEUDVariable,
+    NonSeqCompute,
+    SeqCompute,
+    SetVariables,
+    VProc,
 )
-
-from .eudlv import EUDLightVariable, EUDLightBool
 from .eudxv import EUDXVariable

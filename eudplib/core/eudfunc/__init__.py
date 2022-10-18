@@ -23,21 +23,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from .consttype import *
 from .eudf import (
+    EUDFullFunc,
     EUDFunc,
     EUDTracedFunc,
-    EUDTypedFunc,
     EUDTracedTypedFunc,
+    EUDTypedFunc,
     EUDXTypedFunc,
-    EUDFullFunc,
 )
-
+from .eudfmethod import EUDMethod, EUDTracedMethod, EUDTracedTypedMethod, EUDTypedMethod
 from .eudfptr import EUDFuncPtr, EUDTypedFuncPtr
-
-from .eudfmethod import EUDMethod, EUDTracedMethod, EUDTypedMethod, EUDTracedTypedMethod
-
-from .eudfuncn import EUDReturn, EUDFuncN
-
+from .eudfuncn import EUDFuncN, EUDReturn
 from .trace import *
-
-from .consttype import *

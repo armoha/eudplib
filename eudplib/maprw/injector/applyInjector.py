@@ -23,17 +23,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from os import urandom
+
 from ... import core as c
 from ...core.allocator.payload import setPayloadLoggerMode
 from ...utils.blockstru import BlockStruManager, SetCurrentBlockStruManager
-
-from .vectorReloc import CreateVectorRelocator
-from .payloadReloc import CreatePayloadRelocator
 from .injFinalizer import CreateInjectFinalizer
 from .payloadInit import InitializePayload
-
-from os import urandom
-
+from .payloadReloc import CreatePayloadRelocator
+from .vectorReloc import CreateVectorRelocator
 
 skip_payload_relocator = False
 

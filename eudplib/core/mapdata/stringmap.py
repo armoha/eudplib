@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from ...localize import _
 from ...utils import b2i2, b2i4, ep_assert, u2b, u2utf8, unProxy
 from . import tblformat
-from ...localize import _
 
 
 class StringIdMap:

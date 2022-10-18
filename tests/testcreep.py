@@ -1,12 +1,11 @@
 # Test for complex map
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath("..\\"))
 
 from eudplib import *
-
 
 """
 Creep reading

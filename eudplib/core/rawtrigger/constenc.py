@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..mapdata import GetPropertyIndex
 from ... import utils as ut
 from ...localize import _
+from ..mapdata import GetPropertyIndex
 
 
 def EP_SetMemDestStrictMode(mode):

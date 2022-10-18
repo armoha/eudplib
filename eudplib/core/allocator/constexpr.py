@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .rlocint import RlocInt_C, toRlocInt
 from ... import utils as ut
 from ...localize import _
+from .rlocint import RlocInt_C, toRlocInt
 
 
 def _total_ord(a, b):
@@ -101,9 +101,7 @@ class ConstExpr:
             return NotImplemented
         ut.ep_assert(
             (self.rlocmode == 0) or (self.rlocmode % k == 0),
-            _("Address not divisible; {} is not a factor of {}").format(
-                k, self.rlocmode
-            ),
+            _("Address not divisible; {} is not a factor of {}").format(k, self.rlocmode),
         )
         return ConstExpr(self.baseobj, self.offset // k, self.rlocmode // k)
 

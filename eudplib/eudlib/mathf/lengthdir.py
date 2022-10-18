@@ -25,7 +25,9 @@ THE SOFTWARE.
 
 import math
 
-from eudplib import core as c, ctrlstru as cs, utils as ut
+from eudplib import core as c
+from eudplib import ctrlstru as cs
+from eudplib import utils as ut
 
 from ..memiof import f_dwread_epd
 

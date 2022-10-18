@@ -26,11 +26,12 @@ THE SOFTWARE.
 import random
 import warnings
 
-from ... import core as c, ctrlstru as cs, utils as ut
-
-from .modcurpl import f_setcurpl2cpcache
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ...localize import _
+from .modcurpl import f_setcurpl2cpcache
 
 
 @_EUDPredefineReturn(2)

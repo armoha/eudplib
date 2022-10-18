@@ -23,7 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from eudplib import core as c, utils as ut
+from eudplib import core as c
+from eudplib import utils as ut
 
 
 class EUDVArrayReader:
@@ -58,9 +59,7 @@ class EUDVArrayReader:
                     varr_ptr.QueueAssignTo(ut.EPD(self._trg) + 1),
                     varr_epd.AddNumber(1),
                     varr_epd.QueueAssignTo(ut.EPD(self._trg) + 360 // 4 + 4),
-                    c.SetMemory(
-                        self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())
-                    ),
+                    c.SetMemory(self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())),
                 ],
             )
             trg = c.VProc(
@@ -80,8 +79,6 @@ class EUDVArrayReader:
         if not self._trg.IsSet():
             self._maketrg()
         nptr = c.Forward()
-        trg = c.RawTrigger(
-            nextptr=self._trg, actions=[acts] + [c.SetNextPtr(self._fin, nptr)]
-        )
+        trg = c.RawTrigger(nextptr=self._trg, actions=[acts] + [c.SetNextPtr(self._fin, nptr)])
         nptr << c.NextTrigger()
         return trg

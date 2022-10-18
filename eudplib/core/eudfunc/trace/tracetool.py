@@ -23,29 +23,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import os
+import sys
+
 from .... import utils as ut
-from ...rawtrigger import (
-    RawTrigger,
-    MemoryX,
-    AtLeast,
-    SetNextPtr,
-    SetMemory,
-    SetMemoryEPD,
-    SetTo,
-    Add,
-    Subtract,
-    PushTriggerScope,
-    PopTriggerScope,
-    NextTrigger,
-)
 from ...allocator import Forward
 from ...eudobj import Db
+from ...rawtrigger import (
+    Add,
+    AtLeast,
+    MemoryX,
+    NextTrigger,
+    PopTriggerScope,
+    PushTriggerScope,
+    RawTrigger,
+    SetMemory,
+    SetMemoryEPD,
+    SetNextPtr,
+    SetTo,
+    Subtract,
+)
 from ...variable import EUDVariable, SeqCompute
-
-import sys
-import os
 from . import tracecrypt
-
 
 iHeader = os.urandom(16)
 traceToolDataEPD = ut.EPD(Db(iHeader + bytes(4 * 2048)))

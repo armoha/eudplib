@@ -23,18 +23,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import os
+import re
+import sys
+import types
+from bisect import bisect_right
 from importlib.machinery import FileFinder, SourceFileLoader
 
-from .epscompile import epsCompile
 from eudplib.localize import _
 from eudplib.utils import EPError
-import os
-import sys
-import re
-from bisect import bisect_right
 
-import types
-
+from .epscompile import epsCompile
 
 lineno_regex = re.compile(b" *# \\(Line (\\d+)\\) .+")
 is_scdb_map = False

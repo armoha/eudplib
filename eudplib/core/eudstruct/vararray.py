@@ -23,17 +23,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import rawtrigger as bt
-from ..allocator import Forward, ConstExpr, IsConstExpr
-
 from ...localize import _
-from ..inplacecw import iset, cpset, isub, iand, ior, ixor, ilshift, irshift
-from ...utils import EPD, ExprProxy, ep_assert, cachedfunc, isUnproxyInstance, ep_assert
-
-from ..variable import EUDVariable, EUDLightVariable, SeqCompute, VProc, IsEUDVariable
-from ..variable.eudv import _ProcessDest
-from ..variable.vbuf import GetCurrentVariableBuffer, GetCurrentCustomVariableBuffer
+from ...utils import EPD, ExprProxy, cachedfunc, ep_assert, isUnproxyInstance
+from .. import rawtrigger as bt
+from ..allocator import ConstExpr, Forward, IsConstExpr
 from ..curpl import GetCPCache
+from ..inplacecw import cpset, iand, ilshift, ior, irshift, iset, isub, ixor
+from ..variable import EUDLightVariable, EUDVariable, IsEUDVariable, SeqCompute, VProc
+from ..variable.eudv import _ProcessDest
+from ..variable.vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
 
 
 @cachedfunc
@@ -280,9 +278,7 @@ def EUDVArray(size, basetype=None):
                         bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
                         val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        bt.SetMemoryX(
-                            bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
-                        ),
+                        bt.SetMemoryX(bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
@@ -296,9 +292,7 @@ def EUDVArray(size, basetype=None):
                         self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
-                        bt.SetMemoryX(
-                            bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
-                        ),
+                        bt.SetMemoryX(bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
@@ -311,9 +305,7 @@ def EUDVArray(size, basetype=None):
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        bt.SetMemoryX(
-                            bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
-                        ),
+                        bt.SetMemoryX(bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
@@ -325,9 +317,7 @@ def EUDVArray(size, basetype=None):
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
-                        bt.SetMemoryX(
-                            bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
-                        ),
+                        bt.SetMemoryX(bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
@@ -732,8 +722,7 @@ def EUDVArray(size, basetype=None):
                 trg["end"] << bt.RawTrigger(
                     nextptr=GetCPCache().GetVTable(),
                     actions=[
-                        trg["ret"]
-                        << bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0x55555555),
+                        trg["ret"] << bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0x55555555),
                         bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0xAAAAAAAA),
                         GetCPCache().SetDest(EPD(0x6509B0)),
                     ],

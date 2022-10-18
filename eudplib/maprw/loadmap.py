@@ -23,11 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..core.mapdata import chktok, mpqapi, mapdata
-from ..localize import _
-from ..utils import ep_eprint, ep_assert
-from .mpqadd import UpdateFileListByListfile
 import os
+
+from ..core.mapdata import chktok, mapdata, mpqapi
+from ..localize import _
+from ..utils import ep_assert, ep_eprint
+from .mpqadd import UpdateFileListByListfile
 
 
 def LoadMap(fname):

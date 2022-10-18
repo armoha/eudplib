@@ -23,8 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .eperror import ep_assert
 from ..localize import _
+from .eperror import ep_assert
 
 
 class BlockStruManager:

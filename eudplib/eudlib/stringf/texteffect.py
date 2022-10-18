@@ -24,13 +24,15 @@ THE SOFTWARE.
 """
 
 import itertools
-from ... import core as c, ctrlstru as cs, utils as ut
+
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
-from .eudprint import ptr2s, epd2s
-from .cpprint import f_cpstr_print, cw
 from ..stringf.rwcommon import br1
 from ..utilf import f_getgametick
-
+from .cpprint import cw, f_cpstr_print
+from .eudprint import epd2s, ptr2s
 
 color_codes = list(range(1, 32))
 color_codes.remove(0x9)  # tab
@@ -87,9 +89,7 @@ def f_cpchar_adddw(number):
         if i != 9:
             skipper[i] << c.NextTrigger()
         cs.DoActions(
-            c.SetDeaths(
-                c.CurrentPlayer, c.SetTo, color_v + ch[i] * 256 + (0x0D0D3000), 0
-            ),
+            c.SetDeaths(c.CurrentPlayer, c.SetTo, color_v + ch[i] * 256 + (0x0D0D3000), 0),
             c.AddCurrentPlayer(1),
         )
 
@@ -136,7 +136,9 @@ def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):
 
 
 _TextFX_dict = dict()
-id_codes = "\x18\x02\x03\x04\x06\x07\x08\x0D\x0E\x0F\x10\x11\x15\x16\x17\x19\x1A\x1B\x1C\x1D\x1E\x1F"
+id_codes = (
+    "\x18\x02\x03\x04\x06\x07\x08\x0D\x0E\x0F\x10\x11\x15\x16\x17\x19\x1A\x1B\x1C\x1D\x1E\x1F"
+)
 id_gen = itertools.cycle(itertools.product(id_codes, repeat=6))
 
 
@@ -261,8 +263,7 @@ def _is_CP_less_than_start(actions):
     _next = c.Forward()
     c.RawTrigger(
         nextptr=_is_below_start,
-        actions=[actions]
-        + [_cpbelowbuffer.Clear(), c.SetNextPtr(_is_below_start, _next)],
+        actions=[actions] + [_cpbelowbuffer.Clear(), c.SetNextPtr(_is_below_start, _next)],
     )
     _next << c.NextTrigger()
 
@@ -310,9 +311,7 @@ def _TextFX_Print(*args, identifier, encoding="UTF-8"):
             line = arg.split("\n")
             for s in line[:-1]:
                 f_cpchar_print(s, EOS=False, encoding=encoding)
-                f_cpstr_print(
-                    identifier + b"\n" + identifier, EOS=False, encoding=encoding
-                )
+                f_cpstr_print(identifier + b"\n" + identifier, EOS=False, encoding=encoding)
             f_cpchar_print(line[-1], EOS=False, encoding=encoding)
         else:
             f_cpchar_print(arg, EOS=False, encoding=encoding)
@@ -450,9 +449,7 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
     cs.DoActions(
         c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else [],
         c.AddCurrentPlayer((len(color) - 1) - timer),
-        c.SetNextPtr(increment_and_jump, paint_last_color)
-        if does_last_color_overwrite
-        else [],
+        c.SetNextPtr(increment_and_jump, paint_last_color) if does_last_color_overwrite else [],
     )
     ret = R2L(color)
     if does_last_color_overwrite:
@@ -471,9 +468,7 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
                 start.SetDest(ut.EPD(0x6509B0)),
             ],
         )
-        f_setcurpl2cpcache(
-            [], c.SetDeathsX(c.CurrentPlayer, c.SetTo, color[-1], 0, 0xFF)
-        )
+        f_setcurpl2cpcache([], c.SetDeathsX(c.CurrentPlayer, c.SetTo, color[-1], 0, 0xFF))
         skip << c.NextTrigger()
     else:
         c.RawTrigger(conditions=ret.Exactly(1), actions=counter.AddNumber(1))

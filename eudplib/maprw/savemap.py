@@ -23,17 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..core.mapdata import mapdata, mpqapi, fixmapdata
-from ..core import RegisterCreatePayloadCallback
-from .injector.applyInjector import applyInjector
-from .inlinecode.ilcprocesstrig import PreprocessInlineCode
-from .injector.mainloop import _MainStarter
-from .mpqadd import UpdateMPQ
-from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
-from ..localize import _
-from ..utils import ep_eprint, ep_assert, EPError
 import binascii
 import os
+
+from ..core import RegisterCreatePayloadCallback
+from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
+from ..core.mapdata import fixmapdata, mapdata, mpqapi
+from ..localize import _
+from ..utils import EPError, ep_assert, ep_eprint
+from .injector.applyInjector import applyInjector
+from .injector.mainloop import _MainStarter
+from .inlinecode.ilcprocesstrig import PreprocessInlineCode
+from .mpqadd import UpdateMPQ
 
 traceHeader = None
 traceMap = []
@@ -92,9 +93,7 @@ def SaveMap(fname, rootf, *, sectorSize=None):
             raise EPError(_("Fail to access output map ({})").format(GetLastError()))
         for n, f in mapdata.IterListFiles():
             if f:
-                ep_assert(
-                    mw.PutFile(n, f), _("Fail to export input map data to output map")
-                )
+                ep_assert(mw.PutFile(n, f), _("Fail to export input map data to output map"))
     else:
         # Process by modifying existing mpqfile
         try:

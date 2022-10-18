@@ -24,10 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
+from eudplib import utils as ut
+from eudplib.localize import _
+
 from .rlocint cimport RlocInt_C, toRlocInt
 from .rlocint import RlocInt, RlocInt_C, toRlocInt
-from ... import utils as ut
-from ...localize import _
 
 
 def _total_ord(a, b):

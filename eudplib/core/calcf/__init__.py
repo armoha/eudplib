@@ -23,20 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .bitwise import (
-    f_bitand,
-    f_bitor,
-    f_bitxor,
-    f_bitnand,
-    f_bitnor,
-    f_bitnxor,
-    f_bitnot,
-    f_bitlshift,
-    f_bitrshift,
-    f_bitsplit,
-)
-
-from .muldiv import f_mul, f_div
-
 # Just run _eudvsupport. This won't be visible in user side.
 from . import _eudvsupport
+from .bitwise import (
+    f_bitand,
+    f_bitlshift,
+    f_bitnand,
+    f_bitnor,
+    f_bitnot,
+    f_bitnxor,
+    f_bitor,
+    f_bitrshift,
+    f_bitsplit,
+    f_bitxor,
+)
+from .muldiv import f_div, f_mul

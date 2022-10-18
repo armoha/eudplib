@@ -23,14 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .constexpr import ConstExpr, Forward, Evaluate, IsConstExpr
-
-from .rlocint import RlocInt, RlocInt_C, toRlocInt
-
+from .constexpr import ConstExpr, Evaluate, Forward, IsConstExpr
 from .payload import (
-    GetObjectAddr,
-    CreatePayload,
     CompressPayload,
-    ShufflePayload,
+    CreatePayload,
+    GetObjectAddr,
     RegisterCreatePayloadCallback,
+    ShufflePayload,
 )
+from .rlocint import RlocInt, RlocInt_C, toRlocInt

@@ -24,9 +24,7 @@ def test_unitgroup():
         unit.move_cp(0x4C // 4)  # NO-OP
         f_dwadd_epd(EPD(0x6509B0), EPD(k) - 19)
         f_dwwrite_cp(0, 1)
-    test_equality(
-        "Basic UnitGroup test", [k[i] for i in range(7)], [0, 0, 1, 1, 0, 0, 1]
-    )
+    test_equality("Basic UnitGroup test", [k[i] for i in range(7)], [0, 0, 1, 1, 0, 0, 1])
 
     g.add(4)
     g.add(EUDVariable(0))

@@ -24,11 +24,13 @@ THE SOFTWARE.
 """
 
 from struct import pack
+
 from eudplib import utils as ut
-from ..localize import _
-from ..utils import EPD, b2i2, u2b, ep_assert, unProxy
+
 from ..core.rawtrigger.constenc import *
 from ..core.rawtrigger.strenc import *
+from ..localize import _
+from ..utils import EPD, b2i2, ep_assert, u2b, unProxy
 
 """
 Defines stock conditions & actions. You are most likely to use only conditions
@@ -45,9 +47,7 @@ condition / actions.
 """
 
 
-def Condition(
-    locid, player, amount, unitid, comparison, condtype, restype, flag, *, eudx=0
-):
+def Condition(locid, player, amount, unitid, comparison, condtype, restype, flag, *, eudx=0):
     if player < 0:
         player += 0x100000000  # EPD
 
@@ -71,18 +71,7 @@ def Condition(
 
 
 def Action(
-    locid1,
-    strid,
-    wavid,
-    time,
-    player1,
-    player2,
-    unitid,
-    acttype,
-    amount,
-    flags,
-    *,
-    eudx=0
+    locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags, *, eudx=0
 ):
     player1 &= 0xFFFFFFFF
     player2 &= 0xFFFFFFFF
@@ -304,9 +293,7 @@ def Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay=4
     WAVName = EncodeString(WAVName)
     TimeModifier = EncodeModifier(TimeModifier)
     Text = EncodeString(Text)
-    return Action(
-        Where, Text, WAVName, Time, 0, 0, Unit, 7, TimeModifier, AlwaysDisplay
-    )
+    return Action(Where, Text, WAVName, Time, 0, 0, Unit, 7, TimeModifier, AlwaysDisplay)
 
 
 def PlayWAV(WAVName):

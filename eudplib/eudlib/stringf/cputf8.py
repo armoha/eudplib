@@ -2,18 +2,17 @@
 # -*- coding: utf-8 -*-
 
 
-from ..eudarray import EUDArray
-
 from ...core import EUDFunc
 from ...ctrlstru import (
-    EUDInfLoop,
-    EUDEndInfLoop,
-    EUDIf,
+    DoActions,
+    EUDBreakIf,
     EUDElse,
     EUDEndIf,
-    EUDBreakIf,
-    DoActions,
+    EUDEndInfLoop,
+    EUDIf,
+    EUDInfLoop,
 )
+from ..eudarray import EUDArray
 from ..stringf.rwcommon import br1, bw1
 from .cp949_table import cp949_table
 

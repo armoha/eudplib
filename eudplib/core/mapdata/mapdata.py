@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .stringmap import InitStringMap, ApplyStringMap
-from .proptable import InitPropertyMap, ApplyPropertyMap
 from .playerinfo import InitPlayerInfo
+from .proptable import ApplyPropertyMap, InitPropertyMap
+from .stringmap import ApplyStringMap, InitStringMap
 
 _inited = False
 _chkt = None

@@ -23,13 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from . import rlocint, pbuffer
-from . import constexpr
+import time
+
 from eudplib import utils as ut
 from eudplib.localize import _
-from eudplib.utils import stackobjs, RandList
+from eudplib.utils import RandList, stackobjs
 
-import time
+from . import constexpr, pbuffer, rlocint
 
 _found_objects = []
 _rootobj = None
@@ -198,9 +198,7 @@ def CollectObjects(root):
 
     # Final
     lprint(
-        _(" - Collected {} / {} objects").format(
-            len(_found_objects), len(_found_objects)
-        ),
+        _(" - Collected {} / {} objects").format(len(_found_objects), len(_found_objects)),
         flush=True,
     )
     if not _payload_shuffle:
@@ -336,9 +334,9 @@ def AllocObjects():
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
 
             raise ut.EPError(
-                _(
-                    "Occupation map length ({}) & Object size mismatch for object ({})"
-                ).format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
+                _("Occupation map length ({}) & Object size mismatch for object ({})").format(
+                    len(dwoccupmap), (obj.GetDataSize() + 3) >> 2
+                )
             )
         lprint(_(" - Preprocessed {} / {} objects").format(i + 1, objn))
 
@@ -348,9 +346,7 @@ def AllocObjects():
     stackobjs.StackObjects(_found_objects, dwoccupmap_dict, _alloctable)
 
     # Get payload length
-    _payload_size = max(
-        map(lambda obj: _alloctable[obj] + obj.GetDataSize(), _found_objects)
-    )
+    _payload_size = max(map(lambda obj: _alloctable[obj] + obj.GetDataSize(), _found_objects))
 
     phase = None
 

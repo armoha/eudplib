@@ -27,13 +27,13 @@ THE SOFTWARE.
 import random
 
 from ..core.rawtrigger import (
+    Action,
+    Add,
+    CurrentPlayer,
     EncodeModifier,
     SetDeaths,
-    Action,
     SetTo,
-    Add,
     Subtract,
-    CurrentPlayer,
 )
 from ..utils import EPD
 

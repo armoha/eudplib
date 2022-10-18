@@ -23,10 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ... import core as c, ctrlstru as cs, utils as ut
-from . import dwepdio as dwm
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...core.variable.evcommon import _ev
+from . import dwepdio as dwm
 
 
 @_EUDPredefineReturn(2)
@@ -173,9 +175,7 @@ def _wwriter(subp, w):
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(3)):
         if cs.EUDSwitchCase()(i):
-            c.RawTrigger(
-                actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i))
-            )
+            c.RawTrigger(actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i)))
             c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256**i))])
             cs.EUDBreak()
 
@@ -192,9 +192,7 @@ def _wwriter(subp, w):
 def f_wwrite_cp(cpo, subp, w):
     try:
         cs.DoActions(
-            []
-            if isinstance(cpo, int) and cpo == 0
-            else c.SetMemory(0x6509B0, c.Add, cpo),
+            [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
             c.SetDeathsX(
                 c.CurrentPlayer,
                 c.SetTo,
@@ -202,9 +200,7 @@ def f_wwrite_cp(cpo, subp, w):
                 0,
                 65535 << (8 * subp),
             ),
-            []
-            if isinstance(cpo, int) and cpo == 0
-            else c.SetMemory(0x6509B0, c.Add, -cpo),
+            [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
         )
     except (TypeError):
         if not (isinstance(cpo, int) and cpo == 0):
@@ -219,9 +215,7 @@ def _bwriter(subp, b):
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(4)):
         if cs.EUDSwitchCase()(i):
-            c.RawTrigger(
-                actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 << (8 * i))
-            )
+            c.RawTrigger(actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 << (8 * i)))
 
             c.SeqCompute([(c.CurrentPlayer, c.Add, b * (256**i))])
             cs.EUDBreak()
@@ -232,9 +226,7 @@ def _bwriter(subp, b):
 def f_bwrite_cp(cpo, subp, b):
     try:
         cs.DoActions(
-            []
-            if isinstance(cpo, int) and cpo == 0
-            else c.SetMemory(0x6509B0, c.Add, cpo),
+            [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
             c.SetDeathsX(
                 c.CurrentPlayer,
                 c.SetTo,
@@ -242,9 +234,7 @@ def f_bwrite_cp(cpo, subp, b):
                 0,
                 255 << (8 * subp),
             ),
-            []
-            if isinstance(cpo, int) and cpo == 0
-            else c.SetMemory(0x6509B0, c.Add, -cpo),
+            [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
         )
     except (TypeError):
         if not (isinstance(cpo, int) and cpo == 0):

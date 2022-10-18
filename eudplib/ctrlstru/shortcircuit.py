@@ -23,8 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import core as c, trigger as tg, utils as ut
-
+from .. import core as c
+from .. import trigger as tg
+from .. import utils as ut
 from .basicstru import EUDJumpIf, EUDJumpIfNot
 
 

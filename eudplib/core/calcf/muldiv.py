@@ -23,9 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import allocator as ac, rawtrigger as rt, variable as ev, eudfunc as ef
-
 from eudplib import utils as ut
+
+from .. import allocator as ac
+from .. import eudfunc as ef
+from .. import rawtrigger as rt
+from .. import variable as ev
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 
 
@@ -240,9 +243,7 @@ def _f_div(a, b):
 
     # Fill in chain
     for i in range(32):
-        ev.SeqCompute(
-            [(ut.EPD(chain_x0[i]), rt.SetTo, x), (ut.EPD(chain_x1[i]), rt.SetTo, x)]
-        )
+        ev.SeqCompute([(ut.EPD(chain_x0[i]), rt.SetTo, x), (ut.EPD(chain_x1[i]), rt.SetTo, x)])
 
         # Skip if over 0x80000000
         p1, p2, p3 = ac.Forward(), ac.Forward(), ac.Forward()

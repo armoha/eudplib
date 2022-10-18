@@ -24,7 +24,5 @@ THE SOFTWARE.
 """
 
 from . import epsimp
-
-from .epscompile import epsCompile, EPS_SetDebug
-
+from .epscompile import EPS_SetDebug, epsCompile
 from .epsimp import EPSFinder, EPSLoader, IsSCDBMap

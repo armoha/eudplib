@@ -24,12 +24,12 @@ THE SOFTWARE.
 """
 
 from ... import core as c
-from ...core.variable.evcommon import _ev
 from ... import ctrlstru as cs
-
-from . import dwepdio as dwm, modcurpl as cp
+from ...core.variable.evcommon import _ev
 from ...localize import _
 from ...utils import EPD, EPError, RandList
+from . import dwepdio as dwm
+from . import modcurpl as cp
 
 
 class EUDByteReader:

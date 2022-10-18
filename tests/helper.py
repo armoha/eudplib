@@ -1,8 +1,8 @@
 # TEST HELPER
 
-import sys as _sys
 import os as _os
 import random as _random
+import sys as _sys
 
 _sys.path.insert(1, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..")))
 

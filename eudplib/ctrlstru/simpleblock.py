@@ -23,12 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import core as c
 from eudplib import utils as ut
-from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
-from .cshelper import CtrlStruOpener
 from eudplib.localize import _
 
+from .. import core as c
+from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
+from .cshelper import CtrlStruOpener
 
 """
 There are code duplication between EUDIf - EUDIfNot, EUDElseIf - EUDElseIfNot.
@@ -62,9 +62,7 @@ def EUDIfNot():
 def EUDElseIf():
     def _header():
         block = ut.EUDPeekBlock("ifblock")[1]
-        ut.ep_assert(
-            block["next_elseif"] is not None, _("Cannot have EUDElseIf after EUDElse")
-        )
+        ut.ep_assert(block["next_elseif"] is not None, _("Cannot have EUDElseIf after EUDElse"))
 
         # Finish previous if/elseif block
         EUDJump(block["ifend"])
@@ -97,9 +95,7 @@ def EUDElseIfNot():
 def EUDElse():
     def _footer():
         block = ut.EUDPeekBlock("ifblock")[1]
-        ut.ep_assert(
-            block["next_elseif"] is not None, _("Cannot have EUDElse after EUDElse")
-        )
+        ut.ep_assert(block["next_elseif"] is not None, _("Cannot have EUDElse after EUDElse"))
 
         # Finish previous if/elseif block
         EUDJump(block["ifend"])

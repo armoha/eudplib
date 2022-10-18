@@ -1,7 +1,6 @@
+import os
 import sys
 import time
-import os
-
 
 _currentProfileTree = None
 

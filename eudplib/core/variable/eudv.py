@@ -23,26 +23,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from sys import getrefcount
 import traceback
+from sys import getrefcount
 
-from .. import rawtrigger as bt
-from ..allocator import Forward, ConstExpr, IsConstExpr
 from ...localize import _
 from ...utils import (
-    FlattenList,
     EPD,
-    List2Assignable,
-    unProxy,
-    isUnproxyInstance,
-    ep_assert,
     EPError,
-    ep_warn,
+    FlattenList,
+    List2Assignable,
     RandList,
+    ep_assert,
+    ep_warn,
+    isUnproxyInstance,
+    unProxy,
 )
+from .. import rawtrigger as bt
+from ..allocator import ConstExpr, Forward, IsConstExpr
 from .vbase import VariableBase
-from .vbuf import GetCurrentVariableBuffer, GetCurrentCustomVariableBuffer
-
+from .vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
 
 isRValueStrict = False
 

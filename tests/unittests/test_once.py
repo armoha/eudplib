@@ -1,6 +1,5 @@
 from helper import *
 
-
 a = EUDVariable(0)
 b = EUDVariable(0)
 i = EUDVariable(0)

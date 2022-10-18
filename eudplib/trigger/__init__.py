@@ -23,6 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .triggerdef import Trigger
 from .branch import EUDBranch
 from .ptrigger import PTrigger
+from .triggerdef import Trigger

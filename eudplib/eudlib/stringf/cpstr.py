@@ -23,11 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from eudplib import core as c, ctrlstru as cs, utils as ut
-from ..memiof import f_dwepdread_epd, f_wread_epd, f_dwread_epd
-from eudplib.localize import _
+from eudplib import core as c
+from eudplib import ctrlstru as cs
+from eudplib import utils as ut
 from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import GetStringSectionName
+from eudplib.localize import _
+
+from ..memiof import f_dwepdread_epd, f_dwread_epd, f_wread_epd
 
 
 @c.EUDTypedFunc([c.TrgString])
@@ -86,18 +89,14 @@ class CPString:
         elif isinstance(content, str) or isinstance(content, bytes):
             self.content = _s2b(content)
         else:
-            raise ut.EPError(
-                _("Unexpected type for CPString: {}").format(type(content))
-            )
+            raise ut.EPError(_("Unexpected type for CPString: {}").format(type(content)))
 
         self.length = len(self.content) // 4
         self.trigger = list()
         self.valueAddr = [0 for _ in range(self.length)]
         actions = [
             [
-                c.SetDeaths(
-                    c.CurrentPlayer, c.SetTo, ut.b2i4(self.content[i : i + 4]), i // 48
-                )
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(self.content[i : i + 4]), i // 48)
                 for i in range(4 * mod, len(self.content), 48)
             ]
             for mod in range(12)
@@ -125,9 +124,7 @@ class CPString:
             self.trigger.append(t)
         c.PopTriggerScope()
 
-        self.valueAddr = [
-            self.trigger[v // 64] + 348 + 32 * (v % 64) for v in self.valueAddr
-        ]
+        self.valueAddr = [self.trigger[v // 64] + 348 + 32 * (v % 64) for v in self.valueAddr]
         _nextptr = c.Forward()
         self.trigger[-1]._nextptr = _nextptr
         _nextptr << c.NextTrigger()

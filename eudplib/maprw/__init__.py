@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .loadmap import LoadMap
-from .savemap import SaveMap
-from .injector.mainloop import EUDDoEvents, EUDOnStart
-from .mpqadd import MPQAddFile, MPQAddWave, MPQCheckFile
-from .inlinecode.ilcprocesstrig import PRT_SetInliningRate
 from .injector.applyInjector import PRT_SkipPayloadRelocator
+from .injector.mainloop import EUDDoEvents, EUDOnStart
+from .inlinecode.ilcprocesstrig import PRT_SetInliningRate
+from .loadmap import LoadMap
+from .mpqadd import MPQAddFile, MPQAddWave, MPQCheckFile
+from .savemap import SaveMap

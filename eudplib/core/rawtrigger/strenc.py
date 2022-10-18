@@ -23,23 +23,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..mapdata import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
+import difflib
 
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from ..mapdata import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
 from .constenc import _Unique
 from .strdict import (
     DefAIScriptDict,
-    DefLocationDict,
-    DefSwitchDict,
-    DefUnitDict,
-    DefTBLDict,
     DefImageDict,
     DefIscriptDict,
+    DefLocationDict,
+    DefSwitchDict,
+    DefTBLDict,
+    DefUnitDict,
 )
-
-import difflib
 
 
 def EncodeAIScript(ais, issueError=False):

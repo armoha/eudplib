@@ -23,11 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ... import core as c, ctrlstru as cs, utils as ut
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam
 from ...core.variable.evcommon import _cp
-from ..memiof import f_posread_cp, f_setcurpl2cpcache, f_dwread_epd
 from ...localize import _
+from ..memiof import f_dwread_epd, f_posread_cp, f_setcurpl2cpcache
 
 _loct = ut.EPD(0x58DC60) - 5
 

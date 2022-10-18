@@ -40,9 +40,7 @@ def test_struct():
 
     d = a.copy()
     a.add(d)
-    test_equality(
-        "EUDTypedMethod test", [a.x, a.y, a.z, d.x, d.y, d.z], [6, 14, 16, 3, 7, 8]
-    )
+    test_equality("EUDTypedMethod test", [a.x, a.y, a.z, d.x, d.y, d.z], [6, 14, 16, 3, 7, 8])
 
     e = EUDVariable()
     e << a
@@ -78,9 +76,7 @@ def test_nested_struct():
     a.p[1].y += 2
     a.q = 3
 
-    test_assert(
-        "Nested EUDStruct test", [a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3]
-    )
+    test_assert("Nested EUDStruct test", [a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3])
 
     b = a.copy()
     b.p[0].x = 5

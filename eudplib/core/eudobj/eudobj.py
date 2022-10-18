@@ -23,9 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from eudplib import utils as ut
+
 from ..allocator import ConstExpr
 from ..allocator.payload import GetObjectAddr
-from eudplib import utils as ut
 
 
 class EUDObject(ConstExpr):

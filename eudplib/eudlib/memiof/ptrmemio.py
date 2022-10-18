@@ -23,14 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from . import (
-    dwepdio as dwm,
-    cpmemio as cpm,
-    byterw as brw,
-    bwepdio as bwm,
-    modcurpl as cp,
-)
-from ... import core as c, ctrlstru as cs, utils as ut
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
+from . import bwepdio as bwm
+from . import byterw as brw
+from . import cpmemio as cpm
+from . import dwepdio as dwm
+from . import modcurpl as cp
 
 
 def _ptr2epd(ptr):

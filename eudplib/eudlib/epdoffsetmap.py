@@ -24,34 +24,35 @@ THE SOFTWARE.
 """
 
 
-from .memiof import (
-    f_cunitread_epd,
-    f_cunitepdread_epd,
-    f_epdcunitread_epd,
-    f_spriteread_epd,
-    f_spriteepdread_epd,
-    f_epdspriteread_epd,
-    f_epdread_epd,
-    f_dwread_epd,
-    f_dwepdread_epd,
-    f_wread_epd,
-    f_bread_epd,
-    f_dwwrite_epd,
-    f_wwrite_epd,
-    f_bwrite_epd,
-    f_posread_epd,
-    f_maskread_epd,
-    f_maskwrite_epd,
-)
-from .locf import f_setloc_epd
-
-from .. import core as c, utils as ut, ctrlstru as cs
-from ..localize import _
-
-from collections.abc import Mapping, Sequence
 import functools
 import traceback
+from collections.abc import Mapping, Sequence
 from typing import Union
+
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
+from ..localize import _
+from .locf import f_setloc_epd
+from .memiof import (
+    f_bread_epd,
+    f_bwrite_epd,
+    f_cunitepdread_epd,
+    f_cunitread_epd,
+    f_dwepdread_epd,
+    f_dwread_epd,
+    f_dwwrite_epd,
+    f_epdcunitread_epd,
+    f_epdread_epd,
+    f_epdspriteread_epd,
+    f_maskread_epd,
+    f_maskwrite_epd,
+    f_posread_epd,
+    f_spriteepdread_epd,
+    f_spriteread_epd,
+    f_wread_epd,
+    f_wwrite_epd,
+)
 
 rwdict = {2: (f_wread_epd, f_wwrite_epd), 1: (f_bread_epd, f_bwrite_epd)}
 

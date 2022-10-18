@@ -23,9 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from eudplib import utils as ut
+
 from .. import core as c
 from .. import trigger as tg
-from eudplib import utils as ut
 
 
 def DoActions(*actions, preserved=True):

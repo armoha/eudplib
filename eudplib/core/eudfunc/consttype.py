@@ -24,9 +24,13 @@ THE SOFTWARE.
 """
 
 from ..rawtrigger import (
+    EncodeAIScript,
     EncodeAllyStatus,
     EncodeComparison,
     EncodeCount,
+    EncodeImage,
+    EncodeIscript,
+    EncodeLocation,
     EncodeModifier,
     EncodeOrder,
     EncodePlayer,
@@ -34,16 +38,12 @@ from ..rawtrigger import (
     EncodePropState,
     EncodeResource,
     EncodeScore,
-    EncodeSwitchAction,
-    EncodeSwitchState,
-    EncodeAIScript,
-    EncodeLocation,
-    EncodeUnit,
     EncodeString,
     EncodeSwitch,
+    EncodeSwitchAction,
+    EncodeSwitchState,
     EncodeTBL,
-    EncodeImage,
-    EncodeIscript,
+    EncodeUnit,
 )
 
 

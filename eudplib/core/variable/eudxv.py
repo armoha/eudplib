@@ -23,15 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import rawtrigger as bt
 from ...utils import EPD, EPError
+from .. import rawtrigger as bt
 from .eudv import EUDVariable, VariableTriggerForward, _ProcessDest
 
 
 class EUDXVariable(EUDVariable):
-    def __init__(
-        self, _initval=0, modifier=None, /, initval=None, mask=None, *, nextptr=0
-    ):
+    def __init__(self, _initval=0, modifier=None, /, initval=None, mask=None, *, nextptr=0):
         # bitmask, player, #, modifier, nextptr
         # value (positional)
         if modifier is None and initval is None and mask is None:

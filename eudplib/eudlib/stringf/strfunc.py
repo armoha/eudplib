@@ -26,9 +26,8 @@ THE SOFTWARE.
 from ... import core as c
 from ... import ctrlstru as cs
 from ...utils import EPD, EUDPeekBlock
-
-from ..stringf.rwcommon import br1, br2, bw1, bs1
-from ..memiof import f_setcurpl2cpcache, f_dwread_epd
+from ..memiof import f_dwread_epd, f_setcurpl2cpcache
+from ..stringf.rwcommon import br1, br2, bs1, bw1
 
 
 @c.EUDFunc

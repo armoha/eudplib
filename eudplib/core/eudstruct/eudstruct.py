@@ -27,8 +27,8 @@ from ... import utils as ut
 from ...localize import _
 from ..allocator import IsConstExpr
 from ..variable import EUDVariable
-from .vararray import EUDVArray
 from .structarr import _EUDStruct_Metaclass
+from .vararray import EUDVArray
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):

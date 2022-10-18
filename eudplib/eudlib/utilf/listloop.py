@@ -98,9 +98,7 @@ def EUDLoopNewUnit(allowance=2):
     if cs.EUDWhile()(ptr >= 1):
         epd += 0xA5 // 4
         if cs.EUDIf()(c.MemoryXEPD(epd, c.AtLeast, 0x100, 0xFF00)):
-            cs.DoActions(
-                c.SetMemoryXEPD(epd, c.SetTo, 0, 0xFF00), epd.AddNumber(-(0xA5 // 4))
-            )
+            cs.DoActions(c.SetMemoryXEPD(epd, c.SetTo, 0, 0xFF00), epd.AddNumber(-(0xA5 // 4)))
             yield ptr, epd
         if cs.EUDElse()():
             cs.DoActions(tos0.AddNumber(1), epd.AddNumber(-(0xA5 // 4)))

@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from ...localize import _
+from ...utils import EPD, ep_assert, ep_warn, unProxy
 from .action import Action
 from .constenc import (
     Add,
@@ -45,8 +47,6 @@ from .strenc import (
     EncodeSwitch,
     EncodeUnit,
 )
-from ...localize import _
-from ...utils import EPD, ep_warn, ep_assert, unProxy
 
 
 def Victory():
@@ -114,9 +114,7 @@ def Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay=4
     WAVName = EncodeString(WAVName, issueError=True)
     TimeModifier = EncodeModifier(TimeModifier, issueError=True)
     Text = EncodeString(Text, issueError=True)
-    return Action(
-        Where, Text, WAVName, Time, 0, 0, Unit, 7, TimeModifier, AlwaysDisplay
-    )
+    return Action(Where, Text, WAVName, Time, 0, 0, Unit, 7, TimeModifier, AlwaysDisplay)
 
 
 def PlayWAV(WAVName):
@@ -686,9 +684,7 @@ def SetKills(Player, Modifier, Number, Unit):
                 SetDeaths(CurrentPlayer, Modifier, Number, Unit),
                 SetMemory(0x6509B0, Add, 12 * 228),
             ]
-        ep_assert(
-            Player <= 11, _("SetKills Player should be only P1~P12 or CurrentPlayer")
-        )
+        ep_assert(Player <= 11, _("SetKills Player should be only P1~P12 or CurrentPlayer"))
     if isinstance(Unit, int):
         ep_assert(Unit <= 227, _("SetKills Unit should be at most 227"))
     return SetDeaths(Player - 228 * 12, Modifier, Number, Unit)

@@ -23,7 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import core as c, ctrlstru as cs, utils as ut
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
 from .utilf import f_playerexist
 
 
@@ -47,9 +49,7 @@ class PVariable(c.EUDVArray(8)):
             ],
         )
         for k in range(3):
-            c.RawTrigger(
-                conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
-            )
+            c.RawTrigger(conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k)))
         c.SetNextTrigger(value.GetVTable())
         nptr << c.NextTrigger()
 
@@ -61,9 +61,7 @@ class PVariable(c.EUDVArray(8)):
             c.SetNextPtr(value.GetVTable(), nptr),
         )
         for k in range(3):
-            c.RawTrigger(
-                conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
-            )
+            c.RawTrigger(conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k)))
         c.SetNextTrigger(value.GetVTable())
         nptr << c.NextTrigger()
 

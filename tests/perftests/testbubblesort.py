@@ -1,6 +1,5 @@
 from helper import *
 
-
 N = 2000
 arr = EUDArray(N)
 

@@ -27,11 +27,12 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from libc.stdint cimport uint32_t, uint8_t
 from libc.string cimport memset
 
-from ..eudobj import EUDObject
-from ... import utils as ut
-from ..allocator import RegisterCreatePayloadCallback
-from .. import rawtrigger as bt
 from collections import deque
+
+from ... import utils as ut
+from .. import rawtrigger as bt
+from ..allocator import RegisterCreatePayloadCallback
+from ..eudobj import EUDObject
 
 
 class EUDVarBuffer(EUDObject):

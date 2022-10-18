@@ -23,16 +23,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import trigger as trg
-from ... import eudlib as sf
-from ... import utils as ut
-from ...trigtrg import runtrigtrg as rtt
-from ..inlinecode.ilcprocesstrig import GetInlineCodeList
-from ...eudlib.memiof.mblockio import _repaddsd_epd
 import random
 
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import eudlib as sf
+from ... import trigger as trg
+from ... import utils as ut
+from ...eudlib.memiof.mblockio import _repaddsd_epd
+from ...trigtrg import runtrigtrg as rtt
+from ..inlinecode.ilcprocesstrig import GetInlineCodeList
 
 """ Stage 3:
 - Fixes nextptr modification to TRIG triggers by stage 1
@@ -232,9 +232,7 @@ def CreateInjectFinalizer(chkt, root, mrgndata=None):
                 actions=c.SetNextPtr(tstart, _t0),
             )
 
-            _t0 << c.RawTrigger(
-                nextptr=tmcheckt, actions=c.SetNextPtr(tstart, trs)  # reset
-            )
+            _t0 << c.RawTrigger(nextptr=tmcheckt, actions=c.SetNextPtr(tstart, trs))  # reset
 
             c.PopTriggerScope()
 

@@ -1,6 +1,5 @@
 from helper import *
 
-
 test_operator("Multiplication", lambda x, y: x * y)
 test_operator("Division", lambda x, y: x // y)
 test_operator("Remainder", lambda x, y: x % y)

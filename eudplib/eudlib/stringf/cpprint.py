@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from math import ceil
+
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
@@ -32,19 +34,17 @@ from ..memiof import (
     CPByteWriter,
     f_bread_epd,
     f_cunitread_epd,
+    f_dwepdread_epd,
     f_dwwrite,
     f_getcurpl,
     f_setcurpl,
-    f_dwepdread_epd,
     f_wread_epd,
 )
 from ..stringf.rwcommon import br1
+from ..utilf import IsUserCP
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
-from ..eudarray import EUDArray
-from ..utilf import IsUserCP
-from math import ceil
 
 cw = CPByteWriter()
 prevcp = c.EUDVariable()
@@ -247,9 +247,7 @@ def f_cpstr_addptr(number):
                 )
             cs.DoActions(
                 c.AddCurrentPlayer(1),
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0)
-                if i == 16
-                else [],
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0) if i == 16 else [],
             )
 
 
@@ -329,9 +327,7 @@ def _eprint_init():
         _eprintln_print << c.RawTrigger(
             nextptr=0, actions=c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))
         )
-        _eprintln_EOS << c.RawTrigger(
-            actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
-        )
+        _eprintln_EOS << c.RawTrigger(actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
         f_setcurpl(prevcp)
     cs.EUDEndIf()
     _eprintln_end << c.RawTrigger(nextptr=0)
@@ -366,9 +362,7 @@ def f_eprintln(*args):
     c.RawTrigger(
         nextptr=_eprintln_template,
         actions=[
-            c.SetMemory(
-                _eprintln_template + 380, c.SetTo, c.EncodePlayer(c.CurrentPlayer)
-            ),
+            c.SetMemory(_eprintln_template + 380, c.SetTo, c.EncodePlayer(c.CurrentPlayer)),
             c.SetMemoryX(_eprintln_desync + 12, c.SetTo, 15 << 24, 0xFF000000),
             c.SetNextPtr(_eprintln_print, _print),
             c.SetNextPtr(_eprintln_end, _next),
@@ -405,9 +399,7 @@ def f_eprintln2(*args):
             prevcp << f_getcurpl()
             f_setcurpl(epd)
             _eprintln2_print << c.RawTrigger(nextptr=0)
-            _eprintln2_EOS << c.RawTrigger(
-                actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
-            )
+            _eprintln2_EOS << c.RawTrigger(actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
             f_setcurpl(prevcp)
         cs.EUDEndIf()
         _eprintln2_end << c.RawTrigger(nextptr=0)

@@ -23,13 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..allocator import IsConstExpr
-from ..eudobj import EUDObject, Db
-from .triggerscope import NextTrigger, _RegisterTrigger
-from .condition import Condition
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from ..allocator import IsConstExpr
+from ..eudobj import Db, EUDObject
+from .condition import Condition
+from .triggerscope import NextTrigger, _RegisterTrigger
 
 # Trigger counter thing
 

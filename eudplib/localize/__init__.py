@@ -2,8 +2,8 @@ import gettext
 import locale
 import os
 import sys
-from typing import Type
 from types import TracebackType
+from typing import Type
 
 _lc = os.environ.get("LANG")
 if _lc is None:

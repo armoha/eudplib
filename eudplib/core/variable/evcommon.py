@@ -1,8 +1,8 @@
-from .eudv import EUDVariable, EUDCreateVariables
-from .eudxv import EUDXVariable
 from ...utils import EPD
-from ..rawtrigger import Add
 from ..allocator import Forward
+from ..rawtrigger import Add
+from .eudv import EUDCreateVariables, EUDVariable
+from .eudxv import EUDXVariable
 
 _ev = EUDCreateVariables(5)
 _xv = [EUDXVariable(0, 0) for _ in range(1)]

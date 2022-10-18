@@ -25,15 +25,15 @@ THE SOFTWARE.
 
 from .qgc import (
     QueueGameCommand,
-    QueueGameCommand_RightClick,
-    QueueGameCommand_QueuedRightClick,
-    QueueGameCommand_Select,
+    QueueGameCommand_MergeArchon,
+    QueueGameCommand_MergeDarkArchon,
     QueueGameCommand_MinimapPing,
     QueueGameCommand_PauseGame,
-    QueueGameCommand_ResumeGame,
+    QueueGameCommand_QueuedRightClick,
     QueueGameCommand_RestartGame,
-    QueueGameCommand_UseCheat,
+    QueueGameCommand_ResumeGame,
+    QueueGameCommand_RightClick,
+    QueueGameCommand_Select,
     QueueGameCommand_TrainUnit,
-    QueueGameCommand_MergeDarkArchon,
-    QueueGameCommand_MergeArchon,
+    QueueGameCommand_UseCheat,
 )

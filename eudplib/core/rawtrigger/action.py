@@ -23,9 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..allocator import ConstExpr, IsConstExpr
 from eudplib import utils as ut
 from eudplib.localize import _
+
+from ..allocator import ConstExpr, IsConstExpr
 
 _acttypes = {
     0: "(no action)",

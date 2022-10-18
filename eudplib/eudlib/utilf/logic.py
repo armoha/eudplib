@@ -23,9 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from eudplib.utils.eperror import EPError
-from eudplib import core as c, ctrlstru as cs
+from eudplib import core as c
+from eudplib import ctrlstru as cs
 from eudplib.trigger.tpatcher import NegateCondition
+from eudplib.utils.eperror import EPError
 
 
 def EUDOr(cond1, *conds):

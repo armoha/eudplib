@@ -23,8 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from . import dwepdio as dwm, cpmemio as cpm, byterw as brw, modcurpl as cp
-from ... import core as c, ctrlstru as cs, utils as ut
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
+from . import byterw as brw
+from . import cpmemio as cpm
+from . import dwepdio as dwm
+from . import modcurpl as cp
 
 # Helper functions
 
@@ -44,9 +49,7 @@ def _wwriter(epd, subp, w):
     for i in ut.RandList(range(3)):
         if cs.EUDSwitchCase()(i):
             cs.DoActions(
-                c.SetDeathsX(
-                    c.CurrentPlayer, c.SetTo, _lshift(w, 8 * i), 0, 0xFFFF << (8 * i)
-                )
+                c.SetDeathsX(c.CurrentPlayer, c.SetTo, _lshift(w, 8 * i), 0, 0xFFFF << (8 * i))
             )
             cs.EUDBreak()
 
@@ -67,11 +70,7 @@ def f_wwrite_epd(epd, subp, w):
             return _wwriter(epd, subp, w)
 
         try:
-            cs.DoActions(
-                c.SetDeathsX(
-                    epd, c.SetTo, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp)
-                )
-            )
+            cs.DoActions(c.SetDeathsX(epd, c.SetTo, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp)))
         except (TypeError):
             _wwriter(epd, subp, w)
     else:
@@ -85,9 +84,7 @@ def _bwriter(epd, subp, b):
     for i in ut.RandList(range(4)):
         if cs.EUDSwitchCase()(i):
             cs.DoActions(
-                c.SetDeathsX(
-                    c.CurrentPlayer, c.SetTo, _lshift(b, 8 * i), 0, 0xFF << (8 * i)
-                )
+                c.SetDeathsX(c.CurrentPlayer, c.SetTo, _lshift(b, 8 * i), 0, 0xFF << (8 * i))
             )
             cs.EUDBreak()
     cs.EUDEndSwitch()
@@ -97,9 +94,7 @@ def _bwriter(epd, subp, b):
 
 def f_bwrite_epd(epd, subp, b):
     try:
-        cs.DoActions(
-            c.SetDeathsX(epd, c.SetTo, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp))
-        )
+        cs.DoActions(c.SetDeathsX(epd, c.SetTo, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp)))
     except (TypeError):
         _bwriter(epd, subp, b)
 

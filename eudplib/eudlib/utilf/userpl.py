@@ -23,7 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from eudplib import core as c, utils as ut, ctrlstru as cs
+from eudplib import core as c
+from eudplib import ctrlstru as cs
+from eudplib import utils as ut
+
 from ..memiof import f_bread_epd, f_dwread_epd
 
 _userp = None

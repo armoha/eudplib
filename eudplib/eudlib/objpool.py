@@ -24,13 +24,14 @@ THE SOFTWARE.
 """
 
 import weakref
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
 
-from .. import core as c, ctrlstru as cs, utils as ut
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
 from ..core.variable import eudv as ev
 from ..localize import _
-
 from .eudarray import EUDArray
 
 
@@ -46,9 +47,7 @@ class _ObjPoolData(c.ConstExpr):
         try:
             return evb._vdict[self].Evaluate()
         except KeyError:
-            ret = evb.CreateMultipleVarTriggers(
-                self, [0] * (self.max_fieldn * self.size)
-            )
+            ret = evb.CreateMultipleVarTriggers(self, [0] * (self.max_fieldn * self.size))
             return ret.Evaluate()
 
 
@@ -78,9 +77,7 @@ class ObjPool:
     def alloc(self, basetype, *args, **kwargs):
         ut.ep_assert(
             len(basetype._fields_) <= self.max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(
-                self.max_fieldn
-            ),
+            _("Only structs less than {} fields can be allocated").format(self.max_fieldn),
         )
         data = self._alloc()
         data = basetype.cast(data)
@@ -90,9 +87,7 @@ class ObjPool:
     def free(self, basetype, data):
         ut.ep_assert(
             len(basetype._fields_) <= self.max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(
-                self.max_fieldn
-            ),
+            _("Only structs less than {} fields can be allocated").format(self.max_fieldn),
         )
 
         data = basetype.cast(data)

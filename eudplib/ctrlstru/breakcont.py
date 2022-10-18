@@ -23,10 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from . import loopblock as lb, swblock as sb
-
 from .. import utils as ut
 from ..localize import _
+from . import loopblock as lb
+from . import swblock as sb
 
 
 def EUDContinue():

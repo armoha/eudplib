@@ -23,10 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import utils as ut
-from ..localize import _
 import ctypes
 import sys
+
+from .. import utils as ut
+from ..localize import _
 
 _addedFiles = {}
 
@@ -53,13 +54,11 @@ def MPQCheckFile(fname):
     """
 
     # make fname case_insensitive
-    from ntpath import normpath, normcase
+    from ntpath import normcase, normpath
 
     fname_key = ut.u2b(normpath(normcase(fname)))
 
-    ut.ep_assert(
-        fname_key not in _addedFiles, _('MPQ filename duplicate : "{}"').format(fname)
-    )
+    ut.ep_assert(fname_key not in _addedFiles, _('MPQ filename duplicate : "{}"').format(fname))
 
     return fname_key
 
@@ -120,9 +119,7 @@ def UpdateMPQ(mpqw):
             else:
                 ret = mpqw.PutFile(fname, content)
             if not ret:
-                ut.ep_eprint(
-                    _("Failed adding file {} to mpq: May be duplicate").format(fname)
-                )
+                ut.ep_eprint(_("Failed adding file {} to mpq: May be duplicate").format(fname))
                 raise ctypes.WinError(ctypes.get_last_error())
 
 

@@ -23,11 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ctypes import CDLL, c_int, c_char_p, c_void_p
-
-from eudplib.utils import u2b, find_data_file
-
 import platform
+from ctypes import CDLL, c_char_p, c_int, c_void_p
+
+from eudplib.utils import find_data_file, u2b
 
 libFile = {
     "Linux": "libepScriptLib.so",  # Linux

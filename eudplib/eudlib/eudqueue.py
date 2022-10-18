@@ -24,21 +24,21 @@ THE SOFTWARE.
 """
 
 from ..core import (
-    EUDVArray,
-    Forward,
-    EUDVariable,
-    Memory,
-    Exactly,
+    Add,
     AtLeast,
+    EUDFunc,
+    EUDVariable,
+    EUDVArray,
+    Exactly,
+    Forward,
+    Memory,
+    RawTrigger,
     SetMemory,
     SetTo,
-    Add,
-    RawTrigger,
-    EUDFunc,
     VProc,
 )
 from ..core.eudfunc.eudf import _EUDPredefineParam
-from ..utils import cachedfunc, ep_assert, EPD
+from ..utils import EPD, cachedfunc, ep_assert
 
 
 @cachedfunc

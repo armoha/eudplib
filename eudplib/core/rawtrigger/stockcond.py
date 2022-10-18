@@ -23,20 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from ...localize import _
+from ...utils import EPD, ep_assert, unProxy
 from .condition import Condition
+from .constenc import Kills  # for __calls__ binding
 from .constenc import (
     EncodeComparison,
     EncodePlayer,
     EncodeResource,
     EncodeScore,
     EncodeSwitchState,
-    Kills,  # for __calls__ binding
 )
-
 from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit
-
-from ...localize import _
-from ...utils import EPD, ep_assert, unProxy
 
 
 def CountdownTimer(Comparison, Time):

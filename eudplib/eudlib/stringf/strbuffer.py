@@ -28,17 +28,12 @@ from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.mapdata.stringmap import ForceAddString
 from ..memiof import f_getcurpl, f_setcurpl
-from ..utilf import f_getuserplayerid, IsUserCP
-from .cpprint import f_cpstr_print, FixedText, f_gettextptr
+from ..utilf import IsUserCP, f_getuserplayerid
+from .cpprint import FixedText, f_cpstr_print, f_gettextptr
 from .cpstr import GetMapStringAddr
 from .fmtprint import _format_args
 from .strfunc import f_strlen_epd
-from .texteffect import (
-    TextFX_FadeIn,
-    TextFX_FadeOut,
-    TextFX_Remove,
-    _get_TextFX_timer,
-)
+from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove, _get_TextFX_timer
 
 _display_text = c.DisplayText(0)
 

@@ -1,5 +1,6 @@
-from helper import *
 import random
+
+from helper import *
 
 
 @TestInstance

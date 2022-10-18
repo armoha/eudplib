@@ -26,14 +26,12 @@ THE SOFTWARE.
 import functools
 
 from ... import utils as ut
-
+from ...localize import _
+from ...utils.blockstru import BlockStruManager, SetCurrentBlockStruManager
 from .. import allocator as ac
 from .. import rawtrigger as bt
 from .. import variable as ev
-from .trace.tracetool import _EUDTracePush, _EUDTracePop
-from ...localize import _
-from ...utils.blockstru import BlockStruManager, SetCurrentBlockStruManager
-
+from .trace.tracetool import _EUDTracePop, _EUDTracePush
 
 _currentCompiledFunc = None
 _currentTriggerCount = 0
@@ -73,9 +71,7 @@ class EUDFuncN:
         if isinstance(argn, int):
             self._argn = argn
             self._arginits = [(0, bt.SetTo, 0, None)] * argn
-        elif all(
-            isinstance(initvals, tuple) and len(initvals) == 4 for initvals in argn
-        ):
+        elif all(isinstance(initvals, tuple) and len(initvals) == 4 for initvals in argn):
             self._argn = len(argn)
             self._arginits = argn
         else:
@@ -225,8 +221,7 @@ class EUDFuncN:
 
         ut.ep_assert(
             len(args) == self._argn,
-            _("Argument number mismatch : ")
-            + "len(%s) != %d" % (repr(args), self._argn),
+            _("Argument number mismatch : ") + "len(%s) != %d" % (repr(args), self._argn),
         )
 
         fcallend = ac.Forward()

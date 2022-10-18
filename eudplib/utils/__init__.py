@@ -23,29 +23,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .ubconv import u2b, b2u, u2utf8
-from .binio import b2i1, b2i2, b2i4, i2b1, i2b2, i2b4, bits
+from .binio import b2i1, b2i2, b2i4, bits, i2b1, i2b2, i2b4
 from .blockstru import (
     EUDCreateBlock,
+    EUDGetBlockList,
     EUDGetLastBlock,
     EUDGetLastBlockOfName,
     EUDPeekBlock,
     EUDPopBlock,
-    EUDGetBlockList,
 )
+from .eperror import EPError, EPWarning, ep_assert, ep_eprint, ep_warn
 from .etc import (
     EPD,
+    Assignable2List,
     FlattenList,
     List2Assignable,
-    Assignable2List,
+    RandList,
     SCMD2Text,
     cachedfunc,
+    find_data_file,
     isStrict,
     setStrict,
-    RandList,
 )
-
-from .eperror import EPError, EPWarning, ep_assert, ep_eprint, ep_warn
-
-from .exprproxy import ExprProxy, unProxy, isUnproxyInstance
-from .etc import find_data_file
+from .exprproxy import ExprProxy, isUnproxyInstance, unProxy
+from .ubconv import b2u, u2b, u2utf8

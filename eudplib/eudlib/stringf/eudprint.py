@@ -311,9 +311,7 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
             strlen = addf["ptr"](*dstmsg(arg._value))
         else:
             raise ut.EPError(
-                _("Object with unknown parameter type {} given to f_eudprint.").format(
-                    type(arg)
-                )
+                _("Object with unknown parameter type {} given to f_eudprint.").format(type(arg))
             )
         strlens.append(strlen)
 

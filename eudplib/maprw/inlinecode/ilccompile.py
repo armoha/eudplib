@@ -24,13 +24,13 @@ THE SOFTWARE.
 """
 
 
-from ... import utils as ut
+import types
+
 from ... import core as c
-from ... import trigger as t
 from ... import ctrlstru as cs
 from ... import eudlib as sf
-
-import types
+from ... import trigger as t
+from ... import utils as ut
 
 _inlineGlobals = {}
 

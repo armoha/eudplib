@@ -23,12 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-
-from .rlocint import RlocInt_C
-
-from . import constexpr
 from eudplib import utils as ut
 from eudplib.localize import _
+
+from . import constexpr
+from .rlocint import RlocInt_C
 
 
 class Payload:
@@ -73,9 +72,7 @@ class PayloadBuffer:
         number = constexpr.Evaluate(number)
 
         if number.rlocmode:
-            ut.ep_assert(
-                self._datacur % 4 == 0, _("Non-const dwords must be aligned to 4byte")
-            )
+            ut.ep_assert(self._datacur % 4 == 0, _("Non-const dwords must be aligned to 4byte"))
             if number.rlocmode == 1:
                 self._prttable.append(self._datacur)
             elif number.rlocmode == 4:

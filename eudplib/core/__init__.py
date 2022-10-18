@@ -25,13 +25,12 @@ THE SOFTWARE.
 
 
 from .allocator import *
-from .eudobj import *
-from .rawtrigger import *
-from .mapdata import *
-from .variable import *
-from .eudstruct import *
-from .eudfunc import *
 from .calcf import *
-
+from .curpl import AddCurrentPlayer, SetCurrentPlayer
+from .eudfunc import *
+from .eudobj import *
+from .eudstruct import *
 from .inlinens import *
-from .curpl import SetCurrentPlayer, AddCurrentPlayer
+from .mapdata import *
+from .rawtrigger import *
+from .variable import *

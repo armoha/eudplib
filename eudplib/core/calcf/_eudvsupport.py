@@ -23,12 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .muldiv import f_mul, f_div
-from .bitwise import f_bitand, f_bitor, f_bitxor, f_bitnot, f_bitlshift, f_bitrshift
-
-
 from ..variable import EUDVariable
 from ..variable.evcommon import _ev
+from .bitwise import f_bitand, f_bitlshift, f_bitnot, f_bitor, f_bitrshift, f_bitxor
+from .muldiv import f_div, f_mul
 
 
 def DefClsMethod(name, f):

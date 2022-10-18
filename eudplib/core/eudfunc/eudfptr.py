@@ -23,16 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import rawtrigger as rt
-from .. import allocator as ac
 from ... import utils as ut
 from ...localize import _
-
+from .. import allocator as ac
+from .. import rawtrigger as rt
+from ..eudstruct import EUDStruct, EUDVArray
+from ..variable import EUDVariable, SetVariables, VProc
 from .eudfuncn import EUDFuncN
 from .eudtypedfuncn import applyTypes
-from ..variable import VProc, EUDVariable, SetVariables
-from ..eudstruct import EUDStruct, EUDVArray
-
 
 #
 # Common argument / returns storage
@@ -166,9 +164,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):
 
             # Call function
             t, a = ac.Forward(), ac.Forward()
-            SetVariables(
-                [ut.EPD(t + 4), ut.EPD(a + 16)], [self._fstart, self._fendnext_epd]
-            )
+            SetVariables([ut.EPD(t + 4), ut.EPD(a + 16)], [self._fstart, self._fendnext_epd])
 
             fcallend = ac.Forward()
             t << rt.RawTrigger(actions=[a << rt.SetNextPtr(0, fcallend)])

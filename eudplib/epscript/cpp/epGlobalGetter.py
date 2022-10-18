@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 
-import eudplib
-import types
 import re
+import types
+
+import eudplib
 
 # mode = 1  # Get functions
 # mode = 2  # Get globals

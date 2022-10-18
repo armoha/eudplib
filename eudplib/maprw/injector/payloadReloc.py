@@ -23,10 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ... import core as c
-from ... import eudlib as sf
-from ... import ctrlstru as cs
 from eudplib import utils as ut
+
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import eudlib as sf
 
 """ Stage 2 :
 - Initialize payload (stage3+ + user code) & execute it

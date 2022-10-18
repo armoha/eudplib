@@ -23,19 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ... import utils as ut
-from ...trigtrg import trigtrg as tt
 from random import random
 
-from .ilccompile import ComputeBaseInlineCodeGlobals, CompileInlineCode
+from ... import utils as ut
+from ...trigtrg import trigtrg as tt
 from .btInliner import (
     GetExecutingPlayers,
     GetTriggerSize,
-    TryToShareTrigger,
     InlineCodifyBinaryTrigger,
     InlineCodifyMultipleBinaryTriggers,
+    TryToShareTrigger,
 )
-
+from .ilccompile import CompileInlineCode, ComputeBaseInlineCodeGlobals
 
 _inlineCodes = []
 _inliningRate = 1

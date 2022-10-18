@@ -215,9 +215,9 @@ class TBL:
                     if nextstring != b"":
                         if j in unitdict and unit_name_encoding:
                             try:
-                                nextstring = (
-                                    nextstring.decode(unit_name_encoding)
-                                ).encode("utf-8")
+                                nextstring = (nextstring.decode(unit_name_encoding)).encode(
+                                    "utf-8"
+                                )
                             except UnicodeDecodeError:
                                 pass
                         self._emptystring.append((i - 1, nextstring))
@@ -291,9 +291,7 @@ class TBL:
                 self._capacity += roundup_by_4(len(string) + 1) + self._saveentry
             self._stringmap[string] = stringindex
 
-        ut.ep_assert(
-            self._capacity < (1 << (8 * self._saveentry)), _("String table overflow")
-        )
+        ut.ep_assert(self._capacity < (1 << (8 * self._saveentry)), _("String table overflow"))
 
         return stringindex
 
@@ -363,8 +361,6 @@ class TBL:
         # string + b'\0' + string offset
         self._capacity += roundup_by_4(len(string) + 1) + self._saveentry
 
-        ut.ep_assert(
-            self._capacity < (1 << (8 * self._saveentry)), _("String table overflow")
-        )
+        ut.ep_assert(self._capacity < (1 << (8 * self._saveentry)), _("String table overflow"))
 
         return stringindex

@@ -23,10 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .. import rawtrigger as bt
-from ..allocator import IsConstExpr
 from eudplib import utils as ut
 from eudplib.localize import _
+
+from .. import rawtrigger as bt
+from ..allocator import IsConstExpr
 
 
 class VariableBase:

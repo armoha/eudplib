@@ -23,17 +23,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .locf import *
-from .memiof import *
-from .stringf import *
-from .utilf import *
-from .qgcf import *
-from .mathf import *
-
+from .epdoffsetmap import EPDCUnitMap, EPDOffsetMap
 from .eudarray import EUDArray
 from .eudgrp import EUDGrp
-from .eudstack import EUDStack
 from .eudqueue import EUDQueue
-from .epdoffsetmap import EPDOffsetMap, EPDCUnitMap
+from .eudstack import EUDStack
+from .locf import *
+from .mathf import *
+from .memiof import *
 from .playerv import PVariable
+from .qgcf import *
+from .stringf import *
 from .unitgroup import UnitGroup
+from .utilf import *

@@ -1,6 +1,7 @@
-from .test_eps_epsfile import f_square, f_constv_thing, f_test_array, f_switch_test
-from .test_eps_array import f_test_write, f_test_compare
 from helper import *
+
+from .test_eps_array import f_test_compare, f_test_write
+from .test_eps_epsfile import f_constv_thing, f_square, f_switch_test, f_test_array
 
 
 @TestInstance

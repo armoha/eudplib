@@ -23,24 +23,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import os
+import platform
+import struct
 from ctypes import (
-    c_int,
-    c_char_p,
-    c_wchar_p,
-    c_void_p,
-    create_string_buffer,
-    byref,
-    Structure,
     POINTER,
+    Structure,
+    byref,
+    c_char_p,
+    c_int,
+    c_void_p,
+    c_wchar_p,
+    create_string_buffer,
     sizeof,
 )
-import os
-import struct
-import platform
 from tempfile import NamedTemporaryFile
-from eudplib.localize import _
-from eudplib.utils import u2b, u2utf8, b2u, ep_eprint, find_data_file
 
+from eudplib.localize import _
+from eudplib.utils import b2u, ep_eprint, find_data_file, u2b, u2utf8
 
 # Constants
 MPQ_FILE_COMPRESS = 0x00000200
@@ -78,13 +78,9 @@ def InitMpqLibrary():
             from ctypes import WinDLL
 
             if struct.calcsize("P") == 4:  # 32bit
-                libstorm = WinDLL(
-                    find_data_file("StormLib32.dll", __file__), use_last_error=True
-                )
+                libstorm = WinDLL(find_data_file("StormLib32.dll", __file__), use_last_error=True)
             else:  # 64bit
-                libstorm = WinDLL(
-                    find_data_file("StormLib64.dll", __file__), use_last_error=True
-                )
+                libstorm = WinDLL(find_data_file("StormLib64.dll", __file__), use_last_error=True)
 
         elif platformName == "Darwin":  # mac
             from ctypes import CDLL
@@ -221,9 +217,7 @@ class MPQ:
         fileh = c_void_p()
         ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2b(fname), 0, byref(fileh))
         if not ret:
-            ret = self.libstorm.SFileOpenFileEx(
-                self.mpqh, u2utf8(fname), 0, byref(fileh)
-            )
+            ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2utf8(fname), 0, byref(fileh))
             if not ret:
                 return None
 
