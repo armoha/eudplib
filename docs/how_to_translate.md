@@ -7,5 +7,5 @@ python C:\YourPythonPath\Tools\i18n\pygettext.py -d C:\eudplibPath\eudplib\local
 ```
 4. Run `PoEdit` and open PO template file (.pot)
 5. Start localization
-![poedit screenshot](docs/img/poedit.jpg)
+![poedit screenshot](img/poedit.jpg)
 6. Send a pull request for .po file
