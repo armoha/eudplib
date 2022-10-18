@@ -726,6 +726,36 @@ expr(A) ::= PLUS    expr(B). [UNARY] { B->data = "+" + B->data; A = mkTokenTemp(
 expr(A) ::= MINUS   expr(B). [UNARY] { B->data = "-" + B->data; A = mkTokenTemp(B); }
 expr(A) ::= BITNOT  expr(B). [UNARY] { B->data = "~" + B->data; A = mkTokenTemp(B); }
 
+expr(A) ::= expr(B) PERIOD NAME(C) EQ expr(D). [EQ] {
+    C->data = "_ATTC(" + B->data + ", " + C->data + ")";
+    delete B;
+    A = binopConcat(C, "==", D);
+}
+expr(A) ::= expr(B) PERIOD NAME(C) NE expr(D). [NE] {
+    C->data = "_ATTC(" + B->data + ", " + C->data + ")";
+    delete B;
+    A = negate(binopConcat(C, "==", D));
+}
+expr(A) ::= expr(B) PERIOD NAME(C) LE expr(D). [LE] {
+    C->data = "_ATTC(" + B->data + ", " + C->data + ")";
+    delete B;
+    A = binopConcat(C, "<=", D);
+}
+expr(A) ::= expr(B) PERIOD NAME(C) GE expr(D). [GE] {
+    C->data = "_ATTC(" + B->data + ", " + C->data + ")";
+    delete B;
+    A = binopConcat(C, ">=", D);
+}
+expr(A) ::= expr(B) PERIOD NAME(C) LT expr(D). [LT] {
+    C->data = "_ATTC(" + B->data + ", " + C->data + ")";
+    delete B;
+    A = negate(binopConcat(C, ">=", D));
+}
+expr(A) ::= expr(B) PERIOD NAME(C) GT expr(D). [GT] {
+    C->data = "_ATTC(" + B->data + ", " + C->data + ")";
+    delete B;
+    A = negate(binopConcat(C, "<=", D));
+}
 
 expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET EQ expr(D). [EQ] {
     C->data = "_ARRC(" + B->data + ", " + C->data + ")";

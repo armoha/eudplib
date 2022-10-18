@@ -296,6 +296,48 @@ class _ARRW:  # array write
         return self
 
 
+class _ATTC:  # attribute comparison
+    def __init__(self, obj, attrName):
+        self.obj = obj
+        self.attrName = attrName
+
+    def __eq__(self, k):
+        try:
+            return self.obj.eqattr(self.attrName, k)
+        except AttributeError:
+            return getattr(self.obj, self.attrName) == k
+
+    def __ne__(self, k):
+        try:
+            return self.obj.neattr(self.attrName, k)
+        except AttributeError:
+            return getattr(self.obj, self.attrName) != k
+
+    def __le__(self, k):
+        try:
+            return self.obj.leattr(self.attrName, k)
+        except AttributeError:
+            return getattr(self.obj, self.attrName) <= k
+
+    def __lt__(self, k):
+        try:
+            return self.obj.ltattr(self.attrName, k)
+        except AttributeError:
+            return getattr(self.obj, self.attrName) < k
+
+    def __ge__(self, k):
+        try:
+            return self.obj.geattr(self.attrName, k)
+        except AttributeError:
+            return getattr(self.obj, self.attrName) >= k
+
+    def __gt__(self, k):
+        try:
+            return self.obj.gtattr(self.attrName, k)
+        except AttributeError:
+            return getattr(self.obj, self.attrName) > k
+
+
 class _ARRC:  # array comparison
     def __init__(self, obj, index):
         self.obj = obj

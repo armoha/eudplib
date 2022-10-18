@@ -216,7 +216,7 @@ class EUDVariable(VariableBase):
             "Unexpected modifier {}".format(modifier),
         )
         modifier = bt.EncodeModifier(modifier) << 24
-        return (bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000),)
+        return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000)
 
     # -------
 
