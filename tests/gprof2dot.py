@@ -101,9 +101,7 @@ def ratio(numerator, denominator):
         return 1.0
     if ratio < 0.0:
         if ratio < -tol:
-            sys.stderr.write(
-                "warning: negative ratio (%s/%s)\n" % (numerator, denominator)
-            )
+            sys.stderr.write("warning: negative ratio (%s/%s)\n" % (numerator, denominator))
         return 0.0
     if ratio > 1.0:
         if ratio > 1.0 + tol:
@@ -313,8 +311,7 @@ class Profile(Object):
     def add_function(self, function):
         if function.id in self.functions:
             sys.stderr.write(
-                "warning: overwriting function %s (id %s)\n"
-                % (function.name, str(function.id))
+                "warning: overwriting function %s (id %s)\n" % (function.name, str(function.id))
             )
         self.functions[function.id] = function
 
@@ -448,10 +445,7 @@ class Profile(Object):
                     callee = self.functions[call.callee_id]
                     if event in call.events:
                         function_totals[callee] += call[event]
-                        if (
-                            callee.cycle is not None
-                            and callee.cycle is not function.cycle
-                        ):
+                        if callee.cycle is not None and callee.cycle is not function.cycle:
                             cycle_totals[callee.cycle] += call[event]
                     else:
                         sys.stderr.write(
@@ -471,10 +465,7 @@ class Profile(Object):
                 if call.callee_id != function.id:
                     callee = self.functions[call.callee_id]
                     if event in call.events:
-                        if (
-                            callee.cycle is not None
-                            and callee.cycle is not function.cycle
-                        ):
+                        if callee.cycle is not None and callee.cycle is not function.cycle:
                             total = cycle_totals[callee.cycle]
                         else:
                             total = function_totals[callee]
@@ -603,12 +594,8 @@ class Profile(Object):
                     callee = self.functions[call.callee_id]
                     if callee.cycle is cycle:
                         if ranks[callee] > ranks[function]:
-                            call_ratios[callee] = (
-                                call_ratios.get(callee, 0.0) + call.ratio
-                            )
-                            self._call_ratios_cycle(
-                                cycle, callee, ranks, call_ratios, visited
-                            )
+                            call_ratios[callee] = call_ratios.get(callee, 0.0) + call.ratio
+                            self._call_ratios_cycle(cycle, callee, ranks, call_ratios, visited)
 
     def _integrate_cycle_function(
         self,
@@ -698,9 +685,7 @@ class Profile(Object):
                 else:
                     try:
                         # make a safe estimate
-                        call.weight = min(
-                            function[TOTAL_TIME_RATIO], callee[TOTAL_TIME_RATIO]
-                        )
+                        call.weight = min(function[TOTAL_TIME_RATIO], callee[TOTAL_TIME_RATIO])
                     except UndefinedEvent:
                         pass
 
@@ -971,9 +956,7 @@ class XmlTokenizer:
         if self.character_data:
             if not self.skip_ws or not self.character_data.isspace():
                 line, column = self.character_pos
-                token = XmlToken(
-                    XML_CHARACTER_DATA, self.character_data, None, line, column
-                )
+                token = XmlToken(XML_CHARACTER_DATA, self.character_data, None, line, column)
                 self.tokens.append(token)
             self.character_data = ""
 
@@ -1432,9 +1415,7 @@ class AXEParser(Parser):
             # read function parent line
             mo = self._cg_parent_re.match(line)
             if not mo:
-                sys.stderr.write(
-                    "warning: unrecognized call graph entry (1): %r\n" % line
-                )
+                sys.stderr.write("warning: unrecognized call graph entry (1): %r\n" % line)
             else:
                 parent = self.translate(mo)
                 if parent.name != "<spontaneous>":
@@ -1454,9 +1435,7 @@ class AXEParser(Parser):
             # read function subroutine line
             mo = self._cg_child_re.match(line)
             if not mo:
-                sys.stderr.write(
-                    "warning: unrecognized call graph entry (3): %r\n" % line
-                )
+                sys.stderr.write("warning: unrecognized call graph entry (3): %r\n" % line)
             else:
                 child = self.translate(mo)
                 if child.name != "<spontaneous>":
@@ -1481,9 +1460,7 @@ class AXEParser(Parser):
                 break
             mo = self._cg_parent_re.match(line)
             if not mo:
-                sys.stderr.write(
-                    "warning: unrecognized call graph entry (6): %r\n" % line
-                )
+                sys.stderr.write("warning: unrecognized call graph entry (6): %r\n" % line)
             else:
                 parent = self.translate(mo)
                 if parent.name != "<spontaneous>":
@@ -1501,9 +1478,7 @@ class AXEParser(Parser):
         for line in lines[1:]:
             mo = self._cg_cycle_member_re.match(line)
             if not mo:
-                sys.stderr.write(
-                    "warning: unrecognized call graph entry (5): %r\n" % line
-                )
+                sys.stderr.write("warning: unrecognized call graph entry (5): %r\n" % line)
                 continue
             call = self.translate(mo)
             cycle.functions.append(call)
@@ -1724,9 +1699,7 @@ class CallgrindParser(LineParser):
         )
 
     __subpos_re = r"(0x[0-9a-fA-F]+|\d+|\+\d+|-\d+|\*)"
-    _cost_re = re.compile(
-        r"^" + __subpos_re + r"( +" + __subpos_re + r")*" + r"( +\d+)*" + "$"
-    )
+    _cost_re = re.compile(r"^" + __subpos_re + r"( +" + __subpos_re + r")*" + r"( +\d+)*" + "$")
 
     def parse_cost_line(self, calls=None):
         line = self.lookahead().rstrip()
@@ -2899,13 +2872,9 @@ TEMPERATURE_COLORMAP = Theme(
     gamma=1.0,
 )
 
-PINK_COLORMAP = Theme(
-    mincolor=(0.0, 1.0, 0.90), maxcolor=(0.0, 1.0, 0.5)  # pink  # satured red
-)
+PINK_COLORMAP = Theme(mincolor=(0.0, 1.0, 0.90), maxcolor=(0.0, 1.0, 0.5))  # pink  # satured red
 
-GRAY_COLORMAP = Theme(
-    mincolor=(0.0, 0.0, 0.85), maxcolor=(0.0, 0.0, 0.0)  # light gray  # black
-)
+GRAY_COLORMAP = Theme(mincolor=(0.0, 0.0, 0.85), maxcolor=(0.0, 0.0, 0.0))  # light gray  # black
 
 BW_COLORMAP = Theme(
     minfontsize=8.0,
@@ -3294,15 +3263,11 @@ def main():
         parser = Format(fp)
     elif Format.multipleInput:
         if not args:
-            optparser.error(
-                "at least a file must be specified for %s input" % options.format
-            )
+            optparser.error("at least a file must be specified for %s input" % options.format)
         parser = Format(*args)
     else:
         if len(args) != 1:
-            optparser.error(
-                "exactly one file must be specified for %s input" % options.format
-            )
+            optparser.error("exactly one file must be specified for %s input" % options.format)
         parser = Format(args[0])
 
     profile = parser.parse()

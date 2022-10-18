@@ -102,9 +102,7 @@ def test_operator(testname, realf, exptf=None):
             real.append(realf(*inputs))
             expt.append(exptf(*rnums) & 0xFFFFFFFF)
 
-        test_assert(
-            "Operator test : %s" % testname, [r == e for r, e in zip(real, expt)]
-        )
+        test_assert("Operator test : %s" % testname, [r == e for r, e in zip(real, expt)])
 
 
 class expect_eperror:

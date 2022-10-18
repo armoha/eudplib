@@ -216,9 +216,7 @@ class EUDVariable(VariableBase):
             "Unexpected modifier {}".format(modifier),
         )
         modifier = bt.EncodeModifier(modifier) << 24
-        return (
-            bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000),
-        )
+        return (bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000),)
 
     # -------
 
@@ -371,9 +369,7 @@ class EUDVariable(VariableBase):
         if IsConstExpr(other):
             return super().__iand__(other)  # 1A
         write = self.SetNumberX(0, 0xFFFFFFFF)
-        SeqCompute(
-            [(EPD(write), bt.SetTo, 0xFFFFFFFF), (EPD(write), bt.Subtract, other)]
-        )
+        SeqCompute([(EPD(write), bt.SetTo, 0xFFFFFFFF), (EPD(write), bt.Subtract, other)])
         bt.RawTrigger(actions=write)  # 1T 6A
         return self
 
@@ -461,9 +457,7 @@ class EUDVariable(VariableBase):
                 ],
             )
             VProc(other, other.SetMask(0xAAAAAAAA))  # 3T 8A
-            bt.RawTrigger(  # FIXME: restore to previous mask???
-                actions=other.SetMask(0xFFFFFFFF)
-            )
+            bt.RawTrigger(actions=other.SetMask(0xFFFFFFFF))  # FIXME: restore to previous mask???
         return self
 
     def __xor__(self, other):
@@ -485,9 +479,7 @@ class EUDVariable(VariableBase):
                 ],
             )
             VProc(other, other.SetMask(0xAAAAAAAA))
-            bt.RawTrigger(  # FIXME: restore to previous mask???
-                actions=other.SetMask(0xFFFFFFFF)
-            )
+            bt.RawTrigger(actions=other.SetMask(0xFFFFFFFF))  # FIXME: restore to previous mask???
         return t.makeR()
 
     def __rxor__(self, other):
@@ -506,9 +498,7 @@ class EUDVariable(VariableBase):
                 ]
             )
             VProc(other, other.SetMask(0xAAAAAAAA))
-            bt.RawTrigger(  # FIXME: restore to previous mask???
-                actions=other.SetMask(0xFFFFFFFF)
-            )
+            bt.RawTrigger(actions=other.SetMask(0xFFFFFFFF))  # FIXME: restore to previous mask???
         return t.makeR()
 
     # -------
@@ -737,9 +727,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
         else:
             nonConstAction.append(src.SetModifier(mdt))
 
-        nonConstActions.append(
-            [nonConstAction, bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
-        )
+        nonConstActions.append([nonConstAction, bt.SetNextPtr(src.GetVTable(), vt_nextptr)])
         last_pairs = src, dst, mdt
 
     _RemoveDuplicateActions()

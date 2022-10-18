@@ -257,9 +257,7 @@ class _PlayerName:
         self._optimize()
 
         start = c.Forward()
-        c.RawTrigger(
-            nextptr=self.optimize_start, actions=c.SetNextPtr(self.optimize_end, start)
-        )
+        c.RawTrigger(nextptr=self.optimize_start, actions=c.SetNextPtr(self.optimize_end, start))
         start << c.NextTrigger()
 
         _end = c.Forward()
@@ -307,9 +305,7 @@ class _PlayerName:
                 self.epd.AddNumber(54),
                 self.odds_or_even.Toggle(),
             )
-            c.RawTrigger(
-                conditions=self.odds_or_even.IsCleared(), actions=self.epd.AddNumber(1)
-            )
+            c.RawTrigger(conditions=self.odds_or_even.IsCleared(), actions=self.epd.AddNumber(1))
         cs.EUDEndWhile()
         f_setcurpl(origcp)
 
