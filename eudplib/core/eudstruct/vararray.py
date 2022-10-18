@@ -380,7 +380,7 @@ def EUDVArray(size, basetype=None):
                     actions=[
                         bt.SetMemoryX(trg["ret"] + 20, bt.Add, -1, 0x55555555),
                         bt.SetMemoryX(trg["ret"] + 20, bt.Add, -1, 0xAAAAAAAA),
-                        bt.SetMemoryEPD(trg["ret"] + 20, bt.Add, 1),
+                        bt.SetMemory(trg["ret"] + 20, bt.Add, 1),
                         trg["ret"] << bt.SetDeaths(0, bt.Add, 0, 0),
                     ],
                 )
