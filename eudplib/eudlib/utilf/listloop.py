@@ -116,9 +116,10 @@ def EUDLoopUnit2():
     """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
     1700개 유닛을 도는 방식으로 작동합니다.
     """
-
-    offset = 0x4C // 4
-    is_dead = c.MemoryXEPD(0, c.Exactly, 0, 0xFF00)
+    if _isUnlimiterOn():
+        offset, is_dead = 0x4C // 4, c.MemoryXEPD(0, c.Exactly, 0, 0xFF00)
+    else:
+        offset, is_dead = 0x0C // 4, c.MemoryEPD(0, c.Exactly, 0)
     ptr = c.EUDVariable()
     epd = c.EUDVariable()
     continue_if = c.Forward()
@@ -126,10 +127,10 @@ def EUDLoopUnit2():
 
     cs.DoActions(
         ptr.SetNumber(0x59CCA8),
-        c.SetMemory(set_ptr + 20, c.SetTo, 0x59CCA8 + 336),
+        c.SetMemory(set_ptr + 20, c.SetTo, 0x59CCA8),
         epd.SetNumber(EPD(0x59CCA8)),
-        c.SetMemory(is_dead + 4, c.SetTo, EPD(0x59CCA8) + 0x4C // 4),
-        c.SetMemory(set_epd + 20, c.SetTo, EPD(0x59CCA8) + 84),
+        c.SetMemory(is_dead + 4, c.SetTo, EPD(0x59CCA8) + offset),
+        c.SetMemory(set_epd + 20, c.SetTo, EPD(0x59CCA8)),
     )
     if cs.EUDWhileNot()(ptr >= 0x59CCA8 + 336 * 1699 + 1):
         whileblock = ut.EUDPeekBlock("whileblock")[1]
@@ -151,11 +152,11 @@ def EUDLoopUnit2():
         c.RawTrigger(
             nextptr=whileblock["loopstart"],
             actions=[
-                set_ptr,
-                c.SetMemory(set_ptr + 20, c.Add, 336),
                 c.SetMemory(is_dead + 4, c.Add, 84),
-                set_epd,
+                c.SetMemory(set_ptr + 20, c.Add, 336),
+                set_ptr,
                 c.SetMemory(set_epd + 20, c.Add, 84),
+                set_epd,
             ],
         )
     cs.EUDEndWhile()
