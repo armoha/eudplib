@@ -156,7 +156,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
             try:
                 self.setfield(name, value)
             except KeyError as e:
-                raise AttributeError(_("Unknown field name {}").format(name)) from e
+                raise ut.EPError(_("Unknown field name {}").format(name))
         else:
             self.__dict__[name] = value
 
