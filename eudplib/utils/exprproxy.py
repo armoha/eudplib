@@ -150,9 +150,6 @@ class ExprProxy:
     def __getitem__(self, name):
         return self._value[name]
 
-    def __iter__(self):
-        return self._value
-
     def __setitem__(self, name, newvalue):
         self._value[name] = newvalue
 

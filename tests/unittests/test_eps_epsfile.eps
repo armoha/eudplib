@@ -12,8 +12,9 @@ function square(x) {
     const z = EUDArray(5);
     return x * x; // + z.k;
 }
-
+const receives = py_eval('[PVariable() for _ in range(8)]');
 function constv_thing() {
+    foreach(i, pvar: py_enumerate(receives)) {}
     return a[0] + a[1] + a[2] + a[3] + a[4];
 }
 
