@@ -43,7 +43,7 @@ from .trigtrg.runtrigtrg import (
 )
 from .utils import *
 
-__version__ = "0.70.16"
+__version__ = "0.70.17"
 
 import types
 

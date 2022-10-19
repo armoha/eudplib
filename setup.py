@@ -127,7 +127,7 @@ def generate_cython():
         raise RuntimeError("Running cythonize failed!")
 
 
-__version__ = "0.70.16"
+__version__ = "0.70.17"
 
 
 if __name__ == "__main__":
