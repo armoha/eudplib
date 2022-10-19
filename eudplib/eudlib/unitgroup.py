@@ -26,8 +26,10 @@ THE SOFTWARE.
 from ..core import (
     Add,
     AtLeast,
+    AtMost,
     ConstExpr,
     CurrentPlayer,
+    Deaths,
     DeathsX,
     EUDVariable,
     EUDVArray,
@@ -40,6 +42,7 @@ from ..core import (
     PushTriggerScope,
     RawTrigger,
     SeqCompute,
+    SetDeathsX,
     SetMemory,
     SetNextPtr,
     SetNextTrigger,
@@ -258,12 +261,32 @@ class _CpHelper:
 
         class Dying:
             def __iter__(nonself):
+                dying_end, check_death, dying_block = Forward(), Forward(), Forward()
+                RawTrigger(
+                    actions=[
+                        self.move_cp(0x08 // 4, action=True),
+                        SetNextPtr(check_death, dying_end),
+                    ]
+                )
+                RawTrigger(
+                    conditions=Deaths(CurrentPlayer, AtMost, 127, 0),
+                    actions=[
+                        self.move_cp(0x4C // 4, action=True),
+                        SetDeathsX(CurrentPlayer, SetTo, 0, 0, 0xFF00),
+                        self.move_cp(0x08 // 4, action=True),
+                    ],
+                )
                 self.move_cp(0x4C // 4)
-                if EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
-                    yield self
-                    self.remove()
-                EUDEndIf()
+                check_death << RawTrigger(
+                    nextptr=dying_end,
+                    conditions=DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00),
+                    actions=SetNextPtr(check_death, dying_block),
+                )
+                dying_block << NextTrigger()
+                yield self
+                self.remove()
                 self.offset = 19
+                dying_end << NextTrigger()
 
         self.dying = Dying()
 
