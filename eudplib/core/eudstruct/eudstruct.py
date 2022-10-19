@@ -149,14 +149,14 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
             try:
                 return self.getfield(name)
             except KeyError as e:
-                raise AttributeError(e)
+                raise AttributeError from e
 
     def __setattr__(self, name, value):
         if "_initialized" in self.__dict__:
             try:
                 self.setfield(name, value)
             except KeyError as e:
-                raise ut.EPError(_("Unknown field name {}").format(name))
+                raise AttributeError(_("Unknown field name {}").format(name)) from e
         else:
             self.__dict__[name] = value
 

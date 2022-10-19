@@ -98,7 +98,10 @@ def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
             self._epd = epd
 
         def __getattr__(self, name):
-            kind, size, offset = addrTable[name]
+            try:
+                kind, size, offset = addrTable[name]
+            except KeyError as e:
+                raise AttributeError from e
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
             if kind == "cunit":
