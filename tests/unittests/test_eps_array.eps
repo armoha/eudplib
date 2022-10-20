@@ -1,5 +1,6 @@
 import py_random;
 import py_itertools;
+import collections.deque;
 function test_write() {
     const ret = py_list();
 
@@ -125,4 +126,32 @@ function test_queue() {
     ret += q8.popleft() == 3 ? 0b1000 : 0;  // pop 3, ret = 15
     ret += q8.empty() ? 0b10000 : 0;  // ret = 31
     return ret;
+}
+const methods = py_eval('{\
+    "append": "a",   "appendleft": "aL",\
+    "pop":    "p",   "popleft":    "pL"\
+}');
+const DequeCases = py_eval('random.sample(sorted(methods.getValue()), 27, counts=[9, 9, 9, 9])');
+const DequeTest = py_eval("''.join(methods[name] for name in DequeCases)");
+const dq = EUDDeque(7)();
+function test_deque() {
+    const ret = py_list();
+    var pushes = 1;
+    const a = function () { dq.append(pushes); pushes++; };
+    const aL = function () { dq.appendleft(pushes); pushes++; };
+    const _p = function() { if (dq.empty()) return 0; else return dq.pop(); };
+    const _pL = function() { if (dq.empty()) return 0; else return dq.popleft(); };
+    const p = py_eval('lambda s=ret, f=_p: s.append(f())');
+    const pL = py_eval('lambda s=ret, f=_pL: s.append(f())');
+    const methodMap = py_eval('{\
+        "append":     a,    "pop":     p,\
+        "appendleft": aL,   "popleft": pL,\
+    }');
+    foreach(method : DequeCases) { methodMap[method](); }
+    var sum = dq.length;  // TODO: implement __iter__
+    while (!dq.empty()) {
+        sum += dq.pop();
+    }
+    ret.append(sum);
+    return List2Assignable(ret);
 }

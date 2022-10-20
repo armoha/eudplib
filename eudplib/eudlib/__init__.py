@@ -26,7 +26,7 @@ THE SOFTWARE.
 from .epdoffsetmap import EPDCUnitMap, EPDOffsetMap
 from .eudarray import EUDArray
 from .eudgrp import EUDGrp
-from .eudqueue import EUDQueue
+from .eudqueue import EUDDeque, EUDQueue
 from .eudstack import EUDStack
 from .locf import *
 from .mathf import *
