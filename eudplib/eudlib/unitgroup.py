@@ -50,41 +50,11 @@ from ..core import (
     Subtract,
     VProc,
 )
-from ..ctrlstru import (
-    CtrlStruOpener,
-    DoActions,
-    EUDEndIf,
-    EUDEndWhile,
-    EUDIf,
-    EUDSetContinuePoint,
-)
+from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
+from ..ctrlstru.loopblock import _UnsafeWhileNot
 from ..utils import EPD, EUDCreateBlock, EUDPeekBlock, ep_assert
 
 _assign_helper = EUDVariable()
-
-
-def _UnsafeWhileNot():
-    def _header():
-        block = {
-            "loopstart": NextTrigger(),
-            "loopend": Forward(),
-            "contpoint": Forward(),
-            "conditional": True,
-        }
-
-        EUDCreateBlock("whileblock", block)
-
-    def _footer(conditions):
-        block = EUDPeekBlock("whileblock")[1]
-        RawTrigger(
-            conditions=conditions,
-            actions=SetNextPtr(block["loopstart"], block["loopend"]),
-        )
-        block["conditional"] = False
-        return True
-
-    _header()
-    return CtrlStruOpener(_footer)
 
 
 class UnitGroup:

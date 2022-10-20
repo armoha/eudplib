@@ -142,6 +142,30 @@ def EUDWhileNot():
     return CtrlStruOpener(lambda conditions: c(conditions, neg=True))
 
 
+def _UnsafeWhileNot():
+    def _header():
+        block = {
+            "loopstart": c.NextTrigger(),
+            "loopend": c.Forward(),
+            "contpoint": c.Forward(),
+            "conditional": True,
+        }
+
+        ut.EUDCreateBlock("whileblock", block)
+
+    def _footer(conditions):
+        block = ut.EUDPeekBlock("whileblock")[1]
+        c.RawTrigger(
+            conditions=conditions,
+            actions=c.SetNextPtr(block["loopstart"], block["loopend"]),
+        )
+        block["conditional"] = False
+        return True
+
+    _header()
+    return CtrlStruOpener(_footer)
+
+
 def EUDEndWhile():
     block = ut.EUDPopBlock("whileblock")[1]
     if not block["contpoint"].IsSet():
