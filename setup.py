@@ -5,6 +5,8 @@ import textwrap
 
 from setuptools import find_packages, setup
 
+__version__ = "0.71.0"
+
 
 def parse_setuppy_commands():
     """Check the commands and respond appropriately.  Disable broken commands.
@@ -125,9 +127,6 @@ def generate_cython():
     )
     if p != 0:
         raise RuntimeError("Running cythonize failed!")
-
-
-__version__ = "0.70.18"
 
 
 if __name__ == "__main__":
