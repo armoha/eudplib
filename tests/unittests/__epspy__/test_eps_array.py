@@ -35,31 +35,31 @@ def f_test_write():
         expect.__iadd__(vals[1])
         # (Line 19) expect -= vals[2];
         expect.__isub__(vals[2])
-        # (Line 20) dbg.appendf("\n\x07{:x}\x02 *= {:x}", expect, vals[3]);
+        # (Line 20) dbg.appendf("\n\x07{:x}\x02 *= {:x}", expect, vals[3],);
         dbg.appendf("\n\x07{:x}\x02 *= {:x}", expect, vals[3])
         # (Line 21) expect *= vals[3];
         expect.__imul__(vals[3])
         # (Line 22) var temp = expect;
         temp = _LVAR([expect])
-        # (Line 23) dbg.appendf(" -> \x07{:x}\x02 /= {:x}", expect, vals[4]);
+        # (Line 23) dbg.appendf(" -> \x07{:x}\x02 /= {:x}", expect, vals[4],);
         dbg.appendf(" -> \x07{:x}\x02 /= {:x}", expect, vals[4])
         # (Line 24) expect /= vals[4];
         expect.__ifloordiv__(vals[4])
         # (Line 25) temp += expect;
         temp.__iadd__(expect)
-        # (Line 26) dbg.appendf(" -> \x07{}\x02 %= {:x}", expect, vals[5]);
+        # (Line 26) dbg.appendf(" -> \x07{}\x02 %= {:x}", expect, vals[5],);
         dbg.appendf(" -> \x07{}\x02 %= {:x}", expect, vals[5])
         # (Line 27) expect %= vals[5];
         expect.__imod__(vals[5])
         # (Line 28) temp += expect;
         temp.__iadd__(expect)
-        # (Line 29) dbg.appendf(" -> \x07{}\x02 <<= {}", expect, vals[6]);
+        # (Line 29) dbg.appendf(" -> \x07{}\x02 <<= {}", expect, vals[6],);
         dbg.appendf(" -> \x07{}\x02 <<= {}", expect, vals[6])
         # (Line 30) expect <<= vals[6];
         expect.__ilshift__(vals[6])
         # (Line 31) temp += expect;
         temp.__iadd__(expect)
-        # (Line 32) dbg.appendf(" -> \x07{:x}\x02 >>= {}", expect, vals[7]);
+        # (Line 32) dbg.appendf(" -> \x07{:x}\x02 >>= {}", expect, vals[7],);
         dbg.appendf(" -> \x07{:x}\x02 >>= {}", expect, vals[7])
         # (Line 33) expect >>= vals[7];
         expect.__irshift__(vals[7])
@@ -215,8 +215,8 @@ q8 = _CGFW(lambda: [EUDQueue(8)()], 1)[0]
 def f_test_queue():
     # (Line 117) var ret = 0;
     ret = _LVAR([0])
-    # (Line 118) ret += q8.empty() ? 0b00001 : 0;  // ret = 1
-    ret.__iadd__(EUDTernary(q8.empty())(0b00001)(0))
+    # (Line 118) ret += q8.empty() ? 0b1 : 0;  // ret = 1
+    ret.__iadd__(EUDTernary(q8.empty())(0b1)(0))
     # (Line 119) q8.append(1);
     q8.append(1)
     # (Line 120) q8.append(EUDVariable(2));
@@ -227,10 +227,10 @@ def f_test_queue():
     q8.append(EUDVariable(3))
     # (Line 123) ret += q8.empty() ? 0x80000000 : 0;
     ret.__iadd__(EUDTernary(q8.empty())(0x80000000)(0))
-    # (Line 124) ret += q8.popleft() == 2 ? 0b00100 : 0;  // pop 2, ret = 7
-    ret.__iadd__(EUDTernary(q8.popleft() == 2)(0b00100)(0))
-    # (Line 125) ret += q8.popleft() == 3 ? 0b01000 : 0;  // pop 3, ret = 15
-    ret.__iadd__(EUDTernary(q8.popleft() == 3)(0b01000)(0))
+    # (Line 124) ret += q8.popleft() == 2 ? 0b100 : 0;  // pop 2, ret = 7
+    ret.__iadd__(EUDTernary(q8.popleft() == 2)(0b100)(0))
+    # (Line 125) ret += q8.popleft() == 3 ? 0b1000 : 0;  // pop 3, ret = 15
+    ret.__iadd__(EUDTernary(q8.popleft() == 3)(0b1000)(0))
     # (Line 126) ret += q8.empty() ? 0b10000 : 0;  // ret = 31
     ret.__iadd__(EUDTernary(q8.empty())(0b10000)(0))
     # (Line 127) return ret;

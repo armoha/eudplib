@@ -596,6 +596,7 @@ fArgs_nonEmpty(A) ::= fArgs_nonEmpty(B) COMMA fArg(C). {
 
 fArgs(A) ::= . { A = genEmpty(); }
 fArgs(A) ::= fArgs_nonEmpty(B). { A = B; }
+fArgs(A) ::= fArgs_nonEmpty(B) COMMA. { A = B; }
 
 funcexprStmt ::= funcexpr(A). {
     writeTraceInfo(ps->gen, A);
