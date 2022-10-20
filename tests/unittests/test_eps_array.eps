@@ -127,6 +127,33 @@ function test_queue() {
     ret += q8.empty() ? 0b10000 : 0;  // ret = 31
     return ret;
 }
+function test_queue_wraparound() {
+    const q3 = EUDQueue(3)();
+    const ret = EUDCreateVariables(6);
+    var iter = 0;
+    // no element in queue: no-op
+    foreach(v : q3) { ret[0] += v; iter++; }
+    q3.append(1);
+    q3.append(2);
+    // 3 = 1 + 2
+    foreach(v : q3) { ret[1] += v; iter++; }
+    q3.append(3);
+    q3.append(4);
+    // 9 = 2 + 3 + 4
+    foreach(v : q3) { ret[2] += v; iter++; }
+    // 12 = 3 + 4 + 5
+    q3.append(5);
+    foreach(v : q3) { ret[3] += v; iter++; }
+    // 9 = 4 + 5
+    q3.popleft();
+    foreach(v : q3) { ret[4] += v; iter++; }
+    // 18 = 5 + 6 + 7
+    q3.append(6);
+    q3.append(7);
+    foreach(v : q3) { ret[5] += v; iter++; }
+    ret.append(iter);
+    return List2Assignable(ret);
+}
 const methods = py_eval('{\
     "append": "a",   "appendleft": "aL",\
     "pop":    "p",   "popleft":    "pL"\
@@ -148,10 +175,10 @@ function test_deque() {
         "appendleft": aL,   "popleft": pL,\
     }');
     foreach(method : DequeCases) { methodMap[method](); }
-    var sum = dq.length;  // TODO: implement __iter__
-    while (!dq.empty()) {
-        sum += dq.pop();
-    }
+    var sum = dq.length;
+    while(!dq.empty()) sum += dq.pop();
+    // FIXME: implement __iter__
+    // foreach(element: dq) { sum += element; }
     ret.append(sum);
     return List2Assignable(ret);
 }

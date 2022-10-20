@@ -8,6 +8,7 @@ from .test_eps_array import (
     f_test_compare,
     f_test_deque,
     f_test_queue,
+    f_test_queue_wraparound,
     f_test_write,
 )
 from .test_eps_epsfile import f_constv_thing, f_square, f_switch_test, f_test_array
@@ -37,6 +38,7 @@ def test_epscript():
         [c[0]] * (len(c) - 1),
     )
     test_equality("epScript EUDQueue", f_test_queue(), 31)
+    test_equality("epScript queue wraparound", f_test_queue_wraparound(), [0, 3, 9, 12, 9, 18, 13])
     dq = deque(maxlen=7)
     cases = []
     pushes = 1

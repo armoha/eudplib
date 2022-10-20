@@ -153,6 +153,12 @@ class ExprProxy:
     def __setitem__(self, name, newvalue):
         self._value[name] = newvalue
 
+    def __iter__(self):
+        try:
+            return self._value.__iter__()
+        except AttributeError:
+            return self._value
+
 
 def unProxy(x):
     try:
