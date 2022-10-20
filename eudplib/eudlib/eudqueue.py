@@ -43,7 +43,7 @@ from ..utils import EPD, cachedfunc, ep_assert
 
 @cachedfunc
 def EUDQueue(capacity):
-    ep_assert(isinstance(capacity, int))
+    ep_assert(isinstance(capacity, int) and capacity > 0)
 
     class _EUDQueue:
         def __init__(self):
@@ -90,7 +90,7 @@ def EUDQueue(capacity):
 
             def empty():
                 is_empty = Memory(jump + 4, Exactly, 0)
-                VProc(tail, tail.SetDest(EPD(is_empty) + 5))
+                VProc(tail, tail.SetDest(EPD(is_empty) + 2))
                 return is_empty
 
             self._append = append
