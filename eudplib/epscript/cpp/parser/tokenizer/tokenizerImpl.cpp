@@ -198,7 +198,15 @@ Token* TokenizerImpl::getToken() {
                 num = (num << 4) | chnum;
                 cursor++;
             }
-            return TK(TOKEN_NUMBER, std::string(numberStart, cursor - numberStart));
+        }
+        // Binary number
+        else if((cursor[1] == 'b' && (cursor[2] == '0' || cursor[2] == '1'))) {
+            cursor += 2;
+            int num = 0;
+            while('0' <= *cursor && *cursor <= '1') {
+                num = num * 2 + (*cursor - '0');
+                cursor++;
+            }
         }
         // Decimal number
         else {
@@ -207,8 +215,8 @@ Token* TokenizerImpl::getToken() {
                 num = num * 10 + (*cursor - '0');
                 cursor++;
             }
-            return TK(TOKEN_NUMBER, std::string(numberStart, cursor - numberStart));
         }
+        return TK(TOKEN_NUMBER, std::string(numberStart, cursor - numberStart));
     }
 
     // Inplace operators

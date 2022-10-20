@@ -215,8 +215,8 @@ q8 = _CGFW(lambda: [EUDQueue(8)()], 1)[0]
 def f_test_queue():
     # (Line 117) var ret = 0;
     ret = _LVAR([0])
-    # (Line 118) ret += q8.empty() ? 1 : 0;  // ret = 1
-    ret.__iadd__(EUDTernary(q8.empty())(1)(0))
+    # (Line 118) ret += q8.empty() ? 0b00001 : 0;  // ret = 1
+    ret.__iadd__(EUDTernary(q8.empty())(0b00001)(0))
     # (Line 119) q8.append(1);
     q8.append(1)
     # (Line 120) q8.append(EUDVariable(2));
@@ -227,12 +227,12 @@ def f_test_queue():
     q8.append(EUDVariable(3))
     # (Line 123) ret += q8.empty() ? 0x80000000 : 0;
     ret.__iadd__(EUDTernary(q8.empty())(0x80000000)(0))
-    # (Line 124) ret += q8.popleft() == 2 ? 4 : 0;  // pop 2, ret = 7
-    ret.__iadd__(EUDTernary(q8.popleft() == 2)(4)(0))
-    # (Line 125) ret += q8.popleft() == 3 ? 8 : 0;  // pop 3, ret = 15
-    ret.__iadd__(EUDTernary(q8.popleft() == 3)(8)(0))
-    # (Line 126) ret += q8.empty() ? 16 : 0;  // ret = 31
-    ret.__iadd__(EUDTernary(q8.empty())(16)(0))
+    # (Line 124) ret += q8.popleft() == 2 ? 0b00100 : 0;  // pop 2, ret = 7
+    ret.__iadd__(EUDTernary(q8.popleft() == 2)(0b00100)(0))
+    # (Line 125) ret += q8.popleft() == 3 ? 0b01000 : 0;  // pop 3, ret = 15
+    ret.__iadd__(EUDTernary(q8.popleft() == 3)(0b01000)(0))
+    # (Line 126) ret += q8.empty() ? 0b10000 : 0;  // ret = 31
+    ret.__iadd__(EUDTernary(q8.empty())(0b10000)(0))
     # (Line 127) return ret;
     EUDReturn(ret)
     # (Line 128) }

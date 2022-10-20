@@ -115,14 +115,14 @@ function test_compare() {
 const q8 = EUDQueue(8)();
 function test_queue() {
     var ret = 0;
-    ret += q8.empty() ? 1 : 0;  // ret = 1
+    ret += q8.empty() ? 0b1 : 0;  // ret = 1
     q8.append(1);
     q8.append(EUDVariable(2));
     ret += 1 << q8.popleft();  // pop 1, ret = 3
     q8.append(EUDVariable(3));
     ret += q8.empty() ? 0x80000000 : 0;
-    ret += q8.popleft() == 2 ? 4 : 0;  // pop 2, ret = 7
-    ret += q8.popleft() == 3 ? 8 : 0;  // pop 3, ret = 15
-    ret += q8.empty() ? 16 : 0;  // ret = 31
+    ret += q8.popleft() == 2 ? 0b100 : 0;  // pop 2, ret = 7
+    ret += q8.popleft() == 3 ? 0b1000 : 0;  // pop 3, ret = 15
+    ret += q8.empty() ? 0b10000 : 0;  // ret = 31
     return ret;
 }
