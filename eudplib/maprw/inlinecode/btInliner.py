@@ -130,7 +130,7 @@ def CountConditionsAndActions(bTrigger):
         elif bTrigger[c * 20 + 15] >= 1:
             cond_count += 1
     for a in range(64):
-        if bTrigger[320 + a * 32 + 26] in (3, 47):  # PreserveTrigger, Comment
+        if bTrigger[320 + a * 32 + 26] in (47,):  # Comment
             continue
         elif bTrigger[320 + a * 32 + 26] >= 1:
             act_count += 1

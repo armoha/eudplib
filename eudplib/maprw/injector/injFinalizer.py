@@ -163,8 +163,8 @@ def _FlipProp(trigepd):
         """
 
         # Dispatch inline code
-        if cs.EUDIf()(c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 0x10000000)):
-            cs.DoActions(c.SetDeathsX(c.CurrentPlayer, c.SetTo, 4, u, 0x10000004))
+        if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 0x10000000, u)):
+            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 4, u))  # Preserve
             _DispatchInlineCode(nexttrig, trigepd, prop)
         cs.EUDEndIf()
 
