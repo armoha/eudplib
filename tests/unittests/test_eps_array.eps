@@ -176,9 +176,7 @@ function test_deque() {
     }');
     foreach(method : DequeCases) { methodMap[method](); }
     var sum = dq.length;
-    while(!dq.empty()) sum += dq.pop();
-    // FIXME: implement __iter__
-    // foreach(element: dq) { sum += element; }
+    foreach(element: dq) { sum += element; }
     ret.append(sum);
     return List2Assignable(ret);
 }

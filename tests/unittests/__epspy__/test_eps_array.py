@@ -363,12 +363,12 @@ def f_test_deque():
         # (Line 178) var sum = dq.length;
 
     sum = _LVAR([dq.length])
-    # (Line 179) while(!dq.empty()) sum += dq.pop();
-    if EUDWhile()(dq.empty(), neg=True):
-        sum.__iadd__(dq.pop())
-        # (Line 182) ret.append(sum);
-    EUDEndWhile()
+    # (Line 179) foreach(element: dq) { sum += element; }
+    for element in dq:
+        sum.__iadd__(element)
+        # (Line 180) ret.append(sum);
+
     ret.append(sum)
-    # (Line 183) return List2Assignable(ret);
+    # (Line 181) return List2Assignable(ret);
     EUDReturn(List2Assignable(ret))
-    # (Line 184) }
+    # (Line 182) }
