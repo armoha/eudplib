@@ -1,3 +1,5 @@
+from types import ModuleType
+
 from ..core import (
     EUDVariable,
     EUDVArray,
@@ -11,7 +13,7 @@ from ..core.variable.eudv import IsRValue
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
 from ..eudlib import EUDArray
 from ..maprw import EUDOnStart
-from ..utils import ExprProxy, FlattenList, List2Assignable
+from ..utils import ExprProxy, FlattenList, List2Assignable, ep_warn
 from .epsimp import EPSLoader
 
 
@@ -86,6 +88,11 @@ class _ATTW:  # attribute write
         self.attrName = attrName
 
     def __lshift__(self, r):
+        if isinstance(self.obj, ModuleType):
+            ov = getattr(self.obj, self.attrName)
+            if IsEUDVariable(ov):
+                return ov << r
+            ep_warn("Try to shadow module variable")
         setattr(self.obj, self.attrName, r)
 
     def __iadd__(self, v):
