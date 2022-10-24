@@ -1,6 +1,7 @@
 from types import ModuleType
 
 from ..core import (
+    ConstExpr,
     EUDVariable,
     EUDVArray,
     IsEUDVariable,
@@ -91,7 +92,8 @@ class _ATTW:  # attribute write
         if isinstance(self.obj, ModuleType):
             ov = getattr(self.obj, self.attrName)
             if IsEUDVariable(ov):
-                return ov << r
+                ov << r
+                return
             ep_warn("Try to shadow module variable")
         setattr(self.obj, self.attrName, r)
 
@@ -201,6 +203,12 @@ class _ARRW:  # array write
         self.index = index
 
     def __lshift__(self, r):
+        if not IsEUDVariable(self.obj) and not isinstance(self.obj, ConstExpr):
+            # maybe Python collections
+            ov = self.obj[self.index]
+            if IsEUDVariable(ov):
+                ov << r
+                return
         self.obj[self.index] = r
 
     def __iadd__(self, v):
