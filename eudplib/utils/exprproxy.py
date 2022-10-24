@@ -83,6 +83,12 @@ class ExprProxy:
     def __rfloordiv__(self, k):
         return k // self._value
 
+    def __mod__(self, k):
+        return self._value % k
+
+    def __rmod__(self, k):
+        return k % self._value
+
     def __and__(self, k):
         return self._value & k
 

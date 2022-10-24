@@ -13,8 +13,10 @@ function square(x) {
     return x * x; // + z.k;
 }
 const receives = py_eval('[PVariable() for _ in range(8)]');
+const attack_gwpID = 4;
 function constv_thing() {
     foreach(i, pvar: py_enumerate(receives)) {}
+    SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
     return a[0] + a[1] + a[2] + a[3] + a[4];
 }
 
