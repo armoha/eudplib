@@ -108,18 +108,21 @@ def _dwread(ptr):
     return dw
 
 
-def f_dwread(ptr):
-    if type(ptr) == int and ptr % 4 == 0:
-        return dwm.f_dwread_epd(ut.EPD(ptr))
+def f_dwread(ptr, **kwargs):
+    if (isinstance(ptr, int) and ptr % 4 == 0) or (
+        not c.IsEUDVariable(ptr)
+        and isinstance(ptr, (c.RlocInt_C, c.ConstExpr))
+        and ptr.rlocmode == 4
+        and ptr.offset % 4 == 0
+    ):
+        return dwm.f_dwread_epd(ut.EPD(ptr), **kwargs)
     else:
-        return _dwread(ptr)
+        return _dwread(ptr, **kwargs)
 
 
-def f_wread(ptr):
-    epd, subp = _ptr2epd(ptr)
-    return bwm.f_wread_epd(epd, subp)
+def f_wread(ptr, **kwargs):
+    return bwm.f_wread_epd(*_ptr2epd(ptr), **kwargs)
 
 
-def f_bread(ptr):
-    epd, subp = _ptr2epd(ptr)
-    return bwm.f_bread_epd(epd, subp)
+def f_bread(ptr, **kwargs):
+    return bwm.f_bread_epd(*_ptr2epd(ptr), **kwargs)
