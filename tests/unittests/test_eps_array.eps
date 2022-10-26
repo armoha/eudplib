@@ -85,9 +85,7 @@ function test_write() {
 }
 function test_compare() {
     const ret = py_list();
-    const u32 = py_eval("lambda: random.randint(1, 0xFFFFFFFF)");
-
-    const num = u32(), u32(), u32(), u32(), u32(), u32(), u32();
+    const num = py_eval("[random.randint(1, 0xFFFFFFFF) for _ in range(11)]");
     const numV = EUDArray(num);
 
     const pvar, arr = PVariable(), EUDArray(8);
@@ -108,6 +106,12 @@ function test_compare() {
         if (arr[i] <= vals[4]) temp += 1 << 4;
         if (arr[i] > vals[5]) temp += 1 << 5;
         if (arr[i] < vals[6]) temp += 1 << 6;
+        if (1 * arr[i] < vals[7]) temp += 1 << 7;
+        const v8, v9 = vals[8], vals[9];
+        if (v8 >= arr[i]) temp += 1 << 8;
+        if (v9 < arr[i]) temp += 1 << 9;
+        // FIXME
+        if (vals[10] != arr[i]) temp += 1 << 10;
         ret.append(temp);
     }
 
