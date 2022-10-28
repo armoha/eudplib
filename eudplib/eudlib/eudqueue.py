@@ -160,9 +160,21 @@ def EUDQueue(capacity):
                 )
                 return ret
 
+            def clear():
+                c.RawTrigger(
+                    actions=[
+                        SetMemory(jump + 4, c.SetTo, queue - 72),
+                        SetMemory(iter_init + 348, c.SetTo, EPD(queue) + 87),
+                        SetMemory(iter_init + 380, c.SetTo, queue - 72),
+                        SetMemory(append_act + 16, c.SetTo, EPD(queue) + 87),
+                        self._length.SetNumber(0),
+                    ]
+                )
+
             self._append = append
             self._popleft = popleft
             self._iter = iter
+            self._clear = clear
 
             c.PushTriggerScope()
             append(0)  # prevent 'Cannot evaluate <ConstExpr>...' error
@@ -177,6 +189,9 @@ def EUDQueue(capacity):
 
         def popleft(self, **kwargs):
             return self._popleft(**kwargs)
+
+        def clear(self):
+            self._clear()
 
         def empty(self):
             return self._length == 0
@@ -425,11 +440,25 @@ def EUDDeque(capacity):
                 )
                 return ret
 
+            def clear():
+                c.RawTrigger(
+                    actions=[
+                        SetMemory(jump + 4, c.SetTo, deque - 72),
+                        SetMemory(jumpleft + 4, c.SetTo, deque - 72),
+                        SetMemory(iter_init + 348, c.SetTo, EPD(deque) + 87),
+                        SetMemory(iter_init + 380, c.SetTo, deque - 72),
+                        SetMemory(append_act + 16, c.SetTo, EPD(deque) + 87),
+                        SetMemory(appendleft_act + 16, c.SetTo, EPD(deque) + 87),
+                        self._length.SetNumber(0),
+                    ]
+                )
+
             self._append = append
             self._appendleft = appendleft
             self._pop = _pop
             self._popleft = popleft
             self._iter = iter
+            self._clear = clear
 
             c.PushTriggerScope()
             append(0)  # prevent 'Cannot evaluate <ConstExpr>...' error
@@ -452,6 +481,9 @@ def EUDDeque(capacity):
 
         def popleft(self, **kwargs):
             return self._popleft(**kwargs)
+
+        def clear(self):
+            self._clear()
 
         def empty(self):
             return self._length == 0
