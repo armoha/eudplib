@@ -42,7 +42,7 @@ def EUDQueue(capacity):
             pop = c.EUDVariable(ret, c.SetTo, 0)
             queue = EUDVArray(capacity)(dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable())
             append_act = SetMemory(queue + 348, c.SetTo, 0)
-            jump = c.Forward()
+            jumpleft = c.Forward()
             self._length = c.EUDVariable(0)
 
             c.PushTriggerScope()
@@ -113,17 +113,17 @@ def EUDQueue(capacity):
                     conditions=self._length.AtLeast(capacity + 1),
                     actions=[
                         c.SetNextPtr(check_wrap, wrap_tail),
-                        SetMemory(jump + 4, Add, 72),
+                        SetMemory(jumpleft + 4, Add, 72),
                         SetMemory(iter_init + 348, Add, 18),
                         SetMemory(iter_init + 380, Add, 72),
                         self._length.SubtractNumber(1),
                     ],
                 )
                 wrap_tail << c.RawTrigger(
-                    conditions=Memory(jump + 4, c.AtLeast, queue + 72 * (capacity - 1)),
+                    conditions=Memory(jumpleft + 4, c.AtLeast, queue + 72 * (capacity - 1)),
                     actions=[
                         c.SetNextPtr(check_wrap, wrap_head),
-                        SetMemory(jump + 4, Add, -(72 * capacity)),
+                        SetMemory(jumpleft + 4, Add, -(72 * capacity)),
                         SetMemory(iter_init + 348, Add, -(18 * capacity)),
                         SetMemory(iter_init + 380, Add, -(72 * capacity)),
                     ],
@@ -138,22 +138,22 @@ def EUDQueue(capacity):
                 # ret = queue[tail]
                 # tail %+ 1
                 # return ret
-                nonlocal jump
+                nonlocal jumpleft
                 wraparound = c.Forward()
-                jump << c.RawTrigger(
+                jumpleft << c.RawTrigger(
                     nextptr=queue - 72,
                     actions=[
                         c.SetNextPtr(pop.GetVTable(), wraparound),
-                        SetMemory(jump + 4, Add, 72),
+                        SetMemory(jumpleft + 4, Add, 72),
                         SetMemory(iter_init + 348, Add, 18),
                         SetMemory(iter_init + 380, Add, 72),
                         self._length.SubtractNumber(1),
                     ],
                 )
                 wraparound << c.RawTrigger(
-                    conditions=Memory(jump + 4, c.AtLeast, queue + 72 * (capacity - 1)),
+                    conditions=Memory(jumpleft + 4, c.AtLeast, queue + 72 * (capacity - 1)),
                     actions=[
-                        SetMemory(jump + 4, Add, -(72 * capacity)),
+                        SetMemory(jumpleft + 4, Add, -(72 * capacity)),
                         SetMemory(iter_init + 348, Add, -(18 * capacity)),
                         SetMemory(iter_init + 380, Add, -(72 * capacity)),
                     ],
@@ -163,7 +163,7 @@ def EUDQueue(capacity):
             def clear():
                 c.RawTrigger(
                     actions=[
-                        SetMemory(jump + 4, c.SetTo, queue - 72),
+                        SetMemory(jumpleft + 4, c.SetTo, queue - 72),
                         SetMemory(iter_init + 348, c.SetTo, EPD(queue) + 87),
                         SetMemory(iter_init + 380, c.SetTo, queue - 72),
                         SetMemory(append_act + 16, c.SetTo, EPD(queue) + 87),
@@ -327,7 +327,7 @@ def EUDDeque(capacity):
                     ],
                 )
                 wrap_tail << c.RawTrigger(
-                    conditions=Memory(jump + 4, c.AtLeast, deque + 72 * (capacity - 1)),
+                    conditions=Memory(jumpleft + 4, c.AtLeast, deque + 72 * (capacity - 1)),
                     actions=[
                         c.SetNextPtr(check_wrap, wrap_head),
                         SetMemory(appendleft_act + 16, Add, -(18 * capacity)),
