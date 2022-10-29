@@ -353,10 +353,16 @@ class _ATTC:  # attribute comparison
             return getattr(self.obj, self.attrName) > k
 
 
-class _ARRC:  # array comparison
+class _ARRC(ExprProxy):  # array comparison
     def __init__(self, obj, index):
         self.obj = obj
         self.index = index
+
+    def getValue(self):
+        return self.obj[self.index]
+
+    def __hash__(self):
+        return id(self)
 
     def __eq__(self, k):
         try:
@@ -393,6 +399,88 @@ class _ARRC:  # array comparison
             return self.obj.gtitem(self.index, k)
         except AttributeError:
             return self.obj[self.index] > k
+
+    # Proxy arithmetic operators
+    def __lshift__(self, k):
+        return self.obj[self.index] << k
+
+    def __rlshift__(self, k):
+        return k << self.obj[self.index]
+
+    def __rshift__(self, k):
+        return self.obj[self.index] >> k
+
+    def __rrshift__(self, k):
+        return k >> self.obj[self.index]
+
+    def __add__(self, k):
+        return self.obj[self.index] + k
+
+    def __radd__(self, k):
+        return k + self.obj[self.index]
+
+    def __sub__(self, k):
+        return self.obj[self.index] - k
+
+    def __rsub__(self, k):
+        return k - self.obj[self.index]
+
+    def __mul__(self, k):
+        return self.obj[self.index] * k
+
+    def __rmul__(self, k):
+        return k * self.obj[self.index]
+
+    def __floordiv__(self, k):
+        return self.obj[self.index] // k
+
+    def __rfloordiv__(self, k):
+        return k // self.obj[self.index]
+
+    def __mod__(self, k):
+        return self.obj[self.index] % k
+
+    def __rmod__(self, k):
+        return k % self.obj[self.index]
+
+    def __and__(self, k):
+        return self.obj[self.index] & k
+
+    def __rand__(self, k):
+        return k & self.obj[self.index]
+
+    def __or__(self, k):
+        return self.obj[self.index] | k
+
+    def __ror__(self, k):
+        return k | self.obj[self.index]
+
+    def __xor__(self, k):
+        return self.obj[self.index] ^ k
+
+    def __rxor__(self, k):
+        return k ^ self.obj[self.index]
+
+    def __neg__(self):
+        return -self.obj[self.index]
+
+    def __invert__(self):
+        return ~self.obj[self.index]
+
+    def __bool__(self):
+        return bool(self.obj[self.index])
+
+    def __call__(self, *args, **kwargs):
+        return self.obj[self.index](*args, **kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self.obj[self.index], name)
+
+    def __iter__(self):
+        try:
+            return self.obj[self.index].__iter__()
+        except AttributeError:
+            return self.obj[self.index]
 
 
 def _L2V(l):  # logic to value
