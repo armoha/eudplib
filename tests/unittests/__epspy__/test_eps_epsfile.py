@@ -33,7 +33,7 @@ def f_constv_thing():
 
     # (Line 20) return a[0] + a[1] + a[2] + a[3] + a[4];
     DoActions(SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID // 4, Add, _LSH(100,(attack_gwpID % 4 * 8)), _LSH(0xFF,(attack_gwpID % 4 * 8))))
-    EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
+    EUDReturn(_ARRC(a, 0) + _ARRC(a, 1) + _ARRC(a, 2) + _ARRC(a, 3) + _ARRC(a, 4))
     # (Line 21) }
     # (Line 23) function switch_test(): EUDArray {
 
@@ -278,47 +278,47 @@ def f_test_array():
     # (Line 143) const p = EUDVariable(1);
     p = EUDVariable(1)
     # (Line 144) ret += ack[p] % ackMax > 4 ? 1 : 2;  // ret = 2
-    ret.__iadd__(EUDTernary(ack[p] % ackMax <= 4, neg=True)(1)(2))
+    ret.__iadd__(EUDTernary(_ARRC(ack, p) % ackMax <= 4, neg=True)(1)(2))
     # (Line 146) const arr = [1, 2, 3, 4, 5, 6, 7, 8];
     arr = _ARR(FlattenList([1, 2, 3, 4, 5, 6, 7, 8]))
     # (Line 147) ack[0] %= arr[p];
-    _ARRW(ack, 0).__imod__(arr[p])
+    _ARRW(ack, 0).__imod__(_ARRC(arr, p))
     # (Line 148) ret = ret >> 0;  // ret = 2
     ret << (ret >> 0)
     # (Line 150) ack[p] &= 1;  // ack[1] = 0
     _ARRW(ack, p).__iand__(1)
     # (Line 151) ack[p] &= arr[p];
-    _ARRW(ack, p).__iand__(arr[p])
+    _ARRW(ack, p).__iand__(_ARRC(arr, p))
     # (Line 152) ack[p] -= -2;  // ack[1] = 2
     _ARRW(ack, p).__isub__(-2)
     # (Line 153) const x = ack[p];
-    x = ack[p]
+    x = _ARRC(ack, p)
     # (Line 154) ack[p] = x & arr[p];  // 2 & 2
-    _ARRW(ack, p) << (x & arr[p])
+    _ARRW(ack, p) << (x & _ARRC(arr, p))
     # (Line 155) arr[p] &= ack[p];
-    _ARRW(arr, p).__iand__(ack[p])
+    _ARRW(arr, p).__iand__(_ARRC(ack, p))
     # (Line 156) ret *= ack[p] * arr[p];  // ret = 8
-    ret.__imul__(ack[p] * arr[p])
+    ret.__imul__(_ARRC(ack, p) * _ARRC(arr, p))
     # (Line 158) arr[p] ^= ack[p];  // arr[1] = 0
-    _ARRW(arr, p).__ixor__(ack[p])
+    _ARRW(arr, p).__ixor__(_ARRC(ack, p))
     # (Line 159) arr[p] |= ack[0];  // arr[1] = 1
-    _ARRW(arr, p).__ior__(ack[0])
+    _ARRW(arr, p).__ior__(_ARRC(ack, 0))
     # (Line 160) arr[p] <<= ack[p];  // arr[1] = 4
-    _ARRW(arr, p).__ilshift__(ack[p])
+    _ARRW(arr, p).__ilshift__(_ARRC(ack, p))
     # (Line 161) ret |= arr[p];  // ret = 12
-    ret.__ior__(arr[p])
+    ret.__ior__(_ARRC(arr, p))
     # (Line 163) if (ack[p] > arr[p]) ret = 0;
-    if EUDIf()(_ARRC(ack, p) <= arr[p], neg=True):
+    if EUDIf()(_ARRC(ack, p) <= _ARRC(arr, p), neg=True):
         ret << (0)
         # (Line 164) if (arr[p]) ret <<= 1;  // ret = 24
     EUDEndIf()
-    if EUDIf()(arr[p]):
+    if EUDIf()(_ARRC(arr, p)):
         ret.__ilshift__(1)
         # (Line 165) ret -= ack[p] + p / 2;  // ret = 22
     EUDEndIf()
-    ret.__isub__(ack[p] + p // 2)
+    ret.__isub__(_ARRC(ack, p) + p // 2)
     # (Line 167) switch(arr[p]) {
-    EUDSwitch(arr[p])
+    EUDSwitch(_ARRC(arr, p))
     # (Line 168) case 4:  // fall-through
     _t3 = EUDSwitchCase()
     # (Line 169) case 1:
@@ -331,7 +331,7 @@ def f_test_array():
         # (Line 171) }
     # (Line 172) switch(ack[p]) {
     EUDEndSwitch()
-    EUDSwitch(ack[p])
+    EUDSwitch(_ARRC(ack, p))
     # (Line 173) case 2:
     _t5 = EUDSwitchCase()
     # (Line 174) break;

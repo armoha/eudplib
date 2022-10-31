@@ -32,57 +32,57 @@ def f_test_write():
     # (Line 17) foreach(vals : numS) {
     for vals in numS:
         # (Line 18) var expect = vals[0];
-        expect = _LVAR([vals[0]])
+        expect = _LVAR([_ARRC(vals, 0)])
         # (Line 19) expect += vals[1];
-        expect.__iadd__(vals[1])
+        expect.__iadd__(_ARRC(vals, 1))
         # (Line 20) expect -= vals[2];
-        expect.__isub__(vals[2])
+        expect.__isub__(_ARRC(vals, 2))
         # (Line 21) dbg.appendf("\n\x07{:x}\x02 *= {:x}", expect, vals[3],);
-        dbg.appendf("\n\x07{:x}\x02 *= {:x}", expect, vals[3])
+        dbg.appendf("\n\x07{:x}\x02 *= {:x}", expect, _ARRC(vals, 3))
         # (Line 22) expect *= vals[3];
-        expect.__imul__(vals[3])
+        expect.__imul__(_ARRC(vals, 3))
         # (Line 23) var temp = expect;
         temp = _LVAR([expect])
         # (Line 24) dbg.appendf(" -> \x07{:x}\x02 /= {:x}", expect, vals[4],);
-        dbg.appendf(" -> \x07{:x}\x02 /= {:x}", expect, vals[4])
+        dbg.appendf(" -> \x07{:x}\x02 /= {:x}", expect, _ARRC(vals, 4))
         # (Line 25) expect /= vals[4];
-        expect.__ifloordiv__(vals[4])
+        expect.__ifloordiv__(_ARRC(vals, 4))
         # (Line 26) temp += expect;
         temp.__iadd__(expect)
         # (Line 27) dbg.appendf(" -> \x07{}\x02 %= {:x}", expect, vals[5],);
-        dbg.appendf(" -> \x07{}\x02 %= {:x}", expect, vals[5])
+        dbg.appendf(" -> \x07{}\x02 %= {:x}", expect, _ARRC(vals, 5))
         # (Line 28) expect %= vals[5];
-        expect.__imod__(vals[5])
+        expect.__imod__(_ARRC(vals, 5))
         # (Line 29) temp += expect;
         temp.__iadd__(expect)
         # (Line 30) dbg.appendf(" -> \x07{}\x02 <<= {}", expect, vals[6],);
-        dbg.appendf(" -> \x07{}\x02 <<= {}", expect, vals[6])
+        dbg.appendf(" -> \x07{}\x02 <<= {}", expect, _ARRC(vals, 6))
         # (Line 31) expect <<= vals[6];
-        expect.__ilshift__(vals[6])
+        expect.__ilshift__(_ARRC(vals, 6))
         # (Line 32) temp += expect;
         temp.__iadd__(expect)
         # (Line 33) dbg.appendf(" -> \x07{:x}\x02 >>= {}", expect, vals[7],);
-        dbg.appendf(" -> \x07{:x}\x02 >>= {}", expect, vals[7])
+        dbg.appendf(" -> \x07{:x}\x02 >>= {}", expect, _ARRC(vals, 7))
         # (Line 34) expect >>= vals[7];
-        expect.__irshift__(vals[7])
+        expect.__irshift__(_ARRC(vals, 7))
         # (Line 35) temp += expect;
         temp.__iadd__(expect)
         # (Line 38) dbg.appendf(" -> \x07{}\x02 &= {:x}", expect, vals[8]);
-        dbg.appendf(" -> \x07{}\x02 &= {:x}", expect, vals[8])
+        dbg.appendf(" -> \x07{}\x02 &= {:x}", expect, _ARRC(vals, 8))
         # (Line 39) expect &= vals[8];
-        expect.__iand__(vals[8])
+        expect.__iand__(_ARRC(vals, 8))
         # (Line 40) temp += expect;
         temp.__iadd__(expect)
         # (Line 41) dbg.appendf(" -> \x07{}\x02 |= {:x}", expect, vals[9]);
-        dbg.appendf(" -> \x07{}\x02 |= {:x}", expect, vals[9])
+        dbg.appendf(" -> \x07{}\x02 |= {:x}", expect, _ARRC(vals, 9))
         # (Line 42) expect |= vals[9];
-        expect.__ior__(vals[9])
+        expect.__ior__(_ARRC(vals, 9))
         # (Line 43) temp += expect;
         temp.__iadd__(expect)
         # (Line 44) dbg.appendf(" -> \x07{:x}", expect);
         dbg.appendf(" -> \x07{:x}", expect)
         # (Line 45) expect ^= vals[10];
-        expect.__ixor__(vals[10])
+        expect.__ixor__(_ARRC(vals, 10))
         # (Line 46) temp += expect;
         temp.__iadd__(expect)
         # (Line 47) ret.append(temp);
@@ -103,43 +103,43 @@ def f_test_write():
     # (Line 58) )")) {
     for arr_1, i, vals in eval("itertools.product(        (pvar, arr, pvarV, arrV), (index, indexV), (num, numV)    )"):
         # (Line 59) arr[i] = vals[0];
-        _ARRW(arr_1, i) << (vals[0])
+        _ARRW(arr_1, i) << (_ARRC(vals, 0))
         # (Line 60) arr[i] += vals[1];
-        _ARRW(arr_1, i).__iadd__(vals[1])
+        _ARRW(arr_1, i).__iadd__(_ARRC(vals, 1))
         # (Line 61) arr[i] -= vals[2];
-        _ARRW(arr_1, i).__isub__(vals[2])
+        _ARRW(arr_1, i).__isub__(_ARRC(vals, 2))
         # (Line 62) arr[i] *= vals[3];
-        _ARRW(arr_1, i).__imul__(vals[3])
+        _ARRW(arr_1, i).__imul__(_ARRC(vals, 3))
         # (Line 63) var temp = arr[i];
-        temp = _LVAR([arr_1[i]])
+        temp = _LVAR([_ARRC(arr_1, i)])
         # (Line 64) arr[i] /= vals[4];
-        _ARRW(arr_1, i).__ifloordiv__(vals[4])
+        _ARRW(arr_1, i).__ifloordiv__(_ARRC(vals, 4))
         # (Line 65) temp += arr[i];
-        temp.__iadd__(arr_1[i])
+        temp.__iadd__(_ARRC(arr_1, i))
         # (Line 66) arr[i] %= vals[5];
-        _ARRW(arr_1, i).__imod__(vals[5])
+        _ARRW(arr_1, i).__imod__(_ARRC(vals, 5))
         # (Line 67) temp += arr[i];
-        temp.__iadd__(arr_1[i])
+        temp.__iadd__(_ARRC(arr_1, i))
         # (Line 68) arr[i] <<= vals[6];
-        _ARRW(arr_1, i).__ilshift__(vals[6])
+        _ARRW(arr_1, i).__ilshift__(_ARRC(vals, 6))
         # (Line 69) temp += arr[i];
-        temp.__iadd__(arr_1[i])
+        temp.__iadd__(_ARRC(arr_1, i))
         # (Line 70) arr[i] >>= vals[7];
-        _ARRW(arr_1, i).__irshift__(vals[7])
+        _ARRW(arr_1, i).__irshift__(_ARRC(vals, 7))
         # (Line 71) temp += arr[i];
-        temp.__iadd__(arr_1[i])
+        temp.__iadd__(_ARRC(arr_1, i))
         # (Line 74) arr[i] &= vals[8];
-        _ARRW(arr_1, i).__iand__(vals[8])
+        _ARRW(arr_1, i).__iand__(_ARRC(vals, 8))
         # (Line 75) temp += arr[i];
-        temp.__iadd__(arr_1[i])
+        temp.__iadd__(_ARRC(arr_1, i))
         # (Line 76) arr[i] |= vals[9];
-        _ARRW(arr_1, i).__ior__(vals[9])
+        _ARRW(arr_1, i).__ior__(_ARRC(vals, 9))
         # (Line 77) temp += arr[i];
-        temp.__iadd__(arr_1[i])
+        temp.__iadd__(_ARRC(arr_1, i))
         # (Line 78) arr[i] ^= vals[10];
-        _ARRW(arr_1, i).__ixor__(vals[10])
+        _ARRW(arr_1, i).__ixor__(_ARRC(vals, 10))
         # (Line 79) temp += arr[i];
-        temp.__iadd__(arr_1[i])
+        temp.__iadd__(_ARRC(arr_1, i))
         # (Line 80) ret.append(temp);
         ret.append(temp)
         # (Line 81) }
@@ -175,47 +175,47 @@ def f_test_compare():
         # (Line 101) var temp = 0;
         temp = _LVAR([0])
         # (Line 102) arr[i] = vals[0];
-        _ARRW(arr_1, i) << (vals[0])
+        _ARRW(arr_1, i) << (_ARRC(vals, 0))
         # (Line 103) if (arr[i] == vals[1]) temp += 1 << 1;
-        if EUDIf()(_ARRC(arr_1, i) == vals[1]):
+        if EUDIf()(_ARRC(arr_1, i) == _ARRC(vals, 1)):
             temp.__iadd__(_LSH(1,1))
             # (Line 104) if (arr[i] != vals[2]) temp += 1 << 2;
         EUDEndIf()
-        if EUDIf()(_ARRC(arr_1, i) == vals[2], neg=True):
+        if EUDIf()(_ARRC(arr_1, i) == _ARRC(vals, 2), neg=True):
             temp.__iadd__(_LSH(1,2))
             # (Line 105) if (arr[i] >= vals[3]) temp += 1 << 3;
         EUDEndIf()
-        if EUDIf()(_ARRC(arr_1, i) >= vals[3]):
+        if EUDIf()(_ARRC(arr_1, i) >= _ARRC(vals, 3)):
             temp.__iadd__(_LSH(1,3))
             # (Line 106) if (arr[i] <= vals[4]) temp += 1 << 4;
         EUDEndIf()
-        if EUDIf()(_ARRC(arr_1, i) <= vals[4]):
+        if EUDIf()(_ARRC(arr_1, i) <= _ARRC(vals, 4)):
             temp.__iadd__(_LSH(1,4))
             # (Line 107) if (arr[i] > vals[5]) temp += 1 << 5;
         EUDEndIf()
-        if EUDIf()(_ARRC(arr_1, i) <= vals[5], neg=True):
+        if EUDIf()(_ARRC(arr_1, i) <= _ARRC(vals, 5), neg=True):
             temp.__iadd__(_LSH(1,5))
             # (Line 108) if (arr[i] < vals[6]) temp += 1 << 6;
         EUDEndIf()
-        if EUDIf()(_ARRC(arr_1, i) >= vals[6], neg=True):
+        if EUDIf()(_ARRC(arr_1, i) >= _ARRC(vals, 6), neg=True):
             temp.__iadd__(_LSH(1,6))
             # (Line 109) if (1 * arr[i] < vals[7]) temp += 1 << 7;
         EUDEndIf()
-        if EUDIf()(1 * EUDNot(_ARRC(arr_1, i) >= vals[7])):
+        if EUDIf()(1 * _ARRC(arr_1, i) >= _ARRC(vals, 7), neg=True):
             temp.__iadd__(_LSH(1,7))
             # (Line 110) const v8, v9 = vals[8], vals[9];
         EUDEndIf()
-        v8, v9 = List2Assignable([vals[8], vals[9]])
+        v8, v9 = List2Assignable([_ARRC(vals, 8), _ARRC(vals, 9)])
         # (Line 111) if (v8 >= arr[i]) temp += 1 << 8;
-        if EUDIf()(v8 >= arr_1[i]):
+        if EUDIf()(v8 >= _ARRC(arr_1, i)):
             temp.__iadd__(_LSH(1,8))
             # (Line 112) if (v9 < arr[i]) temp += 1 << 9;
         EUDEndIf()
-        if EUDIf()(v9 >= arr_1[i], neg=True):
+        if EUDIf()(v9 >= _ARRC(arr_1, i), neg=True):
             temp.__iadd__(_LSH(1,9))
             # (Line 114) if (vals[10] != arr[i]) temp += 1 << 10;
         EUDEndIf()
-        if EUDIf()(_ARRC(vals, 10) == arr_1[i], neg=True):
+        if EUDIf()(_ARRC(vals, 10) == _ARRC(arr_1, i), neg=True):
             temp.__iadd__(_LSH(1,10))
             # (Line 115) ret.append(temp);
         EUDEndIf()
@@ -375,7 +375,7 @@ def f_test_deque():
     methodMap = eval('{        "append":     a,    "pop":     p,        "appendleft": aL,   "popleft": pL,    }')
     # (Line 181) foreach(method : DequeCases) { methodMap[method](); }
     for method in DequeCases:
-        methodMap[method]()
+        _ARRC(methodMap, method)()
         # (Line 182) var sum = dq.length;
 
     sum = _LVAR([dq.length])
