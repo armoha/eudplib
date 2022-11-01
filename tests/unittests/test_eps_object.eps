@@ -1,0 +1,80 @@
+object Test {
+    var x, y, z;
+    function setX(x) { this.x = x; }
+    function add(other: selftype) {
+        this.x += other.x;
+        this.y += other.y;
+        this.z += other.z;
+    }
+};
+function test_object() {
+    const a = Test();
+    a.x, a.y = 5, 7;
+
+    const b = Test.cast(a);
+    const c = Test.cast(b);
+
+    b.z = 8;
+    c.x = 3;
+
+    // object can be converted to a condition
+    var ret = a ? 1 : 0;
+    if (a.x == b.x && b.x == c.x) ret += 2;
+    if (a.y == b.y && b.y == c.y) ret += 4;
+    if (a.z == b.z && b.z == c.z) ret += 8;
+    if (a.x == 3 && b.y == 7 && c.z == 8) ret += 16;
+
+    const d = a.copy();
+    a.add(d);
+    if (c.x == 6 && a.y == 14 && b.z == 16) ret += 32;
+    if (d.x == 3 && d.y == 7 && d.z == 8) ret += 64;
+
+    var e = a;
+    Test.cast(e).setX(1);
+    if (a.x == 1) ret += 128;
+
+    return ret;  // 255
+}
+
+object Coord { var x, y; };
+object Triangle {
+    var p: Coord * 5;
+    var q;
+};
+function test_nested_object() {
+    const a = Triangle();
+    a.p = (Coord * 5)();
+    foreach(i : py_range(5)) {
+        a.p[i] = Coord();
+    }
+
+    a.p[0].x = 1;
+    a.p[1].y = 2;
+    a.p[1].y += 2;
+    a.q = 3;
+
+    var ret = list(a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3) ? 1 : 0;
+
+    const b = a.copy();
+    b.p[0].x = 5;
+    b.q = 2;
+    if (a.p[0].x == 5) ret += 2;
+    if (b.p[0].x == 5) ret += 4;
+    if (b.p[0].y == 0) ret += 8;
+    if (b.p[1].y == 4) ret += 16;
+    if (a.q == 3) ret += 32;
+    if (b.q == 2) ret += 64;
+
+    return ret;
+}
+
+object List {
+    var prev: selftype, next: selftype;
+};
+function test_selftype_member() {
+    const a, b = List(), List();
+    a.prev = b;
+    a.next = b;
+    b.prev = a;
+    b.next = a;
+}

@@ -50,7 +50,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
             super().__init__(EUDVArray(fieldn).cast(_from))
             self._initialized = True
         else:
-            super().__init__(EUDVArray(fieldn)([0] * len(fields)))
+            super().__init__(EUDVArray(fieldn)([0] * fieldn))
             self.isPooled = False
             self._initialized = True
             self.constructor_static(*args, **kwargs)
@@ -172,3 +172,85 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
 
     def __lshift__(self, rhs):
         raise ut.EPError(_("Cannot reassign another value to eudstruct."))
+
+    # Specializations
+
+    def iaddattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.iadditem(attrid, value)
+
+    # FIXME: add operator for Subtract
+    def isubtractattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.isubtractitem(attrid, value)
+
+    def isubattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.isubitem(attrid, value)
+
+    def imulattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.imulitem(attrid, value)
+
+    def ifloordivattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.ifloordivitem(attrid, value)
+
+    def imodattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.imoditem(attrid, value)
+
+    def ilshiftattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.ilshiftitem(attrid, value)
+
+    def irshiftattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.irshiftitem(attrid, value)
+
+    def ipowattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.ipowitem(attrid, value)
+
+    def iandattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.ianditem(attrid, value)
+
+    def iorattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.ioritem(attrid, value)
+
+    def ixorattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.ixoritem(attrid, value)
+
+    # FIXME: Add operator for x[i] = ~x[i]
+    def iinvertattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        self.iinvertitem(attrid, value)
+
+    # Attribute comparisons
+
+    def eqattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        return self.eqitem(attrid, value)
+
+    def neattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        return self.neitem(attrid, value)
+
+    def leattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        return self.leitem(attrid, value)
+
+    def geattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        return self.geitem(attrid, value)
+
+    def ltattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        return self.ltitem(attrid, value)
+
+    def gtattr(self, name, value):
+        attrid, _ = self._fielddict[name]
+        return self.gtitem(attrid, value)

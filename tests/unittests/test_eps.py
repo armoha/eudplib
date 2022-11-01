@@ -12,6 +12,7 @@ from .test_eps_array import (
     f_test_write,
 )
 from .test_eps_epsfile import f_constv_thing, f_square, f_switch_test, f_test_array
+from .test_eps_object import f_test_nested_object, f_test_object, f_test_selftype_member
 
 
 @TestInstance
@@ -55,3 +56,7 @@ def test_epscript():
     cases.append(len(dq) + sum(dq))
     testname = DequeTest + "".join(chr(14 + i % 4) + str(x) for i, x in enumerate(cases))
     test_equality(testname, f_test_deque(), cases)
+
+    test_equality("epScript object", f_test_object(), 255)
+    test_equality("epScript nested object", f_test_nested_object(), 127)
+    f_test_selftype_member()
