@@ -171,8 +171,6 @@ from .stockact import (
     Victory,
     Wait,
 )
-
-# fmt: off
 from .stockcond import (
     Accumulate,
     Always,
@@ -202,16 +200,22 @@ from .stockcond import (
     Score,
     Switch,
 )
-
-# fmt: on
 from .strenc import (
     EncodeAIScript,
+    EncodeFlingy,
+    EncodeIcon,
     EncodeImage,
     EncodeIscript,
     EncodeLocation,
+    EncodePortrait,
+    EncodeSprite,
     EncodeString,
     EncodeSwitch,
     EncodeTBL,
+    EncodeTech,
     EncodeUnit,
+    EncodeUnitOrder,
+    EncodeUpgrade,
+    EncodeWeapon,
 )
 from .triggerscope import NextTrigger, PopTriggerScope, PushTriggerScope, SetNextTrigger
