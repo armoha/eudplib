@@ -239,7 +239,7 @@ class _CpHelper:
                     ]
                 )
                 RawTrigger(
-                    conditions=Deaths(CurrentPlayer, AtMost, 127, 0),
+                    conditions=Deaths(CurrentPlayer, Exactly, 0, 0),
                     actions=[
                         self.move_cp(0x4C // 4, action=True),
                         SetDeathsX(CurrentPlayer, SetTo, 0, 0, 0xFF00),
