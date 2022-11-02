@@ -29,7 +29,7 @@ from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam
 from ...core.variable.evcommon import _cp
 from ...localize import _
-from ..memiof import f_dwread_epd, f_posread_cp, f_setcurpl2cpcache
+from ..memiof import f_dwread_cp, f_posread_cp, f_setcurpl2cpcache
 
 _loct = ut.EPD(0x58DC60) - 5
 
@@ -165,13 +165,14 @@ _AddLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add)
 _DilateLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add, signed=True)
 
 
-def f_setloc(locID, *coords):
+def f_setloc(locID, *coords, action=False):
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),
     )
-    if isinstance(locID, str):
-        locID = c.GetLocationIndex(locID)
+    locID = c.EncodeLocation(locID)
+    if action is True:
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(locID))
     if c.IsConstExpr(locID):
         dst = _loct + 5 * locID
         if len(coords) == 2:
@@ -179,7 +180,9 @@ def f_setloc(locID, *coords):
             r, b = coords
         else:
             l, t, r, b = coords
-        c.SeqCompute(
+        if action is True:
+            return [c.SetMemoryEPD(dst + i, c.SetTo, x) for i, x in enumerate((l, t, r, b))]
+        c.NonSeqCompute(
             [
                 (dst, c.SetTo, l),
                 (dst + 1, c.SetTo, t),
@@ -193,13 +196,14 @@ def f_setloc(locID, *coords):
         _SetLoc4(locID * 5, *coords)
 
 
-def f_addloc(locID, *coords):
+def f_addloc(locID, *coords, action=False):
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),
     )
-    if isinstance(locID, str):
-        locID = c.GetLocationIndex(locID)
+    locID = c.EncodeLocation(locID)
+    if action is True:
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(locID))
     if c.IsConstExpr(locID):
         dst = _loct + 5 * locID
         if len(coords) == 2:
@@ -207,7 +211,9 @@ def f_addloc(locID, *coords):
             r, b = coords
         else:
             l, t, r, b = coords
-        c.SeqCompute(
+        if action is True:
+            return [c.SetMemoryEPD(dst + i, c.Add, x) for i, x in enumerate((l, t, r, b))]
+        c.NonSeqCompute(
             [
                 (dst, c.Add, l),
                 (dst + 1, c.Add, t),
@@ -221,13 +227,14 @@ def f_addloc(locID, *coords):
         _AddLoc4(locID * 5, *coords)
 
 
-def f_dilateloc(locID, *coords):
+def f_dilateloc(locID, *coords, action=False):
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),
     )
-    if isinstance(locID, str):
-        locID = c.GetLocationIndex(locID)
+    locID = c.EncodeLocation(locID)
+    if action is True:
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(locID))
     if c.IsConstExpr(locID):
         dst = _loct + 5 * locID
         if len(coords) == 2:
@@ -235,7 +242,9 @@ def f_dilateloc(locID, *coords):
             r, b = coords
         else:
             l, t, r, b = coords
-        c.SeqCompute(
+        if action is True:
+            return [c.SetMemoryEPD(dst + i, c.Add, x) for i, x in enumerate((-l, -t, r, b))]
+        c.NonSeqCompute(
             [
                 (dst, c.Add, -l),
                 (dst + 1, c.Add, -t),
@@ -251,10 +260,11 @@ def f_dilateloc(locID, *coords):
 
 @c.EUDFunc
 def _GetLocTL(epd):
-    epd += _loct
-    left = f_dwread_epd(epd)
-    epd += 1
-    f_dwread_epd(epd, ret=epd)
+    c.VProc(epd, [epd.AddNumber(_loct), epd.SetDest(ut.EPD(0x6509B0))])
+    left = f_dwread_cp(0)
+    c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
+    f_dwread_cp(0, ret=[epd])
+    f_setcurpl2cpcache()
     return left, epd
 
 
@@ -263,8 +273,7 @@ def f_getlocTL(locID, **kwargs):
     로케이션의 위(top), 왼쪽 (left) 좌표를 얻어냅니다.
     @param  {[type]} locID 로케이션 번호. $L(로케이션 이름) 으로 얻을 수 있습니다.
     """
-    if isinstance(locID, str):
-        locID = c.GetLocationIndex(locID)
+    locID = c.EncodeLocation(locID)
     return _GetLocTL(locID * 5, **kwargs)
 
 
