@@ -48,9 +48,8 @@ def _wwriter(epd, subp, w):
     cs.EUDSwitch(subp)
     for i in ut.RandList(range(3)):
         if cs.EUDSwitchCase()(i):
-            cs.DoActions(
-                c.SetDeathsX(c.CurrentPlayer, c.SetTo, _lshift(w, 8 * i), 0, 0xFFFF << (8 * i))
-            )
+            c.f_bitlshift(w, 8 * i, ret=[w])
+            cs.DoActions(c.SetDeathsX(c.CurrentPlayer, c.SetTo, w, 0, 0xFFFF << (8 * i)))
             cs.EUDBreak()
 
     # Things gets complicated on this case.
@@ -65,16 +64,66 @@ def _wwriter(epd, subp, w):
 
 
 def f_wwrite_epd(epd, subp, w):
-    if type(subp) is int:
+    if isinstance(subp, int) and isinstance(w, int):
         if subp == 3:
             return _wwriter(epd, subp, w)
-
-        try:
-            cs.DoActions(c.SetDeathsX(epd, c.SetTo, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp)))
-        except (TypeError):
-            _wwriter(epd, subp, w)
+        cs.DoActions(c.SetDeathsX(epd, c.SetTo, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp)))
     else:
         _wwriter(epd, subp, w)
+
+
+@c.EUDFunc
+def _wadder(epd, subp, w):
+    c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
+    cs.EUDSwitch(subp)
+    for i in ut.RandList(range(3)):
+        if cs.EUDSwitchCase()(i):
+            c.f_bitlshift(w, 8 * i, ret=[w])
+            cs.DoActions(c.SetDeathsX(c.CurrentPlayer, c.Add, w, 0, 0xFFFF << (8 * i)))
+            cs.EUDBreak()
+
+    # Not implemented yet
+    # if cs.EUDSwitchCase()(3):
+
+    cs.EUDEndSwitch()
+    cp.f_setcurpl2cpcache()
+
+
+def f_wadd_epd(epd, subp, w):
+    ut.ep_assert(isinstance(subp, int) and 0 <= subp <= 2)
+    if isinstance(subp, int) and isinstance(w, int):
+        if subp == 3:
+            return _wadder(epd, subp, w)
+        cs.DoActions(c.SetDeathsX(epd, c.Add, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp)))
+    else:
+        _wadder(epd, subp, w)
+
+
+@c.EUDFunc
+def _wsubtracter(epd, subp, w):
+    c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
+    cs.EUDSwitch(subp)
+    for i in ut.RandList(range(3)):
+        if cs.EUDSwitchCase()(i):
+            c.f_bitlshift(w, 8 * i, ret=[w])
+            cs.DoActions(c.SetDeathsX(c.CurrentPlayer, c.Subtract, w, 0, 0xFFFF << (8 * i)))
+            cs.EUDBreak()
+
+    # Not implemented yet
+    # if cs.EUDSwitchCase()(3):
+
+    cs.EUDEndSwitch()
+    cp.f_setcurpl2cpcache()
+
+
+def f_wsubtract_epd(epd, subp, w):
+    ut.ep_assert(isinstance(subp, int) and 0 <= subp <= 2)
+    if isinstance(subp, int) and isinstance(w, int):
+        if subp == 3:
+            return _wsubtracter(epd, subp, w)
+        cs.DoActions(c.SetDeathsX(epd, c.Subtract, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp)))
+    else:
+        _wsubtracter(epd, subp, w)
 
 
 @c.EUDFunc
@@ -93,10 +142,52 @@ def _bwriter(epd, subp, b):
 
 
 def f_bwrite_epd(epd, subp, b):
-    try:
+    if isinstance(subp, int) and isinstance(b, int):
         cs.DoActions(c.SetDeathsX(epd, c.SetTo, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp)))
-    except (TypeError):
+    else:
         _bwriter(epd, subp, b)
+
+
+@c.EUDFunc
+def _badder(epd, subp, b):
+    c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
+    cs.EUDSwitch(subp)
+    for i in ut.RandList(range(4)):
+        if cs.EUDSwitchCase()(i):
+            c.f_bitlshift(b, 8 * i, ret=[b])
+            cs.DoActions(c.SetDeathsX(c.CurrentPlayer, c.Add, b, 0, 0xFF << (8 * i)))
+            cs.EUDBreak()
+    cs.EUDEndSwitch()
+    cp.f_setcurpl2cpcache()
+    return b
+
+
+def f_badd_epd(epd, subp, b):
+    if isinstance(subp, int) and isinstance(b, int):
+        cs.DoActions(c.SetDeathsX(epd, c.Add, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp)))
+    else:
+        _bwriter(epd, subp, b)
+
+
+@c.EUDFunc
+def _bsubtracter(epd, subp, b):
+    c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
+    cs.EUDSwitch(subp)
+    for i in ut.RandList(range(4)):
+        if cs.EUDSwitchCase()(i):
+            c.f_bitlshift(b, 8 * i, ret=[b])
+            cs.DoActions(c.SetDeathsX(c.CurrentPlayer, c.Subtract, b, 0, 0xFF << (8 * i)))
+            cs.EUDBreak()
+    cs.EUDEndSwitch()
+    cp.f_setcurpl2cpcache()
+    return b
+
+
+def f_bsubtract_epd(epd, subp, b):
+    if isinstance(subp, int) and isinstance(b, int):
+        cs.DoActions(c.SetDeathsX(epd, c.Subtract, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp)))
+    else:
+        _bsubtracter(epd, subp, b)
 
 
 # -----------------------------

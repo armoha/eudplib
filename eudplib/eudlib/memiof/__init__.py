@@ -24,10 +24,14 @@ THE SOFTWARE.
 """
 
 from .bwepdio import (
+    f_badd_epd,
     f_bread_epd,
+    f_bsubtract_epd,
     f_bwrite_epd,
     f_maskwrite_epd,
+    f_wadd_epd,
     f_wread_epd,
+    f_wsubtract_epd,
     f_wwrite_epd,
 )
 from .byterw import EUDByteReader, EUDByteStream, EUDByteWriter
