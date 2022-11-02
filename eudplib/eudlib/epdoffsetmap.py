@@ -26,8 +26,6 @@ THE SOFTWARE.
 
 import functools
 import traceback
-from collections.abc import Mapping, Sequence
-from typing import Union
 
 from .. import core as c
 from .. import ctrlstru as cs
@@ -35,7 +33,9 @@ from .. import utils as ut
 from ..localize import _
 from .locf import f_setloc_epd
 from .memiof import (
+    f_badd_epd,
     f_bread_epd,
+    f_bsubtract_epd,
     f_bwrite_epd,
     f_cunitepdread_epd,
     f_cunitread_epd,
@@ -50,11 +50,30 @@ from .memiof import (
     f_posread_epd,
     f_spriteepdread_epd,
     f_spriteread_epd,
+    f_wadd_epd,
     f_wread_epd,
+    f_wsubtract_epd,
     f_wwrite_epd,
 )
 
-rwdict = {2: (f_wread_epd, f_wwrite_epd), 1: (f_bread_epd, f_bwrite_epd)}
+rdict = {1: f_bread_epd, 2: f_wread_epd, 4: lambda epd, _: f_dwread_epd(epd)}
+wdict = {
+    1: {
+        c.SetTo: f_bwrite_epd,
+        c.Add: f_badd_epd,
+        c.Subtract: f_bsubtract_epd,
+    },
+    2: {
+        c.SetTo: f_wwrite_epd,
+        c.Add: f_wadd_epd,
+        c.Subtract: f_wsubtract_epd,
+    },
+    4: {
+        c.SetTo: lambda epd, _, value: f_dwwrite_epd(epd, value),
+        c.Add: lambda epd, _, value: f_dwadd_epd(epd, value),
+        c.Subtract: lambda epd, _, value: f_dwsubtract_epd(epd, value),
+    },
+}
 
 
 def _checkEPDAddr(epd):
@@ -63,30 +82,38 @@ def _checkEPDAddr(epd):
         traceback.print_stack()
 
 
-# @functools.lru_cache(None)
-def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
-    """dictionary of "name": (size, offset) pairs
+@functools.lru_cache(None)
+def EPDOffsetMap(ct: tuple[tuple[str, int, int | type | str], ...]):
+    """Tuple of (name, offset, type) pairs
 
-    size: 1, 2, 4 or bool, "cunit", "sprite", "pos"
+    name: str
     offset: int
+    type: 1, 2, 4 or type, "CUnit", "CSprite", "Position"
+    (example: bool, TrgPlayer, TrgUnit)
     """
-    bytesizes = {
+    typemap = {
         4: 4,
         2: 2,
         1: 1,
         bool: 1,
-        "cunit": 4,
-        "sprite": 4,
-        "pos": 4,
+        "CUnit": 4,
+        "CSprite": 4,
+        "Position": 4,
+        "PositionX": 2,
+        "PositionY": 2,
+        c.Flingy: 2,
+        c.TrgPlayer: 1,
+        c.TrgUnit: 2,
+        c.UnitOrder: 1,
+        c.Upgrade: 1,
+        c.Tech: 1,
     }
 
     addrTable = {}
-    for name in ct:
-        items = ct[name]
-        kind, offset = items[0], items[1]
-        if kind not in (4, 2, 1, bool, "cunit", "sprite", "pos"):
-            raise ut.EPError(_("EPDOffsetMap member size should be in 4, 2, 1"))
-        size = bytesizes[kind]
+    for name, offset, kind in ct:
+        if kind not in typemap:
+            raise ut.EPError(_("Invalid EPDOffsetMap member type: {}").format(kind))
+        size = typemap[kind]
         if offset % size != 0:
             raise ut.EPError(_("EPDOffsetMap members should be aligned"))
         addrTable[name] = (kind, size, offset)
@@ -104,23 +131,21 @@ def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
                 raise AttributeError from e
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
-            if kind == "cunit":
+            if kind == "CUnit":
                 return f_cunitepdread_epd(epd)
-            if kind == "sprite":
+            if kind == "CSprite":
                 return f_epdspriteread_epd(epd)
-            if size == 4:
-                return f_dwread_epd(epd)
             if kind == bool:
                 return f_maskread_epd(epd, 1 << (8 * subp))
-            return rwdict[size][0](epd, subp)
+            return rdict[size](epd, subp)
 
         def getepd(self, name):
             kind, size, offset = addrTable[name]
             ut.ep_assert(size == 4, _("Only dword can be read as epd"))
             epd = self._epd + offset // 4
-            if kind == "cunit":
+            if kind == "CUnit":
                 return f_epdcunitread_epd(epd)
-            if kind == "sprite":
+            if kind == "CSprite":
                 return f_epdspriteread_epd(epd)
             return f_epdread_epd(epd)
 
@@ -128,9 +153,9 @@ def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
             kind, size, offset = addrTable[name]
             ut.ep_assert(size == 4, _("Only dword can be read as epd"))
             epd = self._epd + offset // 4
-            if kind == "cunit":
+            if kind == "CUnit":
                 return f_cunitepdread_epd(epd)
-            if kind == "sprite":
+            if kind == "CSprite":
                 return f_spriteepdread_epd(epd)
             return f_dwepdread_epd(epd)
 
@@ -147,211 +172,328 @@ def EPDOffsetMap(ct: Mapping[str, Sequence[Union[int, str, type]]]):
             kind, size, offset = addrTable[name]
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
-            if size == 4:
-                return f_dwwrite_epd(epd, value)
-            return rwdict[size][1](epd, subp, value)
+            try:
+                value = kind.cast(value)
+            except AttributeError:
+                pass
+            return wdict[size][c.SetTo](epd, subp, value)
+
+        def iaddattr(self, name, value):
+            kind, size, offset = addrTable[name]
+            offsetEPD, subp = divmod(offset, 4)
+            epd = self._epd + offsetEPD
+            try:
+                value = kind.cast(value)
+            except AttributeError:
+                pass
+            return wdict[size][c.Add](epd, subp, value)
+
+        # TODO: add operator for Subtract
+        def isubtractattr(self, name, value):
+            kind, size, offset = addrTable[name]
+            offsetEPD, subp = divmod(offset, 4)
+            epd = self._epd + offsetEPD
+            try:
+                value = kind.cast(value)
+            except AttributeError:
+                pass
+            return wdict[size][c.Subtract](epd, subp, value)
+
+        def isubattr(self, name, value):
+            kind, size, offset = addrTable[name]
+            offsetEPD, subp = divmod(offset, 4)
+            epd = self._epd + offsetEPD
+            try:
+                value = kind.cast(value)
+            except AttributeError:
+                pass
+            return wdict[size][c.Add](epd, subp, -value)
+
+        def imulattr(self, name, value):
+            raise AttributeError
+
+        def ifloordivattr(self, name, value):
+            raise AttributeError
+
+        def imodattr(self, name, value):
+            raise AttributeError
+
+        def ilshiftattr(self, name, value):
+            raise AttributeError
+
+        def irshiftattr(self, name, value):
+            raise AttributeError
+
+        def ipowattr(self, name, value):
+            raise AttributeError
+
+        def iandattr(self, name, value):
+            raise AttributeError
+
+        def iorattr(self, name, value):
+            raise AttributeError
+
+        def ixorattr(self, name, value):
+            raise AttributeError
+
+        # FIXME: Add operator for x[i] = ~x[i]
+        def iinvertattr(self, name, value):
+            raise AttributeError
+
+        # Attribute comparisons
+
+        def eqattr(self, name, value):
+            kind, size, offset = addrTable[name]
+            offsetEPD, subp = divmod(offset, 4)
+            epd = self._epd + offsetEPD
+            mask = ((1 << (8 * size)) - 1) << (8 * subp)
+            try:
+                value = kind.cast(value)
+            except AttributeError:
+                pass
+            if subp == 0:
+                return c.MemoryXEPD(epd, c.Exactly, value, mask)
+            else:
+                return c.MemoryXEPD(epd, c.Exactly, c.f_bitlshift(value, 8 * subp), mask)
+
+        def neattr(self, name, value):
+            raise AttributeError
+
+        def leattr(self, name, value):
+            kind, size, offset = addrTable[name]
+            offsetEPD, subp = divmod(offset, 4)
+            epd = self._epd + offsetEPD
+            mask = ((1 << (8 * size)) - 1) << (8 * subp)
+            try:
+                value = kind.cast(value)
+            except AttributeError:
+                pass
+            if subp == 0:
+                return c.MemoryXEPD(epd, c.AtMost, value, mask)
+            else:
+                return c.MemoryXEPD(epd, c.AtMost, c.f_bitlshift(value, 8 * subp), mask)
+
+        def geattr(self, name, value):
+            kind, size, offset = addrTable[name]
+            offsetEPD, subp = divmod(offset, 4)
+            epd = self._epd + offsetEPD
+            mask = ((1 << (8 * size)) - 1) << (8 * subp)
+            try:
+                value = kind.cast(value)
+            except AttributeError:
+                pass
+            if subp == 0:
+                return c.MemoryXEPD(epd, c.AtLeast, value, mask)
+            else:
+                return c.MemoryXEPD(epd, c.AtLeast, c.f_bitlshift(value, 8 * subp), mask)
+
+        def ltattr(self, name, value):
+            raise AttributeError
+
+        def gtattr(self, name, value):
+            raise AttributeError
 
     return OffsetMap
 
 
 class EPDCUnitMap(
     # fmt: off
-    EPDOffsetMap({
-        "prev": ("cunit", 0x000), "next": ("cunit", 0x004),
-        "hp": (4, 0x008), "hitPoints": (4, 0x008),
-        "sprite": ("sprite", 0x00C),
-        "moveTargetXY": ("pos", 0x010), "moveTargetPosition": ("pos", 0x010),
-        "moveTargetX": (2, 0x010), "moveTargetY": (2, 0x012),
-        "moveTarget": ("cunit", 0x014), "moveTargetUnit": ("cunit", 0x014),
-        "nextMovementWaypoint": ("pos", 0x018),
-        "nextTargetWaypoint": ("pos", 0x01C),
-        "movementFlags": (1, 0x020),
-        "direction": (1, 0x021), "currentDirection1": (1, 0x021),
-        "flingyTurnRadius": (1, 0x022),
-        "velocityDirection1": (1, 0x023),
-        "flingyID": (2, 0x024),
-        "_unknown_0x026": (1, 0x026),
-        "flingyMovementType": (1, 0x027),
-        "pos": ("pos", 0x028), "position": ("pos", 0x028),
-        "posX": (2, 0x028), "positionX": (2, 0x028),
-        "posY": (2, 0x02A), "positionY": (2, 0x02A),
-        "haltX": (4, 0x02C), "haltY": (4, 0x030),
-        "topSpeed": (4, 0x034), "flingyTopSpeed": (4, 0x034),
-        "current_speed1": (4, 0x038), "current_speed2": (4, 0x03C),
-        "current_speedX": (4, 0x040), "current_speedY": (4, 0x044),
-        "flingyAcceleration": (2, 0x048),
-        "currentDirection2": (1, 0x04A),
-        "velocityDirection2": (1, 0x04B),
-        "owner": (1, 0x04C), "playerID": (1, 0x04C),
-        "order": (1, 0x04D), "orderID": (1, 0x04D),
-        "orderState": (1, 0x04E), "orderSignal": (1, 0x04F),
-        "orderUnitType": (2, 0x050),
-        "cooldown": (4, 0x054),
-        "orderTimer": (1, 0x054), "mainOrderTimer": (1, 0x054),
-        "gCooldown": (1, 0x055), "groundWeaponCooldown": (1, 0x055),
-        "aCooldown": (1, 0x056), "airWeaponCooldown": (1, 0x056),
-        "spellCooldown": (1, 0x057),
-        "orderTargetXY": ("pos", 0x058), "orderTargetPosition": ("pos", 0x058),
-        "orderTargetX": (2, 0x058), "orderTargetY": (2, 0x05A),
-        "orderTarget": ("cunit", 0x05C), "orderTargetUnit": ("cunit", 0x05C),
-        "shield": (4, 0x060), "shieldPoints": (4, 0x060),
-        "unitId": (2, 0x064), "unitType": (2, 0x064),
-        "previousPlayerUnit": ("cunit", 0x068),
-        "nextPlayerUnit": ("cunit", 0x06C),
-        "subUnit": ("cunit", 0x070),
-        "orderQHead": (4, 0x074), "orderQueueHead": (4, 0x074),  # COrder
-        "orderQTail": (4, 0x078), "orderQueueTail": (4, 0x078),
-        "autoTargetUnit": ("cunit", 0x07C),
-        "connectedUnit": ("cunit", 0x080),
-        "orderQCount": (1, 0x084), "orderQueueCount": (1, 0x084),
-        "orderQTimer": (1, 0x085), "orderQueueTimer": (1, 0x085),
-        "_unknown_0x086": (1, 0x086),
-        "attackNotifyTimer": (1, 0x087),
-        "previousUnitType": (2, 0x088),
-        "lastEventTimer": (1, 0x08A),
-        "lastEventColor": (1, 0x08B),
-        "_unused_0x08C": (2, 0x08C),
-        "rankIncrease": (1, 0x08E),
-        "killCount": (1, 0x08F),
-        "lastAttackingPlayer": (1, 0x090),
-        "secondaryOrderTimer": (1, 0x091),
-        "AIActionFlag": (1, 0x092),
-        "userActionFlags": (1, 0x093),
-        "currentButtonSet": (2, 0x094),
-        "isCloaked": (bool, 0x096),
-        "movementState": (1, 0x097),
-        "buildQ12": (4, 0x098),
-        "buildQ1": (2, 0x098), "buildQueue1": (2, 0x098),
-        "buildQ2": (2, 0x09A), "buildQueue2": (2, 0x09A),
-        "buildQ34": (4, 0x09C),
-        "buildQ3": (2, 0x09C), "buildQueue3": (2, 0x09C),
-        "buildQ4": (2, 0x09E), "buildQueue4": (2, 0x09E),
-        "buildQ5": (2, 0x0A0), "buildQueue5": (2, 0x0A0),
-        "energy": (2, 0x0A2),
-        "buildQueueSlot": (1, 0x0A4),
-        "uniquenessIdentifier": (1, 0x0A5),
-        "secondaryOrder": (1, 0x0A6), "secondaryOrderID": (1, 0x0A6),
-        "buildingOverlayState": (1, 0x0A7),
-        "hpGain": (2, 0x0A8),
-        "shieldGain": (2, 0x0AA),
-        "remainingBuildTime": (2, 0x0AC),
-        "previousHP": (2, 0x0AE),
-        "loadedUnitIndex0": (2, 0x0B0),
-        "loadedUnitIndex1": (2, 0x0B2),
-        "loadedUnitIndex2": (2, 0x0B4),
-        "loadedUnitIndex3": (2, 0x0B6),
-        "loadedUnitIndex4": (2, 0x0B8),
-        "loadedUnitIndex5": (2, 0x0BA),
-        "loadedUnitIndex6": (2, 0x0BC),
-        "loadedUnitIndex7": (2, 0x0BE),
+    EPDOffsetMap((
+        ("prev", 0x000, "CUnit"), ("next", 0x004, "CUnit"),
+        ("hp", 0x008, 4), ("hitPoints", 0x008, 4),
+        ("sprite", 0x00C, "CSprite"),
+        ("moveTargetXY", 0x010, "Position"), ("moveTargetPosition", 0x010, "Position"),
+        ("moveTargetX", 0x010, "PositionX"), ("moveTargetY", 0x012, "PositionY"),
+        ("moveTarget", 0x014, "CUnit"), ("moveTargetUnit", 0x014, "CUnit"),
+        ("nextMovementWaypoint", 0x018, "Position"),
+        ("nextTargetWaypoint", 0x01C, "Position"),
+        ("movementFlags", 0x020, 1),
+        ("direction", 0x021, 1), ("currentDirection1", 0x021, 1),
+        ("flingyTurnRadius", 0x022, 1),
+        ("velocityDirection1", 0x023, 1),
+        ("flingyID", 0x024, c.Flingy),
+        ("_unknown_0x026", 0x026, 1),
+        ("flingyMovementType", 0x027, 1),
+        ("pos", 0x028, "Position"), ("position", 0x028, "Position"),
+        ("posX", 0x028, "PositionX"), ("positionX", 0x028, "PositionX"),
+        ("posY", 0x02A, "PositionY"), ("positionY", 0x02A, "PositionY"),
+        ("haltX", 0x02C, 4), ("haltY", 0x030, 4),
+        ("topSpeed", 0x034, 4), ("flingyTopSpeed", 0x034, 4),
+        ("current_speed1", 0x038, 4), ("current_speed2", 0x03C, 4),
+        ("current_speedX", 0x040, 4), ("current_speedY", 0x044, 4),
+        ("flingyAcceleration", 0x048, 2),
+        ("currentDirection2", 0x04A, 1),
+        ("velocityDirection2", 0x04B, 1),
+        ("owner", 0x04C, c.TrgPlayer), ("playerID", 0x04C, c.TrgPlayer),
+        ("order", 0x04D, 1), ("orderID", 0x04D, 1),
+        ("orderState", 0x04E, 1), ("orderSignal", 0x04F, 1),
+        ("orderUnitType", 0x050, c.TrgUnit),
+        ("cooldown", 0x054, 4),
+        ("orderTimer", 0x054, 1), ("mainOrderTimer", 0x054, 1),
+        ("gCooldown", 0x055, 1), ("groundWeaponCooldown", 0x055, 1),
+        ("aCooldown", 0x056, 1), ("airWeaponCooldown", 0x056, 1),
+        ("spellCooldown", 0x057, 1),
+        ("orderTargetXY", 0x058, "Position"), ("orderTargetPosition", 0x058, "Position"),
+        ("orderTargetX", 0x058, "PositionX"), ("orderTargetY", 0x05A, "PositionY"),
+        ("orderTarget", 0x05C, "CUnit"), ("orderTargetUnit", 0x05C, "CUnit"),
+        ("shield", 0x060, 4), ("shieldPoints", 0x060, 4),
+        ("unitId", 0x064, c.TrgUnit), ("unitType", 0x064, c.TrgUnit),
+        ("previousPlayerUnit", 0x068, "CUnit"),
+        ("nextPlayerUnit", 0x06C, "CUnit"),
+        ("subUnit", 0x070, "CUnit"),
+        ("orderQHead", 0x074, 4), ("orderQueueHead", 0x074, 4),  # COrder
+        ("orderQTail", 0x078, 4), ("orderQueueTail", 0x078, 4),
+        ("autoTargetUnit", 0x07C, "CUnit"),
+        ("connectedUnit", 0x080, "CUnit"),
+        ("orderQCount", 0x084, 1), ("orderQueueCount", 0x084, 1),
+        ("orderQTimer", 0x085, 1), ("orderQueueTimer", 0x085, 1),
+        ("_unknown_0x086", 0x086, 1),
+        ("attackNotifyTimer", 0x087, 1),
+        ("previousUnitType", 0x088, c.TrgUnit),
+        ("lastEventTimer", 0x08A, 1),
+        ("lastEventColor", 0x08B, 1),
+        ("_unused_0x08C", 0x08C, 2),
+        ("rankIncrease", 0x08E, 1),
+        ("killCount", 0x08F, 1),
+        ("lastAttackingPlayer", 0x090, c.TrgPlayer),
+        ("secondaryOrderTimer", 0x091, 1),
+        ("AIActionFlag", 0x092, 1),
+        ("userActionFlags", 0x093, 1),
+        ("currentButtonSet", 0x094, 2),
+        ("isCloaked", 0x096, bool),
+        ("movementState", 0x097, 1),
+        ("buildQ12", 0x098, 4),
+        ("buildQ1", 0x098, c.TrgUnit), ("buildQueue1", 0x098, c.TrgUnit),
+        ("buildQ2", 0x09A, c.TrgUnit), ("buildQueue2", 0x09A, c.TrgUnit),
+        ("buildQ34", 0x09C, 4),
+        ("buildQ3", 0x09C, c.TrgUnit), ("buildQueue3", 0x09C, c.TrgUnit),
+        ("buildQ4", 0x09E, c.TrgUnit), ("buildQueue4", 0x09E, c.TrgUnit),
+        ("buildQ5", 0x0A0, c.TrgUnit), ("buildQueue5", 0x0A0, c.TrgUnit),
+        ("energy", 0x0A2, 2),
+        ("buildQueueSlot", 0x0A4, 1),
+        ("uniquenessIdentifier", 0x0A5, 1),
+        ("secondaryOrder", 0x0A6, 1), ("secondaryOrderID", 0x0A6, 1),
+        ("buildingOverlayState", 0x0A7, 1),
+        ("hpGain", 0x0A8, 2),
+        ("shieldGain", 0x0AA, 2),
+        ("remainingBuildTime", 0x0AC, 2),
+        ("previousHP", 0x0AE, 2),
+        ("loadedUnitIndex0", 0x0B0, 2),  # alphaID
+        ("loadedUnitIndex1", 0x0B2, 2),
+        ("loadedUnitIndex2", 0x0B4, 2),
+        ("loadedUnitIndex3", 0x0B6, 2),
+        ("loadedUnitIndex4", 0x0B8, 2),
+        ("loadedUnitIndex5", 0x0BA, 2),
+        ("loadedUnitIndex6", 0x0BC, 2),
+        ("loadedUnitIndex7", 0x0BE, 2),
         # 0x0C0 union, vulture
-        "mineCount": (1, 0x0C0), "spiderMineCount": (1, 0x0C0),
-        "pInHanger": ("cunit", 0x0C0),
-        "pOutHanger": ("cunit", 0x0C4),
-        "inHangerCount": (1, 0x0C8),
-        "outHangerCount": (1, 0x0C9),  # carrier
-        "parent": ("cunit", 0x0C0),
-        "prevFighter": ("cunit", 0x0C4),
-        "nextFighter": ("cunit", 0x0C8),
-        "inHanger": (bool, 0x0CC),  # fighter
-        "_unknown_00": (4, 0x0C0),
-        "_unknown_04": (4, 0x0C4),
-        "flagSpawnFrame": (4, 0x0C8),  # beacon
-        "addon": ("cunit", 0x0C0),
-        "addonBuildType": (2, 0x0C4),
-        "upgradeResearchTime": (2, 0x0C6),
-        "techType": (1, 0x0C8), "upgradeType": (1, 0x0C9),
-        "larvaTimer": (1, 0x0CA),
-        "landingTimer": (1, 0x0CB),
-        "creepTimer": (1, 0x0CC),
-        "upgradeLevel": (1, 0x0CD),
-        "__E": (2, 0x0CE),  # building
-        "pPowerup": ("cunit", 0x0C0),
-        "targetResourcePosition": ("pos", 0x0C4),
-        "targetResourceX": (2, 0x0C4), "targetResourceY": (2, 0x0C6),
-        "targetResourceUnit": ("cunit", 0x0C8),
-        "repairResourceLossTimer": (2, 0x0CC),
-        "isCarryingSomething": (bool, 0x0CE),
-        "resourceCarryCount": (1, 0x0CF),  # worker
-        "resourceCount": (2, 0x0D0),  # 0x0D0 union
-        "resourceIscript": (1, 0x0D2),
-        "gatherQueueCount": (1, 0x0D3),
-        "nextGatherer": ("cunit", 0x0D4),
-        "resourceGroup": (1, 0x0D8), "resourceBelongsToAI": (1, 0x0D9),
-        "exit": ("cunit", 0x0D0), "nydusExit": ("cunit", 0x0D0),
-        "nukeDot": ("sprite", 0x0D0),  # ghost
-        "pPowerTemplate": ("sprite", 0x0D0),  # Pylon
-        "pNuke": ("cunit", 0x0D0),
-        "bReady": (bool, 0x0D4),  # silo
-        "harvestValueLU": (4, 0x0D0),  # hatchery
-        "harvestValueL": (2, 0x0D0), "harvestValueU": (2, 0x0D2),
-        "harvestValueRB": (4, 0x0D4),
-        "harvestValueR": (2, 0x0D4), "harvestValueB": (2, 0x0D6),
-        "originXY": ("pos", 0x0D0), "origin": ("pos", 0x0D0),
-        "originX": (2, 0x0D0), "originY": (2, 0x0D2),  # powerup
-        "harvestTarget": ("cunit", 0x0D0),
-        "prevHarvestUnit": ("cunit", 0x0D4),
-        "nextHarvestUnit": ("cunit", 0x0D8),  # gatherer
-        "statusFlags": (4, 0x0DC),
-        "resourceType": (1, 0x0E0),
-        "wireframeRandomizer": (1, 0x0E1),
-        "secondaryOrderState": (1, 0x0E2),
-        "recentOrderTimer": (1, 0x0E3),
-        "visibilityStatus": (4, 0x0E4),
-        "secondaryOrderPosition": ("pos", 0x0E8),
-        "secondaryOrderX": (2, 0x0E8), "secondaryOrderY": (2, 0x0EA),
-        "currentBuildUnit": ("cunit", 0x0EC),
-        "previousBurrowedUnit": ("cunit", 0x0F0),
-        "nextBurrowedUnit": ("cunit", 0x0F4),
-        "rallyXY": ("pos", 0x0F8), "rallyPosition": ("pos", 0x0F8),
-        "rallyX": (2, 0x0F8), "rallyY": (2, 0x0FA),
-        "rallyUnit": ("cunit", 0x0FC),
-        "prevPsiProvider": ("cunit", 0x0F8),
-        "nextPsiProvider": ("cunit", 0x0FC),
-        "path": (4, 0x100),
-        "pathingCollisionInterval": (1, 0x104),
-        "pathingFlags": (1, 0x105),
-        "_unused_0x106": (1, 0x106),
-        "isBeingHealed": (bool, 0x107),
-        "contourBoundsLU": (4, 0x108),
-        "contourBoundsL": (2, 0x108), "contourBoundsU": (2, 0x10A),
-        "contourBoundsRB": (4, 0x10C),
-        "contourBoundsR": (2, 0x10C), "contourBoundsB": (2, 0x10E),
+        ("mineCount", 0x0C0, 1), ("spiderMineCount", 0x0C0, 1),
+        ("pInHanger", 0x0C0, "CUnit"),
+        ("pOutHanger", 0x0C4, "CUnit"),
+        ("inHangerCount", 0x0C8, 1),
+        ("outHangerCount", 0x0C9, 1),  # carrier
+        ("parent", 0x0C0, "CUnit"),
+        ("prevFighter", 0x0C4, "CUnit"),
+        ("nextFighter", 0x0C8, "CUnit"),
+        ("inHanger", 0x0CC, bool),  # fighter
+        ("_unknown_00", 0x0C0, 4),
+        ("_unknown_04", 0x0C4, 4),
+        ("flagSpawnFrame", 0x0C8, 4),  # beacon
+        ("addon", 0x0C0, "CUnit"),
+        ("addonBuildType", 0x0C4, c.TrgUnit),
+        ("upgradeResearchTime", 0x0C6, 2),
+        ("techType", 0x0C8, c.Tech), ("upgradeType", 0x0C9, c.Upgrade),
+        ("larvaTimer", 0x0CA, 1),
+        ("landingTimer", 0x0CB, 1),
+        ("creepTimer", 0x0CC, 1),
+        ("upgradeLevel", 0x0CD, 1),
+        ("__E", 0x0CE, 2),  # building
+        ("pPowerup", 0x0C0, "CUnit"),
+        ("targetResourcePosition", 0x0C4, "Position"),
+        ("targetResourceX", 0x0C4, 2), ("targetResourceY", 0x0C6, 2),
+        ("targetResourceUnit", 0x0C8, "CUnit"),
+        ("repairResourceLossTimer", 0x0CC, 2),
+        ("isCarryingSomething", 0x0CE, bool),
+        ("resourceCarryCount", 0x0CF, 1),  # worker
+        ("resourceCount", 0x0D0, 2),  # 0x0D0 union
+        ("resourceIscript", 0x0D2, 1),
+        ("gatherQueueCount", 0x0D3, 1),
+        ("nextGatherer", 0x0D4, "CUnit"),
+        ("resourceGroup", 0x0D8, 1), ("resourceBelongsToAI", 0x0D9, 1),
+        ("exit", 0x0D0, "CUnit"), ("nydusExit", 0x0D0, "CUnit"),
+        ("nukeDot", 0x0D0, "CSprite"),  # ghost
+        ("pPowerTemplate", 0x0D0, "CSprite"),  # Pylon
+        ("pNuke", 0x0D0, "CUnit"),
+        ("bReady", 0x0D4, bool),  # silo
+        ("harvestValueLU", 0x0D0, 4),  # hatchery
+        ("harvestValueL", 0x0D0, 2), ("harvestValueU", 0x0D2, 2),
+        ("harvestValueRB", 0x0D4, 4),
+        ("harvestValueR", 0x0D4, 2), ("harvestValueB", 0x0D6, 2),
+        ("originXY", 0x0D0, "Position"), ("origin", 0x0D0, "Position"),
+        ("originX", 0x0D0, 2), ("originY", 0x0D2, 2),  # powerup
+        ("harvestTarget", 0x0D0, "CUnit"),
+        ("prevHarvestUnit", 0x0D4, "CUnit"),
+        ("nextHarvestUnit", 0x0D8, "CUnit"),  # gatherer
+        ("statusFlags", 0x0DC, 4),
+        ("resourceType", 0x0E0, 1),
+        ("wireframeRandomizer", 0x0E1, 1),
+        ("secondaryOrderState", 0x0E2, 1),
+        ("recentOrderTimer", 0x0E3, 1),
+        ("visibilityStatus", 0x0E4, 4),
+        ("secondaryOrderPosition", 0x0E8, "Position"),
+        ("secondaryOrderX", 0x0E8, 2), ("secondaryOrderY", 0x0EA, 2),
+        ("currentBuildUnit", 0x0EC, "CUnit"),
+        ("previousBurrowedUnit", 0x0F0, "CUnit"),
+        ("nextBurrowedUnit", 0x0F4, "CUnit"),
+        ("rallyXY", 0x0F8, "Position"), ("rallyPosition", 0x0F8, "Position"),
+        ("rallyX", 0x0F8, 2), ("rallyY", 0x0FA, 2),
+        ("rallyUnit", 0x0FC, "CUnit"),
+        ("prevPsiProvider", 0x0F8, "CUnit"),
+        ("nextPsiProvider", 0x0FC, "CUnit"),
+        ("path", 0x100, 4),
+        ("pathingCollisionInterval", 0x104, 1),
+        ("pathingFlags", 0x105, 1),
+        ("_unused_0x106", 0x106, 1),
+        ("isBeingHealed", 0x107, bool),
+        ("contourBoundsLU", 0x108, 4),
+        ("contourBoundsL", 0x108, 2), ("contourBoundsU", 0x10A, 2),
+        ("contourBoundsRB", 0x10C, 4),
+        ("contourBoundsR", 0x10C, 2), ("contourBoundsB", 0x10E, 2),
         # status
-        "removeTimer": (2, 0x110),
-        "matrixDamage": (2, 0x112), "defenseMatrixDamage": (2, 0x112),
-        "matrixTimer": (1, 0x114), "defenseMatrixTimer": (1, 0x114),
-        "stimTimer": (1, 0x115),
-        "ensnareTimer": (1, 0x116),
-        "lockdownTimer": (1, 0x117),
-        "irradiateTimer": (1, 0x118),
-        "stasisTimer": (1, 0x119),
-        "plagueTimer": (1, 0x11A),
-        "stormTimer": (1, 0x11B),
-        "irradiatedBy": ("cunit", 0x11C),
-        "irradiatePlayerID": (1, 0x120),
-        "parasiteFlags": (1, 0x121),
-        "cycleCounter": (1, 0x122),
-        "isBlind": (bool, 0x123),
-        "maelstromTimer": (1, 0x124),
-        "_unused_0x125": (1, 0x125),
-        "acidSporeCount": (1, 0x126),
-        "acidSporeTime0": (1, 0x127),
-        "acidSporeTime1": (1, 0x128),
-        "acidSporeTime2": (1, 0x129),
-        "acidSporeTime3": (1, 0x12A),
-        "acidSporeTime4": (1, 0x12B),
-        "acidSporeTime5": (1, 0x12C),
-        "acidSporeTime6": (1, 0x12D),
-        "acidSporeTime7": (1, 0x12E),
-        "acidSporeTime8": (1, 0x12F),
-        "bulletBehaviour3by3AttackSequence": (2, 0x130),
-        "pAI": (4, 0x134),
-        "airStrength": (2, 0x138), "groundStrength": (2, 0x13A),
-        "_repulseUnknown": (1, 0x14C), "repulseAngle": (1, 0x14D),
-        "bRepMtxXY": (2, 0x14E),
-        "bRepMtxX": (1, 0x14E), "bRepMtxY": (1, 0x14F),
-    })
+        ("removeTimer", 0x110, 2),
+        ("matrixDamage", 0x112, 2), ("defenseMatrixDamage", 0x112, 2),
+        ("matrixTimer", 0x114, 1), ("defenseMatrixTimer", 0x114, 1),
+        ("stimTimer", 0x115, 1),
+        ("ensnareTimer", 0x116, 1),
+        ("lockdownTimer", 0x117, 1),
+        ("irradiateTimer", 0x118, 1),
+        ("stasisTimer", 0x119, 1),
+        ("plagueTimer", 0x11A, 1),
+        ("stormTimer", 0x11B, 1),
+        ("irradiatedBy", 0x11C, "CUnit"),
+        ("irradiatePlayerID", 0x120, 1),
+        ("parasiteFlags", 0x121, 1),
+        ("cycleCounter", 0x122, 1),
+        ("isBlind", 0x123, bool),
+        ("maelstromTimer", 0x124, 1),
+        ("_unused_0x125", 0x125, 1),
+        ("acidSporeCount", 0x126, 1),
+        ("acidSporeTime0", 0x127, 1),
+        ("acidSporeTime1", 0x128, 1),
+        ("acidSporeTime2", 0x129, 1),
+        ("acidSporeTime3", 0x12A, 1),
+        ("acidSporeTime4", 0x12B, 1),
+        ("acidSporeTime5", 0x12C, 1),
+        ("acidSporeTime6", 0x12D, 1),
+        ("acidSporeTime7", 0x12E, 1),
+        ("acidSporeTime8", 0x12F, 1),
+        ("bulletBehaviour3by3AttackSequence", 0x130, 2),
+        ("pAI", 0x134, 4),
+        ("airStrength", 0x138, 2), ("groundStrength", 0x13A, 2),
+        ("_repulseUnknown", 0x14C, 1), ("repulseAngle", 0x14D, 1),
+        ("bRepMtxXY", 0x14E, 2),
+        ("bRepMtxX", 0x14E, 1), ("bRepMtxY", 0x14F, 1),
+    ))
     # fmt: on
 ):
     def set_color(self, player):
