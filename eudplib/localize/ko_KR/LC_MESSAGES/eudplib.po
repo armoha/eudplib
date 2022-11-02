@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: eudplib 0.64.0\n"
-"POT-Creation-Date: 2022-10-17 16:42+0900\n"
-"PO-Revision-Date: 2022-10-17 16:43+0900\n"
+"POT-Creation-Date: 2022-11-03 03:51+0900\n"
+"PO-Revision-Date: 2022-11-03 03:52+0900\n"
 "Last-Translator: Armoha <kein0011@naver.com>\n"
 "Language-Team: \n"
 "Language: ko\n"
@@ -21,15 +21,15 @@ msgstr ""
 msgid "Address not divisible; {} is not a factor of {}"
 msgstr "주소가 나누어 떨어지지 않습니다; {}는 {}의 약수가 아닙니다"
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:171
+#: E:\eudplib\eudplib\core\allocator\constexpr.py:169
 msgid "Reforwarding without reset is not allowed"
 msgstr "Forward를 .Reset()하지 않고 재설정할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:172
+#: E:\eudplib\eudplib\core\allocator\constexpr.py:170
 msgid "Cannot forward to None"
 msgstr "Forward를 None으로 설정할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:186
+#: E:\eudplib\eudplib\core\allocator\constexpr.py:184
 msgid "Forward not initialized"
 msgstr ""
 "Forward가 설정되지 않았습니다\n"
@@ -53,56 +53,56 @@ msgstr " - 오브젝트 {} / {} 수집"
 msgid "No object collected"
 msgstr "수집된 오브젝트가 없습니다"
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:207
+#: E:\eudplib\eudplib\core\allocator\payload.py:205
 msgid "ShufflePayload has been turned off."
 msgstr "ShufflePayload가 해제되었습니다."
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:307
+#: E:\eudplib\eudplib\core\allocator\payload.py:305
 msgid "[Stage 2/3] AllocObjects"
 msgstr "[2/3 단계] 오브젝트 할당"
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:318
-#: E:\eudplib\eudplib\core\allocator\payload.py:321
+#: E:\eudplib\eudplib\core\allocator\payload.py:316
+#: E:\eudplib\eudplib\core\allocator\payload.py:319
 msgid " - Allocated {} / {} objects"
 msgstr " - 오브젝트 {} / {} 할당"
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:339
+#: E:\eudplib\eudplib\core\allocator\payload.py:337
 msgid "Occupation map length ({}) & Object size mismatch for object ({})"
 msgstr "차지할 공간 ({}) 과 오브젝트 크기가 일치하지 않습니다 ({})"
 
+#: E:\eudplib\eudplib\core\allocator\payload.py:341
 #: E:\eudplib\eudplib\core\allocator\payload.py:343
-#: E:\eudplib\eudplib\core\allocator\payload.py:345
 msgid " - Preprocessed {} / {} objects"
 msgstr " - 오브젝트 {} / {} 전처리"
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:347
+#: E:\eudplib\eudplib\core\allocator\payload.py:345
 msgid " - Allocating objects.."
 msgstr " - 오브젝트 할당 중.."
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:365
+#: E:\eudplib\eudplib\core\allocator\payload.py:361
 msgid "[Stage 3/3] ConstructPayload"
 msgstr "[3/3 단계] 페이로드 구성"
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:378
+#: E:\eudplib\eudplib\core\allocator\payload.py:374
 msgid "obj.GetDataSize()({}) != Real payload size({}) for object {}"
 msgstr ""
 "obj.GetDataSize()({}) 가 실제 페이로드 크기({}) 와 오브젝트 {} 에서 일치하"
 "지 않습니다"
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:383
-#: E:\eudplib\eudplib\core\allocator\payload.py:385
+#: E:\eudplib\eudplib\core\allocator\payload.py:379
+#: E:\eudplib\eudplib\core\allocator\payload.py:381
 msgid " - Written {} / {} objects"
 msgstr " - 오브젝트 {} / {} 작성"
 
-#: E:\eudplib\eudplib\core\allocator\pbuffer.py:77
+#: E:\eudplib\eudplib\core\allocator\pbuffer.py:75
 msgid "Non-const dwords must be aligned to 4byte"
 msgstr "상수가 아닌 dword는 4바이트로 정렬되어야 합니다"
 
-#: E:\eudplib\eudplib\core\allocator\pbuffer.py:84
+#: E:\eudplib\eudplib\core\allocator\pbuffer.py:81
 msgid "rlocmode should be 1 or 4"
 msgstr "rlocmode는 1 또는 4여야합니다"
 
-#: E:\eudplib\eudplib\core\allocator\pbuffer.py:151
+#: E:\eudplib\eudplib\core\allocator\pbuffer.py:148
 msgid "Cannot write non-const in byte/word/nonalligned dword."
 msgstr "byte/word/정렬되지 않은 dword에 상수가 아닌 값을 작성할 수 없습니다."
 
@@ -115,66 +115,66 @@ msgstr "RlocInt를 상수가 아닌 값으로 나눌 수 없습니다"
 msgid "Divide by zero"
 msgstr "0으로 나눌 수 없습니다"
 
-#: E:\eudplib\eudplib\core\allocator\rlocint.py:74
+#: E:\eudplib\eudplib\core\allocator\rlocint.py:73
 msgid "RlocInt not divisible by {}"
 msgstr "RlocInt는 {}로 나누어 떨어지지 않습니다"
 
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:41
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:77
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:109
-#: E:\eudplib\eudplib\core\eudfunc\eudfmethod.py:43
+#: E:\eudplib\eudplib\core\eudfunc\eudf.py:40
+#: E:\eudplib\eudplib\core\eudfunc\eudf.py:74
+#: E:\eudplib\eudplib\core\eudfunc\eudf.py:102
+#: E:\eudplib\eudplib\core\eudfunc\eudfmethod.py:42
 msgid "No variadic arguments (*args) allowed for EUDFunc."
 msgstr "EUD함수는 가변 인자(*args)가 허용되지 않습니다."
 
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:45
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:81
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:113
-#: E:\eudplib\eudplib\core\eudfunc\eudfmethod.py:47
+#: E:\eudplib\eudplib\core\eudfunc\eudf.py:43
+#: E:\eudplib\eudplib\core\eudfunc\eudf.py:77
+#: E:\eudplib\eudplib\core\eudfunc\eudf.py:105
+#: E:\eudplib\eudplib\core\eudfunc\eudfmethod.py:45
 msgid "No variadic keyword arguments (**kwargs) allowed for EUDFunc."
 msgstr "EUD함수는 가변 키워드 인자(**kwargs)가 허용되지 않습니다."
 
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:104
+#: E:\eudplib\eudplib\core\eudfunc\eudf.py:98
 msgid "Different number of variables({}) from initial values({})"
 msgstr "인자 개수({})와 초기값 수({})가 같아야합니다"
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:124
+#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:122
 msgid "{} is not an EUDFuncN"
 msgstr "{} 는 EUDFuncN가 아닙니다"
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:132
+#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:130
 msgid "Function requires {} arguments (Expected {})"
 msgstr "인자 {}개인 함수를 인자 {}개인 함수포인터에 사용할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:136
+#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:134
 msgid "Function returns {} values (Expected {})"
 msgstr "반환값 {}개인 함수를 반환값 {}개인 함수포인터에 사용할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:141
+#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:137
 msgid "Block start/end mismatch inside function"
 msgstr "블럭의 시작과 끝이 함수 안에서 일치하지 않습니다"
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:167
+#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:163
 msgid "Number of returned values should be constant."
 msgstr "반환값의 개수는 일정해야 합니다."
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:168
+#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:164
 msgid " (From function %s)"
 msgstr " (함수 %s)"
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:198
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:241
+#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:194
+#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:236
 msgid "Return number mismatch : "
 msgstr "반환값 개수가 일치하지 않습니다 : "
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:228
+#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:224
 msgid "Argument number mismatch : "
 msgstr "인자 개수가 일치하지 않습니다 : "
 
-#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:52
+#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:51
 msgid "Different number of variables({}) from type declarations({})"
 msgstr "변수 개수({})와 타입 선언 수({})가 같아야합니다"
 
-#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:107
+#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:104
 msgid "Different number of arguments({}) from mask declarations({})."
 msgstr "인자 개수({})와 비트 마스크 선언 수({})가 같아야합니다."
 
@@ -186,25 +186,25 @@ msgstr "알 수 없는 필드 이름 {}"
 msgid "Cannot reassign another value to eudstruct."
 msgstr "EUD구조체를 다른 값으로 재설정할 수 없습니다."
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:47
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:46
 msgid "{} items expected, got {}"
 msgstr "{} 개 항목이 예상됨, {}개 받음"
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:50
-#: E:\eudplib\eudplib\eudlib\eudarray.py:49
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:49
+#: E:\eudplib\eudplib\eudlib\eudarray.py:50
 msgid "Invalid item #{}"
 msgstr "{}번째 항목이 잘못됨"
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:52
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:51
 #: E:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:88
 msgid "nextptr should be ConstExpr"
 msgstr "nextptr은 상수표현식(ConstExpr)이어야 합니다"
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:131
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:130
 msgid "EUDVArray index out of bounds."
 msgstr "EUDVArray 인덱스가 범위를 벗어남."
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:356
+#: E:\eudplib\eudplib\core\eudstruct\vararray.py:347
 msgid "Can't iterate EUDVArray"
 msgstr "EUDVArray를 반복할 수 없습니다"
 
@@ -220,24 +220,24 @@ msgstr "[경고] 입력 맵에 [0, 0] null 타일 지형이 있습니다."
 msgid "Replaced them to 0000.01, because they cause desync."
 msgstr "방갈림 방지를 위해 [0, 1] null 타일로 대체하였습니다."
 
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:96
+#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:92
 msgid "You need to install stormlib before using eudplib."
 msgstr "eudplib 사용 전에 StormLib을 설치해야합니다."
 
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:144
+#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:140
 msgid "Loading StormLib failed."
 msgstr "StromLib을 불러오는데 실패했습니다."
 
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:158
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:171
+#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:154
+#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:167
 msgid "Duplicate opening"
 msgstr "MPQ를 중복해서 열 수 없습니다"
 
-#: E:\eudplib\eudplib\core\mapdata\proptable.py:59
+#: E:\eudplib\eudplib\core\mapdata\proptable.py:60
 msgid "Invalid property type"
 msgstr "잘못된 유닛 프로퍼티 타입입니다"
 
-#: E:\eudplib\eudplib\core\mapdata\proptable.py:73
+#: E:\eudplib\eudplib\core\mapdata\proptable.py:74
 msgid "Unit property table overflow"
 msgstr "유닛 프로퍼티 테이블 오버플로"
 
@@ -246,45 +246,45 @@ msgid "Ambigious string {}"
 msgstr "모호한 문자열 {}; 같은 내용의 문자열이 2개 이상 존재합니다"
 
 #: E:\eudplib\eudplib\core\mapdata\tblformat.py:256
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:354
+#: E:\eudplib\eudplib\core\mapdata\tblformat.py:352
 msgid "Invalid type for string"
 msgstr "잘못된 문자열 타입입니다"
 
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:295
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:367
+#: E:\eudplib\eudplib\core\mapdata\tblformat.py:294
+#: E:\eudplib\eudplib\core\mapdata\tblformat.py:364
 msgid "String table overflow"
 msgstr "문자열 테이블 오버플로"
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:183
+#: E:\eudplib\eudplib\core\rawtrigger\action.py:184
 msgid "Invalid {} \"{}\" in action{} \"{}\""
 msgstr "{2}번째 액션 \"{3}\"의 {1} \"{0}\"가 잘못됨"
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:189
+#: E:\eudplib\eudplib\core\rawtrigger\action.py:190
 msgid "Actions cannot be shared by two triggers."
 msgstr "액션을 2개 이상의 트리거와 공유할 수 없습니다."
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:192
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:136
+#: E:\eudplib\eudplib\core\rawtrigger\action.py:193
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:138
 msgid "Trigger should not be null."
 msgstr "액션/조건의 트리거는 None이 아니어야합니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:193
+#: E:\eudplib\eudplib\core\rawtrigger\action.py:194
 msgid "Triggers out of range"
 msgstr "액션 인덱스는 0에서 63이어야 합니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:127
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:129
 msgid "Invalid {} \"{}\" in condition{} \"{}\""
 msgstr "{2}번째 조건 \"{3}\"의 {1} \"{0}\"가 잘못됨"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:133
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:135
 msgid "Condition cannot be shared by two triggers."
 msgstr "조건을 2개 이상의 트리거와 공유할 수 없습니다."
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:137
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:139
 msgid "Condition index should be 0 to 15"
 msgstr "조건 인덱스는 0에서 15이어야 합니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:145
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:147
 msgid ""
 "Orphan condition. This often happens when you try to do arithmetics with "
 "conditions."
@@ -292,40 +292,36 @@ msgstr ""
 "고아 조건입니다. 아무 트리거에도 속하지 않은 조건입니다.\n"
 "종종 조건으로 산술을 하려고 할 때 발생합니다."
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:164
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:166
 msgid "To prevent error, Condition can't be put into if."
 msgstr "파이썬 if문에 트리거 조건을 넣을 수 없습니다. EUDIf를 사용하세요."
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:198
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:200
 msgid "Bring and Command can't exchange AtMost and Exactly/AtLeast"
 msgstr ""
 "Bring과 Command는 AtMost와 Exactly/AtLeast가 아예 달라서 교체할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:203
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:205
 msgid "Invalid comparison \"{}\" in trigger index {}"
 msgstr "트리거 조건 인덱스 {1}의 comparison \"{0}\"이 잘못됨"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:212
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:214
 msgid "Can't negate EUDX condition"
 msgstr "EUDX 조건의 부정 조건을 구할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:217
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:219
 msgid "Can't negate condition with comparison"
 msgstr "비교 조건의 부정 조건을 구할 수 없습니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:219
+#: E:\eudplib\eudplib\core\rawtrigger\condition.py:221
 msgid "Can't negate condition"
 msgstr "부정 조건을 구할 수 없습니다"
 
 #: E:\eudplib\eudplib\core\rawtrigger\constenc.py:191
 #: E:\eudplib\eudplib\core\rawtrigger\constenc.py:327
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:67
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:82
+#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:74
 #: E:\eudplib\eudplib\core\rawtrigger\strenc.py:96
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:117
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:121
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:159
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:163
+#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:100
 msgid "[Warning] \"{}\" is not a {}"
 msgstr "[경고] \"{}\"는 {}가 아닙니다"
 
@@ -342,63 +338,57 @@ msgstr "액션이 너무 많습니다"
 msgid "Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"
 msgstr "자신이 무슨 일을 하는지 모르는 한 Wait 액션을 사용하지 마세요!"
 
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:690
+#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:687
 msgid "SetKills Player should be only P1~P12 or CurrentPlayer"
 msgstr "SetKills의 플레이어는 P1~12 또는 CurrentPlayer이어야합니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:693
+#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:689
 msgid "SetKills Unit should be at most 227"
 msgstr "SetKills의 유닛은 227 이하여야합니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:52
+#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:59
 msgid "AIScript name too short"
 msgstr "AIScript 이름이 너무 짧습니다"
 
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:58
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:77
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:91
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:111
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:154
+#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:65
+#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:90
 msgid "Cannot encode string {} as {}."
 msgstr "문자열 {}를 타입 {}으로 인코딩할 수 없습니다."
 
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:60
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:79
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:93
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:113
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:156
+#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:67
+#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:92
 msgid " - Suggestion: {}"
 msgstr " - 제안: {}"
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:138
+#: E:\eudplib\eudplib\core\variable\eudv.py:137
 msgid "Trying to modify value of l-value variable"
 msgstr "좌변 변수의 값을 수정하려 시도하였습니다"
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:522
+#: E:\eudplib\eudplib\core\variable\eudv.py:511
+#: E:\eudplib\eudplib\core\variable\eudv.py:528
 #: E:\eudplib\eudplib\core\variable\eudv.py:539
-#: E:\eudplib\eudplib\core\variable\eudv.py:550
-#: E:\eudplib\eudplib\core\variable\eudv.py:566
-#: E:\eudplib\eudplib\core\variable\eudv.py:582
+#: E:\eudplib\eudplib\core\variable\eudv.py:555
+#: E:\eudplib\eudplib\core\variable\eudv.py:571
 msgid "{}: Comparing with temporary variable."
 msgstr "{}: 임시 변수를 생성해 비교합니다."
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:558
+#: E:\eudplib\eudplib\core\variable\eudv.py:547
 msgid "No unsigned number can be leq than {}"
 msgstr ""
 "부호 없는 숫자는 {}이하일 수 없습니다\n"
 "이 조건은 무조건 거짓입니다"
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:574
+#: E:\eudplib\eudplib\core\variable\eudv.py:563
 msgid "No unsigned number can be greater than {}"
 msgstr ""
 "부호 없는 숫자는 {}보다 클 수 없습니다\n"
 "이 조건은 무조건 거짓입니다"
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:855
+#: E:\eudplib\eudplib\core\variable\eudv.py:842
 msgid "dst and src have intersection"
 msgstr "dst와 src 변수에 중복이 있습니다"
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:875
+#: E:\eudplib\eudplib\core\variable\eudv.py:862
 msgid "Input/output size mismatch"
 msgstr "dst와 src의 개수가 같아야합니다"
 
@@ -409,37 +399,37 @@ msgid "No loop/switch block surrounding this code area"
 msgstr "이 코드를 감싸는 반복문/switch문 블럭이 없습니다"
 
 #: E:\eudplib\eudplib\ctrlstru\cshelper.py:38
-#: E:\eudplib\eudplib\ctrlstru\cshelper.py:44
+#: E:\eudplib\eudplib\ctrlstru\cshelper.py:43
 msgid "Control structures must be double-parenthesised."
 msgstr "제어문은 괄호를 이중으로 넣어야합니다."
 
-#: E:\eudplib\eudplib\ctrlstru\loopblock.py:161
+#: E:\eudplib\eudplib\ctrlstru\loopblock.py:185
 msgid "No loop block surrounding this code area"
 msgstr "이 코드를 감싸는 반복문 블럭이 없습니다"
 
-#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:66
+#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:65
 msgid "Cannot have EUDElseIf after EUDElse"
 msgstr "EUDElseIf를 EUDElse 이후에 사용할 수 없습니다"
 
-#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:101
+#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:98
 msgid "Cannot have EUDElse after EUDElse"
 msgstr "EUDElse를 EUDElse 이후에 사용할 수 없습니다"
 
-#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:161
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:82
+#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:157
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:84
 #: E:\eudplib\eudplib\ctrlstru\swblock.py:101
 msgid "Block start/end mismatch"
 msgstr "블럭의 시작과 끝이 일치하지 않습니다"
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:78
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:80
 msgid "Invalid selector start for EUDSwitch"
 msgstr "잘못된 EUDSwitch 변수입니다"
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:87
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:89
 msgid "Duplicate cases"
 msgstr "switch문 case 경우 중복"
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:89
+#: E:\eudplib\eudplib\ctrlstru\swblock.py:90
 msgid "cases out of mask"
 msgstr "case 경우가 비트마스크 바깥에 있습니다"
 
@@ -447,67 +437,67 @@ msgstr "case 경우가 비트마스크 바깥에 있습니다"
 msgid "Duplicate default"
 msgstr "default 중복"
 
-#: E:\eudplib\eudplib\epscript\epsimp.py:113
+#: E:\eudplib\eudplib\epscript\epsimp.py:112
 msgid "[epScript] Compiling \"{}\"..."
 msgstr "[epScript] \"{}\" 컴파일 중..."
 
-#: E:\eudplib\eudplib\epscript\epsimp.py:116
+#: E:\eudplib\eudplib\epscript\epsimp.py:115
 msgid " - Compiled failed for {}"
 msgstr " - 컴파일 실패: {}"
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:61
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:81
 msgid "EPD check warning. Don't use raw pointer address"
 msgstr "EPD 점검 경고. 생 포인터 주소를 사용하지 마세요"
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:87
-msgid "EPDOffsetMap member size should be in 4, 2, 1"
-msgstr "EPDOffsetMap의 멤버 크기는 4, 2, 또는 1이어야합니다"
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:115
+msgid "Invalid EPDOffsetMap member type: {}"
+msgstr "유효하지 않은 EPDOffsetMap 멤버 타입입니다: {}"
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:90
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:118
 msgid "EPDOffsetMap members should be aligned"
 msgstr "EPDOffsetMap의 멤버는 정렬되어야합니다"
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:115
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:125
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:144
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:154
 msgid "Only dword can be read as epd"
 msgstr "크기가 4인 멤버만 epd로 읽어올 수 있습니다"
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:135
+#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:164
 msgid "Only dword can be read as position"
 msgstr "크기가 4인 멤버만 위치로 읽어올 수 있습니다"
 
-#: E:\eudplib\eudplib\eudlib\eudarray.py:93
+#: E:\eudplib\eudplib\eudlib\eudarray.py:94
 msgid "Can't iterate EUDArray"
 msgstr "EUDArray를 반복할 수 없습니다"
 
-#: E:\eudplib\eudplib\eudlib\locf\locf.py:169
-#: E:\eudplib\eudplib\eudlib\locf\locf.py:197
-#: E:\eudplib\eudplib\eudlib\locf\locf.py:225
+#: E:\eudplib\eudplib\eudlib\locf\locf.py:171
+#: E:\eudplib\eudplib\eudlib\locf\locf.py:202
+#: E:\eudplib\eudplib\eudlib\locf\locf.py:233
 msgid "number of coordinates should be 2 or 4."
 msgstr "로케이션 좌표 인자 개수는 2 또는 4개여야합니다."
 
-#: E:\eudplib\eudplib\eudlib\memiof\byterw.py:257
+#: E:\eudplib\eudplib\eudlib\memiof\byterw.py:250
 msgid "copyto target should be EUDByteReader/Writer/Stream"
 msgstr "copyto할 대상은 EUDByteReader/Writer/Stream만 사용할 수 있습니다"
 
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:235
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:243
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:251
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:236
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:244
+#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:252
 msgid "safe read functions are deprecated in 0.61 and will be removed in 0.63"
 msgstr ""
 "_safe 읽기 함수는 0.61에 deprecated(사용이 권장되지 않으며, 0.61에 삭제될 예"
 "정입니다"
 
-#: E:\eudplib\eudplib\eudlib\objpool.py:81
-#: E:\eudplib\eudplib\eudlib\objpool.py:93
+#: E:\eudplib\eudplib\eudlib\objpool.py:80
+#: E:\eudplib\eudplib\eudlib\objpool.py:90
 msgid "Only structs less than {} fields can be allocated"
 msgstr "필드 개수가 {}개 이하인 구조체만 동적 할당이 가능합니다"
 
-#: E:\eudplib\eudplib\eudlib\stringf\cpstr.py:53
+#: E:\eudplib\eudplib\eudlib\stringf\cpstr.py:56
 msgid "Invalid string section name: {}"
 msgstr "잘못된 문자열 단락 이름: {}"
 
-#: E:\eudplib\eudplib\eudlib\stringf\cpstr.py:90
+#: E:\eudplib\eudplib\eudlib\stringf\cpstr.py:92
 msgid "Unexpected type for CPString: {}"
 msgstr "CPString에 대한 예기치 않은 타입: {}"
 
@@ -515,17 +505,17 @@ msgstr "CPString에 대한 예기치 않은 타입: {}"
 msgid "Object with unknown parameter type {} given to f_eudprint."
 msgstr "알 수 없는 인자 타입 {}이 출력 함수에 주어졌습니다."
 
-#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:52
+#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:53
 msgid "Max string recursion exceeded"
 msgstr "문자열 재귀 최대 제한 초과"
 
-#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:70
-#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:75
+#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:69
+#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:74
 msgid ""
 "cannot switch from manual field specification to automatic field numbering"
 msgstr "수동 필드 넘버링에서 자동 필드 넘버링으로 전환할 수 없습니다"
 
-#: E:\eudplib\eudplib\eudlib\stringf\pname.py:129
+#: E:\eudplib\eudplib\eudlib\stringf\pname.py:128
 msgid "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
 msgstr ""
 "IsPName의 플레이어는 {}가 아니라 Player1에서 Player8 사이 또는 CurrentPlayer"
@@ -535,27 +525,27 @@ msgstr ""
 msgid "listloop mismatch"
 msgstr "EUDListLoop 블럭 불일치"
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:75
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:77
 msgid "No player met condition for input map settings:"
 msgstr "연결맵에 조건에 맞는 플레이어가 없습니다:"
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:77
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:79
 msgid " type {}"
 msgstr " 종류 {}"
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:79
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:81
 msgid " force {}"
 msgstr " 세력 {}"
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:81
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:83
 msgid " race {}"
 msgstr " 종족 {}"
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:82
+#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:84
 msgid "Check out whether Start Locations are placed correctly."
 msgstr "스타트 로케이션을 제대로 배치했는지 확인해보세요."
 
-#: E:\eudplib\eudplib\maprw\injector\vectorReloc.py:212
+#: E:\eudplib\eudplib\maprw\injector\vectorReloc.py:204
 msgid "MRGN section size bug"
 msgstr ""
 "MRGN 단락 크기 버그\n"
@@ -563,35 +553,35 @@ msgstr ""
 "보세요.\n"
 "(2) 단락 분리 프로텍트된 맵은 input맵으로 사용할 수 없습니다"
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:39
+#: E:\eudplib\eudplib\maprw\loadmap.py:40
 msgid "Loading map {}"
 msgstr "맵 {} 불러오는 중"
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:40
+#: E:\eudplib\eudplib\maprw\loadmap.py:41
 msgid "input path is not a map file"
 msgstr "연결맵 경로가 맵 파일이 아닙니다"
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:44
+#: E:\eudplib\eudplib\maprw\loadmap.py:45
 msgid "input map does not exist"
 msgstr ""
 "연결맵이 존재하지 않습니다.\n"
 "확장자가 맞는지, 확장자 숨김 옵션을 사용하는지 확인하세요"
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:48
+#: E:\eudplib\eudplib\maprw\loadmap.py:49
 msgid "You lacks permission to get access rights for input map"
 msgstr "사용자 계정이 input맵에 접근할 권한이 없습니다"
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:49
-#: E:\eudplib\eudplib\maprw\savemap.py:87
-#: E:\eudplib\eudplib\maprw\savemap.py:105
+#: E:\eudplib\eudplib\maprw\loadmap.py:50
+#: E:\eudplib\eudplib\maprw\savemap.py:88
+#: E:\eudplib\eudplib\maprw\savemap.py:104
 msgid "Try to turn off antivirus or StarCraft"
 msgstr "백신 프로그램이나 스타크래프트를 종료해보세요"
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:54
+#: E:\eudplib\eudplib\maprw\loadmap.py:55
 msgid "Fail to open input map"
 msgstr "연결맵을 여는데 실패했습니다."
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:57
+#: E:\eudplib\eudplib\maprw\loadmap.py:58
 msgid "Fail to extract scenario.chk, maybe invalid scx"
 msgstr "scenario.chk를 추출하는데 실패했습니다, 잘못된 scx 파일일 수 있습니다"
 
@@ -599,25 +589,25 @@ msgstr "scenario.chk를 추출하는데 실패했습니다, 잘못된 scx 파일
 msgid "MPQ filename duplicate : \"{}\""
 msgstr "MPQ 파일명이 중복됨 : \"{}\""
 
-#: E:\eudplib\eudplib\maprw\mpqadd.py:83
+#: E:\eudplib\eudplib\maprw\mpqadd.py:82
 msgid "Invalid content type"
 msgstr "잘못된 콘텐츠 타입"
 
-#: E:\eudplib\eudplib\maprw\mpqadd.py:124
+#: E:\eudplib\eudplib\maprw\mpqadd.py:122
 msgid "Failed adding file {} to mpq: May be duplicate"
 msgstr "파일 {}를 mpq에 추가하는데 실패: 중복된 파일일 수 있음"
 
-#: E:\eudplib\eudplib\maprw\savemap.py:62
+#: E:\eudplib\eudplib\maprw\savemap.py:63
 msgid "Saving to {}..."
 msgstr "{}에 저장 중..."
 
-#: E:\eudplib\eudplib\maprw\savemap.py:86
-#: E:\eudplib\eudplib\maprw\savemap.py:104
+#: E:\eudplib\eudplib\maprw\savemap.py:87
+#: E:\eudplib\eudplib\maprw\savemap.py:103
 msgid "You lacks permission to get access rights for output map"
 msgstr "사용자 계정이 결과맵에 접근할 권한이 없습니다"
 
-#: E:\eudplib\eudplib\maprw\savemap.py:92
-#: E:\eudplib\eudplib\maprw\savemap.py:110
+#: E:\eudplib\eudplib\maprw\savemap.py:93
+#: E:\eudplib\eudplib\maprw\savemap.py:109
 msgid "Fail to access output map ({})"
 msgstr "결과맵 접근에 실패했습니다. ({})"
 
@@ -625,23 +615,23 @@ msgstr "결과맵 접근에 실패했습니다. ({})"
 msgid "Fail to export input map data to output map"
 msgstr "입력맵 데이터를 결과맵으로 내보내는 데 실패했습니다"
 
-#: E:\eudplib\eudplib\maprw\savemap.py:113
+#: E:\eudplib\eudplib\maprw\savemap.py:112
 msgid "Fail to add scenario.chk"
 msgstr "scenario.chk를 결과맵에 추가하는데 실패했습니다"
 
-#: E:\eudplib\eudplib\maprw\savemap.py:115
+#: E:\eudplib\eudplib\maprw\savemap.py:114
 msgid "Fail to compact MPQ"
 msgstr "MPQ 밀집에 실패했습니다"
 
-#: E:\eudplib\eudplib\maprw\savemap.py:120
+#: E:\eudplib\eudplib\maprw\savemap.py:119
 msgid "Writing trace file to {}"
 msgstr "{}에 추적 파일 작성"
 
-#: E:\eudplib\eudplib\trigger\tpatcher.py:67
+#: E:\eudplib\eudplib\trigger\tpatcher.py:68
 msgid "Can't put Action in conditionals: {}"
 msgstr "액션을 조건문에 넣을 수 없습니다: {}"
 
-#: E:\eudplib\eudplib\trigger\triggerdef.py:47
+#: E:\eudplib\eudplib\trigger\triggerdef.py:48
 msgid "preserved should be bool"
 msgstr "preserved(트리거 반복 여부)는 참 또는 거짓(bool)이어야합니다"
 
@@ -668,6 +658,9 @@ msgstr "타입 {}는 캐스팅할 수 없습니다"
 #: E:\eudplib\eudplib\utils\ubconv.py:64
 msgid "Invalid type {}"
 msgstr "잘못된 타입 {}"
+
+#~ msgid "EPDOffsetMap member size should be in 4, 2, 1"
+#~ msgstr "EPDOffsetMap의 멤버 크기는 4, 2, 또는 1이어야합니다"
 
 #~ msgid "Invalid locid1 \"{}\" in trigger index {}"
 #~ msgstr "트리거 액션 인덱스 {1}의 locid1 \"{0}\"이 잘못됨"
