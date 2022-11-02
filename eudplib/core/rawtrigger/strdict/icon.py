@@ -246,7 +246,7 @@ DefIconDict = {
     "Irradiate": 242,
     "Use Spider Mines": 243,
     "Afterburners (Unused Terran Upgrade)": 244,
-    "Seige Mode": 245,
+    "Siege Mode": 245,
     "Tank Mode": 246,
     "Defensive Matrix": 247,
     "Titan Reactor": 248,
