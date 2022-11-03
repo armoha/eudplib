@@ -14,7 +14,7 @@ from ..core.variable.eudv import IsRValue
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
 from ..eudlib import EUDArray
 from ..maprw import EUDOnStart
-from ..utils import ExprProxy, FlattenList, List2Assignable, ep_warn
+from ..utils import ExprProxy, FlattenList, List2Assignable, ep_warn, isUnproxyInstance
 from .epsimp import EPSLoader
 
 
@@ -203,7 +203,8 @@ class _ARRW:  # array write
         self.index = index
 
     def __lshift__(self, r):
-        if not IsEUDVariable(self.obj) and not isinstance(self.obj, ConstExpr):
+        isUnproxyInstance
+        if not IsEUDVariable(self.obj) and not isUnproxyInstance(self.obj, ConstExpr):
             # maybe Python collections
             ov = self.obj[self.index]
             if IsEUDVariable(ov):
