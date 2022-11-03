@@ -29,6 +29,7 @@ from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .. import variable as ev
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ..variable import SeqCompute
 from ..variable.evcommon import _ev, _selfadder, _xv
 from .muldiv import f_div, f_mul
 
@@ -136,6 +137,11 @@ def _f_bitlshift(a, b):
 
 def f_bitlshift(a, b, _fdict={}, **kwargs):
     """Calculate a << b"""
+    if not ev.IsEUDVariable(a) and not ev.IsEUDVariable(b):
+        if "ret" in kwargs:
+            SeqCompute((kwargs["ret"][0], rt.SetTo, a << b))
+            return kwargs["ret"][0]
+        return a << b
     ret = kwargs["ret"][0] if "ret" in kwargs else ev.EUDVariable()
     if ev.IsEUDVariable(a) and not ev.IsEUDVariable(b):
         if b == 0:
