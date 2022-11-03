@@ -32,8 +32,10 @@ function test_object() {
     var e = a;
     Test.cast(e).setX(1);
     if (a.x == 1) ret += 128;
+    Test.cast(e).add(d);
+    if (b.x == 4 && c.y == 21 && a.z == 24) ret += 256;
 
-    return ret;  // 255
+    return ret;  // 511
 }
 
 object Coord { var x, y; };
@@ -70,6 +72,7 @@ function test_nested_object() {
 
 object List {
     var prev: selftype, next: selftype;
+    function foo(c: Coord) {}
 };
 function test_selftype_member() {
     const a, b = List(), List();
@@ -77,4 +80,5 @@ function test_selftype_member() {
     a.next = b;
     b.prev = a;
     b.next = a;
+    a.foo(0);
 }

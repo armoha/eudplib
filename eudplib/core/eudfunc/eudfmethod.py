@@ -69,7 +69,11 @@ def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):
                 selftype = type(self)
                 if method not in _mth_classtype:
                     _mth_classtype[method] = selftype
-                return genericCaller(self, *args)
+
+                SetSelfType(selftype)
+                rets = genericCaller(self, *args)  # FIXME: euddraft#34
+                SetSelfType(None)
+                return rets
 
             # Const expression. Can use optimizations
             else:

@@ -79,24 +79,30 @@ def f_test_object():
     # (Line 34) if (a.x == 1) ret += 128;
     if EUDIf()(_ATTC(a, 'x') == 1):
         ret.__iadd__(128)
-        # (Line 36) return ret;  // 255
+        # (Line 35) Test.cast(e).add(d);
+    EUDEndIf()
+    Test.cast(e).add(d)
+    # (Line 36) if (b.x == 4 && c.y == 21 && a.z == 24) ret += 256;
+    if EUDIf()(EUDSCAnd()(_ATTC(b, 'x') == 4)(_ATTC(c, 'y') == 21)(_ATTC(a, 'z') == 24)()):
+        ret.__iadd__(256)
+        # (Line 38) return ret;  // 511
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 37) }
-    # (Line 39) object Coord { var x, y; };
+    # (Line 39) }
+    # (Line 41) object Coord { var x, y; };
 
 class Coord(EUDStruct):
-    # (Line 40) object Triangle {
+    # (Line 42) object Triangle {
     _fields_ = [
         'x',
         'y',
     ]
 
-# (Line 41) var p: Coord * 5;
+# (Line 43) var p: Coord * 5;
 class Triangle(EUDStruct):
-    # (Line 42) var q;
-    # (Line 43) };
-    # (Line 44) function test_nested_object() {
+    # (Line 44) var q;
+    # (Line 45) };
+    # (Line 46) function test_nested_object() {
     _fields_ = [
         ('p', Coord * 5),
         'q',
@@ -104,65 +110,70 @@ class Triangle(EUDStruct):
 
 @EUDFunc
 def f_test_nested_object():
-    # (Line 45) const a = Triangle();
+    # (Line 47) const a = Triangle();
     a = Triangle()
-    # (Line 46) a.p = (Coord * 5)();
+    # (Line 48) a.p = (Coord * 5)();
     _ATTW(a, 'p') << ((Coord * 5)())
-    # (Line 47) foreach(i : py_range(5)) {
+    # (Line 49) foreach(i : py_range(5)) {
     for i in range(5):
-        # (Line 48) a.p[i] = Coord();
+        # (Line 50) a.p[i] = Coord();
         _ARRW(a.p, i) << (Coord())
-        # (Line 49) }
-        # (Line 51) a.p[0].x = 1;
+        # (Line 51) }
+        # (Line 53) a.p[0].x = 1;
 
     _ATTW(a.p[0], 'x') << (1)
-    # (Line 52) a.p[1].y = 2;
+    # (Line 54) a.p[1].y = 2;
     _ATTW(a.p[1], 'y') << (2)
-    # (Line 53) a.p[1].y += 2;
+    # (Line 55) a.p[1].y += 2;
     _ATTW(a.p[1], 'y').__iadd__(2)
-    # (Line 54) a.q = 3;
+    # (Line 56) a.q = 3;
     _ATTW(a, 'q') << (3)
-    # (Line 56) var ret = list(a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3) ? 1 : 0;
+    # (Line 58) var ret = list(a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3) ? 1 : 0;
     ret = _LVAR([EUDTernary(FlattenList([_ATTC(a.p[0], 'x') == 1, _ATTC(a.p[0], 'y') == 0, _ATTC(a.p[1], 'y') == 4, _ATTC(a, 'q') == 3]))(1)(0)])
-    # (Line 58) const b = a.copy();
+    # (Line 60) const b = a.copy();
     b = a.copy()
-    # (Line 59) b.p[0].x = 5;
+    # (Line 61) b.p[0].x = 5;
     _ATTW(b.p[0], 'x') << (5)
-    # (Line 60) b.q = 2;
+    # (Line 62) b.q = 2;
     _ATTW(b, 'q') << (2)
-    # (Line 61) if (a.p[0].x == 5) ret += 2;
+    # (Line 63) if (a.p[0].x == 5) ret += 2;
     if EUDIf()(_ATTC(a.p[0], 'x') == 5):
         ret.__iadd__(2)
-        # (Line 62) if (b.p[0].x == 5) ret += 4;
+        # (Line 64) if (b.p[0].x == 5) ret += 4;
     EUDEndIf()
     if EUDIf()(_ATTC(b.p[0], 'x') == 5):
         ret.__iadd__(4)
-        # (Line 63) if (b.p[0].y == 0) ret += 8;
+        # (Line 65) if (b.p[0].y == 0) ret += 8;
     EUDEndIf()
     if EUDIf()(_ATTC(b.p[0], 'y') == 0):
         ret.__iadd__(8)
-        # (Line 64) if (b.p[1].y == 4) ret += 16;
+        # (Line 66) if (b.p[1].y == 4) ret += 16;
     EUDEndIf()
     if EUDIf()(_ATTC(b.p[1], 'y') == 4):
         ret.__iadd__(16)
-        # (Line 65) if (a.q == 3) ret += 32;
+        # (Line 67) if (a.q == 3) ret += 32;
     EUDEndIf()
     if EUDIf()(_ATTC(a, 'q') == 3):
         ret.__iadd__(32)
-        # (Line 66) if (b.q == 2) ret += 64;
+        # (Line 68) if (b.q == 2) ret += 64;
     EUDEndIf()
     if EUDIf()(_ATTC(b, 'q') == 2):
         ret.__iadd__(64)
-        # (Line 68) return ret;
+        # (Line 70) return ret;
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 69) }
-    # (Line 71) object List {
+    # (Line 71) }
+    # (Line 73) object List {
 
-# (Line 72) var prev: selftype, next: selftype;
+# (Line 74) var prev: selftype, next: selftype;
 class List(EUDStruct):
-    # (Line 73) };
-    # (Line 74) function test_selftype_member() {
+    # (Line 75) function foo(c: Coord) {}
+    @EUDTypedMethod([Coord])
+    def foo(this, c):
+        # (Line 76) };
+        pass
+
+    # (Line 77) function test_selftype_member() {
     _fields_ = [
         ('prev', selftype),
         ('next', selftype),
@@ -170,14 +181,16 @@ class List(EUDStruct):
 
 @EUDFunc
 def f_test_selftype_member():
-    # (Line 75) const a, b = List(), List();
+    # (Line 78) const a, b = List(), List();
     a, b = List2Assignable([List(), List()])
-    # (Line 76) a.prev = b;
+    # (Line 79) a.prev = b;
     _ATTW(a, 'prev') << (b)
-    # (Line 77) a.next = b;
+    # (Line 80) a.next = b;
     _ATTW(a, 'next') << (b)
-    # (Line 78) b.prev = a;
+    # (Line 81) b.prev = a;
     _ATTW(b, 'prev') << (a)
-    # (Line 79) b.next = a;
+    # (Line 82) b.next = a;
     _ATTW(b, 'next') << (a)
-    # (Line 80) }
+    # (Line 83) a.foo(0);
+    a.foo(0)
+    # (Line 84) }
