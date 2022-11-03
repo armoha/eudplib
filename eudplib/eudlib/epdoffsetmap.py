@@ -174,20 +174,16 @@ def EPDOffsetMap(ct: tuple[tuple[str, int, int | type | str], ...]):
             kind, size, offset = addrTable[name]
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
-            try:
+            if hasattr(kind, "cast"):
                 value = kind.cast(value)
-            except AttributeError:
-                pass
             return wdict[size][c.SetTo](epd, subp, value)
 
         def iaddattr(self, name, value):
             kind, size, offset = addrTable[name]
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
-            try:
+            if hasattr(kind, "cast"):
                 value = kind.cast(value)
-            except AttributeError:
-                pass
             return wdict[size][c.Add](epd, subp, value)
 
         # TODO: add operator for Subtract
@@ -195,20 +191,16 @@ def EPDOffsetMap(ct: tuple[tuple[str, int, int | type | str], ...]):
             kind, size, offset = addrTable[name]
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
-            try:
+            if hasattr(kind, "cast"):
                 value = kind.cast(value)
-            except AttributeError:
-                pass
             return wdict[size][c.Subtract](epd, subp, value)
 
         def isubattr(self, name, value):
             kind, size, offset = addrTable[name]
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
-            try:
+            if hasattr(kind, "cast"):
                 value = kind.cast(value)
-            except AttributeError:
-                pass
             return wdict[size][c.Add](epd, subp, -value)
 
         def imulattr(self, name, value):
@@ -249,10 +241,8 @@ def EPDOffsetMap(ct: tuple[tuple[str, int, int | type | str], ...]):
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
             mask = ((1 << (8 * size)) - 1) << (8 * subp)
-            try:
+            if hasattr(kind, "cast"):
                 value = kind.cast(value)
-            except AttributeError:
-                pass
             if subp == 0:
                 return c.MemoryXEPD(epd, c.Exactly, value, mask)
             else:
@@ -266,10 +256,8 @@ def EPDOffsetMap(ct: tuple[tuple[str, int, int | type | str], ...]):
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
             mask = ((1 << (8 * size)) - 1) << (8 * subp)
-            try:
+            if hasattr(kind, "cast"):
                 value = kind.cast(value)
-            except AttributeError:
-                pass
             if subp == 0:
                 return c.MemoryXEPD(epd, c.AtMost, value, mask)
             else:
@@ -280,10 +268,8 @@ def EPDOffsetMap(ct: tuple[tuple[str, int, int | type | str], ...]):
             offsetEPD, subp = divmod(offset, 4)
             epd = self._epd + offsetEPD
             mask = ((1 << (8 * size)) - 1) << (8 * subp)
-            try:
+            if hasattr(kind, "cast"):
                 value = kind.cast(value)
-            except AttributeError:
-                pass
             if subp == 0:
                 return c.MemoryXEPD(epd, c.AtLeast, value, mask)
             else:
