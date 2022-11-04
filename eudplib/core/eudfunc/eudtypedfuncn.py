@@ -44,7 +44,10 @@ def applyTypes(typesdecl, varlist):
     if typesdecl is None:
         return varlist
 
+    rets = []
+    # FIXME: armoha/euddraft#34
     if len(varlist) == len(typesdecl) + 1:
+        rets.append(varlist[0])
         varlist = varlist[1:]
     ut.ep_assert(
         len(varlist) == len(typesdecl),
@@ -54,7 +57,6 @@ def applyTypes(typesdecl, varlist):
         + f"argtypes: {typesdecl}, args: {varlist}",
     )
 
-    rets = []
     for vartype, var in zip(typesdecl, varlist):
         if vartype == ev.EUDVariable or vartype is None:
             rets.append(var)
