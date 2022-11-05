@@ -1,0 +1,1 @@
+hello-arg = 안녕 {$name}!

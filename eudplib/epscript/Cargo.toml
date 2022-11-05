@@ -1,0 +1,22 @@
+[package]
+name = "epscript"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "epScript"
+crate-type = ["cdylib"]
+
+[dependencies.cpython]
+version = "0.7"
+features = ["extension-module"]
+
+[dev-dependencies]
+static_assertions = "1.1.0"
+
+[dependencies]
+chumsky = "0.8"
+ariadne = "0.1"
+i18n-embed = { version = "0.13.4", features = ["fluent-system", "desktop-requester"]}
+rust-embed = "6.4.2"
+i18n-embed-fl = "0.6.4"
