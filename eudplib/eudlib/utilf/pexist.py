@@ -27,30 +27,66 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
+from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ...core.variable.evcommon import _ev
 from ...localize import _
 from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl
 
+_check_playerexist = c.Db(4)
 
-@c.EUDFunc
-def f_playerexist(player):
+
+@_EUDPredefineParam((ut.EPD(_check_playerexist),))
+@_EUDPredefineReturn(1, 2)
+@c.EUDTypedFunc([c.TrgPlayer])
+def _playerexist(player):
     """Check if player has not left the game.
 
     :returns: 1 if player exists, 0 if not.
     """
     pts = 0x51A280
-
-    cs.EUDSwitch(player)
+    _ev[1] << 1
+    cs.EPDSwitch(ut.EPD(_check_playerexist))
     for p in ut.RandList(range(8)):
         if cs.EUDSwitchCase()(p):
-            if cs.EUDIf()(c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4))):
-                c.EUDReturn(0)
-            if cs.EUDElse()():
-                c.EUDReturn(1)
-            cs.EUDEndIf()
-
+            c.RawTrigger(
+                conditions=c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)),
+                actions=_ev[1].SetNumber(0),
+            )
     if cs.EUDSwitchDefault()():
-        c.EUDReturn(0)
+        _ev[1] << 0
     cs.EUDEndSwitch()
+
+
+def f_playerexist(player, *, _cf={}, **kwargs):
+    """Check if player has not left the game.
+
+    :returns: 1 if player exists, 0 if not.
+    """
+    if c.IsEUDVariable(player):
+        return _playerexist(player, **kwargs)
+    else:
+        p = c.EncodePlayer(player)
+        ret = kwargs["ret"][0] if "ret" in kwargs else c.EUDVariable()
+        if p not in _cf:
+            c.PushTriggerScope()
+            pts = 0x51A280
+            _cf[p] = c.RawTrigger(
+                conditions=c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)),
+                actions=c.SetMemoryEPD(0, c.SetTo, 0),
+            )
+            c.PopTriggerScope()
+
+        nptr = c.Forward()
+        c.RawTrigger(
+            nextptr=_cf[p],
+            actions=[
+                ret.SetNumber(1),
+                c.SetNextPtr(_cf[p], nptr),
+                c.SetMemory(_cf[p] + 344, c.SetTo, ut.EPD(ret.getValueAddr())),
+            ],
+        )
+        nptr << c.NextTrigger()
+        return ret
 
 
 # --------
