@@ -48,15 +48,17 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}, _check_empty=False):
         @c.EUDFunc
         def f_read_epd_template(targetplayer):
             ret = f_read_epd_template._frets
-            cs.DoActions([retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)])
+            done = c.Forward()
 
-            if _check_empty and not all(arg[0] == 0 for arg in args):
-                c.RawTrigger(
+            if _check_empty:
+                check = c.Forward()
+                check << c.RawTrigger(
                     conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
-                    actions=[
-                        retv.SetNumber(0) if arg[0] != 0 else [] for retv, arg in zip(ret, args)
-                    ],
+                    actions=[retv.SetNumber(0) for retv in ret] + [c.SetNextPtr(check, done)],
                 )
+                init = c.NextTrigger()
+
+            cs.DoActions([retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)])
 
             for i in ut.bits(mask):
                 if all(arg[1](i) == 0 for arg in args):
@@ -64,12 +66,12 @@ def f_readgen_epd(mask, *args, docstring=None, _fdict={}, _check_empty=False):
                 c.RawTrigger(
                     conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i),
                     actions=[
-                        retv.AddNumber(arg[1](i)) if arg[1](i) != 0 else []
-                        for retv, arg in zip(ret, args)
+                        retv.AddNumber(arg[1](i)) for retv, arg in zip(ret, args) if arg[1](i) != 0
                     ],
                 )
 
-            cp.f_setcurpl2cpcache()
+            done << c.NextTrigger()
+            cp.f_setcurpl2cpcache(actions=c.SetNextPtr(check, init) if _check_empty else [])
             # return ut.List2Assignable(ret)
 
         if docstring:
@@ -95,27 +97,34 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}, _check_empty=False):
         @c.EUDFunc
         def readerf():
             ret = readerf._frets
-            cs.DoActions([retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)])
+            init_actions = [retv.SetNumber(arg[0]) for retv, arg in zip(ret, args)]
+            if _check_empty:
+                check, read_start = c.Forward(), c.Forward()
+                init_actions.append(c.SetNextPtr(check, read_start))
+            cs.DoActions(init_actions)
 
-            if _check_empty and not all(arg[0] == 0 for arg in args):
-                c.RawTrigger(
+            if _check_empty:
+                done = c.Forward()
+                check << c.RawTrigger(
                     conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
                     actions=[
-                        retv.SetNumber(0) if arg[0] != 0 else [] for retv, arg in zip(ret, args)
-                    ],
+                        retv.SetNumber(0) for retv, arg in zip(ret, args) if arg[0] != 0
+                    ] + [c.SetNextPtr(check, done)],
                 )
+                read_start << c.NextTrigger()
 
             for i in ut.bits(mask):
                 if all(arg[1](i) == 0 for arg in args):
                     continue
                 c.RawTrigger(
-                    conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i)],
+                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i),
                     actions=[
-                        retv.AddNumber(arg[1](i)) if arg[1](i) != 0 else []
-                        for retv, arg in zip(ret, args)
+                        retv.AddNumber(arg[1](i)) for retv, arg in zip(ret, args) if arg[1](i) != 0
                     ],
                 )
 
+            if _check_empty:
+                done << c.NextTrigger()
             # return ut.List2Assignable(ret)
 
         def f_read_cp_template(cpo, **kwargs):
@@ -186,8 +195,8 @@ f_spriteepdread_cp = f_readgen_cp(
     (0x188000 - 0x58A364 // 4, lambda y: y // 4),
     _check_empty=True,
 )
-f_spriteread_epd = lambda epd: f_spriteepdread_epd(epd)[0]
-f_spriteread_cp = lambda cpoffset: f_spriteepdread_cp(cpoffset)[0]
+f_spriteread_epd = f_readgen_epd(0x1FFFC, (0x620000, lambda x: x), _check_empty=True)
+f_spriteread_cp = f_readgen_cp(0x1FFFC, (0x620000, lambda x: x), _check_empty=True)
 
 
 def _posread_epd():

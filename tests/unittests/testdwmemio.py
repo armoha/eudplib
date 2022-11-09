@@ -40,6 +40,11 @@ def test_dwmemio():
 
     ptr, epd = f_cunitepdread_epd(EPD(Db(i2b4(c1))))
     test_equality("f_cunitread_epd %X" % c1, [ptr, epd], [cptr, cepd])
+    oldcp = f_getcurpl()
+    f_dwwrite(0x6509B0, EPD(Db(i2b4(c1))))
+    ptr, epd = f_cunitepdread_cp(0)
+    f_setcurpl(oldcp)
+    test_equality("f_cunitread_cp %X" % c1, [ptr, epd], [cptr, cepd])
 
     # Flag reading!
     f1, f2, f3, f4 = f_flagread_epd(EPD(a), 0x1000, 0x0100, ~0x0010, 0x0004)
