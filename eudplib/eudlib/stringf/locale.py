@@ -33,8 +33,9 @@ LOCALES = (
 
 
 class LocalLocale(ExprProxy):
+    dontFlatten = True
+
     def __init__(self, initvar) -> None:
-        self.dontFlatten = True
         super().__init__(initvar)
 
     def __lshift__(self, other):

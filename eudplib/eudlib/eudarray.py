@@ -18,9 +18,10 @@ class EUDArrayData(c.EUDObject):
     Structure for storing multiple values.
     """
 
+    dontFlatten = True
+
     def __init__(self, arr) -> None:
         super().__init__()
-        self.dontFlatten = True
 
         if isinstance(arr, int):
             arrlen = arr
@@ -48,9 +49,16 @@ class EUDArrayData(c.EUDObject):
 
 
 class EUDArray(ut.ExprProxy):
+    dontFlatten = True
+
     def __init__(self, initval=None, *, _from=None) -> None:
+        self.length: int | None
         if _from is not None:
             dataObj = _from
+            try:
+                self.length = _from._arrlen
+            except AttributeError:
+                self.length = None
 
         else:
             dataObj = EUDArrayData(initval)
@@ -58,7 +66,15 @@ class EUDArray(ut.ExprProxy):
 
         super().__init__(dataObj)
         self._epd = ut.EPD(self)
-        self.dontFlatten = True
+
+    def fmt(self, formatter):
+        if isinstance(self.length, int):
+            formatter.write_str("[")
+            for i in range(length):
+                formatter.write_fmt("{}" if i == 0 else ", {}", self[i])
+            formatter.write_str("]")
+        else:
+            formatter.write_fmt("[ptr=0x{:X}]", self)
 
     def _bound_check(self, index: object) -> None:
         index = ut.unProxy(index)

@@ -33,6 +33,8 @@ class _EUDStruct_Metaclass(type):
 
 
 class EUDStructArray(ExprProxy, metaclass=_EUDStruct_Metaclass):
+    dontFlatten = True
+
     def __init__(self, initvar=None, *, _from=None, _times, _basetype):
         if _from is None:
             if initvar is None:
@@ -44,7 +46,6 @@ class EUDStructArray(ExprProxy, metaclass=_EUDStruct_Metaclass):
             super().__init__(EUDVArray(_times, _basetype).cast(_from))
 
         self._initialized = True
-        self.dontFlatten = True
         self._times = _times
 
     def copy(self):

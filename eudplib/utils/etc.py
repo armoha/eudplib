@@ -5,12 +5,11 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from collections.abc import Sequence
 import functools
 import os.path
 import random
 import sys
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Any, TypeVar, overload
 
 T = TypeVar("T")
@@ -74,8 +73,8 @@ def EPD(p: Any, **kwargs) -> Any:
         nexttrg << c.NextTrigger()
         return ret
 
-    from .eperror import EPError
     from ..localize import _
+    from .eperror import EPError
 
     raise EPError(_("Invalid input for EPD: {}").format(p))
 

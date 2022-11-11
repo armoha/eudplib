@@ -96,6 +96,7 @@ def EUDVArray(size: int, basetype: type | None = None):
             )
 
     class _EUDVArray(ExprProxy):
+        dontFlatten = True
         def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None) -> None:
             # Initialization from value
             if _from is not None:
@@ -116,7 +117,6 @@ def EUDVArray(size: int, basetype: type | None = None):
                 baseobj = EUDVArrayData(size)(initvars, dest=dest, nextptr=nextptr)
 
             super().__init__(baseobj)
-            self.dontFlatten = True
             self._epd = EPD(self)
             self._basetype = basetype
 
