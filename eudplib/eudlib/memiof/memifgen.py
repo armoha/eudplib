@@ -107,9 +107,8 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}, _check_empty=False):
                 done = c.Forward()
                 check << c.RawTrigger(
                     conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
-                    actions=[
-                        retv.SetNumber(0) for retv, arg in zip(ret, args) if arg[0] != 0
-                    ] + [c.SetNextPtr(check, done)],
+                    actions=[retv.SetNumber(0) for retv, arg in zip(ret, args) if arg[0] != 0]
+                    + [c.SetNextPtr(check, done)],
                 )
                 read_start << c.NextTrigger()
 
