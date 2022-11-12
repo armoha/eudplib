@@ -32,7 +32,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from ...utils import EPD
-from ..memiof import f_cunitepdread_epd, f_dwepdread_epd
+from ..memiof import f_bread_cp, f_cunitepdread_epd, f_dwepdread_epd, f_setcurpl2cpcache
 
 
 @dataclass
@@ -88,6 +88,17 @@ def EUDLoopUnit():
     ut.EUDPopBlock("unitloop")
 
 
+class _UniqueIdentifier(c.EUDObject):
+    def GetDataSize(self):
+        return 4 + 336 * 1699
+
+    def WritePayload(self, emitbuffer):
+        emitbuffer.WriteDword(0)
+        for _ in range(1699):
+            emitbuffer.WriteSpace(332)
+            emitbuffer.WriteDword(0)
+
+
 def EUDLoopNewUnit(allowance=2):
     firstUnitPtr = EPD(0x628430)
     ut.EUDCreateBlock("newunitloop", "newlo")
@@ -95,13 +106,23 @@ def EUDLoopNewUnit(allowance=2):
     tos0 << 0
 
     ptr, epd = f_cunitepdread_epd(firstUnitPtr)
-    if cs.EUDWhile()(ptr >= 1):
-        epd += 0xA5 // 4
-        if cs.EUDIf()(c.MemoryXEPD(epd, c.AtLeast, 0x100, 0xFF00)):
-            cs.DoActions(c.SetMemoryXEPD(epd, c.SetTo, 0, 0xFF00), epd.AddNumber(-(0xA5 // 4)))
+    if cs.EUDWhileNot()(ptr == 0):
+        c.VProc(epd, [c.SetMemory(0x6509B0, c.SetTo, 0xA5 // 4), epd.QueueAddTo(EPD(0x6509B0))])
+        uniq = f_bread_cp(0, 1)
+        uniqueIdentifier = _UniqueIdentifier()
+        CheckUnique = c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF)
+        c.VProc(
+            uniq,
+            [
+                c.SetMemory(0x6509B0, c.Add, EPD(uniqueIdentifier) - EPD(0x59CCA8) - 0xA5 // 4),
+                uniq.SetDest(EPD(CheckUnique + 8)),
+            ],
+        )
+        if cs.EUDIfNot()(CheckUnique):
+            f_setcurpl2cpcache(uniq, uniq.SetDest(c.CurrentPlayer))
             yield ptr, epd
         if cs.EUDElse()():
-            cs.DoActions(tos0.AddNumber(1), epd.AddNumber(-(0xA5 // 4)))
+            cs.DoActions(tos0.AddNumber(1))
             cs.EUDBreakIf(tos0.AtLeast(allowance))
         cs.EUDEndIf()
         cs.EUDSetContinuePoint()

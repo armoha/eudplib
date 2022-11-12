@@ -61,3 +61,6 @@ def test_unitgroup():
         else:
             raise EPError("unit.remove() call is mandatory")
     EUDEndIf()
+
+    for ptr, epd in EUDLoopNewUnit():
+        pass
