@@ -49,18 +49,5 @@ def test_unitgroup():
     result = [1 if i in indexes else 3 if (i - 19) in indexes else 0 for i in range(26)]
     test_equality("UnitGroup dying test", [m[i] for i in range(26)], result)
 
-    # test mandatory remove call
-    if EUDIf()(False):
-        ug = UnitGroup(3)
-        ug.add(7)
-        try:
-            for unit in ug.cploop:
-                pass
-        except EPError:
-            unit.remove()
-        else:
-            raise EPError("unit.remove() call is mandatory")
-    EUDEndIf()
-
     for ptr, epd in EUDLoopNewUnit():
         pass

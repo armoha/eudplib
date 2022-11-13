@@ -123,6 +123,7 @@ class UnitGroup:
                     self._parent.pos,
                     self._parent.loopvar,
                 )
+
                 VProc(
                     [trg, tpos],
                     [
@@ -150,29 +151,30 @@ class UnitGroup:
 
                 if _UnsafeWhileNot()(Memory(loopstart, AtLeast, varray + 72 * capacity)):
                     block = EUDPeekBlock("whileblock")[1]
+                    PushTriggerScope()  # remove entry
+                    remove_end = Forward()
+                    remove_start = RawTrigger(
+                        nextptr=trg.GetVTable(),
+                        actions=[
+                            trg.SetDest(EPD(trg.GetVTable()) + 1),
+                            SetNextPtr(loopvar.GetVTable(), remove_end),
+                            loopvar.SetDest(0),  # pos가 이 액션의 값 칸
+                        ],
+                    )
+                    pos << remove_start + 328 + 32 * 2 + 20
+                    remove_end << RawTrigger(
+                        actions=[
+                            trg.AddNumber(72),
+                            tpos.AddNumber(18),
+                            loopvar.SetDest(EPD(0x6509B0)),
+                            SetNextPtr(loopvar.GetVTable(), check_death),
+                        ]
+                    )
+                    SetNextTrigger(block["contpoint"])
+                    PopTriggerScope()
+
                     loopstart << block["loopstart"] + 4
                     check_death << NextTrigger()
-
-                    def remove():
-                        remove_end = Forward()
-                        remove_start = RawTrigger(
-                            nextptr=trg.GetVTable(),
-                            actions=[
-                                trg.SetDest(EPD(trg.GetVTable()) + 1),
-                                SetNextPtr(loopvar.GetVTable(), remove_end),
-                                loopvar.SetDest(0),  # pos가 이 액션의 값 칸
-                            ],
-                        )
-                        pos << remove_start + 328 + 32 * 2 + 20
-                        remove_end << RawTrigger(
-                            actions=[
-                                trg.AddNumber(72),
-                                tpos.AddNumber(18),
-                                loopvar.SetDest(EPD(0x6509B0)),
-                                SetNextPtr(loopvar.GetVTable(), check_death),
-                            ]
-                        )
-                        SetNextTrigger(block["contpoint"])
 
                     def get_epd():
                         ret = EUDVariable()
@@ -185,7 +187,7 @@ class UnitGroup:
                         return ret
 
                     # EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
-                    yield _CpHelper(0x4C // 4, reset_cp, remove, get_epd)
+                    yield _CpHelper(0x4C // 4, reset_cp, remove_start, get_epd)
                     EUDSetContinuePoint()
                     DoActions(SetMemory(loopstart, Add, 72), SetMemory(pos, Add, 18))
                 EUDEndWhile()
@@ -223,10 +225,10 @@ class UnitGroup:
 
 # TODO: Add EPDCUnitMap-like convenient methods
 class _CpHelper:
-    def __init__(self, offset, resetf, removef, epdf):
+    def __init__(self, offset, resetf, remove, epdf):
         self.offset = offset
         self._reset = resetf
-        self.remove = removef
+        self._remove_start = remove
         self.get_epd = epdf
 
         class Dying:
@@ -259,6 +261,9 @@ class _CpHelper:
                 dying_end << NextTrigger()
 
         self.dying = Dying()
+
+    def remove(self):
+        SetNextTrigger(self._remove_start)
 
     @property  # read-only
     def epd(self):
