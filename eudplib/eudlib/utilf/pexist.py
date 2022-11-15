@@ -27,30 +27,36 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
+from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...localize import _
 from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl
 
 
-@c.EUDFunc
+@_EUDPredefineReturn(2, 3)
+@c.EUDTypedFunc([c.TrgPlayer], [None])
 def f_playerexist(player):
     """Check if player has not left the game.
 
     :returns: 1 if player exists, 0 if not.
     """
+    ret = f_playerexist._frets[0]
     pts = 0x51A280
 
     cs.EUDSwitch(player)
+    block = ut.EUDGetLastBlockOfName("swblock")[1]
+    block["_actions"] = ret.SetNumber(1)
     for p in ut.RandList(range(8)):
         if cs.EUDSwitchCase()(p):
-            if cs.EUDIf()(c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4))):
-                c.EUDReturn(0)
-            if cs.EUDElse()():
-                c.EUDReturn(1)
-            cs.EUDEndIf()
+            c.RawTrigger(
+                nextptr=block["swend"],
+                conditions=c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)),
+                actions=ret.SetNumber(0),
+            )
 
     if cs.EUDSwitchDefault()():
-        c.EUDReturn(0)
+        ret << 0
     cs.EUDEndSwitch()
+    # return ret
 
 
 # --------

@@ -184,7 +184,7 @@ def EUDEndSwitch():
         # use simple comparisons
         branch, nextbranch = c.Forward(), c.Forward()
         restore = c.SetMemory(branch + 4, c.SetTo, nextbranch)
-        c.RawTrigger(actions=restore)
+        c.RawTrigger(actions=[restore, block["_actions"]] if "_actions" in block else restore)
         for case in casekeylist:
             branch << c.RawTrigger(
                 conditions=c.MemoryXEPD(epd, c.Exactly, case, bitmask),
@@ -210,8 +210,9 @@ def EUDEndSwitch():
     density = len(casebrlist) / (2 ** len(keybits))
     if density >= 0.4:
         # use jump table
-        check_invariant = c.MemoryXEPD(epd, c.Exactly, keyand, (~keyor | keyand) & bitmask)
-        EUDJumpIfNot(check_invariant, defbranch)
+        if (~keyor | keyand) & bitmask != 0:
+            check_invariant = c.MemoryXEPD(epd, c.Exactly, keyand, (~keyor | keyand) & bitmask)
+            EUDJumpIfNot(check_invariant, defbranch)
 
         def powerset(iterable):
             "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
@@ -234,10 +235,14 @@ def EUDEndSwitch():
                     cpcache.SetDest(ut.EPD(0x6509B0)),
                     epd.QueueAssignTo(ut.EPD(0x6509B0)),
                     c.SetNextPtr(jumper, jump_table),
+                    block["_actions"] if "_actions" in block else [],
                 ],
             )
         else:
-            lastbit = c.RawTrigger(actions=c.SetNextPtr(jumper, jump_table))
+            restore = c.SetNextPtr(jumper, jump_table)
+            lastbit = c.RawTrigger(
+                actions=[restore, block["_actions"]] if "_actions" in block else restore
+            )
 
         for i, bit in enumerate(keybits):
             lastbit = c.RawTrigger(
@@ -260,6 +265,7 @@ def EUDEndSwitch():
                 cpcache.SetDest(ut.EPD(0x6509B0)),
                 epd.QueueAssignTo(ut.EPD(0x6509B0)),
                 c.SetNextPtr(cpcache.GetVTable(), defbranch),
+                block["_actions"] if "_actions" in block else [],
             ],
         )
         reset = []

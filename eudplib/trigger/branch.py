@@ -60,7 +60,7 @@ def EUDBranch(conditions, ontrue, onfalse, *, _actions=None):
     conditions = list(map(PatchCondition, conditions))
 
     if len(conditions) == 0:
-        c.RawTrigger(nextptr=ontrue)  # Just jump
+        c.RawTrigger(nextptr=ontrue, actions=_actions)  # Just jump
         return
 
     # Check all conditions
