@@ -82,7 +82,7 @@ _acttypes = {
     50: "ModifyUnitEnergy",
     51: "ModifyUnitShields",
     52: "ModifyUnitResourceAmount",
-    53: "ModifyUnitHangerCount",
+    53: "ModifyUnitHangarCount",
     54: "PauseTimer",
     55: "UnpauseTimer",
     56: "Draw",
