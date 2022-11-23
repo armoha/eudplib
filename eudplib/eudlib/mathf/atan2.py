@@ -35,25 +35,37 @@ def f_atan2(y, x):
     signflags << 0
 
     # Check x sign
-    if cs.EUDIf()(x >= 0x80000000):
-        c.SeqCompute([(signflags, c.Add, 1), (x, c.SetTo, -x)])  # set xsign
-    cs.EUDEndIf()
+    c.RawTrigger(
+        conditions=x >= 0x80000000,
+        actions=[
+            signflags.AddNumber(1),  # set xsign
+            x.AddNumberX(0xFFFFFFFF, 0x55555555),
+            x.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+            x.AddNumber(1),
+        ],
+    )
 
     # Check y sign
-    if cs.EUDIf()(y >= 0x80000000):
-        c.SeqCompute([(signflags, c.Add, 2), (y, c.SetTo, -y)])  # set ysign
-    cs.EUDEndIf()
+    c.RawTrigger(
+        conditions=y >= 0x80000000,
+        actions=[
+            signflags.AddNumber(2),  # set ysign
+            y.AddNumberX(0xFFFFFFFF, 0x55555555),
+            y.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+            y.AddNumber(1),
+        ],
+    )
 
     # Check x/y order
     if cs.EUDIf()(y >= x):
-        z = c.EUDVariable()
+        z = c.EUDVariable(0, c.SetTo, 0)
         # Swap x, y so that y <= x
         c.SeqCompute(
             [
                 (signflags, c.Add, 4),  # set xyabscmp
                 (z, c.SetTo, x),
                 (x, c.SetTo, y),
-                (y, c.SetTo, z),
+                (y, None, z),
             ]
         )
     cs.EUDEndIf()
