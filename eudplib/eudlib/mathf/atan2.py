@@ -165,4 +165,4 @@ def f_atan2(y, x):
             ],
         )
     cs.EUDEndSwitch()
-    c.EUDReturn(atan_value)
+    return atan_value

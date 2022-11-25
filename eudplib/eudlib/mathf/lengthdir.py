@@ -100,31 +100,24 @@ def f_lengthdir(length, angle):
     # calculate lengthdir: cos, sin * 65536
     ldir_x = c.f_div(c.f_mul(tablecos, length), 65536)[0]
     ldir_y = c.f_div(c.f_mul(tablesin, length), 65536)[0]
-    signedness = c.EUDVariable()
 
     # restore sign of cos, sin
-    if cs.EUDIf()(sign.ExactlyX(1, 1)):
-        c.VProc(
-            [ldir_x, signedness],
-            [
-                signedness.SetDest(ldir_x),
-                signedness.SetNumber(0xFFFFFFFF),
-                ldir_x.QueueSubtractTo(signedness),
-            ],
-        )
-        ldir_x += 1
-    cs.EUDEndIf()
+    c.RawTrigger(
+        conditions=sign.ExactlyX(1, 1),
+        actions=[  # ldir_x = -ldir_x
+            ldir_x.AddNumberX(0xFFFFFFFF, 0x55555555),
+            ldir_x.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+            ldir_x.AddNumber(1),
+        ],
+    )
 
-    if cs.EUDIf()(sign.ExactlyX(2, 2)):
-        c.VProc(
-            [ldir_y, signedness],
-            [
-                signedness.SetDest(ldir_y),
-                signedness.SetNumber(0xFFFFFFFF),
-                ldir_y.QueueSubtractTo(signedness),
-            ],
-        )
-        ldir_y += 1
-    cs.EUDEndIf()
+    c.RawTrigger(
+        conditions=sign.ExactlyX(2, 2),
+        actions=[  # ldir_y = -ldir_y
+            ldir_y.AddNumberX(0xFFFFFFFF, 0x55555555),
+            ldir_y.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+            ldir_y.AddNumber(1),
+        ],
+    )
 
     return ldir_x, ldir_y
