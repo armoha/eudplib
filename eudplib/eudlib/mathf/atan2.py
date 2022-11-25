@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
+from eudplib import utils as ut
 
 # Formula source : http://nghiaho.com/?p=997
 
@@ -100,21 +101,68 @@ def f_atan2(y, x):
     # -----+----+----+           -----+----+----+
     # ysign|      xyabscmp=0     ysign|      xyabscmp=1
 
-    cs.EUDSwitch(signflags)
+    cs.EUDSwitch(signflags, 7)
+    swblock = ut.EUDGetLastBlock()[1]
     if cs.EUDSwitchCase()(0):  # xsign, ysign, xyabscmp = 0, 0, 0
-        c.EUDReturn(atan_value)
+        # atan_value
+        c.SetNextTrigger(swblock["swend"])
     if cs.EUDSwitchCase()(1):  # xsign, ysign, xyabscmp = 1, 0, 0
-        c.EUDReturn(180 - atan_value)
+        # 180 - atan_value
+        c.RawTrigger(
+            nextptr=swblock["swend"],
+            actions=[
+                atan_value.AddNumberX(0xFFFFFFFF, 0x55555555),
+                atan_value.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+                atan_value.AddNumber(180 + 1),
+            ],
+        )
     if cs.EUDSwitchCase()(2):  # xsign, ysign, xyabscmp = 0, 1, 0
-        c.EUDReturn(360 - atan_value)
+        # 360 - atan_value
+        c.RawTrigger(
+            nextptr=swblock["swend"],
+            actions=[
+                atan_value.AddNumberX(0xFFFFFFFF, 0x55555555),
+                atan_value.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+                atan_value.AddNumber(360 + 1),
+            ],
+        )
     if cs.EUDSwitchCase()(3):  # xsign, ysign, xyabscmp = 1, 1, 0
-        c.EUDReturn(180 + atan_value)
+        # 180 + atan_value
+        c.RawTrigger(
+            nextptr=swblock["swend"],
+            actions=atan_value.AddNumber(180),
+        )
     if cs.EUDSwitchCase()(4):  # xsign, ysign, xyabscmp = 0, 0, 1
-        c.EUDReturn(90 - atan_value)
+        # 90 - atan_value
+        c.RawTrigger(
+            nextptr=swblock["swend"],
+            actions=[
+                atan_value.AddNumberX(0xFFFFFFFF, 0x55555555),
+                atan_value.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+                atan_value.AddNumber(90 + 1),
+            ],
+        )
     if cs.EUDSwitchCase()(5):  # xsign, ysign, xyabscmp = 1, 0, 1
-        c.EUDReturn(90 + atan_value)
+        # 90 + atan_value
+        c.RawTrigger(
+            nextptr=swblock["swend"],
+            actions=atan_value.AddNumber(90),
+        )
     if cs.EUDSwitchCase()(6):  # xsign, ysign, xyabscmp = 0, 1, 1
-        c.EUDReturn(270 + atan_value)
+        # 270 + atan_value
+        c.RawTrigger(
+            nextptr=swblock["swend"],
+            actions=atan_value.AddNumber(270),
+        )
     if cs.EUDSwitchCase()(7):  # xsign, ysign, xyabscmp = 1, 1, 1
-        c.EUDReturn(270 - atan_value)
+        # 270 - atan_value
+        c.RawTrigger(
+            nextptr=swblock["swend"],
+            actions=[
+                atan_value.AddNumberX(0xFFFFFFFF, 0x55555555),
+                atan_value.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+                atan_value.AddNumber(270 + 1),
+            ],
+        )
     cs.EUDEndSwitch()
+    c.EUDReturn(atan_value)
