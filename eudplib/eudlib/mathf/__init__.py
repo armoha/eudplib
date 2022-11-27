@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .atan2 import f_atan2
-from .lengthdir import f_lengthdir
+from .atan2 import f_atan2, f_atan2_256
+from .lengthdir import f_lengthdir, f_lengthdir_256
 from .pow import f_pow
 from .sqrt import f_sqrt
