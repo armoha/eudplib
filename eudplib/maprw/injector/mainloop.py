@@ -28,17 +28,20 @@ from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
 from ...eudlib.utilf.userpl import _f_initisusercp
+from ...utils import ep_assert
 
 jumper = None
 startFunctionList = []
+hasAlreadyStarted = False
 
 
 def EUDOnStart(func):
+    ep_assert(not hasAlreadyStarted)
     startFunctionList.append(func)
 
 
 def _MainStarter(mf):
-    global jumper
+    global jumper, hasAlreadyStarted
     jumper = c.Forward()
 
     if c.PushTriggerScope():
@@ -51,6 +54,7 @@ def _MainStarter(mf):
 
         for func in startFunctionList:
             func()
+        hasAlreadyStarted = True
 
         mf()
 
