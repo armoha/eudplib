@@ -94,7 +94,7 @@ def Trigger(conditions=None, actions=None, preserved=True):
 
         skipt = c.Forward()
         if not preserved:
-            actions.append(c.SetNextPtr(start, skipt))
+            actions.append(c.SetNextPtr(tstart, skipt))
 
         # Execute actions
         for i in range(0, len(actions), 64):
