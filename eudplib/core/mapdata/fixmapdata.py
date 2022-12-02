@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 from ...localize import _
-from ...utils import ep_warn
+from ...utils import b2i2, ep_warn
 
 
 def FixMapData(chkt):
@@ -99,13 +99,17 @@ def ApplyRemasteredChk(chkt):
 def FixMTXM0_0Null(chkt):
     mtxm = bytearray(chkt.getsection("MTXM"))
 
-    hasNull = False
+    null_tiles = []
     for i in range(0, len(mtxm), 2):
         if mtxm[i : i + 2] == b"\0\0":
             mtxm[i : i + 2] = b"\x01\0"
-            hasNull = True
+            null_tiles.append(i // 2)
 
-    if hasNull:
+    if null_tiles:
+        dim = chkt.getsection("DIM")
+        width = b2i2(dim, 0)
+
+        print("Null tiles at:", ", ".join(map(lambda x: str(divmod(x, width)), null_tiles)))
         ep_warn(
             _("[Warning] Input map has 0000.00 null tiles")
             + "\n"
