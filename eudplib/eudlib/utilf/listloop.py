@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from dataclasses import dataclass
-
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import trigtrg as tt
@@ -33,24 +31,7 @@ from eudplib.localize import _
 
 from ...utils import EPD
 from ..memiof import f_bread_cp, f_cunitepdread_epd, f_dwepdread_epd, f_setcurpl2cpcache
-
-
-@dataclass
-class _UnlimiterBool:
-    is_unlimiter_on: bool = False
-
-
-_unlimiter = _UnlimiterBool(is_unlimiter_on=False)
-
-
-def _turnUnlimiterOn():
-    global _unlimiter
-    _unlimiter.is_unlimiter_on = True
-
-
-def _isUnlimiterOn():
-    global _unlimiter
-    return _unlimiter.is_unlimiter_on
+from .unlimiterflag import IsUnlimiterOn
 
 
 def EUDLoopList(header_offset, break_offset=None):
@@ -137,7 +118,7 @@ def EUDLoopUnit2():
     """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
     1700개 유닛을 도는 방식으로 작동합니다.
     """
-    if _isUnlimiterOn():
+    if IsUnlimiterOn():
         offset, is_dead = 0x4C // 4, c.MemoryXEPD(0, c.Exactly, 0, 0xFF00)
     else:
         offset, is_dead = 0x0C // 4, c.MemoryEPD(0, c.Exactly, 0)
