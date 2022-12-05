@@ -57,6 +57,7 @@ from .memiof import (
     f_wsubtract_epd,
     f_wwrite_epd,
 )
+from .utilf.unlimiterflag import IsUnlimiterOn
 
 rdict = {1: f_bread_epd, 2: f_wread_epd, 4: lambda epd, _: f_dwread_epd(epd)}
 wdict = {
@@ -575,6 +576,7 @@ class EPDCUnitMap(
         self.clear_status_flag(0x00100000)
 
     def is_dying(self):
+        ut.ep_assert(not IsUnlimiterOn(), "Can't detect unit dying with [unlimiter]")
         return [self.order == 0, self.sprite >= 1]
 
     def is_completed(self):
