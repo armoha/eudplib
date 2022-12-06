@@ -81,8 +81,26 @@ def f_dwread_epd(targetplayer):
     # return ptr
 
 
+@_EUDPredefineReturn(1)
+@_EUDPredefineParam(c.CurrentPlayer)
+@c.EUDFunc
 def f_epdread_epd(targetplayer):
-    return f_dwepdread_epd(targetplayer)[1]
+    ptr = f_epdread_epd._frets[0]
+    u = random.randint(234, 65535)
+    acts = [
+        ptr.SetNumber(ut.EPD(0)),
+        c.SetMemory(0x6509B0, c.Add, -12 * u),
+    ]
+    cs.DoActions(ut.RandList(acts))
+    for i in ut.RandList(range(2, 32)):
+        c.RawTrigger(
+            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
+            actions=ptr.AddNumber(2 ** (i - 2)),
+        )
+
+    f_setcurpl2cpcache()
+
+    # return ptr
 
 
 # Special flag reading functions

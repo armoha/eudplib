@@ -4,7 +4,7 @@
 from .wireframe import (
     InitialWireframe,
     SetGrpWire,
-    SetTransWire,
+    SetTranWire,
     SetWirefram,
     SetWireframes,
 )

@@ -35,6 +35,10 @@ startFunctionList = []
 hasAlreadyStarted = False
 
 
+def _hasAlreadyStarted():
+    return hasAlreadyStarted == True
+
+
 def EUDOnStart(func):
     ep_assert(not hasAlreadyStarted)
     startFunctionList.append(func)
