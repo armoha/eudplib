@@ -97,7 +97,7 @@ def _repaddsd_epd(dstepdp, srcepdp, copydwn):
 
 
 @c.EUDFunc
-def f_memcpy(dst, src, copylen):
+def _memcpy(dst, src, copylen):
     from ..stringf.rwcommon import br1, bw1
 
     br1.seekoffset(src)
@@ -108,6 +108,12 @@ def f_memcpy(dst, src, copylen):
         bw1.writebyte(b)
         copylen -= 1
     cs.EUDEndWhile()
+
+
+def f_memcpy(dst, src, copylen, **kwargs):
+    if type(dst) == type(src) == type(copylen) == int and dst % 4 == src % 4 == copylen % 4 == 0:
+        return f_repmovsd_epd(ut.EPD(dst), ut.EPD(src), copylen // 4, **kwargs)
+    return _memcpy(dst, src, copylen, **kwargs)
 
 
 @c.EUDFunc
