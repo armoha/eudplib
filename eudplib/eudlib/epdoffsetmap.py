@@ -287,17 +287,19 @@ def EPDOffsetMap(ct: tuple[tuple[str, int, int | type | str], ...]):
 class EPDCUnitMap(
     # fmt: off
     EPDOffsetMap((
-        ("prev", 0x000, "CUnit"), ("next", 0x004, "CUnit"),
-        ("hp", 0x008, 4), ("hitPoints", 0x008, 4),
+        ("prev", 0x000, "CUnit"), ("next", 0x004, "CUnit"),  # link
+        ("hp", 0x008, 4), ("hitPoints", 0x008, 4),  # displayed value is ceil(healthPoints/256)
         ("sprite", 0x00C, "CSprite"),
         ("moveTargetXY", 0x010, "Position"), ("moveTargetPosition", 0x010, "Position"),
         ("moveTargetX", 0x010, "PositionX"), ("moveTargetY", 0x012, "PositionY"),
         ("moveTarget", 0x014, "CUnit"), ("moveTargetUnit", 0x014, "CUnit"),
+        # The next way point in the path the unit is following to get to its destination.
+        # Equal to moveToPos for air units since they don't need to navigate around buildings.
         ("nextMovementWaypoint", 0x018, "Position"),
-        ("nextTargetWaypoint", 0x01C, "Position"),
+        ("nextTargetWaypoint", 0x01C, "Position"),  # The desired position
         ("movementFlags", 0x020, 1),
-        ("direction", 0x021, 1), ("currentDirection1", 0x021, 1),
-        ("flingyTurnRadius", 0x022, 1),
+        ("direction", 0x021, 1), ("currentDirection1", 0x021, 1),  # current direction the unit is facing
+        ("flingyTurnRadius", 0x022, 1), ("flingyTurnSpeed", 0x022, 1),
         ("velocityDirection1", 0x023, 1),
         ("flingyID", 0x024, c.Flingy),
         ("_unknown_0x026", 0x026, 1),
@@ -311,41 +313,44 @@ class EPDCUnitMap(
         ("current_speedX", 0x040, 4), ("current_speedY", 0x044, 4),
         ("flingyAcceleration", 0x048, 2),
         ("currentDirection2", 0x04A, 1),
-        ("velocityDirection2", 0x04B, 1),
+        ("velocityDirection2", 0x04B, 1),  # pathing related
         ("owner", 0x04C, c.TrgPlayer), ("playerID", 0x04C, c.TrgPlayer),
         ("order", 0x04D, 1), ("orderID", 0x04D, 1),
         ("orderState", 0x04E, 1), ("orderSignal", 0x04F, 1),
         ("orderUnitType", 0x050, c.TrgUnit),
+        ("_unknown_0x052", 0x052, 2),  # 2-byte padding
         ("cooldown", 0x054, 4),
         ("orderTimer", 0x054, 1), ("mainOrderTimer", 0x054, 1),
         ("gCooldown", 0x055, 1), ("groundWeaponCooldown", 0x055, 1),
         ("aCooldown", 0x056, 1), ("airWeaponCooldown", 0x056, 1),
         ("spellCooldown", 0x057, 1),
-        ("orderTargetXY", 0x058, "Position"), ("orderTargetPosition", 0x058, "Position"),
+        ("orderTargetXY", 0x058, "Position"), ("orderTargetPosition", 0x058, "Position"),  # ActionFocus
         ("orderTargetX", 0x058, "PositionX"), ("orderTargetY", 0x05A, "PositionY"),
         ("orderTarget", 0x05C, "CUnit"), ("orderTargetUnit", 0x05C, "CUnit"),
         ("shield", 0x060, 4), ("shieldPoints", 0x060, 4),
         ("unitId", 0x064, c.TrgUnit), ("unitType", 0x064, c.TrgUnit),
+        ("_unknown_0x066", 0x066, 2),  # 2-byte padding
         ("previousPlayerUnit", 0x068, "CUnit"),
-        ("nextPlayerUnit", 0x06C, "CUnit"),
+        ("nextPlayerUnit", 0x06C, "CUnit"),  # player_link
         ("subUnit", 0x070, "CUnit"),
         ("orderQHead", 0x074, 4), ("orderQueueHead", 0x074, 4),  # COrder
         ("orderQTail", 0x078, 4), ("orderQueueTail", 0x078, 4),
         ("autoTargetUnit", 0x07C, "CUnit"),
-        ("connectedUnit", 0x080, "CUnit"),
+        ("connectedUnit", 0x080, "CUnit"),  # larva, in-transit, addons
         ("orderQCount", 0x084, 1), ("orderQueueCount", 0x084, 1),
         ("orderQTimer", 0x085, 1), ("orderQueueTimer", 0x085, 1),
         ("_unknown_0x086", 0x086, 1),
         ("attackNotifyTimer", 0x087, 1),
-        ("previousUnitType", 0x088, c.TrgUnit),
+        ("previousUnitType", 0x088, c.TrgUnit),  # zerg buildings while morphing
         ("lastEventTimer", 0x08A, 1),
-        ("lastEventColor", 0x08B, 1),
+        ("lastEventColor", 0x08B, 1),  # 17 = was completed (train, morph), 174 = was attacked
         ("_unused_0x08C", 0x08C, 2),
         ("rankIncrease", 0x08E, 1),
         ("killCount", 0x08F, 1),
         ("lastAttackingPlayer", 0x090, c.TrgPlayer),
         ("secondaryOrderTimer", 0x091, 1),
         ("AIActionFlag", 0x092, 1),
+        # 2 = issued an order, 3 = interrupted an order, 4 = hide self before death (self-destruct?)
         ("userActionFlags", 0x093, 1),
         ("currentButtonSet", 0x094, 2),
         ("isCloaked", 0x096, bool),
@@ -359,14 +364,14 @@ class EPDCUnitMap(
         ("buildQ5", 0x0A0, c.TrgUnit), ("buildQueue5", 0x0A0, c.TrgUnit),
         ("energy", 0x0A2, 2),
         ("buildQueueSlot", 0x0A4, 1),
-        ("uniquenessIdentifier", 0x0A5, 1),
+        ("uniquenessIdentifier", 0x0A5, 1), ("targetOrderSpecial", 0x0A5, 1),
         ("secondaryOrder", 0x0A6, 1), ("secondaryOrderID", 0x0A6, 1),
         ("buildingOverlayState", 0x0A7, 1),
-        ("hpGain", 0x0A8, 2),
+        ("hpGain", 0x0A8, 2),  # buildRepairHpGain
         ("shieldGain", 0x0AA, 2),
         ("remainingBuildTime", 0x0AC, 2),
         ("previousHP", 0x0AE, 2),
-        ("loadedUnitIndex0", 0x0B0, 2),  # alphaID
+        ("loadedUnitIndex0", 0x0B0, 2),  # alphaID (StoredUnit)
         ("loadedUnitIndex1", 0x0B2, 2),
         ("loadedUnitIndex2", 0x0B4, 2),
         ("loadedUnitIndex3", 0x0B6, 2),
@@ -383,7 +388,7 @@ class EPDCUnitMap(
         ("parent", 0x0C0, "CUnit"),
         ("prevFighter", 0x0C4, "CUnit"),
         ("nextFighter", 0x0C8, "CUnit"),
-        ("inHanger", 0x0CC, bool),  # fighter
+        ("inHanger", 0x0CC, bool), ("isOutsideHangar", 0x0CC, bool),  # fighter
         ("_unknown_00", 0x0C0, 4),
         ("_unknown_04", 0x0C4, 4),
         ("flagSpawnFrame", 0x0C8, 4),  # beacon
@@ -427,7 +432,7 @@ class EPDCUnitMap(
         ("wireframeRandomizer", 0x0E1, 1),
         ("secondaryOrderState", 0x0E2, 1),
         ("recentOrderTimer", 0x0E3, 1),
-        ("visibilityStatus", 0x0E4, 4),
+        ("visibilityStatus", 0x0E4, 4),  # which players can detect this unit (cloaked/burrowed)
         ("secondaryOrderPosition", 0x0E8, "Position"),
         ("secondaryOrderX", 0x0E8, 2), ("secondaryOrderY", 0x0EA, 2),
         ("currentBuildUnit", 0x0EC, "CUnit"),
@@ -449,7 +454,7 @@ class EPDCUnitMap(
         ("contourBoundsR", 0x10C, 2), ("contourBoundsB", 0x10E, 2),
         # status
         ("removeTimer", 0x110, 2),
-        ("matrixDamage", 0x112, 2), ("defenseMatrixDamage", 0x112, 2),
+        ("matrixDamage", 0x112, 2), ("defenseMatrixDamage", 0x112, 2), ("defensiveMatrixHp", 0x112, 2),
         ("matrixTimer", 0x114, 1), ("defenseMatrixTimer", 0x114, 1),
         ("stimTimer", 0x115, 1),
         ("ensnareTimer", 0x116, 1),
@@ -457,14 +462,14 @@ class EPDCUnitMap(
         ("irradiateTimer", 0x118, 1),
         ("stasisTimer", 0x119, 1),
         ("plagueTimer", 0x11A, 1),
-        ("stormTimer", 0x11B, 1),
+        ("stormTimer", 0x11B, 1), ("isUnderStorm", 0x11B, 1),
         ("irradiatedBy", 0x11C, "CUnit"),
         ("irradiatePlayerID", 0x120, 1),
         ("parasiteFlags", 0x121, 1),
         ("cycleCounter", 0x122, 1),
-        ("isBlind", 0x123, bool),
+        ("isBlind", 0x123, 1), ("blindFlags", 0x123, 1),
         ("maelstromTimer", 0x124, 1),
-        ("_unused_0x125", 0x125, 1),
+        ("_unused_0x125", 0x125, 1), ("unusedTimer", 0x125, 1),
         ("acidSporeCount", 0x126, 1),
         ("acidSporeTime0", 0x127, 1),
         ("acidSporeTime1", 0x128, 1),
@@ -475,12 +480,18 @@ class EPDCUnitMap(
         ("acidSporeTime6", 0x12D, 1),
         ("acidSporeTime7", 0x12E, 1),
         ("acidSporeTime8", 0x12F, 1),
-        ("bulletBehaviour3by3AttackSequence", 0x130, 2),
+        ("bulletBehaviour3by3AttackSequence", 0x130, 2), ("offsetIndex3by3", 0x130, 2),
+        ("_padding_0x132", 0x132, 2),
         ("pAI", 0x134, 4),
         ("airStrength", 0x138, 2), ("groundStrength", 0x13A, 2),
-        ("_repulseUnknown", 0x14C, 1), ("repulseAngle", 0x14D, 1),
-        ("bRepMtxXY", 0x14E, 2),
+        ("finderIndexLeft", 0x13C, 4),
+        ("finderIndexRight", 0x140, 4),
+        ("finderIndexTop", 0x144, 4),
+        ("finderIndexBottom", 0x148, 4),
+        ("repulseUnknown", 0x14C, 1), ("repulseAngle", 0x14D, 1),
+        ("driftPos", 0x14E, 2), ("bRepMtxXY", 0x14E, 2),  # mapsizex / 1.5 max
         ("bRepMtxX", 0x14E, 1), ("bRepMtxY", 0x14F, 1),
+        ("driftPosX", 0x14E, 1), ("driftPosY", 0x14F, 1),
     ))
     # fmt: on
 ):
