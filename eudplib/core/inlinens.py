@@ -22,7 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-
+from eudplib.utils import ep_warn
 
 _objns = {}
 
@@ -35,6 +35,7 @@ def EUDRegisterObjectToNamespace(funcname, obj):
     """Register object to inline code namespace."""
     if funcname[0] != "_":
         if funcname in _objns:
+            ep_warn(f"Duplicated name {funcname} for EUDRegisterObjectToNamespace")
             _objns[funcname] = None
         else:
             _objns[funcname] = obj
