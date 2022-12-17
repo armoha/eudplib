@@ -109,7 +109,7 @@ def FixMTXM0_0Null(chkt):
         dim = chkt.getsection("DIM")
         width = b2i2(dim, 0)
 
-        print("Null tiles at:", ", ".join(map(lambda x: str(divmod(x, width)), null_tiles)))
+        print("Null tiles at:", ", ".join(map(lambda x: str(divmod(x, width)[::-1]), null_tiles)))
         ep_warn(
             _("[Warning] Input map has 0000.00 null tiles")
             + "\n"
