@@ -43,7 +43,9 @@ def IsSCDBMap():
     return is_scdb_map
 
 
-def modifyCodeLineno(codeobj, codeMap):
+def modifyCodeLineno(codeobj: types.CodeType, codeMap):
+    # See: https://peps.python.org/pep-0626/#backwards-compatibility
+    # https://github.com/python/cpython/blob/main/Objects/lnotab_notes.txt
     co_lnotab = codeobj.co_lnotab
     co_firstlineno = codeobj.co_firstlineno
 
@@ -70,24 +72,47 @@ def modifyCodeLineno(codeobj, codeMap):
             c = modifyCodeLineno(c, codeMap)
         new_co_consts.append(c)
 
-    codeobj = types.CodeType(
-        codeobj.co_argcount,
-        codeobj.co_posonlyargcount,  # python 3.8 support (See PEP 570)
-        codeobj.co_kwonlyargcount,
-        codeobj.co_nlocals,
-        codeobj.co_stacksize,
-        codeobj.co_flags,
-        codeobj.co_code,
-        tuple(new_co_consts),
-        codeobj.co_names,
-        codeobj.co_varnames,
-        codeobj.co_filename,
-        codeobj.co_name,
-        codeMap(co_firstlineno),  # codeobj.co_firstlineno,
-        b"".join(new_lnotab),  # codeobj.co_lnotab,
-        codeobj.co_freevars,
-        codeobj.co_cellvars,
-    )
+    try:
+        # Python 3.11 change: Added co_qualname, co_exceptiontable
+        codeobj = types.CodeType(
+            codeobj.co_argcount,
+            codeobj.co_posonlyargcount,  # python 3.8 support (See PEP 570)
+            codeobj.co_kwonlyargcount,
+            codeobj.co_nlocals,
+            codeobj.co_stacksize,
+            codeobj.co_flags,
+            codeobj.co_code,
+            tuple(new_co_consts),
+            codeobj.co_names,
+            codeobj.co_varnames,
+            codeobj.co_filename,
+            codeobj.co_name,
+            codeobj.co_qualname,
+            codeMap(co_firstlineno),  # codeobj.co_firstlineno,
+            b"".join(new_lnotab),  # codeobj.co_lnotab,
+            codeobj.co_exceptiontable,
+            codeobj.co_freevars,
+            codeobj.co_cellvars,
+        )
+    except AttributeError:  # Python 3.7~3.9
+        codeobj = types.CodeType(
+            codeobj.co_argcount,
+            codeobj.co_posonlyargcount,  # python 3.8 support (See PEP 570)
+            codeobj.co_kwonlyargcount,
+            codeobj.co_nlocals,
+            codeobj.co_stacksize,
+            codeobj.co_flags,
+            codeobj.co_code,
+            tuple(new_co_consts),
+            codeobj.co_names,
+            codeobj.co_varnames,
+            codeobj.co_filename,
+            codeobj.co_name,
+            codeMap(co_firstlineno),  # codeobj.co_firstlineno,
+            b"".join(new_lnotab),  # codeobj.co_lnotab,
+            codeobj.co_freevars,
+            codeobj.co_cellvars,
+        )
 
     return codeobj
 
