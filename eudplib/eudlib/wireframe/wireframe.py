@@ -61,7 +61,9 @@ class InitialWireframe:
                     init.append(ut.i2b2(data[-2] >> 16))
                     init.append(ut.i2b4(data[-1]))
                     init = c.Db(b"".join(init))
-                    ut.ep_assert(len(init.content) == (size + 1) * 8)
+                    ut.ep_assert(
+                        len(init.content) == (size + 1) * 8, f"Size mismatch: {len(init.content)}"
+                    )
                 else:
                     init = default
                 return ut.EPD(init)
@@ -87,7 +89,10 @@ class InitialWireframe:
                     init.append(ut.i2b2(data[x + 2]))
                 init.append(ut.i2b2(data[2 * src[key_max] + 2] >> 16))
                 init = c.Db(b"".join(init))
-                ut.ep_assert(len(init.content) == (key_max - key_min + 1) * 8 + 4)
+                ut.ep_assert(
+                    len(init.content) == (key_max - key_min + 1) * 8 + 4,
+                    f"Size mismatch: {len(init.content)}",
+                )
                 f_repmovsd_epd(ptr, ut.EPD(init), (key_max - key_min + 1) * 2 + 1)
 
             init32(tranwire, cls._tranwires, wd.TranWire32)
@@ -97,7 +102,10 @@ class InitialWireframe:
 
     @classmethod
     def init(cls):
-        ut.ep_assert(not _hasAlreadyStarted())
+        ut.ep_assert(
+            not _hasAlreadyStarted(),
+            "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262",
+        )
         if not cls._collected:
             cls._collected = True
             EUDOnStart(cls._init)
@@ -105,7 +113,9 @@ class InitialWireframe:
     @classmethod
     def _add(cls, unit, wireframe, length, wiredict):
         unit, wireframe = c.EncodeUnit(unit), c.EncodeUnit(wireframe)
-        ut.ep_assert(type(unit) == type(wireframe) == int)
+        ut.ep_assert(
+            type(unit) == type(wireframe) == int, f"{unit} and {wireframe} should be valid unit"
+        )
         if 0 <= unit < length and 0 <= wireframe < length:
             wiredict[unit] = wireframe
             cls.init()

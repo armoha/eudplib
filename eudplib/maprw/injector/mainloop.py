@@ -40,7 +40,9 @@ def _hasAlreadyStarted():
 
 
 def EUDOnStart(func):
-    ep_assert(not hasAlreadyStarted)
+    ep_assert(
+        not hasAlreadyStarted, "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262"
+    )
     startFunctionList.append(func)
 
 
