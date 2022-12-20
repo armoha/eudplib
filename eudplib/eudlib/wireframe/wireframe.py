@@ -93,6 +93,8 @@ class InitialWireframe:
                     len(init.content) == (key_max - key_min + 1) * 8 + 4,
                     f"Size mismatch: {len(init.content)}",
                 )
+                if key_min > 0:
+                    ptr = ptr + 2 * key_min
                 f_repmovsd_epd(ptr, ut.EPD(init), (key_max - key_min + 1) * 2 + 1)
 
             init32(tranwire, cls._tranwires, wd.TranWire32)
