@@ -3,7 +3,7 @@ from bisect import insort_right
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
-from eudplib.maprw.injector.mainloop import EUDOnStart, _hasAlreadyStarted
+from eudplib.maprw.injector.mainloop import EUDOnStart, _EUDOnStart2, _hasAlreadyStarted
 
 from ..eudarray import EUDArray
 from ..memiof import (
@@ -110,7 +110,7 @@ class InitialWireframe:
         )
         if not cls._collected:
             cls._collected = True
-            EUDOnStart(cls._init)
+            _EUDOnStart2(cls._init)
 
     @classmethod
     def _add(cls, unit, wireframe, length, wiredict):

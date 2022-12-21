@@ -31,19 +31,27 @@ from ...eudlib.utilf.userpl import _f_initisusercp
 from ...utils import ep_assert
 
 jumper = None
-startFunctionList = []
-hasAlreadyStarted = False
+startFunctionList1 = []
+startFunctionList2 = []
+hasAlreadyStarted = 0
 
 
 def _hasAlreadyStarted():
-    return hasAlreadyStarted == True
+    return hasAlreadyStarted == 2
 
 
 def EUDOnStart(func):
     ep_assert(
-        not hasAlreadyStarted, "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262"
+        hasAlreadyStarted < 2, "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262"
     )
-    startFunctionList.append(func)
+    if hasAlreadyStarted == 0:
+        startFunctionList1.append(func)
+    else:
+        _EUDOnStart2(func)
+
+
+def _EUDOnStart2(func):
+    startFunctionList2.append(func)
 
 
 def _MainStarter(mf):
@@ -58,11 +66,25 @@ def _MainStarter(mf):
         sf.f_getcurpl()
         _f_initstacktrace()
 
-        for func in startFunctionList:
+        for func in startFunctionList1:
             func()
-        hasAlreadyStarted = True
+        hasAlreadyStarted = 1
 
-        mf()
+        if not startFunctionList2:
+            mf()
+        else:
+            start2 = c.Forward()
+            c.RawTrigger(nextptr=start2)
+            mf_start = c.NextTrigger()
+            mf()
+
+            c.PushTriggerScope()
+            start2 << c.NextTrigger()
+            for func in startFunctionList2:
+                func()
+            hasAlreadyStarted = 2
+            c.SetNextTrigger(mf_start)
+            c.PopTriggerScope()
 
         c.RawTrigger(nextptr=0x80000000, actions=c.SetNextPtr(jumper, 0x80000000))
         jumper << c.RawTrigger(nextptr=rootstarter)

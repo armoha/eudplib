@@ -18,14 +18,19 @@ helper.EP_SetRValueStrictMode(True)
 
 helper.InitialWireframe.wireframes("Terran Marine", "Protoss Archon")
 helper.InitialWireframe.wireframes("Terran Goliath", "Terran Dropship")
-helper.InitialWireframe.wireframes("Devouring One", "Zerg Hive")
-helper.InitialWireframe.wireframes("Zerg Queen's Nest", "Protoss Photon Cannon")
-helper.InitialWireframe.wireframes("Protoss Scout", "Psi Emitter")
-helper.InitialWireframe.wireframes("Protoss Cybernetics Core", "Protoss Probe")
+
+
+@helper.EUDFunc
+def foo():
+    helper.InitialWireframe.wireframes("Devouring One", "Zerg Hive")
+    helper.InitialWireframe.wireframes("Zerg Queen's Nest", "Protoss Photon Cannon")
 
 
 @helper.TestInstance
 def test_wireframe():
+    foo()
+    helper.InitialWireframe.wireframes("Protoss Scout", "Psi Emitter")
+    helper.InitialWireframe.wireframes("Protoss Cybernetics Core", "Protoss Probe")
     helper.SetWireframes("Terran SCV", "Zerg Drone")
 
 

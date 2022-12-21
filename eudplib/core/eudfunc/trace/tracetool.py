@@ -70,7 +70,7 @@ def _f_initstacktrace():
             SetMemoryEPD(traceToolDataEPD + 1, SetTo, ut.b2i4(traceHeader, 0x4)),
             SetMemoryEPD(traceToolDataEPD + 2, SetTo, ut.b2i4(traceHeader, 0x8)),
             SetMemoryEPD(traceToolDataEPD + 3, SetTo, ut.b2i4(traceHeader, 0xC)),
-        ]
+        ],
     )
 
 
