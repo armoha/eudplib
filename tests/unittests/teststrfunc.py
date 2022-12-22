@@ -121,4 +121,25 @@ def test_strbuffer():
     SetPName(P4, "TestTest")
     SetPNamef(userid, "SetPNameTest{}", userid)
 
+    f_dwwrite(0x640B58, 0)
+    f_setcurpl(userid)
+    if EUDIfNot()(True):
+        neverstr = StringBuffer()
+        a = Db("Hi")
+        neverstr.printf("{:t}", EPD(a))
+    if EUDElse()():
+        b = Db("Never say never")
+        neverstr.printf("{:t}", EPD(b))
+    EUDEndIf()
+    test_assert(
+        "StringBuffer branch test",
+        [
+            Memory(0x640B60, Exactly, b2i4(b"Neve")),
+            Memory(0x640B64, Exactly, b2i4(b"r sa")),
+            Memory(0x640B68, Exactly, b2i4(b"y ne")),
+            Memory(0x640B6C, Exactly, b2i4(b"ver\r")),
+            MemoryX(0x640B70, Exactly, 0, 0xFF),
+        ],
+    )
+
     f_setcurpl(origcp)

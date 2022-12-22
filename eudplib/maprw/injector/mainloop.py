@@ -66,25 +66,25 @@ def _MainStarter(mf):
         sf.f_getcurpl()
         _f_initstacktrace()
 
+        hasAlreadyStarted = 1
         for func in startFunctionList1:
             func()
-        hasAlreadyStarted = 1
+        start2 = c.Forward()
+        c.SetNextTrigger(start2)
 
-        if not startFunctionList2:
-            mf()
-        else:
-            start2 = c.Forward()
-            c.RawTrigger(nextptr=start2)
-            mf_start = c.NextTrigger()
-            mf()
+        mf_start = c.NextTrigger()
+        mf()
 
+        hasAlreadyStarted = 2
+        if startFunctionList2:
             c.PushTriggerScope()
             start2 << c.NextTrigger()
             for func in startFunctionList2:
                 func()
-            hasAlreadyStarted = 2
             c.SetNextTrigger(mf_start)
             c.PopTriggerScope()
+        else:
+            start2 << mf_start
 
         c.RawTrigger(nextptr=0x80000000, actions=c.SetNextPtr(jumper, 0x80000000))
         jumper << c.RawTrigger(nextptr=rootstarter)

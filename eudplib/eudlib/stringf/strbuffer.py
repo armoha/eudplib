@@ -27,6 +27,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.mapdata.stringmap import ForceAddString
+from ...maprw.injector.mainloop import EUDOnStart
 from ..memiof import f_getcurpl, f_setcurpl
 from ..utilf import IsUserCP, f_getuserplayerid
 from .cpprint import FixedText, f_cpstr_print, f_gettextptr
@@ -111,17 +112,10 @@ class StringBuffer:
         self.StringIndex = ForceAddString(content)
         self.epd, self.pos = c.EUDVariable(), c.EUDVariable()
 
-        try:
-            cs.EUDExecuteOnce()()
+        def _f():
             self.epd << ut.EPD(GetMapStringAddr(self.StringIndex))
-            cs.EUDEndExecuteOnce()
-        except IndexError:
-            from ...maprw.injector.mainloop import EUDOnStart
 
-            def _f():
-                self.epd << ut.EPD(GetMapStringAddr(self.StringIndex))
-
-            EUDOnStart(_f)
+        EUDOnStart(_f)
 
     @classmethod
     def _init_template(cls):
