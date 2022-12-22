@@ -184,6 +184,7 @@ def _testmain():
 def test_runall(testname):
     LoadMap("outputmap/basemap/basemap_strx.scx")
     SaveMap("outputmap/test_%s.scx" % testname, _testmain)
+    print(f"eudplib version {eudplibVersion()}")
 
 
 def test_wait(time):
