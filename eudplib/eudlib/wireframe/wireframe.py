@@ -182,21 +182,25 @@ def _set_wireframe(unit, wireframe, size, ptr, default32, default64):
 
 @c.EUDTypedFunc([c.TrgUnit, c.TrgUnit])
 def SetTranWire(unit, wireframe):
+    InitialWireframe.init()
     _set_wireframe(unit, wireframe, 105, tranwire, tranwire_default32, tranwire_default64)
 
 
 @c.EUDTypedFunc([c.TrgUnit, c.TrgUnit])
 def SetGrpWire(unit, wireframe):
+    InitialWireframe.init()
     _set_wireframe(unit, wireframe, 130, grpwire, grpwire_default32, grpwire_default64)
 
 
 @c.EUDTypedFunc([c.TrgUnit, c.TrgUnit])
 def SetWirefram(unit, wireframe):
+    InitialWireframe.init()
     _set_wireframe(unit, wireframe, 227, wirefram, wirefram_default32, wirefram_default64)
 
 
 @c.EUDTypedFunc([c.TrgUnit, c.TrgUnit])
 def SetWireframes(unit, wireframe):
+    InitialWireframe.init()
     SetTranWire(unit, wireframe)
     SetGrpWire(unit, wireframe)
     SetWirefram(unit, wireframe)
