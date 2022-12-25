@@ -98,8 +98,10 @@ def EUDDoEvents():
     oldcp = sf.f_getcurpl()
 
     _t = c.Forward()
-    cs.DoActions(c.SetNextPtr(jumper, _t))
-    cs.EUDJump(0x80000000)
+    c.RawTrigger(
+        nextptr=0x80000000,
+        actions=c.SetNextPtr(jumper, _t),
+    )
     _t << c.NextTrigger()
 
     sf.f_setcurpl(oldcp)
