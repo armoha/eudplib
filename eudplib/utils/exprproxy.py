@@ -43,6 +43,9 @@ class ExprProxy:
     def getValue(self):
         return self._value
 
+    def __len__(self):
+        return len(self._value)
+
     def __hash__(self):
         return id(self)
 

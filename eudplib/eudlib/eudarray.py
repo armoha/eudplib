@@ -91,7 +91,7 @@ class EUDArray(ut.ExprProxy):
         return self.set(key, item)
 
     def __iter__(self):
-        raise EPError(_("Can't iterate EUDArray"))
+        raise ut.EPError(_("Can't iterate EUDArray"))
 
     # in-place item operations
     # Total 6 cases = 3 × 2

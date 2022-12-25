@@ -1,9 +1,11 @@
 from helper import *
 
+a_initials = ExprProxy([5] * 10)
+
 
 @TestInstance
 def test_varray():
-    a = EUDVArray(10)([5, 5, 5, 5, 5, 5, 5, 5, 5, 5])
+    a = EUDVArray(len(a_initials))(a_initials)
     for i in range(8):
         a[i] = 2**i
 
