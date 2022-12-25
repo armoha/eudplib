@@ -163,17 +163,31 @@ def f_test_nested_object():
     EUDEndIf()
     EUDReturn(ret)
     # (Line 71) }
-    # (Line 73) object List {
+    # (Line 73) const ListList = py_list();
 
-# (Line 74) var prev: selftype, next: selftype;
+ListList = _CGFW(lambda: [list()], 1)[0]
+# (Line 74) var AllList;  // EUDArray
+AllList = EUDVariable()
+# (Line 75) object List {
+# (Line 76) var prev: selftype, next: selftype;
 class List(EUDStruct):
-    # (Line 75) function foo(c: Coord) {}
+    # (Line 77) function constructor() {
+    @EUDMethod
+    def constructor(this):
+        # (Line 78) py_exec("\
+        # (Line 84) EUDOnStart(init)");
+        exec("if not ListList:\n    def init():\n        global AllList\n        ListList.append(-1)\n        AllList << EUDArray(ListList)\n    EUDOnStart(init)")
+        # (Line 85) ListList.append(this);
+        ListList.append(this)
+        # (Line 86) }
+        # (Line 87) function foo(c: Coord) {}
+
     @EUDTypedMethod([Coord])
     def foo(this, c):
-        # (Line 76) };
+        # (Line 88) };
         pass
 
-    # (Line 77) function test_selftype_member() {
+    # (Line 89) function test_selftype_member() {
     _fields_ = [
         ('prev', selftype),
         ('next', selftype),
@@ -181,16 +195,36 @@ class List(EUDStruct):
 
 @EUDFunc
 def f_test_selftype_member():
-    # (Line 78) const a, b = List(), List();
+    # (Line 90) const a, b = List(), List();
     a, b = List2Assignable([List(), List()])
-    # (Line 79) a.prev = b;
+    # (Line 91) a.prev = b;
     _ATTW(a, 'prev') << (b)
-    # (Line 80) a.next = b;
+    # (Line 92) a.next = b;
     _ATTW(a, 'next') << (b)
-    # (Line 81) b.prev = a;
+    # (Line 93) b.prev = a;
     _ATTW(b, 'prev') << (a)
-    # (Line 82) b.next = a;
+    # (Line 94) b.next = a;
     _ATTW(b, 'next') << (a)
-    # (Line 83) a.foo(0);
+    # (Line 95) a.foo(0);
     a.foo(0)
-    # (Line 84) }
+    # (Line 96) const c = List();
+    c = List()
+    # (Line 97) const d = List();
+    d = List()
+    # (Line 98) const e = List();
+    e = List()
+    # (Line 100) const arr = EUDArray.cast(AllList);
+    arr = EUDArray.cast(AllList)
+    # (Line 101) var i;
+    i = EUDVariable()
+    # (Line 102) for (i = 0 ; arr[i] != -1 ; i++) {}
+    i << (0)
+    if EUDWhile()(_ARRC(arr, i) == -1, neg=True):
+        def _t2():
+            i.__iadd__(1)
+        # (Line 103) return i;
+        EUDSetContinuePoint()
+        _t2()
+    EUDEndWhile()
+    EUDReturn(i)
+    # (Line 104) }
