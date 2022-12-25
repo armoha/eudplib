@@ -27,8 +27,9 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.mapdata.stringmap import ForceAddString
-from ...maprw.injector.mainloop import EUDOnStart
-from ..memiof import f_getcurpl, f_setcurpl
+from ...maprw.injector.mainloop import _EUDOnStart2, _hasAlreadyStarted
+from ..eudarray import EUDArray
+from ..memiof import f_dwread_cp, f_getcurpl, f_setcurpl
 from ..utilf import IsUserCP, f_getuserplayerid
 from .cpprint import FixedText, f_cpstr_print, f_gettextptr
 from .cpstr import GetMapStringAddr
@@ -90,6 +91,7 @@ class StringBuffer:
 
     _method_template = c.Forward()
     _cpbranch = c.Forward()
+    _initlist = []
 
     def __init__(self, content=None):
         """Constructor for StringBuffer
@@ -101,6 +103,10 @@ class StringBuffer:
 
         :type content: str, bytes, int
         """
+        ut.ep_assert(
+            not _hasAlreadyStarted(),
+            "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262",
+        )
         _chkt = c.GetChkTokenized()
         if content is None:
             content = "\r" * 218
@@ -112,10 +118,26 @@ class StringBuffer:
         self.StringIndex = ForceAddString(content)
         self.epd, self.pos = c.EUDVariable(), c.EUDVariable()
 
-        def _f():
-            self.epd << ut.EPD(GetMapStringAddr(self.StringIndex))
+        if not StringBuffer._initlist:
+            _EUDOnStart2(StringBuffer._init)
 
-        EUDOnStart(_f)
+        StringBuffer._initlist.extend((ut.EPD(self.epd.getValueAddr()), self.StringIndex))
+
+    @classmethod
+    def _init(cls):
+        StringBuffer._initlist.append(-1)
+        initarr = EUDArray(StringBuffer._initlist)
+        set_cp = c.SetMemory(0x6509B0, c.SetTo, ut.EPD(initarr))
+        cs.DoActions(c.SetMemory(0x6509B0, c.SetTo, ut.EPD(initarr)))
+        if cs.EUDWhileNot()(c.Deaths(c.CurrentPlayer, c.Exactly, -1, 0)):
+            dest_epd = c.Forward()
+            f_dwread_cp(0, ret=[dest_epd])
+            cs.DoActions(c.SetMemory(0x6509B0, c.Add, 1))
+            string_index = f_dwread_cp(0)
+            epd = ut.EPD(GetMapStringAddr(string_index))
+            dest_epd << ut.EPD(epd.getDestAddr())
+            c.VProc(epd, [c.SetMemory(set_cp + 20, c.Add, 2), set_cp])
+        cs.EUDEndWhile()
 
     @classmethod
     def _init_template(cls):
