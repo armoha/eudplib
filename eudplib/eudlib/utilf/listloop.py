@@ -77,7 +77,7 @@ class _UniqueIdentifier(c.EUDObject):
         emitbuffer.WriteDword(0)
         for _ in range(1699):
             emitbuffer.WriteSpace(332)
-            emitbuffer.WriteDword(0)
+            emitbuffer.WriteDword(0xFF)
 
 
 def EUDLoopNewUnit(allowance=2):
@@ -103,7 +103,7 @@ def EUDLoopNewUnit(allowance=2):
             f_setcurpl2cpcache(uniq, uniq.SetDest(c.CurrentPlayer))
             yield ptr, epd
         if cs.EUDElse()():
-            cs.DoActions(tos0.AddNumber(1))
+            tos0 += 1
             cs.EUDBreakIf(tos0.AtLeast(allowance))
         cs.EUDEndIf()
         cs.EUDSetContinuePoint()
