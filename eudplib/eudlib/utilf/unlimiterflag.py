@@ -9,11 +9,11 @@ class _UnlimiterBool:
 _unlimiter = _UnlimiterBool(is_unlimiter_on=False)
 
 
-def _turnUnlimiterOn():
+def _turnUnlimiterOn() -> None:
     global _unlimiter
     _unlimiter.is_unlimiter_on = True
 
 
-def IsUnlimiterOn():
+def IsUnlimiterOn() -> None:
     global _unlimiter
     return _unlimiter.is_unlimiter_on == True

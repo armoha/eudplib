@@ -22,6 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
+from typing import Generator, Optional
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
@@ -62,7 +63,9 @@ def f_playerexist(player):
 # --------
 
 
-def EUDLoopPlayer(ptype="Human", force=None, race=None):
+def EUDLoopPlayer(
+    ptype: Optional[str] = "Human", force=None, race: Optional[str] = None
+) -> Generator[c.EUDVariable, None, None]:
     def EncodeForce(f):
         force_dict = {c.Force1: 0, c.Force2: 1, c.Force3: 2, c.Force4: 3}
         if type(f) != int and f in force_dict:

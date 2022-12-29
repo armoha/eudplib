@@ -27,7 +27,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 
 
-def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF):
+def EUDBinaryMax(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
     """Find maximum x satisfying cond(x) using binary search
 
     :param cond: Test condition
@@ -72,7 +72,7 @@ def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF):
     return x
 
 
-def EUDBinaryMin(cond, minv=0, maxv=0xFFFFFFFF):
+def EUDBinaryMin(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
     """Find minimum x satisfying cond(x) using binary search
 
     :param cond: Test condition

@@ -33,7 +33,7 @@ _userp = None
 _userp_fws = set()
 
 
-def f_getuserplayerid():
+def f_getuserplayerid() -> c.EUDVariable:
     global _userp
     if _userp is None:
         if cs.EUDExecuteOnce()():
@@ -42,7 +42,7 @@ def f_getuserplayerid():
     return _userp
 
 
-def IsUserCP():
+def IsUserCP() -> c.Condition:
     """Condition: check if CurrentPlayer equals to user player id (local)"""
     fw = c.Forward()
     ret = c.Memory(0x6509B0, c.Exactly, fw)
@@ -50,7 +50,7 @@ def IsUserCP():
     return ret
 
 
-def _action_all(action):
+def _action_all(action) -> list[c.Action]:
     fw = c.Forward()
     ret = c.SetMemory(0x6509B0, c.SetTo, fw)
     fw << UserP_FW(ret, 20)

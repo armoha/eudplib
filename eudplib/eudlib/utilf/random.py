@@ -34,13 +34,13 @@ from ..memiof import f_wread_epd
 _seed = c.EUDVariable()
 
 
-def f_getseed():
+def f_getseed() -> c.EUDVariable:
     t = c.EUDVariable()
     t << _seed
     return t
 
 
-def f_srand(seed):
+def f_srand(seed) -> None:
     _seed << seed
 
 

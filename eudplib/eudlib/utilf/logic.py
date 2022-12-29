@@ -29,7 +29,7 @@ from eudplib.trigger.tpatcher import NegateCondition
 from eudplib.utils.eperror import EPError
 
 
-def EUDOr(cond1, *conds):
+def EUDOr(cond1, *conds) -> c.EUDLightBool:
     """cond1 || cond2 || ... || condn
 
     .. warning:: Short circuiting is not supported
@@ -49,7 +49,7 @@ def EUDOr(cond1, *conds):
     return v
 
 
-def EUDAnd(cond1, *conds):
+def EUDAnd(cond1, *conds) -> c.EUDLightBool:
     """cond1 && cond2 && ... && condn
 
     .. note::

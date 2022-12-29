@@ -23,13 +23,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import Union
+
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import trigger as t
 from eudplib import utils as ut
 
 from ..eudarray import EUDArray
-from ..memiof import f_dwread_epd, f_dwwrite_epd, f_repmovsd_epd
+from ..memiof import f_dwread_epd, f_dwwrite_epd, f_repmovsd_epd, f_setcurpl2cpcache
 
 patchMax = 8192
 
@@ -38,13 +40,47 @@ dws_top, ps_top = c.EUDVariable(), c.EUDVariable()
 dwstack = EUDArray(patchMax)
 
 
-def pushpatchstack(value):
+def pushpatchstack(*values: Union[c.EUDVariable, int]) -> None:
     global ps_top
-    patchstack[ps_top] = value
-    ps_top += 1
+    has_var = False
+    varlist = [ps_top]
+    actlist = [
+        c.SetMemory(0x6509B0, c.SetTo, ut.EPD(patchstack)),
+        ps_top.QueueAddTo(ut.EPD(0x6509B0)),
+    ]
+    for v in values:
+        if c.IsEUDVariable(v):
+            if has_var:
+                c.VProc(varlist, actlist)
+                varlist, actlist = [v], [
+                    c.SetMemory(0x6509B0, c.Add, 1),
+                    v.SetDest(c.CurrentPlayer),
+                ]
+            else:
+                varlist.append(v)
+                actlist.append(v.SetDest(c.CurrentPlayer))
+            has_var = True
+        else:
+            if has_var:
+                c.VProc(varlist, actlist)
+                varlist, actlist = [], [
+                    c.SetMemory(0x6509B0, c.Add, 1),
+                    c.SetDeaths(c.CurrentPlayer, c.SetTo, v, 0),
+                ]
+            else:
+                actlist.extend(
+                    [
+                        c.SetMemory(0x6509B0, c.Add, 1),
+                        c.SetDeaths(c.CurrentPlayer, c.SetTo, v, 0),
+                    ]
+                )
+            has_var = False
+
+    actlist.append(ps_top.AddNumber(1))
+    f_setcurpl2cpcache(varlist, actlist)
 
 
-def poppatchstack():
+def poppatchstack() -> c.EUDVariable:
     global ps_top
     ps_top -= 1
     return patchstack[ps_top]
@@ -55,19 +91,18 @@ def f_dwpatch_epd(dstepd, value):
     global dws_top
 
     prev_value = f_dwread_epd(dstepd)
-    dws_pos = ut.EPD(dwstack) + dws_top
+    dws_pos = dws_top  # aliasing
     c.VProc(
         [dstepd, value, dws_pos, prev_value],
         [
             dstepd.SetDest(ut.EPD(value.getDestAddr())),
+            dws_pos.AddNumber(ut.EPD(dwstack)),
             dws_pos.SetDest(ut.EPD(prev_value.getDestAddr())),
         ],
     )
 
-    pushpatchstack(dstepd)
-    pushpatchstack(dws_pos)
-    pushpatchstack(1)
-    dws_top += 1
+    pushpatchstack(dstepd, dws_pos, 1)
+    dws_top += 1 - ut.EPD(value.getDestAddr())
 
 
 @c.EUDFunc
@@ -83,23 +118,17 @@ def f_blockpatch_epd(dstepd, srcepd, dwn):
     global dws_top
 
     # Push to stack
-    pushpatchstack(dstepd)
-    pushpatchstack(srcepd)
-    pushpatchstack(dwn)
+    pushpatchstack(dstepd, srcepd, dwn)
     dws_top += 1
 
     # Swap contents btw dstepd, srcepd
     tmpbuffer = c.Db(1024)
 
-    if cs.EUDWhile()(dwn > 0):
-        copydwn = c.EUDVariable()
-        copydwn << 256
-        t.Trigger(dwn <= 256, copydwn.SetNumber(dwn))
-        dwn -= copydwn
-
-        f_repmovsd_epd(ut.EPD(tmpbuffer), dstepd, copydwn)
-        f_repmovsd_epd(dstepd, srcepd, copydwn)
-        f_repmovsd_epd(srcepd, ut.EPD(tmpbuffer), copydwn)
+    if cs.EUDWhileNot()(dwn == 0):
+        f_repmovsd_epd(ut.EPD(tmpbuffer), dstepd, dwn)
+        f_repmovsd_epd(dstepd, srcepd, dwn)
+        f_repmovsd_epd(srcepd, ut.EPD(tmpbuffer), dwn)
+        c.RawTrigger(actions=dwn.SubtractNumber(256))
     cs.EUDEndWhile()
 
 
