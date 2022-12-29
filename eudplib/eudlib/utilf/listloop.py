@@ -81,7 +81,7 @@ class _UniqueIdentifier(c.EUDObject):
         emitbuffer.WriteDword(0)
         for _ in range(1699):
             emitbuffer.WriteSpace(332)
-            emitbuffer.WriteDword(0)
+            emitbuffer.WriteDword(0xFF)
 
 
 def EUDLoopNewUnit(
