@@ -165,7 +165,7 @@ _AddLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add)
 _DilateLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add, signed=True)
 
 
-def f_setloc(locID, *coords, action=False):
+def f_setloc(locID, *coords, action=False) -> None:
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),
@@ -196,7 +196,7 @@ def f_setloc(locID, *coords, action=False):
         _SetLoc4(locID * 5, *coords)
 
 
-def f_addloc(locID, *coords, action=False):
+def f_addloc(locID, *coords, action=False) -> None:
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),
@@ -227,7 +227,7 @@ def f_addloc(locID, *coords, action=False):
         _AddLoc4(locID * 5, *coords)
 
 
-def f_dilateloc(locID, *coords, action=False):
+def f_dilateloc(locID, *coords, action=False) -> None:
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),
@@ -268,7 +268,7 @@ def _GetLocTL(epd):
     return left, epd
 
 
-def f_getlocTL(locID, **kwargs):
+def f_getlocTL(locID, **kwargs) -> tuple[c.EUDVariable, c.EUDVariable]:
     """
     로케이션의 위(top), 왼쪽 (left) 좌표를 얻어냅니다.
     @param  {[type]} locID 로케이션 번호. $L(로케이션 이름) 으로 얻을 수 있습니다.
@@ -316,7 +316,7 @@ def _SetLocEPD(loc, epd):
     done << f_setcurpl2cpcache(actions=c.SetNextPtr(set_xy, one_more))
 
 
-def f_setloc_epd(locID, epd):
+def f_setloc_epd(locID, epd) -> None:
     if isinstance(locID, str):
         locID = c.GetLocationIndex(locID)
-    return _SetLocEPD(locID * 5, epd)
+    _SetLocEPD(locID * 5, epd)
