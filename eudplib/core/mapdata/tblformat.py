@@ -115,10 +115,6 @@ class TBL:
                         break
                 if len(self._emptystring) == empty_len:
                     self._emptystring.append(i - 1)
-            try:
-                string = ut.u2b(string)
-            except UnicodeEncodeError:
-                pass
             self.AddString(string)
         self._loaded = True
 
@@ -247,18 +243,17 @@ class TBL:
             if i in removed_str:
                 string = b""
 
-            try:
-                string = ut.u2b(string)
-            except UnicodeEncodeError:
-                pass
             self.AddString(string)
         self._loaded = True
 
     def AddString(self, string):
         # Starcraft: Remastered uses both utf-8 and multibyte encoding.
-        string = ut.u2utf8(string)
+        try:
+            string = ut.u2b(string)
+        except UnicodeEncodeError:
+            string = ut.u2utf8(string)
         if not isinstance(string, bytes):
-            raise ut.EPError(_("Invalid type for string") + f": {string}")
+            raise ut.EPError(_("Invalid type for string"))
 
         stringindex = len(self._dataindextb)
 
