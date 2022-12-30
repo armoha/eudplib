@@ -32,7 +32,7 @@ class BlockStruManager:
         self._blockstru = []
         self._lastblockdict = {}
 
-    def empty(self):
+    def empty(self) -> bool:
         return not self._blockstru
 
 
@@ -46,7 +46,7 @@ def SetCurrentBlockStruManager(bsm):
     return old_bsm
 
 
-def EUDCreateBlock(name, userdata):
+def EUDCreateBlock(name, userdata) -> None:
     _blockstru = _current_bsm._blockstru
     _lastblockdict = _current_bsm._lastblockdict
 

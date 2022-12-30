@@ -23,22 +23,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import Union
+
 from ..localize import _
 from .eperror import EPError
 
 g_encoding = "cp949"
 
 
-def UbconvSetEncoding(encoding):
+def UbconvSetEncoding(encoding: str) -> None:
     global g_encoding
     g_encoding = encoding
 
 
-def u2b(s):
+def u2b(s: Union[str, bytes]) -> bytes:
     if isinstance(s, str):
         try:
             return s.encode(g_encoding)
-        except (UnicodeEncodeError):
+        except UnicodeEncodeError:
             return s.encode("utf-8")
     elif isinstance(s, bytes):
         return s
@@ -46,7 +48,7 @@ def u2b(s):
         raise EPError(_("Invalid type {}").format(type(s)))
 
 
-def b2u(b):
+def b2u(b: Union[str, bytes]) -> str:
     if isinstance(b, bytes):
         return b.decode(g_encoding)
     elif isinstance(b, str):
@@ -55,7 +57,7 @@ def b2u(b):
         raise EPError(_("Invalid type {}").format(type(s)))
 
 
-def u2utf8(s):
+def u2utf8(s: Union[str, bytes]) -> bytes:
     if isinstance(s, str):
         return s.encode("utf-8")
     elif isinstance(s, bytes):

@@ -176,7 +176,7 @@ def unProxy(x):
         return x
 
 
-def isUnproxyInstance(x, cls):
+def isUnproxyInstance(x, cls) -> bool:
     if isinstance(x, cls):
         return True
     try:

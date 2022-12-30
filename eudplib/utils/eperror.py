@@ -36,14 +36,14 @@ class EPWarning(Warning):
     pass
 
 
-def ep_assert(statement, message="Assertion failed"):
+def ep_assert(statement, message="Assertion failed") -> None:
     if not statement:
         raise EPError(message)
 
 
-def ep_eprint(*args, **kwargs):
+def ep_eprint(*args, **kwargs) -> None:
     print(*args, file=sys.stderr, **kwargs)
 
 
-def ep_warn(message):
+def ep_warn(message) -> None:
     warnings.warn(message, EPWarning)

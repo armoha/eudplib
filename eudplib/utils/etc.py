@@ -105,7 +105,7 @@ def cachedfunc(function):
 # Original code from TrigEditPlus::ConvertString_SCMD2ToRaw
 
 
-def SCMD2Text(s):
+def SCMD2Text(s: str) -> str:
     #
     # normal -> xdigitinput1 -> xdigitinput2 -> xdigitinput3 -> normal
     #        '<'           xdigit          xdigit            '>'
@@ -176,24 +176,7 @@ def SCMD2Text(s):
     return "".join(out)
 
 
-####
-
-strict = False
-
-
-def isStrict():
-    return strict
-
-
-def setStrict(mode):
-    global strict
-    strict = mode
-
-
-####
-
-
-def find_data_file(filename, file):
+def find_data_file(filename: str, file) -> str:
     if getattr(sys, "frozen", False):
         # The application is frozen
         datadir = os.path.dirname(sys.executable)
