@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import Iterator
+from collections.abc import Iterator
 
 
 def b2i1(b: bytes, index: int = 0) -> int:

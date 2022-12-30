@@ -1,14 +1,15 @@
 #!python
 #cython: language_level=3, boundscheck=False, wraparound=False
 
+from typing import Any
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from libc.string cimport memset
 
 def StackObjects(
-    found_objects,
-    dwoccupmap_dict,
-    alloctable,
-):
+    found_objects: list[Any],
+    dwoccupmap_dict: dict[Any, Any],
+    alloctable: dict[Any, int],
+) -> None:
     cdef int dwoccupmap_max_size = 0
     for obj in found_objects:
         dwoccupmap_max_size += len(dwoccupmap_dict[obj])

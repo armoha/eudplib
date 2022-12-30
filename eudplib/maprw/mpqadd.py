@@ -27,12 +27,15 @@ import ctypes
 import sys
 
 from .. import utils as ut
+from ..core.mapdata.mpqapi import MPQ
 from ..localize import _
 
 _addedFiles = {}
+from collections.abc import ByteString
+from typing import AnyStr
 
 
-def UpdateFileListByListfile(mpqr):
+def UpdateFileListByListfile(mpqr: MPQ) -> None:
     """Use listfile to get list of already existing files."""
 
     _addedFiles.clear()
@@ -47,7 +50,7 @@ def UpdateFileListByListfile(mpqr):
         MPQAddFile(fname, None)
 
 
-def MPQCheckFile(fname):
+def MPQCheckFile(fname: AnyStr) -> bytes:
     """Check if filename is already exist.
 
     :param fname: Desired filename in mpq
@@ -63,7 +66,7 @@ def MPQCheckFile(fname):
     return fname_key
 
 
-def MPQAddFile(fname, content, isWave=False):
+def MPQAddFile(fname: AnyStr, content: ByteString, isWave: bool = False) -> None:
     """Add file/wave to output map.
 
     :param fname: Desired filename in mpq
@@ -88,7 +91,7 @@ def MPQAddFile(fname, content, isWave=False):
     _addedFiles[fname_key] = (fname, content, isWave)
 
 
-def MPQAddWave(fname, content):
+def MPQAddWave(fname: AnyStr, content: ByteString) -> None:
     """Add wave to output map.
 
     :param fname: Desired filename in mpq
@@ -96,10 +99,10 @@ def MPQAddWave(fname, content):
 
     .. note:: See `MPQAddFile` for more info
     """
-    return MPQAddFile(fname, content, True)
+    MPQAddFile(fname, content, True)
 
 
-def UpdateMPQ(mpqw):
+def UpdateMPQ(mpqw: MPQ) -> None:
     """Really append additional mpq file to mpq file.
 
     `MPQAddFile` queues addition, and UpdateMPQ really adds them.
@@ -123,8 +126,8 @@ def UpdateMPQ(mpqw):
                 raise ctypes.WinError(ctypes.get_last_error())
 
 
-def GetAddedFiles():
+def GetAddedFiles() -> set[bytes]:
     ret = set(fname for fname, content, isWave in _addedFiles.values())
-    ret.add("staredit\\scenario.chk")
-    ret.add("(listfile)")
+    ret.add(b"staredit\\scenario.chk")
+    ret.add(b"(listfile)")
     return ret

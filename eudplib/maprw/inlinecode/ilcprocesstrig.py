@@ -23,9 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import ByteString
 from random import random
 
 from ... import utils as ut
+from ...core.mapdata.chktok import CHK
 from ...trigtrg import trigtrg as tt
 from .btInliner import (
     GetExecutingPlayers,
@@ -37,27 +39,27 @@ from .btInliner import (
 from .ilccompile import CompileInlineCode, ComputeBaseInlineCodeGlobals
 
 _inlineCodes = []
-_inliningRate = 1
-_cutoffRate = [1 + (i - 2) / 3 for i in range(9)]
+_inliningRate: float = 1.0
+_cutoffRate: list[float] = [1 + (i - 2) / 3 for i in range(9)]
 
 
-def PRT_SetInliningRate(rate):
+def PRT_SetInliningRate(rate: float) -> None:
     """Set how much triggers will be inlined into STR section."""
     global _inliningRate
     _inliningRate = rate
 
 
-def PreprocessInlineCode(chkt):
+def PreprocessInlineCode(chkt: CHK) -> None:
     global _inlineCodes
     trigSection = chkt.getsection("TRIG")
     _inlineCodes, trigSection = PreprocessTrigSection(trigSection)
     chkt.setsection("TRIG", trigSection)
 
 
-def PreprocessTrigSection(trigSection):
+def PreprocessTrigSection(trigSection: ByteString) -> tuple[list[tuple[int, callable]], bytes]:
     """Fetch inline codes & compiles them"""
     ComputeBaseInlineCodeGlobals()
-    if _inliningRate == 1:
+    if _inliningRate >= 1.0:
         return ConsecutiveInlineTrigSection(trigSection)
 
     inlineCodes = []
@@ -95,7 +97,7 @@ def PreprocessTrigSection(trigSection):
     return inlineCodes, trigSection
 
 
-def ConsecutiveInlineTrigSection(trigSection):
+def ConsecutiveInlineTrigSection(trigSection: ByteString):
     inlineCodes = []
     trigSegments = []
     pTriggers = ([], [], [], [], [], [], [], [])
@@ -197,7 +199,7 @@ def InlinifyNormalTrigger(inlineCodes, trigger_bytes):
     return CreateInlineCodeDispatcher(inlineCodes, func, playerCode)
 
 
-def CreateInlineCodeDispatcher(inlineCodes, func, playerCode):
+def CreateInlineCodeDispatcher(inlineCodes, func, playerCode: int) -> bytearray:
     """Create link from TRIG list to STR trigger."""
     funcID = len(inlineCodes) + 1024
     inlineCodes.append((funcID, func))

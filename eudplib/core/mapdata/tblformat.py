@@ -253,7 +253,7 @@ class TBL:
         except UnicodeEncodeError:
             string = ut.u2utf8(string)
         if not isinstance(string, bytes):
-            raise ut.EPError(_("Invalid type for string"))
+            raise ut.EPError(_("Invalid type for string") + f": {string}")
 
         stringindex = len(self._dataindextb)
 

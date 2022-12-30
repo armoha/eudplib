@@ -23,7 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import Union
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
@@ -40,7 +39,7 @@ dws_top, ps_top = c.EUDVariable(), c.EUDVariable()
 dwstack = EUDArray(patchMax)
 
 
-def pushpatchstack(*values: Union[c.EUDVariable, int]) -> None:
+def pushpatchstack(*values: c.EUDVariable | int) -> None:
     global ps_top
     has_var = False
     varlist = [ps_top]

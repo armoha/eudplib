@@ -154,7 +154,9 @@ if __name__ == "__main__":
             name="eudplib",
             version=__version__,
             packages=find_packages(),
-            package_data={"": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst", "*.mo"]},
+            package_data={
+                "": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst", "*.mo", "eudplib/py.typed"]
+            },
             include_package_data=True,
             ext_modules=cythonize(["eudplib/**/*.pyx"], language_level="3"),
             python_requires=">=3.10",

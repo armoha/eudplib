@@ -34,18 +34,18 @@ _hibytefilter = c.EUDXVariable(0, 0xFF0000)
 _msbytefilter = c.EUDXVariable(0, 0xFF000000)
 
 
-def _filldw(dstepd, v1):
+def _filldw(dstepd, v1) -> None:
     c.SeqCompute(((dstepd, c.SetTo, v1),))
 
 
-def _fillloword(dstepd, v1):
+def _fillloword(dstepd, v1) -> None:
     c.VProc(
         [v1, _lowordfilter],
         [v1.QueueAssignTo(_lowordfilter), _lowordfilter.SetDest(dstepd)],
     )
 
 
-def _filllsbyte(dstepd, v1):
+def _filllsbyte(dstepd, v1) -> None:
     c.VProc(
         [v1, _lsbytefilter],
         [v1.QueueAssignTo(_lsbytefilter), _lsbytefilter.SetDest(dstepd)],
@@ -63,7 +63,7 @@ def _fill_b__(v1):
         )
 
 
-def _filllobyte(dstepd, v1):
+def _filllobyte(dstepd, v1) -> None:
     _fill_b__(v1)
     c.VProc(_lobytefilter, _lobytefilter.SetDest(dstepd))
 
@@ -79,7 +79,7 @@ def _fill__b_(v1):
         )
 
 
-def _fillhibyte(dstepd, v1):
+def _fillhibyte(dstepd, v1) -> None:
     _fill__b_(v1)
     c.VProc(_hibytefilter, _hibytefilter.SetDest(dstepd))
 
@@ -95,6 +95,6 @@ def _fill___b(v1):
         )
 
 
-def _fillmsbyte(dstepd, v1):
+def _fillmsbyte(dstepd, v1) -> None:
     _fill___b(v1)
     c.VProc(_msbytefilter, _msbytefilter.SetDest(dstepd))

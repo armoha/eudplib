@@ -29,7 +29,7 @@ from .. import core as c
 from .tpatcher import PatchCondition
 
 
-def _EUDBranchSub(conditions, ontrue, onfalse, *, _actions=None):
+def _EUDBranchSub(conditions, ontrue, onfalse, *, _actions=None) -> None:
     """
     Reduced version of EUDBranch with following restructions.
     - All fields of conditions/actions should be constant.
@@ -49,7 +49,7 @@ def _EUDBranchSub(conditions, ontrue, onfalse, *, _actions=None):
     tjtrg << c.RawTrigger(nextptr=ontrue, actions=_actions)
 
 
-def EUDBranch(conditions, ontrue, onfalse, *, _actions=None):
+def EUDBranch(conditions, ontrue, onfalse, *, _actions=None) -> None:
     """Branch by whether conditions is satisfied or not.
 
     :param conditions: Nested list of conditions.

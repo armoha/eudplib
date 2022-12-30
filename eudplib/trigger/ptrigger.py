@@ -33,14 +33,14 @@ _pinfos = None
 _pdbtable = {}
 
 
-def InitPTrigger():
+def InitPTrigger() -> None:
     """(Internal) Enable PTrigger. Internally called by eudplib"""
     global _pinfos
     if _pinfos is None:
         _pinfos = [c.GetPlayerInfo(player) for player in range(8)]
 
 
-def PTrigger(players, conditions=None, actions=None):
+def PTrigger(players, conditions=None, actions=None) -> None:
     """Execute trigger by player basis
 
     :param players: Players the trigger should execute with. When Current

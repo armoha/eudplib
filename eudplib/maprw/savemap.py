@@ -40,7 +40,7 @@ traceHeader = None
 traceMap = []
 
 
-def getTraceMap():
+def getTraceMap() -> None:
     global traceMap, traceHeader
     newTraceHeader, newTraceMap = _GetTraceMap()
     if newTraceMap:
@@ -52,7 +52,7 @@ def getTraceMap():
 RegisterCreatePayloadCallback(getTraceMap)
 
 
-def SaveMap(fname, rootf, *, sectorSize=None):
+def SaveMap(fname, rootf, *, sectorSize=None) -> None:
     """Save output map with root function.
 
     :param fname: Path for output map.

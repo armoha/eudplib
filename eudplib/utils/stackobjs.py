@@ -22,9 +22,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
+from typing import Any
 
 
-def StackObjects(found_objects, dwoccupmap_dict, alloctable):
+def StackObjects(
+    found_objects: list[Any], dwoccupmap_dict: dict[Any, Any], alloctable: dict[Any, int]
+) -> None:
     dwoccupmap_max_size = 0
     for obj in found_objects:
         dwoccupmap_max_size += len(dwoccupmap_dict[obj])

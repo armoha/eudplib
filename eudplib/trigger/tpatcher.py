@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+
 from eudplib.localize import _
 
 from .. import core as c
@@ -37,7 +38,7 @@ from .filler import (
 )
 
 
-def ApplyPatchTable(initepd, obj, patchTable):
+def ApplyPatchTable(initepd, obj, patchTable: list[list[int | None]]) -> None:
     fieldName = 0
     for i, patchEntry in enumerate(patchTable):
         patchFields = patchEntry
@@ -63,7 +64,7 @@ condpt = [[-1], [-1], [-1], [0, 4, 5], [2, 3, None, None]]
 actpt = [[-1], [-1], [-1], [-1], [-1], [-1], [0, 4, 5], [2, None, None, None]]
 
 
-def PatchCondition(cond):
+def PatchCondition(cond) -> c.Condition:
     if isinstance(cond, c.Action):
         raise ut.EPError(_("Can't put Action in conditionals: {}").format(cond))
     if hasattr(cond, "getValueAddr"):
@@ -89,12 +90,14 @@ def PatchCondition(cond):
             raise
 
 
-def PatchAction(act):
+def PatchAction(act) -> c.Action:
+    if not isinstance(act, c.Action):
+        raise ut.EPError(_("Action expected, found {}").format(act))
     ApplyPatchTable(ut.EPD(act), act, actpt)
     return act
 
 
-def IsConditionConst(cond):
+def IsConditionConst(cond) -> bool:
     if c.IsEUDVariable(cond):
         return True
     elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
@@ -120,7 +123,7 @@ def IsConditionConst(cond):
             return False
 
 
-def IsConditionNegatable(cond):
+def IsConditionNegatable(cond) -> bool:
     if c.IsEUDVariable(cond):
         return True
     elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
@@ -173,7 +176,7 @@ def IsConditionNegatable(cond):
             return False
 
 
-def NegateCondition(cond):
+def NegateCondition(cond) -> c.Condition:
     if c.IsEUDVariable(cond):
         return cond == 0
     elif ut.isUnproxyInstance(cond, c.EUDLightVariable):

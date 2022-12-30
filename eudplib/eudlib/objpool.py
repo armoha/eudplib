@@ -25,7 +25,6 @@ THE SOFTWARE.
 
 import weakref
 from dataclasses import dataclass
-from typing import Optional
 
 from .. import core as c
 from .. import ctrlstru as cs
@@ -98,7 +97,7 @@ class ObjPool:
 
 @dataclass
 class _GlobalObjPool:
-    pool: Optional[ObjPool]
+    pool: ObjPool | None
     max_fieldn: int = 8
     max_object_num: int = 32768
 

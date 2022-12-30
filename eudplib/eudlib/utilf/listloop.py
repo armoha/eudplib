@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import Generator, Optional
+from collections.abc import Iterator
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
@@ -37,8 +37,8 @@ from .unlimiterflag import IsUnlimiterOn
 
 
 def EUDLoopList(
-    header_offset: int, break_offset: Optional[int] = None
-) -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]:
+    header_offset: int, break_offset: int | None = None
+) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     blockname = "listloop"
     ut.EUDCreateBlock(blockname, header_offset)
 
@@ -58,7 +58,7 @@ def EUDLoopList(
     ut.ep_assert(ut.EUDPopBlock(blockname)[1] is header_offset, _("listloop mismatch"))
 
 
-def EUDLoopUnit() -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]:
+def EUDLoopUnit() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     ut.EUDCreateBlock("unitloop", 0x628430)
 
     ptr, epd = f_cunitepdread_epd(EPD(0x628430))
@@ -86,7 +86,7 @@ class _UniqueIdentifier(c.EUDObject):
 
 def EUDLoopNewUnit(
     allowance: int = 2,
-) -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]:
+) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     ut.ep_assert(isinstance(allowance, int))
     firstUnitPtr = EPD(0x628430)
     ut.EUDCreateBlock("newunitloop", "newlo")
@@ -121,7 +121,7 @@ def EUDLoopNewUnit(
     ut.EUDPopBlock("newunitloop")
 
 
-def EUDLoopUnit2() -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]:
+def EUDLoopUnit2() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
     1700개 유닛을 도는 방식으로 작동합니다.
     """
@@ -171,7 +171,7 @@ def EUDLoopUnit2() -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]
     cs.EUDEndWhile()
 
 
-def EUDLoopPlayerUnit(player) -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]:
+def EUDLoopPlayerUnit(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     player = c.EncodePlayer(player)
     first_player_unit = 0x6283F8
     ut.EUDCreateBlock("playerunitloop", first_player_unit)
@@ -188,12 +188,12 @@ def EUDLoopPlayerUnit(player) -> Generator[tuple[c.EUDVariable, c.EUDVariable], 
     ut.EUDPopBlock("playerunitloop")
 
 
-def EUDLoopBullet() -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]:
+def EUDLoopBullet() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     for ptr, epd in EUDLoopList(0x64DEC4):
         yield ptr, epd
 
 
-def EUDLoopSprite() -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]:
+def EUDLoopSprite() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     y_epd = c.EUDVariable()
     y_epd << ut.EPD(0x629688)
 
@@ -213,7 +213,7 @@ def EUDLoopSprite() -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None
     ut.EUDPopBlock("spriteloop")
 
 
-def EUDLoopTrigger(player) -> Generator[tuple[c.EUDVariable, c.EUDVariable], None, None]:
+def EUDLoopTrigger(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     player = c.EncodePlayer(player)
 
     tbegin = tt.TrigTriggerBegin(player)

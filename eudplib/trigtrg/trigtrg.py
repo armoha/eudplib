@@ -47,7 +47,9 @@ condition / actions.
 """
 
 
-def Condition(locid, player, amount, unitid, comparison, condtype, restype, flag, *, eudx=0):
+def Condition(
+    locid, player, amount, unitid, comparison, condtype, restype, flag, *, eudx=0
+) -> bytes:
     if player < 0:
         player += 0x100000000  # EPD
 
@@ -72,7 +74,7 @@ def Condition(locid, player, amount, unitid, comparison, condtype, restype, flag
 
 def Action(
     locid1, strid, wavid, time, player1, player2, unitid, acttype, amount, flags, *, eudx=0
-):
+) -> bytes:
     player1 &= 0xFFFFFFFF
     player2 &= 0xFFFFFFFF
 
@@ -99,7 +101,7 @@ def Action(
     )
 
 
-def Trigger(players, conditions=[], actions=[]):
+def Trigger(players, conditions=[], actions=[]) -> bytes:
     conditions = ut.FlattenList(conditions)
     actions = ut.FlattenList(actions)
 
@@ -125,23 +127,23 @@ def Trigger(players, conditions=[], actions=[]):
 
 
 # predefined conditions
-def NoCondition():
+def NoCondition() -> bytes:
     return Condition(0, 0, 0, 0, 0, 0, 0, 0)
 
 
-def CountdownTimer(Comparison, Time):
+def CountdownTimer(Comparison, Time: int) -> bytes:
     Comparison = EncodeComparison(Comparison)
     return Condition(0, 0, Time, 0, Comparison, 1, 0, 0)
 
 
-def Command(Player, Comparison, Number, Unit):
+def Command(Player, Comparison, Number: int, Unit) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
     return Condition(0, Player, Number, Unit, Comparison, 2, 0, 0)
 
 
-def Bring(Player, Comparison, Number, Unit, Location):
+def Bring(Player, Comparison, Number: int, Unit, Location) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
@@ -149,145 +151,147 @@ def Bring(Player, Comparison, Number, Unit, Location):
     return Condition(Location, Player, Number, Unit, Comparison, 3, 0, 0)
 
 
-def Accumulate(Player, Comparison, Number, ResourceType):
+def Accumulate(Player, Comparison, Number: int, ResourceType) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     ResourceType = EncodeResource(ResourceType)
     return Condition(0, Player, Number, 0, Comparison, 4, ResourceType, 0)
 
 
-def Kills(Player, Comparison, Number, Unit):
+def Kills(Player, Comparison, Number: int, Unit) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
     return Condition(0, Player, Number, Unit, Comparison, 5, 0, 0)
 
 
-def CommandMost(Unit):
+def CommandMost(Unit) -> bytes:
     Unit = EncodeUnit(Unit)
     return Condition(0, 0, 0, Unit, 0, 6, 0, 0)
 
 
-def CommandMostAt(Unit, Location):
+def CommandMostAt(Unit, Location) -> bytes:
     Unit = EncodeUnit(Unit)
     Location = EncodeLocation(Location)
     return Condition(Location, 0, 0, Unit, 0, 7, 0, 0)
 
 
-def MostKills(Unit):
+def MostKills(Unit) -> bytes:
     Unit = EncodeUnit(Unit)
     return Condition(0, 0, 0, Unit, 0, 8, 0, 0)
 
 
-def HighestScore(ScoreType):
+def HighestScore(ScoreType) -> bytes:
     ScoreType = EncodeScore(ScoreType)
     return Condition(0, 0, 0, 0, 0, 9, ScoreType, 0)
 
 
-def MostResources(ResourceType):
+def MostResources(ResourceType) -> bytes:
     ResourceType = EncodeResource(ResourceType)
     return Condition(0, 0, 0, 0, 0, 10, ResourceType, 0)
 
 
-def Switch(Switch, State):
+def Switch(Switch, State) -> bytes:
     Switch = EncodeSwitch(Switch)
     State = EncodeSwitchState(State)
     return Condition(0, 0, 0, 0, State, 11, Switch, 0)
 
 
-def ElapsedTime(Comparison, Time):
+def ElapsedTime(Comparison, Time: int) -> bytes:
     Comparison = EncodeComparison(Comparison)
     return Condition(0, 0, Time, 0, Comparison, 12, 0, 0)
 
 
-def Briefing():
+def Briefing() -> bytes:
     return Condition(0, 0, 0, 0, 0, 13, 0, 0)
 
 
-def Opponents(Player, Comparison, Number):
+def Opponents(Player, Comparison, Number: int) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     return Condition(0, Player, Number, 0, Comparison, 14, 0, 0)
 
 
-def Deaths(Player, Comparison, Number, Unit):
+def Deaths(Player, Comparison, Number: int, Unit) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
     return Condition(0, Player, Number, Unit, Comparison, 15, 0, 0)
 
 
-def CommandLeast(Unit):
+def CommandLeast(Unit) -> bytes:
     Unit = EncodeUnit(Unit)
     return Condition(0, 0, 0, Unit, 0, 16, 0, 0)
 
 
-def CommandLeastAt(Unit, Location):
+def CommandLeastAt(Unit, Location) -> bytes:
     Unit = EncodeUnit(Unit)
     Location = EncodeLocation(Location)
     return Condition(Location, 0, 0, Unit, 0, 17, 0, 0)
 
 
-def LeastKills(Unit):
+def LeastKills(Unit) -> bytes:
     Unit = EncodeUnit(Unit)
     return Condition(0, 0, 0, Unit, 0, 18, 0, 0)
 
 
-def LowestScore(ScoreType):
+def LowestScore(ScoreType) -> bytes:
     ScoreType = EncodeScore(ScoreType)
     return Condition(0, 0, 0, 0, 0, 19, ScoreType, 0)
 
 
-def LeastResources(ResourceType):
+def LeastResources(ResourceType) -> bytes:
     ResourceType = EncodeResource(ResourceType)
     return Condition(0, 0, 0, 0, 0, 20, ResourceType, 0)
 
 
-def Score(Player, ScoreType, Comparison, Number):
+def Score(Player, ScoreType, Comparison, Number: int) -> bytes:
     Player = EncodePlayer(Player)
     ScoreType = EncodeScore(ScoreType)
     Comparison = EncodeComparison(Comparison)
     return Condition(0, Player, Number, 0, Comparison, 21, ScoreType, 0)
 
 
-def Always():
+def Always() -> bytes:
     return Condition(0, 0, 0, 0, 0, 22, 0, 0)
 
 
-def Never():
+def Never() -> bytes:
     return Condition(0, 0, 0, 0, 0, 23, 0, 0)
 
 
 # predefined Action
-def NoAction():
+def NoAction() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 0, 0, 4)
 
 
-def Victory():
+def Victory() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 1, 0, 4)
 
 
-def Defeat():
+def Defeat() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 2, 0, 4)
 
 
-def PreserveTrigger():
+def PreserveTrigger() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 3, 0, 4)
 
 
-def Wait(Time):
+def Wait(Time) -> bytes:
     return Action(0, 0, 0, Time, 0, 0, 0, 4, 0, 4)
 
 
-def PauseGame():
+def PauseGame() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 5, 0, 4)
 
 
-def UnpauseGame():
+def UnpauseGame() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 6, 0, 4)
 
 
-def Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay=4):
+def Transmission(
+    Unit, Where, WAVName, TimeModifier, Time: int, Text, AlwaysDisplay: int = 4
+) -> bytes:
     Unit = EncodeUnit(Unit)
     Where = EncodeLocation(Where)
     WAVName = EncodeString(WAVName)
@@ -296,22 +300,22 @@ def Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay=4
     return Action(Where, Text, WAVName, Time, 0, 0, Unit, 7, TimeModifier, AlwaysDisplay)
 
 
-def PlayWAV(WAVName):
+def PlayWAV(WAVName) -> bytes:
     WAVName = EncodeString(WAVName)
     return Action(0, 0, WAVName, 0, 0, 0, 0, 8, 0, 4)
 
 
-def DisplayText(Text, AlwaysDisplay=4):
+def DisplayText(Text, AlwaysDisplay: int = 4) -> bytes:
     Text = EncodeString(Text)
     return Action(0, Text, 0, 0, 0, 0, 0, 9, 0, AlwaysDisplay)
 
 
-def CenterView(Where):
+def CenterView(Where) -> bytes:
     Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, 0, 0, 0, 10, 0, 4)
 
 
-def CreateUnitWithProperties(Count, Unit, Where, Player, Properties):
+def CreateUnitWithProperties(Count: int, Unit, Where, Player, Properties) -> bytes:
     Unit = EncodeUnit(Unit)
     Where = EncodeLocation(Where)
     Player = EncodePlayer(Player)
@@ -319,71 +323,71 @@ def CreateUnitWithProperties(Count, Unit, Where, Player, Properties):
     return Action(Where, 0, 0, 0, Player, Properties, Unit, 11, Count, 28)
 
 
-def SetMissionObjectives(Text):
+def SetMissionObjectives(Text) -> bytes:
     Text = EncodeString(Text)
     return Action(0, Text, 0, 0, 0, 0, 0, 12, 0, 4)
 
 
-def SetSwitch(Switch, State):
+def SetSwitch(Switch, State) -> bytes:
     Switch = EncodeSwitch(Switch)
     State = EncodeSwitchAction(State)
     return Action(0, 0, 0, 0, 0, Switch, 0, 13, State, 4)
 
 
-def SetCountdownTimer(TimeModifier, Time):
+def SetCountdownTimer(TimeModifier, Time: int) -> bytes:
     TimeModifier = EncodeModifier(TimeModifier)
     return Action(0, 0, 0, Time, 0, 0, 0, 14, TimeModifier, 4)
 
 
-def RunAIScript(Script):
+def RunAIScript(Script) -> bytes:
     Script = EncodeAIScript(Script)
     return Action(0, 0, 0, 0, 0, Script, 0, 15, 0, 4)
 
 
-def RunAIScriptAt(Script, Where):
+def RunAIScriptAt(Script, Where) -> bytes:
     Script = EncodeAIScript(Script)
     Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, 0, Script, 0, 16, 0, 4)
 
 
-def LeaderBoardControl(Unit, Label):
+def LeaderBoardControl(Unit, Label) -> bytes:
     Unit = EncodeUnit(Unit)
     Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, 0, Unit, 17, 0, 20)
 
 
-def LeaderBoardControlAt(Unit, Location, Label):
+def LeaderBoardControlAt(Unit, Location, Label) -> bytes:
     Unit = EncodeUnit(Unit)
     Location = EncodeLocation(Location)
     Label = EncodeString(Label)
     return Action(Location, Label, 0, 0, 0, 0, Unit, 18, 0, 20)
 
 
-def LeaderBoardResources(ResourceType, Label):
+def LeaderBoardResources(ResourceType, Label) -> bytes:
     ResourceType = EncodeResource(ResourceType)
     Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, 0, ResourceType, 19, 0, 4)
 
 
-def LeaderBoardKills(Unit, Label):
+def LeaderBoardKills(Unit, Label) -> bytes:
     Unit = EncodeUnit(Unit)
     Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, 0, Unit, 20, 0, 20)
 
 
-def LeaderBoardScore(ScoreType, Label):
+def LeaderBoardScore(ScoreType, Label) -> bytes:
     ScoreType = EncodeScore(ScoreType)
     Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, 0, Score, 21, 0, 4)
 
 
-def KillUnit(Unit, Player):
+def KillUnit(Unit, Player) -> bytes:
     Unit = EncodeUnit(Unit)
     Player = EncodePlayer(Player)
     return Action(0, 0, 0, 0, Player, 0, Unit, 22, 0, 20)
 
 
-def KillUnitAt(Count, Unit, Where, ForPlayer):
+def KillUnitAt(Count, Unit, Where, ForPlayer) -> bytes:
     Count = EncodeCount(Count)
     Unit = EncodeUnit(Unit)
     Where = EncodeLocation(Where)
@@ -391,13 +395,13 @@ def KillUnitAt(Count, Unit, Where, ForPlayer):
     return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 23, Count, 20)
 
 
-def RemoveUnit(Unit, Player):
+def RemoveUnit(Unit, Player) -> bytes:
     Unit = EncodeUnit(Unit)
     Player = EncodePlayer(Player)
     return Action(0, 0, 0, 0, Player, 0, Unit, 24, 0, 20)
 
 
-def RemoveUnitAt(Count, Unit, Where, ForPlayer):
+def RemoveUnitAt(Count, Unit, Where, ForPlayer) -> bytes:
     Count = EncodeCount(Count)
     Unit = EncodeUnit(Unit)
     Where = EncodeLocation(Where)
@@ -405,75 +409,75 @@ def RemoveUnitAt(Count, Unit, Where, ForPlayer):
     return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 25, Count, 20)
 
 
-def SetResources(Player, Modifier, Amount, ResourceType):
+def SetResources(Player, Modifier, Amount: int, ResourceType) -> bytes:
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
     ResourceType = EncodeResource(ResourceType)
     return Action(0, 0, 0, 0, Player, Amount, ResourceType, 26, Modifier, 4)
 
 
-def SetScore(Player, Modifier, Amount, ScoreType):
+def SetScore(Player, Modifier, Amount: int, ScoreType) -> bytes:
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
     ScoreType = EncodeScore(ScoreType)
     return Action(0, 0, 0, 0, Player, Amount, ScoreType, 27, Modifier, 4)
 
 
-def MinimapPing(Where):
+def MinimapPing(Where) -> bytes:
     Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, 0, 0, 0, 28, 0, 4)
 
 
-def TalkingPortrait(Unit, Time):
+def TalkingPortrait(Unit, Time) -> bytes:
     Unit = EncodeUnit(Unit)
     return Action(0, 0, 0, Time, 0, 0, Unit, 29, 0, 20)
 
 
-def MuteUnitSpeech():
+def MuteUnitSpeech() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 30, 0, 4)
 
 
-def UnMuteUnitSpeech():
+def UnMuteUnitSpeech() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 31, 0, 4)
 
 
-def LeaderBoardComputerPlayers(State):
+def LeaderBoardComputerPlayers(State) -> bytes:
     State = EncodePropState(State)
     return Action(0, 0, 0, 0, 0, 0, 0, 32, State, 4)
 
 
-def LeaderBoardGoalControl(Goal, Unit, Label):
+def LeaderBoardGoalControl(Goal: int, Unit, Label) -> bytes:
     Unit = EncodeUnit(Unit)
     Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, Goal, Unit, 33, 0, 20)
 
 
-def LeaderBoardGoalControlAt(Goal, Unit, Location, Label):
+def LeaderBoardGoalControlAt(Goal: int, Unit, Location, Label) -> bytes:
     Unit = EncodeUnit(Unit)
     Location = EncodeLocation(Location)
     Label = EncodeString(Label)
     return Action(Location, Label, 0, 0, 0, Goal, Unit, 34, 0, 20)
 
 
-def LeaderBoardGoalResources(Goal, ResourceType, Label):
+def LeaderBoardGoalResources(Goal: int, ResourceType, Label) -> bytes:
     ResourceType = EncodeResource(ResourceType)
     Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, Goal, ResourceType, 35, 0, 4)
 
 
-def LeaderBoardGoalKills(Goal, Unit, Label):
+def LeaderBoardGoalKills(Goal: int, Unit, Label) -> bytes:
     Unit = EncodeUnit(Unit)
     Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, Goal, Unit, 36, 0, 20)
 
 
-def LeaderBoardGoalScore(Goal, ScoreType, Label):
+def LeaderBoardGoalScore(Goal: int, ScoreType, Label) -> bytes:
     ScoreType = EncodeScore(ScoreType)
     Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, Goal, ScoreType, 37, 0, 4)
 
 
-def MoveLocation(Location, OnUnit, Owner, DestLocation):
+def MoveLocation(Location, OnUnit, Owner, DestLocation) -> bytes:
     Location = EncodeLocation(Location)
     OnUnit = EncodeUnit(OnUnit)
     Owner = EncodePlayer(Owner)
@@ -481,7 +485,7 @@ def MoveLocation(Location, OnUnit, Owner, DestLocation):
     return Action(DestLocation, 0, 0, 0, Owner, Location, OnUnit, 38, 0, 20)
 
 
-def MoveUnit(Count, UnitType, Owner, StartLocation, DestLocation):
+def MoveUnit(Count, UnitType, Owner, StartLocation, DestLocation) -> bytes:
     Count = EncodeCount(Count)
     UnitType = EncodeUnit(UnitType)
     Owner = EncodePlayer(Owner)
@@ -490,16 +494,16 @@ def MoveUnit(Count, UnitType, Owner, StartLocation, DestLocation):
     return Action(StartLocation, 0, 0, 0, Owner, DestLocation, UnitType, 39, Count, 20)
 
 
-def LeaderBoardGreed(Goal):
+def LeaderBoardGreed(Goal) -> bytes:
     return Action(0, 0, 0, 0, 0, Goal, 0, 40, 0, 4)
 
 
-def SetNextScenario(ScenarioName):
+def SetNextScenario(ScenarioName) -> bytes:
     ScenarioName = EncodeString(ScenarioName)
     return Action(0, ScenarioName, 0, 0, 0, 0, 0, 41, 0, 4)
 
 
-def SetDoodadState(State, Unit, Owner, Where):
+def SetDoodadState(State, Unit, Owner, Where) -> bytes:
     State = EncodePropState(State)
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
@@ -507,7 +511,7 @@ def SetDoodadState(State, Unit, Owner, Where):
     return Action(Where, 0, 0, 0, Owner, 0, Unit, 42, State, 20)
 
 
-def SetInvincibility(State, Unit, Owner, Where):
+def SetInvincibility(State, Unit, Owner, Where) -> bytes:
     State = EncodePropState(State)
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
@@ -515,21 +519,21 @@ def SetInvincibility(State, Unit, Owner, Where):
     return Action(Where, 0, 0, 0, Owner, 0, Unit, 43, State, 20)
 
 
-def CreateUnit(Number, Unit, Where, ForPlayer):
+def CreateUnit(Number: int, Unit, Where, ForPlayer) -> bytes:
     Unit = EncodeUnit(Unit)
     Where = EncodeLocation(Where)
     ForPlayer = EncodePlayer(ForPlayer)
     return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 44, Number, 20)
 
 
-def SetDeaths(Player, Modifier, Number, Unit):
+def SetDeaths(Player, Modifier, Number: int, Unit) -> bytes:
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
     Unit = EncodeUnit(Unit)
     return Action(0, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20)
 
 
-def Order(Unit, Owner, StartLocation, OrderType, DestLocation):
+def Order(Unit, Owner, StartLocation, OrderType, DestLocation) -> bytes:
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
     StartLocation = EncodeLocation(StartLocation)
@@ -538,12 +542,12 @@ def Order(Unit, Owner, StartLocation, OrderType, DestLocation):
     return Action(StartLocation, 0, 0, 0, Owner, DestLocation, Unit, 46, OrderType, 20)
 
 
-def Comment(Text):
+def Comment(Text) -> bytes:
     Text = EncodeString(Text)
     return Action(0, Text, 0, 0, 0, 0, 0, 47, 0, 4)
 
 
-def GiveUnits(Count, Unit, Owner, Where, NewOwner):
+def GiveUnits(Count, Unit, Owner, Where, NewOwner) -> bytes:
     Count = EncodeCount(Count)
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
@@ -552,7 +556,7 @@ def GiveUnits(Count, Unit, Owner, Where, NewOwner):
     return Action(Where, 0, 0, 0, Owner, NewOwner, Unit, 48, Count, 20)
 
 
-def ModifyUnitHitPoints(Count, Unit, Owner, Where, Percent):
+def ModifyUnitHitPoints(Count, Unit, Owner, Where, Percent: int) -> bytes:
     Count = EncodeCount(Count)
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
@@ -560,7 +564,7 @@ def ModifyUnitHitPoints(Count, Unit, Owner, Where, Percent):
     return Action(Where, 0, 0, 0, Owner, Percent, Unit, 49, Count, 20)
 
 
-def ModifyUnitEnergy(Count, Unit, Owner, Where, Percent):
+def ModifyUnitEnergy(Count, Unit, Owner, Where, Percent: int) -> bytes:
     Count = EncodeCount(Count)
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
@@ -568,7 +572,7 @@ def ModifyUnitEnergy(Count, Unit, Owner, Where, Percent):
     return Action(Where, 0, 0, 0, Owner, Percent, Unit, 50, Count, 20)
 
 
-def ModifyUnitShields(Count, Unit, Owner, Where, Percent):
+def ModifyUnitShields(Count, Unit, Owner, Where, Percent: int) -> bytes:
     Count = EncodeCount(Count)
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
@@ -576,14 +580,14 @@ def ModifyUnitShields(Count, Unit, Owner, Where, Percent):
     return Action(Where, 0, 0, 0, Owner, Percent, Unit, 51, Count, 20)
 
 
-def ModifyUnitResourceAmount(Count, Owner, Where, NewValue):
+def ModifyUnitResourceAmount(Count, Owner, Where, NewValue: int) -> bytes:
     Count = EncodeCount(Count)
     Owner = EncodePlayer(Owner)
     Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, Owner, NewValue, 0, 52, Count, 4)
 
 
-def ModifyUnitHangarCount(Add, Count, Unit, Owner, Where):
+def ModifyUnitHangarCount(Add: int, Count, Unit, Owner, Where) -> bytes:
     Count = EncodeCount(Count)
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
@@ -591,50 +595,50 @@ def ModifyUnitHangarCount(Add, Count, Unit, Owner, Where):
     return Action(Where, 0, 0, 0, Owner, Add, Unit, 53, Count, 20)
 
 
-def PauseTimer():
+def PauseTimer() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 54, 0, 4)
 
 
-def UnpauseTimer():
+def UnpauseTimer() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 55, 0, 4)
 
 
-def Draw():
+def Draw() -> bytes:
     return Action(0, 0, 0, 0, 0, 0, 0, 56, 0, 4)
 
 
-def SetAllianceStatus(Player, Status):
+def SetAllianceStatus(Player, Status) -> bytes:
     Player = EncodePlayer(Player)
     Status = EncodeAllyStatus(Status)
     return Action(0, 0, 0, 0, Player, 0, Status, 57, 0, 4)
 
 
 # compound triggers
-def Memory(dest, cmptype, value):
+def Memory(dest: int, cmptype, value: int) -> bytes:
     return Deaths(EPD(dest), cmptype, value, 0)
 
 
-def SetMemory(dest, modtype, value):
+def SetMemory(dest: int, modtype, value: int) -> bytes:
     return SetDeaths(EPD(dest), modtype, value, 0)
 
 
-def DeathsX(Player, Comparison, Number, Unit, Mask):
+def DeathsX(Player, Comparison, Number: int, Unit, Mask: int) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
     return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx="SC")
 
 
-def MemoryX(dest, cmptype, value, mask):
+def MemoryX(dest: int, cmptype, value: int, mask: int) -> bytes:
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
 
-def SetDeathsX(Player, Modifier, Number, Unit, Mask):
+def SetDeathsX(Player, Modifier, Number: int, Unit, Mask: int) -> bytes:
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
     Unit = EncodeUnit(Unit)
     return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx="SC")
 
 
-def SetMemoryX(dest, modtype, value, mask):
+def SetMemoryX(dest: int, modtype, value: int, mask: int) -> bytes:
     return SetDeathsX(EPD(dest), modtype, value, 0, mask)

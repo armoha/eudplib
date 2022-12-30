@@ -42,8 +42,6 @@ from .etc import (
     SCMD2Text,
     cachedfunc,
     find_data_file,
-    isStrict,
-    setStrict,
 )
 from .exprproxy import ExprProxy, isUnproxyInstance, unProxy
 from .ubconv import b2u, u2b, u2utf8

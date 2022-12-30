@@ -30,7 +30,9 @@ from .. import core as c
 from .tpatcher import PatchAction, PatchCondition
 
 
-def Trigger(conditions=None, actions=None, preserved=True):
+def Trigger(
+    conditions=None, actions=None, preserved: bool = True
+) -> tuple[c.RawTrigger, c.RawTrigger]:
     """General easy-to-use trigger
 
     :param conditions: List of conditions. If there are none, trigger will

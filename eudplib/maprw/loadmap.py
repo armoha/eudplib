@@ -24,14 +24,17 @@ THE SOFTWARE.
 """
 
 import os
+from typing import TypeVar
 
 from ..core.mapdata import chktok, mapdata, mpqapi
 from ..localize import _
 from ..utils import ep_assert, ep_eprint
 from .mpqadd import UpdateFileListByListfile
 
+AnyPath = TypeVar("AnyPath", str, bytes, os.PathLike[str], os.PathLike[bytes])
 
-def LoadMap(fname):
+
+def LoadMap(fname: AnyPath) -> None:
     """Load basemap from fname
 
     :param fname: Path for basemap.
