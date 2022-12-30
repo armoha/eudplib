@@ -25,38 +25,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import ByteString, Callable
+
 from ... import utils as ut
 from ...localize import _
 
 unit_name_encoding = None
 
 
-def DecodeUnitNameAs(e):
+def DecodeUnitNameAs(e: str) -> None:
     global unit_name_encoding
-    " ".encode(e)
+    "".encode(e)  # check if e is valid encoding
     unit_name_encoding = e
 
 
-def IgnoreColor(s):
+def IgnoreColor(s: bytes) -> bytes:
     return bytes(filter(lambda x: not (0x01 <= x <= 0x1F or x == 0x7F), s))
 
 
-def b2in(n):
+def b2in(n: int) -> Callable[[ByteString], int]:
     b2in_map = {2: ut.b2i2, 4: ut.b2i4}
     return b2in_map[n]
 
 
-def i2bn(n):
+def i2bn(n: int) -> Callable[[int], bytes]:
     i2bn_map = {2: ut.i2b2, 4: ut.i2b4}
     return i2bn_map[n]
 
 
-def u2bn(n):
+def u2bn(n: int) -> Callable[[str | bytes], bytes]:
     u2bn_map = {2: ut.u2b, 4: ut.u2utf8}
     return u2bn_map[n]
 
 
-def roundup_by_4(num):
+def roundup_by_4(num: int) -> int:
     return -((-num) // 4) * 4
 
 
@@ -84,7 +86,7 @@ class TBL:
             else:
                 self.LoadTBL(content)
 
-    def LoadTBL(self, content):
+    def LoadTBL(self, content: ByteString) -> None:
         self._datatb.clear()
         self._stringmap.clear()
         self._capacity = self._saveentry
@@ -118,7 +120,7 @@ class TBL:
             self.AddString(string)
         self._loaded = True
 
-    def LoadTBLWithChk(self, content, init_chkt):
+    def LoadTBLWithChk(self, content: ByteString, init_chkt) -> None:
         self._datatb.clear()
         self._stringmap.clear()
         self._capacity = self._saveentry
@@ -246,7 +248,7 @@ class TBL:
             self.AddString(string)
         self._loaded = True
 
-    def AddString(self, string):
+    def AddString(self, string: str | bytes) -> int:
         # Starcraft: Remastered uses both utf-8 and multibyte encoding.
         try:
             string = ut.u2b(string)
@@ -295,7 +297,7 @@ class TBL:
 
         return stringindex
 
-    def GetString(self, index):
+    def GetString(self, index: int) -> bytes | None:
         if index == 0:
             return None
         else:
@@ -305,7 +307,7 @@ class TBL:
             except IndexError:
                 return None
 
-    def GetStringIndex(self, string):
+    def GetStringIndex(self, string: str | bytes) -> int:
         try:
             return self._stringmap[ut.u2b(string)] + 1
         except KeyError:
@@ -314,7 +316,7 @@ class TBL:
             except KeyError:
                 return self.AddString(string) + 1
 
-    def SaveTBL(self):
+    def SaveTBL(self) -> bytes:
         outbytes = []
 
         # calculate offset of each string
@@ -346,7 +348,7 @@ class TBL:
 
         return b"".join(outbytes)
 
-    def ForceAddString(self, string):
+    def ForceAddString(self, string: str | bytes) -> int:
         string = ut.u2b(string)  # Starcraft uses multibyte encoding.
         if not isinstance(string, bytes):
             raise ut.EPError(_("Invalid type for string"))

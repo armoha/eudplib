@@ -142,11 +142,11 @@ class RawTrigger(EUDObject):
             self._currentAction = None if not (self._flags & 1) else trigSection[2399]
 
     @property
-    def preserved(self):
+    def preserved(self) -> bool:
         return bool(self._flags & 4)
 
     @preserved.setter
-    def preserved(self, preserved):
+    def preserved(self, preserved) -> None:
         if preserved:
             self._flags |= 4
         else:
@@ -155,10 +155,10 @@ class RawTrigger(EUDObject):
     def GetNextPtrMemory(self):
         return self + 4
 
-    def GetDataSize(self):
+    def GetDataSize(self) -> int:
         return 2408
 
-    def CollectDependency(self, pbuffer):
+    def CollectDependency(self, pbuffer) -> None:
         pbuffer.WriteDword(self._prevptr)
         pbuffer.WriteDword(self._nextptr)
 
@@ -167,7 +167,7 @@ class RawTrigger(EUDObject):
         for act in self._actions:
             act.CollectDependency(pbuffer)
 
-    def WritePayload(self, pbuffer):
+    def WritePayload(self, pbuffer) -> None:
         pbuffer.WriteDword(self._prevptr)
         pbuffer.WriteDword(self._nextptr)
 

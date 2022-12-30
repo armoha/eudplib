@@ -28,13 +28,14 @@ from eudplib import utils as ut
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
+from ...core.allocator.pbuffer import Payload
 
 """ Stage 2 :
 - Initialize payload (stage3+ + user code) & execute it
 """
 
 
-def CreatePayloadRelocator(payload):
+def CreatePayloadRelocator(payload: Payload) -> Payload:
     # We first build code injector.
     prtdb = c.Db(b"".join([ut.i2b4(x // 4) for x in payload.prttable]))
     ortdb = c.Db(b"".join([ut.i2b4(x // 4) for x in payload.orttable]))

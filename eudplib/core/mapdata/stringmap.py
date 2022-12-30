@@ -76,19 +76,19 @@ def InitStringMap(chkt):
     strmap = tblformat.TBL(chkt.getsection("STR"), init_chkt, save_entry=4)
 
 
-def GetLocationIndex(l):
+def GetLocationIndex(l) -> int:
     return locmap.GetStringIndex(l) + 1
 
 
-def GetStringIndex(s):
+def GetStringIndex(s) -> int:
     return strmap.GetStringIndex(s)
 
 
-def GetSwitchIndex(s):
+def GetSwitchIndex(s) -> int:
     return swmap.GetStringIndex(s)
 
 
-def GetUnitIndex(u):
+def GetUnitIndex(u) -> int:
     return unitmap.GetStringIndex(u)
 
 

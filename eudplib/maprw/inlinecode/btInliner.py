@@ -24,6 +24,8 @@ THE SOFTWARE.
 """
 
 
+from collections.abc import ByteString, Collection
+
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
@@ -31,35 +33,25 @@ from ... import utils as ut
 from ...trigtrg.runtrigtrg import _runner_cp
 
 sharedTriggers = []
+tStartEnd = tuple[c.RawTrigger, c.RawTrigger]
 
 
-def GetExecutingPlayers(bTrigger):
+def GetExecutingPlayers(
+    bTrigger: ByteString,
+) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
     # Get executing players of the trigger.
-    # If all player executes it, then pass it
+    # If AllPlayers executes it, then pass it
     if bTrigger[320 + 2048 + 4 + 17] != 0:
-        playerExecutesTrigger = [True] * 8
-
-    else:  # Should check manually
-        playerExecutesTrigger = [False] * 8
-        # By player
-        for player in range(8):
-            if bTrigger[320 + 2048 + 4 + player] != 0:
-                playerExecutesTrigger[player] = True
-
-        # By force
-        playerForce = [0] * 8
-        for player in range(8):
-            playerForce[player] = c.GetPlayerInfo(player).force
-
-        for force in range(4):
-            if bTrigger[320 + 2048 + 4 + 18 + force] != 0:
-                for player in range(8):
-                    if playerForce[player] == force:
-                        playerExecutesTrigger[player] = True
-    return playerExecutesTrigger
+        return (True,) * 8
+    # Should check manually, by player and force
+    return tuple(
+        bTrigger[320 + 2048 + 4 + player] != 0
+        or bTrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force] != 0
+        for player in range(8)
+    )
 
 
-def NoWaitAndPreserved(bTrigger):
+def NoWaitAndPreserved(bTrigger: ByteString) -> bool:
     execOnce = True
     for i in range(64):
         actionflag = bTrigger[320 + 32 * i + 28]
@@ -75,7 +67,7 @@ def NoWaitAndPreserved(bTrigger):
     return True
 
 
-def InlineCodifyBinaryTrigger(bTrigger):
+def InlineCodifyBinaryTrigger(bTrigger: ByteString) -> tStartEnd:
     """Inline codify raw(binary) trigger data.
 
     For minimal protection, eudplib make some of the trig-triggers to
@@ -119,10 +111,10 @@ def InlineCodifyBinaryTrigger(bTrigger):
             tEnd = c.RawTrigger()
     c.PopTriggerScope()
 
-    return (tStart, tEnd)
+    return tStart, tEnd
 
 
-def CountConditionsAndActions(bTrigger):
+def CountConditionsAndActions(bTrigger: ByteString) -> tuple[int, int]:
     cond_count, act_count = 0, 0
     for c in range(16):
         if bTrigger[c * 20 + 15] == 22:  # Always
@@ -137,7 +129,7 @@ def CountConditionsAndActions(bTrigger):
     return cond_count, act_count
 
 
-def GetTriggerSize(bTrigger):
+def GetTriggerSize(bTrigger: ByteString) -> int:
     cond_count, act_count = CountConditionsAndActions(bTrigger)
     min_size = 4 + 5 * cond_count + 8 * act_count
     trig = {
@@ -168,14 +160,16 @@ def GetTriggerSize(bTrigger):
             return ret * 4
 
 
-def TryToShareTrigger(bTrigger):
+def TryToShareTrigger(bTrigger: ByteString) -> int | ByteString:
     if NoWaitAndPreserved(bTrigger):
         sharedTriggers.append(bTrigger)
         return len(sharedTriggers) - 1
     return bTrigger
 
 
-def InlineCodifyMultipleBinaryTriggers(bTriggers):
+def InlineCodifyMultipleBinaryTriggers(
+    bTriggers: Collection[ByteString],
+) -> tStartEnd:
     """Inline codify raw(binary) trigger data.
 
     For minimal protection, eudplib make some of the trig-triggers to
@@ -232,4 +226,4 @@ def InlineCodifyMultipleBinaryTriggers(bTriggers):
 
     c.PopTriggerScope()
 
-    return (tStart, tEnd)
+    return tStart, tEnd

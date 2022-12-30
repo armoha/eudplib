@@ -27,6 +27,7 @@ from os import urandom
 
 from ... import core as c
 from ...core.allocator.payload import setPayloadLoggerMode
+from ...core.mapdata.chktok import CHK
 from ...utils.blockstru import BlockStruManager, SetCurrentBlockStruManager
 from .injFinalizer import CreateInjectFinalizer
 from .payloadInit import InitializePayload
@@ -36,12 +37,12 @@ from .vectorReloc import CreateVectorRelocator
 skip_payload_relocator = False
 
 
-def PRT_SkipPayloadRelocator(enable):
+def PRT_SkipPayloadRelocator(enable: bool) -> None:
     global skip_payload_relocator
     skip_payload_relocator = enable
 
 
-def applyInjector(chkt, root):
+def applyInjector(chkt: CHK, root) -> None:
     # Create injector triggers
     bsm = BlockStruManager()
     prev_bsm = SetCurrentBlockStruManager(bsm)

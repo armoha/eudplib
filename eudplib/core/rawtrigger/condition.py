@@ -101,12 +101,12 @@ class Condition(ConstExpr):
         self.parenttrg = None
         self.condindex = None
 
-    def Disabled(self):
+    def Disabled(self) -> None:
         self.fields[7] |= 2
 
     # -------
 
-    def CheckArgs(self, i):
+    def CheckArgs(self, i: int) -> None:
         for n, field in enumerate(self.fields[:8]):
             if field is None or IsConstExpr(field):
                 continue
@@ -127,8 +127,6 @@ class Condition(ConstExpr):
             except TypeError:  # unhashable type
                 condtype = "(unknown)"
             raise ut.EPError(_('Invalid {} "{}" in condition{} "{}"').format(params[n], field, i, condtype))
-
-        return True
 
     def SetParentTrigger(self, trg, index):
         ut.ep_assert(

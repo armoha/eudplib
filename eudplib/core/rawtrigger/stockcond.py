@@ -37,7 +37,7 @@ from .constenc import (
 from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit
 
 
-def CountdownTimer(Comparison, Time):
+def CountdownTimer(Comparison, Time) -> Condition:
     """Checks countdown timer.
 
     Example::
@@ -54,7 +54,7 @@ def CountdownTimer(Comparison, Time):
     return Condition(0, 0, Time, 0, Comparison, 1, 0, 0)
 
 
-def Command(Player, Comparison, Number, Unit):
+def Command(Player, Comparison, Number, Unit) -> Condition:
     """[Player] commands [Comparison] [Number] [Unit].
 
     Example::
@@ -68,7 +68,7 @@ def Command(Player, Comparison, Number, Unit):
     return Condition(0, Player, Number, Unit, Comparison, 2, 0, 0)
 
 
-def Bring(Player, Comparison, Number, Unit, Location):
+def Bring(Player, Comparison, Number, Unit, Location) -> Condition:
     """Player brings quantity units to location.
 
     This states that a player is required to bring ‘X’ number of units to a specific location. The units can be any player-controlled unit available in the game.
@@ -80,7 +80,7 @@ def Bring(Player, Comparison, Number, Unit, Location):
     return Condition(Location, Player, Number, Unit, Comparison, 3, 0, 0)
 
 
-def Accumulate(Player, Comparison, Number, ResourceType):
+def Accumulate(Player, Comparison, Number, ResourceType) -> Condition:
     """Player accumulates quantity resources.
 
     Accumulate requires that the player gather enough of a specific resource.
@@ -93,7 +93,7 @@ def Accumulate(Player, Comparison, Number, ResourceType):
 
 # 'Kills' is already defined inside constenc, so we just add __call__ method
 # to there instead of creating new function
-def __Kills__internal(Player, Comparison, Number, Unit):
+def __Kills__internal(Player, Comparison, Number, Unit) -> Condition:
     Player = EncodePlayer(Player, issueError=True)
     Comparison = EncodeComparison(Comparison, issueError=True)
     Unit = EncodeUnit(Unit, issueError=True)
@@ -103,7 +103,7 @@ def __Kills__internal(Player, Comparison, Number, Unit):
 Kills._internalf = __Kills__internal
 
 
-def CommandMost(Unit):
+def CommandMost(Unit) -> Condition:
     """Current player commands the most units.
 
     Command the Most requires that you command the most of the defined units. These units can be any player-controlled unit available in the game. This condition compares all players in the game, including neutral and rescuable units.
@@ -112,7 +112,7 @@ def CommandMost(Unit):
     return Condition(0, 0, 0, Unit, 0, 6, 0, 0)
 
 
-def CommandMostAt(Unit, Location):
+def CommandMostAt(Unit, Location) -> Condition:
     """Current player commands the most units at location.
 
     Similar to the Command the Most, this condition compares the number of units at a specific location. The location can be restricted to certain elevations.
@@ -122,7 +122,7 @@ def CommandMostAt(Unit, Location):
     return Condition(Location, 0, 0, Unit, 0, 7, 0, 0)
 
 
-def MostKills(Unit):
+def MostKills(Unit) -> Condition:
     """Current player has most kills of unit.
 
     This condition is considered true if the trigger’s owner has the most kills of the specified Unit.
@@ -131,7 +131,7 @@ def MostKills(Unit):
     return Condition(0, 0, 0, Unit, 0, 8, 0, 0)
 
 
-def HighestScore(ScoreType):
+def HighestScore(ScoreType) -> Condition:
     """Current player has highest score points.
 
     This condition is considered true if the trigger’s owner has the highest Score. Note that if this is used as the only condition in a trigger, it will activate immediately at the start of the scenario, since all players will be tied for the highest score.
@@ -140,7 +140,7 @@ def HighestScore(ScoreType):
     return Condition(0, 0, 0, 0, 0, 9, ScoreType, 0)
 
 
-def MostResources(ResourceType):
+def MostResources(ResourceType) -> Condition:
     """Current player has most resources.
 
     Similar to Most Kills, this condition is considered true if the trigger’s owner has the most of the specified resource.
@@ -149,7 +149,7 @@ def MostResources(ResourceType):
     return Condition(0, 0, 0, 0, 0, 10, ResourceType, 0)
 
 
-def Switch(Switch, State):
+def Switch(Switch, State) -> Condition:
     """Switch is set.
 
     This allows you to test against a switch value. Switches are on/off values that can be set with an action. Switches can be used to keep track of which triggers have been activated, to disable or enable certain triggers or to link multiple triggers together. You may also rename switches from this dialog box.
@@ -159,7 +159,7 @@ def Switch(Switch, State):
     return Condition(0, 0, 0, 0, State, 11, Switch, 0)
 
 
-def ElapsedTime(Comparison, Time):
+def ElapsedTime(Comparison, Time) -> Condition:
     """Elapsed scenario time is duration game seconds.
 
     This condition allows you to create triggers that occur after a specified number of game seconds have passed since the start of the scenario.
@@ -168,7 +168,7 @@ def ElapsedTime(Comparison, Time):
     return Condition(0, 0, Time, 0, Comparison, 12, 0, 0)
 
 
-def Opponents(Player, Comparison, Number):
+def Opponents(Player, Comparison, Number) -> Condition:
     """Player has quantity opponents remaining in the game.
 
     -   This condition evaluates how many of the players are opponents of the trigger owner. By default, all of the other players are considered opponents. A player does not count as an opponent if either of the following conditions are met:
@@ -184,7 +184,7 @@ def Opponents(Player, Comparison, Number):
     return Condition(0, Player, Number, 0, Comparison, 14, 0, 0)
 
 
-def Deaths(Player, Comparison, Number, Unit):
+def Deaths(Player, Comparison, Number, Unit) -> Condition:
     """Player has suffered quantity deaths of unit.
 
     Gives you the ability to create actions that are launched when a player has suffered a specific number of deaths of any of the units in the game.
@@ -195,7 +195,7 @@ def Deaths(Player, Comparison, Number, Unit):
     return Condition(0, Player, Number, Unit, Comparison, 15, 0, 0)
 
 
-def CommandLeast(Unit):
+def CommandLeast(Unit) -> Condition:
     """Current player commands the least units.
 
     Command the Least allows you to define an action based on the player that commands the least units. You might use this to give advantages to slower players or to single out weakened players. Note that this condition checks all players, including neutral, computer controlled, and rescuable players.
@@ -204,7 +204,7 @@ def CommandLeast(Unit):
     return Condition(0, 0, 0, Unit, 0, 16, 0, 0)
 
 
-def CommandLeastAt(Unit, Location):
+def CommandLeastAt(Unit, Location) -> Condition:
     """Current player commands the least units at location.
 
     Command the Least At is similar to ‘Command the Least’, however, but only compares units at a particular location. The location can be restricted to certain elevations.
@@ -214,7 +214,7 @@ def CommandLeastAt(Unit, Location):
     return Condition(Location, 0, 0, Unit, 0, 17, 0, 0)
 
 
-def LeastKills(Unit):
+def LeastKills(Unit) -> Condition:
     """Current player has least kills of unit.
 
     This condition is considered true if the trigger’s owner has the least kills of the specified Unit.
@@ -223,7 +223,7 @@ def LeastKills(Unit):
     return Condition(0, 0, 0, Unit, 0, 18, 0, 0)
 
 
-def LowestScore(ScoreType):
+def LowestScore(ScoreType) -> Condition:
     """Current player has lowest score points.
 
     This condition evaluates the current Score and is considered true if the current player has the lowest or is tied for the lowest score. Lowest Score checks all players, including neutral and rescuable players.
@@ -232,7 +232,7 @@ def LowestScore(ScoreType):
     return Condition(0, 0, 0, 0, 0, 19, ScoreType, 0)
 
 
-def LeastResources(ResourceType):
+def LeastResources(ResourceType) -> Condition:
     """Current player has least resources.
 
     Similar to Least Kills, this condition is considered true if the trigger’s owner has the least of the specified resource. Note that Least Resources checks all players, including neutral, computer controlled and rescuable players.
@@ -241,7 +241,7 @@ def LeastResources(ResourceType):
     return Condition(0, 0, 0, 0, 0, 20, ResourceType, 0)
 
 
-def Score(Player, ScoreType, Comparison, Number):
+def Score(Player, ScoreType, Comparison, Number) -> Condition:
     """Player score type score is quantity.
 
     This condition allows you to analyze a player’s current Score and perform actions based on the value. You can reference any of the individual scoring types from score.
@@ -252,7 +252,7 @@ def Score(Player, ScoreType, Comparison, Number):
     return Condition(0, Player, Number, 0, Comparison, 21, ScoreType, 0)
 
 
-def Always():
+def Always() -> Condition:
     """Always.
 
     Accumulate requires that the player gather enough of a specific resource.z
@@ -260,7 +260,7 @@ def Always():
     return Condition(0, 0, 0, 0, 0, 22, 0, 0)
 
 
-def Never():
+def Never() -> Condition:
     """Never.
 
     The Never condition can be used to temporarily disable actions for testing. A trigger with the Never condition will not activate at any point.
@@ -268,28 +268,28 @@ def Never():
     return Condition(0, 0, 0, 0, 0, 23, 0, 0)
 
 
-def Memory(dest, cmptype, value):
+def Memory(dest, cmptype, value) -> Condition:
     cmptype = EncodeComparison(cmptype, issueError=True)
     return Deaths(EPD(dest), cmptype, value, 0)
 
 
-def MemoryEPD(dest, cmptype, value):
+def MemoryEPD(dest, cmptype, value) -> Condition:
     cmptype = EncodeComparison(cmptype, issueError=True)
     return Deaths(dest, cmptype, value, 0)
 
 
-def DeathsX(Player, Comparison, Number, Unit, Mask):
+def DeathsX(Player, Comparison, Number, Unit, Mask) -> Condition:
     Player = EncodePlayer(Player, issueError=True)
     Comparison = EncodeComparison(Comparison, issueError=True)
     Unit = EncodeUnit(Unit, issueError=True)
     return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx="SC")
 
 
-def MemoryX(dest, cmptype, value, mask):
+def MemoryX(dest, cmptype, value, mask) -> Condition:
     cmptype = EncodeComparison(cmptype, issueError=True)
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
 
-def MemoryXEPD(dest, cmptype, value, mask):
+def MemoryXEPD(dest, cmptype, value, mask) -> Condition:
     cmptype = EncodeComparison(cmptype, issueError=True)
     return DeathsX(dest, cmptype, value, 0, mask)

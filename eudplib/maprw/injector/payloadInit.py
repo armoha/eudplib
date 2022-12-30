@@ -1,9 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from collections.abc import ByteString
+
 from eudplib import utils as ut
 
 from ... import core as c
+from ...core.allocator.pbuffer import Payload
+from ...core.mapdata.chktok import CHK
 from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
 from ...localize import _
 from ...trigtrg import trigtrg as tt
@@ -16,12 +20,12 @@ from ...trigtrg import trigtrg as tt
 trglist = []
 
 
-def Trigger(players=[tt.AllPlayers], *args, **kwargs):
+def Trigger(players=[tt.AllPlayers], *args, **kwargs) -> None:
     global trglist
     trglist.append(tt.Trigger(players=players, *args, **kwargs))
 
 
-def InitializePayload(chkt, payload, mrgndata=None):
+def InitializePayload(chkt: CHK, payload: Payload, mrgndata: ByteString | None = None) -> None:
     str_section = GetStringMap().SaveTBL()
     str_padding = -len(str_section) & 3
     payload_offset = 0x191943C8 + len(str_section) + str_padding

@@ -130,12 +130,12 @@ class Action(ConstExpr):
         self.parenttrg = None
         self.actindex = None
 
-    def Disabled(self):
+    def Disabled(self) -> None:
         self.fields[9] |= 2
 
     # -------
 
-    def CheckArgs(self, i):
+    def CheckArgs(self, i: int) -> None:
         for n, field in enumerate(self.fields[:10]):
             if field is None or IsConstExpr(field):
                 continue
@@ -183,9 +183,7 @@ class Action(ConstExpr):
                 acttype = "(unknown)"
             raise ut.EPError(_('Invalid {} "{}" in action{} "{}"').format(params[n], field, i, acttype))
 
-        return True
-
-    def SetParentTrigger(self, trg, index):
+    def SetParentTrigger(self, trg, index) -> None:
         ut.ep_assert(
             self.parenttrg is None, _("Actions cannot be shared by two triggers.")
         )
@@ -199,7 +197,7 @@ class Action(ConstExpr):
     def Evaluate(self):
         return self.parenttrg.Evaluate() + 8 + 320 + 32 * self.actindex
 
-    def CollectDependency(self, pbuffer):
+    def CollectDependency(self, pbuffer) -> None:
         wdw = pbuffer.WriteDword
         fld = self.fields
         wdw(fld[0])
@@ -209,5 +207,5 @@ class Action(ConstExpr):
         wdw(fld[4])
         wdw(fld[5])
 
-    def WritePayload(self, pbuffer):
+    def WritePayload(self, pbuffer) -> None:
         pbuffer.WritePack("IIIIIIHBBBBH", self.fields)

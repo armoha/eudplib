@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Callable
+
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
@@ -36,11 +38,12 @@ startFunctionList2 = []
 hasAlreadyStarted = 0
 
 
-def _hasAlreadyStarted():
+def _hasAlreadyStarted() -> bool:
     return hasAlreadyStarted == 2
 
 
-def EUDOnStart(func):
+def EUDOnStart(func: Callable) -> None:
+    # FIXME: Callable[[], ...]
     ep_assert(
         hasAlreadyStarted < 2, "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262"
     )
@@ -50,11 +53,11 @@ def EUDOnStart(func):
         _EUDOnStart2(func)
 
 
-def _EUDOnStart2(func):
+def _EUDOnStart2(func: Callable) -> None:
     startFunctionList2.append(func)
 
 
-def _MainStarter(mf):
+def _MainStarter(mf: Callable) -> c.Forward:
     global jumper, hasAlreadyStarted
     jumper = c.Forward()
 
@@ -94,7 +97,7 @@ def _MainStarter(mf):
     return jumper
 
 
-def EUDDoEvents():
+def EUDDoEvents() -> None:
     oldcp = sf.f_getcurpl()
 
     _t = c.Forward()

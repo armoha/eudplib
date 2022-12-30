@@ -29,7 +29,7 @@ def _excepthook(
     _h(type_, value, traceback)
 
 
-def _unraisablehook(unraisable):
+def _unraisablehook(unraisable) -> None:
     # print("# FIXME: unraisablehook")
     err_msg = unraisable.err_msg
     obj = unraisable.object

@@ -30,6 +30,7 @@ from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ... import trigger as trg
 from ... import utils as ut
+from ...core.mapdata.chktok import CHK
 from ...eudlib.memiof.mblockio import _repaddsd_epd
 from ...trigtrg import runtrigtrg as rtt
 from ..inlinecode.ilcprocesstrig import GetInlineCodeList
@@ -42,7 +43,7 @@ from ..inlinecode.ilcprocesstrig import GetInlineCodeList
 """
 
 
-def _DispatchInlineCode(nextptr, trigepd, prop):
+def _DispatchInlineCode(nextptr: c.EUDVariable, trigepd: c.EUDVariable, prop: int) -> None:
     cs0 = c.Forward()  # set cs0+20 to codeStart
     cs1 = c.Forward()  # set cs1+20 to ut.EPD(codeEnd) + 1
     cs2 = c.Forward()  # set cs2+20 to cs_a0_epd + 4
@@ -131,7 +132,7 @@ def _DispatchInlineCode(nextptr, trigepd, prop):
     )
 
 
-def _FlipProp(trigepd):
+def _FlipProp(trigepd) -> None:
     """Iterate through triggers and flip 'Trigger disabled' flag
 
     Also, dispatch inline codes
@@ -173,7 +174,7 @@ def _FlipProp(trigepd):
     cs.EUDEndWhile()
 
 
-def CreateInjectFinalizer(chkt, root, mrgndata=None):
+def CreateInjectFinalizer(chkt: CHK, root, mrgndata: bytes | None = None) -> c.Forward:
     rtt.AllocTrigTriggerLink()
     c.EP_SetRValueStrictMode(False)
 

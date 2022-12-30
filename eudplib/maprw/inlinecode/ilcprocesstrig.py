@@ -35,10 +35,11 @@ from .btInliner import (
     InlineCodifyBinaryTrigger,
     InlineCodifyMultipleBinaryTriggers,
     TryToShareTrigger,
+    tStartEnd,
 )
 from .ilccompile import CompileInlineCode, ComputeBaseInlineCodeGlobals
 
-_inlineCodes = []
+_inlineCodes: list[tuple[int, tStartEnd]] = []
 _inliningRate: float = 1.0
 _cutoffRate: list[float] = [1 + (i - 2) / 3 for i in range(9)]
 
@@ -56,7 +57,7 @@ def PreprocessInlineCode(chkt: CHK) -> None:
     chkt.setsection("TRIG", trigSection)
 
 
-def PreprocessTrigSection(trigSection: ByteString) -> tuple[list[tuple[int, callable]], bytes]:
+def PreprocessTrigSection(trigSection: ByteString) -> tuple[list[tuple[int, tStartEnd]], bytes]:
     """Fetch inline codes & compiles them"""
     ComputeBaseInlineCodeGlobals()
     if _inliningRate >= 1.0:
@@ -97,7 +98,9 @@ def PreprocessTrigSection(trigSection: ByteString) -> tuple[list[tuple[int, call
     return inlineCodes, trigSection
 
 
-def ConsecutiveInlineTrigSection(trigSection: ByteString):
+def ConsecutiveInlineTrigSection(
+    trigSection: ByteString,
+) -> tuple[list[tuple[int, tStartEnd]], bytes]:
     inlineCodes = []
     trigSegments = []
     pTriggers = ([], [], [], [], [], [], [], [])
@@ -149,12 +152,12 @@ def ConsecutiveInlineTrigSection(trigSection: ByteString):
     return inlineCodes, trigSection
 
 
-def GetInlineCodeList():
+def GetInlineCodeList() -> list[tuple[int, tStartEnd]]:
     """Get list of compiled inline_eudplib code"""
     return _inlineCodes
 
 
-def GetInlineCodePlayerList(bTrigger):
+def GetInlineCodePlayerList(bTrigger: ByteString) -> int | None:
     # Check if effplayer & current_action is empty
     for player in range(28):
         if bTrigger[320 + 2048 + 4 + player] != 0:
@@ -170,7 +173,9 @@ def GetInlineCodePlayerList(bTrigger):
     return ut.b2i4(bTrigger, 24)
 
 
-def DispatchInlineCode(inlineCodes, trigger_bytes):
+def DispatchInlineCode(
+    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: ByteString
+) -> bytearray | None:
     """Check if trigger segment has special data."""
     magicCode = ut.b2i4(trigger_bytes, 20)
     if magicCode != 0x10978D4A:
@@ -188,7 +193,9 @@ def DispatchInlineCode(inlineCodes, trigger_bytes):
     return CreateInlineCodeDispatcher(inlineCodes, func, playerCode)
 
 
-def InlinifyNormalTrigger(inlineCodes, trigger_bytes):
+def InlinifyNormalTrigger(
+    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: ByteString
+) -> bytearray:
     """Inlinify normal binary triggers"""
     playerCode = 0
     for i in range(27):
@@ -199,7 +206,9 @@ def InlinifyNormalTrigger(inlineCodes, trigger_bytes):
     return CreateInlineCodeDispatcher(inlineCodes, func, playerCode)
 
 
-def CreateInlineCodeDispatcher(inlineCodes, func, playerCode: int) -> bytearray:
+def CreateInlineCodeDispatcher(
+    inlineCodes: list[tuple[int, tStartEnd]], func: tStartEnd, playerCode: int
+) -> bytearray:
     """Create link from TRIG list to STR trigger."""
     funcID = len(inlineCodes) + 1024
     inlineCodes.append((funcID, func))

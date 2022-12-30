@@ -25,10 +25,12 @@ THE SOFTWARE.
 
 
 import random
+from typing import Any
 
 from ..core.rawtrigger import (
     Action,
     Add,
+    Condition,
     CurrentPlayer,
     EncodeModifier,
     SetDeaths,
@@ -41,26 +43,26 @@ _seed = 0
 _stack = []
 
 
-def push():
+def push() -> None:
     _stack.append(_seed)
 
 
-def pop():
+def pop() -> None:
     _stack.pop()
 
 
-def load():
+def load() -> None:
     global _seed
     _seed = _stack[-1]
 
 
-def rand(dest):
+def rand(dest) -> tuple[Any, Any]:
     unit = random.randint(234, 65535)
     cpo = EPD(dest) - 12 * unit - _seed
     return cpo, unit
 
 
-def srand():
+def srand() -> Action:
     r = random.randint(27, 0xFFFFFFFF)
     _loc = random.randint(1, 0xFFFFFFFF)
     u = random.randint(234, 65535)
@@ -70,7 +72,7 @@ def srand():
     return Action(_loc, 0, 0, 0, epd, r, u, 45, 7, 20)
 
 
-def SetMemoryS(dest, modtype, value):
+def SetMemoryS(dest, modtype, value) -> list[Condition]:
     modtype = EncodeModifier(modtype, issueError=True)
     cpo, unit = rand(dest)
     return [
@@ -79,7 +81,7 @@ def SetMemoryS(dest, modtype, value):
     ]
 
 
-def MoveCP(dest):
+def MoveCP(dest) -> Action:
     try:
         value = dest - _seed
     except TypeError:
@@ -87,7 +89,7 @@ def MoveCP(dest):
     return SetMemoryC(0x6509B0, Add, value)
 
 
-def SetMemoryC(dest, modtype, value):
+def SetMemoryC(dest, modtype, value) -> Action:
     modtype = EncodeModifier(modtype, issueError=True)
     _loc = random.randint(0, 0xFFFFFFFF)
     u = random.randint(234, 65535)

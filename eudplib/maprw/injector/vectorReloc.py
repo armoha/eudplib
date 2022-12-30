@@ -26,6 +26,8 @@ THE SOFTWARE.
 from eudplib import utils as ut
 
 from ... import core as c
+from ...core.allocator.pbuffer import Payload
+from ...core.mapdata.chktok import CHK
 from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
 from ...localize import _
 from ...trigtrg import trigtrg as tt
@@ -38,12 +40,12 @@ from ...trigtrg import trigtrg as tt
 trglist = []
 
 
-def Trigger(players=[tt.AllPlayers], *args, **kwargs):
+def Trigger(players=[tt.AllPlayers], *args, **kwargs) -> None:
     global trglist
     trglist.append(tt.Trigger(players=players, *args, **kwargs))
 
 
-def CopyDeaths(iplayer, oplayer, copyepd=False, initvalue=None):
+def CopyDeaths(iplayer, oplayer, copyepd: bool = False, initvalue: int | None = None) -> None:
     if initvalue is None:
         if copyepd:
             initvalue = tt.EPD(0)
@@ -65,7 +67,7 @@ def CopyDeaths(iplayer, oplayer, copyepd=False, initvalue=None):
         )
 
 
-def CreateVectorRelocator(chkt, payload):
+def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
     global trglist
 
     str_section = GetStringMap().SaveTBL()

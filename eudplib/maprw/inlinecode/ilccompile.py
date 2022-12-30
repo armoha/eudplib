@@ -25,17 +25,20 @@ THE SOFTWARE.
 
 
 import types
+from typing import Any
 
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ... import trigger as t
 from ... import utils as ut
+from ...core import RawTrigger
+from .btInliner import tStartEnd
 
 _inlineGlobals = {}
 
 
-def ComputeBaseInlineCodeGlobals():
+def ComputeBaseInlineCodeGlobals() -> None:
     """
     Return list of globals inline eudplib code can call.
     """
@@ -57,7 +60,7 @@ def ComputeBaseInlineCodeGlobals():
     _inlineGlobals = G
 
 
-def GetInlineCodeGlobals():
+def GetInlineCodeGlobals() -> dict[str, Any]:
     """
     Return list of globals inline eudplib code can call.
     """
@@ -71,13 +74,13 @@ def GetInlineCodeGlobals():
     return G
 
 
-def CompileInlineCode(code):
+def CompileInlineCode(code: str) -> tStartEnd:
     code = compile(code, "<string>", "exec")
 
     if c.PushTriggerScope():
-        tStart = c.RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
+        tStart = RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
         exec(code, GetInlineCodeGlobals(), {})
-        tEnd = c.RawTrigger()
+        tEnd = RawTrigger()
     c.PopTriggerScope()
 
-    return (tStart, tEnd)
+    return tStart, tEnd
