@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from math import log2
+
 from ...localize import _
 from ...utils import EPD, ExprProxy, cachedfunc, ep_assert, isUnproxyInstance
 from .. import rawtrigger as bt
