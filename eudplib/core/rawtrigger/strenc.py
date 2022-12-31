@@ -49,7 +49,7 @@ from .strdict import (
 )
 
 
-def EncodeAIScript(ais, issueError=False):
+def EncodeAIScript(ais):
     ais = ut.unProxy(ais)
 
     if isinstance(ais, str):
@@ -59,16 +59,20 @@ def EncodeAIScript(ais, issueError=False):
         ut.ep_assert(len(ais) >= 4, _("AIScript name too short"))
 
         if len(ais) > 4:
-            try:
+            if ais in DefAIScriptDict:
                 return ut.b2i4(DefAIScriptDict[ais])
-            except KeyError:
-                sl = _("Cannot encode string {} as {}.").format(ais, "AIScript")
-                for match in difflib.get_close_matches(ais, DefAIScriptDict.keys()):
-                    sl += "\n" + _(" - Suggestion: {}").format(match)
-                raise ut.EPError(sl)
+            sl = _("Cannot encode string {} as {}.").format(ais, "AIScript")
+            for match in difflib.get_close_matches(ais, DefAIScriptDict.keys()):
+                sl += "\n" + _(" - Suggestion: {}").format(match)
+            raise ut.EPError(sl)
 
         elif len(ais) == 4:
-            return ut.b2i4(ais)
+            if ais in DefAIScriptDict.values():
+                return ut.b2i4(ais)
+            sl = _("Cannot encode string {} as {}.").format(ais, "AIScript")
+            for match in difflib.get_close_matches(ais, DefAIScriptDict.values()):
+                sl += "\n" + _(" - Suggestion: {}").format(match)
+            raise ut.EPError(sl)
 
     elif isinstance(ais, _Unique):
         raise ut.EPError(_('[Warning] "{}" is not a {}').format(ais, "AIScript"))
@@ -76,7 +80,7 @@ def EncodeAIScript(ais, issueError=False):
     return ais
 
 
-def _EncodeAny(t, f, dl, s, issueError):
+def _EncodeAny(t, f, dl, s):
     s = ut.unProxy(s)
 
     if isinstance(s, str) or isinstance(s, bytes):
@@ -84,17 +88,13 @@ def _EncodeAny(t, f, dl, s, issueError):
             return f(s)
         except KeyError:
             if isinstance(s, str):
-                try:
+                if s in dl:
                     return dl[s]
-                except KeyError:
-                    sl = _("Cannot encode string {} as {}.").format(s, t)
-                    for match in difflib.get_close_matches(s, dl.keys()):
-                        sl += "\n" + _(" - Suggestion: {}").format(match)
-                    raise ut.EPError(sl)
-
-            if issueError:
-                raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
-            return s
+                sl = _("Cannot encode string {} as {}.").format(s, t)
+                for match in difflib.get_close_matches(s, dl.keys()):
+                    sl += "\n" + _(" - Suggestion: {}").format(match)
+                raise ut.EPError(sl)
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
 
     elif isinstance(s, _Unique):
         raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, t))
@@ -106,62 +106,62 @@ def _EncodeAny(t, f, dl, s, issueError):
         return s
 
 
-def EncodeLocation(loc, issueError=False):
-    return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc, issueError)
+def EncodeLocation(loc):
+    return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc)
 
 
-def EncodeString(s, issueError=False):
-    return _EncodeAny("MapString", GetStringIndex, {}, s, issueError)
+def EncodeString(s):
+    return _EncodeAny("MapString", GetStringIndex, {}, s)
 
 
-def EncodeSwitch(sw, issueError=False):
-    return _EncodeAny("switch", GetSwitchIndex, DefSwitchDict, sw, issueError)
+def EncodeSwitch(sw):
+    return _EncodeAny("switch", GetSwitchIndex, DefSwitchDict, sw)
 
 
-def EncodeUnit(u, issueError=False):
-    return _EncodeAny("unit", GetUnitIndex, DefUnitDict, u, issueError)
+def EncodeUnit(u):
+    return _EncodeAny("unit", GetUnitIndex, DefUnitDict, u)
 
 
-def EncodeTBL(t, issueError=False):
+def EncodeTBL(t):
     # TODO: handle custom stat_txt.tbl
-    return _EncodeAny("stat_txt.tbl", lambda s: {}[s], DefStatTextDict, t, issueError)
+    return _EncodeAny("stat_txt.tbl", lambda s: {}[s], DefStatTextDict, t)
 
 
-def EncodeFlingy(flingy, issueError=False):
-    return _EncodeAny("flingy", lambda s: {}[s], DefFlingyDict, flingy, issueError)
+def EncodeFlingy(flingy):
+    return _EncodeAny("flingy", lambda s: {}[s], DefFlingyDict, flingy)
 
 
-def EncodeIcon(icon, issueError=False):
-    return _EncodeAny("icon", lambda s: {}[s], DefIconDict, icon, issueError)
+def EncodeIcon(icon):
+    return _EncodeAny("icon", lambda s: {}[s], DefIconDict, icon)
 
 
-def EncodeSprite(sprite, issueError=False):
-    return _EncodeAny("sprite", lambda s: {}[s], DefSpriteDict, sprite, issueError)
+def EncodeSprite(sprite):
+    return _EncodeAny("sprite", lambda s: {}[s], DefSpriteDict, sprite)
 
 
-def EncodeImage(image, issueError=False):
-    return _EncodeAny("image", lambda s: {}[s], DefImageDict, image, issueError)
+def EncodeImage(image):
+    return _EncodeAny("image", lambda s: {}[s], DefImageDict, image)
 
 
-def EncodeIscript(iscript, issueError=False):
-    return _EncodeAny("iscript", lambda s: {}[s], DefIscriptDict, iscript, issueError)
+def EncodeIscript(iscript):
+    return _EncodeAny("iscript", lambda s: {}[s], DefIscriptDict, iscript)
 
 
-def EncodeUnitOrder(order, issueError=False):
-    return _EncodeAny("UnitOrder", lambda s: {}[s], DefUnitOrderDict, order, issueError)
+def EncodeUnitOrder(order):
+    return _EncodeAny("UnitOrder", lambda s: {}[s], DefUnitOrderDict, order)
 
 
-def EncodeWeapon(weapon, issueError=False):
-    return _EncodeAny("weapon", lambda s: {}[s], DefWeaponDict, weapon, issueError)
+def EncodeWeapon(weapon):
+    return _EncodeAny("weapon", lambda s: {}[s], DefWeaponDict, weapon)
 
 
-def EncodeTech(tech, issueError=False):
-    return _EncodeAny("tech", lambda s: {}[s], DefTechDict, tech, issueError)
+def EncodeTech(tech):
+    return _EncodeAny("tech", lambda s: {}[s], DefTechDict, tech)
 
 
-def EncodeUpgrade(upgrade, issueError=False):
-    return _EncodeAny("upgrade", lambda s: {}[s], DefUpgradeDict, upgrade, issueError)
+def EncodeUpgrade(upgrade):
+    return _EncodeAny("upgrade", lambda s: {}[s], DefUpgradeDict, upgrade)
 
 
-def EncodePortrait(portrait, issueError=False):
-    return _EncodeAny("portrait", lambda s: {}[s], DefPortraitDict, portrait, issueError)
+def EncodePortrait(portrait):
+    return _EncodeAny("portrait", lambda s: {}[s], DefPortraitDict, portrait)

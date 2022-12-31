@@ -73,7 +73,7 @@ def srand() -> Action:
 
 
 def SetMemoryS(dest, modtype, value) -> tuple[Action, Action]:
-    modtype = EncodeModifier(modtype, issueError=True)
+    modtype = EncodeModifier(modtype)
     cpo, unit = rand(dest)
     return (
         SetMemoryC(0x6509B0, Add, cpo),
@@ -90,7 +90,7 @@ def MoveCP(dest) -> Action:
 
 
 def SetMemoryC(dest, modtype, value) -> Action:
-    modtype = EncodeModifier(modtype, issueError=True)
+    modtype = EncodeModifier(modtype)
     _loc = random.randint(0, 0xFFFFFFFF)
     u = random.randint(234, 65535)
     epd = EPD(dest) - 12 * u

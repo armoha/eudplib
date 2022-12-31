@@ -132,7 +132,7 @@ def f_getnextchatdst():
     return ret
 
 
-@c.EUDTypedFunc([c.TrgTBL], None)
+@c.EUDTypedFunc([c.StatText], None)
 def GetTBLAddr(tblId):
     add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
     if cs.EUDExecuteOnce()():

@@ -109,11 +109,11 @@ def Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay=4
 
     if not IsSCDBMap():
         ep_warn(_("Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"))
-    Unit = EncodeUnit(Unit, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
-    WAVName = EncodeString(WAVName, issueError=True)
-    TimeModifier = EncodeModifier(TimeModifier, issueError=True)
-    Text = EncodeString(Text, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Where = EncodeLocation(Where)
+    WAVName = EncodeString(WAVName)
+    TimeModifier = EncodeModifier(TimeModifier)
+    Text = EncodeString(Text)
     return Action(Where, Text, WAVName, Time, 0, 0, Unit, 7, TimeModifier, AlwaysDisplay)
 
 
@@ -122,7 +122,7 @@ def PlayWAV(WAVName) -> Action:
 
     This will play a WAV file for the trigger’s owner.
     """
-    WAVName = EncodeString(WAVName, issueError=True)
+    WAVName = EncodeString(WAVName)
     return Action(0, 0, WAVName, 0, 0, 0, 0, 8, 0, 4)
 
 
@@ -131,7 +131,7 @@ def DisplayText(Text, AlwaysDisplay=4) -> Action:
 
     Displays a specific text message to each owner of the condition. Text messages will only appear if the affected player has Subtitles turned on in the Starcraft Sound Options Menu or if the Always Display option is checked for the action.
     """
-    Text = EncodeString(Text, issueError=True)
+    Text = EncodeString(Text)
     return Action(0, Text, 0, 0, 0, 0, 0, 9, 0, AlwaysDisplay)
 
 
@@ -143,7 +143,7 @@ def CenterView(Where) -> Action:
     Keep in mind that when the conditions are successfully met, the unit(s) will be created for each player that owns the trigger. For example, if All Players own a trigger that creates a Terran Marine for Player 1, and the conditions of the trigger are true for four of the players, Player 1 will get 4 Marines.
 
     """
-    Where = EncodeLocation(Where, issueError=True)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, 0, 0, 0, 10, 0, 4)
 
 
@@ -152,10 +152,10 @@ def CreateUnitWithProperties(Count, Unit, Where, Player, Properties) -> Action:
 
     This action works just like Create Unit, except that you can customize the properties of the newly created unit(s).
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
-    Player = EncodePlayer(Player, issueError=True)
-    Properties = EncodeProperty(Properties, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Where = EncodeLocation(Where)
+    Player = EncodePlayer(Player)
+    Properties = EncodeProperty(Properties)
     return Action(Where, 0, 0, 0, Player, Properties, Unit, 11, Count, 28)
 
 
@@ -164,7 +164,7 @@ def SetMissionObjectives(Text) -> Action:
 
     Changes the mission objectives text to something other than what was defined at the outset of the level. While this doesn’t actually change the victory or defeat conditions for the scenario, it can be used to notify the players of changes to the scenario’s objectives.
     """
-    Text = EncodeString(Text, issueError=True)
+    Text = EncodeString(Text)
     return Action(0, Text, 0, 0, 0, 0, 0, 12, 0, 4)
 
 
@@ -178,8 +178,8 @@ def SetSwitch(Switch, State) -> Action:
     -   Toggle a switch: if a switch is cleared, it becomes set; if it is set, it becomes cleared.
     -   Randomly choose between the set or cleared position.
     """
-    Switch = EncodeSwitch(Switch, issueError=True)
-    State = EncodeSwitchAction(State, issueError=True)
+    Switch = EncodeSwitch(Switch)
+    State = EncodeSwitchAction(State)
     return Action(0, 0, 0, 0, 0, Switch, 0, 13, State, 4)
 
 
@@ -190,7 +190,7 @@ def SetCountdownTimer(TimeModifier, Time) -> Action:
 
     You can also use this action to add or subtract time from the countdown timer.
     """
-    TimeModifier = EncodeModifier(TimeModifier, issueError=True)
+    TimeModifier = EncodeModifier(TimeModifier)
     return Action(0, 0, 0, Time, 0, 0, 0, 14, TimeModifier, 4)
 
 
@@ -199,7 +199,7 @@ def RunAIScript(Script) -> Action:
 
     This instructs the specified computer-controlled players to use a certain AI script. The AI script determines the overall aggressiveness and effectiveness of the computer player, and by changing the AI script during the scenario, you can effectively handicap the scenario.
     """
-    Script = EncodeAIScript(Script, issueError=True)
+    Script = EncodeAIScript(Script)
     return Action(0, 0, 0, 0, 0, Script, 0, 15, 0, 4)
 
 
@@ -208,8 +208,8 @@ def RunAIScriptAt(Script, Where) -> Action:
 
     Identical to [Run AI Script](#link_action_runaiscript) but specifies a location to run the script at. Certain scripts are designed specifically to target a Location.
     """
-    Script = EncodeAIScript(Script, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
+    Script = EncodeAIScript(Script)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, 0, Script, 0, 16, 0, 4)
 
 
@@ -218,16 +218,16 @@ def LeaderBoardControl(Unit, Label) -> Action:
 
     This will display the Leader Board to all players based on who controls the most of a particular unit in the scenario.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, 0, Unit, 17, 0, 20)
 
 
 def LeaderBoardControlAt(Unit, Location, Label) -> Action:
     """Show Leader Board for most control of units at location. Display label: label"""
-    Unit = EncodeUnit(Unit, issueError=True)
-    Location = EncodeLocation(Location, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Location = EncodeLocation(Location)
+    Label = EncodeString(Label)
     return Action(Location, Label, 0, 0, 0, 0, Unit, 18, 0, 20)
 
 
@@ -236,8 +236,8 @@ def LeaderBoardResources(ResourceType, Label) -> Action:
 
     This will display the Leader Board to all players based on who has the most resources.
     """
-    ResourceType = EncodeResource(ResourceType, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    ResourceType = EncodeResource(ResourceType)
+    Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, 0, ResourceType, 19, 0, 4)
 
 
@@ -246,8 +246,8 @@ def LeaderBoardKills(Unit, Label) -> Action:
 
     This will display the Leader Board to all players based on who has the most kills in the scenario.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, 0, Unit, 20, 0, 20)
 
 
@@ -256,8 +256,8 @@ def LeaderBoardScore(ScoreType, Label) -> Action:
 
     This will display the Leader Board to all players based on who has the most points.
     """
-    ScoreType = EncodeScore(ScoreType, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    ScoreType = EncodeScore(ScoreType)
+    Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, 0, ScoreType, 21, 0, 4)
 
 
@@ -266,8 +266,8 @@ def KillUnit(Unit, Player) -> Action:
 
     This action kills all units of a particular type for the player specified. This action has no effect while the game is paused.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Player = EncodePlayer(Player, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Player = EncodePlayer(Player)
     return Action(0, 0, 0, 0, Player, 0, Unit, 22, 0, 20)
 
 
@@ -276,10 +276,10 @@ def KillUnitAt(Count, Unit, Where, ForPlayer) -> Action:
 
     Similar to the ‘Kill Unit’ action, the ‘Kill Unit at Location’ action gives you the ability to kill a specified number of units of a particular type belonging to a certain player at the specified Location. This action will not function while the game is paused.
     """
-    Count = EncodeCount(Count, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
-    ForPlayer = EncodePlayer(ForPlayer, issueError=True)
+    Count = EncodeCount(Count)
+    Unit = EncodeUnit(Unit)
+    Where = EncodeLocation(Where)
+    ForPlayer = EncodePlayer(ForPlayer)
     return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 23, Count, 20)
 
 
@@ -288,8 +288,8 @@ def RemoveUnit(Unit, Player) -> Action:
 
     Remove Unit works just like Kill Unit, except that the affected units will simply disappear without actually dying. This action has no effect while the game is paused.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Player = EncodePlayer(Player, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Player = EncodePlayer(Player)
     return Action(0, 0, 0, 0, Player, 0, Unit, 24, 0, 20)
 
 
@@ -298,10 +298,10 @@ def RemoveUnitAt(Count, Unit, Where, ForPlayer) -> Action:
 
     This action works just like Remove Unit. In addition, you may specify a location and a quantity of units that the action will affect. It has no effect on a paused game.
     """
-    Count = EncodeCount(Count, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
-    ForPlayer = EncodePlayer(ForPlayer, issueError=True)
+    Count = EncodeCount(Count)
+    Unit = EncodeUnit(Unit)
+    Where = EncodeLocation(Where)
+    ForPlayer = EncodePlayer(ForPlayer)
     return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 25, Count, 20)
 
 
@@ -310,9 +310,9 @@ def SetResources(Player, Modifier, Amount, ResourceType) -> Action:
 
     The set resources action allows you to increase, decrease, or set the amount of resources that a player has.
     """
-    Player = EncodePlayer(Player, issueError=True)
-    Modifier = EncodeModifier(Modifier, issueError=True)
-    ResourceType = EncodeResource(ResourceType, issueError=True)
+    Player = EncodePlayer(Player)
+    Modifier = EncodeModifier(Modifier)
+    ResourceType = EncodeResource(ResourceType)
     return Action(0, 0, 0, 0, Player, Amount, ResourceType, 26, Modifier, 4)
 
 
@@ -321,9 +321,9 @@ def SetScore(Player, Modifier, Amount, ScoreType) -> Action:
 
     The set score action lets you the increase, decrease, or set the number of points that a player currently has.
     """
-    Player = EncodePlayer(Player, issueError=True)
-    Modifier = EncodeModifier(Modifier, issueError=True)
-    ScoreType = EncodeScore(ScoreType, issueError=True)
+    Player = EncodePlayer(Player)
+    Modifier = EncodeModifier(Modifier)
+    ScoreType = EncodeScore(ScoreType)
     return Action(0, 0, 0, 0, Player, Amount, ScoreType, 27, Modifier, 4)
 
 
@@ -332,7 +332,7 @@ def MinimapPing(Where) -> Action:
 
     This sends out a ‘ping’ on the mini map at the specified location. This can be used to draw attention to a particular spot or to track a moving location. Note that pressing the spacebar in the game after receiving the ping will not center your screen on the ping Location. Only transmissions allow you to jump to a different location with the spacebar.
     """
-    Where = EncodeLocation(Where, issueError=True)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, 0, 0, 0, 28, 0, 4)
 
 
@@ -341,7 +341,7 @@ def TalkingPortrait(Unit, Time) -> Action:
 
     This will show the unit picture of your choice in the unit window in the game screen for the specified amount of time.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
+    Unit = EncodeUnit(Unit)
     return Action(0, 0, 0, Time, 0, 0, Unit, 29, 0, 20)
 
 
@@ -366,7 +366,7 @@ def LeaderBoardComputerPlayers(State) -> Action:
 
     This action allows you to specify whether neutral, rescue and computer controlled players will be included in the leader board calculations. By default, all computer players are included in the tally.
     """
-    State = EncodePropState(State, issueError=True)
+    State = EncodePropState(State)
     return Action(0, 0, 0, 0, 0, 0, 0, 32, State, 4)
 
 
@@ -375,8 +375,8 @@ def LeaderBoardGoalControl(Goal, Unit, Label) -> Action:
 
     This will display the Leader Board to all players based on the amount of units controlled on the map that are required to achieve a goal. In this type of leader board, the lower the number the better.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, Goal, Unit, 33, 0, 20)
 
 
@@ -385,9 +385,9 @@ def LeaderBoardGoalControlAt(Goal, Unit, Location, Label) -> Action:
 
     This will display the Leader Board to all players based on the amount of units controlled at a certain Location that are required to achieve a goal. In this type of leader board, the lower the number the better.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Location = EncodeLocation(Location, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Location = EncodeLocation(Location)
+    Label = EncodeString(Label)
     return Action(Location, Label, 0, 0, 0, Goal, Unit, 34, 0, 20)
 
 
@@ -396,8 +396,8 @@ def LeaderBoardGoalResources(Goal, ResourceType, Label) -> Action:
 
     This will display the Leader Board to all players based on who have the most resources required to achieve a goal. In this type of leader board, the lower the number the better.
     """
-    ResourceType = EncodeResource(ResourceType, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    ResourceType = EncodeResource(ResourceType)
+    Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, Goal, ResourceType, 35, 0, 4)
 
 
@@ -406,8 +406,8 @@ def LeaderBoardGoalKills(Goal, Unit, Label) -> Action:
 
     This will display the Leader Board to all players based on who have the most kills required to achieve a goal. In this type of leader board, the lower the number the better.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, Goal, Unit, 36, 0, 20)
 
 
@@ -416,8 +416,8 @@ def LeaderBoardGoalScore(Goal, ScoreType, Label) -> Action:
 
     This will display the Leader Board to all players based on who have the most points required to achieve a goal. In this type of leader board, the lower the number the better.
     """
-    ScoreType = EncodeScore(ScoreType, issueError=True)
-    Label = EncodeString(Label, issueError=True)
+    ScoreType = EncodeScore(ScoreType)
+    Label = EncodeString(Label)
     return Action(0, Label, 0, 0, 0, Goal, ScoreType, 37, 0, 4)
 
 
@@ -426,10 +426,10 @@ def MoveLocation(Location, OnUnit, Owner, DestLocation) -> Action:
 
     This action will center a Location on a unit. In addition to choosing a location to move, you must specify a search location. The Action will ignore any units outside the search location. If no unit is found, the Location will move to the center of the search location. You can combine this Action with Center View to center the screen on a particular unit.
     """
-    Location = EncodeLocation(Location, issueError=True)
-    OnUnit = EncodeUnit(OnUnit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    DestLocation = EncodeLocation(DestLocation, issueError=True)
+    Location = EncodeLocation(Location)
+    OnUnit = EncodeUnit(OnUnit)
+    Owner = EncodePlayer(Owner)
+    DestLocation = EncodeLocation(DestLocation)
     return Action(DestLocation, 0, 0, 0, Owner, Location, OnUnit, 38, 0, 20)
 
 
@@ -438,11 +438,11 @@ def MoveUnit(Count, UnitType, Owner, StartLocation, DestLocation) -> Action:
 
     This action will teleport a specified number of units (or unit) from one Location to another.
     """
-    Count = EncodeCount(Count, issueError=True)
-    UnitType = EncodeUnit(UnitType, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    StartLocation = EncodeLocation(StartLocation, issueError=True)
-    DestLocation = EncodeLocation(DestLocation, issueError=True)
+    Count = EncodeCount(Count)
+    UnitType = EncodeUnit(UnitType)
+    Owner = EncodePlayer(Owner)
+    StartLocation = EncodeLocation(StartLocation)
+    DestLocation = EncodeLocation(DestLocation)
     return Action(StartLocation, 0, 0, 0, Owner, DestLocation, UnitType, 39, Count, 20)
 
 
@@ -459,7 +459,7 @@ def SetNextScenario(ScenarioName) -> Action:
 
     This trigger offers the ability to link multiple user-created maps together to form one large campaign.
     """
-    ScenarioName = EncodeString(ScenarioName, issueError=True)
+    ScenarioName = EncodeString(ScenarioName)
     return Action(0, ScenarioName, 0, 0, 0, 0, 0, 41, 0, 4)
 
 
@@ -470,10 +470,10 @@ def SetDoodadState(State, Unit, Owner, Where) -> Action:
 
     Enabling a door closes it, and enabling a turret causes it to activate and attack any enemies of the trigger owner.
     """
-    State = EncodePropState(State, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
+    State = EncodePropState(State)
+    Unit = EncodeUnit(Unit)
+    Owner = EncodePlayer(Owner)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, Owner, 0, Unit, 42, State, 20)
 
 
@@ -482,10 +482,10 @@ def SetInvincibility(State, Unit, Owner, Where) -> Action:
 
     This action makes the specified unit or units Invincible. Invincible units cannot be targeted or attacked, and take no damage.
     """
-    State = EncodePropState(State, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
+    State = EncodePropState(State)
+    Unit = EncodeUnit(Unit)
+    Owner = EncodePlayer(Owner)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, Owner, 0, Unit, 43, State, 20)
 
 
@@ -496,9 +496,9 @@ def CreateUnit(Number, Unit, Where, ForPlayer) -> Action:
 
     Keep in mind that when the conditions are successfully met, the unit(s) will be created for each player that owns the trigger. For example, if **All Players** own a trigger that creates a Terran Marine for Player 1, and the conditions of the trigger are true for four of the players, Player 1 will get 4 Marines.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
-    ForPlayer = EncodePlayer(ForPlayer, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Where = EncodeLocation(Where)
+    ForPlayer = EncodePlayer(ForPlayer)
     return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 44, Number, 20)
 
 
@@ -507,9 +507,9 @@ def SetDeaths(Player, Modifier, Number, Unit) -> Action:
 
     This will set the death counter of a particular unit, for the specified player, to a value listed in the action.
     """
-    Player = EncodePlayer(Player, issueError=True)
-    Modifier = EncodeModifier(Modifier, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
+    Player = EncodePlayer(Player)
+    Modifier = EncodeModifier(Modifier)
+    Unit = EncodeUnit(Unit)
     return Action(0, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20)
 
 
@@ -518,11 +518,11 @@ def Order(Unit, Owner, StartLocation, OrderType, DestLocation) -> Action:
 
     This action allows you to issue orders through a trigger to a unit (or units) that will change their behavior in a scenario. The different orders are attack, move and patrol.
     """
-    Unit = EncodeUnit(Unit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    StartLocation = EncodeLocation(StartLocation, issueError=True)
-    OrderType = EncodeOrder(OrderType, issueError=True)
-    DestLocation = EncodeLocation(DestLocation, issueError=True)
+    Unit = EncodeUnit(Unit)
+    Owner = EncodePlayer(Owner)
+    StartLocation = EncodeLocation(StartLocation)
+    OrderType = EncodeOrder(OrderType)
+    DestLocation = EncodeLocation(DestLocation)
     return Action(StartLocation, 0, 0, 0, Owner, DestLocation, Unit, 46, OrderType, 20)
 
 
@@ -531,7 +531,7 @@ def Comment(Text) -> Action:
 
     If this action exists in a trigger, and is enabled, whatever text is listed in the text field will be displayed in the trigger text. If you disable this action, the normal trigger text will be displayed.
     """
-    Text = EncodeString(Text, issueError=True)
+    Text = EncodeString(Text)
     return Action(0, Text, 0, 0, 0, 0, 0, 47, 0, 4)
 
 
@@ -540,11 +540,11 @@ def GiveUnits(Count, Unit, Owner, Where, NewOwner) -> Action:
 
     This action allows you to transfer units from one player to another.
     """
-    Count = EncodeCount(Count, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
-    NewOwner = EncodePlayer(NewOwner, issueError=True)
+    Count = EncodeCount(Count)
+    Unit = EncodeUnit(Unit)
+    Owner = EncodePlayer(Owner)
+    Where = EncodeLocation(Where)
+    NewOwner = EncodePlayer(NewOwner)
     return Action(Where, 0, 0, 0, Owner, NewOwner, Unit, 48, Count, 20)
 
 
@@ -553,10 +553,10 @@ def ModifyUnitHitPoints(Count, Unit, Owner, Where, Percent) -> Action:
 
     This action will modify the specified unit(s) hit points. The hit points will be changed based on the percentage specified in the action trigger.
     """
-    Count = EncodeCount(Count, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
+    Count = EncodeCount(Count)
+    Unit = EncodeUnit(Unit)
+    Owner = EncodePlayer(Owner)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, Owner, Percent, Unit, 49, Count, 20)
 
 
@@ -565,10 +565,10 @@ def ModifyUnitEnergy(Count, Unit, Owner, Where, Percent) -> Action:
 
     This action will modify the specified unit(s) spell-casting energy. The energy will be changed based on the percentage specified in the action trigger.
     """
-    Count = EncodeCount(Count, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
+    Count = EncodeCount(Count)
+    Unit = EncodeUnit(Unit)
+    Owner = EncodePlayer(Owner)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, Owner, Percent, Unit, 50, Count, 20)
 
 
@@ -577,10 +577,10 @@ def ModifyUnitShields(Count, Unit, Owner, Where, Percent) -> Action:
 
     This action will modify the specified unit(s) shield points. The shield points will be changed based on the percentage specified in the action trigger.
     """
-    Count = EncodeCount(Count, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
+    Count = EncodeCount(Count)
+    Unit = EncodeUnit(Unit)
+    Owner = EncodePlayer(Owner)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, Owner, Percent, Unit, 51, Count, 20)
 
 
@@ -589,9 +589,9 @@ def ModifyUnitResourceAmount(Count, Owner, Where, NewValue) -> Action:
 
     This action allows you to modify the amount of resources contained in the various mineral stores. For example, you could modify a Vespene Geyser so that it had 0 resources if you desire.
     """
-    Count = EncodeCount(Count, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
+    Count = EncodeCount(Count)
+    Owner = EncodePlayer(Owner)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, Owner, NewValue, 0, 52, Count, 4)
 
 
@@ -600,10 +600,10 @@ def ModifyUnitHangarCount(Add, Count, Unit, Owner, Where) -> Action:
 
     This action will modify the contents of a unit(s) hangar. For example, this will allow you to add 5 additional Interceptors to the Carrier’s hangar.
     """
-    Count = EncodeCount(Count, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
-    Owner = EncodePlayer(Owner, issueError=True)
-    Where = EncodeLocation(Where, issueError=True)
+    Count = EncodeCount(Count)
+    Unit = EncodeUnit(Unit)
+    Owner = EncodePlayer(Owner)
+    Where = EncodeLocation(Where)
     return Action(Where, 0, 0, 0, Owner, Add, Unit, 53, Count, 20)
 
 
@@ -636,19 +636,19 @@ def SetAllianceStatus(Player, Status) -> Action:
 
     This allows you to set the value of the affected players’ alliance status.
     """
-    Player = EncodePlayer(Player, issueError=True)
-    Status = EncodeAllyStatus(Status, issueError=True)
+    Player = EncodePlayer(Player)
+    Status = EncodeAllyStatus(Status)
     return Action(0, 0, 0, 0, Player, 0, Status, 57, 0, 4)
 
 
 def SetMemory(dest, modtype, value) -> Action:
-    modtype = EncodeModifier(modtype, issueError=True)
+    modtype = EncodeModifier(modtype)
     return Action(0, 0, 0, 0, EPD(dest), value, 0, 45, modtype, 20)
 
 
 def SetMemoryEPD(dest, modtype, value) -> Action:
-    dest = EncodePlayer(dest, issueError=True)
-    modtype = EncodeModifier(modtype, issueError=True)
+    dest = EncodePlayer(dest)
+    modtype = EncodeModifier(modtype)
     return Action(0, 0, 0, 0, dest, value, 0, 45, modtype, 20)
 
 
@@ -657,26 +657,26 @@ def SetNextPtr(trg, dest) -> Action:
 
 
 def SetDeathsX(Player, Modifier, Number, Unit, Mask) -> Action:
-    Player = EncodePlayer(Player, issueError=True)
-    Modifier = EncodeModifier(Modifier, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
+    Player = EncodePlayer(Player)
+    Modifier = EncodeModifier(Modifier)
+    Unit = EncodeUnit(Unit)
     return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx="SC")
 
 
 def SetMemoryX(dest, modtype, value, mask) -> Action:
-    modtype = EncodeModifier(modtype, issueError=True)
+    modtype = EncodeModifier(modtype)
     return SetDeathsX(EPD(dest), modtype, value, 0, mask)
 
 
 def SetMemoryXEPD(epd, modtype, value, mask) -> Action:
-    modtype = EncodeModifier(modtype, issueError=True)
+    modtype = EncodeModifier(modtype)
     return SetDeathsX(epd, modtype, value, 0, mask)
 
 
 def SetKills(Player, Modifier, Number, Unit) -> Action | tuple[Action, Action, Action]:
-    Player = EncodePlayer(Player, issueError=True)
-    Modifier = EncodeModifier(Modifier, issueError=True)
-    Unit = EncodeUnit(Unit, issueError=True)
+    Player = EncodePlayer(Player)
+    Modifier = EncodeModifier(Modifier)
+    Unit = EncodeUnit(Unit)
     if isinstance(Player, int) and Player >= 12:
         if Player == 13:
             return (
