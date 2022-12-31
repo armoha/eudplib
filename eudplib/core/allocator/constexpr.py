@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import Any, TypeVar
+
 from ... import utils as ut
 from ...localize import _
 from .rlocint import RlocInt_C, toRlocInt
@@ -78,19 +80,19 @@ class ConstExpr:
             )
         return NotImplemented
 
-    def __mul__(self, k):
+    def __mul__(self, k) -> "ConstExpr":
         if not isinstance(k, int):
             return NotImplemented
 
         return ConstExpr(self.baseobj, self.offset * k, self.rlocmode * k)
 
-    def __rmul__(self, k):
+    def __rmul__(self, k) -> "ConstExpr":
         if not isinstance(k, int):
             return NotImplemented
 
         return ConstExpr(self.baseobj, self.offset * k, self.rlocmode * k)
 
-    def __floordiv__(self, k):
+    def __floordiv__(self, k) -> "ConstExpr":
         if not isinstance(k, int):
             return NotImplemented
         ut.ep_assert(
@@ -105,7 +107,7 @@ class ConstExpr:
         ut.ep_assert(4 % k == 0 and self.rlocmode == 4)
         return self.offset % k
 
-    def __neg__(self):
+    def __neg__(self) -> "ConstExpr":
         return self.__mul__(-1)
 
     def __eq__(self, other) -> bool:
@@ -149,9 +151,9 @@ def _total_ord(a: ConstExpr, b: ConstExpr) -> bool:
 
 
 class ConstExprInt(ConstExpr):
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         super().__init__(None, value, 0)
-        self.value = RlocInt_C(value & 0xFFFFFFFF, 0)
+        self.value: RlocInt_C = RlocInt_C(value & 0xFFFFFFFF, 0)
 
     def Evaluate(self) -> RlocInt_C:
         return self.value
@@ -161,9 +163,9 @@ class Forward(ConstExpr):
 
     """Class for forward definition."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(self)
-        self._expr = None
+        self._expr: Any = None
 
     def __lshift__(self, expr):
         ut.ep_assert(self._expr is None, _("Reforwarding without reset is not allowed"))

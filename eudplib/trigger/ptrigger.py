@@ -30,7 +30,7 @@ from ..core.mapdata.playerinfo import PlayerInfo
 from .triggerdef import Trigger
 
 _pinfos: list[PlayerInfo] = []
-_pdbtable = {}
+_pdbtable: dict[bytes, c.Db] = {}
 
 
 def InitPTrigger() -> None:

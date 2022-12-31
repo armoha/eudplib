@@ -22,11 +22,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from eudplib.core.eudobj import EUDObject
 
 
 def StackObjects(
-    found_objects: list[Any], dwoccupmap_dict: dict[Any, Any], alloctable: dict[Any, int]
+    found_objects: list["EUDObject"],
+    dwoccupmap_dict: dict["EUDObject", list[int]],
+    alloctable: dict["EUDObject", int],
 ) -> None:
     dwoccupmap_max_size = 0
     for obj in found_objects:

@@ -242,6 +242,7 @@ def CreateInjectFinalizer(chkt: CHK, root, mrgndata: bytes | None = None) -> c.F
 
             # If there were triggers
             if cs.EUDIfNot()(prevtstart == ~(pts + player * 12 + 4)):
+                orig_tstart, orig_tend, _runner_end_array = rtt.AllocTrigTriggerLink()
                 link_trs = c.Forward()
                 vs = [prevtstart, prevtend, prevtend_epd]
                 acts = [
@@ -249,8 +250,8 @@ def CreateInjectFinalizer(chkt: CHK, root, mrgndata: bytes | None = None) -> c.F
                     c.SetMemory(pts + player * 12 + 8, c.SetTo, tstart),
                     c.SetMemory(pts + player * 12 + 4, c.SetTo, tre),
                     # Cache dlist start & end
-                    prevtstart.SetDest(ut.EPD(rtt.orig_tstart) + player),
-                    prevtend.SetDest(ut.EPD(rtt.orig_tend) + player),
+                    prevtstart.SetDest(ut.EPD(orig_tstart) + player),
+                    prevtend.SetDest(ut.EPD(orig_tend) + player),
                     prevtend_epd.AddNumber(1),
                     prevtend_epd.SetDest(ut.EPD(link_trs) + 4),
                 ]

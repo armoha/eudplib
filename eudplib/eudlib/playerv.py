@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import Any
+
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
@@ -36,7 +38,10 @@ class _EUDVariableFrom(c.EUDVariable):
         self._rvalue = False
 
 
-class PVariable(c.EUDVArray(8)):
+_EUDVArray8: Any = c.EUDVArray(8)  # FIXME : Unsupported dynamic base class
+
+
+class PVariable(_EUDVArray8):
     def _casteudset(self, i, value):
         nptr = c.Forward()
         c.VProc(

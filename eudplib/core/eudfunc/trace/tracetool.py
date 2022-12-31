@@ -64,7 +64,7 @@ def _f_initstacktrace() -> None:
     # that is really written in-game.
     # We will fill the trace stack 'magic code' on runtime, and later find the
     # magic code to locate the stack trace table.
-    if traceHeader is None:
+    if not traceHeader:
         raise ut.EPError(_("Must call SaveMap first"))
     RawTrigger(
         actions=[
@@ -88,7 +88,7 @@ def _EUDTracePop() -> None:
 nextTraceId = 0
 traceMap: list[tuple[int, str]] = []
 traceKey = 0
-traceHeader: bytes | None = None
+traceHeader: bytes = b""
 
 
 def GetTraceStackDepth() -> EUDVariable:
@@ -153,5 +153,5 @@ def EUDTraceLogRaw(v: int) -> None:
     nt << NextTrigger()
 
 
-def _GetTraceMap() -> tuple[tuple[bytes, bytes | None], list[tuple[int, str]]]:
+def _GetTraceMap() -> tuple[tuple[bytes, bytes], list[tuple[int, str]]]:
     return (iHeader, traceHeader), traceMap

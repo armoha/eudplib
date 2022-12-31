@@ -43,6 +43,8 @@ traceMap = []
 def getTraceMap() -> None:
     global traceMap, traceHeader
     newTraceHeader, newTraceMap = _GetTraceMap()
+    if not newTraceHeader[1]:
+        raise EPError(_("Empty trace header"))
     if newTraceMap:
         traceHeader = newTraceHeader
         traceMap = list(newTraceMap)
@@ -117,6 +119,8 @@ def SaveMap(fname, rootf, *, sectorSize=None) -> None:
     if traceMap:
         traceFname = fname + ".epmap"
         print(_("Writing trace file to {}").format(traceFname))
+        if traceHeader is None:
+            raise EPError(_("Unreachable callback error"))
         with open(traceFname, "w", encoding="utf-8") as wf:
             wf.write("H0: %s\n" % binascii.hexlify(traceHeader[0]).decode("ascii"))
             wf.write("H1: %s\n" % binascii.hexlify(traceHeader[1]).decode("ascii"))

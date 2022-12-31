@@ -22,16 +22,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
+from collections.abc import Callable
+from typing import Any
+
 from eudplib.utils import ep_warn
 
-_objns = {}
+_objns: dict[str, Any] = {}
 
 
-def EUDClearNamespace():
+def EUDClearNamespace() -> None:
     _objns.clear()
 
 
-def EUDRegisterObjectToNamespace(funcname, obj):
+def EUDRegisterObjectToNamespace(funcname: str, obj: Any) -> Any:
     """Register object to inline code namespace."""
     if funcname[0] != "_":
         if funcname in _objns:
@@ -43,11 +46,11 @@ def EUDRegisterObjectToNamespace(funcname, obj):
     return obj
 
 
-def EUDRegistered(func):
+def EUDRegistered(func: Callable) -> Callable:
     """Decoreator for registering class / function."""
     return EUDRegisterObjectToNamespace(func.__name__, func)
 
 
-def GetEUDNamespace():
+def GetEUDNamespace() -> dict[str, Any]:
     """Get list of functions that inline code can use."""
     return _objns

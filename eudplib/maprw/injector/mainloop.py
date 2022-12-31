@@ -29,7 +29,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
-from ...eudlib.utilf.userpl import _f_initisusercp
+from ...eudlib.utilf.userpl import _f_initisusercp, _f_inituserplayerid
 from ...utils import ep_assert
 
 jumper = None
@@ -65,6 +65,7 @@ def _MainStarter(mf: Callable) -> c.Forward:
         rootstarter = c.NextTrigger()
 
         # Various initializes
+        _f_inituserplayerid()
         _f_initisusercp()
         sf.f_getcurpl()
         _f_initstacktrace()

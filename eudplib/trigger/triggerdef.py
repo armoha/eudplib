@@ -32,7 +32,7 @@ from .tpatcher import PatchAction, PatchCondition
 
 def Trigger(
     conditions=None, actions=None, preserved: bool = True
-) -> tuple[c.RawTrigger, c.RawTrigger]:
+) -> tuple[c.Forward, c.RawTrigger]:
     """General easy-to-use trigger
 
     :param conditions: List of conditions. If there are none, trigger will
@@ -118,4 +118,4 @@ def Trigger(
         if not preserved:
             skipt << c.NextTrigger()
 
-    return (tstart, tend)
+    return tstart, tend

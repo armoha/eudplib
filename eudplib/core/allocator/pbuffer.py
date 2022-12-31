@@ -34,10 +34,10 @@ from .rlocint import RlocInt_C
 
 
 class Payload:
-    def __init__(self, data, prttable, orttable):
-        self.data = data
-        self.prttable = prttable
-        self.orttable = orttable
+    def __init__(self, data, prttable, orttable) -> None:
+        self.data: Final[bytearray] = data
+        self.prttable: Final[list[int]] = prttable
+        self.orttable: Final[list[int]] = orttable
 
 
 _packerData: dict[str, list[int]] = {}
@@ -50,12 +50,14 @@ class PayloadBuffer:
     """
 
     def __init__(self, totlen: int) -> None:
-        self._data = bytearray(totlen)
-        self._totlen = totlen
-        self._prttable = []
-        self._orttable = []
+        self._data: bytearray = bytearray(totlen)
+        self._totlen: int = totlen
+        self._prttable: list[int] = []
+        self._orttable: list[int] = []
+        self._datastart: int
+        self._datacur: int
 
-    def StartWrite(self, writeaddr) -> None:
+    def StartWrite(self, writeaddr: int) -> None:
         self._datastart = writeaddr
         self._datacur = writeaddr
 

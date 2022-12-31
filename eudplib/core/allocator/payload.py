@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 import time
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from eudplib import utils as ut
 from eudplib.localize import _
@@ -32,12 +33,14 @@ from eudplib.utils import RandList, ep_assert, stackobjs
 
 from . import constexpr, pbuffer, rlocint
 
-_found_objects = []
-_rootobj = None
-_found_objects_set = set()
-_untraversed_objects = []
-_dynamic_objects_set = set()
-_alloctable = {}
+if TYPE_CHECKING:
+    from eudplib.core.eudobj import EUDObject
+_found_objects: list["EUDObject"] = []
+_rootobj: "EUDObject | None" = None
+_found_objects_set: set["EUDObject"] = set()
+_untraversed_objects: list["EUDObject"] = []
+_dynamic_objects_set: set["EUDObject"] = set()
+_alloctable: dict["EUDObject", int] = {}
 _payload_size: int = 0
 
 PHASE = Enum("PHASE", ["COLLECTING", "ALLOCATING", "WRITING"])
@@ -176,7 +179,8 @@ def CollectObjects(root) -> None:
 
     if _payload_shuffle:
         # Shuffle objects -> Randomize(?) addresses
-        _found_objects_set.remove(_rootobj)
+        if _rootobj:
+            _found_objects_set.remove(_rootobj)
         _found_objects = [_rootobj] + RandList(_found_objects_set)
 
     # cleanup
@@ -206,9 +210,9 @@ class ObjAllocator:
         self._sizes = {}
 
     def StartWrite(self) -> None:
-        self._suboccupmap = 0
-        self._suboccupidx = 0
-        self._occupmap = []
+        self._suboccupmap: int = 0
+        self._suboccupidx: int = 0
+        self._occupmap: list[int] = []
 
     def _Occup0(self) -> None:
         self._suboccupidx += 1

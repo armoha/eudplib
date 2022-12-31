@@ -36,14 +36,6 @@ else:
         eudplib.core.rawtrigger.constenc._KillsSpecialized,
     ]
 exclude_names = ["__loader__", "__path__", "__spec__"]
-section_header_charr = ["=", "-", "'", "~", "^"]
-
-
-print("Collecting list of documentation-needed structures")
-doc_needed_functions = set()
-doc_needed_classes = set()
-fc_documented = {}
-
 
 # Document module
 nlist = []
@@ -67,7 +59,7 @@ print("\n==================================\n")
 nlist.sort()
 nlist = ['"%s", ' % name for name in nlist]
 col = 4
-s = []
+s: list[str] = []
 
 
 def flush():

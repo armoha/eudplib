@@ -39,8 +39,18 @@ def DecodeUnitNameAs(e: str) -> None:
     unit_name_encoding = e
 
 
-def IgnoreColor(s: bytes) -> bytes:
-    return bytes(filter(lambda x: not (0x01 <= x <= 0x1F or x == 0x7F), s))
+def IgnoreColor(s: bytes) -> bytes | None:
+    has_color = False
+    ret = []
+    for x in s:
+        if 0x01 <= x <= 0x1F or x == 0x7F:
+            has_color = True
+        else:
+            ret.append(x)
+    if has_color:
+        return bytes(ret)
+    else:
+        return None
 
 
 def b2in(n: int) -> Callable[[ByteString, int], int]:
@@ -235,8 +245,9 @@ class TBL:
                         except UnicodeDecodeError:
                             pass
                     unitmap.AddItem(string, unitdict[i])
-                    if string != IgnoreColor(string):
-                        unitmap.AddItem(IgnoreColor(string), unitdict[i])
+                    color_erased = IgnoreColor(string)
+                    if color_erased:
+                        unitmap.AddItem(color_erased, unitdict[i])
                 if i in locdict:
                     locmap.AddItem(string, locdict[i])
                 if i in swnmdict:

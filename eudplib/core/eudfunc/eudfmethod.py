@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 import functools
 import inspect
+from collections.abc import Callable
 
 from ... import utils as ut
 from ...localize import _
@@ -32,7 +33,7 @@ from .. import variable as ev
 from ..eudstruct.selftype import SetSelfType, selftype
 from .eudtypedfuncn import EUDTypedFuncN, applyTypes
 
-_mth_classtype = {}
+_mth_classtype: dict[Callable, type] = {}
 
 
 def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):

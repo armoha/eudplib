@@ -12,8 +12,8 @@ re_shift = re.compile(r"^ +(\w+) shift  (\d+)$")
 lines = open("epparser.out").readlines()
 
 # Get graph
-graph = {}
-currentState = 0
+graph: dict[int, list[tuple[str, int]]] = {}
+currentState: int = 0
 for line in lines:
     r_st = re_state.match(line)
     if r_st:
@@ -35,7 +35,7 @@ while q:
     for token, nextState in graph[currentState]:
         if nextState in pathMap:
             continue
-        path = "%s %s" % (prevPath, token)
+        path = f"{prevPath} {token}"
         pathMap[nextState] = path
         q.append((path, nextState))
 

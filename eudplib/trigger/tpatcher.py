@@ -186,11 +186,10 @@ def IsConditionNegatable(cond) -> bool:
 
 
 def NegateCondition(cond) -> c.Condition:
-    if c.IsEUDVariable(cond):
-        return cond == 0
-    elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
-        return cond == 0
-    elif ut.isUnproxyInstance(cond, c.EUDLightBool):
+    unproxy = ut.unProxy(cond)
+    if isinstance(unproxy, c.EUDVariable) or isinstance(unproxy, c.EUDLightVariable):
+        return unproxy == 0
+    elif isinstance(unproxy, c.EUDLightBool):
         return cond.IsCleared()
 
     # translate boolean condition

@@ -29,16 +29,15 @@ from eudplib import utils as ut
 
 from ..memiof import f_bread_epd, f_dwread_epd
 
-_userp: c.EUDVariable | None = None
+_userp: c.EUDVariable = c.EUDVariable()
 _userp_fws: set[tuple] = set()
 
 
+def _f_inituserplayerid():
+    f_bread_epd(ut.EPD(0x512684), 0, ret=[ut.EPD(_userp.getValueAddr())])
+
+
 def f_getuserplayerid() -> c.EUDVariable:
-    global _userp
-    if _userp is None:
-        if cs.EUDExecuteOnce()():
-            _userp = f_bread_epd(ut.EPD(0x512684), 0)
-        cs.EUDEndExecuteOnce()
     return _userp
 
 
