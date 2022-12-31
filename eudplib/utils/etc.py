@@ -103,7 +103,7 @@ def SCMD2Text(s: str) -> str:
     #                                        '>' emit x00
     #                                                        -> normal
     # xdigit/normal  emit '<xx'
-    def toxdigit(i):
+    def toxdigit(i: str) -> int | None:
         if "0" <= i <= "9":
             return ord(i) - 48
         elif "a" <= i <= "z":
@@ -113,53 +113,57 @@ def SCMD2Text(s: str) -> str:
         else:
             return None
 
-    state = 0
-    buf = [None, None]
-    bufch = [None, None]
-    out = []
+    state: int = 0
+    buf: list[int] = []
+    bufch: list[str] = []
+    out: list[str] = []
 
     # simple fsm
     for i in s:
         if state == 0:
             if i == "<":
                 state = 1
-            else:
-                out.append(i)
+                continue
+
+            out.append(i)
 
         elif state == 1:
             xdi = toxdigit(i)
             if xdi is not None:
-                buf[0] = xdi
-                bufch[0] = i
+                buf.append(xdi)
+                bufch.append(i)
                 state = 2
+                continue
 
-            else:
-                out.extend(["<", i])
-                state = 0
+            state = 0
+            out.extend(["<", i])
 
         elif state == 2:
             xdi = toxdigit(i)
             if xdi is not None:
-                buf[1] = xdi
-                bufch[1] = i
+                buf.append(xdi)
+                bufch.append(i)
                 state = 3
+                continue
 
-            elif i == ">":
-                out.append(chr(buf[0]))
-                state = 0
+            state = 0
+            if i == ">":
+                out.append(chr(buf.pop()))
+                bufch.clear()
 
             else:
-                out.extend(["<", bufch[0], i])
-                state = 0
+                out.extend(["<", bufch.pop(), i])
+                buf.clear()
 
         elif state == 3:
+            state = 0
             if i == ">":
                 out.append(chr(buf[0] * 16 + buf[1]))
-                state = 0
 
             else:
                 out.extend(["<", bufch[0], bufch[1], i])
-                state = 0
+            buf.clear()
+            bufch.clear()
 
     return "".join(out)
 

@@ -25,14 +25,13 @@ THE SOFTWARE.
 
 import ctypes
 import sys
+from collections.abc import ByteString
 
 from .. import utils as ut
 from ..core.mapdata.mpqapi import MPQ
 from ..localize import _
 
-_addedFiles = {}
-from collections.abc import ByteString
-from typing import AnyStr
+_addedFiles: dict[bytes, tuple[str, ByteString | None, bool]] = {}
 
 
 def UpdateFileListByListfile(mpqr: MPQ) -> None:
@@ -50,7 +49,7 @@ def UpdateFileListByListfile(mpqr: MPQ) -> None:
         MPQAddFile(fname, None)
 
 
-def MPQCheckFile(fname: AnyStr) -> bytes:
+def MPQCheckFile(fname: str) -> bytes:
     """Check if filename is already exist.
 
     :param fname: Desired filename in mpq
@@ -66,7 +65,7 @@ def MPQCheckFile(fname: AnyStr) -> bytes:
     return fname_key
 
 
-def MPQAddFile(fname: AnyStr, content: ByteString, isWave: bool = False) -> None:
+def MPQAddFile(fname: str, content: ByteString | None, isWave: bool = False) -> None:
     """Add file/wave to output map.
 
     :param fname: Desired filename in mpq
@@ -91,7 +90,7 @@ def MPQAddFile(fname: AnyStr, content: ByteString, isWave: bool = False) -> None
     _addedFiles[fname_key] = (fname, content, isWave)
 
 
-def MPQAddWave(fname: AnyStr, content: ByteString) -> None:
+def MPQAddWave(fname: str, content: ByteString | None) -> None:
     """Add wave to output map.
 
     :param fname: Desired filename in mpq
@@ -126,8 +125,8 @@ def UpdateMPQ(mpqw: MPQ) -> None:
                 raise ctypes.WinError(ctypes.get_last_error())
 
 
-def GetAddedFiles() -> set[bytes]:
+def GetAddedFiles() -> set[str]:
     ret = set(fname for fname, content, isWave in _addedFiles.values())
-    ret.add(b"staredit\\scenario.chk")
-    ret.add(b"(listfile)")
+    ret.add("staredit\\scenario.chk")
+    ret.add("(listfile)")
     return ret

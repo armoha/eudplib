@@ -129,7 +129,7 @@ def CountConditionsAndActions(bTrigger: ByteString) -> tuple[int, int]:
     return cond_count, act_count
 
 
-def GetTriggerSize(bTrigger: ByteString) -> int:
+def GetTriggerSize(bTrigger: bytes) -> int:
     cond_count, act_count = CountConditionsAndActions(bTrigger)
     min_size = 4 + 5 * cond_count + 8 * act_count
     trig = {
@@ -160,7 +160,7 @@ def GetTriggerSize(bTrigger: ByteString) -> int:
             return ret * 4
 
 
-def TryToShareTrigger(bTrigger: ByteString) -> int | ByteString:
+def TryToShareTrigger(bTrigger: bytes) -> int | bytes:
     if NoWaitAndPreserved(bTrigger):
         sharedTriggers.append(bTrigger)
         return len(sharedTriggers) - 1
@@ -168,7 +168,7 @@ def TryToShareTrigger(bTrigger: ByteString) -> int | ByteString:
 
 
 def InlineCodifyMultipleBinaryTriggers(
-    bTriggers: Collection[ByteString],
+    bTriggers: Collection[bytes],
 ) -> tStartEnd:
     """Inline codify raw(binary) trigger data.
 

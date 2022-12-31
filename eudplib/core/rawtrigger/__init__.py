@@ -185,7 +185,6 @@ from .stockcond import (
     DeathsX,
     ElapsedTime,
     HighestScore,
-    Kills,
     LeastKills,
     LeastResources,
     LowestScore,

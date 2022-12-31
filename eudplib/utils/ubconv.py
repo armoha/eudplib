@@ -53,7 +53,7 @@ def b2u(b: str | bytes) -> str:
     elif isinstance(b, str):
         return b
     else:
-        raise EPError(_("Invalid type {}").format(type(s)))
+        raise EPError(_("Invalid type {}").format(type(b)))
 
 
 def u2utf8(s: str | bytes) -> bytes:

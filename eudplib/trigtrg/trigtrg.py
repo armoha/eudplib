@@ -25,12 +25,94 @@ THE SOFTWARE.
 
 from struct import pack
 
-from eudplib import utils as ut
-
-from ..core.rawtrigger.constenc import *
-from ..core.rawtrigger.strenc import *
+from ..core.rawtrigger.constenc import (
+    P1,
+    P2,
+    P3,
+    P4,
+    P5,
+    P6,
+    P7,
+    P8,
+    P9,
+    P10,
+    P11,
+    P12,
+    Add,
+    All,
+    AlliedVictory,
+    Allies,
+    AllPlayers,
+    Ally,
+    AtLeast,
+    AtMost,
+    Attack,
+    Buildings,
+    Clear,
+    Cleared,
+    CurrentPlayer,
+    Custom,
+    Disable,
+    Enable,
+    EncodeAllyStatus,
+    EncodeComparison,
+    EncodeCount,
+    EncodeModifier,
+    EncodeOrder,
+    EncodePlayer,
+    EncodeProperty,
+    EncodePropState,
+    EncodeResource,
+    EncodeScore,
+    EncodeSwitchAction,
+    EncodeSwitchState,
+    Enemy,
+    Exactly,
+    Foes,
+    Force1,
+    Force2,
+    Force3,
+    Force4,
+    Gas,
+    KillsAndRazings,
+    Move,
+    NeutralPlayers,
+    NonAlliedVictoryPlayers,
+    Ore,
+    OreAndGas,
+    Patrol,
+    Player1,
+    Player2,
+    Player3,
+    Player4,
+    Player5,
+    Player6,
+    Player7,
+    Player8,
+    Player9,
+    Player10,
+    Player11,
+    Player12,
+    Random,
+    Razings,
+    Set,
+    SetTo,
+    Subtract,
+    Toggle,
+    Total,
+    Units,
+    UnitsAndBuildings,
+    _KillsSpecialized,
+)
+from ..core.rawtrigger.strenc import (
+    EncodeAIScript,
+    EncodeLocation,
+    EncodeString,
+    EncodeSwitch,
+    EncodeUnit,
+)
 from ..localize import _
-from ..utils import EPD, b2i2, ep_assert, u2b, unProxy
+from ..utils import EPD, FlattenList, b2i2, ep_assert, u2b, unProxy
 
 """
 Defines stock conditions & actions. You are most likely to use only conditions
@@ -102,14 +184,14 @@ def Action(
 
 
 def Trigger(players, conditions=[], actions=[]) -> bytes:
-    conditions = ut.FlattenList(conditions)
-    actions = ut.FlattenList(actions)
+    conditions = FlattenList(conditions)
+    actions = FlattenList(actions)
 
-    ut.ep_assert(type(players) is list)
-    ut.ep_assert(type(conditions) is list)
-    ut.ep_assert(type(actions) is list)
-    ut.ep_assert(len(conditions) <= 16)
-    ut.ep_assert(len(actions) <= 64)
+    ep_assert(type(players) is list)
+    ep_assert(type(conditions) is list)
+    ep_assert(type(actions) is list)
+    ep_assert(len(conditions) <= 16)
+    ep_assert(len(actions) <= 64)
     peff = bytearray(28)
     for p in players:
         peff[EncodePlayer(p)] = 1
@@ -122,7 +204,7 @@ def Trigger(players, conditions=[], actions=[]) -> bytes:
         + [b"\x04\0\0\0"]
         + [bytes(peff)]
     )
-    ut.ep_assert(len(b) == 2400)
+    ep_assert(len(b) == 2400)
     return b
 
 
@@ -158,11 +240,15 @@ def Accumulate(Player, Comparison, Number: int, ResourceType) -> bytes:
     return Condition(0, Player, Number, 0, Comparison, 4, ResourceType, 0)
 
 
-def Kills(Player, Comparison, Number: int, Unit) -> bytes:
+def __Kills__internal(Player, Comparison, Number: int, Unit) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
     return Condition(0, Player, Number, Unit, Comparison, 5, 0, 0)
+
+
+Kills = _KillsSpecialized("Kiils")
+Kills._internalf = __Kills__internal
 
 
 def CommandMost(Unit) -> bytes:

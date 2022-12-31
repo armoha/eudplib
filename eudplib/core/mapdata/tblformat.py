@@ -43,7 +43,7 @@ def IgnoreColor(s: bytes) -> bytes:
     return bytes(filter(lambda x: not (0x01 <= x <= 0x1F or x == 0x7F), s))
 
 
-def b2in(n: int) -> Callable[[ByteString], int]:
+def b2in(n: int) -> Callable[[ByteString, int], int]:
     b2in_map = {2: ut.b2i2, 4: ut.b2i4}
     return b2in_map[n]
 
@@ -86,7 +86,7 @@ class TBL:
             else:
                 self.LoadTBL(content)
 
-    def LoadTBL(self, content: ByteString) -> None:
+    def LoadTBL(self, content: bytes) -> None:
         self._datatb.clear()
         self._stringmap.clear()
         self._capacity = self._saveentry
@@ -120,7 +120,7 @@ class TBL:
             self.AddString(string)
         self._loaded = True
 
-    def LoadTBLWithChk(self, content: ByteString, init_chkt) -> None:
+    def LoadTBLWithChk(self, content: bytes, init_chkt) -> None:
         self._datatb.clear()
         self._stringmap.clear()
         self._capacity = self._saveentry

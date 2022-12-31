@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import overload
+
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
@@ -165,7 +167,17 @@ _AddLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add)
 _DilateLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add, signed=True)
 
 
-def f_setloc(locID, *coords, action=False) -> None:
+@overload
+def f_setloc(locID, *coords, action: True) -> list[c.Action]:
+    ...
+
+
+@overload
+def f_setloc(locID, *coords, action: False) -> None:
+    ...
+
+
+def f_setloc(locID, *coords, action=False):
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),
@@ -196,7 +208,17 @@ def f_setloc(locID, *coords, action=False) -> None:
         _SetLoc4(locID * 5, *coords)
 
 
-def f_addloc(locID, *coords, action=False) -> None:
+@overload
+def f_addloc(locID, *coords, action: True) -> list[c.Action]:
+    ...
+
+
+@overload
+def f_addloc(locID, *coords, action: False) -> None:
+    ...
+
+
+def f_addloc(locID, *coords, action=False):
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),
@@ -227,7 +249,17 @@ def f_addloc(locID, *coords, action=False) -> None:
         _AddLoc4(locID * 5, *coords)
 
 
-def f_dilateloc(locID, *coords, action=False) -> None:
+@overload
+def f_dilateloc(locID, *coords, action: True) -> list[c.Action]:
+    ...
+
+
+@overload
+def f_dilateloc(locID, *coords, action: False) -> None:
+    ...
+
+
+def f_dilateloc(locID, *coords, action=False):
     ut.ep_assert(
         len(coords) == 2 or len(coords) == 4,
         _("number of coordinates should be 2 or 4."),

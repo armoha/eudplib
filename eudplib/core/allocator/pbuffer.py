@@ -23,6 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Iterable
+from typing import Final
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
@@ -46,29 +49,29 @@ class PayloadBuffer:
     Buffer where EUDObject should write to.
     """
 
-    def __init__(self, totlen):
+    def __init__(self, totlen: int) -> None:
         self._data = bytearray(totlen)
         self._totlen = totlen
         self._prttable = []
         self._orttable = []
 
-    def StartWrite(self, writeaddr):
+    def StartWrite(self, writeaddr) -> None:
         self._datastart = writeaddr
         self._datacur = writeaddr
 
     def EndWrite(self):
         return self._datacur - self._datastart
 
-    def WriteByte(self, number):
+    def WriteByte(self, number) -> None:
         self._data[self._datacur] = number & 0xFF
         self._datacur += 1
 
-    def WriteWord(self, number):
+    def WriteWord(self, number) -> None:
         self._data[self._datacur + 0] = number & 0xFF
         self._data[self._datacur + 1] = (number >> 8) & 0xFF
         self._datacur += 2
 
-    def WriteDword(self, number):
+    def WriteDword(self, number) -> None:
         number = constexpr.Evaluate(number)
 
         if number.rlocmode:
@@ -87,7 +90,7 @@ class PayloadBuffer:
         self._data[self._datacur + 3] = (offset >> 24) & 0xFF
         self._datacur += 4
 
-    def WritePack(self, structformat, arglist):
+    def WritePack(self, structformat, arglist) -> None:
         """
         ======= =======
           Char   Type
@@ -104,7 +107,7 @@ class PayloadBuffer:
             _packerData[structformat] = CreateStructPackerData(structformat)
             _StructPacker(_packerData[structformat], self, arglist)
 
-    def WriteBytes(self, b):
+    def WriteBytes(self, b) -> None:
         """
         Write bytes object to buffer.
 
@@ -116,24 +119,20 @@ class PayloadBuffer:
         self._data[self._datacur : self._datacur + len(b)] = b
         self._datacur += len(b)
 
-    def WriteSpace(self, spacesize):
+    def WriteSpace(self, spacesize) -> None:
         self._datacur += spacesize
 
     # Internally used
-    def CreatePayload(self):
+    def CreatePayload(self) -> Payload:
         return Payload(self._data, self._prttable, self._orttable)
 
 
-def CreateStructPackerData(structformat):
+def CreateStructPackerData(structformat: Iterable[str]) -> list[int]:
     sizedict = {"B": 1, "H": 2, "I": 4}
-    sizelist = []
-    for s in structformat:
-        sizelist.append(sizedict[s])
-
-    return sizelist
+    return [sizedict[s] for s in structformat]
 
 
-def _StructPacker(sizelist, buf, arglist):
+def _StructPacker(sizelist, buf, arglist) -> None:
     dpos = buf._datacur
     data = buf._data
     prttb = buf._prttable

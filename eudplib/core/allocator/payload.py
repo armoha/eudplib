@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 import time
-from typing import Final
+from enum import Enum
 
 from eudplib import utils as ut
 from eudplib.localize import _
@@ -40,10 +40,8 @@ _dynamic_objects_set = set()
 _alloctable = {}
 _payload_size: int = 0
 
-PHASE_COLLECTING: Final[int] = 1
-PHASE_ALLOCATING: Final[int] = 2
-PHASE_WRITING: Final[int] = 3
-phase: int | None = None
+PHASE = Enum("PHASE", ["COLLECTING", "ALLOCATING", "WRITING"])
+phase: PHASE | None = None
 
 _payload_compress: bool = False
 _payload_shuffle: bool = True
@@ -140,7 +138,7 @@ def CollectObjects(root) -> None:
 
     lprint(_("[Stage 1/3] CollectObjects"), flush=True)
 
-    phase = PHASE_COLLECTING
+    phase = PHASE.COLLECTING
 
     objc = ObjCollector()
     _rootobj = None
@@ -288,7 +286,7 @@ def AllocObjects():
     global _alloctable
     global _payload_size
 
-    phase = PHASE_ALLOCATING
+    phase = PHASE.ALLOCATING
     objn = len(_found_objects)
 
     lprint(_("[Stage 2/3] AllocObjects"), flush=True)
@@ -346,7 +344,7 @@ def AllocObjects():
 def ConstructPayload():
     global phase
 
-    phase = PHASE_WRITING
+    phase = PHASE.WRITING
     lprint(_("[Stage 3/3] ConstructPayload"), flush=True)
     objn = len(_found_objects)
 
@@ -399,7 +397,7 @@ def GetObjectAddr(obj):
     global _dynamic_objects_set
     global _rootobj
 
-    if phase is PHASE_COLLECTING:
+    if phase is PHASE.COLLECTING:
         if obj not in _found_objects_set:
             _untraversed_objects.append(obj)
             _found_objects.append(obj)
@@ -411,9 +409,9 @@ def GetObjectAddr(obj):
 
         return defri
 
-    elif phase is PHASE_ALLOCATING:
+    elif phase is PHASE.ALLOCATING:
         return defri
 
-    elif phase is PHASE_WRITING:
+    elif phase is PHASE.WRITING:
         # ep_assert(_alloctable[obj] & 3 == 0)
         return rlocint.RlocInt_C(_alloctable[obj], 4)

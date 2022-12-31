@@ -221,7 +221,7 @@ def f_wread_epd(epd, subp):
 
 
 @c.EUDFunc
-def f_bread_epd(epd, subp):
+def f_bread_epd(epd, subp) -> c.EUDVariable:
     b = c.EUDVariable()
     c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), b.SetNumber(0)])
     cs.EUDSwitch(subp)

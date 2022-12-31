@@ -3,30 +3,32 @@ import locale
 import os
 import sys
 from types import TracebackType
+from typing import Any
 
 _lc = os.environ.get("LANG")
 if _lc is None:
     _lc, _e = locale.getdefaultlocale()
+_lang = None if _lc is None else (_lc,)
 
 _h = sys.excepthook
 _u = sys.unraisablehook
 _locale_path = os.path.dirname(__file__)
-_t = gettext.translation("eudplib", _locale_path, languages=[_lc], fallback=True)
+_t = gettext.translation("eudplib", _locale_path, languages=_lang, fallback=True)
 if not isinstance(_t, gettext.GNUTranslations):
     _locale_path = os.path.dirname(os.path.dirname(os.path.dirname(_locale_path)))
-    _t = gettext.translation("eudplib", _locale_path, languages=[_lc], fallback=True)
-_, _t = _t.gettext, _t.gettext
+    _t = gettext.translation("eudplib", _locale_path, languages=_lang, fallback=True)
+_ = _t.gettext
 
 
 def _excepthook(
-    type_: type[BaseException], value: BaseException, traceback: TracebackType
-) -> None:
+    type_: type[BaseException], value: BaseException, traceback: TracebackType | None
+) -> Any:
     # print("# FIXME: excepthook")
     v = list(value.args)
     for i, s in enumerate(v):
-        v[i] = _t(s)
+        v[i] = _(s)
     value.args = tuple(v)
-    _h(type_, value, traceback)
+    return _h(type_, value, traceback)
 
 
 def _unraisablehook(unraisable) -> None:
@@ -35,7 +37,7 @@ def _unraisablehook(unraisable) -> None:
     obj = unraisable.object
     if err_msg is None:
         err_msg = "Exception ignored in"
-    err_msg = _t(err_msg)
+    err_msg = _(err_msg)
     print(f"{err_msg}: {obj!r}")
 
 

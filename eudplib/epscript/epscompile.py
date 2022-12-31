@@ -41,7 +41,7 @@ libeps.compileString.restype = c_void_p
 libeps.freeCompiledResult.argtypes = [c_void_p]
 libeps.setDebugMode.argtypes = [c_int]
 libeps.getErrorCount.argtypes = []
-libeps.getErrorCount.resType = c_int
+libeps.getErrorCount.restype = c_int
 libeps.registerPlibConstants.argtypes = [c_char_p]
 
 

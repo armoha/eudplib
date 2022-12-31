@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Callable
+
 from ... import utils as ut
 from ...localize import _
 from ..mapdata import GetPropertyIndex
@@ -34,7 +36,7 @@ def EP_SetMemDestStrictMode(mode):
 
 class _Unique:
     def __init__(self, name):
-        self._name = name
+        self._name: str = name
 
     def __repr__(self):
         return self._name
@@ -44,6 +46,10 @@ class _Unique:
 
 
 class _KillsSpecialized(_Unique):
+    def __init__(self, name):
+        super().__init__(name)
+        self._internalf: Callable
+
     def __call__(self, a, b, c, d):
         return self._internalf(a, b, c, d)
 

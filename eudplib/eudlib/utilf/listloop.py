@@ -27,10 +27,10 @@ from collections.abc import Iterator
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
-from eudplib import trigtrg as tt
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from ...trigtrg.runtrigtrg import TrigTriggerBegin, TrigTriggerEnd
 from ...utils import EPD
 from ..memiof import f_bread_cp, f_cunitepdread_epd, f_dwepdread_epd, f_setcurpl2cpcache
 from .unlimiterflag import IsUnlimiterOn
@@ -216,9 +216,9 @@ def EUDLoopSprite() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
 def EUDLoopTrigger(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     player = c.EncodePlayer(player)
 
-    tbegin = tt.TrigTriggerBegin(player)
+    tbegin = TrigTriggerBegin(player)
     if cs.EUDIfNot()(tbegin == 0):
-        tend = tt.TrigTriggerEnd(player)
+        tend = TrigTriggerEnd(player)
         for ptr, epd in EUDLoopList(tbegin, tend):
             yield ptr, epd
     cs.EUDEndIf()

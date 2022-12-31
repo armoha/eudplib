@@ -94,7 +94,7 @@ def modifyCodeLineno(codeobj: types.CodeType, codeMap):
             codeobj.co_freevars,
             codeobj.co_cellvars,
         )
-    except AttributeError:  # Python 3.7~3.9
+    except AttributeError:  # Python 3.7~3.10
         codeobj = types.CodeType(
             codeobj.co_argcount,
             codeobj.co_posonlyargcount,  # python 3.8 support (See PEP 570)
@@ -109,9 +109,9 @@ def modifyCodeLineno(codeobj: types.CodeType, codeMap):
             codeobj.co_filename,
             codeobj.co_name,
             codeMap(co_firstlineno),  # codeobj.co_firstlineno,
-            b"".join(new_lnotab),  # codeobj.co_lnotab,
-            codeobj.co_freevars,
-            codeobj.co_cellvars,
+            b"".join(new_lnotab),  # type: ignore
+            codeobj.co_freevars,  # type: ignore
+            codeobj.co_cellvars,  # type: ignore
         )
 
     return codeobj

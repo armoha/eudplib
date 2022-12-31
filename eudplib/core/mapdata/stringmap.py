@@ -24,39 +24,39 @@ THE SOFTWARE.
 """
 
 from ...localize import _
-from ...utils import b2i2, b2i4, ep_assert, u2b, u2utf8, unProxy
-from . import tblformat
+from ...utils import EPError, b2i2, b2i4, ep_assert, ep_warn, u2b, u2utf8, unProxy
+from .chktok import CHK
+from .tblformat import TBL
 
 
 class StringIdMap:
-    def __init__(self):
-        self._s2id = {}
+    def __init__(self) -> None:
+        self._s2id: dict[bytes, int] = {}
 
-    def AddItem(self, string, strid):
-        string = u2b(unProxy(string))
-        if string in self._s2id:  # ambiguous string
-            self._s2id[string] = None
-
+    def AddItem(self, string: str | bytes, strid: int) -> None:
+        byte = u2b(unProxy(string))
+        if byte in self._s2id:  # ambiguous string
+            # self._s2id[string] = None
+            ep_warn(_("Ambiguous string {}").format(string))
         else:
-            self._s2id[string] = strid
+            self._s2id[byte] = strid
 
-    def GetStringIndex(self, string):
+    def GetStringIndex(self, string: str | bytes) -> int:
         byte = u2utf8(unProxy(string))
         if byte not in self._s2id:
             byte = u2b(unProxy(string))
         retid = self._s2id[byte]
-        ep_assert(retid is not None, _("Ambigious string {}").format(string))
         return retid
 
 
-strmap = None
-strsection = None
-unitmap = None
-locmap = None
-swmap = None
+strmap: TBL | None = None
+strsection: str | None = None
+unitmap: StringIdMap | None = None
+locmap: StringIdMap | None = None
+swmap: StringIdMap | None = None
 
 
-def InitStringMap(chkt):
+def InitStringMap(chkt: CHK) -> None:
     global strmap, strsection, unitmap, locmap, swmap
 
     unitmap = StringIdMap()
@@ -70,39 +70,51 @@ def InitStringMap(chkt):
         pass
     else:
         strsection = "STRx"
-        strmap = tblformat.TBL(strx, init_chkt, load_entry=4, save_entry=4)
+        strmap = TBL(strx, init_chkt, load_entry=4, save_entry=4)
         return
     strsection = "STRx"
-    strmap = tblformat.TBL(chkt.getsection("STR"), init_chkt, save_entry=4)
+    strmap = TBL(chkt.getsection("STR"), init_chkt, save_entry=4)
 
 
-def GetLocationIndex(l) -> int:
+def GetLocationIndex(l: str | bytes) -> int:
+    if locmap is None:
+        raise EPError(_("Must use LoadMap first"))
     return locmap.GetStringIndex(l) + 1
 
 
-def GetStringIndex(s) -> int:
+def GetStringIndex(s: str | bytes) -> int:
+    if strmap is None:
+        raise EPError(_("Must use LoadMap first"))
     return strmap.GetStringIndex(s)
 
 
-def GetSwitchIndex(s) -> int:
+def GetSwitchIndex(s: str | bytes) -> int:
+    if swmap is None:
+        raise EPError(_("Must use LoadMap first"))
     return swmap.GetStringIndex(s)
 
 
-def GetUnitIndex(u) -> int:
+def GetUnitIndex(u: str | bytes) -> int:
+    if unitmap is None:
+        raise EPError(_("Must use LoadMap first"))
     return unitmap.GetStringIndex(u)
 
 
-def ApplyStringMap(chkt):
+def ApplyStringMap(chkt: CHK) -> None:
+    if strmap is None:
+        raise EPError(_("Must use LoadMap first"))
     chkt.setsection(strsection, strmap.SaveTBL())
 
 
-def ForceAddString(s):
+def ForceAddString(s: str | bytes) -> int:
+    if strmap is None:
+        raise EPError(_("Must use LoadMap first"))
     return strmap.ForceAddString(s) + 1
 
 
-def GetStringMap():
+def GetStringMap() -> TBL | None:
     return strmap
 
 
-def GetStringSectionName():
+def GetStringSectionName() -> str | None:
     return strsection

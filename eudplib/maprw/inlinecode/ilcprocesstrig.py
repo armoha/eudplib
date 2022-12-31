@@ -28,6 +28,7 @@ from random import random
 
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
+from ...core.rawtrigger import AllPlayers, SetTo
 from ...trigtrg import trigtrg as tt
 from .btInliner import (
     GetExecutingPlayers,
@@ -92,7 +93,7 @@ def PreprocessTrigSection(trigSection: ByteString) -> tuple[list[tuple[int, tSta
 
     So we need 'normal' trigger at the last of TRIG triggers for every player.
     """
-    trigSegments.append(tt.Trigger(players=[tt.AllPlayers]))
+    trigSegments.append(tt.Trigger(players=[AllPlayers]))
 
     trigSection = b"".join(trigSegments)
     return inlineCodes, trigSection
@@ -146,7 +147,7 @@ def ConsecutiveInlineTrigSection(
         trigSegments.append(trigSegment)
     for p in range(8):
         appendPTriggers(p)
-    trigSegments.append(tt.Trigger(players=[tt.AllPlayers]))
+    trigSegments.append(tt.Trigger(players=[AllPlayers]))
 
     trigSection = b"".join(trigSegments)
     return inlineCodes, trigSection
@@ -222,7 +223,7 @@ def CreateInlineCodeDispatcher(
             newTrigger[320 + 2048 + 4 + player] = 1
 
     # Apply 4 SetDeaths
-    SetDeathsTemplate = tt.SetDeaths(0, tt.SetTo, 0, 0)
+    SetDeathsTemplate = tt.SetDeaths(0, SetTo, 0, 0)
     newTrigger[320 + 32 * 0 : 320 + 32 * 1] = SetDeathsTemplate
     newTrigger[320 + 32 * 1 : 320 + 32 * 2] = SetDeathsTemplate
     newTrigger[320 + 32 * 2 : 320 + 32 * 3] = SetDeathsTemplate

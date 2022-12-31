@@ -29,15 +29,15 @@ from eudplib.localize import _
 
 from .unitprp import UnitProperty
 
-_uprpdict = {}
-_uprptable = []
+_uprpdict: dict[bytes, int] = {}
+_uprptable: list[bytes] = []
 
 
 def InitPropertyMap(chkt):
     global _prptable, _uprpdict
     _uprpdict.clear()
     _uprptable.clear()
-    _uprptable.extend([None] * 64)
+    _uprptable.extend([b""] * 64)
 
     # Backup UPRP data
     uprp = chkt.getsection("UPRP")
@@ -67,7 +67,7 @@ def GetPropertyIndex(prop):
     except KeyError:
         indexNotFound = False
         for uprpindex in range(64):
-            if _uprptable[uprpindex] is None:
+            if not _uprptable[uprpindex]:
                 indexFound = True
                 break
 
