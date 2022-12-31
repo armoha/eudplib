@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from collections.abc import ByteString
+from collections.abc import Sequence
 from random import random
 
 from ... import utils as ut
@@ -58,14 +58,14 @@ def PreprocessInlineCode(chkt: CHK) -> None:
     chkt.setsection("TRIG", trigSection)
 
 
-def PreprocessTrigSection(trigSection: ByteString) -> tuple[list[tuple[int, tStartEnd]], bytes]:
+def PreprocessTrigSection(trigSection: bytes) -> tuple[list[tuple[int, tStartEnd]], bytes]:
     """Fetch inline codes & compiles them"""
     ComputeBaseInlineCodeGlobals()
     if _inliningRate >= 1.0:
         return ConsecutiveInlineTrigSection(trigSection)
 
-    inlineCodes = []
-    trigSegments = []
+    inlineCodes: list[tuple[int, tStartEnd]] = []
+    trigSegments: list[bytes] = []
     for i in range(0, len(trigSection), 2400):
         trigSegment = trigSection[i : i + 2400]
         if len(trigSegment) != 2400:
@@ -100,11 +100,20 @@ def PreprocessTrigSection(trigSection: ByteString) -> tuple[list[tuple[int, tSta
 
 
 def ConsecutiveInlineTrigSection(
-    trigSection: ByteString,
+    trigSection: bytes,
 ) -> tuple[list[tuple[int, tStartEnd]], bytes]:
-    inlineCodes = []
-    trigSegments = []
-    pTriggers = ([], [], [], [], [], [], [], [])
+    inlineCodes: list[tuple[int, tStartEnd]] = []
+    trigSegments: list[bytes] = []
+    pTriggers: tuple[
+        list[bytes],
+        list[bytes],
+        list[bytes],
+        list[bytes],
+        list[bytes],
+        list[bytes],
+        list[bytes],
+        list[bytes],
+    ] = ([], [], [], [], [], [], [], [])
 
     def appendPTriggers(p):
         if pTriggers[p]:
@@ -128,14 +137,14 @@ def ConsecutiveInlineTrigSection(
         elif propv < 0x80000000:
             pCount = playerExecutesTrigger.count(True)
             if pCount >= 2:
-                trigSegment = TryToShareTrigger(trigSegment)
-                if isinstance(trigSegment, bytes):
-                    size = GetTriggerSize(trigSegment)
+                indexOrTrig = TryToShareTrigger(trigSegment)
+                if isinstance(indexOrTrig, bytes):
+                    size = GetTriggerSize(indexOrTrig)
                     if size * pCount * _cutoffRate[pCount] > 2400:
                         for p in range(8):
                             if playerExecutesTrigger[p]:
                                 appendPTriggers(p)
-                        trigSegments.append(trigSegment)
+                        trigSegments.append(indexOrTrig)
                         continue
             for p in range(8):
                 if playerExecutesTrigger[p]:
@@ -158,7 +167,7 @@ def GetInlineCodeList() -> list[tuple[int, tStartEnd]]:
     return _inlineCodes
 
 
-def GetInlineCodePlayerList(bTrigger: ByteString) -> int | None:
+def GetInlineCodePlayerList(bTrigger: bytes) -> int | None:
     # Check if effplayer & current_action is empty
     for player in range(28):
         if bTrigger[320 + 2048 + 4 + player] != 0:
@@ -175,7 +184,7 @@ def GetInlineCodePlayerList(bTrigger: ByteString) -> int | None:
 
 
 def DispatchInlineCode(
-    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: ByteString
+    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
 ) -> bytearray | None:
     """Check if trigger segment has special data."""
     magicCode = ut.b2i4(trigger_bytes, 20)
@@ -195,7 +204,7 @@ def DispatchInlineCode(
 
 
 def InlinifyNormalTrigger(
-    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: ByteString
+    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
 ) -> bytearray:
     """Inlinify normal binary triggers"""
     playerCode = 0

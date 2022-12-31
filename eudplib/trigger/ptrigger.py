@@ -26,17 +26,17 @@ THE SOFTWARE.
 from eudplib import utils as ut
 
 from .. import core as c
+from ..core.mapdata.playerinfo import PlayerInfo
 from .triggerdef import Trigger
 
-_pt_db = c.Db
-_pinfos = None
+_pinfos: list[PlayerInfo] = []
 _pdbtable = {}
 
 
 def InitPTrigger() -> None:
     """(Internal) Enable PTrigger. Internally called by eudplib"""
     global _pinfos
-    if _pinfos is None:
+    if not _pinfos:
         _pinfos = [c.GetPlayerInfo(player) for player in range(8)]
 
 
@@ -53,7 +53,7 @@ def PTrigger(players, conditions=None, actions=None) -> None:
     InitPTrigger()
 
     players = ut.FlattenList(players)
-    effp = [False] * 8
+    effp: list[bool] = [False] * 8
 
     # Trigger is never executed if it has no effplayers.
     if len(players) == 0:

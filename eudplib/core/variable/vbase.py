@@ -23,77 +23,81 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import NoReturn, TypeVar
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
 from .. import rawtrigger as bt
 from ..allocator import IsConstExpr
 
+Self = TypeVar("Self", bound="VariableBase")
+
 
 class VariableBase:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def getValueAddr(self):
+    def getValueAddr(self) -> NoReturn:
         raise NotImplementedError
 
     # -------
 
-    def AtLeast(self, value):
+    def AtLeast(self, value) -> bt.Condition:
         return bt.Memory(self.getValueAddr(), bt.AtLeast, value)
 
-    def AtMost(self, value):
+    def AtMost(self, value) -> bt.Condition:
         return bt.Memory(self.getValueAddr(), bt.AtMost, value)
 
-    def Exactly(self, value):
+    def Exactly(self, value) -> bt.Condition:
         return bt.Memory(self.getValueAddr(), bt.Exactly, value)
 
     # -------
 
-    def SetNumber(self, value):
+    def SetNumber(self, value) -> bt.Action:
         return bt.SetMemory(self.getValueAddr(), bt.SetTo, value)
 
-    def AddNumber(self, value):
+    def AddNumber(self, value) -> bt.Action:
         return bt.SetMemory(self.getValueAddr(), bt.Add, value)
 
-    def SubtractNumber(self, value):
+    def SubtractNumber(self, value) -> bt.Action:
         return bt.SetMemory(self.getValueAddr(), bt.Subtract, value)
 
     # -------
 
-    def AtLeastX(self, value, mask):
+    def AtLeastX(self, value, mask) -> bt.Condition:
         return bt.MemoryX(self.getValueAddr(), bt.AtLeast, value, mask)
 
-    def AtMostX(self, value, mask):
+    def AtMostX(self, value, mask) -> bt.Condition:
         return bt.MemoryX(self.getValueAddr(), bt.AtMost, value, mask)
 
-    def ExactlyX(self, value, mask):
+    def ExactlyX(self, value, mask) -> bt.Condition:
         return bt.MemoryX(self.getValueAddr(), bt.Exactly, value, mask)
 
     # -------
 
-    def SetNumberX(self, value, mask):
+    def SetNumberX(self, value, mask) -> bt.Action:
         return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, value, mask)
 
-    def AddNumberX(self, value, mask):
+    def AddNumberX(self, value, mask) -> bt.Action:
         return bt.SetMemoryX(self.getValueAddr(), bt.Add, value, mask)
 
-    def SubtractNumberX(self, value, mask):
+    def SubtractNumberX(self, value, mask) -> bt.Action:
         return bt.SetMemoryX(self.getValueAddr(), bt.Subtract, value, mask)
 
     # -------
 
-    def Assign(self, value):
+    def Assign(self, value) -> None:
         bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.SetTo, value))
 
-    def __lshift__(self, value):
+    def __lshift__(self, value) -> None:
         self.Assign(value)
 
-    def __iadd__(self, value):
+    def __iadd__(self: Self, value) -> Self:
         bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.Add, value))
         return self
 
-    def __isub__(self, value):
+    def __isub__(self: Self, value) -> Self:
         bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.Subtract, value))
         return self
 
@@ -101,15 +105,15 @@ class VariableBase:
 
     # See: https://github.com/heinermann/llvm-bw/wiki/Instruction-Implementation
 
-    def __ior__(self, value):
+    def __ior__(self: Self, value) -> Self:
         bt.RawTrigger(actions=self.SetNumberX(0xFFFFFFFF, value))
         return self
 
-    def __iand__(self, value):
+    def __iand__(self: Self, value: int) -> Self:
         bt.RawTrigger(actions=self.SetNumberX(0, ~value))
         return self
 
-    def __ixor__(self, value):
+    def __ixor__(self: Self, value) -> Self:
         bt.RawTrigger(
             actions=[
                 self.AddNumberX(value, 0x55555555),  # 5 = 0b0101
@@ -118,11 +122,11 @@ class VariableBase:
         )
         return self
 
-    def iinvert(self):
+    def iinvert(self: Self) -> Self:
         "In-place invert (x << ~x)"
         return self.__ixor__(0xFFFFFFFF)
 
-    def ineg(self):
+    def ineg(self: Self) -> Self:
         "In-place negate (x << -x)"
         bt.RawTrigger(
             actions=[
@@ -133,7 +137,7 @@ class VariableBase:
         )
         return self
 
-    def __ilshift__(self, n):
+    def __ilshift__(self: Self, n) -> Self:
         mask = (1 << (n + 1)) - 1
         bt.RawTrigger(
             actions=[
@@ -147,7 +151,7 @@ class VariableBase:
         )
         return self
 
-    def __irshift__(self, n):
+    def __irshift__(self: Self, n) -> Self:
         mask = (1 << (n + 1)) - 1
         bt.RawTrigger(
             actions=[self.SetNumberX(0, mask >> 1)]  # lowest n bits
@@ -157,10 +161,10 @@ class VariableBase:
 
     # -------
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bt.Condition:  # type: ignore[override]
         return self.Exactly(other)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> bt.Condition:  # type: ignore[override]
         if isinstance(other, int):
             if other & 0xFFFFFFFF == 0:
                 return self.AtLeast(1)
@@ -168,18 +172,18 @@ class VariableBase:
                 return self.AtMost(0xFFFFFFFE)
         return NotImplemented
 
-    def __le__(self, other):
+    def __le__(self, other) -> bt.Condition:
         return self.AtMost(other)
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bt.Condition:
         if IsConstExpr(other):
             return self.AtMost(other - 1)
         return NotImplemented
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> bt.Condition:
         return self.AtLeast(other)
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bt.Condition:
         if IsConstExpr(other):
             return self.AtLeast(other + 1)
         return NotImplemented

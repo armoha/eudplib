@@ -26,9 +26,10 @@ THE SOFTWARE.
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
+from eudplib.localize import _
 
 
-def EUDBinaryMax(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
+def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:
     """Find maximum x satisfying cond(x) using binary search
 
     :param cond: Test condition
@@ -46,9 +47,8 @@ def EUDBinaryMax(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
     if isinstance(minv, int) and isinstance(maxv, int):
         ut.ep_assert(minv <= maxv)
         r = maxv - minv
-        if r == 0:
-            return minv
-
+        if r <= 0:
+            raise ut.EPError(_("maxv must be greater than minv"))
     else:
         r = None
 
@@ -73,7 +73,7 @@ def EUDBinaryMax(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
     return x
 
 
-def EUDBinaryMin(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
+def EUDBinaryMin(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:
     """Find minimum x satisfying cond(x) using binary search
 
     :param cond: Test condition
@@ -91,8 +91,8 @@ def EUDBinaryMin(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
     if isinstance(minv, int) and isinstance(maxv, int):
         ut.ep_assert(minv <= maxv)
         r = maxv - minv
-        if r == 0:
-            return minv
+        if r <= 0:
+            raise ut.EPError(_("maxv must be greater than minv"))
     else:
         r = None
 

@@ -24,25 +24,31 @@ THE SOFTWARE.
 """
 
 from eudplib import utils as ut
-
-_playerinfo = None
+from eudplib.core.mapdata.chktok import CHK
 
 
 class PlayerInfo:
-    pass
+    def __init__(self) -> None:
+        self.force: int
+        self.race: int
+        self.type: int
+        self.racestr: str
+        self.typestr: str
 
 
-def InitPlayerInfo(chkt):
-    global _playerinfo
+_playerinfo: list[PlayerInfo] = []
+
+
+def InitPlayerInfo(chkt: CHK) -> None:
+    _playerinfo.clear()
 
     section_forc = chkt.getsection("FORC")
     section_ownr = chkt.getsection("OWNR")
     section_side = chkt.getsection("SIDE")
 
-    _playerinfo = [PlayerInfo() for _ in range(8)]
-
     for player in range(8):
-        pinfo = _playerinfo[player]
+        pinfo = PlayerInfo()
+        _playerinfo.append(pinfo)
 
         # Numeric info
         pinfo.force = section_forc[player]
@@ -72,5 +78,7 @@ def InitPlayerInfo(chkt):
         }.get(pinfo.type, "")
 
 
-def GetPlayerInfo(player):
-    return _playerinfo[player]
+def GetPlayerInfo(player) -> PlayerInfo:
+    from eudplib.core.rawtrigger.constenc import EncodePlayer
+
+    return _playerinfo[EncodePlayer(player)]

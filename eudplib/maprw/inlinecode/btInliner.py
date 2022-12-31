@@ -33,11 +33,11 @@ from ... import utils as ut
 from ...trigtrg.runtrigtrg import _runner_cp
 
 sharedTriggers = []
-tStartEnd = tuple[c.RawTrigger, c.RawTrigger]
+tStartEnd = tuple[c.ConstExpr, c.RawTrigger]
 
 
 def GetExecutingPlayers(
-    bTrigger: ByteString,
+    bTrigger: bytes,
 ) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
     # Get executing players of the trigger.
     # If AllPlayers executes it, then pass it
@@ -45,10 +45,12 @@ def GetExecutingPlayers(
         return (True,) * 8
     # Should check manually, by player and force
     return tuple(
-        bTrigger[320 + 2048 + 4 + player] != 0
-        or bTrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force] != 0
+        (
+            bool(bTrigger[320 + 2048 + 4 + player])
+            or bool(bTrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force])
+        )
         for player in range(8)
-    )
+    )  # type: ignore
 
 
 def NoWaitAndPreserved(bTrigger: ByteString) -> bool:
@@ -67,7 +69,7 @@ def NoWaitAndPreserved(bTrigger: ByteString) -> bool:
     return True
 
 
-def InlineCodifyBinaryTrigger(bTrigger: ByteString) -> tStartEnd:
+def InlineCodifyBinaryTrigger(bTrigger: bytes) -> tStartEnd:
     """Inline codify raw(binary) trigger data.
 
     For minimal protection, eudplib make some of the trig-triggers to

@@ -27,6 +27,7 @@ import os
 import sys
 
 from .... import utils as ut
+from ....localize import _
 from ...allocator import Forward
 from ...eudobj import Db
 from ...rawtrigger import (
@@ -56,14 +57,15 @@ recordTraceTrigger = RawTrigger(
 PopTriggerScope()
 
 
-def _f_initstacktrace():
+def _f_initstacktrace() -> None:
     # Fill the header of trace stack with random string on runtime.
     # SC:R creates a copy of STR section during EUD emulation and writes to
     # only one of the copy during emulation stage. We should read the copy
     # that is really written in-game.
     # We will fill the trace stack 'magic code' on runtime, and later find the
     # magic code to locate the stack trace table.
-
+    if traceHeader is None:
+        raise ut.EPError(_("Must call SaveMap first"))
     RawTrigger(
         actions=[
             SetMemoryEPD(traceToolDataEPD + 0, SetTo, ut.b2i4(traceHeader, 0x0)),
@@ -74,22 +76,22 @@ def _f_initstacktrace():
     )
 
 
-def _EUDTracePush():
+def _EUDTracePush() -> None:
     RawTrigger(actions=SetMemory(recordTraceAct + 16, Add, 1))
 
 
-def _EUDTracePop():
+def _EUDTracePop() -> None:
     EUDTraceLogRaw(0)
     RawTrigger(actions=SetMemory(recordTraceAct + 16, Subtract, 1))
 
 
 nextTraceId = 0
-traceMap = []
+traceMap: list[tuple[int, str]] = []
 traceKey = 0
-traceHeader = None
+traceHeader: bytes | None = None
 
 
-def GetTraceStackDepth():
+def GetTraceStackDepth() -> EUDVariable:
     v = EUDVariable()
     v << 0
     for i in range(31, -1, -1):
@@ -101,7 +103,7 @@ def GetTraceStackDepth():
     return v
 
 
-def _ResetTraceMap():
+def _ResetTraceMap() -> None:
     """This function gets called by savemap.py::SaveMap to clear trace data."""
     global nextTraceId, traceKey, traceHeader
     nextTraceId = 0
@@ -110,7 +112,7 @@ def _ResetTraceMap():
     traceHeader = os.urandom(16)
 
 
-def EUDTraceLog(lineno=None):
+def EUDTraceLog(lineno: int | None = None) -> None:
     """Log trace."""
     global nextTraceId
 
@@ -139,7 +141,7 @@ def EUDTraceLog(lineno=None):
     EUDTraceLogRaw(v)
 
 
-def EUDTraceLogRaw(v):
+def EUDTraceLogRaw(v: int) -> None:
     nt = Forward()
     RawTrigger(
         nextptr=recordTraceTrigger,
@@ -151,5 +153,5 @@ def EUDTraceLogRaw(v):
     nt << NextTrigger()
 
 
-def _GetTraceMap():
+def _GetTraceMap() -> tuple[tuple[bytes, bytes | None], list[tuple[int, str]]]:
     return (iHeader, traceHeader), traceMap

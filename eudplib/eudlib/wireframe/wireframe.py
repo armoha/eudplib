@@ -26,8 +26,10 @@ wirefram_default64 = EUDArray(wd.Wirefram64)
 
 
 class InitialWireframe:
-    _collected = False
-    _tranwires, _grpwires, _wireframs = {}, {}, {}
+    _collected: bool = False
+    _tranwires: dict[int, int] = {}
+    _grpwires: dict[int, int] = {}
+    _wireframs: dict[int, int] = {}
 
     @classmethod
     def _init(cls):

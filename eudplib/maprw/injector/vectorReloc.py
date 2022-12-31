@@ -40,9 +40,14 @@ from ...trigtrg import trigtrg as tt
 trglist = []
 
 
-def Trigger(players=[tt.AllPlayers], *args, **kwargs) -> None:
+def Trigger(
+    *,
+    players: list = [tt.AllPlayers],
+    conditions: list[bytes] | bytes = [],
+    actions: list[bytes] | bytes = []
+) -> None:
     global trglist
-    trglist.append(tt.Trigger(players=players, *args, **kwargs))
+    trglist.append(tt.Trigger(players, conditions, actions))
 
 
 def CopyDeaths(iplayer, oplayer, copyepd: bool = False, initvalue: int | None = None) -> None:
@@ -72,7 +77,7 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
 
     strmap = GetStringMap()
     if strmap is None:
-        raise EPError(_("Must use LoadMap first"))
+        raise ut.EPError(_("Must use LoadMap first"))
     str_section = strmap.SaveTBL()
 
     """
@@ -99,7 +104,7 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
     #############
     # STR SECTION
     #############
-    str_sled = []
+    str_sled: list[bytes] = []
     mrgn_ort = mrgn + 836
     sledheader_prt = b"\0\0\0\0" + ut.i2b4(mrgn)
     sledheader_ort = b"\0\0\0\0" + ut.i2b4(mrgn_ort)
@@ -151,22 +156,21 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
         + tt.Trigger(
             players=[tt.AllPlayers],
             actions=[
-                [
-                    tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, 0xFFFFFFFF - prevoffset[j])
-                    for j in range(packn)
-                ],
-                tt.SetMemory(mrgn_ort + 4, tt.Add, 4),  # skip garbage area
-            ],
+                tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, 0xFFFFFFFF - prevoffset[j])
+                for j in range(packn)
+            ]
+            + [tt.SetMemory(mrgn_ort + 4, tt.Add, 4)],  # skip garbage area
         )
     )
 
-    # sled completed
-    str_sled = b"".join(str_sled)
+    sled_completed = b"".join(str_sled)
 
     str_padding_length = -len(str_section) & 3
     strsled_offset = len(str_section) + str_padding_length + 0x191943C8
-    payload_offset = strsled_offset + len(str_sled) + 4
-    str_section = str_section + bytes(str_padding_length) + str_sled + b"\0\0\0\0" + payload.data
+    payload_offset = strsled_offset + len(sled_completed) + 4
+    str_section = (
+        str_section + bytes(str_padding_length) + sled_completed + bytes(4) + payload.data
+    )
     chkt.setsection(GetStringSectionName(), str_section)
 
     ##############
@@ -178,14 +182,10 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
         + ut.i2b4(prttrg_start + strsled_offset)
         + tt.Trigger(
             players=[tt.AllPlayers],
-            actions=[
-                # SetDeaths actions in MRGN initially points to EPD(payload - 4)
-                [
-                    tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4)
-                    for _ in range(packn)
-                ],
-                tt.SetMemory(mrgn + 4, tt.Add, 2408),
-            ],
+            actions=[  # SetDeaths actions in MRGN initially points to EPD(payload - 4)
+                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4) for _ in range(packn)
+            ]
+            + [tt.SetMemory(mrgn + 4, tt.Add, 2408)],
         )
         + bytes(836)
     )
@@ -195,9 +195,9 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
         + tt.Trigger(
             players=[tt.AllPlayers],
             actions=[
-                [tt.SetMemory(payload_offset - 4, tt.Add, payload_offset) for _ in range(packn)],
-                tt.SetMemory(mrgn_ort + 4, tt.Add, 2408),
-            ],
+                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset) for _ in range(packn)
+            ]
+            + [tt.SetMemory(mrgn_ort + 4, tt.Add, 2408)],
         )
     )
     for b1, b2 in zip(mrgn_trigger_prt, mrgn_trigger_ort):

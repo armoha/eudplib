@@ -47,10 +47,10 @@ from .fmtprint import _format_args
 from .strfunc import f_strlen_epd
 
 PLVarUnit, PLVarMask = ceil((0x58F500 - 0x58A364) / 48), 0
-PLVarDict = {}
+# FIXME: PLVarDict = {}
 
 
-def GetPlayerLightVariable():
+def GetPlayerLightVariable() -> tuple[int, int]:
     global PLVarUnit, PLVarMask
     ret = (PLVarUnit, 1 << PLVarMask)
     PLVarMask += 1
@@ -60,13 +60,13 @@ def GetPlayerLightVariable():
     return ret
 
 
-def compare_sequence(src, seq):
+def compare_sequence(src: int, seq: str) -> list[c.Condition]:
     ut.ep_assert(isinstance(src, int) and isinstance(seq, str))
     seq += "\0"
     ret = []
     val, mask = 0, 0
 
-    def append_cmp():
+    def append_cmp() -> None:
         nonlocal val, mask
         ret.append(c.MemoryX(src - src % 4, c.Exactly, val, mask))
         val, mask = 0, 0

@@ -59,9 +59,18 @@ def ApplyPatchTable(initepd, obj, patchTable: list[list[int | None]]) -> None:
             fieldName += 1
 
 
-condpt = [[-1], [-1], [-1], [0, 4, 5], [2, 3, None, None]]
+condpt: list[list[int | None]] = [[-1], [-1], [-1], [0, 4, 5], [2, 3, None, None]]
 
-actpt = [[-1], [-1], [-1], [-1], [-1], [-1], [0, 4, 5], [2, None, None, None]]
+actpt: list[list[int | None]] = [
+    [-1],
+    [-1],
+    [-1],
+    [-1],
+    [-1],
+    [-1],
+    [0, 4, 5],
+    [2, None, None, None],
+]
 
 
 def PatchCondition(cond) -> c.Condition:

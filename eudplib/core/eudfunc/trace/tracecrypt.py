@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 
-def T(x):
+def T(x: int) -> int:
     x &= 0xFFFFFFFF
     for i in range(4):
         xsq = x * x
@@ -32,5 +32,5 @@ def T(x):
     return x
 
 
-def mix(x, y):
+def mix(x: int, y: int) -> int:
     return T(T(x) + y + 0x10F874F3) & 0xFFFFFFFF

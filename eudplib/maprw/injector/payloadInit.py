@@ -20,13 +20,21 @@ from ...trigtrg import trigtrg as tt
 trglist = []
 
 
-def Trigger(players=[tt.AllPlayers], *args, **kwargs) -> None:
+def Trigger(
+    *,
+    players: list = [tt.AllPlayers],
+    conditions: list[bytes] | bytes = [],
+    actions: list[bytes] | bytes = []
+) -> None:
     global trglist
-    trglist.append(tt.Trigger(players=players, *args, **kwargs))
+    trglist.append(tt.Trigger(players, conditions, actions))
 
 
 def InitializePayload(chkt: CHK, payload: Payload, mrgndata: ByteString | None = None) -> None:
-    str_section = GetStringMap().SaveTBL()
+    strmap = GetStringMap()
+    if strmap is None:
+        raise ut.EPError(_("Must use LoadMap first"))
+    str_section = strmap.SaveTBL()
     str_padding = -len(str_section) & 3
     payload_offset = 0x191943C8 + len(str_section) + str_padding
 
