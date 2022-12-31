@@ -23,10 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import functools
 from math import log2
 
 from ...localize import _
-from ...utils import EPD, ExprProxy, cachedfunc, ep_assert, isUnproxyInstance
+from ...utils import EPD, ExprProxy, ep_assert, isUnproxyInstance
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, Forward, IsConstExpr
 from ..curpl import GetCPCache
@@ -36,7 +37,7 @@ from ..variable.eudv import _ProcessDest
 from ..variable.vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
 
 
-@cachedfunc
+@functools.cache
 def EUDVArrayData(size):
     ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
@@ -96,7 +97,7 @@ class BitsTrg:
         BitsTrg.cache[self._key][index] = item
 
 
-@cachedfunc
+@functools.cache
 def EUDVArray(size, basetype=None):
     ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 

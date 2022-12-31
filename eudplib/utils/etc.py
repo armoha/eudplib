@@ -23,22 +23,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import collections
 import functools
 import itertools
 import os.path
 import random
 import sys
+from collections.abc import Callable, Collection, Iterable, Iterator
+from typing import Any, overload
 
 
-def EPD(p):
+def EPD(p: Any) -> Any:
     return (p + (-0x58A364)) // 4
 
 
 # -------
 
 
-def FlattenList(l):
+def FlattenList(l: Any) -> list:
     if isinstance(l, bytes) or isinstance(l, str) or hasattr(l, "dontFlatten"):
         return [l]
 
@@ -52,7 +53,7 @@ def FlattenList(l):
         return [l]
 
 
-def eqsplit(iterable, eqr):
+def eqsplit(iterable: Collection, eqr: int) -> Iterator:
     if isinstance(iterable, list):
         for i in range(0, len(iterable), eqr):
             yield iterable[i : i + eqr]
@@ -65,7 +66,7 @@ def eqsplit(iterable, eqr):
             item = list(itertools.islice(it, eqr))
 
 
-def List2Assignable(l):
+def List2Assignable(l: list) -> Any | list:
     if len(l) == 1:
         return l[0]
 
@@ -73,31 +74,18 @@ def List2Assignable(l):
         return l
 
 
-def Assignable2List(a):
+def Assignable2List(a: Any) -> list:
     if a is None:
         return []
 
-    elif isinstance(a, collections.abc.Iterable) and not hasattr(a, "dontFlatten"):
+    elif isinstance(a, Iterable) and not hasattr(a, "dontFlatten"):
         return list(a)
 
     else:
         return [a]
 
 
-def cachedfunc(function):
-    memo = {}
-
-    @functools.wraps(function)
-    def wrapper(*args):
-        args_hashable = tuple(args)
-        if args_hashable in memo:
-            return memo[args_hashable]
-        else:
-            rv = function(*args)
-            memo[args_hashable] = rv
-            return rv
-
-    return wrapper
+cachedfunc = functools.cache
 
 
 # -------
@@ -176,7 +164,21 @@ def SCMD2Text(s: str) -> str:
     return "".join(out)
 
 
-def find_data_file(filename: str, file) -> str:
+StrPath = str | os.PathLike[str]
+BytesPath = bytes | os.PathLike[bytes]
+
+
+@overload
+def find_data_file(filename: StrPath, file: StrPath) -> str:
+    ...
+
+
+@overload
+def find_data_file(filename: BytesPath, file: BytesPath) -> bytes:
+    ...
+
+
+def find_data_file(filename, file):
     if getattr(sys, "frozen", False):
         # The application is frozen
         datadir = os.path.dirname(sys.executable)
@@ -188,7 +190,7 @@ def find_data_file(filename: str, file) -> str:
     return os.path.join(datadir, filename)
 
 
-def RandList(lst):
+def RandList(lst: Iterable) -> list:
     lst = list(lst)
     random.shuffle(lst)
     return lst

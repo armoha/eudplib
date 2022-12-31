@@ -23,15 +23,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import functools
+
 from .. import core as c
 from ..core import Add, EUDVArray, Memory, SetMemory
 from ..core.eudfunc.eudf import _EUDPredefineParam
 from ..ctrlstru import EUDSetContinuePoint, EUDWhile
 from ..ctrlstru.loopblock import _UnsafeWhileNot
-from ..utils import EPD, cachedfunc, ep_assert
+from ..utils import EPD, ep_assert
 
 
-@cachedfunc
+@functools.cache
 def EUDQueue(capacity):
     """A single-ended queue implemented with a fixed-size variable array."""
     ep_assert(isinstance(capacity, int) and capacity > 0)
@@ -233,7 +235,7 @@ def EUDQueue(capacity):
     return _EUDQueue
 
 
-@cachedfunc
+@functools.cache
 def EUDDeque(capacity):
     """A double-ended queue implemented with a fixed-size variable array."""
     ep_assert(isinstance(capacity, int) and capacity > 0)
