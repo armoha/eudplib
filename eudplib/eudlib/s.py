@@ -72,13 +72,13 @@ def srand() -> Action:
     return Action(_loc, 0, 0, 0, epd, r, u, 45, 7, 20)
 
 
-def SetMemoryS(dest, modtype, value) -> list[Condition]:
+def SetMemoryS(dest, modtype, value) -> tuple[Action, Action]:
     modtype = EncodeModifier(modtype, issueError=True)
     cpo, unit = rand(dest)
-    return [
+    return (
         SetMemoryC(0x6509B0, Add, cpo),
         SetDeaths(CurrentPlayer, modtype, value, unit),
-    ]
+    )
 
 
 def MoveCP(dest) -> Action:

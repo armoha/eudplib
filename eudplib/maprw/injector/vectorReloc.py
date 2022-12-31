@@ -70,7 +70,10 @@ def CopyDeaths(iplayer, oplayer, copyepd: bool = False, initvalue: int | None = 
 def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
     global trglist
 
-    str_section = GetStringMap().SaveTBL()
+    strmap = GetStringMap()
+    if strmap is None:
+        raise EPError(_("Must use LoadMap first"))
+    str_section = strmap.SaveTBL()
 
     """
     Algorithm credit to klassical_31@naver.com

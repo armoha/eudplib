@@ -36,9 +36,7 @@ from ..memiof import f_bread_cp, f_cunitepdread_epd, f_dwepdread_epd, f_setcurpl
 from .unlimiterflag import IsUnlimiterOn
 
 
-def EUDLoopList(
-    header_offset: int, break_offset: int | None = None
-) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
+def EUDLoopList(header_offset, break_offset=None) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     blockname = "listloop"
     ut.EUDCreateBlock(blockname, header_offset)
 

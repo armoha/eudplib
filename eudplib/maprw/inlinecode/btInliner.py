@@ -114,7 +114,7 @@ def InlineCodifyBinaryTrigger(bTrigger: ByteString) -> tStartEnd:
     return tStart, tEnd
 
 
-def CountConditionsAndActions(bTrigger: ByteString) -> tuple[int, int]:
+def CountConditionsAndActions(bTrigger: bytes) -> tuple[int, int]:
     cond_count, act_count = 0, 0
     for c in range(16):
         if bTrigger[c * 20 + 15] == 22:  # Always
@@ -145,7 +145,7 @@ def GetTriggerSize(bTrigger: bytes) -> int:
     if act_count == 64:
         del trig["a"]
 
-    for ret in range(min_size, 2408 // 4 + 1):
+    for ret in range(min_size, 2408 // 4):
         output = ["_" for _ in range(ret)]
 
         def _f():
@@ -158,6 +158,7 @@ def GetTriggerSize(bTrigger: bytes) -> int:
 
         if _f():
             return ret * 4
+    return 2408
 
 
 def TryToShareTrigger(bTrigger: bytes) -> int | bytes:

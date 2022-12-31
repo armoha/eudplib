@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import overload
+from typing import Literal, overload
 
 from ... import core as c
 from ... import ctrlstru as cs
@@ -168,12 +168,12 @@ _DilateLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add, signed=True)
 
 
 @overload
-def f_setloc(locID, *coords, action: True) -> list[c.Action]:
+def f_setloc(locID, *coords, action: Literal[True]) -> list[c.Action]:
     ...
 
 
 @overload
-def f_setloc(locID, *coords, action: False) -> None:
+def f_setloc(locID, *coords, action: Literal[False]) -> None:
     ...
 
 
@@ -209,12 +209,12 @@ def f_setloc(locID, *coords, action=False):
 
 
 @overload
-def f_addloc(locID, *coords, action: True) -> list[c.Action]:
+def f_addloc(locID, *coords, action: Literal[True]) -> list[c.Action]:
     ...
 
 
 @overload
-def f_addloc(locID, *coords, action: False) -> None:
+def f_addloc(locID, *coords, action: Literal[False]) -> None:
     ...
 
 
@@ -250,12 +250,12 @@ def f_addloc(locID, *coords, action=False):
 
 
 @overload
-def f_dilateloc(locID, *coords, action: True) -> list[c.Action]:
+def f_dilateloc(locID, *coords, action: Literal[True]) -> list[c.Action]:
     ...
 
 
 @overload
-def f_dilateloc(locID, *coords, action: False) -> None:
+def f_dilateloc(locID, *coords, action: Literal[False]) -> None:
     ...
 
 
@@ -309,8 +309,8 @@ def f_getlocTL(locID, **kwargs) -> tuple[c.EUDVariable, c.EUDVariable]:
     return _GetLocTL(locID * 5, **kwargs)
 
 
-_set_loc = c.SetMemory(0x6509B0, c.SetTo, 0)
-_setcp2loc = ut.EPD(_set_loc) + 5
+_set_loc: c.Action = c.SetMemory(0x6509B0, c.SetTo, 0)
+_setcp2loc: c.ConstExpr = ut.EPD(_set_loc) + 5
 
 
 @_EUDPredefineParam((_setcp2loc,), c.CurrentPlayer)

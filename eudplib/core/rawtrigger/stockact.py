@@ -107,7 +107,7 @@ def Transmission(Unit, Where, WAVName, TimeModifier, Time, Text, AlwaysDisplay=4
     """
     from ...epscript import IsSCDBMap
 
-    if not IsSCDBMap:
+    if not IsSCDBMap():
         ep_warn(_("Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"))
     Unit = EncodeUnit(Unit, issueError=True)
     Where = EncodeLocation(Where, issueError=True)
@@ -673,17 +673,17 @@ def SetMemoryXEPD(epd, modtype, value, mask) -> Action:
     return SetDeathsX(epd, modtype, value, 0, mask)
 
 
-def SetKills(Player, Modifier, Number, Unit) -> Action:
+def SetKills(Player, Modifier, Number, Unit) -> Action | tuple[Action, Action, Action]:
     Player = EncodePlayer(Player, issueError=True)
     Modifier = EncodeModifier(Modifier, issueError=True)
     Unit = EncodeUnit(Unit, issueError=True)
     if isinstance(Player, int) and Player >= 12:
         if Player == 13:
-            return [
+            return (
                 SetMemory(0x6509B0, Add, -12 * 228),
                 SetDeaths(CurrentPlayer, Modifier, Number, Unit),
                 SetMemory(0x6509B0, Add, 12 * 228),
-            ]
+            )
         ep_assert(Player <= 11, _("SetKills Player should be only P1~P12 or CurrentPlayer"))
     if isinstance(Unit, int):
         ep_assert(Unit <= 227, _("SetKills Unit should be at most 227"))

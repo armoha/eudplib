@@ -40,7 +40,7 @@ class Payload:
         self.orttable = orttable
 
 
-_packerData = {}
+_packerData: dict[str, list[int]] = {}
 
 
 class PayloadBuffer:
@@ -90,7 +90,7 @@ class PayloadBuffer:
         self._data[self._datacur + 3] = (offset >> 24) & 0xFF
         self._datacur += 4
 
-    def WritePack(self, structformat, arglist) -> None:
+    def WritePack(self, structformat: str, arglist: list) -> None:
         """
         ======= =======
           Char   Type
@@ -107,7 +107,7 @@ class PayloadBuffer:
             _packerData[structformat] = CreateStructPackerData(structformat)
             _StructPacker(_packerData[structformat], self, arglist)
 
-    def WriteBytes(self, b) -> None:
+    def WriteBytes(self, b: bytes | int) -> None:
         """
         Write bytes object to buffer.
 
@@ -119,7 +119,7 @@ class PayloadBuffer:
         self._data[self._datacur : self._datacur + len(b)] = b
         self._datacur += len(b)
 
-    def WriteSpace(self, spacesize) -> None:
+    def WriteSpace(self, spacesize: int) -> None:
         self._datacur += spacesize
 
     # Internally used
@@ -127,12 +127,12 @@ class PayloadBuffer:
         return Payload(self._data, self._prttable, self._orttable)
 
 
-def CreateStructPackerData(structformat: Iterable[str]) -> list[int]:
+def CreateStructPackerData(structformat: str) -> list[int]:
     sizedict = {"B": 1, "H": 2, "I": 4}
     return [sizedict[s] for s in structformat]
 
 
-def _StructPacker(sizelist, buf, arglist) -> None:
+def _StructPacker(sizelist: list[int], buf: PayloadBuffer, arglist: list) -> None:
     dpos = buf._datacur
     data = buf._data
     prttb = buf._prttable

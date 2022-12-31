@@ -35,18 +35,18 @@ def EP_SetMemDestStrictMode(mode):
 
 
 class _Unique:
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self._name: str = name
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self._name
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self)
 
 
 class _KillsSpecialized(_Unique):
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         super().__init__(name)
         self._internalf: Callable
 

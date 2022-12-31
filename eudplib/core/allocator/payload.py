@@ -180,7 +180,7 @@ def CollectObjects(root) -> None:
         _found_objects = [_rootobj] + RandList(_found_objects_set)
 
     # cleanup
-    _found_objects_set = None
+    _found_objects_set.clear()
     phase = None
 
     # Final

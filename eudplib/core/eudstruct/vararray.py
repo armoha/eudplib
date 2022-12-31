@@ -24,10 +24,12 @@ THE SOFTWARE.
 """
 
 import functools
+from collections.abc import Iterator
 from math import log2
+from typing import NoReturn
 
 from ...localize import _
-from ...utils import EPD, ExprProxy, ep_assert, isUnproxyInstance
+from ...utils import EPD, EPError, ExprProxy, ep_assert, isUnproxyInstance
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, Forward, IsConstExpr
 from ..curpl import GetCPCache
@@ -75,34 +77,34 @@ _index = EUDLightVariable()
 
 
 class BitsTrg:
-    cache = {}
+    cache: dict[str, dict[int | str, Forward]] = {}
 
-    def __init__(self, key):
-        self._key = key
+    def __init__(self, key: str) -> None:
+        self._key: str = key
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self._key in BitsTrg.cache
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[dict[int | str, Forward]]:
         if not self:
             BitsTrg.cache[self._key] = {i: Forward() for i in range(28)}
             bt.PushTriggerScope()
             yield BitsTrg.cache[self._key]
             bt.PopTriggerScope()
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int | str) -> Forward:
         return BitsTrg.cache[self._key][index]
 
-    def __setitem__(self, index, item):
+    def __setitem__(self, index: int | str, item: Forward) -> None:
         BitsTrg.cache[self._key][index] = item
 
 
 @functools.cache
-def EUDVArray(size, basetype=None):
+def EUDVArray(size: int, basetype: type | None = None):
     ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
     class _EUDVArray(ExprProxy):
-        def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None):
+        def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None) -> None:
             # Initialization from value
             if _from is not None:
                 if IsConstExpr(_from):
@@ -249,12 +251,13 @@ def EUDVArray(size, basetype=None):
             nptr << bt.NextTrigger()
             return r
 
-        def set(self, i, val):
+        def set(self, i, val) -> None:
             self._set(i, bt.SetTo, val)
 
-        def _set(self, i, modifier, val):
+        def _set(self, i, modifier, val) -> None:
             if not IsEUDVariable(i):
-                return iset(self._epd, 18 * i + 348 // 4, modifier, val)
+                iset(self._epd, 18 * i + 348 // 4, modifier, val)
+                return
             modifier = bt.EncodeModifier(modifier) << 24
 
             bitstrg = BitsTrg("varrset")
@@ -328,7 +331,7 @@ def EUDVArray(size, basetype=None):
                 )
             nptr << bt.NextTrigger()
 
-        def fill(self, values, *, assert_expected_values_len=None):
+        def fill(self, values, *, assert_expected_values_len=None) -> None:
             if assert_expected_values_len:
                 ep_assert(len(values) == assert_expected_values_len)
 
@@ -342,25 +345,27 @@ def EUDVArray(size, basetype=None):
         def __getitem__(self, i):
             return self.get(i)
 
-        def __setitem__(self, i, value):
+        def __setitem__(self, i, value) -> None:
             self.set(i, value)
 
-        def __iter__(self):
+        def __iter__(self) -> NoReturn:
             # FIXME: add EUDVArray iterator
-            raise ut.EPError(_("Can't iterate EUDVArray"))
+            raise EPError(_("Can't iterate EUDVArray"))
 
-        def iadditem(self, i, val):
+        def iadditem(self, i, val) -> None:
             self._set(i, bt.Add, val)
 
         # FIXME: add operator for Subtract
-        def isubtractitem(self, i, val):
+        def isubtractitem(self, i, val) -> None:
             self._set(i, bt.Subtract, val)
 
-        def isubitem(self, i, val):
+        def isubitem(self, i, val) -> None:
             if not IsEUDVariable(val):
-                return self._set(i, bt.Add, -val)
+                self._set(i, bt.Add, -val)
+                return
             if not IsEUDVariable(i):
-                return isub(self._epd, 18 * i + 87, val)
+                isub(self._epd, 18 * i + 87, val)
+                return
             bitstrg = BitsTrg("varrsub")
             for trg in bitstrg:
                 trg["end"], trg["ret"] = Forward(), Forward()
@@ -410,51 +415,56 @@ def EUDVArray(size, basetype=None):
             nptr << bt.NextTrigger()
 
         # defined when val is power of 2
-        def imulitem(self, i, val):
+        def imulitem(self, i, val) -> None:
             if not isinstance(val, int):
                 raise AttributeError
             if val == 0:
-                return self.set(i, 0)
+                self.set(i, 0)
+                return
             # val is power of 2
             if val & (val - 1) == 0:
-                return self.ilshiftitem(i, int(log2(val)))
+                self.ilshiftitem(i, int(log2(val)))
+                return
             # val is negation of power of 2
             if -val & (-val - 1) == 0:
                 pass
             raise AttributeError
 
         # defined when val is power of 2
-        def ifloordivitem(self, i, val):
+        def ifloordivitem(self, i, val) -> None:
             if not isinstance(val, int):
                 raise AttributeError
             if val == 0:
                 raise ZeroDivisionError
             # val is power of 2
             if val & (val - 1) == 0:
-                return self.irshiftitem(i, int(log2(val)))
+                self.irshiftitem(i, int(log2(val)))
+                return
             # val is negation of power of 2
             if -val & (-val - 1) == 0:
                 pass
             raise AttributeError
 
         # defined when val is power of 2
-        def imoditem(self, i, val):
+        def imoditem(self, i, val) -> None:
             if not isinstance(val, int):
                 raise AttributeError
             if val == 0:
                 raise ZeroDivisionError
             # val is power of 2
             if val & (val - 1) == 0:
-                return self.ianditem(i, val - 1)
+                self.ianditem(i, val - 1)
+                return
             raise AttributeError
 
         # FIXME: merge logic with EUDVariable and VariableBase
 
-        def ilshiftitem(self, i, n):
+        def ilshiftitem(self, i, n) -> None:
             if not isinstance(n, int):
                 raise AttributeError
             if not IsEUDVariable(i):
-                return ilshift(self._epd, 18 * i + 87, n)
+                ilshift(self._epd, 18 * i + 87, n)
+                return
             if n == 0:
                 return
             mask = (1 << (n + 1)) - 1
@@ -509,11 +519,12 @@ def EUDVArray(size, basetype=None):
                 )
             nptr << bt.NextTrigger()
 
-        def irshiftitem(self, i, n):
+        def irshiftitem(self, i, n) -> None:
             if not isinstance(n, int):
                 raise AttributeError
             if not IsEUDVariable(i):
-                return irshift(self._epd, 18 * i + 87, n)
+                irshift(self._epd, 18 * i + 87, n)
+                return
             if n == 0:
                 return
             mask = (1 << (n + 1)) - 1
@@ -562,14 +573,15 @@ def EUDVArray(size, basetype=None):
                 )
             nptr << bt.NextTrigger()
 
-        def ipowitem(self, i, val):
+        def ipowitem(self, i, val) -> None:
             if isinstance(val, int) and val == 1:
                 return
             raise AttributeError
 
-        def ianditem(self, i, val):
+        def ianditem(self, i, val) -> None:
             if not IsEUDVariable(i):
-                return iand(self._epd, 18 * i + 87, val)
+                iand(self._epd, 18 * i + 87, val)
+                return
             bitstrg = BitsTrg("varrand")
             for trg in bitstrg:
                 trg["end"], trg["ret"] = Forward(), Forward()
@@ -641,9 +653,10 @@ def EUDVArray(size, basetype=None):
                 )
             nptr << bt.NextTrigger()
 
-        def ioritem(self, i, val):
+        def ioritem(self, i, val) -> None:
             if not IsEUDVariable(i):
-                return ior(self._epd, 18 * i + 87, val)
+                ior(self._epd, 18 * i + 87, val)
+                return
             bitstrg = BitsTrg("varror")
             for trg in bitstrg:
                 trg["end"], trg["ret"] = Forward(), Forward()
@@ -711,9 +724,10 @@ def EUDVArray(size, basetype=None):
                 )
             nptr << bt.NextTrigger()
 
-        def ixoritem(self, i, val):
+        def ixoritem(self, i, val) -> None:
             if not IsEUDVariable(i):
-                return ixor(self._epd, 18 * i + 87, val)
+                ixor(self._epd, 18 * i + 87, val)
+                return
             bitstrg = BitsTrg("varrxor")
             for trg in bitstrg:
                 trg["end"], trg["ret"] = Forward(), Forward()
@@ -802,14 +816,15 @@ def EUDVArray(size, basetype=None):
             nptr << bt.NextTrigger()
 
         # FIXME: Add operator?
-        def iinvertitem(self, i):
-            return self.ixoritem(i, 0xFFFFFFFF)
+        def iinvertitem(self, i) -> None:
+            self.ixoritem(i, 0xFFFFFFFF)
+            return
 
-        def inotitem(self, i):
+        def inotitem(self, i) -> NoReturn:
             raise AttributeError
 
         # item comparisons
-        def eqitem(self, i, val):
+        def eqitem(self, i, val) -> bt.Condition:
             if not IsEUDVariable(i):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val)
             raise AttributeError
@@ -821,12 +836,12 @@ def EUDVArray(size, basetype=None):
                 return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val))
             raise AttributeError
 
-        def leitem(self, i, val):
+        def leitem(self, i, val) -> bt.Condition:
             if not IsEUDVariable(i):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val)
             raise AttributeError
 
-        def geitem(self, i, val):
+        def geitem(self, i, val) -> bt.Condition:
             if not IsEUDVariable(i):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val)
             raise AttributeError
