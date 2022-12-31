@@ -23,7 +23,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .consttype import *
+from .consttype import (
+    Flingy,
+    Icon,
+    Image,
+    Iscript,
+    Portrait,
+    Sprite,
+    StatText,
+    Tech,
+    TrgAIScript,
+    TrgAllyStatus,
+    TrgComparison,
+    TrgCount,
+    TrgLocation,
+    TrgModifier,
+    TrgOrder,
+    TrgPlayer,
+    TrgProperty,
+    TrgPropState,
+    TrgResource,
+    TrgScore,
+    TrgString,
+    TrgSwitch,
+    TrgSwitchAction,
+    TrgSwitchState,
+    TrgUnit,
+    UnitOrder,
+    Upgrade,
+    Weapon,
+)
 from .eudf import (
     EUDFullFunc,
     EUDFunc,

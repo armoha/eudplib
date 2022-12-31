@@ -39,8 +39,8 @@ from .strdict import (
     DefLocationDict,
     DefPortraitDict,
     DefSpriteDict,
+    DefStatTextDict,
     DefSwitchDict,
-    DefTBLDict,
     DefTechDict,
     DefUnitDict,
     DefUnitOrderDict,
@@ -124,7 +124,7 @@ def EncodeUnit(u, issueError=False):
 
 def EncodeTBL(t, issueError=False):
     # TODO: handle custom stat_txt.tbl
-    return _EncodeAny("stat_txt.tbl", lambda s: {}[s], DefTBLDict, t, issueError)
+    return _EncodeAny("stat_txt.tbl", lambda s: {}[s], DefStatTextDict, t, issueError)
 
 
 def EncodeFlingy(flingy, issueError=False):

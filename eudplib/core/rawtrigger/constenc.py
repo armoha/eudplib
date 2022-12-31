@@ -30,10 +30,6 @@ from ...localize import _
 from ..mapdata import GetPropertyIndex
 
 
-def EP_SetMemDestStrictMode(mode):
-    pass
-
-
 class _Unique:
     def __init__(self, name: str) -> None:
         self._name: str = name
@@ -45,7 +41,110 @@ class _Unique:
         return repr(self)
 
 
-class _KillsSpecialized(_Unique):
+class Player(_Unique):
+    pass
+
+
+class PlayerGroup(Player):
+    pass
+
+
+P1 = Player("P1")
+P2 = Player("P2")
+P3 = Player("P3")
+P4 = Player("P4")
+P5 = Player("P5")
+P6 = Player("P6")
+P7 = Player("P7")
+P8 = Player("P8")
+P9 = Player("P9")
+P10 = Player("P10")
+P11 = Player("P11")
+P12 = Player("P12")
+Player1 = Player("Player1")
+Player2 = Player("Player2")
+Player3 = Player("Player3")
+Player4 = Player("Player4")
+Player5 = Player("Player5")
+Player6 = Player("Player6")
+Player7 = Player("Player7")
+Player8 = Player("Player8")
+Player9 = Player("Player9")
+Player10 = Player("Player10")
+Player11 = Player("Player11")
+Player12 = Player("Player12")
+CurrentPlayer = Player("CurrentPlayer")
+Foes = PlayerGroup("Foes")
+Allies = PlayerGroup("Allies")
+NeutralPlayers = PlayerGroup("NeutralPlayers")
+AllPlayers = PlayerGroup("AllPlayers")
+Force1 = PlayerGroup("Force1")
+Force2 = PlayerGroup("Force2")
+Force3 = PlayerGroup("Force3")
+Force4 = PlayerGroup("Force4")
+NonAlliedVictoryPlayers = PlayerGroup("NonAlliedVictoryPlayers")
+
+
+class AllyStatus(_Unique):
+    pass
+
+
+All = AllyStatus("All")
+Enemy = AllyStatus("Enemy")
+Ally = AllyStatus("Ally")
+AlliedVictory = AllyStatus("AlliedVictory")
+
+
+class Comparison(_Unique):
+    pass
+
+
+AtLeast = Comparison("AtLeast")
+AtMost = Comparison("AtMost")
+Exactly = Comparison("Exactly")
+
+
+class Modifier(_Unique):
+    pass
+
+
+SetTo = Modifier("SetTo")
+Add = Modifier("Add")
+Subtract = Modifier("Subtract")
+
+
+class Order(_Unique):
+    pass
+
+
+Move = Order("Move")
+Patrol = Order("Patrol")
+Attack = Order("Attack")
+
+
+class PropState(_Unique):
+    pass
+
+
+Enable = PropState("Enable")
+Disable = PropState("Disable")
+Toggle = PropState("Toggle")
+
+
+class Resource(_Unique):
+    pass
+
+
+Ore = Resource("Ore")
+Gas = Resource("Gas")
+OreAndGas = Resource("OreAndGas")
+
+
+class Score(_Unique):
+    pass
+
+
+class _KillsSpecialized(Score):
     def __init__(self, name: str) -> None:
         super().__init__(name)
         self._internalf: Callable
@@ -54,74 +153,26 @@ class _KillsSpecialized(_Unique):
         return self._internalf(a, b, c, d)
 
 
-All = _Unique("All")
-Enemy = _Unique("Enemy")
-Ally = _Unique("Ally")
-AlliedVictory = _Unique("AlliedVictory")
-AtLeast = _Unique("AtLeast")
-AtMost = _Unique("AtMost")
-Exactly = _Unique("Exactly")
-SetTo = _Unique("SetTo")
-Add = _Unique("Add")
-Subtract = _Unique("Subtract")
-Move = _Unique("Move")
-Patrol = _Unique("Patrol")
-Attack = _Unique("Attack")
-P1 = _Unique("P1")
-P2 = _Unique("P2")
-P3 = _Unique("P3")
-P4 = _Unique("P4")
-P5 = _Unique("P5")
-P6 = _Unique("P6")
-P7 = _Unique("P7")
-P8 = _Unique("P8")
-P9 = _Unique("P9")
-P10 = _Unique("P10")
-P11 = _Unique("P11")
-P12 = _Unique("P12")
-Player1 = _Unique("Player1")
-Player2 = _Unique("Player2")
-Player3 = _Unique("Player3")
-Player4 = _Unique("Player4")
-Player5 = _Unique("Player5")
-Player6 = _Unique("Player6")
-Player7 = _Unique("Player7")
-Player8 = _Unique("Player8")
-Player9 = _Unique("Player9")
-Player10 = _Unique("Player10")
-Player11 = _Unique("Player11")
-Player12 = _Unique("Player12")
-CurrentPlayer = _Unique("CurrentPlayer")
-Foes = _Unique("Foes")
-Allies = _Unique("Allies")
-NeutralPlayers = _Unique("NeutralPlayers")
-AllPlayers = _Unique("AllPlayers")
-Force1 = _Unique("Force1")
-Force2 = _Unique("Force2")
-Force3 = _Unique("Force3")
-Force4 = _Unique("Force4")
-NonAlliedVictoryPlayers = _Unique("NonAlliedVictoryPlayers")
-Enable = _Unique("Enable")
-Disable = _Unique("Disable")
-Toggle = _Unique("Toggle")
-Ore = _Unique("Ore")
-Gas = _Unique("Gas")
-OreAndGas = _Unique("OreAndGas")
-Total = _Unique("Total")
-Units = _Unique("Units")
-Buildings = _Unique("Buildings")
-UnitsAndBuildings = _Unique("UnitsAndBuildings")
-
+Total = Score("Total")
+Units = Score("Units")
+Buildings = Score("Buildings")
+UnitsAndBuildings = Score("UnitsAndBuildings")
 # Name 'Kills' is used for both condition type and score type.
 # To resolve conflict, we initialize Kills differently from others.
 Kills = _KillsSpecialized("Kills")
-Razings = _Unique("Razings")
-KillsAndRazings = _Unique("KillsAndRazings")
-Custom = _Unique("Custom")
-Set = _Unique("Set")
-Clear = _Unique("Clear")
-Random = _Unique("Random")
-Cleared = _Unique("Cleared")
+Razings = Score("Razings")
+KillsAndRazings = Score("KillsAndRazings")
+Custom = Score("Custom")
+
+
+class SwitchState(_Unique):
+    pass
+
+
+Set = SwitchState("Set")
+Clear = SwitchState("Clear")
+Random = SwitchState("Random")
+Cleared = SwitchState("Cleared")
 
 AllyStatusDict = {Enemy: 0, Ally: 1, AlliedVictory: 2}
 

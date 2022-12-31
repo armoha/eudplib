@@ -29,7 +29,7 @@ from .image import DefImageDict
 from .iscript import DefIscriptDict
 from .portrait import DefPortraitDict
 from .sprite import DefSpriteDict
-from .stattxt import DefTBLDict
+from .stattxt import DefStatTextDict
 from .tech import DefTechDict
 from .trg import DefAIScriptDict, DefLocationDict, DefSwitchDict, DefUnitDict
 from .unitorder import DefUnitOrderDict

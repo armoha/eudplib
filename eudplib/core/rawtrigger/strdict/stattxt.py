@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-DefTBLDict = {
+DefStatTextDict = {
     # unit names
     "Terran Marine": 1,
     "Terran Ghost": 2,

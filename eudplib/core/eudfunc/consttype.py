@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Callable
+
 from ..rawtrigger import (
     EncodeAIScript,
     EncodeAllyStatus,
@@ -57,7 +59,7 @@ from ..rawtrigger import (
 
 class createEncoder:
     @staticmethod
-    def _callee(depth=2, default=None):
+    def _callee(depth=2, default=None) -> str:
         import sys
 
         try:
@@ -65,7 +67,7 @@ class createEncoder:
         except (AttributeError, ValueError):  # For platforms without _getframe()
             return default
 
-    def __init__(self, func, name=""):
+    def __init__(self, func: Callable, name: str) -> None:
         self.__name__ = name
         self.__qualname__ = name
         self.__module__ = createEncoder._callee(default="consttype")
@@ -96,7 +98,7 @@ TrgString = createEncoder(EncodeString, "TrgString")
 TrgSwitch = createEncoder(EncodeSwitch, "TrgSwitch")
 TrgUnit = createEncoder(EncodeUnit, "TrgUnit")
 
-TrgTBL = createEncoder(EncodeTBL, "TrgTBL")  # FIXME: StatText would be better name
+StatText = createEncoder(EncodeTBL, "StatText")
 Weapon = createEncoder(EncodeWeapon, "Weapon")
 Flingy = createEncoder(EncodeFlingy, "Flingy")
 Sprite = createEncoder(EncodeSprite, "Sprite")
