@@ -31,12 +31,6 @@ from .rlocint cimport RlocInt_C, toRlocInt
 from .rlocint import RlocInt, RlocInt_C, toRlocInt
 
 
-def _total_ord(a, b):
-    if isinstance(a, ConstExpr) and isinstance(b, ConstExpr) and a.baseobj is b.baseobj:
-        return True
-    return False
-
-
 cdef class ConstExpr:
 
     ''' Class for general expression with rlocints.
@@ -123,7 +117,7 @@ cdef class ConstExpr:
     def __neg__(self):
         return self.__mul__(-1)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if _total_ord(self, other):
             return (self.offset == other.offset) and (self.rlocmode == other.rlocmode)
         return NotImplemented
@@ -131,7 +125,7 @@ cdef class ConstExpr:
     def __hash__(self):
         return id(self)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> bool:
         if _total_ord(self, other):
             return (self.offset != other.offset) or (self.rlocmode != other.rlocmode)
         return NotImplemented
@@ -155,6 +149,12 @@ cdef class ConstExpr:
         if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
             return self.offset >= other.offset
         return NotImplemented
+
+
+def _total_ord(a: ConstExpr, b: ConstExpr) -> bool:
+    if isinstance(a, ConstExpr) and isinstance(b, ConstExpr) and a.baseobj is b.baseobj:
+        return True
+    return False
 
 
 cdef class ConstExprInt(ConstExpr):
@@ -191,10 +191,10 @@ cdef class Forward(ConstExpr):
             self._expr = expr
         return expr
 
-    def IsSet(self):
+    def IsSet(self) -> bool:
         return self._expr is not None
 
-    def Reset(self):
+    def Reset(self) -> None:
         self._expr = None
 
     cpdef RlocInt_C Evaluate(self):
@@ -210,7 +210,7 @@ cdef class Forward(ConstExpr):
     def __getitem__(self, name):
         return self._expr[name]
 
-    def __setitem__(self, name, newvalue):
+    def __setitem__(self, name, newvalue) -> None:
         self._expr[name] = newvalue
 
 
@@ -227,6 +227,6 @@ cpdef RlocInt_C Evaluate(x):
             raise ut.EPError(_("Cannot evaluate value '{}'").format(x))
 
 
-def IsConstExpr(x):
+def IsConstExpr(x) -> bool:
     x = ut.unProxy(x)
     return isinstance(x, int) or isinstance(x, RlocInt_C) or hasattr(x, 'Evaluate')

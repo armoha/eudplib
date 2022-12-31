@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import Any, TypeGuard
+
 from eudplib.localize import _
 
 
@@ -169,14 +171,14 @@ class ExprProxy:
             return self._value
 
 
-def unProxy(x):
+def unProxy(x: Any) -> Any:
     try:
         return unProxy(x.getValue())
     except AttributeError:
         return x
 
 
-def isUnproxyInstance(x, cls) -> bool:
+def isUnproxyInstance(x: Any, cls: type) -> TypeGuard[type]:
     if isinstance(x, cls):
         return True
     try:

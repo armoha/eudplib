@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 import traceback
 from sys import getrefcount
+from typing import Any, TypeGuard
 
 from ...localize import _
 from ...utils import (
@@ -609,7 +610,7 @@ class EUDVariable(VariableBase):
         raise NotImplementedError
 
 
-def IsEUDVariable(x):
+def IsEUDVariable(x: Any) -> TypeGuard[EUDVariable]:
     return isUnproxyInstance(x, EUDVariable)
 
 

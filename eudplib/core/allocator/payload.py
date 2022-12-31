@@ -24,10 +24,11 @@ THE SOFTWARE.
 """
 
 import time
+from typing import Final
 
 from eudplib import utils as ut
 from eudplib.localize import _
-from eudplib.utils import RandList, stackobjs
+from eudplib.utils import RandList, ep_assert, stackobjs
 
 from . import constexpr, pbuffer, rlocint
 
@@ -37,28 +38,28 @@ _found_objects_set = set()
 _untraversed_objects = []
 _dynamic_objects_set = set()
 _alloctable = {}
-_payload_size = 0
+_payload_size: int = 0
 
-PHASE_COLLECTING = 1
-PHASE_ALLOCATING = 2
-PHASE_WRITING = 3
-phase = None
+PHASE_COLLECTING: Final[int] = 1
+PHASE_ALLOCATING: Final[int] = 2
+PHASE_WRITING: Final[int] = 3
+phase: int | None = None
 
-_payload_compress = False
-_payload_shuffle = True
+_payload_compress: bool = False
+_payload_shuffle: bool = True
 
 # -------
 
-_lastTime = 0
-_doLog = False
+_lastTime: float = 0.0
+_doLog: bool = False
 
 
-def setPayloadLoggerMode(mode):
+def setPayloadLoggerMode(mode: bool) -> None:
     global _doLog
     _doLog = mode
 
 
-def lprint(text, flush=False, _endingdict={True: "\n", False: "\r"}):
+def lprint(text, flush: bool = False):
     global _lastTime, _doLog
     if not _doLog:
         return
@@ -66,41 +67,29 @@ def lprint(text, flush=False, _endingdict={True: "\n", False: "\r"}):
     currentTime = time.time()
     if flush or (currentTime - _lastTime) >= 0.5:
         _lastTime = currentTime
-        print(text, end=_endingdict[flush])
+        print(text, end="\n" if flush else "\r")
 
 
-def CompressPayload(mode):
+def CompressPayload(mode: bool) -> None:
     """Set payload compression mode.
 
     :param mode: If true, enable object stacking (compression). If false,
     disable it.
     """
-
     global _payload_compress
-    if mode not in [True, False]:
-        raise ut.EPError(_("Invalid type"))
-
-    if mode:
-        _payload_compress = True
-    else:
-        _payload_compress = False
+    ut.ep_assert(mode in (True, False), _("Invalid type") + f": {mode}")
+    _payload_compress = True if mode else False
 
 
-def ShufflePayload(mode):
+def ShufflePayload(mode: bool) -> None:
     """Set payload shuffle mode.
 
     :param mode: If true, enable object shuffling (compression). If false,
     disable it.
     """
-
     global _payload_shuffle
-    if mode not in [True, False]:
-        raise ut.EPError(_("Invalid type"))
-
-    if mode:
-        _payload_shuffle = True
-    else:
-        _payload_shuffle = False
+    ut.ep_assert(mode in (True, False), _("Invalid type") + f": {mode}")
+    _payload_shuffle = True if mode else False
 
 
 class ObjCollector:
@@ -113,35 +102,35 @@ class ObjCollector:
     def __init__(self):
         pass
 
-    def StartWrite(self):
+    def StartWrite(self) -> None:
         pass
 
     def EndWrite(self):
         pass
 
-    def WriteByte(self, number):
+    def WriteByte(self, number) -> None:
         pass
 
-    def WriteWord(self, number):
+    def WriteWord(self, number) -> None:
         pass
 
-    def WriteDword(self, number):
+    def WriteDword(self, number) -> None:
         if type(number) is not int:
             constexpr.Evaluate(number)
 
-    def WritePack(self, structformat, arglist):
+    def WritePack(self, structformat, arglist) -> None:
         for arg in arglist:
             if type(arg) is not int:
                 constexpr.Evaluate(arg)
 
-    def WriteBytes(self, b):
+    def WriteBytes(self, b) -> None:
         pass
 
-    def WriteSpace(self, spacesize):
+    def WriteSpace(self, spacesize) -> None:
         pass
 
 
-def CollectObjects(root):
+def CollectObjects(root) -> None:
     global phase
     global _rootobj
     global _found_objects
@@ -218,19 +207,19 @@ class ObjAllocator:
     def __init__(self):
         self._sizes = {}
 
-    def StartWrite(self):
+    def StartWrite(self) -> None:
         self._suboccupmap = 0
         self._suboccupidx = 0
         self._occupmap = []
 
-    def _Occup0(self):
+    def _Occup0(self) -> None:
         self._suboccupidx += 1
         if self._suboccupidx == 4:
             self._occupmap.append(self._suboccupmap)
             self._suboccupidx = 0
             self._suboccupmap = 0
 
-    def _Occup1(self):
+    def _Occup1(self) -> None:
         self._suboccupmap = 1
         self._suboccupidx += 1
         if self._suboccupidx == 4:
@@ -244,13 +233,13 @@ class ObjAllocator:
             self._suboccupidx = 0
         return self._occupmap
 
-    def WriteByte(self, number):
+    def WriteByte(self, number) -> None:
         if number is None:
             self._Occup0()
         else:
             self._Occup1()
 
-    def WriteWord(self, number):
+    def WriteWord(self, number) -> None:
         if number is None:
             self._Occup0()
             self._Occup0()
@@ -258,10 +247,10 @@ class ObjAllocator:
             self._Occup1()
             self._Occup1()
 
-    def WriteDword(self, number):
+    def WriteDword(self, number) -> None:
         self._occupmap.append(1)
 
-    def WritePack(self, structformat, arglist):
+    def WritePack(self, structformat, arglist) -> None:
         if structformat not in self._sizes:
             ssize = 0
             sizedict = {"B": 1, "H": 2, "I": 4}
@@ -277,13 +266,13 @@ class ObjAllocator:
         for i in range(ssize):
             self._Occup1()
 
-    def WriteBytes(self, b):
+    def WriteBytes(self, b) -> None:
         ssize = len(b)
         self._occupmap.extend([1] * (ssize >> 2))
         for i in range(ssize & 3):
             self._Occup1()
 
-    def WriteSpace(self, ssize):
+    def WriteSpace(self, ssize) -> None:
         self._suboccupidx += ssize
         if self._suboccupidx >= 4:
             self._occupmap.append(self._suboccupmap)
@@ -426,5 +415,5 @@ def GetObjectAddr(obj):
         return defri
 
     elif phase is PHASE_WRITING:
-        # assert _alloctable[obj] & 3 == 0
+        # ep_assert(_alloctable[obj] & 3 == 0)
         return rlocint.RlocInt_C(_alloctable[obj], 4)

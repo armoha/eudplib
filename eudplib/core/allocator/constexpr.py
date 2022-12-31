@@ -28,12 +28,6 @@ from ...localize import _
 from .rlocint import RlocInt_C, toRlocInt
 
 
-def _total_ord(a, b):
-    if isinstance(a, ConstExpr) and isinstance(b, ConstExpr) and a.baseobj is b.baseobj:
-        return True
-    return False
-
-
 class ConstExpr:
 
     """Class for general expression with rlocints."""
@@ -114,7 +108,7 @@ class ConstExpr:
     def __neg__(self):
         return self.__mul__(-1)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if _total_ord(self, other):
             return (self.offset == other.offset) and (self.rlocmode == other.rlocmode)
         return NotImplemented
@@ -122,7 +116,7 @@ class ConstExpr:
     def __hash__(self):
         return id(self)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> bool:
         if _total_ord(self, other):
             return (self.offset != other.offset) or (self.rlocmode != other.rlocmode)
         return NotImplemented
@@ -148,12 +142,18 @@ class ConstExpr:
         return NotImplemented
 
 
+def _total_ord(a: ConstExpr, b: ConstExpr) -> bool:
+    if isinstance(a, ConstExpr) and isinstance(b, ConstExpr) and a.baseobj is b.baseobj:
+        return True
+    return False
+
+
 class ConstExprInt(ConstExpr):
     def __init__(self, value):
         super().__init__(None, value, 0)
         self.value = RlocInt_C(value & 0xFFFFFFFF, 0)
 
-    def Evaluate(self):
+    def Evaluate(self) -> RlocInt_C:
         return self.value
 
 
@@ -174,10 +174,10 @@ class Forward(ConstExpr):
             self._expr = expr
         return expr
 
-    def IsSet(self):
+    def IsSet(self) -> bool:
         return self._expr is not None
 
-    def Reset(self):
+    def Reset(self) -> None:
         self._expr = None
 
     def Evaluate(self):
@@ -193,7 +193,7 @@ class Forward(ConstExpr):
     def __getitem__(self, name):
         return self._expr[name]
 
-    def __setitem__(self, name, newvalue):
+    def __setitem__(self, name, newvalue) -> None:
         self._expr[name] = newvalue
 
 
@@ -207,6 +207,6 @@ def Evaluate(x):
         return toRlocInt(x)
 
 
-def IsConstExpr(x):
+def IsConstExpr(x) -> bool:
     x = ut.unProxy(x)
     return isinstance(x, (int, RlocInt_C)) or hasattr(x, "Evaluate")
