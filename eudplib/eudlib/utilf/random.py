@@ -31,7 +31,7 @@ from eudplib import utils as ut
 
 from ..memiof import f_wread_epd
 
-_seed = c.EUDVariable()
+_seed: c.EUDVariable = c.EUDVariable()
 
 
 def f_getseed() -> c.EUDVariable:

@@ -81,11 +81,11 @@ class RlocInt_C:
         return str(self)
 
 
-def RlocInt(offset, rlocmode):
+def RlocInt(offset: int, rlocmode: int) -> RlocInt_C:
     return RlocInt_C(offset & 0xFFFFFFFF, rlocmode & 0xFFFFFFFF)
 
 
-def toRlocInt(x):
+def toRlocInt(x: int | RlocInt_C) -> RlocInt_C:
     """Convert int/RlocInt to rlocint"""
 
     if isinstance(x, RlocInt_C):

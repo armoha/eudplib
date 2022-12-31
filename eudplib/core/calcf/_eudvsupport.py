@@ -23,18 +23,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Callable
+
 from ..variable import EUDVariable
 from ..variable.evcommon import _ev
 from .bitwise import f_bitand, f_bitlshift, f_bitnot, f_bitor, f_bitrshift, f_bitxor
 from .muldiv import f_div, f_mul
 
 
-def DefClsMethod(name, f):
+def DefClsMethod(name: str, f: Callable) -> None:
     f.__name__ = "EUDVariable.%s" % name
     setattr(EUDVariable, name, f)
 
 
-def DefBinOperator(name, f):
+def DefBinOperator(name: str, f: Callable) -> None:
     DefClsMethod(name, f)
 
     def rop(self, lhs):
@@ -43,7 +45,7 @@ def DefBinOperator(name, f):
     DefClsMethod("__r%s" % name[2:], rop)
 
 
-def DefInplaceOperator(name, f):
+def DefInplaceOperator(name: str, f: Callable) -> None:
     def iop(self, other):
         rvalue = self._rvalue
         ret = f(self, other)

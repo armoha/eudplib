@@ -106,10 +106,10 @@ cdef class RlocInt_C:
         return str(self)
 
 
-cpdef RlocInt_C RlocInt(offset, rlocmode):
+cpdef RlocInt_C RlocInt(offset: int, rlocmode: int):
     return RlocInt_C(offset & 0xFFFFFFFF, rlocmode & 0xFFFFFFFF)
 
-cpdef RlocInt_C toRlocInt(x):
+cpdef RlocInt_C toRlocInt(x: int | RlocInt_C):
     """Convert int/RlocInt to rlocint"""
 
     if isinstance(x, RlocInt_C):
