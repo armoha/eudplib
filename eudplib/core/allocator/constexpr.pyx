@@ -151,7 +151,7 @@ cdef class ConstExpr:
         return NotImplemented
 
 
-def _total_ord(a: ConstExpr, b: ConstExpr) -> bool:
+def _total_ord(a, b) -> bool:
     if isinstance(a, ConstExpr) and isinstance(b, ConstExpr) and a.baseobj is b.baseobj:
         return True
     return False
