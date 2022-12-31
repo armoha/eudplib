@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from ..utils import EPD
+from ..utils import EPD, ep_assert
 from .rawtrigger import (
     Add,
     CurrentPlayer,
@@ -291,7 +291,7 @@ def ixor(a, b, v):
 
 
 def ilshift(a, b, n):
-    assert isinstance(n, int)
+    ep_assert(isinstance(n, int))
     if n == 0:
         return
     mask = (1 << (n + 1)) - 1
@@ -310,7 +310,7 @@ def ilshift(a, b, n):
 
 
 def irshift(a, b, n):
-    assert isinstance(n, int)
+    ep_assert(isinstance(n, int))
     if n == 0:
         return
     mask = (1 << (n + 1)) - 1

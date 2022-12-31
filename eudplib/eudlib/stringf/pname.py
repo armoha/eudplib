@@ -61,7 +61,7 @@ def GetPlayerLightVariable():
 
 
 def compare_sequence(src, seq):
-    assert isinstance(src, int) and isinstance(seq, str)
+    ut.ep_assert(isinstance(src, int) and isinstance(seq, str))
     seq += "\0"
     ret = []
     val, mask = 0, 0

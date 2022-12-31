@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
+from eudplib import utils as ut
 
 
 def EUDBinaryMax(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
@@ -43,7 +44,7 @@ def EUDBinaryMax(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
         function will return maxv.
     """
     if isinstance(minv, int) and isinstance(maxv, int):
-        assert minv <= maxv
+        ut.ep_assert(minv <= maxv)
         r = maxv - minv
         if r == 0:
             return minv
@@ -88,7 +89,7 @@ def EUDBinaryMin(cond, minv: int = 0, maxv: int = 0xFFFFFFFF) -> c.EUDVariable:
         function will return maxv.
     """
     if isinstance(minv, int) and isinstance(maxv, int):
-        assert minv <= maxv
+        ut.ep_assert(minv <= maxv)
         r = maxv - minv
         if r == 0:
             return minv

@@ -41,7 +41,8 @@ def LoadMap(fname: AnyPath) -> None:
     """
 
     print(_("Loading map {}").format(fname))
-    assert os.path.isfile(fname), _("input path is not a map file")
+    if not os.path.isfile(fname):
+        raise FileNotFoundError(_("input path is not a map file"))
     try:
         rawfile = open(fname, "rb").read()
     except FileNotFoundError:

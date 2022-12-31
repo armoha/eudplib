@@ -36,7 +36,7 @@ def _EUDBranchSub(conditions, ontrue, onfalse, *, _actions=None) -> None:
     - type(conditions) is list
     - len(conditions) <= 16
     """
-    assert len(conditions) <= 16
+    ut.ep_assert(len(conditions) <= 16)
 
     brtrg = c.Forward()
     tjtrg = c.Forward()
