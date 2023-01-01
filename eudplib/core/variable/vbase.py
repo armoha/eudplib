@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from abc import ABC, abstractmethod
 from typing import NoReturn, TypeVar
 
 from eudplib import utils as ut
@@ -34,12 +35,14 @@ from ..allocator import IsConstExpr
 Self = TypeVar("Self", bound="VariableBase")
 
 
-class VariableBase:
+class VariableBase(ABC):
+    @abstractmethod
     def __init__(self) -> None:
         pass
 
+    @abstractmethod
     def getValueAddr(self) -> NoReturn:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     # -------
 
