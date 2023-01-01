@@ -23,16 +23,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from abc import ABC, abstractmethod
+
 from eudplib import utils as ut
 
 from ..allocator import ConstExpr
 from ..allocator.payload import GetObjectAddr
 
 
-class EUDObject(ConstExpr):
-
-    """
-    Class for standalone object on memory
+class EUDObject(ConstExpr, ABC):
+    """Class for standalone object on memory
 
     .. note::
         Object collection occures in three steps:
@@ -72,13 +72,15 @@ class EUDObject(ConstExpr):
         """
         return GetObjectAddr(self)
 
+    @abstractmethod
     def GetDataSize(self):
         """Memory size of object."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def CollectDependency(self, pbuffer):
         return self.WritePayload(pbuffer)
 
+    @abstractmethod
     def WritePayload(self, pbuffer):
         """Write object"""
-        raise NotImplementedError
+        raise NotImplementedError()
