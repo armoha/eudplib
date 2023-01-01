@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-DefStatTextDict = {
+DefStatTextDict: dict[str, int] = {
     # unit names
     "Terran Marine": 1,
     "Terran Ghost": 2,

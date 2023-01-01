@@ -23,14 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import TYPE_CHECKING, Any, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, overload
 
 from ... import utils as ut
 from ...localize import _
 from .rlocint import RlocInt_C, toRlocInt
 
 if TYPE_CHECKING:
-    from ...utils.exprproxy import ExprProxy
+    from ...utils import ExprProxy
 
 
 class ConstExpr:
@@ -202,6 +202,8 @@ class ConstExprInt(ConstExpr):
         return self.value
 
 
+_ConstExpr = TypeVar("_ConstExpr", bound=ConstExpr)
+_ExprProxy = TypeVar("_ExprProxy", bound="ExprProxy")
 T = TypeVar("T", ConstExpr, int, "ExprProxy")
 
 
@@ -212,6 +214,18 @@ class Forward(ConstExpr):
         super().__init__(self)
         self._expr: "ConstExpr | ExprProxy | None" = None
         self.dontFlatten = True
+
+    @overload
+    def __lshift__(self, expr: _ConstExpr) -> _ConstExpr:
+        ...
+
+    @overload
+    def __lshift__(self, expr: _ExprProxy) -> _ExprProxy:
+        ...
+
+    @overload
+    def __lshift__(self, expr: int) -> int:
+        ...
 
     def __lshift__(self, expr: T) -> T:
         if self._expr is not None:
@@ -258,7 +272,10 @@ class Forward(ConstExpr):
         self._expr[name] = newvalue  # type: ignore[index]
 
 
-def Evaluate(x: "ExprProxy | ConstExpr | int | RlocInt_C") -> RlocInt_C:
+Evaluable: TypeAlias = "ConstExpr | int | ExprProxy | RlocInt_C"
+
+
+def Evaluate(x: Evaluable) -> RlocInt_C:
     """Evaluate expressions"""
     expr = ut.unProxy(x)
     if isinstance(expr, ConstExpr):

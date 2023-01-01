@@ -24,17 +24,20 @@ THE SOFTWARE.
 """
 
 from collections.abc import Iterable
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from eudplib import utils as ut
 from eudplib.localize import _
 
-from . import constexpr
+from .constexpr import ConstExpr, Evaluable, Evaluate
 from .rlocint import RlocInt_C
+
+if TYPE_CHECKING:
+    from ...utils import ExprProxy
 
 
 class Payload:
-    def __init__(self, data, prttable, orttable) -> None:
+    def __init__(self, data: bytearray, prttable: list[int], orttable: list[int]) -> None:
         self.data: Final[bytearray] = data
         self.prttable: Final[list[int]] = prttable
         self.orttable: Final[list[int]] = orttable
@@ -44,10 +47,7 @@ _packerData: dict[str, list[int]] = {}
 
 
 class PayloadBuffer:
-
-    """
-    Buffer where EUDObject should write to.
-    """
+    """Buffer where EUDObject should write to."""
 
     def __init__(self, totlen: int) -> None:
         self._data: bytearray = bytearray(totlen)
@@ -61,20 +61,20 @@ class PayloadBuffer:
         self._datastart = writeaddr
         self._datacur = writeaddr
 
-    def EndWrite(self):
+    def EndWrite(self) -> int:
         return self._datacur - self._datastart
 
-    def WriteByte(self, number) -> None:
+    def WriteByte(self, number: int) -> None:
         self._data[self._datacur] = number & 0xFF
         self._datacur += 1
 
-    def WriteWord(self, number) -> None:
+    def WriteWord(self, number: int) -> None:
         self._data[self._datacur + 0] = number & 0xFF
         self._data[self._datacur + 1] = (number >> 8) & 0xFF
         self._datacur += 2
 
-    def WriteDword(self, number) -> None:
-        number = constexpr.Evaluate(number)
+    def WriteDword(self, obj: Evaluable) -> None:
+        number = Evaluate(obj)
 
         if number.rlocmode:
             ut.ep_assert(self._datacur % 4 == 0, _("Non-const dwords must be aligned to 4byte"))
@@ -92,7 +92,7 @@ class PayloadBuffer:
         self._data[self._datacur + 3] = (offset >> 24) & 0xFF
         self._datacur += 4
 
-    def WritePack(self, structformat: str, arglist: list) -> None:
+    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
         """
         ======= =======
           Char   Type
@@ -109,15 +109,12 @@ class PayloadBuffer:
             _packerData[structformat] = CreateStructPackerData(structformat)
             _StructPacker(_packerData[structformat], self, arglist)
 
-    def WriteBytes(self, b: bytes | int) -> None:
+    def WriteBytes(self, b: bytes) -> None:
         """
         Write bytes object to buffer.
 
         :param b: bytes object to write.
         """
-        if not isinstance(b, bytes):
-            b = bytes(b)
-
         self._data[self._datacur : self._datacur + len(b)] = b
         self._datacur += len(b)
 
@@ -134,7 +131,11 @@ def CreateStructPackerData(structformat: str) -> list[int]:
     return [sizedict[s] for s in structformat]
 
 
-def _StructPacker(sizelist: list[int], buf: PayloadBuffer, arglist: list) -> None:
+def _StructPacker(
+    sizelist: list[int],
+    buf: PayloadBuffer,
+    arglist: list[Evaluable],
+) -> None:
     dpos = buf._datacur
     data = buf._data
     prttb = buf._prttable
@@ -142,12 +143,10 @@ def _StructPacker(sizelist: list[int], buf: PayloadBuffer, arglist: list) -> Non
 
     for i, arg in enumerate(arglist):
         argsize = sizelist[i]
-        ri = constexpr.Evaluate(arg)
+        ri = Evaluate(arg)
 
-        ut.ep_assert(
-            ri.rlocmode == 0 or (sizelist[i] == 4 and dpos % 4 == 0),
-            _("Cannot write non-const in byte/word/nonalligned dword."),
-        )
+        if not (ri.rlocmode == 0 or (argsize == 4 and dpos % 4 == 0)):
+            raise ut.EPError(_("Cannot write non-const in byte/word/nonalligned dword."))
 
         if ri.rlocmode == 1:
             prttb.append(dpos)
@@ -155,19 +154,20 @@ def _StructPacker(sizelist: list[int], buf: PayloadBuffer, arglist: list) -> Non
         elif ri.rlocmode == 4:
             orttb.append(dpos)
 
-        if sizelist[i] == 1:
+        if argsize == 1:
             data[dpos] = ri.offset & 0xFF
+            dpos += 1
 
-        elif sizelist[i] == 2:
+        elif argsize == 2:
             data[dpos] = ri.offset & 0xFF
             data[dpos + 1] = (ri.offset >> 8) & 0xFF
+            dpos += 2
 
         else:
             data[dpos] = ri.offset & 0xFF
             data[dpos + 1] = (ri.offset >> 8) & 0xFF
             data[dpos + 2] = (ri.offset >> 16) & 0xFF
             data[dpos + 3] = (ri.offset >> 24) & 0xFF
-
-        dpos += sizelist[i]
+            dpos += 4
 
     buf._datacur = dpos

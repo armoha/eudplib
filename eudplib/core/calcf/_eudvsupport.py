@@ -38,11 +38,7 @@ def DefClsMethod(name: str, f: Callable) -> None:
 
 def DefBinOperator(name: str, f: Callable) -> None:
     DefClsMethod(name, f)
-
-    def rop(self, lhs):
-        return f(lhs, self)
-
-    DefClsMethod("__r%s" % name[2:], rop)
+    DefClsMethod("__r%s" % name[2:], lambda self, lhs: f(lhs, self))
 
 
 def DefInplaceOperator(name: str, f: Callable) -> None:

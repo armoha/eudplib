@@ -714,7 +714,7 @@ def DeathsX(Player, Comparison, Number: int, Unit, Mask: int) -> bytes:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
-    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx="SC")
+    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx=0x4353)
 
 
 def MemoryX(dest: int, cmptype, value: int, mask: int) -> bytes:
@@ -725,7 +725,7 @@ def SetDeathsX(Player, Modifier, Number: int, Unit, Mask: int) -> bytes:
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
     Unit = EncodeUnit(Unit)
-    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx="SC")
+    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx=0x4353)
 
 
 def SetMemoryX(dest: int, modtype, value: int, mask: int) -> bytes:

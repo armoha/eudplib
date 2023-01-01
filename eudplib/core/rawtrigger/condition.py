@@ -23,14 +23,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from inspect import getframeinfo, stack
+from typing import TYPE_CHECKING, NoReturn
 
 from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..allocator import ConstExpr, IsConstExpr
+from .action import DwField, WBField
 
-_condtypes = {
+if TYPE_CHECKING:
+    from ...utils import ExprProxy
+    from ..allocator.payload import RlocInt_C, _PayloadBuffer
+    from ..variable import EUDVariable
+    from .rawtriggerdef import RawTrigger
+
+_condtypes: dict[int, str] = {
     0: "(no condition)",
     1: "CountdownTimer",
     2: "Command",
@@ -58,9 +65,7 @@ _condtypes = {
 
 
 class Condition(ConstExpr):
-
-    """
-    Condition class.
+    """Condition class.
 
     Memory layout:
 
@@ -79,59 +84,82 @@ class Condition(ConstExpr):
      ======  =============  ========  ===========
     """
 
-    # fmt: off
-    def __init__(self, locid, player, amount, unitid,
-                 comparison, condtype, restype, flags, *, eudx=0):
-        # self.decl = list()
-        # for i in range(1, 9):
-        #     try:
-        #         decl = getframeinfo(stack()[i][0])
-        #     except IndexError:
-        #         break
-        #     if decl.filename.startswith("E:\\eudplib\\eudplib\\"):
-        #         continue
-        #     self.decl.append(decl)
+    def __init__(
+        self,
+        locid: DwField,
+        player: DwField,
+        amount: DwField,
+        unitid: WBField,
+        comparison: WBField,
+        condtype: WBField,
+        restype: WBField,
+        flags: WBField,
+        eudx: WBField = 0,
+    ) -> None:
+        """See :mod:`eudplib.base.stockcond` for stock conditions list."""
         super().__init__(self)
-
-        if isinstance(eudx, str):
-            eudx = ut.b2i2(ut.u2b(eudx))
-        self.fields = [locid, player, amount, unitid,
-                       comparison, condtype, restype, flags, eudx]
-        # fmt: on
-        self.parenttrg = None
-        self.condindex = None
+        self.fields: list[DwField] = [
+            locid,
+            player,
+            amount,
+            unitid,
+            comparison,
+            condtype,
+            restype,
+            flags,
+            eudx,
+        ]
+        self.parenttrg: "RawTrigger | None" = None
+        self.condindex: int | None = None
 
     def Disabled(self) -> None:
+        if isinstance(self.fields[7], ConstExpr):
+            raise ut.EPError(_("Can't disable non-const Condition flags"))
         self.fields[7] |= 2
 
     # -------
 
+    def _invalid_condition(self, i: int) -> str:
+        condtype = self.fields[5]
+        condname = _condtypes[condtype] if isinstance(condtype, int) else condtype
+        return _("Invalid fields for condition{} {}:".format(i, condname))
+
     def CheckArgs(self, i: int) -> None:
-        for n, field in enumerate(self.fields[:8]):
-            if field is None or IsConstExpr(field):
-                continue
+        if all(IsConstExpr(field) for field in self.fields[:3]) and all(
+            isinstance(field, int) for field in self.fields[3:]
+        ):
+            return
 
-            params = ["locid", "player", "amount", "unitid", "comparison", "condtype", "resource","flags"]
-            condtype = self.fields[5]
-            if isinstance(condtype, int):
-                if condtype == 15:
-                    params[0] = "bitmask"
-                elif condtype == 11:
-                    params[4] = "switchstate"
-                    params[6] = "switchid"
-                if condtype in (9, 19, 21):
-                    params[6] = "scoretype"
+        error = [self._invalid_condition(i)]
+        fieldname = [
+            "location",
+            "player",
+            "amount",
+            "unit_type",
+            "comparison",
+            "condition_type",
+            "resource_type",
+            "flags",
+            "maskflag",
+        ]
+        condtype = self.fields[5]
+        if isinstance(condtype, int):
+            if condtype == 15:
+                fieldname[0] = "bitmask"
+            elif condtype == 11:
+                fieldname[4] = "switchstate"
+                fieldname[6] = "switchid"
+            if condtype in (9, 19, 21):
+                fieldname[6] = "scoretype"
 
-            try:
-                condtype = _condtypes.get(condtype, "(unknown)")
-            except TypeError:  # unhashable type
-                condtype = "(unknown)"
-            raise ut.EPError(_('Invalid {} "{}" in condition{} "{}"').format(params[n], field, i, condtype))
+        for i, field in enumerate(self.fields):
+            if (i < 3 and not IsConstExpr(field)) or (i >= 3 and not isinstance(field, int)):
+                error.append("\t" + _("invalid {}: {}").format(fieldname[i], field))
 
-    def SetParentTrigger(self, trg, index):
-        ut.ep_assert(
-            self.parenttrg is None, _("Condition cannot be shared by two triggers.")
-        )
+        raise ut.EPError("\n".join(error))
+
+    def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:
+        ut.ep_assert(self.parenttrg is None, _("Condition cannot be shared by two triggers."))
 
         ut.ep_assert(trg is not None, _("Trigger should not be null."))
         ut.ep_assert(0 <= index < 16, _("Condition index should be 0 to 15"))
@@ -139,31 +167,48 @@ class Condition(ConstExpr):
         self.parenttrg = trg
         self.condindex = index
 
-    def Evaluate(self):
-        if self.parenttrg is None:
-            msg = []
-            msg.append(_("Orphan condition. This often happens when you try to do arithmetics with conditions."))
-            # msg.append(_("stack backtrace:"))
-            # for decl in reversed(self.decl):
-            #     errs = decl.filename, decl.lineno, decl.function
-            #     msg.append("\t" + _("File {} Line {} in {}").format(*errs))
-            raise ut.EPError("\n".join(msg))
+    def Evaluate(self) -> "RlocInt_C":
+        if self.parenttrg is None or self.condindex is None:
+            # fmt: off
+            raise ut.EPError(
+                _("Orphan condition. This often happens when you try to do arithmetics with conditions.")
+            )
+            # fmt: on
         return self.parenttrg.Evaluate() + 8 + self.condindex * 20
 
-    def CollectDependency(self, pbuffer):
-        wdw = pbuffer.WriteDword
-        fld = self.fields
-        wdw(fld[0])
-        wdw(fld[1])
-        wdw(fld[2])
+    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:
+        from ..variable import IsEUDVariable
 
-    def WritePayload(self, pbuffer):
-        pbuffer.WritePack("IIIHBBBBH", self.fields)
+        eudvar_field = next(
+            ((i, field) for i, field in enumerate(self.fields) if IsEUDVariable(field)), None
+        )
+        if eudvar_field is not None:
+            raise ut.EPError(
+                self._invalid_condition(eudvar_field[0])
+                + _("Found EUDVariable {} in field {}").format(eudvar_field[1], eudvar_field[0])
+            )
 
-    def __bool__(self):
+        for field in self.fields[:3]:
+            pbuffer.WriteDword(field)  # type: ignore[arg-type]
+
+    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:
+        from ..variable import IsEUDVariable
+
+        eudvar_field = next(
+            ((i, field) for i, field in enumerate(self.fields) if IsEUDVariable(field)), None
+        )
+        if eudvar_field is not None:
+            raise ut.EPError(
+                self._invalid_condition(eudvar_field[0])
+                + _("Found EUDVariable {} in field {}").format(eudvar_field[1], eudvar_field[0])
+            )
+
+        pbuffer.WritePack("IIIHBBBBH", self.fields)  # type: ignore[arg-type]
+
+    def __bool__(self) -> NoReturn:
         raise RuntimeError(_("To prevent error, Condition can't be put into if."))
 
-    def Negate(self):
+    def Negate(self) -> None:
         condtype = self.fields[5]
         ut.ep_assert(isinstance(condtype, int))
         comparison_set = (1, 2, 3, 4, 5, 12, 14, 15, 21)
@@ -174,13 +219,13 @@ class Condition(ConstExpr):
         elif condtype in never_set:
             self.fields[5] = 22
         elif condtype == 11:  # Switch
-            self.fields[4] ^= 1
+            self.fields[4] ^= 1  # type: ignore[operator]
         elif condtype in comparison_set:
             bring_or_command = (2, 3)
             comparison = self.fields[4]
             amount = self.fields[2]
             ut.ep_assert(isinstance(comparison, int) and isinstance(amount, int))
-            amount &= 0xFFFFFFFF
+            amount &= 0xFFFFFFFF  # type: ignore[operator]
             if comparison == 10 and amount == 0:
                 self.fields[4] = 0
                 self.fields[2] = 1
@@ -197,12 +242,14 @@ class Condition(ConstExpr):
                 # See: https://cafe.naver.com/edac/book5095361/96809
                 raise ut.EPError(_("Bring and Command can't exchange AtMost and Exactly/AtLeast"))
             elif comparison in (0, 1):
-                self.fields[4] ^= 1
-                self.fields[2] += -((-1) ** comparison)
+                self.fields[4] ^= 1  # type: ignore[operator]
+                self.fields[2] += -((-1) ** comparison)  # type: ignore[operator]
             elif comparison != 10:
-                raise ut.EPError(_('Invalid comparison "{}" in trigger index {}').format(comparison, 0))
+                raise ut.EPError(
+                    _('Invalid comparison "{}" in trigger index {}').format(comparison, 0)
+                )
             elif condtype == 15 and self.fields[8] == ut.b2i2(ut.u2b("SC")):
-                mask = self.fields[0] & 0xFFFFFFFF
+                mask = self.fields[0] & 0xFFFFFFFF  # type: ignore[operator]
                 if amount & (~mask):  # never
                     self.fields[5] = 23
                 elif amount == mask:

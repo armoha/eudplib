@@ -24,10 +24,17 @@ THE SOFTWARE.
 """
 
 from collections.abc import Callable
+from typing import TYPE_CHECKING, TypeVar, overload
 
 from ... import utils as ut
 from ...localize import _
 from ..mapdata import GetPropertyIndex
+
+if TYPE_CHECKING:
+    from ...utils import ExprProxy
+    from ..allocator import ConstExpr
+    from ..mapdata import UnitProperty
+    from ..variable import EUDVariable
 
 
 class _Unique:
@@ -238,6 +245,18 @@ SwitchActionDict = {Set: 4, Clear: 5, Toggle: 6, Random: 11}
 
 SwitchStateDict = {Set: 2, Cleared: 3}
 
+T = TypeVar("T", int, "EUDVariable", "ConstExpr", "ExprProxy")
+
+
+@overload
+def _EncodeConst(t: str, d: dict[_Unique, int], s: _Unique) -> int:
+    ...
+
+
+@overload
+def _EncodeConst(t: str, d: dict[_Unique, int], s: T) -> T:
+    ...
+
 
 def _EncodeConst(t, d, s):
     s = ut.unProxy(s)
@@ -249,37 +268,78 @@ def _EncodeConst(t, d, s):
         return s
 
 
+@overload
+def EncodeAllyStatus(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeAllyStatus(s: T) -> T:
+    ...
+
+
 def EncodeAllyStatus(s):
-    """
-    Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2].
-    """
+    """Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2]."""
     return _EncodeConst("AllyStatus", AllyStatusDict, s)
 
 
+@overload
+def EncodeComparison(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeComparison(s: T) -> T:
+    ...
+
+
 def EncodeComparison(s):
-    """
-    Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10].
-    """
+    """Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10]."""
     return _EncodeConst("Comparison", ComparisonDict, s)
 
 
+@overload
+def EncodeModifier(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeModifier(s: T) -> T:
+    ...
+
+
 def EncodeModifier(s):
-    """
-    Convert [SetTo, Add, Subtract] to number [7, 8, 9].
-    """
+    """Convert [SetTo, Add, Subtract] to number [7, 8, 9]."""
     return _EncodeConst("Modifier", ModifierDict, s)
 
 
+@overload
+def EncodeOrder(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeOrder(s: T) -> T:
+    ...
+
+
 def EncodeOrder(s):
-    """
-    Convert [Move, Patrol, Attack] to number [0, 1, 2].
-    """
+    """Convert [Move, Patrol, Attack] to number [0, 1, 2]."""
     return _EncodeConst("Order", OrderDict, s)
 
 
+@overload
+def EncodePlayer(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodePlayer(s: T) -> T:
+    ...
+
+
 def EncodePlayer(s):
-    """
-    Convert player identifier to corresponding number.
+    """Convert player identifier to corresponding number.
 
     ======================= ========
         Identifier           Number
@@ -324,23 +384,48 @@ def EncodePlayer(s):
     return _EncodeConst("Player", PlayerDict, s)
 
 
+@overload
+def EncodePropState(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodePropState(s: T) -> T:
+    ...
+
+
 def EncodePropState(s):
-    """
-    Convert [Enable, Disable, Toogle] to number [4, 5, 6]
-    """
+    """Convert [Enable, Disable, Toogle] to number [4, 5, 6]"""
     return _EncodeConst("PropState", PropStateDict, s)
 
 
+@overload
+def EncodeResource(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeResource(s: T) -> T:
+    ...
+
+
 def EncodeResource(s):
-    """
-    Convert [Ore, Gas, OreAndGas] to [0, 1, 2]
-    """
+    """Convert [Ore, Gas, OreAndGas] to [0, 1, 2]"""
     return _EncodeConst("Resource", ResourceDict, s)
 
 
+@overload
+def EncodeScore(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeScore(s: T) -> T:
+    ...
+
+
 def EncodeScore(s):
-    """
-    Convert score type identifier to number.
+    """Convert score type identifier to number.
 
     ================= ========
         Score type     Number
@@ -359,24 +444,48 @@ def EncodeScore(s):
     return _EncodeConst("Score", ScoreDict, s)
 
 
+@overload
+def EncodeSwitchAction(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeSwitchAction(s: T) -> T:
+    ...
+
+
 def EncodeSwitchAction(s):
-    """
-    Convert [Set, Clear, Toogle, Random] to [4, 5, 6, 11].
-    """
+    """Convert [Set, Clear, Toogle, Random] to [4, 5, 6, 11]."""
     return _EncodeConst("SwitchAction", SwitchActionDict, s)
 
 
+@overload
+def EncodeSwitchState(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeSwitchState(s: T) -> T:
+    ...
+
+
 def EncodeSwitchState(s):
-    """
-    Convert [Set, Cleared] to [2, 3].
-    """
+    """Convert [Set, Cleared] to [2, 3]."""
     return _EncodeConst("SwitchState", SwitchStateDict, s)
 
 
+@overload
+def EncodeCount(s: _Unique) -> int:
+    ...
+
+
+@overload
+def EncodeCount(s: T) -> T:
+    ...
+
+
 def EncodeCount(s):
-    """
-    Convert [All, (other numbers)] to number [0, (as-is)].
-    """
+    """Convert [All, (other numbers)] to number [0, (as-is)]."""
     s = ut.unProxy(s)
     if s is All:
         return 0
@@ -388,5 +497,5 @@ def EncodeCount(s):
 # ========================
 
 
-def EncodeProperty(prop):
+def EncodeProperty(prop: "UnitProperty | bytes") -> int:
     return GetPropertyIndex(prop)

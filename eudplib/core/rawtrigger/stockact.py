@@ -660,7 +660,7 @@ def SetDeathsX(Player, Modifier, Number, Unit, Mask) -> Action:
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
     Unit = EncodeUnit(Unit)
-    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx="SC")
+    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx=0x4353)
 
 
 def SetMemoryX(dest, modtype, value, mask) -> Action:

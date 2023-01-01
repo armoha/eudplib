@@ -139,6 +139,3 @@ class CPString:
 
     def GetVTable(self):
         return self.trigger[0]
-
-    def GetNextPtrMemory(self):
-        return self.trigger[-1] + 4

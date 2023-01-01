@@ -23,27 +23,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import struct
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Literal, TypeAlias, overload
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..allocator import IsConstExpr
 from ..eudobj import Db, EUDObject
+from .action import Action
 from .condition import Condition
 from .triggerscope import NextTrigger, _RegisterTrigger
+
+if TYPE_CHECKING:
+    from ..allocator import Forward
+    from ..allocator.payload import RlocInt_C, _PayloadBuffer
 
 # Trigger counter thing
 
 _trgCounter = 0
 
 
-def GetTriggerCounter():
+def GetTriggerCounter() -> int:
     return _trgCounter
 
 
 # Aux
 
 
-def _bool2Cond(x):
+def _bool2Cond(x: bool | Condition) -> Condition:
     if x is True:
         return Condition(0, 0, 0, 0, 0, 22, 0, 0)  # Always
     elif x is False:
@@ -52,26 +61,57 @@ def _bool2Cond(x):
         return x
 
 
-def Disabled(arg):
+def Disabled(arg: Condition | Action) -> None:
     """Disable condition or action"""
     arg.Disabled()
 
 
 # RawTrigger
+_Trigger: TypeAlias = "RawTrigger | Forward | int | None"
+_Condition: TypeAlias = Condition | bool | Iterable[Condition | bool | Iterable] | None
+_Action: TypeAlias = Action | Iterable[Action | Iterable] | None
 
 
 class RawTrigger(EUDObject):
+    @overload
     def __init__(
         self,
-        prevptr=None,
-        nextptr=None,
-        conditions=None,
-        actions=None,
-        *args,
-        preserved=True,
-        currentAction=None,
-        trigSection=None
-    ):
+        prevptr: _Trigger = None,
+        nextptr: _Trigger = None,
+        conditions: _Condition = None,
+        actions: _Action = None,
+        *,
+        preserved: bool = True,
+        currentAction: int | None = None,
+        trigSection: None = None
+    ) -> None:
+        ...
+
+    @overload
+    def __init__(
+        self,
+        prevptr: _Trigger = None,
+        nextptr: _Trigger = None,
+        conditions: None = None,
+        actions: None = None,
+        *,
+        preserved: Literal[True] = True,
+        currentAction: None = None,
+        trigSection: bytes
+    ) -> None:
+        ...
+
+    def __init__(
+        self,
+        prevptr: _Trigger = None,
+        nextptr: _Trigger = None,
+        conditions: _Condition = None,
+        actions: _Action = None,
+        *,
+        preserved: bool = True,
+        currentAction: int | None = None,
+        trigSection: bytes | None = None
+    ) -> None:
         super().__init__()
 
         # Register trigger to global table
@@ -96,17 +136,17 @@ class RawTrigger(EUDObject):
             if conditions is None:
                 conditions = []
             conditions = ut.FlattenList(conditions)
-            conditions = list(map(_bool2Cond, conditions))
+            _conditions: list[Condition] = list(map(_bool2Cond, conditions))
 
             if actions is None:
                 actions = []
             actions = ut.FlattenList(actions)
 
-            ut.ep_assert(len(conditions) <= 16, _("Too many conditions"))
+            ut.ep_assert(len(_conditions) <= 16, _("Too many conditions"))
             ut.ep_assert(len(actions) <= 64, _("Too many actions"))
 
             # Register condition/actions to trigger
-            for i, cond in enumerate(conditions):
+            for i, cond in enumerate(_conditions):
                 cond.CheckArgs(i)
                 cond.SetParentTrigger(self, i)
 
@@ -114,7 +154,7 @@ class RawTrigger(EUDObject):
                 act.CheckArgs(i)
                 act.SetParentTrigger(self, i)
 
-            self._conditions = conditions
+            self._conditions = _conditions
             self._actions = actions
             self._flags = 4 if preserved else 0
             self._currentAction = currentAction
@@ -130,15 +170,18 @@ class RawTrigger(EUDObject):
                 if condtype == 22:
                     continue  # ignore Always, no worry disable/enable
                 elif condtype >= 1:
-                    self._conditions.append(Db(trigSection[i * 20 : i * 20 + 20]))
+                    self._conditions.append(
+                        Condition(*struct.unpack_from("<IIIHBBBBH", trigSection, i * 20))
+                    )
             self._flags = trigSection[320 + 2048] & 5
             for i in range(64):
                 acttype = trigSection[320 + i * 32 + 26]
                 if acttype == 47:  # Comment
                     continue
                 elif acttype >= 1:
-                    action = Db(trigSection[320 + i * 32 : 320 + i * 32 + 32])
-                    self._actions.append(action)
+                    self._actions.append(
+                        Action(*struct.unpack_from("<IIIIIIHBBBBH", trigSection, 320 + i * 32))
+                    )
             self._currentAction = None if not (self._flags & 1) else trigSection[2399]
 
     @property
@@ -146,19 +189,16 @@ class RawTrigger(EUDObject):
         return bool(self._flags & 4)
 
     @preserved.setter
-    def preserved(self, preserved) -> None:
+    def preserved(self, preserved: bool) -> None:
         if preserved:
             self._flags |= 4
         else:
             self._flags &= ~4
 
-    def GetNextPtrMemory(self):
-        return self + 4
-
     def GetDataSize(self) -> int:
         return 2408
 
-    def CollectDependency(self, pbuffer) -> None:
+    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:
         pbuffer.WriteDword(self._prevptr)
         pbuffer.WriteDword(self._nextptr)
 
@@ -167,7 +207,7 @@ class RawTrigger(EUDObject):
         for act in self._actions:
             act.CollectDependency(pbuffer)
 
-    def WritePayload(self, pbuffer) -> None:
+    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:
         pbuffer.WriteDword(self._prevptr)
         pbuffer.WriteDword(self._nextptr)
 

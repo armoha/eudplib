@@ -23,14 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-DefLocationDict = {"Location %u" % i: i for i in range(1, 256) if i != 64}
+DefLocationDict: dict[str, int] = {"Location %u" % i: i for i in range(1, 256) if i != 64}
 DefLocationDict["Anywhere"] = 64
 
-DefSwitchDict = {"Switch %d" % (i + 1): i for i in range(256)}
+DefSwitchDict: dict[str, int] = {"Switch %d" % (i + 1): i for i in range(256)}
 
 # ======================================
 
-DefUnitDict = {
+DefUnitDict: dict[str, int] = {
     "Terran Marine": 0,
     "Terran Ghost": 1,
     "Terran Vulture": 2,
@@ -361,7 +361,7 @@ DefUnitDict = {
 
 # Data from http://cafe.daum.net/rpgguild/6cWR/158
 # Original data from ScAIEdit
-DefAIScriptDict = {
+DefAIScriptDict: dict[bytes, bytes] = {
     # Custom AI Scripts
     b"Terran Custom Level": b"TMCu",
     b"Zerg Custom Level": b"ZMCu",

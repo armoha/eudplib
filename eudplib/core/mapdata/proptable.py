@@ -27,13 +27,14 @@ THE SOFTWARE.
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from .chktok import CHK
 from .unitprp import UnitProperty
 
 _uprpdict: dict[bytes, int] = {}
 _uprptable: list[bytes] = []
 
 
-def InitPropertyMap(chkt):
+def InitPropertyMap(chkt: "CHK") -> None:
     global _prptable, _uprpdict
     _uprpdict.clear()
     _uprptable.clear()
@@ -49,12 +50,12 @@ def InitPropertyMap(chkt):
     for i in range(64):
         if upus[i]:
             uprpdata = uprp[20 * i : 20 * i + 20]
-            # TODO: merge duplicates and fix existing CUWPs
+            # FIXME: merge duplicates and fix existing CUWPs
             _uprpdict[uprpdata] = i
             _uprptable[i] = uprpdata
 
 
-def GetPropertyIndex(prop):
+def GetPropertyIndex(prop: UnitProperty | bytes) -> int:
     ut.ep_assert(
         isinstance(prop, UnitProperty) or isinstance(prop, bytes),
         _("Invalid property type"),
@@ -78,6 +79,6 @@ def GetPropertyIndex(prop):
         return uprpindex + 1  # SC counts unit properties from 1. Sucks
 
 
-def ApplyPropertyMap(chkt):
+def ApplyPropertyMap(chkt: "CHK") -> None:
     uprpdata = b"".join([uprpdata or bytes(20) for uprpdata in _uprptable])
     chkt.setsection("UPRP", uprpdata)

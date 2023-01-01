@@ -24,17 +24,22 @@ THE SOFTWARE.
 """
 
 import time
+from collections.abc import Callable
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 from eudplib import utils as ut
 from eudplib.localize import _
 from eudplib.utils import RandList, ep_assert, stackobjs
 
-from . import constexpr, pbuffer, rlocint
+from .constexpr import ConstExpr, Evaluable, Evaluate, Forward
+from .pbuffer import Payload, PayloadBuffer
+from .rlocint import RlocInt, RlocInt_C
 
 if TYPE_CHECKING:
-    from eudplib.core.eudobj import EUDObject
+    from ...utils import ExprProxy
+    from ..eudobj import EUDObject
+
 _found_objects: list["EUDObject"] = []
 _rootobj: "EUDObject | None" = None
 _found_objects_set: set["EUDObject"] = set()
@@ -60,7 +65,7 @@ def setPayloadLoggerMode(mode: bool) -> None:
     _doLog = mode
 
 
-def lprint(text, flush: bool = False):
+def lprint(text: str, flush: bool = False):
     global _lastTime, _doLog
     if not _doLog:
         return
@@ -94,44 +99,53 @@ def ShufflePayload(mode: bool) -> None:
 
 
 class ObjCollector:
-
     """
     Object having PayloadBuffer-like interfaces. Collects all objects by
     calling RegisterObject() for every related objects.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def StartWrite(self) -> None:
         pass
 
-    def EndWrite(self):
+    def EndWrite(self) -> None:
         pass
 
-    def WriteByte(self, number) -> None:
+    def WriteByte(self, number: int) -> None:
         pass
 
-    def WriteWord(self, number) -> None:
+    def WriteWord(self, number: int) -> None:
         pass
 
-    def WriteDword(self, number) -> None:
-        if type(number) is not int:
-            constexpr.Evaluate(number)
+    def WriteDword(self, obj: Evaluable) -> None:
+        from ...utils import ExprProxy
 
-    def WritePack(self, structformat, arglist) -> None:
+        if isinstance(obj, int):
+            return
+        if isinstance(obj, (ConstExpr, ExprProxy, RlocInt_C)):
+            Evaluate(obj)
+            return
+        raise ut.EPError(_("Collected unexpected object: {}").format(obj))
+
+    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
         for arg in arglist:
-            if type(arg) is not int:
-                constexpr.Evaluate(arg)
+            if isinstance(arg, int):
+                continue
+            if isinstance(arg, (ConstExpr, ExprProxy, RlocInt_C)):
+                Evaluate(arg)
+                continue
+            raise ut.EPError(_("Collected unexpected object: {}").format(arg))
 
-    def WriteBytes(self, b) -> None:
+    def WriteBytes(self, b: bytes) -> None:
         pass
 
-    def WriteSpace(self, spacesize) -> None:
+    def WriteSpace(self, spacesize: int) -> None:
         pass
 
 
-def CollectObjects(root) -> None:
+def CollectObjects(root: "EUDObject | Forward") -> None:
     global phase
     global _rootobj
     global _found_objects
@@ -151,7 +165,7 @@ def CollectObjects(root) -> None:
 
     # Evaluate root to register root object.
     # root may not have WritePayload() method e.g: Forward()
-    constexpr.Evaluate(root)
+    Evaluate(root)
 
     while _untraversed_objects:
         while _untraversed_objects:
@@ -200,14 +214,13 @@ def CollectObjects(root) -> None:
 
 
 class ObjAllocator:
-
     """
     Object having PayloadBuffer-like interfaces. Collects all objects by
     calling RegisterObject() for every related objects.
     """
 
-    def __init__(self):
-        self._sizes = {}
+    def __init__(self) -> None:
+        self._sizes: dict[str, int] = {}
 
     def StartWrite(self) -> None:
         self._suboccupmap: int = 0
@@ -229,19 +242,19 @@ class ObjAllocator:
             self._suboccupidx = 0
             self._suboccupmap = 0
 
-    def EndWrite(self):
+    def EndWrite(self) -> list[int]:
         if self._suboccupidx:
             self._occupmap.append(self._suboccupmap)
             self._suboccupidx = 0
         return self._occupmap
 
-    def WriteByte(self, number) -> None:
+    def WriteByte(self, number: int) -> None:
         if number is None:
             self._Occup0()
         else:
             self._Occup1()
 
-    def WriteWord(self, number) -> None:
+    def WriteWord(self, number: int) -> None:
         if number is None:
             self._Occup0()
             self._Occup0()
@@ -249,10 +262,10 @@ class ObjAllocator:
             self._Occup1()
             self._Occup1()
 
-    def WriteDword(self, number) -> None:
+    def WriteDword(self, obj: Evaluable) -> None:
         self._occupmap.append(1)
 
-    def WritePack(self, structformat, arglist) -> None:
+    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
         if structformat not in self._sizes:
             ssize = 0
             sizedict = {"B": 1, "H": 2, "I": 4}
@@ -268,13 +281,13 @@ class ObjAllocator:
         for i in range(ssize):
             self._Occup1()
 
-    def WriteBytes(self, b) -> None:
+    def WriteBytes(self, b: bytes) -> None:
         ssize = len(b)
         self._occupmap.extend([1] * (ssize >> 2))
         for i in range(ssize & 3):
             self._Occup1()
 
-    def WriteSpace(self, ssize) -> None:
+    def WriteSpace(self, ssize: int) -> None:
         self._suboccupidx += ssize
         if self._suboccupidx >= 4:
             self._occupmap.append(self._suboccupmap)
@@ -285,7 +298,7 @@ class ObjAllocator:
             self._suboccupmap = 0
 
 
-def AllocObjects():
+def AllocObjects() -> None:
     global phase
     global _alloctable
     global _payload_size
@@ -345,14 +358,14 @@ def AllocObjects():
 # -------
 
 
-def ConstructPayload():
+def ConstructPayload() -> Payload:
     global phase
 
     phase = PHASE.WRITING
     lprint(_("[Stage 3/3] ConstructPayload"), flush=True)
     objn = len(_found_objects)
 
-    pbuf = pbuffer.PayloadBuffer(_payload_size)
+    pbuf = PayloadBuffer(_payload_size)
 
     for i, obj in enumerate(_found_objects):
         objaddr, objsize = _alloctable[obj], obj.GetDataSize()
@@ -374,14 +387,14 @@ def ConstructPayload():
     return pbuf.CreatePayload()
 
 
-_on_create_payload_callbacks = []
+_on_create_payload_callbacks: list[Callable] = []
 
 
-def RegisterCreatePayloadCallback(f):
+def RegisterCreatePayloadCallback(f: Callable) -> None:
     _on_create_payload_callbacks.append(f)
 
 
-def CreatePayload(root):
+def CreatePayload(root: "EUDObject | Forward") -> Payload:
     # Call callbacks
     for f in _on_create_payload_callbacks:
         f()
@@ -390,10 +403,11 @@ def CreatePayload(root):
     return ConstructPayload()
 
 
-defri = rlocint.RlocInt(0, 4)
+_PayloadBuffer: TypeAlias = ObjCollector | ObjAllocator | PayloadBuffer
+defri: RlocInt_C = RlocInt(0, 4)
 
 
-def GetObjectAddr(obj):
+def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
     global _alloctable
     global _found_objects
     global _found_objects_set
@@ -418,4 +432,7 @@ def GetObjectAddr(obj):
 
     elif phase is PHASE.WRITING:
         # ep_assert(_alloctable[obj] & 3 == 0)
-        return rlocint.RlocInt_C(_alloctable[obj], 4)
+        return RlocInt_C(_alloctable[obj], 4)
+
+    else:
+        raise ut.EPError(_("Can't calculate object address now"))

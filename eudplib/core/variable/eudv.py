@@ -610,7 +610,7 @@ class EUDVariable(VariableBase):
         raise NotImplementedError
 
 
-def IsEUDVariable(x: Any) -> TypeGuard[EUDVariable]:
+def IsEUDVariable(x: object) -> bool:
     return isUnproxyInstance(x, EUDVariable)
 
 

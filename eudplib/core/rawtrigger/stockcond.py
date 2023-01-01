@@ -282,7 +282,7 @@ def DeathsX(Player, Comparison, Number, Unit, Mask) -> Condition:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
-    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx="SC")
+    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx=0x4353)
 
 
 def MemoryX(dest, cmptype, value, mask) -> Condition:

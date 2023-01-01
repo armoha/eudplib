@@ -202,5 +202,5 @@ def NegateCondition(cond) -> c.Condition:
     try:
         cond.Negate()
         return cond
-    except (AttributeError, ut.EPError):
+    except (AttributeError, ut.EPError, TypeError):
         raise

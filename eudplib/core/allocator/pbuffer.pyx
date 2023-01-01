@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # cython: language_level=3
 
-'''
+"""
 Copyright (c) 2014 trgk
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,7 +22,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-'''
+"""
+
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Final
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from cpython.bytes cimport PyBytes_AsString, PyBytes_FromStringAndSize
@@ -33,39 +36,40 @@ from libc.stdint cimport uint32_t, uint16_t
 from eudplib import utils as ut
 from eudplib.localize import _
 
-from . import constexpr
+from .constexpr import ConstExpr, Evaluable, Evaluate
 from .rlocint cimport RlocInt_C
+
+if TYPE_CHECKING:
+    from ...utils import ExprProxy
 
 
 class Payload:
+    def __init__(self, data: bytearray, prttable: list[int], orttable: list[int]) -> None:
+        self.data: Final[bytearray] = data
+        self.prttable: Final[list[int]] = prttable
+        self.orttable: Final[list[int]] = orttable
 
-    def __init__(self, data, prttable, orttable):
-        self.data = data
-        self.prttable = prttable
-        self.orttable = orttable
 
-
-_packerData = {}
+_packerData: dict[str, list[int]] = {}
 
 
 cdef class PayloadBuffer:
-
-    '''
-    Buffer where EUDObject should write to.
-    '''
+    """Buffer where EUDObject should write to."""
 
     cdef size_t _totlen
     cdef public size_t _datastart, _datacur
     cdef public unsigned char* _data
     cdef public list _prttable, _orttable
 
-    def __cinit__(self, size_t totlen):
+    def __cinit__(self, size_t totlen) -> None:
         self._data = <unsigned char*> PyMem_Malloc(totlen)
-        self._totlen = totlen
-        self._prttable = []
-        self._orttable = []
+        self._totlen: int = totlen
+        self._prttable: list[int] = []
+        self._orttable: list[int] = []
+        self._datastart: int
+        self._datacur: int
 
-    def __dealloc(self):
+    def __dealloc(self) -> None:
         PyMem_Free(self._data)
 
     cpdef void StartWrite(self, size_t writeaddr):
@@ -84,20 +88,17 @@ cdef class PayloadBuffer:
         self._data[self._datacur + 1] = (number >> 8) & 0xFF
         self._datacur += 2
 
-    cpdef void WriteDword(self, number2):
-        cdef RlocInt_C number = constexpr.Evaluate(number2)
+    cpdef void WriteDword(self, obj: Evaluable):
+        cdef RlocInt_C number = Evaluate(obj)
 
         if number.rlocmode:
-            ut.ep_assert(
-                self._datacur % 4 == 0,
-                _('Non-const dwords must be aligned to 4byte')
-            )
+            ut.ep_assert(self._datacur % 4 == 0, _("Non-const dwords must be aligned to 4byte"))
             if number.rlocmode == 1:
                 self._prttable.append(self._datacur)
             elif number.rlocmode == 4:
                 self._orttable.append(self._datacur)
             else:
-                raise ut.EPError(_('rlocmode should be 1 or 4'))
+                raise ut.EPError(_("rlocmode should be 1 or 4"))
 
         cdef unsigned int offset = number.offset & 0xFFFFFFFF
         self._data[self._datacur + 0] = offset & 0xFF
@@ -106,8 +107,8 @@ cdef class PayloadBuffer:
         self._data[self._datacur + 3] = (offset >> 24) & 0xFF
         self._datacur += 4
 
-    def WritePack(self, structformat, arglist):
-        '''
+    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
+        """
         ======= =======
           Char   Type
         ======= =======
@@ -115,7 +116,7 @@ cdef class PayloadBuffer:
            H     Word
            I     Dword
         ======= =======
-        '''
+        """
 
         cdef int* pdata
         try:
@@ -125,15 +126,12 @@ cdef class PayloadBuffer:
             _packerData[structformat] = PyCapsule_New(<void*>pdata, "int*", NULL)
         _StructPacker(pdata, self, arglist)
 
-    def WriteBytes(self, b):
-        '''
+    def WriteBytes(self, b: bytes) -> None:
+        """
         Write bytes object to buffer.
 
         :param b: bytes object to write.
-        '''
-        if not isinstance(b, bytes):
-            b = bytes(b)
-
+        """
         cdef char *raw = PyBytes_AsString(b)
         memcpy(&self._data[self._datacur], raw, len(b))
         self._datacur += len(b)
@@ -142,7 +140,7 @@ cdef class PayloadBuffer:
         self._datacur += spacesize
 
     # Internally used
-    def CreatePayload(self):
+    def CreatePayload(self) -> Payload:
         byteData = PyBytes_FromStringAndSize(<const char*>self._data, self._totlen)
         return Payload(byteData, self._prttable, self._orttable)
 
@@ -156,7 +154,7 @@ cdef int* CreateStructPackerData(str structformat):
     return sizelist
 
 
-cdef void _StructPacker(int* sizelist, PayloadBuffer buf, list arglist):
+cdef void _StructPacker(int* sizelist, PayloadBuffer buf, arglist: list[Evaluable]):
     cdef int dpos = buf._datacur
     cdef unsigned char* data = buf._data
     cdef list prttb = buf._prttable
@@ -165,12 +163,10 @@ cdef void _StructPacker(int* sizelist, PayloadBuffer buf, list arglist):
 
     for i, arg in enumerate(arglist):
         argsize = sizelist[i]
-        ri = constexpr.Evaluate(arg)
+        ri = Evaluate(arg)
 
-        if not (ri.rlocmode == 0 or (sizelist[i] == 4 and dpos % 4 == 0)):
-            raise ut.EPError(
-                _('Cannot write non-const in byte/word/nonalligned dword.')
-            )
+        if not (ri.rlocmode == 0 or (argsize == 4 and dpos % 4 == 0)):
+            raise ut.EPError(_("Cannot write non-const in byte/word/nonalligned dword."))
 
         if ri.rlocmode == 1:
             prttb.append(dpos)
@@ -178,11 +174,11 @@ cdef void _StructPacker(int* sizelist, PayloadBuffer buf, list arglist):
         elif ri.rlocmode == 4:
             orttb.append(dpos)
 
-        if sizelist[i] == 1:
+        if argsize == 1:
             data[dpos] = ri.offset & 0xFF
             dpos += 1
 
-        elif sizelist[i] == 2:
+        elif argsize == 2:
             (<uint32_t*>(data + dpos))[0] = ri.offset
             dpos += 2
 

@@ -23,12 +23,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import TYPE_CHECKING, TypeAlias
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..allocator import ConstExpr, IsConstExpr
 
-_acttypes = {
+if TYPE_CHECKING:
+    from ...utils import ExprProxy
+    from ..allocator.payload import RlocInt_C, _PayloadBuffer
+    from ..variable import EUDVariable
+    from .rawtriggerdef import RawTrigger
+
+
+_acttypes: dict[int, str] = {
     0: "(no action)",
     1: "Victory",
     2: "Defeat",
@@ -89,11 +98,13 @@ _acttypes = {
     57: "SetAllianceStatus",
 }
 
+DwField: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy"
+WBField: TypeAlias = "int | EUDVariable | ExprProxy"
+
 
 class Action(ConstExpr):
 
-    """
-    Action class.
+    """Action class.
 
     Memory layout.
 
@@ -114,79 +125,117 @@ class Action(ConstExpr):
      ======  ============= ========  ==========
     """
 
-    # fmt: off
-    def __init__(self, locid1, strid, wavid, time, player1, player2,
-                 unitid, acttype, amount, flags, *, eudx=0):
-        """
-        See :mod:`eudplib.base.stocktrg` for stock actions list.
-        """
+    def __init__(
+        self,
+        locid1: DwField,
+        strid: DwField,
+        wavid: DwField,
+        time: DwField,
+        player1: DwField,
+        player2: DwField,
+        unitid: WBField,
+        acttype: WBField,
+        amount: WBField,
+        flags: WBField,
+        padding: WBField = 0,
+        eudx: WBField = 0,
+    ) -> None:
+        """See :mod:`eudplib.base.stocktrg` for stock actions list."""
         super().__init__(self)
-
-        if isinstance(eudx, str):
-            eudx = ut.b2i2(ut.u2b(eudx))
-        self.fields = [locid1, strid, wavid, time, player1,
-                       player2, unitid, acttype, amount, flags, 0, eudx]
-        # fmt: on
-        self.parenttrg = None
-        self.actindex = None
+        self.fields: list[DwField] = [
+            locid1,
+            strid,
+            wavid,
+            time,
+            player1,
+            player2,
+            unitid,
+            acttype,
+            amount,
+            flags,
+            padding,
+            eudx,
+        ]
+        self.parenttrg: "RawTrigger | None" = None
+        self.actindex: int | None = None
 
     def Disabled(self) -> None:
+        if isinstance(self.fields[9], ConstExpr):
+            raise ut.EPError(_("Can't disable non-const Action flags"))
         self.fields[9] |= 2
 
     # -------
 
+    def _invalid_action(self, i: int) -> str:
+        acttype = self.fields[7]
+        actname = _acttypes[acttype] if isinstance(acttype, int) else acttype
+        return _("Invalid fields for action{} {}:".format(i, actname))
+
     def CheckArgs(self, i: int) -> None:
-        for n, field in enumerate(self.fields[:10]):
-            if field is None or IsConstExpr(field):
-                continue
+        if all(IsConstExpr(field) for field in self.fields[:6]) and all(
+            isinstance(field, int) for field in self.fields[6:]
+        ):
+            return
 
-            params = ["locid", "strid", "wavid", "time", "player", "amount", "unitid", "acttype", "modifier", "flags"]
-            acttype = self.fields[7]
-            if isinstance(acttype, int):
-                if acttype == 45:
-                    params[0] = "bitmask"
-                elif acttype == 48:
-                    params[4] = "giver"
-                    params[5] = "taker"
-                elif acttype == 38:
-                    params[0] = "moveloc"
-                    params[5] = "destloc"
-                elif acttype in (39, 46):
-                    params[0] = "startloc"
-                    params[5] = "destloc"
-                elif acttype == 11:
-                    params[5] = "unitprop"
-                elif acttype in (15, 16):
-                    params[5] = "aiscript"
-                elif acttype == 13:
-                    params[5] = "switchid"
+        error = [self._invalid_action(i)]
+        fieldname = [
+            "location",
+            "string",
+            "wav_string",
+            "time",
+            "player",
+            "amount",
+            "unit_type",
+            "action_type",
+            "modifier",
+            "flags",
+            "padding",
+            "maskflag",
+        ]
+        acttype = self.fields[7]
+        if isinstance(acttype, int):
+            if acttype == 45:  # SetDeaths
+                fieldname[0] = "bitmask"
+            elif acttype == 48:  # GiveUnits
+                fieldname[4] = "giver"
+                fieldname[5] = "taker"
+            elif acttype == 38:  # MoveLocation
+                fieldname[0] = "move_location"
+                fieldname[5] = "dest_location"
+            elif acttype in (39, 46):  # MoveUnit, Order
+                fieldname[0] = "start_location"
+                fieldname[5] = "dest_location"
+            elif acttype == 11:  # CreateUnitwithProperties
+                fieldname[5] = "unit_properties"
+            elif acttype in (15, 16):  # RunAIScript(At)
+                fieldname[5] = "aiscript"
+            elif acttype == 13:  #  SetSwitch
+                fieldname[5] = "switch_id"
 
-                if acttype in (21, 27, 37):
-                    params[6] = "scoretype"
-                elif acttype in (19, 26, 35):
-                    params[6] = "resourcetype"
-                elif acttype == 57:
-                    params[6] = "allystatus"
+            if acttype in (21, 27, 37):  # LeaderBoard (Score),  SetScore
+                fieldname[6] = "score_type"
+            elif acttype in (19, 26, 35):
+                fieldname[6] = "resource_type"
+            elif acttype == 57:
+                fieldname[6] = "ally_status"
 
-                if acttype in (23, 25, 39, 48, 49, 50, 51, 52, 53):
-                    params[8] = "count"
-                elif acttype in (32, 42, 43):
-                    params[8] = "propstate"
-                elif acttype == 13:
-                    params[8] = "switchaction"
-                elif acttype == 46:
-                    params[8] = "unitorder"
+            if acttype in (23, 25, 39, 48, 49, 50, 51, 52, 53):
+                fieldname[8] = "count"
+            elif acttype in (32, 42, 43):
+                fieldname[8] = "propstate"
+            elif acttype == 13:
+                fieldname[8] = "switch_action"
+            elif acttype == 46:
+                fieldname[8] = "unit_order"
 
-            try:
-                acttype = _acttypes.get(acttype, "(unknown)")
-            except TypeError:  # unhashable type
-                acttype = "(unknown)"
-            raise ut.EPError(_('Invalid {} "{}" in action{} "{}"').format(params[n], field, i, acttype))
+        for i, field in enumerate(self.fields):
+            if (i < 6 and not IsConstExpr(field)) or (i >= 6 and not isinstance(field, int)):
+                error.append("\t" + _("invalid {}: {}").format(fieldname[i], field))
 
-    def SetParentTrigger(self, trg, index) -> None:
-        ut.ep_assert(
-            self.parenttrg is None, _("Actions cannot be shared by two triggers.")
-        )
+        raise ut.EPError("\n".join(error))
+
+    def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:
+        ut.ep_assert(self.parenttrg is None, _("Actions cannot be shared by two triggers."))
 
         ut.ep_assert(trg is not None, _("Trigger should not be null."))
         ut.ep_assert(0 <= index < 64, _("Triggers out of range"))
@@ -194,18 +243,38 @@ class Action(ConstExpr):
         self.parenttrg = trg
         self.actindex = index
 
-    def Evaluate(self):
+    def Evaluate(self) -> "RlocInt_C":
+        if self.parenttrg is None or self.actindex is None:
+            raise ut.EPError(
+                _("Orphan action. This often happens when you try to do arithmetics with actions.")
+            )
         return self.parenttrg.Evaluate() + 8 + 320 + 32 * self.actindex
 
-    def CollectDependency(self, pbuffer) -> None:
-        wdw = pbuffer.WriteDword
-        fld = self.fields
-        wdw(fld[0])
-        wdw(fld[1])
-        wdw(fld[2])
-        wdw(fld[3])
-        wdw(fld[4])
-        wdw(fld[5])
+    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:
+        from ..variable import IsEUDVariable
 
-    def WritePayload(self, pbuffer) -> None:
-        pbuffer.WritePack("IIIIIIHBBBBH", self.fields)
+        eudvar_field = next(
+            ((i, field) for i, field in enumerate(self.fields) if IsEUDVariable(field)), None
+        )
+        if eudvar_field is not None:
+            raise ut.EPError(
+                self._invalid_action(eudvar_field[0])
+                + _("Found EUDVariable {} in field {}").format(eudvar_field[1], eudvar_field[0])
+            )
+
+        for field in self.fields[:6]:
+            pbuffer.WriteDword(field)  # type: ignore[arg-type]
+
+    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:
+        from ..variable import IsEUDVariable
+
+        eudvar_field = next(
+            ((i, field) for i, field in enumerate(self.fields) if IsEUDVariable(field)), None
+        )
+        if eudvar_field is not None:
+            raise ut.EPError(
+                self._invalid_action(eudvar_field[0])
+                + _("Found EUDVariable {} in field {}").format(eudvar_field[1], eudvar_field[0])
+            )
+
+        pbuffer.WritePack("IIIIIIHBBBBH", self.fields)  # type: ignore[arg-type]

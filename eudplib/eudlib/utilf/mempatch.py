@@ -48,7 +48,8 @@ def pushpatchstack(*values: c.EUDVariable | int) -> None:
         ps_top.QueueAddTo(ut.EPD(0x6509B0)),
     ]
     for v in values:
-        if c.IsEUDVariable(v):
+        v = ut.unProxy(v)
+        if isinstance(v, c.EUDVariable):
             if has_var:
                 c.VProc(varlist, actlist)
                 varlist, actlist = [v], [
