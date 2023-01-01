@@ -23,13 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import Any, TypeGuard
+from typing import Any
 
 from eudplib.localize import _
 
 
 class ExprProxy:
-
     """Class which can contain both ConstExpr and EUDVariable"""
 
     def __init__(self, initval):
@@ -172,16 +171,12 @@ class ExprProxy:
 
 
 def unProxy(x: Any) -> Any:
-    try:
-        return unProxy(x.getValue())
-    except AttributeError:
-        return x
+    while isinstance(x, ExprProxy):
+        x = x.getValue()
+    return x
 
 
-def isUnproxyInstance(x: Any, cls: type) -> TypeGuard[type]:
-    if isinstance(x, cls):
+def isUnproxyInstance(x: object, cls: type | tuple[type | tuple[Any, ...], ...]) -> bool:
+    if isinstance(unProxy(x), cls):
         return True
-    try:
-        return isUnproxyInstance(x.getValue(), cls)
-    except (AttributeError, TypeError):
-        return False
+    return False

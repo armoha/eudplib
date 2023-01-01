@@ -40,7 +40,7 @@ def EPD(p: Any) -> Any:
 
 
 def FlattenList(l: Any) -> list:
-    if isinstance(l, bytes) or isinstance(l, str) or hasattr(l, "dontFlatten"):
+    if isinstance(l, (bytes, str)) or hasattr(l, "dontFlatten"):
         return [l]
 
     try:
