@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, TypeVar, overload
+from typing import TYPE_CHECKING, TypeAlias, TypeVar, overload
 
 from ... import utils as ut
 from ...localize import _
@@ -35,6 +35,10 @@ if TYPE_CHECKING:
     from ..allocator import ConstExpr
     from ..mapdata import UnitProperty
     from ..variable import EUDVariable
+
+Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy"
+Word: TypeAlias = "int | EUDVariable | ExprProxy"
+Byte: TypeAlias = "int | EUDVariable | ExprProxy"
 
 
 class _Unique:
@@ -48,110 +52,56 @@ class _Unique:
         return repr(self)
 
 
-class Player(_Unique):
+class _Player(_Unique):
     pass
 
 
-class PlayerGroup(Player):
+class _PlayerGroup(_Player):
     pass
 
 
-P1 = Player("P1")
-P2 = Player("P2")
-P3 = Player("P3")
-P4 = Player("P4")
-P5 = Player("P5")
-P6 = Player("P6")
-P7 = Player("P7")
-P8 = Player("P8")
-P9 = Player("P9")
-P10 = Player("P10")
-P11 = Player("P11")
-P12 = Player("P12")
-Player1 = Player("Player1")
-Player2 = Player("Player2")
-Player3 = Player("Player3")
-Player4 = Player("Player4")
-Player5 = Player("Player5")
-Player6 = Player("Player6")
-Player7 = Player("Player7")
-Player8 = Player("Player8")
-Player9 = Player("Player9")
-Player10 = Player("Player10")
-Player11 = Player("Player11")
-Player12 = Player("Player12")
-CurrentPlayer = Player("CurrentPlayer")
-Foes = PlayerGroup("Foes")
-Allies = PlayerGroup("Allies")
-NeutralPlayers = PlayerGroup("NeutralPlayers")
-AllPlayers = PlayerGroup("AllPlayers")
-Force1 = PlayerGroup("Force1")
-Force2 = PlayerGroup("Force2")
-Force3 = PlayerGroup("Force3")
-Force4 = PlayerGroup("Force4")
-NonAlliedVictoryPlayers = PlayerGroup("NonAlliedVictoryPlayers")
+Player: TypeAlias = "_Player | Dword"
+P1 = _Player("P1")
+P2 = _Player("P2")
+P3 = _Player("P3")
+P4 = _Player("P4")
+P5 = _Player("P5")
+P6 = _Player("P6")
+P7 = _Player("P7")
+P8 = _Player("P8")
+P9 = _Player("P9")
+P10 = _Player("P10")
+P11 = _Player("P11")
+P12 = _Player("P12")
+Player1 = _Player("Player1")
+Player2 = _Player("Player2")
+Player3 = _Player("Player3")
+Player4 = _Player("Player4")
+Player5 = _Player("Player5")
+Player6 = _Player("Player6")
+Player7 = _Player("Player7")
+Player8 = _Player("Player8")
+Player9 = _Player("Player9")
+Player10 = _Player("Player10")
+Player11 = _Player("Player11")
+Player12 = _Player("Player12")
+CurrentPlayer = _Player("CurrentPlayer")
+Foes = _PlayerGroup("Foes")
+Allies = _PlayerGroup("Allies")
+NeutralPlayers = _PlayerGroup("NeutralPlayers")
+AllPlayers = _PlayerGroup("AllPlayers")
+Force1 = _PlayerGroup("Force1")
+Force2 = _PlayerGroup("Force2")
+Force3 = _PlayerGroup("Force3")
+Force4 = _PlayerGroup("Force4")
+NonAlliedVictoryPlayers = _PlayerGroup("NonAlliedVictoryPlayers")
 
 
-class AllyStatus(_Unique):
+class _Score(_Unique):
     pass
 
 
-All = AllyStatus("All")
-Enemy = AllyStatus("Enemy")
-Ally = AllyStatus("Ally")
-AlliedVictory = AllyStatus("AlliedVictory")
-
-
-class Comparison(_Unique):
-    pass
-
-
-AtLeast = Comparison("AtLeast")
-AtMost = Comparison("AtMost")
-Exactly = Comparison("Exactly")
-
-
-class Modifier(_Unique):
-    pass
-
-
-SetTo = Modifier("SetTo")
-Add = Modifier("Add")
-Subtract = Modifier("Subtract")
-
-
-class Order(_Unique):
-    pass
-
-
-Move = Order("Move")
-Patrol = Order("Patrol")
-Attack = Order("Attack")
-
-
-class PropState(_Unique):
-    pass
-
-
-Enable = PropState("Enable")
-Disable = PropState("Disable")
-Toggle = PropState("Toggle")
-
-
-class Resource(_Unique):
-    pass
-
-
-Ore = Resource("Ore")
-Gas = Resource("Gas")
-OreAndGas = Resource("OreAndGas")
-
-
-class Score(_Unique):
-    pass
-
-
-class _KillsSpecialized(Score):
+class _KillsSpecialized(_Score):
     def __init__(self, name: str) -> None:
         super().__init__(name)
         self._internalf: Callable
@@ -160,26 +110,105 @@ class _KillsSpecialized(Score):
         return self._internalf(a, b, c, d)
 
 
-Total = Score("Total")
-Units = Score("Units")
-Buildings = Score("Buildings")
-UnitsAndBuildings = Score("UnitsAndBuildings")
+Score: TypeAlias = "_Score | Word"
+Total = _Score("Total")
+Units = _Score("Units")
+Buildings = _Score("Buildings")
+UnitsAndBuildings = _Score("UnitsAndBuildings")
 # Name 'Kills' is used for both condition type and score type.
 # To resolve conflict, we initialize Kills differently from others.
 Kills = _KillsSpecialized("Kills")
-Razings = Score("Razings")
-KillsAndRazings = Score("KillsAndRazings")
-Custom = Score("Custom")
+Razings = _Score("Razings")
+KillsAndRazings = _Score("KillsAndRazings")
+Custom = _Score("Custom")
 
 
-class SwitchState(_Unique):
+class _Resource(_Unique):
     pass
 
 
-Set = SwitchState("Set")
-Clear = SwitchState("Clear")
-Random = SwitchState("Random")
-Cleared = SwitchState("Cleared")
+Resource: TypeAlias = "_Resource | Word"
+Ore = _Resource("Ore")
+Gas = _Resource("Gas")
+OreAndGas = _Resource("OreAndGas")
+
+
+class _AllyStatus(_Unique):
+    pass
+
+
+AllyStatus: TypeAlias = "_AllyStatus | Word"
+Enemy = _AllyStatus("Enemy")
+Ally = _AllyStatus("Ally")
+AlliedVictory = _AllyStatus("AlliedVictory")
+
+
+class _Comparison(_Unique):
+    pass
+
+
+Comparison: TypeAlias = "_Comparison | Byte"
+AtLeast = _Comparison("AtLeast")
+AtMost = _Comparison("AtMost")
+Exactly = _Comparison("Exactly")
+
+
+class _Modifier(_Unique):
+    pass
+
+
+Modifier: TypeAlias = "_Modifier | Byte"
+SetTo = _Modifier("SetTo")
+Add = _Modifier("Add")
+Subtract = _Modifier("Subtract")
+
+
+class _SwitchState(_Unique):
+    pass
+
+
+class _SwitchAction(_Unique):
+    pass
+
+
+class _SwitchStateOrAction(_SwitchState, _SwitchAction):
+    pass
+
+
+SwitchState: TypeAlias = "_SwitchState | Byte"
+SwitchAction: TypeAlias = "_SwitchAction | Byte"
+Set = _SwitchStateOrAction("Set")
+Clear = _SwitchAction("Clear")
+Random = _SwitchAction("Random")
+Cleared = _SwitchState("Cleared")
+
+
+class _PropState(_Unique):
+    pass
+
+
+PropState: TypeAlias = "_PropState | Byte"
+Enable = _PropState("Enable")
+Disable = _PropState("Disable")
+Toggle = _PropState("Toggle")
+
+
+class _Count(_Unique):
+    pass
+
+
+Count: TypeAlias = "_Count | Byte"
+All = _Count("All")
+
+
+class _Order(_Unique):
+    pass
+
+
+Order: TypeAlias = "_Order | Byte"
+Move = _Order("Move")
+Patrol = _Order("Patrol")
+Attack = _Order("Attack")
 
 AllyStatusDict = {Enemy: 0, Ally: 1, AlliedVictory: 2}
 
@@ -269,7 +298,7 @@ def _EncodeConst(t, d, s):
 
 
 @overload
-def EncodeAllyStatus(s: _Unique) -> int:
+def EncodeAllyStatus(s: _AllyStatus) -> int:
     ...
 
 
@@ -280,11 +309,11 @@ def EncodeAllyStatus(s: T) -> T:
 
 def EncodeAllyStatus(s):
     """Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2]."""
-    return _EncodeConst("AllyStatus", AllyStatusDict, s)
+    return _EncodeConst("_AllyStatus", AllyStatusDict, s)
 
 
 @overload
-def EncodeComparison(s: _Unique) -> int:
+def EncodeComparison(s: _Comparison) -> int:
     ...
 
 
@@ -295,11 +324,11 @@ def EncodeComparison(s: T) -> T:
 
 def EncodeComparison(s):
     """Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10]."""
-    return _EncodeConst("Comparison", ComparisonDict, s)
+    return _EncodeConst("_Comparison", ComparisonDict, s)
 
 
 @overload
-def EncodeModifier(s: _Unique) -> int:
+def EncodeModifier(s: _Modifier) -> int:
     ...
 
 
@@ -310,11 +339,11 @@ def EncodeModifier(s: T) -> T:
 
 def EncodeModifier(s):
     """Convert [SetTo, Add, Subtract] to number [7, 8, 9]."""
-    return _EncodeConst("Modifier", ModifierDict, s)
+    return _EncodeConst("_Modifier", ModifierDict, s)
 
 
 @overload
-def EncodeOrder(s: _Unique) -> int:
+def EncodeOrder(s: _Order) -> int:
     ...
 
 
@@ -325,11 +354,11 @@ def EncodeOrder(s: T) -> T:
 
 def EncodeOrder(s):
     """Convert [Move, Patrol, Attack] to number [0, 1, 2]."""
-    return _EncodeConst("Order", OrderDict, s)
+    return _EncodeConst("_Order", OrderDict, s)
 
 
 @overload
-def EncodePlayer(s: _Unique) -> int:
+def EncodePlayer(s: _Player) -> int:
     ...
 
 
@@ -381,11 +410,11 @@ def EncodePlayer(s):
     ======================= ========
 
     """
-    return _EncodeConst("Player", PlayerDict, s)
+    return _EncodeConst("_Player", PlayerDict, s)
 
 
 @overload
-def EncodePropState(s: _Unique) -> int:
+def EncodePropState(s: _PropState) -> int:
     ...
 
 
@@ -396,11 +425,11 @@ def EncodePropState(s: T) -> T:
 
 def EncodePropState(s):
     """Convert [Enable, Disable, Toogle] to number [4, 5, 6]"""
-    return _EncodeConst("PropState", PropStateDict, s)
+    return _EncodeConst("_PropState", PropStateDict, s)
 
 
 @overload
-def EncodeResource(s: _Unique) -> int:
+def EncodeResource(s: _Resource) -> int:
     ...
 
 
@@ -411,11 +440,11 @@ def EncodeResource(s: T) -> T:
 
 def EncodeResource(s):
     """Convert [Ore, Gas, OreAndGas] to [0, 1, 2]"""
-    return _EncodeConst("Resource", ResourceDict, s)
+    return _EncodeConst("_Resource", ResourceDict, s)
 
 
 @overload
-def EncodeScore(s: _Unique) -> int:
+def EncodeScore(s: _Score) -> int:
     ...
 
 
@@ -428,7 +457,7 @@ def EncodeScore(s):
     """Convert score type identifier to number.
 
     ================= ========
-        Score type     Number
+        _Score type     Number
     ================= ========
     Total                0
     Units                1
@@ -441,11 +470,11 @@ def EncodeScore(s):
     ================= ========
 
     """
-    return _EncodeConst("Score", ScoreDict, s)
+    return _EncodeConst("_Score", ScoreDict, s)
 
 
 @overload
-def EncodeSwitchAction(s: _Unique) -> int:
+def EncodeSwitchAction(s: _SwitchAction) -> int:
     ...
 
 
@@ -460,7 +489,7 @@ def EncodeSwitchAction(s):
 
 
 @overload
-def EncodeSwitchState(s: _Unique) -> int:
+def EncodeSwitchState(s: _SwitchState) -> int:
     ...
 
 
@@ -471,11 +500,11 @@ def EncodeSwitchState(s: T) -> T:
 
 def EncodeSwitchState(s):
     """Convert [Set, Cleared] to [2, 3]."""
-    return _EncodeConst("SwitchState", SwitchStateDict, s)
+    return _EncodeConst("_SwitchState", SwitchStateDict, s)
 
 
 @overload
-def EncodeCount(s: _Unique) -> int:
+def EncodeCount(s: _Count) -> int:
     ...
 
 

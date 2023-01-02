@@ -29,11 +29,10 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..allocator import ConstExpr, IsConstExpr
+from .constenc import Byte, Dword, Word
 
 if TYPE_CHECKING:
-    from ...utils import ExprProxy
     from ..allocator.payload import RlocInt_C, _PayloadBuffer
-    from ..variable import EUDVariable
     from .rawtriggerdef import RawTrigger
 
 
@@ -98,9 +97,6 @@ _acttypes: dict[int, str] = {
     57: "SetAllianceStatus",
 }
 
-DwField: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy"
-WBField: TypeAlias = "int | EUDVariable | ExprProxy"
-
 
 class Action(ConstExpr):
 
@@ -127,22 +123,22 @@ class Action(ConstExpr):
 
     def __init__(
         self,
-        locid1: DwField,
-        strid: DwField,
-        wavid: DwField,
-        time: DwField,
-        player1: DwField,
-        player2: DwField,
-        unitid: WBField,
-        acttype: WBField,
-        amount: WBField,
-        flags: WBField,
-        padding: WBField = 0,
-        eudx: WBField = 0,
+        locid1: Dword,
+        strid: Dword,
+        wavid: Dword,
+        time: Dword,
+        player1: Dword,
+        player2: Dword,
+        unitid: Word,
+        acttype: Byte,
+        amount: Byte,
+        flags: Byte,
+        padding: Byte = 0,
+        eudx: Word = 0,
     ) -> None:
         """See :mod:`eudplib.base.stocktrg` for stock actions list."""
         super().__init__(self)
-        self.fields: list[DwField] = [
+        self.fields: list[Dword] = [
             locid1,
             strid,
             wavid,

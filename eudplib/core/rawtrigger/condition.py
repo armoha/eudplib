@@ -29,7 +29,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..allocator import ConstExpr, IsConstExpr
-from .action import DwField, WBField
+from .constenc import Byte, Dword, Word
 
 if TYPE_CHECKING:
     from ...utils import ExprProxy
@@ -86,19 +86,19 @@ class Condition(ConstExpr):
 
     def __init__(
         self,
-        locid: DwField,
-        player: DwField,
-        amount: DwField,
-        unitid: WBField,
-        comparison: WBField,
-        condtype: WBField,
-        restype: WBField,
-        flags: WBField,
-        eudx: WBField = 0,
+        locid: Dword,
+        player: Dword,
+        amount: Dword,
+        unitid: Word,
+        comparison: Byte,
+        condtype: Byte,
+        restype: Byte,
+        flags: Byte,
+        eudx: Word = 0,
     ) -> None:
         """See :mod:`eudplib.base.stockcond` for stock conditions list."""
         super().__init__(self)
-        self.fields: list[DwField] = [
+        self.fields: list[Dword] = [
             locid,
             player,
             amount,
