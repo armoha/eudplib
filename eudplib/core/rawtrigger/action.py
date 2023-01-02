@@ -133,7 +133,7 @@ class Action(ConstExpr):
         acttype: Byte,
         amount: Byte,
         flags: Byte,
-        padding: Byte = 0,
+        *,
         eudx: Word = 0,
     ) -> None:
         """See :mod:`eudplib.base.stocktrg` for stock actions list."""
@@ -149,7 +149,7 @@ class Action(ConstExpr):
             acttype,
             amount,
             flags,
-            padding,
+            0,
             eudx,
         ]
         self.parenttrg: "RawTrigger | None" = None

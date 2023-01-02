@@ -23,12 +23,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import overload
+from typing import TYPE_CHECKING, overload
 
 from .. import core as c
 from ..ctrlstru import EUDJumpIf
 from ..localize import _
-from ..utils import EPError
+from ..utils import EPError, ExprProxy, unProxy
+
+if TYPE_CHECKING:
+    from ..core.rawtrigger.constenc import Player, _Player
+    from ..eudlib import EUDArray
 
 _runner_start: list[c.Forward] = [c.Forward() for _ in range(8)]
 _runner_end: list[c.Forward] = [c.Forward() for _ in range(8)]
@@ -43,7 +47,7 @@ c.PopTriggerScope()
 
 
 @c.EUDFunc
-def RunTrigTrigger():
+def RunTrigTrigger() -> None:
     from .. import eudlib as sf
 
     oldcp = sf.f_getcurpl()
@@ -74,46 +78,58 @@ def RunTrigTrigger():
 #######
 
 
-def AllocTrigTriggerLink():
+def AllocTrigTriggerLink() -> tuple["EUDArray", "EUDArray", "EUDArray"]:
     if not hasattr(AllocTrigTriggerLink, "arrays"):
         from .. import eudlib as sf
 
-        AllocTrigTriggerLink.arrays = sf.EUDArray(8), sf.EUDArray(8), sf.EUDArray(_runner_end)
-    orig_tstart, orig_tend, runner_end_array = AllocTrigTriggerLink.arrays
+        setattr(
+            AllocTrigTriggerLink,
+            "_arrays",
+            (sf.EUDArray(8), sf.EUDArray(8), sf.EUDArray(_runner_end)),
+        )
+    orig_tstart, orig_tend, runner_end_array = getattr(AllocTrigTriggerLink, "_arrays")
     return orig_tstart, orig_tend, runner_end_array
 
 
-def GetFirstTrigTrigger(player) -> c.EUDVariable:
+def GetFirstTrigTrigger(player: "Player") -> c.EUDVariable:
     """Get dlist start of trig-trigger for player"""
+    player = c.EncodePlayer(player)
     orig_tstart, _orig_tend, _runner_end_array = AllocTrigTriggerLink()
     return orig_tstart[player]
 
 
-def GetLastTrigTrigger(player) -> c.EUDVariable:
+def GetLastTrigTrigger(player: "Player") -> c.EUDVariable:
     """Get dlist end of trig-trigger for player"""
+    player = c.EncodePlayer(player)
     _orig_tstart, orig_tend, _runner_end_array = AllocTrigTriggerLink()
     return orig_tend[player]
 
 
-def TrigTriggerBegin(player) -> c.EUDVariable:
+def TrigTriggerBegin(player: "Player") -> c.EUDVariable:
     return GetFirstTrigTrigger(player)
 
 
 @overload
-def TrigTriggerEnd(player: int) -> c.Forward:
+def TrigTriggerEnd(player: "int | _Player") -> c.Forward:
     ...
 
 
 @overload
-def TrigTriggerEnd(player: c.EUDVariable) -> c.EUDVariable:
+def TrigTriggerEnd(player: c.EUDVariable | c.ConstExpr) -> c.EUDVariable:
+    ...
+
+
+@overload
+def TrigTriggerEnd(player: ExprProxy) -> c.Forward | c.EUDVariable:
     ...
 
 
 def TrigTriggerEnd(player):
     _orig_tstart, _orig_tend, runner_end_array = AllocTrigTriggerLink()
-    AllocTrigTriggerLink()
+    player = c.EncodePlayer(player)
     if isinstance(player, int):
         return _runner_end[player]
-    if runner_end_array is None:
-        raise ut.EPError(_("AllocTrigTriggerLink must be called first"))
+    unproxy_player = unProxy(player)
+    if isinstance(unproxy_player, int):
+        return _runner_end[unproxy_player]
     return runner_end_array[player]

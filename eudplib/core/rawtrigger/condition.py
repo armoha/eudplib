@@ -94,6 +94,7 @@ class Condition(ConstExpr):
         condtype: Byte,
         restype: Byte,
         flags: Byte,
+        *,
         eudx: Word = 0,
     ) -> None:
         """See :mod:`eudplib.base.stockcond` for stock conditions list."""
