@@ -301,8 +301,8 @@ def f_test_queue_wraparound():
 
 # (Line 158) }');
 methods = _CGFW(lambda: [eval('{    "append": "a",   "appendleft": "aL",    "pop":    "p",   "popleft":    "pL"}')], 1)[0]
-# (Line 159) const DequeCases = py_eval('random.sample(sorted(methods.getValue()), 27, counts=[9, 9, 9, 9])');
-DequeCases = _CGFW(lambda: [eval('random.sample(sorted(methods.getValue()), 27, counts=[9, 9, 9, 9])')], 1)[0]
+# (Line 159) const DequeCases = py_eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])');
+DequeCases = _CGFW(lambda: [eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])')], 1)[0]
 # (Line 160) const DequeTest = py_eval("''.join(methods[name] for name in DequeCases)");
 DequeTest = _CGFW(lambda: [eval("''.join(methods[name] for name in DequeCases)")], 1)[0]
 # (Line 161) const dq = EUDDeque(7)();

@@ -44,7 +44,7 @@ def test_epscript():
     dq = deque(maxlen=7)
     cases = []
     pushes = 1
-    for method in DequeCases.getValue():
+    for method in DequeCases:
         if method in ("append", "appendleft"):
             f = getattr(dq, method)
             f(pushes)

@@ -156,7 +156,7 @@ const methods = py_eval('{\
     "append": "a",   "appendleft": "aL",\
     "pop":    "p",   "popleft":    "pL"\
 }');
-const DequeCases = py_eval('random.sample(sorted(methods.getValue()), 27, counts=[9, 9, 9, 9])');
+const DequeCases = py_eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])');
 const DequeTest = py_eval("''.join(methods[name] for name in DequeCases)");
 const dq = EUDDeque(7)();
 function test_deque() {

@@ -15,6 +15,7 @@ from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
 from ..eudlib import EUDArray
 from ..maprw import EUDOnStart
 from ..utils import ExprProxy, FlattenList, List2Assignable, ep_warn, isUnproxyInstance
+from ..utils.eperror import TriggerScopeError
 from .epsimp import EPSLoader
 
 
@@ -50,15 +51,18 @@ def _IGVA(vList, exprListGen):
 
 
 def _CGFW(exprf, retn):
-    rets = [ExprProxy(None) for _ in range(retn)]
+    try:
+        return exprf()
+    except (TriggerScopeError, NameError):
+        rets = [ExprProxy(None) for _ in range(retn)]
 
-    def _():
-        vals = exprf()
-        for ret, val in zip(rets, vals):
-            ret._value = val
+        def _():
+            vals = exprf()
+            for ret, val in zip(rets, vals):
+                ret._value = val
 
-    EUDOnStart(_)
-    return rets
+        EUDOnStart(_)
+        return rets
 
 
 def _ARR(items):  # EUDArray initialization
