@@ -28,7 +28,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from .chktok import CHK
-from .unitprp import UnitProperty
+from .unitprp import PropertyKey, UnitProperty
 
 _uprpdict: dict[bytes, int] = {}
 _uprptable: list[bytes] = []
@@ -49,7 +49,7 @@ def InitPropertyMap(chkt: "CHK") -> None:
 
     for i in range(64):
         if upus[i]:
-            uprpdata = uprp[20 * i : 20 * i + 20]
+            uprpdata = PropertyKey(uprp, 20 * i)
             # FIXME: merge duplicates and fix existing CUWPs
             _uprpdict[uprpdata] = i
             _uprptable[i] = uprpdata
@@ -61,7 +61,7 @@ def GetPropertyIndex(prop: UnitProperty | bytes) -> int:
         _("Invalid property type"),
     )
 
-    prop = bytes(prop)
+    prop = PropertyKey(bytes(prop))
     try:
         return _uprpdict[prop] + 1  # SC counts unit properties from 1.
 

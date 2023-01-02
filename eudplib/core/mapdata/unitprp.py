@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 from ctypes import *
+from struct import pack, unpack_from
 
 from eudplib import utils as ut
 
@@ -49,17 +50,17 @@ class UnitProperty(LittleEndianStructure):
 
     def __init__(
         self,
-        hitpoint=None,
-        shield=None,
-        energy=None,
-        resource=None,
-        hanger=None,
-        cloaked=None,
-        burrowed=None,
-        intransit=None,
-        hallucinated=None,
-        invincible=None,
-    ):
+        hitpoint: int | None = None,
+        shield: int | None = None,
+        energy: int | None = None,
+        resource: int | None = None,
+        hanger: int | None = None,
+        cloaked: bool | None = None,
+        burrowed: bool | None = None,
+        intransit: bool | None = None,
+        hallucinated: bool | None = None,
+        invincible: bool | None = None,
+    ) -> None:
         """
         Properties : Value/None (Don't care)
 
@@ -142,3 +143,58 @@ class UnitProperty(LittleEndianStructure):
             | prop2flag(hallucinated, 1 << 3)
             | prop2flag(invincible, 1 << 4)
         )
+
+
+def PropertyKey(b: bytes, index: int = 0) -> bytes:
+    x = list(unpack_from("<HHBBBBIHHI", b, index))
+
+    x[0] &= 0b11111  # remove unused flags
+    x[1] &= 0b111111  # remove unused flags
+    x[8] &= 0b11111  # remove unused flags
+
+    x[2] = 0  # player number, always NULL
+    x[9] = 0  # padding?
+
+    if x[3] == 100:  # 100% HP is equals to not using HP%
+        x[1] &= ~0b10
+    if x[4] == 100:  # 100% Shields is equals to not using Shields%
+        x[1] &= ~0b100
+    # Can't apply to Energy: Default energy differs between max energy (200 and 250)
+    # Can't apply to Resource amount: Default amount differs between Mineral Fields and Vespene Geyser
+    if x[7] == 0:  # 0 in hanger is equals to not using hanger amount
+        x[1] &= ~0b100000
+
+    if x[1] & 0b10 == 0:  # HP is not valid
+        x[3] = 0
+    if x[1] & 0b100 == 0:  # Shields is not valid
+        x[4] = 0
+    if x[1] & 0b1000 == 0:  # Energy is not valid
+        x[5] = 0
+    if x[1] & 0b10000 == 0:  # Resource amount is not valid
+        x[6] = 0
+    if x[1] & 0b100000 == 0:  # Amount in hanger is not valid
+        x[7] = 0
+
+    if x[8] & 0b1 == 0:  # No Cloak is equals to not using Cloak
+        x[0] &= ~0b1
+    if x[8] & 0b10 == 0:  # No Burrowed is equals to not using Burrowed
+        x[0] &= ~0b10
+    if x[8] & 0b100 == 0:  # No Lifted is equals to not using Lifted
+        x[0] &= ~0b100
+    if x[8] & 0b1000 == 0:  # No Hallucinated is equals to not using Hallucinated
+        x[0] &= ~0b1000
+    if x[8] & 0b10000 == 0:  # No Invincible is equals to not using Invincible
+        x[0] &= ~0b10000
+
+    if x[0] & 0b1 == 0:  # Cloak is not valid
+        x[8] &= ~0b1
+    if x[0] & 0b10 == 0:  # Burrowed is not valid
+        x[8] &= ~0b10
+    if x[0] & 0b100 == 0:  # In transit is not valid
+        x[8] &= ~0b100
+    if x[0] & 0b1000 == 0:  # Hallucinated is not valid
+        x[8] &= ~0b1000
+    if x[0] & 0b10000 == 0:  # Invincible is not valid
+        x[8] &= ~0b10000
+
+    return pack("<HHBBBBIHHI", *x)
