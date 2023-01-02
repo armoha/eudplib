@@ -47,8 +47,8 @@ def StackObjects(
         # Convert to faster c array
         py_dwoccupmap = dwoccupmap_dict[obj]
         oclen = len(py_dwoccupmap)
-        for j in range(oclen):
-            dwoccupmap[j] = py_dwoccupmap[j]
+        for i in range(oclen):
+            dwoccupmap[i] = py_dwoccupmap[i]
 
         # preprocess dwoccupmap
         for i in range(oclen):
@@ -60,20 +60,20 @@ def StackObjects(
                 dwoccupmap[i] = dwoccupmap[i - 1]
 
         # Find appropriate position to allocate object
-        j = 0
-        while j < oclen:
+        i = 0
+        while i < oclen:
             # Update on conflict map
-            if dwoccupmap[j] != -1 and dwoccupmap_sum[lallocaddr + j] != -1:
-                lallocaddr = dwoccupmap_sum[lallocaddr + j] - dwoccupmap[j]
-                j = 0
+            if dwoccupmap[i] != -1 and dwoccupmap_sum[lallocaddr + i] != -1:
+                lallocaddr = dwoccupmap_sum[lallocaddr + i] - dwoccupmap[i]
+                i = 0
 
             else:
-                j += 1
+                i += 1
 
         # Apply occupation map
-        for j in range(oclen - 1, -1, -1):
-            curoff = lallocaddr + j
-            if dwoccupmap[j] != -1 or dwoccupmap_sum[curoff] != -1:
+        for i in range(oclen - 1, -1, -1):
+            curoff = lallocaddr + i
+            if dwoccupmap[i] != -1 or dwoccupmap_sum[curoff] != -1:
                 if dwoccupmap_sum[curoff + 1] == -1:
                     dwoccupmap_sum[curoff] = curoff + 1
                 else:

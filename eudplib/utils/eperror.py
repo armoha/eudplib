@@ -49,5 +49,5 @@ def ep_eprint(*args, **kwargs) -> None:
     print(*args, file=sys.stderr, **kwargs)
 
 
-def ep_warn(message) -> None:
+def ep_warn(message: str) -> None:
     warnings.warn(message, EPWarning)

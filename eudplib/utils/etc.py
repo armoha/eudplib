@@ -29,7 +29,9 @@ import os.path
 import random
 import sys
 from collections.abc import Callable, Collection, Iterable, Iterator
-from typing import Any, overload
+from typing import Any, TypeVar, overload
+
+T = TypeVar("T")
 
 
 def EPD(p: Any) -> Any:
@@ -66,12 +68,27 @@ def eqsplit(iterable: Collection, eqr: int) -> Iterator:
             item = list(itertools.islice(it, eqr))
 
 
-def List2Assignable(l: list) -> Any | list:
+def List2Assignable(l: list[T]) -> T | list[T]:
     if len(l) == 1:
         return l[0]
 
     else:
         return l
+
+
+@overload
+def Assignable2List(a: None) -> list:
+    ...
+
+
+@overload
+def Assignable2List(a: Iterable[T]) -> list[T]:
+    ...
+
+
+@overload
+def Assignable2List(a: T) -> list[T]:
+    ...
 
 
 def Assignable2List(a: Any) -> list:

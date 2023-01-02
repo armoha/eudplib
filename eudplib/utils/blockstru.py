@@ -23,14 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from typing import Any
+
 from ..localize import _
 from .eperror import ep_assert
 
+block = tuple[str, Any]
+
 
 class BlockStruManager:
-    def __init__(self):
-        self._blockstru = []
-        self._lastblockdict = {}
+    def __init__(self) -> None:
+        self._blockstru: list[block] = []
+        self._lastblockdict: dict[str, list[block]] = {}
 
     def empty(self) -> bool:
         return not self._blockstru
@@ -39,14 +43,14 @@ class BlockStruManager:
 _current_bsm = BlockStruManager()  # Default one
 
 
-def SetCurrentBlockStruManager(bsm):
+def SetCurrentBlockStruManager(bsm: BlockStruManager) -> BlockStruManager:
     global _current_bsm
     old_bsm = _current_bsm
     _current_bsm = bsm
     return old_bsm
 
 
-def EUDCreateBlock(name, userdata) -> None:
+def EUDCreateBlock(name: str, userdata: Any) -> None:
     _blockstru = _current_bsm._blockstru
     _lastblockdict = _current_bsm._lastblockdict
 
@@ -58,18 +62,18 @@ def EUDCreateBlock(name, userdata) -> None:
     _lastblockdict[name].append(block)
 
 
-def EUDGetLastBlock():
+def EUDGetLastBlock() -> block:
     _blockstru = _current_bsm._blockstru
     return _blockstru[-1]
 
 
-def EUDGetLastBlockOfName(name):
+def EUDGetLastBlockOfName(name: str) -> block:
     _lastblockdict = _current_bsm._lastblockdict
 
-    return _lastblockdict[name][-1]
+    return _lastblockdict[name][-1]  # IndexError or KeyError
 
 
-def EUDPeekBlock(name):
+def EUDPeekBlock(name: str) -> block:
     lastblock = EUDGetLastBlock()
     ep_assert(
         lastblock[0] == name,
@@ -80,7 +84,7 @@ def EUDPeekBlock(name):
     return lastblock
 
 
-def EUDPopBlock(name):
+def EUDPopBlock(name: str) -> block:
     _blockstru = _current_bsm._blockstru
     _lastblockdict = _current_bsm._lastblockdict
 
@@ -95,5 +99,5 @@ def EUDPopBlock(name):
     return lastblock
 
 
-def EUDGetBlockList():
+def EUDGetBlockList() -> list[block]:
     return _current_bsm._blockstru

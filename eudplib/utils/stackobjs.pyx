@@ -1,14 +1,40 @@
-#!python
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #cython: language_level=3, boundscheck=False, wraparound=False
 
-from typing import Any
+"""
+Copyright (c) 2014 trgk
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+"""
+from typing import TYPE_CHECKING, Any
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from libc.string cimport memset
 
+if TYPE_CHECKING:
+    from eudplib.core.eudobj import EUDObject
+
+
 def StackObjects(
-    found_objects: list[Any],
-    dwoccupmap_dict: dict[Any, Any],
-    alloctable: dict[Any, int],
+    found_objects: list["EUDObject"],
+    dwoccupmap_dict: dict["EUDObject", list[int]],
+    alloctable: dict["EUDObject", int],
 ) -> None:
     cdef int dwoccupmap_max_size = 0
     for obj in found_objects:

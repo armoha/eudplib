@@ -31,7 +31,7 @@ from eudplib.localize import _
 class ExprProxy:
     """Class which can contain both ConstExpr and EUDVariable"""
 
-    def __init__(self, initval):
+    def __init__(self, initval) -> None:
         self._value = initval
 
     @classmethod
@@ -47,7 +47,7 @@ class ExprProxy:
     def __len__(self):
         return len(self._value)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return id(self)
 
     # Proxy arithmetic operators
@@ -160,7 +160,7 @@ class ExprProxy:
     def __getitem__(self, name):
         return self._value[name]
 
-    def __setitem__(self, name, newvalue):
+    def __setitem__(self, name, newvalue) -> None:
         self._value[name] = newvalue
 
     def __iter__(self):
