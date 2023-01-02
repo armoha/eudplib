@@ -30,12 +30,13 @@ from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
 from ...eudlib.utilf.userpl import _f_initisusercp, _f_inituserplayerid
-from ...utils import ep_assert
+from ...localize import _
+from ...utils import EPError, ep_assert
 
-jumper = None
-startFunctionList1 = []
-startFunctionList2 = []
-hasAlreadyStarted = 0
+jumper: c.Forward | None = None
+startFunctionList1: list[Callable] = []
+startFunctionList2: list[Callable] = []
+hasAlreadyStarted: int = 0
 
 
 def _hasAlreadyStarted() -> bool:
@@ -99,6 +100,8 @@ def _MainStarter(mf: Callable) -> c.Forward:
 
 
 def EUDDoEvents() -> None:
+    if jumper is None:
+        raise EPError(_("_MainStarter has not called"))
     oldcp = sf.f_getcurpl()
 
     _t = c.Forward()

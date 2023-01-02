@@ -23,10 +23,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
+from ...localize import _
 from ...utils import EUDCreateBlock, EUDGetLastBlockOfName, EUDPopBlock
+from ...utils.eperror import TriggerScopeError
 from ..allocator import Forward
+
+if TYPE_CHECKING:
+    from .rawtriggerdef import _Trigger
 
 
 def PushTriggerScope() -> Literal[True]:
@@ -34,9 +39,14 @@ def PushTriggerScope() -> Literal[True]:
     return True  # Allow `if PushTriggerScope()` syntax for indent
 
 
-def SetNextTrigger(trg) -> None:
+def SetNextTrigger(trg: "_Trigger") -> None:
     """For optimization purpose, one may call this function directly"""
-    nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
+    try:
+        nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
+    except IndexError:
+        raise TriggerScopeError(
+            _("Must put Trigger into onPluginStart, beforeTriggerExec or afterTriggerExec")
+        )
     for fw in nt_list:
         fw << trg
     nt_list.clear()
@@ -44,12 +54,17 @@ def SetNextTrigger(trg) -> None:
 
 def NextTrigger() -> Forward:
     fw = Forward()
-    nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
+    try:
+        nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
+    except IndexError:
+        raise TriggerScopeError(
+            _("Must put Trigger into onPluginStart, beforeTriggerExec or afterTriggerExec")
+        )
     nt_list.append(fw)
     return fw
 
 
-def _RegisterTrigger(trg) -> None:
+def _RegisterTrigger(trg: "_Trigger") -> None:
     SetNextTrigger(trg)
 
 

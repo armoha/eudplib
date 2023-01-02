@@ -32,6 +32,10 @@ class EPError(Exception):
     pass
 
 
+class TriggerScopeError(Exception):
+    pass
+
+
 class EPWarning(Warning):
     pass
 
