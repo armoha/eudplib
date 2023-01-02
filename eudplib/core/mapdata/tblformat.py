@@ -25,12 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from collections.abc import ByteString, Callable
+from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING, Literal
 
 from ... import utils as ut
 from ...localize import _
+from .chktok import CHK
 
-unit_name_encoding = None
+if TYPE_CHECKING:
+    from .stringmap import StringIdMap
+
+unit_name_encoding: str | None = None
 
 
 def DecodeUnitNameAs(e: str) -> None:
@@ -53,7 +58,7 @@ def IgnoreColor(s: bytes) -> bytes | None:
         return None
 
 
-def b2in(n: int) -> Callable[[ByteString, int], int]:
+def b2in(n: int) -> Callable[[Sequence[int], int], int]:
     b2in_map = {2: ut.b2i2, 4: ut.b2i4}
     return b2in_map[n]
 
@@ -73,22 +78,28 @@ def roundup_by_4(num: int) -> int:
 
 
 class TBL:
-    def __init__(self, content=None, init_chkt=None, load_entry=2, save_entry=4):
+    def __init__(
+        self,
+        content: bytes | None = None,
+        init_chkt: tuple[CHK, "StringIdMap", "StringIdMap", "StringIdMap"] | None = None,
+        load_entry: Literal[2, 4] = 2,
+        save_entry: Literal[2, 4] = 4,
+    ) -> None:
         #
         # datatb : table of strings                       : string data table
         # dataindextb : string id -> data id              : string offset table
         # stringmap : string -> representative string id
         #
 
-        self._datatb = []
-        self._stringmap = {}
-        self._dataindextb = []  # String starts from #1
-        self._capacity = save_entry  # Size of STR section
-        self._loadentry = load_entry
-        self._saveentry = save_entry
-        self._emptystring = []
-        self._loaded = False
-        self._first_extended_string = None
+        self._datatb: list[bytes] = []
+        self._stringmap: dict[bytes, int] = {}
+        self._dataindextb: list[int] = []  # String starts from #1
+        self._capacity: int = save_entry  # Size of STR section
+        self._loadentry: Literal[2, 4] = load_entry
+        self._saveentry: Literal[2, 4] = save_entry
+        self._emptystring: list[tuple[int, bytes] | int] = []
+        self._loaded: bool = False
+        self._first_extended_string: bytes | None = None
 
         if content is not None:
             if init_chkt:
@@ -130,7 +141,9 @@ class TBL:
             self.AddString(string)
         self._loaded = True
 
-    def LoadTBLWithChk(self, content: bytes, init_chkt) -> None:
+    def LoadTBLWithChk(
+        self, content: bytes, init_chkt: tuple[CHK, "StringIdMap", "StringIdMap", "StringIdMap"]
+    ) -> None:
         self._datatb.clear()
         self._stringmap.clear()
         self._capacity = self._saveentry
@@ -280,10 +293,10 @@ class TBL:
         # Else -> Create new entry
         except KeyError:
             if self._emptystring and self._loaded and self._first_extended_string:
-                try:
-                    emptystring = self._emptystring.pop(0)
+                emptystring = self._emptystring.pop(0)
+                if isinstance(emptystring, tuple):
                     stringindex, nextstring = emptystring
-                except TypeError:
+                else:
                     stringindex = emptystring
                     nextstring = self._first_extended_string
                 dataindex = self._datatb.index(nextstring)

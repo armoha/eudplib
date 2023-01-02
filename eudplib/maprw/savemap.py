@@ -54,7 +54,7 @@ def getTraceMap() -> None:
 RegisterCreatePayloadCallback(getTraceMap)
 
 
-def SaveMap(fname, rootf, *, sectorSize=None) -> None:
+def SaveMap(fname: str, rootf, *, sectorSize=None) -> None:
     """Save output map with root function.
 
     :param fname: Path for output map.

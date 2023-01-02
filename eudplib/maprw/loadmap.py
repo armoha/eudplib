@@ -24,17 +24,14 @@ THE SOFTWARE.
 """
 
 import os
-from typing import TypeVar
 
 from ..core.mapdata import chktok, mapdata, mpqapi
 from ..localize import _
-from ..utils import ep_assert, ep_eprint
+from ..utils import EPError, ep_assert, ep_eprint
 from .mpqadd import UpdateFileListByListfile
 
-AnyPath = TypeVar("AnyPath", str, bytes, os.PathLike[str], os.PathLike[bytes])
 
-
-def LoadMap(fname: AnyPath) -> None:
+def LoadMap(fname: str) -> None:
     """Load basemap from fname
 
     :param fname: Path for basemap.
@@ -59,7 +56,8 @@ def LoadMap(fname: AnyPath) -> None:
     ep_assert(mpqr.Open(fname), _("Fail to open input map"))
     chkt = chktok.CHK()
     b = mpqr.Extract("staredit\\scenario.chk")
-    ep_assert(b, _("Fail to extract scenario.chk, maybe invalid scx"))
+    if not b:
+        raise EPError(_("Fail to extract scenario.chk, maybe invalid scx"))
     chkt.loadchk(b)
     mapdata.InitMapData(chkt, rawfile)
     UpdateFileListByListfile(mpqr)

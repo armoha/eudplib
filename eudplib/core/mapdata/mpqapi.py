@@ -24,8 +24,8 @@ THE SOFTWARE.
 """
 
 import os
-import platform
 import struct
+import sys
 from ctypes import (
     POINTER,
     Structure,
@@ -40,7 +40,7 @@ from ctypes import (
 from tempfile import NamedTemporaryFile
 
 from eudplib.localize import _
-from eudplib.utils import b2u, ep_eprint, find_data_file, u2b, u2utf8
+from eudplib.utils import EPError, b2u, b2utf8, find_data_file, u2b, u2utf8
 
 # Constants
 MPQ_FILE_COMPRESS = 0x00000200
@@ -49,7 +49,12 @@ MPQ_FILE_FIX_KEY = 0x00020000
 MPQ_FILE_REPLACEEXISTING = 0x80000000
 MPQ_COMP_ZLIB = 0x00000002
 
-libstorm = None
+if sys.platform.startswith("win32"):  # windows
+    from ctypes import WinDLL as DLL
+else:  # elif sys.platform.startswith("darwin")  # mac
+    from ctypes import CDLL as DLL
+
+libstorm: DLL | None = None
 
 
 class CreateInfo(Structure):
@@ -69,31 +74,25 @@ class CreateInfo(Structure):
     ]
 
 
-def InitMpqLibrary():
+def InitMpqLibrary() -> None:
     global libstorm
 
     try:
-        platformName = platform.system()
-        if platformName == "Windows":  # windows
-            from ctypes import WinDLL
-
+        if sys.platform.startswith("win32"):  # windows
             if struct.calcsize("P") == 4:  # 32bit
-                libstorm = WinDLL(find_data_file("StormLib32.dll", __file__), use_last_error=True)
+                libstorm = DLL(find_data_file("StormLib32.dll", __file__), use_last_error=True)
             else:  # 64bit
-                libstorm = WinDLL(find_data_file("StormLib64.dll", __file__), use_last_error=True)
+                libstorm = DLL(find_data_file("StormLib64.dll", __file__), use_last_error=True)
 
-        elif platformName == "Darwin":  # mac
-            from ctypes import CDLL
-
+        else:  # elif sys.platform.startswith("darwin"):  # mac
             try:
-                libstorm = CDLL("libstorm.dylib", use_last_error=True)
-            except OSError as e:
-                ep_eprint(
+                libstorm = DLL("libstorm.dylib", use_last_error=True)
+            except OSError as exc:
+                raise EPError(
                     _("You need to install stormlib before using eudplib."),
                     " $ brew install homebrew/games/stormlib",
                     sep="\n",
-                )
-                raise
+                ) from exc
 
         # for MpqRead
         libstorm.SFileOpenArchive.restype = c_int
@@ -134,22 +133,21 @@ def InitMpqLibrary():
         libstorm.SFileGetMaxFileCount.argtypes = [c_void_p]
         libstorm.SFileSetMaxFileCount.argtypes = [c_void_p, c_int]
 
-        return True
-
-    except OSError:
-        ep_eprint(_("Loading StormLib failed."))
-        raise
+    except OSError as exc:
+        raise EPError(_("Loading StormLib failed.")) from exc
 
 
 class MPQ:
-    def __init__(self):
-        self.mpqh = None
-        self.libstorm = libstorm
+    def __init__(self) -> None:
+        if libstorm is None:
+            raise EPError(_("Loading StormLib failed."))
+        self.mpqh: c_void_p | None = None
+        self.libstorm: DLL = libstorm
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.Close()
 
-    def Open(self, fname):
+    def Open(self, fname: str) -> bool:
         if self.mpqh is not None:
             raise RuntimeError(_("Duplicate opening"))
 
@@ -162,7 +160,7 @@ class MPQ:
         self.mpqh = h
         return True
 
-    def Create(self, fname, *, sectorSize=3, fileCount=1024):
+    def Create(self, fname: str, *, sectorSize: int = 3, fileCount: int = 1024) -> bool:
         if self.mpqh is not None:
             raise RuntimeError(_("Duplicate opening"))
 
@@ -185,15 +183,14 @@ class MPQ:
         self.mpqh = h
         return True
 
-    def Close(self):
+    def Close(self) -> None:
         if self.mpqh is None:
-            return None
+            return
 
         self.libstorm.SFileCloseArchive(self.mpqh)
         self.mpqh = None
-        return True
 
-    def EnumFiles(self):
+    def EnumFiles(self) -> list[str]:
         # using listfile.
         lst = self.Extract("(listfile)")
         if lst is None:
@@ -202,10 +199,13 @@ class MPQ:
         try:
             return b2u(lst).replace("\r", "").split("\n")
         except UnicodeDecodeError:
-            return []
+            try:
+                return b2utf8(lst).replace("\r", "").split("\n")
+            except UnicodeDecodeError:
+                return []
 
     # Extract
-    def Extract(self, fname):
+    def Extract(self, fname: str) -> bytes | None:
         if self.libstorm is None:
             return None
         elif not self.mpqh:
@@ -240,7 +240,9 @@ class MPQ:
 
     # Writer
 
-    def PutFile(self, fname, buffer, *, cmp1=MPQ_COMP_ZLIB, cmp2=MPQ_COMP_ZLIB):
+    def PutFile(
+        self, fname: str, buffer: bytes, *, cmp1: int = MPQ_COMP_ZLIB, cmp2: int = MPQ_COMP_ZLIB
+    ):
         if not self.mpqh:
             return None
 
@@ -250,24 +252,30 @@ class MPQ:
         tmpfname = f.name
         f.close()
 
-        try:
-            fname = u2b(fname)
-        except UnicodeEncodeError:
-            fname = u2utf8(fname)
-
         # Add to mpq
         ret = self.libstorm.SFileAddFileEx(
             self.mpqh,
             tmpfname,
-            fname,
+            u2b(fname),
             MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED | MPQ_FILE_REPLACEEXISTING,
             cmp1,
             cmp2,
         )
+        if not ret:
+            self.libstorm.SFileAddFileEx(
+                self.mpqh,
+                tmpfname,
+                u2utf8(fname),
+                MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED | MPQ_FILE_REPLACEEXISTING,
+                cmp1,
+                cmp2,
+            )
         os.unlink(tmpfname)
         return ret
 
-    def PutWave(self, fname, buffer, *, cmp1=MPQ_COMP_ZLIB, cmp2=MPQ_COMP_ZLIB):
+    def PutWave(
+        self, fname: str, buffer: bytes, *, cmp1: int = MPQ_COMP_ZLIB, cmp2: int = MPQ_COMP_ZLIB
+    ) -> int | None:
         if not self.mpqh:
             return None
 
@@ -286,16 +294,25 @@ class MPQ:
             cmp1,
             cmp2,
         )
+        if not ret:
+            ret = self.libstorm.SFileAddFileEx(
+                self.mpqh,
+                os.fsencode(tmpfname),
+                u2utf8(fname),
+                MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED,
+                cmp1,
+                cmp2,
+            )
         os.unlink(tmpfname)
         return ret
 
-    def GetMaxFileCount(self):
+    def GetMaxFileCount(self) -> int:
         return self.libstorm.SFileGetMaxFileCount(self.mpqh)
 
-    def SetMaxFileCount(self, count):
+    def SetMaxFileCount(self, count: int) -> int:
         return self.libstorm.SFileSetMaxFileCount(self.mpqh, count)
 
-    def Compact(self):
+    def Compact(self) -> int:
         return self.libstorm.SFileCompactArchive(self.mpqh, None, 0)
 
 
@@ -306,6 +323,8 @@ if __name__ == "__main__":
     mr.Open("basemap.scx")
     a = mr.Extract("staredit\\scenario.chk")
     mr.Close()
+    if a is None:
+        raise EPError("failed to extract staredit\\scenario.chk of basemap.scx")
     print(len(a))
 
     if os.path.exists("test.scx"):
@@ -314,6 +333,8 @@ if __name__ == "__main__":
 
     mr.Open("test.scx")
     a = mr.Extract("staredit\\scenario.chk")
+    if a is None:
+        raise EPError("failed to extract staredit\\scenario.chk of test.scx")
     print(len(a))
     mr.PutFile("test", b"1234")
     b = mr.Extract("test")

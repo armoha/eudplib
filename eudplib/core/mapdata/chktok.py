@@ -31,27 +31,30 @@ General CHK class.
 """
 
 
-def sectionname_format(sn):
-    if type(sn) is str:
-        sn = sn.encode("ascii")
+def sectionname_format(sn: str | bytes) -> bytes:
+    section_name: bytes
+    if isinstance(sn, str):
+        section_name = sn.encode("ascii")
+    else:
+        section_name = sn
 
-    if len(sn) < 4:
-        sn += b" " * (4 - len(sn))
+    if len(section_name) < 4:
+        section_name += b" " * (4 - len(section_name))
 
-    elif len(sn) > 4:
+    elif len(section_name) > 4:
         raise ut.EPError(_("Length of section name cannot be longer than 4"))
 
-    return sn
+    return section_name
 
 
 class CHK:
-    def __init__(self):
+    def __init__(self) -> None:
+        self.sections: dict[bytes, bytes] = {}
+
+    def loadblank(self) -> None:
         self.sections = {}
 
-    def loadblank(self):
-        self.sections = {}
-
-    def loadchk(self, b):
+    def loadchk(self, b: bytes) -> bool:
         # this code won't handle protection methods properly such as...
         # - duplicate section name
         # - jump section protection
@@ -81,12 +84,12 @@ class CHK:
 
         return True
 
-    def clone(self):
+    def clone(self) -> "CHK":
         t = CHK()
         t.sections = dict(self.sections)
         return t
 
-    def savechk(self):
+    def savechk(self) -> bytes:
         # calculate output size
         blist = []
         for name, binary in self.sections.items():
@@ -99,22 +102,22 @@ class CHK:
         blist.append(fake_name[0] + ut.i2b4(random.randint(0, 0xFFFFFFFF) | 0x80000000))
         return b"".join(blist)
 
-    def enumsection(self):
+    def enumsection(self) -> list[bytes]:
         return list(self.sections.keys())
 
-    def getsection(self, sectionname):
+    def getsection(self, sectionname: str | bytes) -> bytes:
         sectionname = sectionname_format(sectionname)
         return self.sections[sectionname]  # KeyError may be raised.
 
-    def setsection(self, sectionname, b):
+    def setsection(self, sectionname: str | bytes, b: bytes) -> None:
         sectionname = sectionname_format(sectionname)
         self.sections[sectionname] = bytes(b)
 
-    def delsection(self, sectionname):
+    def delsection(self, sectionname: str | bytes) -> None:
         sectionname = sectionname_format(sectionname)
         del self.sections[sectionname]
 
-    def optimize(self):
+    def optimize(self) -> None:
 
         # Delete unused sections
         # fmt: off

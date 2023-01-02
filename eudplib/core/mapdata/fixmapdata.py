@@ -25,16 +25,17 @@ THE SOFTWARE.
 
 from ...localize import _
 from ...utils import b2i2, ep_warn
+from .chktok import CHK
 
 
-def FixMapData(chkt):
+def FixMapData(chkt: CHK) -> None:
     FixUnitMap(chkt)
     FixSettings(chkt)
     ApplyRemasteredChk(chkt)
     FixMTXM0_0Null(chkt)
 
 
-def FixUnitMap(chkt):
+def FixUnitMap(chkt: CHK) -> None:
     unit = bytearray(chkt.getsection("UNIT"))
 
     for i in range(0, len(unit), 36):
@@ -69,7 +70,7 @@ def FixUnitMap(chkt):
     chkt.setsection("UNIT", unit)
 
 
-def FixSettings(chkt):
+def FixSettings(chkt: CHK) -> None:
     sections = (
         ("UNIx", 228, (4, 2, 1, 2, 2, 2, 2)),
         ("UPGx", 61, (2, 2, 2, 2, 2, 2)),
@@ -92,11 +93,11 @@ def FixSettings(chkt):
         chkt.setsection(name, data)
 
 
-def ApplyRemasteredChk(chkt):
+def ApplyRemasteredChk(chkt: CHK) -> None:
     chkt.setsection("VER ", b"\xCE\0")
 
 
-def FixMTXM0_0Null(chkt):
+def FixMTXM0_0Null(chkt: CHK) -> None:
     mtxm = bytearray(chkt.getsection("MTXM"))
 
     null_tiles = []

@@ -24,20 +24,19 @@ THE SOFTWARE.
 """
 
 from ...localize import _
-from ...utils import EPError, b2i2, b2i4, ep_assert, ep_warn, u2b, u2utf8, unProxy
+from ...utils import EPError, b2i2, b2i4, ep_assert, u2b, u2utf8, unProxy
 from .chktok import CHK
 from .tblformat import TBL
 
 
 class StringIdMap:
     def __init__(self) -> None:
-        self._s2id: dict[bytes, int] = {}
+        self._s2id: dict[bytes, int | None] = {}
 
     def AddItem(self, string: str | bytes, strid: int) -> None:
         byte = u2b(unProxy(string))
         if byte in self._s2id:  # ambiguous string
-            # self._s2id[string] = None
-            ep_warn(_("Ambiguous string {}").format(string))
+            self._s2id[byte] = None
         else:
             self._s2id[byte] = strid
 
@@ -45,7 +44,9 @@ class StringIdMap:
         byte = u2utf8(unProxy(string))
         if byte not in self._s2id:
             byte = u2b(unProxy(string))
-        retid = self._s2id[byte]
+        retid = self._s2id.get(byte)
+        if retid is None:
+            raise KeyError(_("Ambiguous string: {}").format(string))
         return retid
 
 
@@ -62,7 +63,7 @@ def InitStringMap(chkt: CHK) -> None:
     unitmap = StringIdMap()
     locmap = StringIdMap()
     swmap = StringIdMap()
-    init_chkt = [chkt, unitmap, locmap, swmap]
+    init_chkt = (chkt, unitmap, locmap, swmap)
 
     try:
         strx = chkt.getsection("STRx")
@@ -101,7 +102,7 @@ def GetUnitIndex(u: str | bytes) -> int:
 
 
 def ApplyStringMap(chkt: CHK) -> None:
-    if strmap is None:
+    if strsection is None or strmap is None:
         raise EPError(_("Must use LoadMap first"))
     chkt.setsection(strsection, strmap.SaveTBL())
 
@@ -112,9 +113,13 @@ def ForceAddString(s: str | bytes) -> int:
     return strmap.ForceAddString(s) + 1
 
 
-def GetStringMap() -> TBL | None:
+def GetStringMap() -> TBL:
+    if strmap is None:
+        raise EPError(_("Must use LoadMap first"))
     return strmap
 
 
-def GetStringSectionName() -> str | None:
+def GetStringSectionName() -> str:
+    if strsection is None:
+        raise EPError(_("Must use LoadMap first"))
     return strsection

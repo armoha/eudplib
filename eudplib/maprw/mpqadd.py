@@ -25,13 +25,12 @@ THE SOFTWARE.
 
 import ctypes
 import sys
-from collections.abc import ByteString
 
 from .. import utils as ut
 from ..core.mapdata.mpqapi import MPQ
 from ..localize import _
 
-_addedFiles: dict[bytes, tuple[str, ByteString | None, bool]] = {}
+_addedFiles: dict[bytes, tuple[str, bytes | None, bool]] = {}
 
 
 def UpdateFileListByListfile(mpqr: MPQ) -> None:
@@ -65,7 +64,7 @@ def MPQCheckFile(fname: str) -> bytes:
     return fname_key
 
 
-def MPQAddFile(fname: str, content: ByteString | None, isWave: bool = False) -> None:
+def MPQAddFile(fname: str, content: bytes | None, isWave: bool = False) -> None:
     """Add file/wave to output map.
 
     :param fname: Desired filename in mpq
@@ -90,7 +89,7 @@ def MPQAddFile(fname: str, content: ByteString | None, isWave: bool = False) -> 
     _addedFiles[fname_key] = (fname, content, isWave)
 
 
-def MPQAddWave(fname: str, content: ByteString | None) -> None:
+def MPQAddWave(fname: str, content: bytes | None) -> None:
     """Add wave to output map.
 
     :param fname: Desired filename in mpq
@@ -108,14 +107,15 @@ def UpdateMPQ(mpqw: MPQ) -> None:
     """
 
     count = mpqw.GetMaxFileCount()
-    if count < len(_addedFiles):
+    if count < len(_addedFiles):  # need to increase max file count
         max_count = max(1024, 1 << (len(_addedFiles)).bit_length())
-        ret = mpqw.SetMaxFileCount(max_count)
-        if not ret:
+        is_increased = mpqw.SetMaxFileCount(max_count)
+        if not is_increased:
             raise ctypes.WinError(ctypes.get_last_error())
 
     for fname, content, isWave in _addedFiles.values():
         if content is not None:
+            ret: int | None
             if isWave:
                 ret = mpqw.PutWave(fname, content)
             else:

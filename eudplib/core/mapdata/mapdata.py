@@ -23,18 +23,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Iterator
+
+from ...localize import _
+from ...utils import EPError
+from .chktok import CHK
 from .playerinfo import InitPlayerInfo
 from .proptable import ApplyPropertyMap, InitPropertyMap
 from .stringmap import ApplyStringMap, InitStringMap
 
-_inited = False
-_chkt = None
-_origchkt = None
-_rawfile = None
-_listfiles = []
+_inited: bool = False
+_chkt: CHK | None = None
+_origchkt: CHK | None = None
+_rawfile: bytes | None = None
+_listfiles: list[tuple[str, bytes | None]] = []
 
 
-def InitMapData(chkt, rawfile):
+def InitMapData(chkt: CHK, rawfile: bytes) -> None:
     global _inited, _origchkt, _chkt, _rawfile, _listfiles
     _chkt = chkt
     _origchkt = chkt.clone()
@@ -47,32 +52,40 @@ def InitMapData(chkt, rawfile):
     _inited = True
 
 
-def UpdateMapData():
+def UpdateMapData() -> None:
+    if _chkt is None:
+        raise EPError(_("Must use LoadMap first"))
     ApplyStringMap(_chkt)
     ApplyPropertyMap(_chkt)
 
 
-def AddListFiles(n, f):
+def AddListFiles(n: str, f: bytes | None) -> None:
     _listfiles.append((n, f))
 
 
-def IsMapdataInitialized():
+def IsMapdataInitialized() -> bool:
     return _inited
 
 
-def GetChkTokenized():
+def GetChkTokenized() -> CHK:
+    if _chkt is None:
+        raise EPError(_("Must use LoadMap first"))
     return _chkt
 
 
-def GetOriginalChkTokenized():
+def GetOriginalChkTokenized() -> CHK:
     """NEVER MODIFY ANYTHING WITHIN THIS CHKTOK"""
+    if _origchkt is None:
+        raise EPError(_("Must use LoadMap first"))
     return _origchkt
 
 
-def GetRawFile():
+def GetRawFile() -> bytes:
+    if _rawfile is None:
+        raise EPError(_("Must use LoadMap first"))
     return _rawfile
 
 
-def IterListFiles():
+def IterListFiles() -> Iterator[tuple[str, bytes | None]]:
     for n, f in _listfiles:
         yield n, f
