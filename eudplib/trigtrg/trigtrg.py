@@ -466,7 +466,7 @@ def LeaderBoardKills(Unit, Label) -> bytes:
 def LeaderBoardScore(ScoreType, Label) -> bytes:
     ScoreType = EncodeScore(ScoreType)
     Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, 0, Score, 21, 0, 4)
+    return Action(0, Label, 0, 0, 0, 0, ScoreType, 21, 0, 4)
 
 
 def KillUnit(Unit, Player) -> bytes:
