@@ -28,19 +28,16 @@ from typing import TYPE_CHECKING, TypeAlias, TypeVar, overload
 
 from ... import utils as ut
 from ...localize import _
-from ..mapdata import GetPropertyIndex
+from ..mapdata import GetPropertyIndex, UnitProperty
 
 if TYPE_CHECKING:
     from ...utils import ExprProxy
     from ..allocator import ConstExpr
-    from ..mapdata import UnitProperty
     from ..variable import EUDVariable
 
 Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy"
 Word: TypeAlias = "int | EUDVariable | ExprProxy"
 Byte: TypeAlias = "int | EUDVariable | ExprProxy"
-
-Properties: TypeAlias = "UnitProperty | bytes"
 
 
 class _Unique:
@@ -528,5 +525,5 @@ def EncodeCount(s):
 # ========================
 
 
-def EncodeProperty(prop: "UnitProperty | bytes") -> int:
+def EncodeProperty(prop: UnitProperty | bytes) -> int:
     return GetPropertyIndex(prop)

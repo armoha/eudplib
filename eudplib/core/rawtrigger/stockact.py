@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 from ...localize import _
 from ...utils import EPD, ep_assert, ep_warn, unProxy
+from ..mapdata import UnitProperty
 from .action import Action
 from .constenc import (
     Add,
@@ -46,7 +47,7 @@ from .constenc import (
     Modifier,
 )
 from .constenc import Order as _Order
-from .constenc import Player, Properties, PropState, Resource, Score, SwitchAction
+from .constenc import Player, PropState, Resource, Score, SwitchAction
 from .strenc import (
     AIScript,
     EncodeAIScript,
@@ -184,7 +185,7 @@ def CenterView(Where: Location) -> Action:
 
 
 def CreateUnitWithProperties(
-    Count: Byte, Unit: Unit, Where: Location, Player: Player, Properties: Properties
+    Count: Byte, Unit: Unit, Where: Location, Player: Player, Properties: UnitProperty | bytes
 ) -> Action:
     """Create quantity unit at location for player. Apply properties
 
