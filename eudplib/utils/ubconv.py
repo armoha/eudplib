@@ -63,3 +63,12 @@ def u2utf8(s: str | bytes) -> bytes:
         return s
     else:
         raise EPError(_("Invalid type {}").format(type(s)))
+
+
+def b2utf8(b: str | bytes) -> str:
+    if isinstance(b, bytes):
+        return b.decode("utf-8")
+    elif isinstance(b, str):
+        return b
+    else:
+        raise EPError(_("Invalid type {}").format(type(b)))

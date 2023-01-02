@@ -44,4 +44,4 @@ from .etc import (
     find_data_file,
 )
 from .exprproxy import ExprProxy, isUnproxyInstance, unProxy
-from .ubconv import b2u, u2b, u2utf8
+from .ubconv import b2u, b2utf8, u2b, u2utf8
