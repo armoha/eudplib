@@ -28,7 +28,7 @@ import itertools
 import os.path
 import random
 import sys
-from collections.abc import Callable, Collection, Iterable, Iterator
+from collections.abc import Iterable
 from typing import Any, TypeVar, overload
 
 T = TypeVar("T")
@@ -53,19 +53,6 @@ def FlattenList(l: Any) -> list:
 
     except TypeError:  # l is not iterable
         return [l]
-
-
-def eqsplit(iterable: Collection, eqr: int) -> Iterator:
-    if isinstance(iterable, list):
-        for i in range(0, len(iterable), eqr):
-            yield iterable[i : i + eqr]
-
-    else:
-        it = iter(iterable)
-        item = list(itertools.islice(it, eqr))
-        while item:
-            yield item
-            item = list(itertools.islice(it, eqr))
 
 
 def List2Assignable(l: list[T]) -> T | list[T]:
