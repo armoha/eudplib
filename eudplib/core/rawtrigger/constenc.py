@@ -40,6 +40,8 @@ Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy"
 Word: TypeAlias = "int | EUDVariable | ExprProxy"
 Byte: TypeAlias = "int | EUDVariable | ExprProxy"
 
+Properties: TypeAlias = "UnitProperty | bytes"
+
 
 class _Unique:
     def __init__(self, name: str) -> None:

@@ -63,7 +63,7 @@ def GetPropertyIndex(prop: UnitProperty | bytes) -> int:
 
     prop = bytes(prop)
     try:
-        return _uprpdict[prop] + 1  # SC counts unit properties from 1. Sucks
+        return _uprpdict[prop] + 1  # SC counts unit properties from 1.
 
     except KeyError:
         indexNotFound = False
@@ -76,7 +76,7 @@ def GetPropertyIndex(prop: UnitProperty | bytes) -> int:
 
         _uprptable[uprpindex] = prop
         _uprpdict[prop] = uprpindex
-        return uprpindex + 1  # SC counts unit properties from 1. Sucks
+        return uprpindex + 1  # SC counts unit properties from 1.
 
 
 def ApplyPropertyMap(chkt: "CHK") -> None:

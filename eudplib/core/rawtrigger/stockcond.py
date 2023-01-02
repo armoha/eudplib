@@ -40,7 +40,9 @@ from .constenc import (
 )
 from .constenc import Score as _Score
 from .constenc import SwitchState
-from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit
+from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit, Location
+from .strenc import Switch as _Switch
+from .strenc import Unit
 
 
 def CountdownTimer(Comparison: Comparison, Time: Dword) -> Condition:
@@ -60,7 +62,7 @@ def CountdownTimer(Comparison: Comparison, Time: Dword) -> Condition:
     return Condition(0, 0, Time, 0, Comparison, 1, 0, 0)
 
 
-def Command(Player: Player, Comparison: Comparison, Number: Dword, Unit) -> Condition:
+def Command(Player: Player, Comparison: Comparison, Number: Dword, Unit: Unit) -> Condition:
     """[Player] commands [Comparison] [Number] [Unit].
 
     Example::
@@ -74,10 +76,13 @@ def Command(Player: Player, Comparison: Comparison, Number: Dword, Unit) -> Cond
     return Condition(0, Player, Number, Unit, Comparison, 2, 0, 0)
 
 
-def Bring(Player: Player, Comparison: Comparison, Number: Dword, Unit, Location) -> Condition:
+def Bring(
+    Player: Player, Comparison: Comparison, Number: Dword, Unit: Unit, Location: Location
+) -> Condition:
     """Player brings quantity units to location.
 
-    This states that a player is required to bring 'X' number of units to a specific location. The units can be any player-controlled unit available in the game.
+    This states that a player is required to bring 'X' number of units to a specific location.
+    The units can be any player-controlled unit available in the game.
     """
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
@@ -101,7 +106,9 @@ def Accumulate(
 
 # 'Kills' is already defined inside constenc, so we just add __call__ method
 # to there instead of creating new function
-def __Kills__internal(Player: Player, Comparison: Comparison, Number: Dword, Unit) -> Condition:
+def __Kills__internal(
+    Player: Player, Comparison: Comparison, Number: Dword, Unit: Unit
+) -> Condition:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)
@@ -111,7 +118,7 @@ def __Kills__internal(Player: Player, Comparison: Comparison, Number: Dword, Uni
 Kills._internalf = __Kills__internal
 
 
-def CommandMost(Unit) -> Condition:
+def CommandMost(Unit: Unit) -> Condition:
     """Current player commands the most units.
 
     Command the Most requires that you command the most of the defined units.
@@ -122,7 +129,7 @@ def CommandMost(Unit) -> Condition:
     return Condition(0, 0, 0, Unit, 0, 6, 0, 0)
 
 
-def CommandMostAt(Unit, Location) -> Condition:
+def CommandMostAt(Unit: Unit, Location: Location) -> Condition:
     """Current player commands the most units at location.
 
     Similar to the Command the Most, this condition compares the number of units at a specific location.
@@ -133,7 +140,7 @@ def CommandMostAt(Unit, Location) -> Condition:
     return Condition(Location, 0, 0, Unit, 0, 7, 0, 0)
 
 
-def MostKills(Unit) -> Condition:
+def MostKills(Unit: Unit) -> Condition:
     """Current player has most kills of unit.
 
     This condition is considered true if the trigger's owner has the most kills of the specified Unit.
@@ -162,16 +169,16 @@ def MostResources(ResourceType: Resource) -> Condition:
     return Condition(0, 0, 0, 0, 0, 10, ResourceType, 0)
 
 
-def Switch(Switch, State: SwitchState) -> Condition:
+def Switch(Switch: _Switch, State: SwitchState) -> Condition:
     """Switch is set.
 
     This allows you to test against a switch value. Switches are on/off values that can be set with an action.
     Switches can be used to keep track of which triggers have been activated, to disable or enable certain triggers or to link multiple triggers together.
     You may also rename switches from this dialog box.
     """
-    Switch = EncodeSwitch(Switch)
+    switch = EncodeSwitch(Switch)
     State = EncodeSwitchState(State)
-    return Condition(0, 0, 0, 0, State, 11, Switch, 0)
+    return Condition(0, 0, 0, 0, State, 11, switch, 0)
 
 
 def ElapsedTime(Comparison: Comparison, Time: Dword) -> Condition:
@@ -204,7 +211,7 @@ def Opponents(Player: Player, Comparison: Comparison, Number: Dword) -> Conditio
     return Condition(0, Player, Number, 0, Comparison, 14, 0, 0)
 
 
-def Deaths(Player: Player, Comparison: Comparison, Number: Dword, Unit) -> Condition:
+def Deaths(Player: Player, Comparison: Comparison, Number: Dword, Unit: Unit) -> Condition:
     """Player has suffered quantity deaths of unit.
 
     Gives you the ability to create actions that are launched when a player has suffered a specific number of deaths of any of the units in the game.
@@ -215,7 +222,7 @@ def Deaths(Player: Player, Comparison: Comparison, Number: Dword, Unit) -> Condi
     return Condition(0, Player, Number, Unit, Comparison, 15, 0, 0)
 
 
-def CommandLeast(Unit) -> Condition:
+def CommandLeast(Unit: Unit) -> Condition:
     """Current player commands the least units.
 
     Command the Least allows you to define an action based on the player that commands the least units.
@@ -226,7 +233,7 @@ def CommandLeast(Unit) -> Condition:
     return Condition(0, 0, 0, Unit, 0, 16, 0, 0)
 
 
-def CommandLeastAt(Unit, Location) -> Condition:
+def CommandLeastAt(Unit: Unit, Location: Location) -> Condition:
     """Current player commands the least units at location.
 
     Command the Least At is similar to 'Command the Least', however, but only compares units at a particular location.
@@ -237,7 +244,7 @@ def CommandLeastAt(Unit, Location) -> Condition:
     return Condition(Location, 0, 0, Unit, 0, 17, 0, 0)
 
 
-def LeastKills(Unit) -> Condition:
+def LeastKills(Unit: Unit) -> Condition:
     """Current player has least kills of unit.
 
     This condition is considered true if the trigger's owner has the least kills of the specified Unit.
@@ -306,7 +313,9 @@ def MemoryEPD(dest: Dword, cmptype: Comparison, value: Dword) -> Condition:
     return Deaths(dest, cmptype, value, 0)
 
 
-def DeathsX(Player: Player, Comparison: Comparison, Number: Dword, Unit, Mask: Dword) -> Condition:
+def DeathsX(
+    Player: Player, Comparison: Comparison, Number: Dword, Unit: Unit, Mask: Dword
+) -> Condition:
     Player = EncodePlayer(Player)
     Comparison = EncodeComparison(Comparison)
     Unit = EncodeUnit(Unit)

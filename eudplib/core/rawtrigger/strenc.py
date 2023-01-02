@@ -24,12 +24,14 @@ THE SOFTWARE.
 """
 
 import difflib
+from collections.abc import Callable
+from typing import TYPE_CHECKING, NoReturn, TypeAlias, overload
 
 from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..mapdata import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
-from .constenc import _Unique
+from .constenc import Byte, Dword, T, Word, _Unique
 from .strdict import (
     DefAIScriptDict,
     DefFlingyDict,
@@ -47,6 +49,39 @@ from .strdict import (
     DefUpgradeDict,
     DefWeaponDict,
 )
+
+Unit: TypeAlias = "str | Word | bytes"
+Location: TypeAlias = "str | Dword | bytes"
+String: TypeAlias = "str | Dword | bytes"
+AIScript: TypeAlias = "str | Dword | bytes"
+Switch: TypeAlias = "str | Byte | bytes"  # Byte in Condition, Dword in Action
+
+Flingy: TypeAlias = "str | Word | bytes"
+Icon: TypeAlias = "str | Word | bytes"
+Image: TypeAlias = "str | Word | bytes"
+Iscript: TypeAlias = "str | Word | bytes"
+Portrait: TypeAlias = "str | Word | bytes"
+Sprite: TypeAlias = "str | Word | bytes"
+StatText: TypeAlias = "str | Dword | bytes"
+Tech: TypeAlias = "str | Word | bytes"
+UnitOrder: TypeAlias = "str | Word | bytes"
+Upgrade: TypeAlias = "str | Word | bytes"
+Weapon: TypeAlias = "str | Word | bytes"
+
+
+@overload
+def EncodeAIScript(ais: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeAIScript(ais: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeAIScript(ais: T) -> T:
+    ...
 
 
 def EncodeAIScript(ais):
@@ -80,6 +115,21 @@ def EncodeAIScript(ais):
     return ais
 
 
+@overload
+def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: str | bytes) -> int:
+    ...
+
+
+@overload
+def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: T) -> T:
+    ...
+
+
 def _EncodeAny(t, f, dl, s):
     s = ut.unProxy(s)
 
@@ -106,20 +156,95 @@ def _EncodeAny(t, f, dl, s):
         return s
 
 
+@overload
+def EncodeLocation(loc: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeLocation(loc: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeLocation(loc: T) -> T:
+    ...
+
+
 def EncodeLocation(loc):
     return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc)
+
+
+@overload
+def EncodeString(s: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeString(s: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeString(s: T) -> T:
+    ...
 
 
 def EncodeString(s):
     return _EncodeAny("MapString", GetStringIndex, {}, s)
 
 
+@overload
+def EncodeSwitch(sw: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeSwitch(sw: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeSwitch(sw: T) -> T:
+    ...
+
+
 def EncodeSwitch(sw):
     return _EncodeAny("switch", GetSwitchIndex, DefSwitchDict, sw)
 
 
+@overload
+def EncodeUnit(u: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeUnit(u: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeUnit(u: T) -> T:
+    ...
+
+
 def EncodeUnit(u):
     return _EncodeAny("unit", GetUnitIndex, DefUnitDict, u)
+
+
+@overload
+def EncodeTBL(t: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeTBL(t: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeTBL(t: T) -> T:
+    ...
 
 
 def EncodeTBL(t):
@@ -127,40 +252,190 @@ def EncodeTBL(t):
     return _EncodeAny("stat_txt.tbl", lambda s: {}[s], DefStatTextDict, t)
 
 
+@overload
+def EncodeFlingy(flingy: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeFlingy(flingy: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeFlingy(flingy: T) -> T:
+    ...
+
+
 def EncodeFlingy(flingy):
     return _EncodeAny("flingy", lambda s: {}[s], DefFlingyDict, flingy)
+
+
+@overload
+def EncodeIcon(icon: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeIcon(icon: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeIcon(icon: T) -> T:
+    ...
 
 
 def EncodeIcon(icon):
     return _EncodeAny("icon", lambda s: {}[s], DefIconDict, icon)
 
 
+@overload
+def EncodeSprite(sprite: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeSprite(sprite: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeSprite(sprite: T) -> T:
+    ...
+
+
 def EncodeSprite(sprite):
     return _EncodeAny("sprite", lambda s: {}[s], DefSpriteDict, sprite)
+
+
+@overload
+def EncodeImage(image: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeImage(image: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeImage(image: T) -> T:
+    ...
 
 
 def EncodeImage(image):
     return _EncodeAny("image", lambda s: {}[s], DefImageDict, image)
 
 
+@overload
+def EncodeIscript(iscript: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeIscript(iscript: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeIscript(iscript: T) -> T:
+    ...
+
+
 def EncodeIscript(iscript):
     return _EncodeAny("iscript", lambda s: {}[s], DefIscriptDict, iscript)
+
+
+@overload
+def EncodeUnitOrder(order: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeUnitOrder(order: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeUnitOrder(order: T) -> T:
+    ...
 
 
 def EncodeUnitOrder(order):
     return _EncodeAny("UnitOrder", lambda s: {}[s], DefUnitOrderDict, order)
 
 
+@overload
+def EncodeWeapon(weapon: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeWeapon(weapon: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeWeapon(weapon: T) -> T:
+    ...
+
+
 def EncodeWeapon(weapon):
     return _EncodeAny("weapon", lambda s: {}[s], DefWeaponDict, weapon)
+
+
+@overload
+def EncodeTech(tech: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeTech(tech: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeTech(tech: T) -> T:
+    ...
 
 
 def EncodeTech(tech):
     return _EncodeAny("tech", lambda s: {}[s], DefTechDict, tech)
 
 
+@overload
+def EncodeUpgrade(upgrade: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeUpgrade(upgrade: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodeUpgrade(upgrade: T) -> T:
+    ...
+
+
 def EncodeUpgrade(upgrade):
     return _EncodeAny("upgrade", lambda s: {}[s], DefUpgradeDict, upgrade)
+
+
+@overload
+def EncodePortrait(portrait: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodePortrait(portrait: _Unique) -> NoReturn:
+    ...
+
+
+@overload
+def EncodePortrait(portrait: T) -> T:
+    ...
 
 
 def EncodePortrait(portrait):
