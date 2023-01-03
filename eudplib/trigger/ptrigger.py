@@ -23,14 +23,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Iterable
+from typing import TypeAlias
+
 from eudplib import utils as ut
 
 from .. import core as c
 from ..core.mapdata.playerinfo import PlayerInfo
-from .triggerdef import Trigger
+from ..core.rawtrigger.constenc import _Player
+from .triggerdef import Actions, Conditions, Trigger
 
 _pinfos: list[PlayerInfo] = []
 _pdbtable: dict[bytes, c.Db] = {}
+
+Players: TypeAlias = _Player | int | Iterable[_Player | int | Iterable]
 
 
 def InitPTrigger() -> None:
@@ -40,7 +46,7 @@ def InitPTrigger() -> None:
         _pinfos = [c.GetPlayerInfo(player) for player in range(8)]
 
 
-def PTrigger(players, conditions=None, actions=None) -> None:
+def PTrigger(players: Players, conditions: Conditions = None, actions: Actions = None) -> None:
     """Execute trigger by player basis
 
     :param players: Players the trigger should execute with. When Current

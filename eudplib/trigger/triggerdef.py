@@ -23,15 +23,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Iterable
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
 from .. import core as c
 from .tpatcher import PatchAction, PatchCondition
 
+Conditions = c.Condition | bool | Iterable[c.Condition | bool | Iterable | None] | None
+Actions = c.Action | Iterable[c.Action | Iterable | None] | None
+
 
 def Trigger(
-    conditions=None, actions=None, preserved: bool = True
+    conditions: Conditions = None, actions: Actions = None, preserved: bool = True
 ) -> tuple[c.Forward, c.RawTrigger]:
     """General easy-to-use trigger
 
