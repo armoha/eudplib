@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from functools import cache
 from typing import TYPE_CHECKING, overload
 
 from .. import core as c
@@ -78,17 +79,11 @@ def RunTrigTrigger() -> None:
 #######
 
 
+@cache
 def AllocTrigTriggerLink() -> tuple["EUDArray", "EUDArray", "EUDArray"]:
-    if not hasattr(AllocTrigTriggerLink, "arrays"):
-        from .. import eudlib as sf
+    from .. import eudlib as sf
 
-        setattr(
-            AllocTrigTriggerLink,
-            "_arrays",
-            (sf.EUDArray(8), sf.EUDArray(8), sf.EUDArray(_runner_end)),
-        )
-    orig_tstart, orig_tend, runner_end_array = getattr(AllocTrigTriggerLink, "_arrays")
-    return orig_tstart, orig_tend, runner_end_array
+    return sf.EUDArray(8), sf.EUDArray(8), sf.EUDArray(_runner_end)
 
 
 def GetFirstTrigTrigger(player: "Player") -> c.EUDVariable:
@@ -110,17 +105,14 @@ def TrigTriggerBegin(player: "Player") -> c.EUDVariable:
 
 
 @overload
-def TrigTriggerEnd(player: "int | _Player") -> c.Forward:
+def TrigTriggerEnd(player: "int | _Player | ExprProxy[int | _Player]") -> c.Forward:
     ...
 
 
 @overload
-def TrigTriggerEnd(player: c.EUDVariable | c.ConstExpr) -> c.EUDVariable:
-    ...
-
-
-@overload
-def TrigTriggerEnd(player: ExprProxy) -> c.Forward | c.EUDVariable:
+def TrigTriggerEnd(
+    player: c.EUDVariable | c.ConstExpr | ExprProxy[c.EUDVariable | c.ConstExpr],
+) -> c.EUDVariable:
     ...
 
 
@@ -129,7 +121,4 @@ def TrigTriggerEnd(player):
     player = c.EncodePlayer(player)
     if isinstance(player, int):
         return _runner_end[player]
-    unproxy_player = unProxy(player)
-    if isinstance(unproxy_player, int):
-        return _runner_end[unproxy_player]
     return runner_end_array[player]

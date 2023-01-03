@@ -28,16 +28,16 @@ from typing import TYPE_CHECKING, TypeAlias, TypeVar, overload
 
 from ... import utils as ut
 from ...localize import _
+from ...utils import ExprProxy
 from ..mapdata import GetPropertyIndex, UnitProperty
 
 if TYPE_CHECKING:
-    from ...utils import ExprProxy
     from ..allocator import ConstExpr
     from ..variable import EUDVariable
 
-Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy"
-Word: TypeAlias = "int | EUDVariable | ExprProxy"
-Byte: TypeAlias = "int | EUDVariable | ExprProxy"
+Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy[int] | ExprProxy[EUDVariable] | ExprProxy[ConstExpr]"
+Word: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
+Byte: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
 
 
 class _Unique:
@@ -273,16 +273,22 @@ SwitchActionDict = {Set: 4, Clear: 5, Toggle: 6, Random: 11}
 
 SwitchStateDict = {Set: 2, Cleared: 3}
 
-T = TypeVar("T", int, "EUDVariable", "ConstExpr", "ExprProxy")
+Unique = TypeVar("Unique", bound=_Unique)
+T = TypeVar("T", int, "EUDVariable", "ConstExpr")
 
 
 @overload
-def _EncodeConst(t: str, d: dict[_Unique, int], s: _Unique) -> int:
+def _EncodeConst(t: str, d: dict[_Unique, int], s: Unique | ExprProxy[Unique]) -> int:
     ...
 
 
 @overload
 def _EncodeConst(t: str, d: dict[_Unique, int], s: T) -> T:
+    ...
+
+
+@overload
+def _EncodeConst(t: str, d: dict[_Unique, int], s: ExprProxy[T]) -> T:
     ...
 
 
@@ -297,7 +303,7 @@ def _EncodeConst(t, d, s):
 
 
 @overload
-def EncodeAllyStatus(s: _AllyStatus) -> int:
+def EncodeAllyStatus(s: "_AllyStatus | ExprProxy[_AllyStatus]") -> int:
     ...
 
 
@@ -306,13 +312,18 @@ def EncodeAllyStatus(s: T) -> T:
     ...
 
 
+@overload
+def EncodeAllyStatus(s: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeAllyStatus(s):
     """Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2]."""
-    return _EncodeConst("_AllyStatus", AllyStatusDict, s)
+    return _EncodeConst("AllyStatus", AllyStatusDict, s)
 
 
 @overload
-def EncodeComparison(s: _Comparison) -> int:
+def EncodeComparison(s: _Comparison | ExprProxy[_Comparison]) -> int:
     ...
 
 
@@ -321,13 +332,18 @@ def EncodeComparison(s: T) -> T:
     ...
 
 
+@overload
+def EncodeComparison(s: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeComparison(s):
     """Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10]."""
-    return _EncodeConst("_Comparison", ComparisonDict, s)
+    return _EncodeConst("Comparison", ComparisonDict, s)
 
 
 @overload
-def EncodeModifier(s: _Modifier) -> int:
+def EncodeModifier(s: _Modifier | ExprProxy[_Modifier]) -> int:
     ...
 
 
@@ -336,13 +352,18 @@ def EncodeModifier(s: T) -> T:
     ...
 
 
+@overload
+def EncodeModifier(s: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeModifier(s):
     """Convert [SetTo, Add, Subtract] to number [7, 8, 9]."""
-    return _EncodeConst("_Modifier", ModifierDict, s)
+    return _EncodeConst("Modifier", ModifierDict, s)
 
 
 @overload
-def EncodeOrder(s: _Order) -> int:
+def EncodeOrder(s: _Order | ExprProxy[_Order]) -> int:
     ...
 
 
@@ -351,18 +372,28 @@ def EncodeOrder(s: T) -> T:
     ...
 
 
+@overload
+def EncodeOrder(s: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeOrder(s):
     """Convert [Move, Patrol, Attack] to number [0, 1, 2]."""
-    return _EncodeConst("_Order", OrderDict, s)
+    return _EncodeConst("Order", OrderDict, s)
 
 
 @overload
-def EncodePlayer(s: _Player) -> int:
+def EncodePlayer(s: _Player | ExprProxy[_Player]) -> int:
     ...
 
 
 @overload
 def EncodePlayer(s: T) -> T:
+    ...
+
+
+@overload
+def EncodePlayer(s: ExprProxy[T]) -> T:
     ...
 
 
@@ -409,11 +440,11 @@ def EncodePlayer(s):
     ======================= ========
 
     """
-    return _EncodeConst("_Player", PlayerDict, s)
+    return _EncodeConst("Player", PlayerDict, s)
 
 
 @overload
-def EncodePropState(s: _PropState) -> int:
+def EncodePropState(s: _PropState | ExprProxy[_PropState]) -> int:
     ...
 
 
@@ -422,13 +453,18 @@ def EncodePropState(s: T) -> T:
     ...
 
 
+@overload
+def EncodePropState(s: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodePropState(s):
     """Convert [Enable, Disable, Toogle] to number [4, 5, 6]"""
-    return _EncodeConst("_PropState", PropStateDict, s)
+    return _EncodeConst("PropState", PropStateDict, s)
 
 
 @overload
-def EncodeResource(s: _Resource) -> int:
+def EncodeResource(s: _Resource | ExprProxy[_Resource]) -> int:
     ...
 
 
@@ -437,18 +473,28 @@ def EncodeResource(s: T) -> T:
     ...
 
 
+@overload
+def EncodeResource(s: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeResource(s):
     """Convert [Ore, Gas, OreAndGas] to [0, 1, 2]"""
-    return _EncodeConst("_Resource", ResourceDict, s)
+    return _EncodeConst("Resource", ResourceDict, s)
 
 
 @overload
-def EncodeScore(s: _Score) -> int:
+def EncodeScore(s: _Score | ExprProxy[_Score]) -> int:
     ...
 
 
 @overload
 def EncodeScore(s: T) -> T:
+    ...
+
+
+@overload
+def EncodeScore(s: ExprProxy[T]) -> T:
     ...
 
 
@@ -469,16 +515,21 @@ def EncodeScore(s):
     ================= ========
 
     """
-    return _EncodeConst("_Score", ScoreDict, s)
+    return _EncodeConst("Score", ScoreDict, s)
 
 
 @overload
-def EncodeSwitchAction(s: _SwitchAction) -> int:
+def EncodeSwitchAction(s: _SwitchAction | ExprProxy[_SwitchAction]) -> int:
     ...
 
 
 @overload
 def EncodeSwitchAction(s: T) -> T:
+    ...
+
+
+@overload
+def EncodeSwitchAction(s: ExprProxy[T]) -> T:
     ...
 
 
@@ -488,12 +539,17 @@ def EncodeSwitchAction(s):
 
 
 @overload
-def EncodeSwitchState(s: _SwitchState) -> int:
+def EncodeSwitchState(s: _SwitchState | ExprProxy[_SwitchState]) -> int:
     ...
 
 
 @overload
 def EncodeSwitchState(s: T) -> T:
+    ...
+
+
+@overload
+def EncodeSwitchState(s: ExprProxy[T]) -> T:
     ...
 
 
@@ -503,12 +559,17 @@ def EncodeSwitchState(s):
 
 
 @overload
-def EncodeCount(s: _Count) -> int:
+def EncodeCount(s: _Count | ExprProxy[_Count]) -> int:
     ...
 
 
 @overload
 def EncodeCount(s: T) -> T:
+    ...
+
+
+@overload
+def EncodeCount(s: ExprProxy[T]) -> T:
     ...
 
 
@@ -525,5 +586,6 @@ def EncodeCount(s):
 # ========================
 
 
-def EncodeProperty(prop: UnitProperty | bytes) -> int:
+def EncodeProperty(prop: UnitProperty | bytes | ExprProxy[UnitProperty | bytes]) -> int:
+    prop = ut.unProxy(prop)
     return GetPropertyIndex(prop)

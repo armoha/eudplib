@@ -23,16 +23,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from typing import Any
+from typing import Any, Generic, Protocol, TypeVar, overload
 
 from eudplib.localize import _
 
+T_co = TypeVar("T_co", covariant=True)
 
-class ExprProxy:
+
+class Castable(Protocol):
+    @classmethod
+    def cast(cls, _from):
+        return cls(_from=_from)
+
+
+class ExprProxy(Generic[T_co]):
     """Class which can contain both ConstExpr and EUDVariable"""
 
-    def __init__(self, initval) -> None:
-        self._value = initval
+    def __init__(self, initval: T_co) -> None:
+        self._value: T_co = initval
 
     @classmethod
     def cast(cls, _from):
@@ -41,7 +49,7 @@ class ExprProxy:
         except TypeError as e:
             raise TypeError(_("Type {} is not castable").format(cls.__name__), e)
 
-    def getValue(self):
+    def getValue(self) -> T_co:
         return self._value
 
     def __len__(self):
@@ -160,7 +168,7 @@ class ExprProxy:
     def __getitem__(self, name):
         return self._value[name]
 
-    def __setitem__(self, name, newvalue) -> None:
+    def __setitem__(self, name, newvalue):
         self._value[name] = newvalue
 
     def __iter__(self):
@@ -170,7 +178,20 @@ class ExprProxy:
             return self._value
 
 
-def unProxy(x: Any) -> Any:
+T = TypeVar("T")
+
+
+@overload
+def unProxy(x: ExprProxy[T]) -> T:
+    ...
+
+
+@overload
+def unProxy(x: T) -> T:
+    ...
+
+
+def unProxy(x):
     while isinstance(x, ExprProxy):
         x = x.getValue()
     return x

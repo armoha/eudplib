@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, NoReturn, TypeAlias, overload
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from ...utils import ExprProxy
 from ..mapdata import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
 from .constenc import Byte, Dword, T, Word, _Unique
 from .strdict import (
@@ -70,17 +71,22 @@ Weapon: TypeAlias = "str | Word | bytes"
 
 
 @overload
-def EncodeAIScript(ais: str | bytes) -> int:
+def EncodeAIScript(ais: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeAIScript(ais: _Unique) -> NoReturn:
+def EncodeAIScript(ais: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
 @overload
 def EncodeAIScript(ais: T) -> T:
+    ...
+
+
+@overload
+def EncodeAIScript(ais: ExprProxy[T]) -> T:
     ...
 
 
@@ -116,17 +122,26 @@ def EncodeAIScript(ais):
 
 
 @overload
-def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: _Unique) -> NoReturn:
+def _EncodeAny(
+    t: str, f: Callable, dl: dict[str, int], s: _Unique | ExprProxy[_Unique]
+) -> NoReturn:
     ...
 
 
 @overload
-def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: str | bytes) -> int:
+def _EncodeAny(
+    t: str, f: Callable, dl: dict[str, int], s: str | bytes | ExprProxy[str | bytes]
+) -> int:
     ...
 
 
 @overload
 def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: T) -> T:
+    ...
+
+
+@overload
+def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: ExprProxy[T]) -> T:
     ...
 
 
@@ -157,12 +172,12 @@ def _EncodeAny(t, f, dl, s):
 
 
 @overload
-def EncodeLocation(loc: str | bytes) -> int:
+def EncodeLocation(loc: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeLocation(loc: _Unique) -> NoReturn:
+def EncodeLocation(loc: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -171,17 +186,22 @@ def EncodeLocation(loc: T) -> T:
     ...
 
 
+@overload
+def EncodeLocation(loc: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeLocation(loc):
     return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc)
 
 
 @overload
-def EncodeString(s: str | bytes) -> int:
+def EncodeString(s: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeString(s: _Unique) -> NoReturn:
+def EncodeString(s: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -190,17 +210,22 @@ def EncodeString(s: T) -> T:
     ...
 
 
+@overload
+def EncodeString(s: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeString(s):
     return _EncodeAny("MapString", GetStringIndex, {}, s)
 
 
 @overload
-def EncodeSwitch(sw: str | bytes) -> int:
+def EncodeSwitch(sw: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeSwitch(sw: _Unique) -> NoReturn:
+def EncodeSwitch(sw: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -209,17 +234,22 @@ def EncodeSwitch(sw: T) -> T:
     ...
 
 
+@overload
+def EncodeSwitch(sw: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeSwitch(sw):
     return _EncodeAny("switch", GetSwitchIndex, DefSwitchDict, sw)
 
 
 @overload
-def EncodeUnit(u: str | bytes) -> int:
+def EncodeUnit(u: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeUnit(u: _Unique) -> NoReturn:
+def EncodeUnit(u: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -228,22 +258,32 @@ def EncodeUnit(u: T) -> T:
     ...
 
 
+@overload
+def EncodeUnit(u: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeUnit(u):
     return _EncodeAny("unit", GetUnitIndex, DefUnitDict, u)
 
 
 @overload
-def EncodeTBL(t: str | bytes) -> int:
+def EncodeTBL(t: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeTBL(t: _Unique) -> NoReturn:
+def EncodeTBL(t: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
 @overload
 def EncodeTBL(t: T) -> T:
+    ...
+
+
+@overload
+def EncodeTBL(t: ExprProxy[T]) -> T:
     ...
 
 
@@ -253,12 +293,12 @@ def EncodeTBL(t):
 
 
 @overload
-def EncodeFlingy(flingy: str | bytes) -> int:
+def EncodeFlingy(flingy: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeFlingy(flingy: _Unique) -> NoReturn:
+def EncodeFlingy(flingy: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -267,17 +307,22 @@ def EncodeFlingy(flingy: T) -> T:
     ...
 
 
+@overload
+def EncodeFlingy(flingy: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeFlingy(flingy):
     return _EncodeAny("flingy", lambda s: {}[s], DefFlingyDict, flingy)
 
 
 @overload
-def EncodeIcon(icon: str | bytes) -> int:
+def EncodeIcon(icon: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeIcon(icon: _Unique) -> NoReturn:
+def EncodeIcon(icon: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -286,17 +331,22 @@ def EncodeIcon(icon: T) -> T:
     ...
 
 
+@overload
+def EncodeIcon(icon: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeIcon(icon):
     return _EncodeAny("icon", lambda s: {}[s], DefIconDict, icon)
 
 
 @overload
-def EncodeSprite(sprite: str | bytes) -> int:
+def EncodeSprite(sprite: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeSprite(sprite: _Unique) -> NoReturn:
+def EncodeSprite(sprite: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -305,17 +355,22 @@ def EncodeSprite(sprite: T) -> T:
     ...
 
 
+@overload
+def EncodeSprite(sprite: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeSprite(sprite):
     return _EncodeAny("sprite", lambda s: {}[s], DefSpriteDict, sprite)
 
 
 @overload
-def EncodeImage(image: str | bytes) -> int:
+def EncodeImage(image: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeImage(image: _Unique) -> NoReturn:
+def EncodeImage(image: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -324,17 +379,22 @@ def EncodeImage(image: T) -> T:
     ...
 
 
+@overload
+def EncodeImage(image: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeImage(image):
     return _EncodeAny("image", lambda s: {}[s], DefImageDict, image)
 
 
 @overload
-def EncodeIscript(iscript: str | bytes) -> int:
+def EncodeIscript(iscript: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeIscript(iscript: _Unique) -> NoReturn:
+def EncodeIscript(iscript: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -343,17 +403,22 @@ def EncodeIscript(iscript: T) -> T:
     ...
 
 
+@overload
+def EncodeIscript(iscript: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeIscript(iscript):
     return _EncodeAny("iscript", lambda s: {}[s], DefIscriptDict, iscript)
 
 
 @overload
-def EncodeUnitOrder(order: str | bytes) -> int:
+def EncodeUnitOrder(order: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeUnitOrder(order: _Unique) -> NoReturn:
+def EncodeUnitOrder(order: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -362,17 +427,22 @@ def EncodeUnitOrder(order: T) -> T:
     ...
 
 
+@overload
+def EncodeUnitOrder(order: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeUnitOrder(order):
     return _EncodeAny("UnitOrder", lambda s: {}[s], DefUnitOrderDict, order)
 
 
 @overload
-def EncodeWeapon(weapon: str | bytes) -> int:
+def EncodeWeapon(weapon: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeWeapon(weapon: _Unique) -> NoReturn:
+def EncodeWeapon(weapon: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -381,17 +451,22 @@ def EncodeWeapon(weapon: T) -> T:
     ...
 
 
+@overload
+def EncodeWeapon(weapon: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeWeapon(weapon):
     return _EncodeAny("weapon", lambda s: {}[s], DefWeaponDict, weapon)
 
 
 @overload
-def EncodeTech(tech: str | bytes) -> int:
+def EncodeTech(tech: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeTech(tech: _Unique) -> NoReturn:
+def EncodeTech(tech: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -400,17 +475,22 @@ def EncodeTech(tech: T) -> T:
     ...
 
 
+@overload
+def EncodeTech(tech: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeTech(tech):
     return _EncodeAny("tech", lambda s: {}[s], DefTechDict, tech)
 
 
 @overload
-def EncodeUpgrade(upgrade: str | bytes) -> int:
+def EncodeUpgrade(upgrade: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodeUpgrade(upgrade: _Unique) -> NoReturn:
+def EncodeUpgrade(upgrade: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
@@ -419,22 +499,32 @@ def EncodeUpgrade(upgrade: T) -> T:
     ...
 
 
+@overload
+def EncodeUpgrade(upgrade: ExprProxy[T]) -> T:
+    ...
+
+
 def EncodeUpgrade(upgrade):
     return _EncodeAny("upgrade", lambda s: {}[s], DefUpgradeDict, upgrade)
 
 
 @overload
-def EncodePortrait(portrait: str | bytes) -> int:
+def EncodePortrait(portrait: str | bytes | ExprProxy[str | bytes]) -> int:
     ...
 
 
 @overload
-def EncodePortrait(portrait: _Unique) -> NoReturn:
+def EncodePortrait(portrait: _Unique | ExprProxy[_Unique]) -> NoReturn:
     ...
 
 
 @overload
 def EncodePortrait(portrait: T) -> T:
+    ...
+
+
+@overload
+def EncodePortrait(portrait: ExprProxy[T]) -> T:
     ...
 
 

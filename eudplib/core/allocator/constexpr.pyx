@@ -28,10 +28,8 @@ from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, overload
 
 from ... import utils as ut
 from ...localize import _
+from ...utils import ExprProxy, unProxy
 from .rlocint cimport RlocInt_C, toRlocInt
-
-if TYPE_CHECKING:
-    from ...utils import ExprProxy
 
 
 cdef class ConstExpr:
@@ -41,102 +39,75 @@ cdef class ConstExpr:
     cdef public ConstExpr baseobj
 
     def __init__(
-        self, baseobj: "ConstExpr | ExprProxy | None", offset: int = 0, rlocmode: int = 4
+        self,
+        baseobj: "ConstExpr | ExprProxy[ConstExpr | None] | None",
+        offset: int = 0,
+        rlocmode: int = 4,
     ) -> None:
-        self.baseobj: "ConstExpr | ExprProxy | None" = baseobj
+        self.baseobj: "ConstExpr | None" = unProxy(baseobj)
         self.offset: int = offset & 0xFFFFFFFF
         self.rlocmode: int = rlocmode & 0xFFFFFFFF
 
     cpdef RlocInt_C Evaluate(self) -> RlocInt_C:
-        if self.baseobj is None:
-            raise ut.EPError(_("baseobj is None; Must override Evaluate"))
-        return self.baseobj.Evaluate() * self.rlocmode // 4 + self.offset
+        if self.rlocmode:
+            return self.baseobj.Evaluate() * self.rlocmode // 4 + self.offset  # type: ignore[union-attr]
+        else:
+            return RlocInt_C(self.offset & 0xFFFFFFFF, 0)
 
     # Cython version!
 
-    @overload
-    def __add__(self, other: int) -> "ConstExpr":
-        ...
-
-    @overload
-    def __add__(self, other: "ConstExpr | ExprProxy") -> "ConstExpr | int":
-        ...
-
-    def __add__(self, other):
+    def __add__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> "ConstExpr | int":
         other = ut.unProxy(other)
         if isinstance(other, int):
-            return ConstExpr(self.baseobj, self.offset + other, self.rlocmode)
-        if _total_ord(self, other):
-            if self.rlocmode + other.rlocmode == 0:
-                return self.offset + other.offset
-            return ConstExpr(
-                self.baseobj, self.offset + other.offset, self.rlocmode + other.rlocmode
-            )
+            return IntOrConstExpr(self.baseobj, self.offset + other, self.rlocmode)
+        if isinstance(other, ConstExpr):
+            if other.rlocmode == 0:
+                return IntOrConstExpr(self.baseobj, self.offset + other.offset, self.rlocmode)
+            if self.baseobj is other.baseobj:
+                return IntOrConstExpr(
+                    self.baseobj, self.offset + other.offset, self.rlocmode + other.rlocmode
+                )
         return NotImplemented
 
-    @overload
-    def __radd__(self, other: int) -> "ConstExpr":
-        ...
-
-    @overload
-    def __radd__(self, other: "ConstExpr | ExprProxy") -> "ConstExpr | int":
-        ...
-
-    def __radd__(self, other):
+    def __radd__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> "ConstExpr | int":
         return self.__add__(other)
 
-    @overload
-    def __sub__(self, other: int) -> "ConstExpr":
-        ...
-
-    @overload
-    def __sub__(self, other: "ConstExpr | ExprProxy") -> "ConstExpr | int":
-        ...
-
-    def __sub__(self, other):
+    def __sub__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> "ConstExpr | int":
         other = ut.unProxy(other)
         if isinstance(other, int):
-            return ConstExpr(self.baseobj, self.offset - other, self.rlocmode)
-        elif _total_ord(self, other):
-            if self.rlocmode == other.rlocmode:
-                return self.offset - other.offset
-            return ConstExpr(
-                self.baseobj, self.offset - other.offset, self.rlocmode - other.rlocmode
-            )
+            return IntOrConstExpr(self.baseobj, self.offset - other, self.rlocmode)
+        if isinstance(other, ConstExpr):
+            if other.rlocmode == 0:
+                return IntOrConstExpr(self.baseobj, self.offset - other.offset, self.rlocmode)
+            if self.baseobj is other.baseobj:
+                return IntOrConstExpr(
+                    self.baseobj, self.offset - other.offset, self.rlocmode - other.rlocmode
+                )
         return NotImplemented
 
-    @overload
-    def __rsub__(self, other: int) -> "ConstExpr":
-        ...
-
-    @overload
-    def __rsub__(self, other: "ConstExpr | ExprProxy") -> "ConstExpr | int":
-        ...
-
-    def __rsub__(self, other):
+    def __rsub__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> "ConstExpr | int":
         other = ut.unProxy(other)
         if isinstance(other, int):
-            return ConstExpr(self.baseobj, other - self.offset, -self.rlocmode)
-        elif _total_ord(self, other):
-            if self.rlocmode == other.rlocmode:
-                return other.offset - self.offset
-            return ConstExpr(
-                self.baseobj, other.offset - self.offset, other.rlocmode - self.rlocmode
-            )
+            return IntOrConstExpr(self.baseobj, other - self.offset, -self.rlocmode)
+        if isinstance(other, ConstExpr):
+            if other.rlocmode == 0:
+                return IntOrConstExpr(self.baseobj, other.offset - self.offset, -self.rlocmode)
+            if self.baseobj is other.baseobj:
+                return IntOrConstExpr(
+                    self.baseobj, other.offset - self.offset, other.rlocmode - self.rlocmode
+                )
         return NotImplemented
 
-    def __mul__(self, other: "int | ExprProxy") -> "ConstExpr | int":
+    def __mul__(self, other: "int | ExprProxy[int]") -> "ConstExpr | int":
         other = ut.unProxy(other)
         if isinstance(other, int):
-            if other == 0:
-                return 0
-            return ConstExpr(self.baseobj, self.offset * other, self.rlocmode * other)
+            return IntOrConstExpr(self.baseobj, self.offset * other, self.rlocmode * other)
         return NotImplemented
 
-    def __rmul__(self, other: "int | ExprProxy") -> "ConstExpr | int":
+    def __rmul__(self, other: "int | ExprProxy[int]") -> "ConstExpr | int":
         return self.__mul__(other)
 
-    def __floordiv__(self, other: "int | ExprProxy") -> "ConstExpr":
+    def __floordiv__(self, other: "int | ExprProxy[int]") -> "ConstExpr":
         other = ut.unProxy(other)
         if isinstance(other, int):
             ut.ep_assert(
@@ -146,7 +117,7 @@ cdef class ConstExpr:
             return ConstExpr(self.baseobj, self.offset // other, self.rlocmode // other)
         return NotImplemented
 
-    def __mod__(self, other: "int | ExprProxy") -> int:
+    def __mod__(self, other: "int | ExprProxy[int]") -> int:
         other = ut.unProxy(other)
         if isinstance(other, int):
             ut.ep_assert(
@@ -156,11 +127,14 @@ cdef class ConstExpr:
             return self.offset % other
         return NotImplemented
 
-    def __neg__(self) -> "ConstExpr":
-        return self.__mul__(-1)  # type: ignore[return-value]
+    def __neg__(self) -> "ConstExpr | int":
+        return self.__mul__(-1)
 
     def __eq__(self, other) -> bool:
-        if _total_ord(self, other):
+        other = ut.unProxy(other)
+        if isinstance(other, int) and self.rlocmode == 0:
+            return self.offset == other
+        if isinstance(other, ConstExpr) and self.baseobj is other.baseobj:
             return (self.offset == other.offset) and (self.rlocmode == other.rlocmode)
         return NotImplemented
 
@@ -168,51 +142,70 @@ cdef class ConstExpr:
         return id(self)
 
     def __ne__(self, other) -> bool:
-        if _total_ord(self, other):
+        other = ut.unProxy(other)
+        if isinstance(other, int) and self.rlocmode == 0:
+            return self.offset != other
+        if isinstance(other, ConstExpr) and self.baseobj is other.baseobj:
             return (self.offset != other.offset) or (self.rlocmode != other.rlocmode)
         return NotImplemented
 
-    def __lt__(self, other: "ConstExpr") -> bool:
-        if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
+    def __lt__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> bool:
+        other = ut.unProxy(other)
+        if isinstance(other, int) and self.rlocmode == 0:
+            return self.offset < other
+        if (
+            isinstance(other, ConstExpr)
+            and self.baseobj is other.baseobj
+            and (self.rlocmode == other.rlocmode)
+        ):
             return self.offset < other.offset
         return NotImplemented
 
-    def __gt__(self, other: "ConstExpr") -> bool:
-        if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
+    def __gt__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> bool:
+        other = ut.unProxy(other)
+        if isinstance(other, int) and self.rlocmode == 0:
+            return self.offset > other
+        if (
+            isinstance(other, ConstExpr)
+            and self.baseobj is other.baseobj
+            and (self.rlocmode == other.rlocmode)
+        ):
             return self.offset > other.offset
         return NotImplemented
 
-    def __le__(self, other: "ConstExpr") -> bool:
-        if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
+    def __le__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> bool:
+        other = ut.unProxy(other)
+        if isinstance(other, int) and self.rlocmode == 0:
+            return self.offset <= other
+        if (
+            isinstance(other, ConstExpr)
+            and self.baseobj is other.baseobj
+            and (self.rlocmode == other.rlocmode)
+        ):
             return self.offset <= other.offset
         return NotImplemented
 
-    def __ge__(self, other: "ConstExpr") -> bool:
-        if _total_ord(self, other) and (self.rlocmode == other.rlocmode):
+    def __ge__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> bool:
+        other = ut.unProxy(other)
+        if isinstance(other, int) and self.rlocmode == 0:
+            return self.offset >= other
+        if (
+            isinstance(other, ConstExpr)
+            and self.baseobj is other.baseobj
+            and (self.rlocmode == other.rlocmode)
+        ):
             return self.offset >= other.offset
         return NotImplemented
 
 
-def _total_ord(a, b) -> bool:
-    if isinstance(a, ConstExpr) and isinstance(b, ConstExpr) and a.baseobj is b.baseobj:
-        return True
-    return False
-
-
-cdef class ConstExprInt(ConstExpr):
-    cdef public RlocInt_C value
-
-    def __init__(self, value):
-        super().__init__(None, value, 0)
-        self.value: RlocInt_C = RlocInt_C(value & 0xFFFFFFFF, 0)
-
-    cpdef RlocInt_C Evaluate(self) -> RlocInt_C:
-        return self.value
+def IntOrConstExpr(baseobj: ConstExpr | None, offset: int, rlocmode: int) -> int | ConstExpr:
+    if rlocmode == 0:
+        return offset
+    return ConstExpr(baseobj, offset, rlocmode)
 
 
 _ConstExpr = TypeVar("_ConstExpr", bound=ConstExpr)
-_ExprProxy = TypeVar("_ExprProxy", bound="ExprProxy")
-T = TypeVar("T", ConstExpr, int, "ExprProxy")
+_ConstExprProxy = TypeVar("_ConstExprProxy", bound=ExprProxy[ConstExpr])
 
 
 cdef class Forward(ConstExpr):
@@ -222,7 +215,7 @@ cdef class Forward(ConstExpr):
 
     def __init__(self) -> None:
         super().__init__(self)
-        self._expr: "ConstExpr | ExprProxy | None" = None
+        self._expr: ConstExpr | None = None
         self.dontFlatten = True
 
     @overload
@@ -230,26 +223,23 @@ cdef class Forward(ConstExpr):
         ...
 
     @overload
-    def __lshift__(self, expr: _ExprProxy) -> _ExprProxy:
+    def __lshift__(self, expr: _ConstExprProxy) -> _ConstExprProxy:
         ...
 
     @overload
     def __lshift__(self, expr: int) -> int:
         ...
 
-    def __lshift__(self, expr: T) -> T:
+    def __lshift__(self, expr):
         if self._expr is not None:
             raise ut.EPError(_("Reforwarding without reset is not allowed"))
         if expr is None:
             raise ut.EPError(_("Cannot forward to None"))
-        if isinstance(expr, int):
-            self._expr = ConstExprInt(expr)
+        unproxy = ut.unProxy(expr)
+        if isinstance(unproxy, int):
+            self._expr = ConstExpr(None, unproxy, 0)
         else:
-            unproxy_expr = ut.unProxy(expr)
-            if isinstance(unproxy_expr, int):
-                self._expr = ConstExprInt(unproxy_expr)
-            else:
-                self._expr = expr
+            self._expr = unproxy
         return expr
 
     def IsSet(self) -> bool:
@@ -276,13 +266,13 @@ cdef class Forward(ConstExpr):
             raise ut.EPError(_("Forward not initialized"))
         return self._expr[name]
 
-    def __setitem__(self, name, newvalue) -> None:
+    def __setitem__(self, name, newvalue):
         if self._expr is None:
             raise ut.EPError(_("Forward not initialized"))
-        self._expr[name] = newvalue  # type: ignore[index]
+        self._expr[name] = newvalue
 
 
-Evaluable: TypeAlias = "ConstExpr | int | ExprProxy | RlocInt_C"
+Evaluable: TypeAlias = ConstExpr | int | ExprProxy[ConstExpr] | RlocInt_C
 
 
 cpdef RlocInt_C Evaluate(x: Evaluable) -> RlocInt_C:
@@ -293,8 +283,8 @@ cpdef RlocInt_C Evaluate(x: Evaluable) -> RlocInt_C:
     if isinstance(expr, (int, RlocInt_C)):
         return toRlocInt(expr)
     if x is expr:
-        raise AttributeError(_("{} is not ConstExpr").format(x))
-    raise AttributeError(_("ExprProxy {} does not wrap ConstExpr: {}").format(x, expr))
+        raise AttributeError(_("Only ConstExpr can be Evaluated, not {}").format(x))
+    raise AttributeError(_("ExprProxy {} does not wrap ConstExpr, instead {}").format(x, expr))
 
 
 def IsConstExpr(x) -> bool:
