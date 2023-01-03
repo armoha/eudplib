@@ -26,7 +26,7 @@ THE SOFTWARE.
 from typing import Any
 
 from ..localize import _
-from .eperror import ep_assert
+from .eperror import EPError, ep_assert
 
 block = tuple[str, Any]
 
@@ -69,8 +69,10 @@ def EUDGetLastBlock() -> block:
 
 def EUDGetLastBlockOfName(name: str) -> block:
     _lastblockdict = _current_bsm._lastblockdict
-
-    return _lastblockdict[name][-1]  # IndexError or KeyError
+    try:
+        return _lastblockdict[name][-1]
+    except (IndexError, KeyError):
+        raise EPError(_("Block not found: {}").format(name))
 
 
 def EUDPeekBlock(name: str) -> block:

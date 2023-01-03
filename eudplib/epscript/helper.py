@@ -14,8 +14,14 @@ from ..core.variable.eudv import IsRValue
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
 from ..eudlib import EUDArray
 from ..maprw import EUDOnStart
-from ..utils import ExprProxy, FlattenList, List2Assignable, ep_warn, isUnproxyInstance
-from ..utils.eperror import TriggerScopeError
+from ..utils import (
+    ExprProxy,
+    FlattenList,
+    List2Assignable,
+    TriggerScopeError,
+    ep_warn,
+    isUnproxyInstance,
+)
 from .epsimp import EPSLoader
 
 

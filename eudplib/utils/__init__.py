@@ -32,7 +32,14 @@ from .blockstru import (
     EUDPeekBlock,
     EUDPopBlock,
 )
-from .eperror import EPError, EPWarning, ep_assert, ep_eprint, ep_warn
+from .eperror import (
+    EPError,
+    EPWarning,
+    TriggerScopeError,
+    ep_assert,
+    ep_eprint,
+    ep_warn,
+)
 from .etc import (
     EPD,
     Assignable2List,

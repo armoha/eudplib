@@ -1,6 +1,22 @@
 from helper import *
 
 
+class expect_triggerscope_error:
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, e, traceback):
+        if isinstance(e, TriggerScopeError):
+            print(" - Error as expected : %s" % e)
+            return True
+        else:
+            raise RuntimeError("EPError not thrown")
+
+
+with expect_triggerscope_error():
+    RawTrigger()
+
+
 @EUDFunc
 def f_add(a, b):
     return a + b

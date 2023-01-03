@@ -26,8 +26,13 @@ THE SOFTWARE.
 from typing import TYPE_CHECKING, Literal
 
 from ...localize import _
-from ...utils import EUDCreateBlock, EUDGetLastBlockOfName, EUDPopBlock
-from ...utils.eperror import TriggerScopeError
+from ...utils import (
+    EPError,
+    EUDCreateBlock,
+    EUDGetLastBlockOfName,
+    EUDPopBlock,
+    TriggerScopeError,
+)
 from ..allocator import Forward
 
 if TYPE_CHECKING:
@@ -43,10 +48,10 @@ def SetNextTrigger(trg: "_Trigger") -> None:
     """For optimization purpose, one may call this function directly"""
     try:
         nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
-    except IndexError:
+    except EPError as exc:
         raise TriggerScopeError(
             _("Must put Trigger into onPluginStart, beforeTriggerExec or afterTriggerExec")
-        )
+        ) from exc
     for fw in nt_list:
         fw << trg
     nt_list.clear()
@@ -56,10 +61,10 @@ def NextTrigger() -> Forward:
     fw = Forward()
     try:
         nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
-    except IndexError:
+    except EPError as exc:
         raise TriggerScopeError(
             _("Must put Trigger into onPluginStart, beforeTriggerExec or afterTriggerExec")
-        )
+        ) from exc
     nt_list.append(fw)
     return fw
 

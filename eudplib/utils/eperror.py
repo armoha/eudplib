@@ -32,7 +32,7 @@ class EPError(Exception):
     pass
 
 
-class TriggerScopeError(Exception):
+class TriggerScopeError(EPError):
     pass
 
 
