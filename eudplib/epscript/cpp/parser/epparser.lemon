@@ -907,8 +907,7 @@ vdefAssign_global_stmt ::= VAR nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B).
         }
     });
 
-    ps->gen << s << " = EUDCreateVariables(" << varCount << ")" << std::endl;
-    ps->gen << "_IGVA([" << s << "], lambda: [" << B->data << "])" << std::endl;
+    ps->gen << s << " = _IGVA(" << varCount << ", lambda: [" << B->data << "])" << std::endl;
 
     delete A; delete B;
 }

@@ -2,6 +2,7 @@ from types import ModuleType
 
 from ..core import (
     ConstExpr,
+    EUDCreateVariables,
     EUDVariable,
     EUDVArray,
     Forward,
@@ -53,12 +54,18 @@ def _RELIMP(path, mod_name):  # relative path import
     return module
 
 
-def _IGVA(vList, exprListGen):
-    def _():
-        exprList = exprListGen()
-        SetVariables(vList, exprList)
+def _IGVA(varCount, exprListGen):
+    try:
+        vList = [EUDVariable(x) for x in exprListGen()]
+    except (TriggerScopeError, NameError):
+        vList = EUDCreateVariables(varCount)
 
-    EUDOnStart(_)
+        def _():
+            exprList = exprListGen()
+            SetVariables(vList, exprList)
+
+        EUDOnStart(_)
+    return List2Assignable(vList)
 
 
 def _CGFW(exprf, retn):
