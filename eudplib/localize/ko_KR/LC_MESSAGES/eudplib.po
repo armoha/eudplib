@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eudplib 0.64.0\n"
 "POT-Creation-Date: 2023-01-04 20:28+0900\n"
-"PO-Revision-Date: 2023-01-04 21:34+0900\n"
+"PO-Revision-Date: 2023-01-04 21:43+0900\n"
 "Last-Translator: Armoha <kein0011@naver.com>\n"
 "Language-Team: \n"
 "Language: ko\n"
@@ -130,7 +130,8 @@ msgstr "rlocmode는 1 또는 4여야합니다"
 
 #: E:\eudplib\eudplib\core\allocator\pbuffer.py:149
 msgid "Cannot write non-const in byte/word/nonalligned dword."
-msgstr "byte/word/정렬되지 않은 dword에 상수가 아닌 값을 작성할 수 없습니다."
+msgstr ""
+"바이트/word/정렬되지 않은 dword에 상수가 아닌 값을 작성할 수 없습니다."
 
 #: E:\eudplib\eudplib\core\allocator\rlocint.py:65
 #: E:\eudplib\eudplib\core\allocator\rlocint.py:72
@@ -249,7 +250,7 @@ msgstr "단락 이름 길이는 4글자를 넘지 않습니다"
 
 #: E:\eudplib\eudplib\core\mapdata\fixmapdata.py:115
 msgid "[Warning] Input map has 0000.00 null tiles"
-msgstr "[경고] 입력 맵에 0000.00 null 타일 지형이 있습니다."
+msgstr "[경고] 입력 맵에 0000.00 null 타일 지형이 있습니다"
 
 #: E:\eudplib\eudplib\core\mapdata\fixmapdata.py:117
 msgid "Replaced them to 0000.01, because they cause desync."
@@ -274,7 +275,7 @@ msgstr "LoadMap을 먼저 호출해야합니다"
 
 #: E:\eudplib\eudplib\core\mapdata\mpqapi.py:92
 msgid "You need to install stormlib before using eudplib."
-msgstr "eudplib을 사용하려면 StormLib을 설치해야합니다."
+msgstr "eudplib을 사용하려면 StormLib을 설치해야합니다"
 
 #: E:\eudplib\eudplib\core\mapdata\mpqapi.py:137
 #: E:\eudplib\eudplib\core\mapdata\mpqapi.py:143
@@ -314,7 +315,7 @@ msgstr "상수가 아닌 액션 플래그를 디시블할 수 없습니다"
 
 #: E:\eudplib\eudplib\core\rawtrigger\action.py:168
 msgid "Invalid fields for action{} {}:"
-msgstr "{}번째 액션 '{}'의 필드가 잘못됨"
+msgstr "{}번째 액션 '{}'의 필드가 잘못됨:"
 
 #: E:\eudplib\eudplib\core\rawtrigger\action.py:229
 #: E:\eudplib\eudplib\core\rawtrigger\condition.py:158
@@ -328,7 +329,7 @@ msgstr "액션을 2개 이상의 트리거와 공유할 수 없습니다."
 #: E:\eudplib\eudplib\core\rawtrigger\action.py:236
 #: E:\eudplib\eudplib\core\rawtrigger\condition.py:165
 msgid "Trigger should not be null."
-msgstr "액션/조건의 트리거는 None이 아니어야합니다"
+msgstr "액션/조건의 트리거는 None이 아니어야합니다."
 
 #: E:\eudplib\eudplib\core\rawtrigger\action.py:237
 msgid "Triggers out of range"
@@ -355,7 +356,7 @@ msgstr "상수가 아닌 조건 플래그를 디시블할 수 없습니다"
 
 #: E:\eudplib\eudplib\core\rawtrigger\condition.py:126
 msgid "Invalid fields for condition{} {}:"
-msgstr "{}번째 조거 '{}'의 필드가 잘못됨"
+msgstr "{}번째 조건 '{}'의 필드가 잘못됨:"
 
 #: E:\eudplib\eudplib\core\rawtrigger\condition.py:163
 msgid "Condition cannot be shared by two triggers."
@@ -436,7 +437,7 @@ msgstr "AIScript의 이름이 너무 짧습니다"
 #: E:\eudplib\eudplib\core\rawtrigger\strenc.py:113
 #: E:\eudplib\eudplib\core\rawtrigger\strenc.py:158
 msgid "Cannot encode string {} as {}."
-msgstr "문자열 {}를 {} 목록에서 찾을 수 없습니다"
+msgstr "문자열 {}를 {} 목록에서 찾을 수 없습니다."
 
 #: E:\eudplib\eudplib\core\rawtrigger\strenc.py:107
 #: E:\eudplib\eudplib\core\rawtrigger\strenc.py:115
@@ -680,7 +681,7 @@ msgstr "백신 프로그램이나 스타크래프트를 종료해보세요"
 
 #: E:\eudplib\eudplib\maprw\loadmap.py:56
 msgid "Fail to open input map"
-msgstr "연결맵을 여는데 실패했습니다."
+msgstr "연결맵을 여는데 실패했습니다"
 
 #: E:\eudplib\eudplib\maprw\loadmap.py:60
 msgid "Fail to extract scenario.chk, maybe invalid scx"
@@ -700,7 +701,7 @@ msgstr "파일 {}를 mpq에 추가하는데 실패: 중복된 파일일 수 있�
 
 #: E:\eudplib\eudplib\maprw\savemap.py:47
 msgid "Empty trace header"
-msgstr "빈 추저 헤더"
+msgstr "빈 추적 헤더"
 
 #: E:\eudplib\eudplib\maprw\savemap.py:65
 msgid "Saving to {}..."
