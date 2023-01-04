@@ -23,10 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from functools import cache
+import functools
 from typing import TYPE_CHECKING, overload
 
 from .. import core as c
+from ..core import ConstExpr, EUDVariable
 from ..ctrlstru import EUDJumpIf
 from ..localize import _
 from ..utils import EPError, ExprProxy, unProxy
@@ -79,28 +80,28 @@ def RunTrigTrigger() -> None:
 #######
 
 
-@cache
+@functools.cache
 def AllocTrigTriggerLink() -> tuple["EUDArray", "EUDArray", "EUDArray"]:
     from .. import eudlib as sf
 
     return sf.EUDArray(8), sf.EUDArray(8), sf.EUDArray(_runner_end)
 
 
-def GetFirstTrigTrigger(player: "Player") -> c.EUDVariable:
+def GetFirstTrigTrigger(player: "Player") -> EUDVariable:
     """Get dlist start of trig-trigger for player"""
     player = c.EncodePlayer(player)
     orig_tstart, _orig_tend, _runner_end_array = AllocTrigTriggerLink()
     return orig_tstart[player]
 
 
-def GetLastTrigTrigger(player: "Player") -> c.EUDVariable:
+def GetLastTrigTrigger(player: "Player") -> EUDVariable:
     """Get dlist end of trig-trigger for player"""
     player = c.EncodePlayer(player)
     _orig_tstart, orig_tend, _runner_end_array = AllocTrigTriggerLink()
     return orig_tend[player]
 
 
-def TrigTriggerBegin(player: "Player") -> c.EUDVariable:
+def TrigTriggerBegin(player: "Player") -> EUDVariable:
     return GetFirstTrigTrigger(player)
 
 
@@ -111,8 +112,8 @@ def TrigTriggerEnd(player: "int | _Player | ExprProxy[int | _Player]") -> c.Forw
 
 @overload
 def TrigTriggerEnd(
-    player: c.EUDVariable | c.ConstExpr | ExprProxy[c.EUDVariable | c.ConstExpr],
-) -> c.EUDVariable:
+    player: EUDVariable | ConstExpr | ExprProxy[EUDVariable | ConstExpr],
+) -> EUDVariable:
     ...
 
 

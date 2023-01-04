@@ -27,6 +27,8 @@ from typing import Any
 
 from eudplib.utils import ep_warn
 
+from ..localize import _
+
 _objns: dict[str, Any] = {}
 
 
@@ -38,7 +40,7 @@ def EUDRegisterObjectToNamespace(funcname: str, obj: Any) -> Any:
     """Register object to inline code namespace."""
     if funcname[0] != "_":
         if funcname in _objns:
-            ep_warn(f"Duplicated name {funcname} for EUDRegisterObjectToNamespace")
+            ep_warn(_("Duplicated name {} for EUDRegisterObjectToNamespace").format(funcname))
             _objns[funcname] = None
         else:
             _objns[funcname] = obj

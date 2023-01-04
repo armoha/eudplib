@@ -1,0 +1,18 @@
+function test_compatibility() {
+    static var ret = 0;
+    const empty = Db(i2b4(0));
+    const cond = Forward();
+
+    py_exec("from helper import *\n\
+with expect_eperror():\n\
+    Trigger(cond, ret.AddNumber(1 << 0))\n\
+with expect_eperror():\n\
+    Trigger(empty, ret.AddNumber(1 << 2))\n\
+with expect_eperror():\n\
+    Trigger(empty + 1, ret.AddNumber(1 << 2))\n\
+");
+
+    cond.__lshift__(Memory(empty, AtLeast, 1));
+    if (cond) { ret += 1 << 1; }
+    return ret;
+}

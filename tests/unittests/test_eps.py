@@ -11,6 +11,7 @@ from .test_eps_array import (
     f_test_queue_wraparound,
     f_test_write,
 )
+from .test_eps_compat import f_test_compatibility
 from .test_eps_cunit import f_test_cunit
 from .test_eps_epsfile import f_constv_thing, f_square, f_switch_test, f_test_array
 from .test_eps_object import f_test_nested_object, f_test_object, f_test_selftype_member
@@ -62,3 +63,4 @@ def test_epscript():
     test_equality("epScript nested object", f_test_nested_object(), 127)
     test_equality("epScript all object array", f_test_selftype_member(), 5)
     test_equality("epScript EPDCUnitMap", f_test_cunit(), 63)
+    test_equality("epScript compatibility", f_test_compatibility(), 2)

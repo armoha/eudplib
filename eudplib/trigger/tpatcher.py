@@ -24,10 +24,21 @@ THE SOFTWARE.
 """
 
 
+from typing import Literal, overload
+
 from eudplib.localize import _
 
 from .. import core as c
-from .. import utils as ut
+from ..core import (
+    Action,
+    Condition,
+    ConstExpr,
+    EUDLightBool,
+    EUDLightVariable,
+    EUDVariable,
+    Forward,
+)
+from ..utils import EPD, EPError, ExprProxy, ep_warn, unProxy
 from .filler import (
     _filldw,
     _fillhibyte,
@@ -72,135 +83,183 @@ actpt: list[list[int | None]] = [
     [2, None, None, None],
 ]
 
+ConstCondition = (
+    bool
+    | int
+    | EUDVariable
+    | EUDLightVariable
+    | EUDLightBool
+    | ExprProxy[bool | int | EUDVariable | EUDLightVariable | EUDLightBool]
+)
+_Condition = ConstExpr | ConstCondition | ExprProxy[ConstExpr]
 
-def PatchCondition(cond) -> c.Condition:
-    if isinstance(cond, c.Action):
-        raise ut.EPError(_("Can't put Action in conditionals: {}").format(cond))
-    if hasattr(cond, "getValueAddr"):
-        try:  # EUDLightBool, EUDEntry
-            return c.MemoryX(cond.getValueAddr(), c.AtLeast, 1, cond._mask)
-        except AttributeError:  # EUD(Light)Variable, Db
-            return c.Memory(cond.getValueAddr(), c.AtLeast, 1)
+
+def isCastable(cond) -> bool:
+    # EUDArray, EUDVArray, EUDStruct, DBString
+    return isinstance(cond, ExprProxy) and not type(cond) is ExprProxy
+
+
+def PatchCondition(cond: _Condition) -> Condition:
+    is_castable = isCastable(cond)
+    condition = unProxy(cond)
+    if isinstance(condition, Forward):
+        if condition._expr is None:
+            raise EPError(_("Forward not initialized"))
+        condition = condition._expr
+    if isinstance(condition, EUDLightBool):
+        return c.MemoryX(condition.getValueAddr(), c.AtLeast, 1, condition._mask)
+    if isinstance(condition, (EUDVariable, EUDLightVariable)):
+        return c.Memory(condition.getValueAddr(), c.AtLeast, 1)
 
     # translate boolean condition
-    elif isinstance(cond, bool):
-        if cond:
-            return c.Always()
-        else:
-            return c.Never()
-
-    else:
-        try:
-            ApplyPatchTable(ut.EPD(cond), cond, condpt)
-            return cond
-        except AttributeError:
-            if c.IsConstExpr(cond):
-                return cond != 0
-            raise
+    if isinstance(condition, (bool, int)):
+        return c.Always() if condition else c.Never()
+    if isinstance(condition, Condition):
+        ApplyPatchTable(EPD(condition), condition, condpt)
+        return condition
+    if is_castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
+        ep_warn(_("Condition is always True"))
+        return c.Always() if condition != 0 else c.Never()
+    raise EPError(_("Invalid input for condition: {}").format(cond))
 
 
-def PatchAction(act) -> c.Action:
-    if not isinstance(act, c.Action):
-        raise ut.EPError(_("Action expected, found {}").format(act))
-    ApplyPatchTable(ut.EPD(act), act, actpt)
-    return act
+def PatchAction(act: Action | Forward | ExprProxy[Action | Forward]) -> Action:
+    action = unProxy(act)
+    if isinstance(action, Forward):
+        if action._expr is None:
+            raise EPError(_("Forward not initialized"))
+        action = action._expr  # type: ignore[assignment]
+    if not isinstance(action, Action):
+        raise EPError(_("Action expected, found {}").format(act))
+    ApplyPatchTable(EPD(action), action, actpt)
+    return action
+
+
+@overload
+def IsConditionConst(cond: Condition | ExprProxy[Condition]) -> bool:
+    ...
+
+
+@overload
+def IsConditionConst(cond: ConstCondition) -> Literal[True]:
+    ...
 
 
 def IsConditionConst(cond) -> bool:
-    if c.IsEUDVariable(cond):
-        return True
-    elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
-        return True
-    elif ut.isUnproxyInstance(cond, c.EUDLightBool):
-        return True
-    elif isinstance(cond, bool):
-        return True
-    else:
-        try:
-            fieldName = 0
-            for condFields in condpt:
-                for fieldSize in condFields:
-                    if type(fieldSize) is int:
-                        field = cond.fields[fieldName]
-                        if c.IsEUDVariable(field):
-                            return False
-                    fieldName += 1
-            return True
-        except AttributeError:
-            if c.IsConstExpr(cond):
-                return True
+    is_castable = isCastable(cond)
+    cond = unProxy(cond)
+    if isinstance(cond, Forward):
+        if cond._expr is None:
             return False
+        cond = cond._expr
+    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):
+        return True
+
+    if isinstance(cond, Condition):
+        fieldName = 0
+        for condFields in condpt:
+            for fieldSize in condFields:
+                if isinstance(fieldSize, int):
+                    field = cond.fields[fieldName]
+                    if c.IsEUDVariable(field):
+                        return False
+                fieldName += 1
+        return True
+    if is_castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):
+        return True
+    return False
+
+
+@overload
+def IsConditionNegatable(cond: Condition | ExprProxy[Condition]) -> bool:
+    ...
+
+
+@overload
+def IsConditionNegatable(cond: ConstCondition) -> Literal[True]:
+    ...
 
 
 def IsConditionNegatable(cond) -> bool:
-    if c.IsEUDVariable(cond):
-        return True
-    elif ut.isUnproxyInstance(cond, c.EUDLightVariable):
-        return True
-    elif ut.isUnproxyInstance(cond, c.EUDLightBool):
-        return True
-    elif isinstance(cond, bool):
-        return True
-    else:
-        try:
-            condtype = cond.fields[5]
-            comparison_set = (1, 2, 3, 4, 5, 12, 14, 15, 21)
-            always_or_never = (0, 22, 13, 23)
-            if condtype in always_or_never:
-                return True
-            if condtype == 11:  # Switch
-                return True
-            if condtype in comparison_set:
-                bring_or_command = (2, 3)
-                comparison = cond.fields[4]
-                amount = cond.fields[2] & 0xFFFFFFFF
-                if comparison == 10 and amount == 0:
-                    return True
-                if comparison == 0 and amount <= 1:
-                    return True
-                if condtype in bring_or_command:
-                    # AtMost and Exactly/AtLeast behaves differently in Bring or Command.
-                    # (ex. AtMost counts buildings on construction and does not count Egg/Cocoon)
-                    # So only exchanging (Exactly, 0) <-> (AtLeast, 1) is sound.
-                    #
-                    # See: https://cafe.naver.com/edac/book5095361/96809
-                    return False
-                if comparison in (0, 1):
-                    return True
-                elif comparison != 10:
-                    return False
-                elif condtype == 15 and cond.fields[8] == ut.b2i2(ut.u2b("SC")):
-                    mask = cond.fields[0] & 0xFFFFFFFF
-                    if amount & (~mask):  # never
-                        return True
-                    if amount == mask:
-                        return True
-                    return False
-                elif amount == 0xFFFFFFFF:
-                    return True
+    is_castable = isCastable(cond)
+    cond = unProxy(cond)
+    if isinstance(cond, Forward):
+        if cond._expr is None:
             return False
-        except AttributeError:
-            if c.IsConstExpr(cond):
-                return True
+        cond = cond._expr
+    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):
+        return True
+
+    if isinstance(cond, Condition):
+        condtype = cond.fields[5]
+        if not isinstance(condtype, int):
             return False
+        comparison_set = (1, 2, 3, 4, 5, 12, 14, 15, 21)
+        always_or_never = (0, 22, 13, 23)
+        if condtype in always_or_never:
+            return True
+        comparison = cond.fields[4]
+        if not isinstance(comparison, int):
+            return False
+        if condtype == 11 and comparison in (2, 3):  # Switch
+            return True
+        amount = cond.fields[2]
+        if condtype in comparison_set and isinstance(amount, int):
+            bring_or_command = (2, 3)
+            amount &= 0xFFFFFFFF
+            if comparison == 10 and amount == 0:
+                return True
+            if comparison == 0 and amount <= 1:
+                return True
+            if condtype in bring_or_command:
+                # AtMost and Exactly/AtLeast behaves differently in Bring or Command.
+                # (ex. AtMost counts buildings on construction and does not count Egg/Cocoon)
+                # So only exchanging (Exactly, 0) <-> (AtLeast, 1) is sound.
+                #
+                # See: https://cafe.naver.com/edac/book5095361/96809
+                return False
+            if comparison in (0, 1):
+                return True
+            elif comparison != 10:
+                return False
+            elif condtype == 15 and isinstance(cond.fields[8], int) and cond.fields[8] == 0x4353:
+                mask = cond.fields[0]
+                if not isinstance(mask, int):
+                    return False
+                mask &= 0xFFFFFFFF
+                if amount & (~mask):  # never
+                    return True
+                if amount == mask:
+                    return True
+                return False
+            elif amount == 0xFFFFFFFF:
+                return True
+        return False
+    if is_castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):
+        return True
+    return False
 
 
-def NegateCondition(cond) -> c.Condition:
-    unproxy = ut.unProxy(cond)
-    if isinstance(unproxy, c.EUDVariable) or isinstance(unproxy, c.EUDLightVariable):
-        return unproxy == 0
-    elif isinstance(unproxy, c.EUDLightBool):
-        return cond.IsCleared()
+def NegateCondition(cond: _Condition) -> Condition:
+    is_castable = isCastable(cond)
+    condition = unProxy(cond)
+    if isinstance(condition, Forward):
+        if condition._expr is None:
+            raise EPError(_("Forward not initialized"))
+        condition = condition._expr
+    if isinstance(condition, (EUDVariable, EUDLightVariable)):
+        return condition == 0
+    if isinstance(condition, EUDLightBool):
+        return condition.IsCleared()
 
     # translate boolean condition
-    elif isinstance(cond, bool):
-        if cond:
-            return c.Never()
-        else:
-            return c.Always()
+    if isinstance(condition, (bool, int)):
+        return c.Never() if condition else c.Always()
 
-    try:
-        cond.Negate()
-        return cond
-    except (AttributeError, ut.EPError, TypeError):
-        raise
+    if isinstance(condition, Condition):
+        condition.Negate()
+        return condition
+    if is_castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
+        ep_warn(_("Condition is always False"))
+        return c.Never() if condition == 0 else c.Always()
+    raise EPError(_("Invalid input for condition: {}").format(cond))
