@@ -33,10 +33,7 @@ from ...utils import (
     EUDPopBlock,
     TriggerScopeError,
 )
-from ..allocator import Forward
-
-if TYPE_CHECKING:
-    from .rawtriggerdef import _Trigger
+from ..allocator import ConstExpr, Forward
 
 
 def PushTriggerScope() -> Literal[True]:
@@ -44,7 +41,7 @@ def PushTriggerScope() -> Literal[True]:
     return True  # Allow `if PushTriggerScope()` syntax for indent
 
 
-def SetNextTrigger(trg: "_Trigger") -> None:
+def SetNextTrigger(trg: ConstExpr) -> None:
     """For optimization purpose, one may call this function directly"""
     try:
         nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
@@ -69,7 +66,7 @@ def NextTrigger() -> Forward:
     return fw
 
 
-def _RegisterTrigger(trg: "_Trigger") -> None:
+def _RegisterTrigger(trg: ConstExpr) -> None:
     SetNextTrigger(trg)
 
 

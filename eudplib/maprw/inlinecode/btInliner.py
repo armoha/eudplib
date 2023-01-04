@@ -32,7 +32,7 @@ from ... import eudlib as sf
 from ... import utils as ut
 from ...trigtrg.runtrigtrg import _runner_cp
 
-sharedTriggers = []
+sharedTriggers: list[bytes | c.RawTrigger] = []
 tStartEnd = tuple[c.ConstExpr, c.RawTrigger]
 
 
@@ -171,7 +171,7 @@ def TryToShareTrigger(bTrigger: bytes) -> int | bytes:
 
 
 def InlineCodifyMultipleBinaryTriggers(
-    bTriggers: Collection[bytes],
+    bTriggers: Collection[bytes | int],
 ) -> tStartEnd:
     """Inline codify raw(binary) trigger data.
 
@@ -192,6 +192,7 @@ def InlineCodifyMultipleBinaryTriggers(
     if c.PushTriggerScope():
         nextTrigger = c.Forward()
         for i, bTrigger in enumerate(bTriggers):
+            tEnd: c.RawTrigger
             if isinstance(bTrigger, bytes):
                 tEnd = c.RawTrigger(trigSection=bTrigger)
                 nextTrigger << tEnd
@@ -199,13 +200,14 @@ def InlineCodifyMultipleBinaryTriggers(
                     nextTrigger = c.Forward()
                 b2s = True
             elif isinstance(bTrigger, int):
-                tEnd = sharedTriggers[bTrigger]
-                if isinstance(tEnd, bytes):
-                    tEnd = c.RawTrigger(trigSection=tEnd)
+                sharedTrigger = sharedTriggers[bTrigger]
+                if isinstance(sharedTrigger, bytes):
+                    tEnd = c.RawTrigger(trigSection=sharedTrigger)
                     sharedTriggers[bTrigger] = tEnd
-                elif isinstance(tEnd, c.RawTrigger):
+                elif isinstance(sharedTrigger, c.RawTrigger):
+                    tEnd = sharedTrigger
                     if b2s:
-                        c.SetNextTrigger(tEnd)
+                        c.SetNextTrigger(sharedTrigger)
                 else:
                     raise TypeError()
                 nextTrigger << tEnd
@@ -218,6 +220,9 @@ def InlineCodifyMultipleBinaryTriggers(
             if firstTrigger is None:
                 firstTrigger = tEnd
     c.PopTriggerScope()
+
+    if firstTrigger is None:
+        raise TypeError()
 
     if c.PushTriggerScope():
         tStart = c.Forward()

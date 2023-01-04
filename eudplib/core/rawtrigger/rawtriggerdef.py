@@ -37,8 +37,8 @@ from .condition import Condition
 from .triggerscope import NextTrigger, _RegisterTrigger
 
 if TYPE_CHECKING:
-    from ..allocator import Forward
-    from ..allocator.payload import RlocInt_C, _PayloadBuffer
+    from ..allocator import ConstExpr
+    from ..allocator.payload import _PayloadBuffer
 
 # Trigger counter thing
 
@@ -66,20 +66,19 @@ def Disabled(arg: Condition | Action) -> None:
     arg.Disabled()
 
 
-# RawTrigger
-_Trigger: TypeAlias = "RawTrigger | Forward | int | None"
-_Condition: TypeAlias = Condition | bool | Iterable[Condition | bool | Iterable] | None
-_Action: TypeAlias = Action | Iterable[Action | Iterable] | None
+Trigger: TypeAlias = "ConstExpr | int | None"
+_Condition: TypeAlias = Condition | bool | Iterable[Condition | bool | Iterable]
+_Action: TypeAlias = Action | Iterable[Action | Iterable]
 
 
 class RawTrigger(EUDObject):
     @overload
     def __init__(
         self,
-        prevptr: _Trigger = None,
-        nextptr: _Trigger = None,
-        conditions: _Condition = None,
-        actions: _Action = None,
+        prevptr: Trigger = None,
+        nextptr: Trigger = None,
+        conditions: _Condition | None = None,
+        actions: _Action | None = None,
         *,
         preserved: bool = True,
         currentAction: int | None = None,
@@ -90,8 +89,8 @@ class RawTrigger(EUDObject):
     @overload
     def __init__(
         self,
-        prevptr: _Trigger = None,
-        nextptr: _Trigger = None,
+        prevptr: Trigger = None,
+        nextptr: Trigger = None,
         conditions: None = None,
         actions: None = None,
         *,
@@ -103,10 +102,10 @@ class RawTrigger(EUDObject):
 
     def __init__(
         self,
-        prevptr: _Trigger = None,
-        nextptr: _Trigger = None,
-        conditions: _Condition = None,
-        actions: _Action = None,
+        prevptr: Trigger = None,
+        nextptr: Trigger = None,
+        conditions: _Condition | None = None,
+        actions: _Action | None = None,
         *,
         preserved: bool = True,
         currentAction: int | None = None,

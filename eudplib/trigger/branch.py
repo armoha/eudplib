@@ -23,13 +23,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Iterable, Sequence
+
 from eudplib import utils as ut
 
 from .. import core as c
-from .tpatcher import PatchCondition
+from ..core import Action, Condition, Forward, RawTrigger
+from ..core.rawtrigger.rawtriggerdef import _Action
+from .tpatcher import PatchCondition, _Condition
 
 
-def _EUDBranchSub(conditions, ontrue, onfalse, *, _actions=None) -> None:
+def _EUDBranchSub(
+    conditions: Sequence[Condition],
+    ontrue: c.ConstExpr,
+    onfalse: c.ConstExpr,
+    *,
+    _actions: _Action | None = None
+) -> None:
     """
     Reduced version of EUDBranch with following restructions.
     - All fields of conditions/actions should be constant.
@@ -38,18 +48,24 @@ def _EUDBranchSub(conditions, ontrue, onfalse, *, _actions=None) -> None:
     """
     ut.ep_assert(len(conditions) <= 16)
 
-    brtrg = c.Forward()
-    tjtrg = c.Forward()
-    brtrg << c.RawTrigger(
-        nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg)
-    )
-    if _actions is None:
-        _actions = []
-    _actions.append(c.SetNextPtr(brtrg, onfalse))
-    tjtrg << c.RawTrigger(nextptr=ontrue, actions=_actions)
+    brtrg = Forward()
+    tjtrg = Forward()
+    brtrg << RawTrigger(nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg))
+    if _actions:
+        actions = ut.FlattenList(_actions)
+    else:
+        actions = []
+    actions.append(c.SetNextPtr(brtrg, onfalse))
+    tjtrg << RawTrigger(nextptr=ontrue, actions=actions)
 
 
-def EUDBranch(conditions, ontrue, onfalse, *, _actions=None) -> None:
+def EUDBranch(
+    conditions: _Condition | Iterable[_Condition | Iterable],
+    ontrue: c.ConstExpr,
+    onfalse: c.ConstExpr,
+    *,
+    _actions: _Action | None = None
+) -> None:
     """Branch by whether conditions is satisfied or not.
 
     :param conditions: Nested list of conditions.
@@ -57,20 +73,20 @@ def EUDBranch(conditions, ontrue, onfalse, *, _actions=None) -> None:
     :param onfalse: When any of the conditions are false, this branch is taken.
     """
     conditions = ut.FlattenList(conditions)
-    conditions = list(map(PatchCondition, conditions))
+    conds = list(map(PatchCondition, conditions))
 
-    if len(conditions) == 0:
-        c.RawTrigger(nextptr=ontrue, actions=_actions)  # Just jump
+    if len(conds) == 0:
+        RawTrigger(nextptr=ontrue, actions=_actions)  # Just jump
         return
 
     # Check all conditions
-    for i in range(0, len(conditions), 16):
-        subontrue = c.Forward()
+    for i in range(0, len(conds), 16):
+        subontrue = Forward()
         subonfalse = onfalse
 
-        if i + 16 < len(conditions):
-            _EUDBranchSub(conditions[i : i + 16], subontrue, subonfalse)
+        if i + 16 < len(conds):
+            _EUDBranchSub(conds[i : i + 16], subontrue, subonfalse)
             subontrue << c.NextTrigger()
             continue
-        _EUDBranchSub(conditions[i:], subontrue, subonfalse, _actions=_actions)
+        _EUDBranchSub(conds[i:], subontrue, subonfalse, _actions=_actions)
         subontrue << ontrue
