@@ -49,7 +49,7 @@ from .filler import (
 )
 
 
-def ApplyPatchTable(initepd, obj, patchTable: list[list[int | None]]) -> None:
+def ApplyPatchTable(initepd, obj, patchTable: "list[list[int | None]]") -> None:
     fieldName = 0
     for i, patchEntry in enumerate(patchTable):
         patchFields = patchEntry
@@ -70,9 +70,9 @@ def ApplyPatchTable(initepd, obj, patchTable: list[list[int | None]]) -> None:
             fieldName += 1
 
 
-condpt: list[list[int | None]] = [[-1], [-1], [-1], [0, 4, 5], [2, 3, None, None]]
+condpt: "list[list[int | None]]" = [[-1], [-1], [-1], [0, 4, 5], [2, 3, None, None]]
 
-actpt: list[list[int | None]] = [
+actpt: "list[list[int | None]]" = [
     [-1],
     [-1],
     [-1],
@@ -141,7 +141,7 @@ def IsConditionConst(cond: Condition | ExprProxy[Condition]) -> bool:
 
 
 @overload
-def IsConditionConst(cond: ConstCondition) -> Literal[True]:
+def IsConditionConst(cond: ConstCondition) -> "Literal[True]":
     ...
 
 
@@ -176,7 +176,7 @@ def IsConditionNegatable(cond: Condition | ExprProxy[Condition]) -> bool:
 
 
 @overload
-def IsConditionNegatable(cond: ConstCondition) -> Literal[True]:
+def IsConditionNegatable(cond: ConstCondition) -> "Literal[True]":
     ...
 
 

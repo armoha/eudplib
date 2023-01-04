@@ -44,13 +44,13 @@ if TYPE_CHECKING:
 
 
 class Payload:
-    def __init__(self, data: bytearray, prttable: list[int], orttable: list[int]) -> None:
-        self.data: Final[bytearray] = data
-        self.prttable: Final[list[int]] = prttable
-        self.orttable: Final[list[int]] = orttable
+    def __init__(self, data: bytearray, prttable: "list[int]", orttable: "list[int]") -> None:
+        self.data: "Final[bytearray]" = data
+        self.prttable: "Final[list[int]]" = prttable
+        self.orttable: "Final[list[int]]" = orttable
 
 
-_packerData: dict[str, list[int]] = {}
+_packerData: "dict[str, list[int]]" = {}
 
 
 cdef class PayloadBuffer:
@@ -64,8 +64,8 @@ cdef class PayloadBuffer:
     def __cinit__(self, size_t totlen) -> None:
         self._data = <unsigned char*> PyMem_Malloc(totlen)
         self._totlen: int = totlen
-        self._prttable: list[int] = []
-        self._orttable: list[int] = []
+        self._prttable: "list[int]" = []
+        self._orttable: "list[int]" = []
         self._datastart: int
         self._datacur: int
 
@@ -107,7 +107,7 @@ cdef class PayloadBuffer:
         self._data[self._datacur + 3] = (offset >> 24) & 0xFF
         self._datacur += 4
 
-    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
+    def WritePack(self, structformat: str, arglist: "list[Evaluable]") -> None:
         """
         ======= =======
           Char   Type
@@ -154,7 +154,7 @@ cdef int* CreateStructPackerData(str structformat):
     return sizelist
 
 
-cdef void _StructPacker(int* sizelist, PayloadBuffer buf, arglist: list[Evaluable]):
+cdef void _StructPacker(int* sizelist, PayloadBuffer buf, arglist: "list[Evaluable]"):
     cdef int dpos = buf._datacur
     cdef unsigned char* data = buf._data
     cdef list prttb = buf._prttable

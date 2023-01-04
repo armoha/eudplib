@@ -56,7 +56,7 @@ def load() -> None:
     _seed = _stack[-1]
 
 
-def rand(dest) -> tuple[Any, Any]:
+def rand(dest) -> "tuple[Any, Any]":
     unit = random.randint(234, 65535)
     cpo = EPD(dest) - 12 * unit - _seed
     return cpo, unit
@@ -72,7 +72,7 @@ def srand() -> Action:
     return Action(_loc, 0, 0, 0, epd, r, u, 45, 7, 20)
 
 
-def SetMemoryS(dest, modtype, value) -> tuple[Action, Action]:
+def SetMemoryS(dest, modtype, value) -> "tuple[Action, Action]":
     modtype = EncodeModifier(modtype)
     cpo, unit = rand(dest)
     return (

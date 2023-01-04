@@ -23,8 +23,8 @@ trglist = []
 def Trigger(
     *,
     players: list = [tt.AllPlayers],
-    conditions: list[bytes] | bytes = [],
-    actions: list[bytes] | bytes = []
+    conditions: "list[bytes] | bytes" = [],
+    actions: "list[bytes] | bytes" = []
 ) -> None:
     global trglist
     trglist.append(tt.Trigger(players, conditions, actions))

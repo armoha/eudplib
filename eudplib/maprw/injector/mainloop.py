@@ -34,8 +34,8 @@ from ...localize import _
 from ...utils import EPError, ep_assert
 
 jumper: c.Forward | None = None
-startFunctionList1: list[Callable] = []
-startFunctionList2: list[Callable] = []
+startFunctionList1: "list[Callable]" = []
+startFunctionList2: "list[Callable]" = []
 hasAlreadyStarted: int = 0
 
 

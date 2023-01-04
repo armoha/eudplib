@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-DefUnitOrderDict: dict[str, int] = {
+DefUnitOrderDict: "dict[str, int]" = {
     "Die": 0,
     "Stop": 1,
     "Guard (Normal)": 2,

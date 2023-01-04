@@ -65,7 +65,7 @@ def f_playerexist(player):
 
 def EUDLoopPlayer(
     ptype: str | None = "Human", force=None, race: str | None = None
-) -> Iterator[c.EUDVariable]:
+) -> "Iterator[c.EUDVariable]":
     def EncodeForce(f):
         force_dict = {c.Force1: 0, c.Force2: 1, c.Force3: 2, c.Force4: 3}
         if type(f) != int and f in force_dict:

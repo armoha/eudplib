@@ -49,7 +49,7 @@ def sectionname_format(sn: str | bytes) -> bytes:
 
 class CHK:
     def __init__(self) -> None:
-        self.sections: dict[bytes, bytes] = {}
+        self.sections: "dict[bytes, bytes]" = {}
 
     def loadblank(self) -> None:
         self.sections = {}
@@ -102,7 +102,7 @@ class CHK:
         blist.append(fake_name[0] + ut.i2b4(random.randint(0, 0xFFFFFFFF) | 0x80000000))
         return b"".join(blist)
 
-    def enumsection(self) -> list[bytes]:
+    def enumsection(self) -> "list[bytes]":
         return list(self.sections.keys())
 
     def getsection(self, sectionname: str | bytes) -> bytes:

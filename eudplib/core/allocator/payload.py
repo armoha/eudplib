@@ -40,12 +40,12 @@ if TYPE_CHECKING:
     from ...utils import ExprProxy
     from ..eudobj import EUDObject
 
-_found_objects: list["EUDObject"] = []
+_found_objects: "list[EUDObject]" = []
 _rootobj: "EUDObject | None" = None
-_found_objects_set: set["EUDObject"] = set()
-_untraversed_objects: list["EUDObject"] = []
-_dynamic_objects_set: set["EUDObject"] = set()
-_alloctable: dict["EUDObject", int] = {}
+_found_objects_set: "set[EUDObject]" = set()
+_untraversed_objects: "list[EUDObject]" = []
+_dynamic_objects_set: "set[EUDObject]" = set()
+_alloctable: "dict[EUDObject, int]" = {}
 _payload_size: int = 0
 
 PHASE = Enum("PHASE", ["COLLECTING", "ALLOCATING", "WRITING"])
@@ -129,7 +129,7 @@ class ObjCollector:
             return
         raise ut.EPError(_("Collected unexpected object: {}").format(obj))
 
-    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
+    def WritePack(self, structformat: str, arglist: "list[Evaluable]") -> None:
         for arg in arglist:
             if isinstance(arg, int):
                 continue
@@ -220,12 +220,12 @@ class ObjAllocator:
     """
 
     def __init__(self) -> None:
-        self._sizes: dict[str, int] = {}
+        self._sizes: "dict[str, int]" = {}
 
     def StartWrite(self) -> None:
         self._suboccupmap: int = 0
         self._suboccupidx: int = 0
-        self._occupmap: list[int] = []
+        self._occupmap: "list[int]" = []
 
     def _Occup0(self) -> None:
         self._suboccupidx += 1
@@ -242,7 +242,7 @@ class ObjAllocator:
             self._suboccupidx = 0
             self._suboccupmap = 0
 
-    def EndWrite(self) -> list[int]:
+    def EndWrite(self) -> "list[int]":
         if self._suboccupidx:
             self._occupmap.append(self._suboccupmap)
             self._suboccupidx = 0
@@ -265,7 +265,7 @@ class ObjAllocator:
     def WriteDword(self, obj: Evaluable) -> None:
         self._occupmap.append(1)
 
-    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
+    def WritePack(self, structformat: str, arglist: "list[Evaluable]") -> None:
         if structformat not in self._sizes:
             ssize = 0
             sizedict = {"B": 1, "H": 2, "I": 4}
@@ -387,7 +387,7 @@ def ConstructPayload() -> Payload:
     return pbuf.CreatePayload()
 
 
-_on_create_payload_callbacks: list[Callable] = []
+_on_create_payload_callbacks: "list[Callable]" = []
 
 
 def RegisterCreatePayloadCallback(f: Callable) -> None:

@@ -222,7 +222,7 @@ cdef class Forward(ConstExpr):
         ...
 
     @overload
-    def __lshift__(self, expr: ExprProxy[_ConstExpr]) -> ExprProxy[_ConstExpr]:
+    def __lshift__(self, expr: "ExprProxy[_ConstExpr]") -> "ExprProxy[_ConstExpr]":
         ...
 
     @overload
@@ -271,7 +271,7 @@ cdef class Forward(ConstExpr):
         self._expr[name] = newvalue
 
 
-Evaluable: TypeAlias = ConstExpr | int | ExprProxy[ConstExpr] | RlocInt_C
+Evaluable: TypeAlias = "ConstExpr | int | ExprProxy[ConstExpr] | RlocInt_C"
 
 
 cpdef RlocInt_C Evaluate(x: Evaluable):

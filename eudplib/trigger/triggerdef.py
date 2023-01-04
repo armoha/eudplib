@@ -37,7 +37,7 @@ Actions = c.Action | Iterable[c.Action | Iterable | None] | None
 
 def Trigger(
     conditions: Conditions = None, actions: Actions = None, preserved: bool = True
-) -> tuple[c.Forward, c.RawTrigger]:
+) -> "tuple[c.Forward, c.RawTrigger]":
     """General easy-to-use trigger
 
     :param conditions: List of conditions. If there are none, trigger will

@@ -29,9 +29,9 @@ if TYPE_CHECKING:
 
 
 def StackObjects(
-    found_objects: list["EUDObject"],
-    dwoccupmap_dict: dict["EUDObject", list[int]],
-    alloctable: dict["EUDObject", int],
+    found_objects: "list[EUDObject]",
+    dwoccupmap_dict: "dict[EUDObject, list[int]]",
+    alloctable: "dict[EUDObject, int]",
 ) -> None:
     dwoccupmap_max_size = 0
     for obj in found_objects:

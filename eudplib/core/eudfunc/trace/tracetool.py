@@ -86,7 +86,7 @@ def _EUDTracePop() -> None:
 
 
 nextTraceId = 0
-traceMap: list[tuple[int, str]] = []
+traceMap: "list[tuple[int, str]]" = []
 traceKey = 0
 traceHeader: bytes = b""
 
@@ -153,5 +153,5 @@ def EUDTraceLogRaw(v: int) -> None:
     nt << NextTrigger()
 
 
-def _GetTraceMap() -> tuple[tuple[bytes, bytes], list[tuple[int, str]]]:
+def _GetTraceMap() -> "tuple[tuple[bytes, bytes], list[tuple[int, str]]]":
     return (iHeader, traceHeader), traceMap

@@ -12,7 +12,7 @@ re_shift = re.compile(r"^ +(\w+) shift  (\d+)$")
 lines = open("epparser.out").readlines()
 
 # Get graph
-graph: dict[int, list[tuple[str, int]]] = {}
+graph: "dict[int, list[tuple[str, int]]]" = {}
 currentState: int = 0
 for line in lines:
     r_st = re_state.match(line)

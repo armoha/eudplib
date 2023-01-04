@@ -45,10 +45,10 @@ class EUDVarBuffer(EUDObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self._vdict: dict["VariableTriggerForward", int] = {}
-        self._initvals: list[int | ConstExpr] = []
+        self._vdict: "dict[VariableTriggerForward, int]" = {}
+        self._initvals: "list[int | ConstExpr]" = []
 
-    def DynamicConstructed(self) -> Literal[True]:
+    def DynamicConstructed(self) -> "Literal[True]":
         return True
 
     def CreateVarTrigger(self, v, initval):

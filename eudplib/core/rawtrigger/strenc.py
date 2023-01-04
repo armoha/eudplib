@@ -86,7 +86,7 @@ def EncodeAIScript(ais: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeAIScript(ais: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeAIScript(ais: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -123,25 +123,25 @@ def EncodeAIScript(ais, issueError=False):
 
 @overload
 def _EncodeAny(
-    t: str, f: Callable, dl: dict[str, int], s: _Unique | ExprProxy[_Unique]
+    t: str, f: Callable, dl: "dict[str, int]", s: _Unique | ExprProxy[_Unique]
 ) -> NoReturn:
     ...
 
 
 @overload
 def _EncodeAny(
-    t: str, f: Callable, dl: dict[str, int], s: str | bytes | ExprProxy[str | bytes]
+    t: str, f: Callable, dl: "dict[str, int]", s: str | bytes | ExprProxy[str | bytes]
 ) -> int:
     ...
 
 
 @overload
-def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: T) -> T:
+def _EncodeAny(t: str, f: Callable, dl: "dict[str, int]", s: T) -> T:
     ...
 
 
 @overload
-def _EncodeAny(t: str, f: Callable, dl: dict[str, int], s: ExprProxy[T]) -> T:
+def _EncodeAny(t: str, f: Callable, dl: "dict[str, int]", s: "ExprProxy[T]") -> T:
     ...
 
 
@@ -187,7 +187,7 @@ def EncodeLocation(loc: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeLocation(loc: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeLocation(loc: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -211,7 +211,7 @@ def EncodeString(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeString(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeString(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -235,7 +235,7 @@ def EncodeSwitch(sw: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeSwitch(sw: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeSwitch(sw: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -259,7 +259,7 @@ def EncodeUnit(u: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeUnit(u: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeUnit(u: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -283,7 +283,7 @@ def EncodeTBL(t: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeTBL(t: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeTBL(t: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -308,7 +308,7 @@ def EncodeFlingy(flingy: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeFlingy(flingy: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeFlingy(flingy: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -332,7 +332,7 @@ def EncodeIcon(icon: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeIcon(icon: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeIcon(icon: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -356,7 +356,7 @@ def EncodeSprite(sprite: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeSprite(sprite: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeSprite(sprite: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -380,7 +380,7 @@ def EncodeImage(image: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeImage(image: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeImage(image: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -404,7 +404,7 @@ def EncodeIscript(iscript: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeIscript(iscript: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeIscript(iscript: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -428,7 +428,7 @@ def EncodeUnitOrder(order: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeUnitOrder(order: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeUnitOrder(order: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -452,7 +452,7 @@ def EncodeWeapon(weapon: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeWeapon(weapon: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeWeapon(weapon: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -476,7 +476,7 @@ def EncodeTech(tech: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeTech(tech: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeTech(tech: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -500,7 +500,7 @@ def EncodeUpgrade(upgrade: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeUpgrade(upgrade: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeUpgrade(upgrade: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -526,7 +526,7 @@ def EncodePortrait(portrait: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodePortrait(portrait: ExprProxy[T], issueError: bool = False) -> T:
+def EncodePortrait(portrait: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 

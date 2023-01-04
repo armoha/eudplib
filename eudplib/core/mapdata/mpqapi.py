@@ -190,7 +190,7 @@ class MPQ:
         self.libstorm.SFileCloseArchive(self.mpqh)
         self.mpqh = None
 
-    def EnumFiles(self) -> list[str]:
+    def EnumFiles(self) -> "list[str]":
         # using listfile.
         lst = self.Extract("(listfile)")
         if lst is None:

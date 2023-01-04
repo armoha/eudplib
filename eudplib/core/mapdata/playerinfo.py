@@ -36,7 +36,7 @@ class PlayerInfo:
         self.typestr: str
 
 
-_playerinfo: list[PlayerInfo] = []
+_playerinfo: "list[PlayerInfo]" = []
 
 
 def InitPlayerInfo(chkt: CHK) -> None:

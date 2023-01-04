@@ -227,9 +227,9 @@ def Action(
 
 
 def Trigger(
-    players: list[Player],
-    conditions: list[bytes] | bytes = [],
-    actions: list[bytes] | bytes = [],
+    players: "list[Player]",
+    conditions: "list[bytes] | bytes" = [],
+    actions: "list[bytes] | bytes" = [],
 ) -> bytes:
     conditions = FlattenList(conditions)
     actions = FlattenList(actions)

@@ -40,9 +40,9 @@ from .btInliner import (
 )
 from .ilccompile import CompileInlineCode, ComputeBaseInlineCodeGlobals
 
-_inlineCodes: list[tuple[int, tStartEnd]] = []
+_inlineCodes: "list[tuple[int, tStartEnd]]" = []
 _inliningRate: float = 1.0
-_cutoffRate: list[float] = [1 + (i - 2) / 3 for i in range(9)]
+_cutoffRate: "list[float]" = [1 + (i - 2) / 3 for i in range(9)]
 
 
 def PRT_SetInliningRate(rate: float) -> None:
@@ -58,14 +58,14 @@ def PreprocessInlineCode(chkt: CHK) -> None:
     chkt.setsection("TRIG", trigSection)
 
 
-def PreprocessTrigSection(trigSection: bytes) -> tuple[list[tuple[int, tStartEnd]], bytes]:
+def PreprocessTrigSection(trigSection: bytes) -> "tuple[list[tuple[int, tStartEnd]], bytes]":
     """Fetch inline codes & compiles them"""
     ComputeBaseInlineCodeGlobals()
     if _inliningRate >= 1.0:
         return ConsecutiveInlineTrigSection(trigSection)
 
-    inlineCodes: list[tuple[int, tStartEnd]] = []
-    trigSegments: list[bytes] = []
+    inlineCodes: "list[tuple[int, tStartEnd]]" = []
+    trigSegments: "list[bytes]" = []
     for i in range(0, len(trigSection), 2400):
         trigSegment = trigSection[i : i + 2400]
         if len(trigSegment) != 2400:
@@ -101,19 +101,19 @@ def PreprocessTrigSection(trigSection: bytes) -> tuple[list[tuple[int, tStartEnd
 
 def ConsecutiveInlineTrigSection(
     trigSection: bytes,
-) -> tuple[list[tuple[int, tStartEnd]], bytes]:
-    inlineCodes: list[tuple[int, tStartEnd]] = []
-    trigSegments: list[bytes] = []
-    pTriggers: tuple[
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-    ] = ([], [], [], [], [], [], [], [])
+) -> "tuple[list[tuple[int, tStartEnd]], bytes]":
+    inlineCodes: "list[tuple[int, tStartEnd]]" = []
+    trigSegments: "list[bytes]" = []
+    pTriggers: "tuple[list[bytes], list[bytes], list[bytes], list[bytes], list[bytes], list[bytes], list[bytes], list[bytes]]" = (
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+    )
 
     def appendPTriggers(p):
         if pTriggers[p]:
@@ -162,7 +162,7 @@ def ConsecutiveInlineTrigSection(
     return inlineCodes, trigSection
 
 
-def GetInlineCodeList() -> list[tuple[int, tStartEnd]]:
+def GetInlineCodeList() -> "list[tuple[int, tStartEnd]]":
     """Get list of compiled inline_eudplib code"""
     return _inlineCodes
 
@@ -184,7 +184,7 @@ def GetInlineCodePlayerList(bTrigger: bytes) -> int | None:
 
 
 def DispatchInlineCode(
-    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
+    inlineCodes: "list[tuple[int, tStartEnd]]", trigger_bytes: bytes
 ) -> bytearray | None:
     """Check if trigger segment has special data."""
     magicCode = ut.b2i4(trigger_bytes, 20)
@@ -204,7 +204,7 @@ def DispatchInlineCode(
 
 
 def InlinifyNormalTrigger(
-    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
+    inlineCodes: "list[tuple[int, tStartEnd]]", trigger_bytes: bytes
 ) -> bytearray:
     """Inlinify normal binary triggers"""
     playerCode = 0
@@ -217,7 +217,7 @@ def InlinifyNormalTrigger(
 
 
 def CreateInlineCodeDispatcher(
-    inlineCodes: list[tuple[int, tStartEnd]], func: tStartEnd, playerCode: int
+    inlineCodes: "list[tuple[int, tStartEnd]]", func: tStartEnd, playerCode: int
 ) -> bytearray:
     """Create link from TRIG list to STR trigger."""
     funcID = len(inlineCodes) + 1024

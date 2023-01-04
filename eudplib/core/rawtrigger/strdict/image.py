@@ -1,4 +1,4 @@
-DefImageDict: dict[str, int] = {
+DefImageDict: "dict[str, int]" = {
     "Scourge": 0,
     "Scourge Shadow": 1,
     "Scourge Birth": 2,

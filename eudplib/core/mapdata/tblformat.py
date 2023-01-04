@@ -58,17 +58,17 @@ def IgnoreColor(s: bytes) -> bytes | None:
         return None
 
 
-def b2in(n: int) -> Callable[[Sequence[int], int], int]:
+def b2in(n: int) -> "Callable[[Sequence[int], int], int]":
     b2in_map = {2: ut.b2i2, 4: ut.b2i4}
     return b2in_map[n]
 
 
-def i2bn(n: int) -> Callable[[int], bytes]:
+def i2bn(n: int) -> "Callable[[int], bytes]":
     i2bn_map = {2: ut.i2b2, 4: ut.i2b4}
     return i2bn_map[n]
 
 
-def u2bn(n: int) -> Callable[[str | bytes], bytes]:
+def u2bn(n: int) -> "Callable[[str | bytes], bytes]":
     u2bn_map = {2: ut.u2b, 4: ut.u2utf8}
     return u2bn_map[n]
 
@@ -81,9 +81,9 @@ class TBL:
     def __init__(
         self,
         content: bytes | None = None,
-        init_chkt: tuple[CHK, "StringIdMap", "StringIdMap", "StringIdMap"] | None = None,
-        load_entry: Literal[2, 4] = 2,
-        save_entry: Literal[2, 4] = 4,
+        init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap] | None" = None,
+        load_entry: "Literal[2, 4]" = 2,
+        save_entry: "Literal[2, 4]" = 4,
     ) -> None:
         #
         # datatb : table of strings                       : string data table
@@ -91,13 +91,13 @@ class TBL:
         # stringmap : string -> representative string id
         #
 
-        self._datatb: list[bytes] = []
-        self._stringmap: dict[bytes, int] = {}
-        self._dataindextb: list[int] = []  # String starts from #1
+        self._datatb: "list[bytes]" = []
+        self._stringmap: "dict[bytes, int]" = {}
+        self._dataindextb: "list[int]" = []  # String starts from #1
         self._capacity: int = save_entry  # Size of STR section
-        self._loadentry: Literal[2, 4] = load_entry
-        self._saveentry: Literal[2, 4] = save_entry
-        self._emptystring: list[tuple[int, bytes] | int] = []
+        self._loadentry: "Literal[2, 4]" = load_entry
+        self._saveentry: "Literal[2, 4]" = save_entry
+        self._emptystring: "list[tuple[int, bytes] | int]" = []
         self._loaded: bool = False
         self._first_extended_string: bytes | None = None
 
@@ -142,7 +142,7 @@ class TBL:
         self._loaded = True
 
     def LoadTBLWithChk(
-        self, content: bytes, init_chkt: tuple[CHK, "StringIdMap", "StringIdMap", "StringIdMap"]
+        self, content: bytes, init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap]"
     ) -> None:
         self._datatb.clear()
         self._stringmap.clear()

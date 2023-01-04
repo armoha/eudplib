@@ -77,7 +77,7 @@ _index = EUDLightVariable()
 
 
 class BitsTrg:
-    cache: dict[str, dict[int | str, Forward]] = {}
+    cache: "dict[str, dict[int | str, Forward]]" = {}
 
     def __init__(self, key: str) -> None:
         self._key: str = key
@@ -85,7 +85,7 @@ class BitsTrg:
     def __bool__(self) -> bool:
         return self._key in BitsTrg.cache
 
-    def __iter__(self) -> Iterator[dict[int | str, Forward]]:
+    def __iter__(self) -> "Iterator[dict[int | str, Forward]]":
         if not self:
             BitsTrg.cache[self._key] = {i: Forward() for i in range(28)}
             bt.PushTriggerScope()

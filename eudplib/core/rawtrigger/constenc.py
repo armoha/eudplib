@@ -278,17 +278,17 @@ T = TypeVar("T", int, "EUDVariable", "ConstExpr")
 
 
 @overload
-def _EncodeConst(t: str, d: dict[_Unique, int], s: Unique | ExprProxy[Unique]) -> int:
+def _EncodeConst(t: str, d: "dict[_Unique, int]", s: Unique | ExprProxy[Unique]) -> int:
     ...
 
 
 @overload
-def _EncodeConst(t: str, d: dict[_Unique, int], s: T) -> T:
+def _EncodeConst(t: str, d: "dict[_Unique, int]", s: T) -> T:
     ...
 
 
 @overload
-def _EncodeConst(t: str, d: dict[_Unique, int], s: ExprProxy[T]) -> T:
+def _EncodeConst(t: str, d: "dict[_Unique, int]", s: "ExprProxy[T]") -> T:
     ...
 
 
@@ -313,7 +313,7 @@ def EncodeAllyStatus(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeAllyStatus(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeAllyStatus(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -333,7 +333,7 @@ def EncodeComparison(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeComparison(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeComparison(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -353,7 +353,7 @@ def EncodeModifier(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeModifier(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeModifier(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -373,7 +373,7 @@ def EncodeOrder(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeOrder(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeOrder(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -393,7 +393,7 @@ def EncodePlayer(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodePlayer(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodePlayer(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -454,7 +454,7 @@ def EncodePropState(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodePropState(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodePropState(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -474,7 +474,7 @@ def EncodeResource(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeResource(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeResource(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -494,7 +494,7 @@ def EncodeScore(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeScore(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeScore(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -531,7 +531,7 @@ def EncodeSwitchAction(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeSwitchAction(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeSwitchAction(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -551,7 +551,7 @@ def EncodeSwitchState(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeSwitchState(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeSwitchState(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 
@@ -571,7 +571,7 @@ def EncodeCount(s: T, issueError: bool = False) -> T:
 
 
 @overload
-def EncodeCount(s: ExprProxy[T], issueError: bool = False) -> T:
+def EncodeCount(s: "ExprProxy[T]", issueError: bool = False) -> T:
     ...
 
 

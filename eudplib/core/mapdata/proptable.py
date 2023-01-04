@@ -30,8 +30,8 @@ from eudplib.localize import _
 from .chktok import CHK
 from .unitprp import PropertyKey, UnitProperty
 
-_uprpdict: dict[bytes, int] = {}
-_uprptable: list[bytes] = []
+_uprpdict: "dict[bytes, int]" = {}
+_uprptable: "list[bytes]" = []
 
 
 def InitPropertyMap(chkt: "CHK") -> None:

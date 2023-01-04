@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from ..variable import EUDVariable
     from .rawtriggerdef import RawTrigger
 
-_condtypes: dict[int, str] = {
+_condtypes: "dict[int, str]" = {
     0: "(no condition)",
     1: "CountdownTimer",
     2: "Command",
@@ -99,7 +99,7 @@ class Condition(ConstExpr):
     ) -> None:
         """See :mod:`eudplib.base.stockcond` for stock conditions list."""
         super().__init__(self)
-        self.fields: list[Dword] = [
+        self.fields: "list[Dword]" = [
             locid,
             player,
             amount,

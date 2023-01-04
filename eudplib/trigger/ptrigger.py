@@ -33,8 +33,8 @@ from ..core.mapdata.playerinfo import PlayerInfo
 from ..core.rawtrigger.constenc import _Player
 from .triggerdef import Actions, Conditions, Trigger
 
-_pinfos: list[PlayerInfo] = []
-_pdbtable: dict[bytes, c.Db] = {}
+_pinfos: "list[PlayerInfo]" = []
+_pdbtable: "dict[bytes, c.Db]" = {}
 
 Players: TypeAlias = _Player | int | Iterable[_Player | int | Iterable]
 
@@ -59,7 +59,7 @@ def PTrigger(players: Players, conditions: Conditions = None, actions: Actions =
     InitPTrigger()
 
     players = ut.FlattenList(players)
-    effp: list[bool] = [False] * 8
+    effp: "list[bool]" = [False] * 8
 
     # Trigger is never executed if it has no effplayers.
     if len(players) == 0:

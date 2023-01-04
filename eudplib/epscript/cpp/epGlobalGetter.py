@@ -59,7 +59,7 @@ print("\n==================================\n")
 nlist.sort()
 nlist = ['"%s", ' % name for name in nlist]
 col = 4
-s: list[str] = []
+s: "list[str]" = []
 
 
 def flush():

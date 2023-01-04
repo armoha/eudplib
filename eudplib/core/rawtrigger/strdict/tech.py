@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-DefTechDict: dict[str, int] = {
+DefTechDict: "dict[str, int]" = {
     "Stim Packs": 0,
     "Lockdown": 1,
     "EMP Shockwave": 2,

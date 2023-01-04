@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from .rawtriggerdef import RawTrigger
 
 
-_acttypes: dict[int, str] = {
+_acttypes: "dict[int, str]" = {
     0: "(no action)",
     1: "Victory",
     2: "Defeat",
@@ -138,7 +138,7 @@ class Action(ConstExpr):
     ) -> None:
         """See :mod:`eudplib.base.stocktrg` for stock actions list."""
         super().__init__(self)
-        self.fields: list[Dword] = [
+        self.fields: "list[Dword]" = [
             locid1,
             strid,
             wavid,
