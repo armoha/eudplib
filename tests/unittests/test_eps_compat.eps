@@ -1,4 +1,5 @@
-var x = 1;
+var x = 1 << 4;
+EUDOnStart(function () { x += x; });
 function test_compatibility() {
     static var ret = 0;
     const empty = Db(i2b4(0));
@@ -15,5 +16,6 @@ with expect_eperror():\n\
 
     cond.__lshift__(Memory(empty, AtLeast, 1));
     if (cond) { ret += 1 << 3; }
+    ret += x;
     return ret;
 }

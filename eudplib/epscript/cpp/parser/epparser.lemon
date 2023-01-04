@@ -82,6 +82,7 @@ chunk ::= fdef_chunk.
 chunk ::= fdecl_chunk.
 chunk ::= object_chunk.
 chunk ::= vdef_stmt SEMICOLON.
+chunk ::= funccall_global_stmt SEMICOLON.
 chunk ::= vdefAssign_global_stmt SEMICOLON.
 chunk ::= cdef_global_stmt SEMICOLON.
 chunk ::= blockStmt. {
@@ -632,6 +633,30 @@ funcexpr(out) ::= expr(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
     delete exprs;
 }
 
+funccall_global_stmt ::= NAME(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
+    // Preprocess name
+    checkIsFunction(name->data, name->line);
+    ps->gen << name->data << "(" << exprs->data << ")" << std::endl;
+    delete name; delete exprs;
+}
+
+funccall_global_stmt ::= expr(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
+    // If calling function imported from another module, add f_ prefix to function name.
+    static std::regex prefixedFuncNameRegex("^[a-z][_a-zA-Z0-9]*");
+    std::string& nameStr = name->data;
+    if(std::count(nameStr.begin(), nameStr.end(), '.') == 1) {
+        size_t p = nameStr.find('.');
+        std::string moduleName = nameStr.substr(0, p);
+        std::string funcName = nameStr.substr(p + 1);
+        if (closure->isModule(moduleName) && std::regex_match(funcName, prefixedFuncNameRegex)) {
+            funcNamePreprocess(funcName);
+            name->data = moduleName + '.' + funcName;
+        }
+    }
+
+    ps->gen << name->data << "(" << exprs->data << ")" << std::endl;
+    delete name; delete exprs;
+}
 
 // Objects
 
