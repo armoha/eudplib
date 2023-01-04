@@ -215,7 +215,6 @@ cdef class Forward(ConstExpr):
     def __init__(self) -> None:
         super().__init__(self)
         self._expr: ConstExpr | None = None
-        self.dontFlatten = True
 
     @overload
     def __lshift__(self, expr: _ConstExpr) -> _ConstExpr:
@@ -261,13 +260,9 @@ cdef class Forward(ConstExpr):
         return getattr(self._expr, name)
 
     def __getitem__(self, name):
-        if self._expr is None:
-            raise ut.EPError(_("Forward not initialized"))
         return self._expr[name]
 
     def __setitem__(self, name, newvalue):
-        if self._expr is None:
-            raise ut.EPError(_("Forward not initialized"))
         self._expr[name] = newvalue
 
 
