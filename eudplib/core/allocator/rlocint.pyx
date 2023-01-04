@@ -86,7 +86,7 @@ cdef class RlocInt_C:
         return str(self)
 
 
-cpdef RlocInt_C RlocInt(offset: int, rlocmode: int):
+cpdef RlocInt_C RlocInt(size_t offset,  size_t rlocmode):
     return RlocInt_C(offset & 0xFFFFFFFF, rlocmode & 0xFFFFFFFF)
 
 
