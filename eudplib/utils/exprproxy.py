@@ -198,6 +198,8 @@ def unProxy(x):
 
 
 def isUnproxyInstance(x: object, cls: type | tuple[type | tuple[Any, ...], ...]) -> bool:
+    if isinstance(x, cls):
+        return True
     if isinstance(unProxy(x), cls):
         return True
     return False
