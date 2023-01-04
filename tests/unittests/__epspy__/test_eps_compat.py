@@ -12,12 +12,12 @@ def f_test_compatibility():
     cond = Forward()
     # (Line 6) py_exec("from helper import *\n\
     # (Line 13) ");
-    exec("from helper import *\nwith expect_eperror():\n    Trigger(cond, ret.AddNumber(1 << 0))\nwith expect_eperror():\n    Trigger(empty, ret.AddNumber(1 << 2))\nwith expect_eperror():\n    Trigger(empty + 1, ret.AddNumber(1 << 2))\n")
+    exec("from helper import *\nwith expect_eperror():\n    Trigger(cond, ret.AddNumber(1 << 0))\nwith expect_eperror():\n    Trigger(empty, ret.AddNumber(1 << 1))\nwith expect_eperror():\n    Trigger(empty + 1, ret.AddNumber(1 << 2))\n")
     # (Line 15) cond.__lshift__(Memory(empty, AtLeast, 1));
     cond.__lshift__(Memory(empty, AtLeast, 1))
-    # (Line 16) if (cond) { ret += 1 << 1; }
+    # (Line 16) if (cond) { ret += 1 << 3; }
     if EUDIf()(cond):
-        ret.__iadd__(_LSH(1,1))
+        ret.__iadd__(_LSH(1,3))
         # (Line 17) return ret;
     EUDEndIf()
     EUDReturn(ret)
