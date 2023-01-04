@@ -165,7 +165,7 @@ class Action(ConstExpr):
     def _invalid_action(self, i: int) -> str:
         acttype = self.fields[7]
         actname = _acttypes[acttype] if isinstance(acttype, int) else acttype
-        return _("Invalid fields for action{} {}:".format(i, actname))
+        return _("Invalid fields for action{} {}:").format(i, actname)
 
     def CheckArgs(self, i: int) -> None:
         if all(IsConstExpr(field) for field in self.fields[:6]) and all(

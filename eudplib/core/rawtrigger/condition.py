@@ -123,7 +123,7 @@ class Condition(ConstExpr):
     def _invalid_condition(self, i: int) -> str:
         condtype = self.fields[5]
         condname = _condtypes[condtype] if isinstance(condtype, int) else condtype
-        return _("Invalid fields for condition{} {}:".format(i, condname))
+        return _("Invalid fields for condition{} {}:").format(i, condname)
 
     def CheckArgs(self, i: int) -> None:
         if all(IsConstExpr(field) for field in self.fields[:3]) and all(

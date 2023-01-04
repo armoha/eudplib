@@ -17,7 +17,8 @@ _t = gettext.translation("eudplib", _locale_path, languages=_lang, fallback=True
 if not isinstance(_t, gettext.GNUTranslations):
     _locale_path = os.path.dirname(os.path.dirname(os.path.dirname(_locale_path)))
     _t = gettext.translation("eudplib", _locale_path, languages=_lang, fallback=True)
-_ = _t.gettext
+_gt = _t.gettext
+_ = _gt
 
 
 def _excepthook(
@@ -26,7 +27,7 @@ def _excepthook(
     # print("# FIXME: excepthook")
     v = list(value.args)
     for i, s in enumerate(v):
-        v[i] = _(s)
+        v[i] = _gt(s)
     value.args = tuple(v)
     return _h(type_, value, traceback)
 
@@ -37,7 +38,7 @@ def _unraisablehook(unraisable) -> None:
     obj = unraisable.object
     if err_msg is None:
         err_msg = "Exception ignored in"
-    err_msg = _(err_msg)
+    err_msg = _gt(err_msg)
     print(f"{err_msg}: {obj!r}")
 
 
