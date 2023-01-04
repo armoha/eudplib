@@ -192,7 +192,7 @@ def CreateUnitWithProperties(
     This action works just like Create Unit, except that you can customize the properties of the newly created unit(s).
     """
     if isinstance(Count, int):
-        assert 0 <= Count <= 255
+        ep_assert(0 <= Count <= 255)
     Unit = EncodeUnit(Unit)
     Where = EncodeLocation(Where)
     Player = EncodePlayer(Player)

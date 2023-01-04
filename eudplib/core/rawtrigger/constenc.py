@@ -303,101 +303,101 @@ def _EncodeConst(t, d, s):
 
 
 @overload
-def EncodeAllyStatus(s: "_AllyStatus | ExprProxy[_AllyStatus]") -> int:
+def EncodeAllyStatus(s: "_AllyStatus | ExprProxy[_AllyStatus]", issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeAllyStatus(s: T) -> T:
+def EncodeAllyStatus(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeAllyStatus(s: ExprProxy[T]) -> T:
+def EncodeAllyStatus(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeAllyStatus(s):
+def EncodeAllyStatus(s, issueError=False):
     """Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2]."""
     return _EncodeConst("AllyStatus", AllyStatusDict, s)
 
 
 @overload
-def EncodeComparison(s: _Comparison | ExprProxy[_Comparison]) -> int:
+def EncodeComparison(s: _Comparison | ExprProxy[_Comparison], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeComparison(s: T) -> T:
+def EncodeComparison(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeComparison(s: ExprProxy[T]) -> T:
+def EncodeComparison(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeComparison(s):
+def EncodeComparison(s, issueError=False):
     """Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10]."""
     return _EncodeConst("Comparison", ComparisonDict, s)
 
 
 @overload
-def EncodeModifier(s: _Modifier | ExprProxy[_Modifier]) -> int:
+def EncodeModifier(s: _Modifier | ExprProxy[_Modifier], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeModifier(s: T) -> T:
+def EncodeModifier(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeModifier(s: ExprProxy[T]) -> T:
+def EncodeModifier(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeModifier(s):
+def EncodeModifier(s, issueError=False):
     """Convert [SetTo, Add, Subtract] to number [7, 8, 9]."""
     return _EncodeConst("Modifier", ModifierDict, s)
 
 
 @overload
-def EncodeOrder(s: _Order | ExprProxy[_Order]) -> int:
+def EncodeOrder(s: _Order | ExprProxy[_Order], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeOrder(s: T) -> T:
+def EncodeOrder(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeOrder(s: ExprProxy[T]) -> T:
+def EncodeOrder(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeOrder(s):
+def EncodeOrder(s, issueError=False):
     """Convert [Move, Patrol, Attack] to number [0, 1, 2]."""
     return _EncodeConst("Order", OrderDict, s)
 
 
 @overload
-def EncodePlayer(s: _Player | ExprProxy[_Player]) -> int:
+def EncodePlayer(s: _Player | ExprProxy[_Player], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodePlayer(s: T) -> T:
+def EncodePlayer(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodePlayer(s: ExprProxy[T]) -> T:
+def EncodePlayer(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodePlayer(s):
+def EncodePlayer(s, issueError=False):
     """Convert player identifier to corresponding number.
 
     ======================= ========
@@ -444,61 +444,61 @@ def EncodePlayer(s):
 
 
 @overload
-def EncodePropState(s: _PropState | ExprProxy[_PropState]) -> int:
+def EncodePropState(s: _PropState | ExprProxy[_PropState], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodePropState(s: T) -> T:
+def EncodePropState(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodePropState(s: ExprProxy[T]) -> T:
+def EncodePropState(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodePropState(s):
+def EncodePropState(s, issueError=False):
     """Convert [Enable, Disable, Toogle] to number [4, 5, 6]"""
     return _EncodeConst("PropState", PropStateDict, s)
 
 
 @overload
-def EncodeResource(s: _Resource | ExprProxy[_Resource]) -> int:
+def EncodeResource(s: _Resource | ExprProxy[_Resource], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeResource(s: T) -> T:
+def EncodeResource(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeResource(s: ExprProxy[T]) -> T:
+def EncodeResource(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeResource(s):
+def EncodeResource(s, issueError=False):
     """Convert [Ore, Gas, OreAndGas] to [0, 1, 2]"""
     return _EncodeConst("Resource", ResourceDict, s)
 
 
 @overload
-def EncodeScore(s: _Score | ExprProxy[_Score]) -> int:
+def EncodeScore(s: _Score | ExprProxy[_Score], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeScore(s: T) -> T:
+def EncodeScore(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeScore(s: ExprProxy[T]) -> T:
+def EncodeScore(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeScore(s):
+def EncodeScore(s, issueError=False):
     """Convert score type identifier to number.
 
     ================= ========
@@ -519,61 +519,63 @@ def EncodeScore(s):
 
 
 @overload
-def EncodeSwitchAction(s: _SwitchAction | ExprProxy[_SwitchAction]) -> int:
+def EncodeSwitchAction(
+    s: _SwitchAction | ExprProxy[_SwitchAction], issueError: bool = False
+) -> int:
     ...
 
 
 @overload
-def EncodeSwitchAction(s: T) -> T:
+def EncodeSwitchAction(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeSwitchAction(s: ExprProxy[T]) -> T:
+def EncodeSwitchAction(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeSwitchAction(s):
+def EncodeSwitchAction(s, issueError=False):
     """Convert [Set, Clear, Toogle, Random] to [4, 5, 6, 11]."""
     return _EncodeConst("SwitchAction", SwitchActionDict, s)
 
 
 @overload
-def EncodeSwitchState(s: _SwitchState | ExprProxy[_SwitchState]) -> int:
+def EncodeSwitchState(s: _SwitchState | ExprProxy[_SwitchState], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeSwitchState(s: T) -> T:
+def EncodeSwitchState(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeSwitchState(s: ExprProxy[T]) -> T:
+def EncodeSwitchState(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeSwitchState(s):
+def EncodeSwitchState(s, issueError=False):
     """Convert [Set, Cleared] to [2, 3]."""
     return _EncodeConst("_SwitchState", SwitchStateDict, s)
 
 
 @overload
-def EncodeCount(s: _Count | ExprProxy[_Count]) -> int:
+def EncodeCount(s: _Count | ExprProxy[_Count], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeCount(s: T) -> T:
+def EncodeCount(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeCount(s: ExprProxy[T]) -> T:
+def EncodeCount(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeCount(s):
+def EncodeCount(s, issueError=False):
     """Convert [All, (other numbers)] to number [0, (as-is)]."""
     s = ut.unProxy(s)
     if s is All:
@@ -586,6 +588,8 @@ def EncodeCount(s):
 # ========================
 
 
-def EncodeProperty(prop: UnitProperty | bytes | ExprProxy[UnitProperty | bytes]) -> int:
+def EncodeProperty(
+    prop: UnitProperty | bytes | ExprProxy[UnitProperty | bytes], issueError: bool = False
+) -> int:
     prop = ut.unProxy(prop)
     return GetPropertyIndex(prop)

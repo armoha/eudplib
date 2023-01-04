@@ -71,26 +71,26 @@ Weapon: TypeAlias = "str | Word | bytes"
 
 
 @overload
-def EncodeAIScript(ais: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeAIScript(ais: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeAIScript(ais: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeAIScript(ais: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeAIScript(ais: T) -> T:
+def EncodeAIScript(ais: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeAIScript(ais: ExprProxy[T]) -> T:
+def EncodeAIScript(ais: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeAIScript(ais):
+def EncodeAIScript(ais, issueError=False):
     ais = ut.unProxy(ais)
 
     if isinstance(ais, str):
@@ -172,361 +172,363 @@ def _EncodeAny(t, f, dl, s):
 
 
 @overload
-def EncodeLocation(loc: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeLocation(loc: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeLocation(loc: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeLocation(loc: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeLocation(loc: T) -> T:
+def EncodeLocation(loc: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeLocation(loc: ExprProxy[T]) -> T:
+def EncodeLocation(loc: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeLocation(loc):
+def EncodeLocation(loc, issueError=False):
     return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc)
 
 
 @overload
-def EncodeString(s: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeString(s: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeString(s: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeString(s: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeString(s: T) -> T:
+def EncodeString(s: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeString(s: ExprProxy[T]) -> T:
+def EncodeString(s: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeString(s):
+def EncodeString(s, issueError=False):
     return _EncodeAny("MapString", GetStringIndex, {}, s)
 
 
 @overload
-def EncodeSwitch(sw: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeSwitch(sw: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeSwitch(sw: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeSwitch(sw: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeSwitch(sw: T) -> T:
+def EncodeSwitch(sw: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeSwitch(sw: ExprProxy[T]) -> T:
+def EncodeSwitch(sw: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeSwitch(sw):
+def EncodeSwitch(sw, issueError=False):
     return _EncodeAny("switch", GetSwitchIndex, DefSwitchDict, sw)
 
 
 @overload
-def EncodeUnit(u: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeUnit(u: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeUnit(u: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeUnit(u: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeUnit(u: T) -> T:
+def EncodeUnit(u: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeUnit(u: ExprProxy[T]) -> T:
+def EncodeUnit(u: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeUnit(u):
+def EncodeUnit(u, issueError=False):
     return _EncodeAny("unit", GetUnitIndex, DefUnitDict, u)
 
 
 @overload
-def EncodeTBL(t: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeTBL(t: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeTBL(t: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeTBL(t: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeTBL(t: T) -> T:
+def EncodeTBL(t: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeTBL(t: ExprProxy[T]) -> T:
+def EncodeTBL(t: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeTBL(t):
+def EncodeTBL(t, issueError=False):
     # TODO: handle custom stat_txt.tbl
     return _EncodeAny("stat_txt.tbl", lambda s: {}[s], DefStatTextDict, t)
 
 
 @overload
-def EncodeFlingy(flingy: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeFlingy(flingy: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeFlingy(flingy: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeFlingy(flingy: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeFlingy(flingy: T) -> T:
+def EncodeFlingy(flingy: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeFlingy(flingy: ExprProxy[T]) -> T:
+def EncodeFlingy(flingy: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeFlingy(flingy):
+def EncodeFlingy(flingy, issueError=False):
     return _EncodeAny("flingy", lambda s: {}[s], DefFlingyDict, flingy)
 
 
 @overload
-def EncodeIcon(icon: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeIcon(icon: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeIcon(icon: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeIcon(icon: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeIcon(icon: T) -> T:
+def EncodeIcon(icon: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeIcon(icon: ExprProxy[T]) -> T:
+def EncodeIcon(icon: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeIcon(icon):
+def EncodeIcon(icon, issueError=False):
     return _EncodeAny("icon", lambda s: {}[s], DefIconDict, icon)
 
 
 @overload
-def EncodeSprite(sprite: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeSprite(sprite: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeSprite(sprite: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeSprite(sprite: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeSprite(sprite: T) -> T:
+def EncodeSprite(sprite: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeSprite(sprite: ExprProxy[T]) -> T:
+def EncodeSprite(sprite: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeSprite(sprite):
+def EncodeSprite(sprite, issueError=False):
     return _EncodeAny("sprite", lambda s: {}[s], DefSpriteDict, sprite)
 
 
 @overload
-def EncodeImage(image: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeImage(image: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeImage(image: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeImage(image: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeImage(image: T) -> T:
+def EncodeImage(image: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeImage(image: ExprProxy[T]) -> T:
+def EncodeImage(image: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeImage(image):
+def EncodeImage(image, issueError=False):
     return _EncodeAny("image", lambda s: {}[s], DefImageDict, image)
 
 
 @overload
-def EncodeIscript(iscript: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeIscript(iscript: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeIscript(iscript: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeIscript(iscript: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeIscript(iscript: T) -> T:
+def EncodeIscript(iscript: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeIscript(iscript: ExprProxy[T]) -> T:
+def EncodeIscript(iscript: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeIscript(iscript):
+def EncodeIscript(iscript, issueError=False):
     return _EncodeAny("iscript", lambda s: {}[s], DefIscriptDict, iscript)
 
 
 @overload
-def EncodeUnitOrder(order: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeUnitOrder(order: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeUnitOrder(order: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeUnitOrder(order: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeUnitOrder(order: T) -> T:
+def EncodeUnitOrder(order: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeUnitOrder(order: ExprProxy[T]) -> T:
+def EncodeUnitOrder(order: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeUnitOrder(order):
+def EncodeUnitOrder(order, issueError=False):
     return _EncodeAny("UnitOrder", lambda s: {}[s], DefUnitOrderDict, order)
 
 
 @overload
-def EncodeWeapon(weapon: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeWeapon(weapon: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeWeapon(weapon: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeWeapon(weapon: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeWeapon(weapon: T) -> T:
+def EncodeWeapon(weapon: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeWeapon(weapon: ExprProxy[T]) -> T:
+def EncodeWeapon(weapon: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeWeapon(weapon):
+def EncodeWeapon(weapon, issueError=False):
     return _EncodeAny("weapon", lambda s: {}[s], DefWeaponDict, weapon)
 
 
 @overload
-def EncodeTech(tech: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeTech(tech: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeTech(tech: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeTech(tech: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeTech(tech: T) -> T:
+def EncodeTech(tech: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeTech(tech: ExprProxy[T]) -> T:
+def EncodeTech(tech: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeTech(tech):
+def EncodeTech(tech, issueError=False):
     return _EncodeAny("tech", lambda s: {}[s], DefTechDict, tech)
 
 
 @overload
-def EncodeUpgrade(upgrade: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodeUpgrade(upgrade: str | bytes | ExprProxy[str | bytes], issueError: bool = False) -> int:
     ...
 
 
 @overload
-def EncodeUpgrade(upgrade: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodeUpgrade(upgrade: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodeUpgrade(upgrade: T) -> T:
+def EncodeUpgrade(upgrade: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodeUpgrade(upgrade: ExprProxy[T]) -> T:
+def EncodeUpgrade(upgrade: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodeUpgrade(upgrade):
+def EncodeUpgrade(upgrade, issueError=False):
     return _EncodeAny("upgrade", lambda s: {}[s], DefUpgradeDict, upgrade)
 
 
 @overload
-def EncodePortrait(portrait: str | bytes | ExprProxy[str | bytes]) -> int:
+def EncodePortrait(
+    portrait: str | bytes | ExprProxy[str | bytes], issueError: bool = False
+) -> int:
     ...
 
 
 @overload
-def EncodePortrait(portrait: _Unique | ExprProxy[_Unique]) -> NoReturn:
+def EncodePortrait(portrait: _Unique | ExprProxy[_Unique], issueError: bool = False) -> NoReturn:
     ...
 
 
 @overload
-def EncodePortrait(portrait: T) -> T:
+def EncodePortrait(portrait: T, issueError: bool = False) -> T:
     ...
 
 
 @overload
-def EncodePortrait(portrait: ExprProxy[T]) -> T:
+def EncodePortrait(portrait: ExprProxy[T], issueError: bool = False) -> T:
     ...
 
 
-def EncodePortrait(portrait):
+def EncodePortrait(portrait, issueError=False):
     return _EncodeAny("portrait", lambda s: {}[s], DefPortraitDict, portrait)
