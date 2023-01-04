@@ -9,7 +9,7 @@ from eudplib.epscript.helper import _RELIMP, _IGVA, _CGFW, _ARR, _VARR, _SRET, _
 # (Line 7) square(4),
 # (Line 8) square(5)
 # (Line 9) ];
-a = _CGFW(lambda: [_ARR(FlattenList([f_square(1), f_square(2), f_square(3), f_square(4), f_square(5)]))], 1)[0]
+a = _CGFW(lambda: [_ARR(FlattenList([f_square(1), f_square(2), f_square(3), f_square(4), f_square(5)]))], 1)
 # (Line 11) function square(x) {
 @EUDFunc
 def f_square(x):
@@ -20,9 +20,9 @@ def f_square(x):
     # (Line 14) }
     # (Line 15) const receives = py_eval('[PVariable() for _ in range(8)]');
 
-receives = _CGFW(lambda: [eval('[PVariable() for _ in range(8)]')], 1)[0]
+receives = _CGFW(lambda: [eval('[PVariable() for _ in range(8)]')], 1)
 # (Line 16) const attack_gwpID = 4;
-attack_gwpID = _CGFW(lambda: [4], 1)[0]
+attack_gwpID = _CGFW(lambda: [4], 1)
 # (Line 17) function constv_thing() {
 @EUDFunc
 def f_constv_thing():
@@ -267,9 +267,9 @@ def f_switch_test():
     # (Line 137) }
     # (Line 139) const ack = PVariable(list(1, 2, 3, 4, 5, 6, 7, 8));
 
-ack = _CGFW(lambda: [PVariable(FlattenList([1, 2, 3, 4, 5, 6, 7, 8]))], 1)[0]
+ack = _CGFW(lambda: [PVariable(FlattenList([1, 2, 3, 4, 5, 6, 7, 8]))], 1)
 # (Line 140) const ackMax = 8;
-ackMax = _CGFW(lambda: [8], 1)[0]
+ackMax = _CGFW(lambda: [8], 1)
 # (Line 141) function test_array() {
 @EUDFunc
 def f_test_array():

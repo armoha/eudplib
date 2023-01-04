@@ -4,8 +4,13 @@ from ..core import (
     ConstExpr,
     EUDVariable,
     EUDVArray,
+    Forward,
     IsEUDVariable,
+    NextTrigger,
+    PopTriggerScope,
+    PushTriggerScope,
     SeqCompute,
+    SetNextTrigger,
     SetTo,
     SetVariables,
     f_bitlshift,
@@ -57,9 +62,11 @@ def _IGVA(vList, exprListGen):
 
 
 def _CGFW(exprf, retn):
+    PushTriggerScope()
+    start = NextTrigger()
     try:
-        return exprf()
-    except (TriggerScopeError, NameError):
+        rets = exprf()
+    except NameError:
         rets = [ExprProxy(None) for _ in range(retn)]
 
         def _():
@@ -68,7 +75,17 @@ def _CGFW(exprf, retn):
                 ret._value = val
 
         EUDOnStart(_)
-        return rets
+    end = Forward()
+    SetNextTrigger(end)
+    PopTriggerScope()
+
+    def _():
+        nonlocal end
+        SetNextTrigger(start)
+        end << NextTrigger()
+
+    EUDOnStart(_)
+    return List2Assignable(rets)
 
 
 def _ARR(items):  # EUDArray initialization

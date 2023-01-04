@@ -165,7 +165,7 @@ def f_test_nested_object():
     # (Line 71) }
     # (Line 73) const ListList = py_list();
 
-ListList = _CGFW(lambda: [list()], 1)[0]
+ListList = _CGFW(lambda: [list()], 1)
 # (Line 74) var AllList;  // EUDArray
 AllList = EUDVariable()
 # (Line 75) object List {

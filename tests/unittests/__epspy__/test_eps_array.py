@@ -209,7 +209,7 @@ def f_test_compare():
     # (Line 113) }
     # (Line 114) const q8 = EUDQueue(8)();
 
-q8 = _CGFW(lambda: [EUDQueue(8)()], 1)[0]
+q8 = _CGFW(lambda: [EUDQueue(8)()], 1)
 # (Line 115) function test_queue() {
 @EUDFunc
 def f_test_queue():
@@ -300,13 +300,13 @@ def f_test_queue_wraparound():
     # (Line 155) const methods = py_eval('{\
 
 # (Line 158) }');
-methods = _CGFW(lambda: [eval('{    "append": "a",   "appendleft": "aL",    "pop":    "p",   "popleft":    "pL"}')], 1)[0]
+methods = _CGFW(lambda: [eval('{    "append": "a",   "appendleft": "aL",    "pop":    "p",   "popleft":    "pL"}')], 1)
 # (Line 159) const DequeCases = py_eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])');
-DequeCases = _CGFW(lambda: [eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])')], 1)[0]
+DequeCases = _CGFW(lambda: [eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])')], 1)
 # (Line 160) const DequeTest = py_eval("''.join(methods[name] for name in DequeCases)");
-DequeTest = _CGFW(lambda: [eval("''.join(methods[name] for name in DequeCases)")], 1)[0]
+DequeTest = _CGFW(lambda: [eval("''.join(methods[name] for name in DequeCases)")], 1)
 # (Line 161) const dq = EUDDeque(7)();
-dq = _CGFW(lambda: [EUDDeque(7)()], 1)[0]
+dq = _CGFW(lambda: [EUDDeque(7)()], 1)
 # (Line 162) function test_deque() {
 @EUDFunc
 def f_test_deque():
