@@ -24,11 +24,16 @@ THE SOFTWARE.
 """
 
 from collections import deque
+from typing import TYPE_CHECKING, Literal
 
 from ... import utils as ut
 from .. import rawtrigger as bt
 from ..allocator import RegisterCreatePayloadCallback
 from ..eudobj import EUDObject
+
+if TYPE_CHECKING:
+    from ..allocator import ConstExpr
+    from .eudv import VariableTriggerForward
 
 
 class EUDVarBuffer(EUDObject):
@@ -37,13 +42,13 @@ class EUDVarBuffer(EUDObject):
     72 bytes per variable.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-        self._vdict = {}
-        self._initvals = []
+        self._vdict: dict["VariableTriggerForward", int] = {}
+        self._initvals: list[int | ConstExpr] = []
 
-    def DynamicConstructed(self):
+    def DynamicConstructed(self) -> Literal[True]:
         return True
 
     def CreateVarTrigger(self, v, initval):
@@ -58,15 +63,15 @@ class EUDVarBuffer(EUDObject):
         self._vdict[v] = ret
         return ret
 
-    def GetDataSize(self):
+    def GetDataSize(self) -> int:
         return 2408 + 72 * (len(self._initvals) - 1)
 
-    def CollectDependency(self, emitbuffer):
+    def CollectDependency(self, emitbuffer) -> None:
         for initval in self._initvals:
             if type(initval) is not int:
                 emitbuffer.WriteDword(initval)
 
-    def WritePayload(self, emitbuffer):
+    def WritePayload(self, emitbuffer) -> None:
         emitbuffer.WriteSpace(4)
 
         for _ in range(4):
@@ -118,7 +123,7 @@ class EUDVarBuffer(EUDObject):
 _evb = None
 
 
-def RegisterNewVariableBuffer():
+def RegisterNewVariableBuffer() -> None:
     global _evb
     _evb = EUDVarBuffer()
 

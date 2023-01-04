@@ -25,12 +25,13 @@ THE SOFTWARE.
 
 import traceback
 from sys import getrefcount
-from typing import Any, TypeGuard
+from typing import TYPE_CHECKING, TypeVar, overload
 
 from ...localize import _
 from ...utils import (
     EPD,
     EPError,
+    ExprProxy,
     FlattenList,
     List2Assignable,
     RandList,
@@ -44,27 +45,45 @@ from ..allocator import ConstExpr, Forward, IsConstExpr
 from .vbase import VariableBase
 from .vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
 
+if TYPE_CHECKING:
+    from ..rawtrigger.constenc import Dword, _Modifier, _Player
+
+
 isRValueStrict = False
+T = TypeVar("T", int, ConstExpr, ExprProxy[int] | ExprProxy[ConstExpr])
 
 
-def EP_SetRValueStrictMode(mode):
+def EP_SetRValueStrictMode(mode: bool) -> None:
     global isRValueStrict
     isRValueStrict = mode
 
 
+@overload
+def _ProcessDest(dest: T) -> T:
+    ...
+
+
+@overload
+def _ProcessDest(dest: "VariableBase | ExprProxy[VariableBase]") -> ConstExpr:
+    ...
+
+
+@overload
+def _ProcessDest(dest: "_Player") -> int:
+    ...
+
+
 def _ProcessDest(dest):
-    try:
-        dest.checkNonRValue()
-        dest = EPD(dest.getValueAddr())
-    except AttributeError:
-        if isinstance(dest, ConstExpr) and dest.rlocmode == 4:
-            dest = ConstExpr(dest.baseobj, dest.offset // 4, 1)
-        else:
-            dest = bt.EncodePlayer(dest)
+    epd = unProxy(dest)
+    if isinstance(epd, VariableBase):
+        epd.checkNonRValue()
+        return EPD(epd.getValueAddr())
+    if epd is bt.CurrentPlayer:
+        return bt.EncodePlayer(epd)
     return dest
 
 
-def IsRValue(obj):
+def IsRValue(obj) -> bool:
     # FIXME: Can we handle wrapped (ExprProxy) variables?
     return getrefcount(unProxy(obj)) == 3
 
@@ -88,75 +107,99 @@ class VariableTriggerForward(ConstExpr):
 
 
 class EUDVariable(VariableBase):
+    """Full variable."""
 
-    """
-    Full variable.
-    """
+    @overload
+    def __init__(
+        self,
+        initval_or_epd: int | ConstExpr = 0,
+        modifier: None = None,
+        initval: None = None,
+        /,
+        *,
+        nextptr: None = None,
+    ) -> None:
+        ...
 
-    def __init__(self, _initval=0, modifier=None, /, initval=None, *, nextptr=None):
-        if not (modifier is None and initval is None and nextptr is None):
-            if modifier is None:
-                modifier = 0x072D0000
-            else:
-                modifier = ((bt.EncodeModifier(modifier) & 0xFF) << 24) | 0x2D0000
-            if initval is None:
-                initval = 0
+    @overload
+    def __init__(
+        self,
+        initval_or_epd: int | ConstExpr,
+        modifier: "_Modifier",
+        initval: int | ConstExpr,
+        /,
+        *,
+        nextptr: ConstExpr | None = None,
+    ) -> None:
+        ...
+
+    def __init__(self, initval_or_epd=0, modifier=None, initval=None, /, *, nextptr=None) -> None:
+        if modifier is None and initval is None and nextptr is None:
+            initial_pair = initval_or_epd
+        else:
+            ep_assert(modifier and initval is not None)
             if nextptr is None:
                 nextptr = 0
             # bitmask, player, #, modifier, nextptr
-            _initval = (0xFFFFFFFF, _ProcessDest(_initval), initval, modifier, nextptr)
-        self._vartrigger = VariableTriggerForward(_initval)
-        self._varact = self._vartrigger + (8 + 320)
+            initial_pair = (
+                0xFFFFFFFF,
+                _ProcessDest(initval_or_epd),
+                initval,
+                ((bt.EncodeModifier(modifier) & 0xFF) << 24) | 0x2D0000,
+                nextptr,
+            )
+        self._vartrigger = VariableTriggerForward(initial_pair)
+        self._varact: ConstExpr = self._vartrigger + (8 + 320)  # type: ignore[assignment]
         self._rvalue = False
 
-    def GetVTable(self):
+    def GetVTable(self) -> ConstExpr:
         return self._vartrigger
 
-    def getMaskAddr(self):
+    def getMaskAddr(self) -> ConstExpr:
         return self._varact
 
-    def getDestAddr(self):
-        return self._varact + 16
+    def getDestAddr(self) -> ConstExpr:
+        return self._varact + 16  # type: ignore[return-value]
 
-    def getValueAddr(self):
-        return self._varact + 20
+    def getValueAddr(self) -> ConstExpr:
+        return self._varact + 20  # type: ignore[return-value]
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return id(self)
 
     # -------
-    def makeL(self):
+    def makeL(self) -> "EUDVariable":
         self._rvalue = False
         return self
 
-    def makeR(self):
+    def makeR(self) -> "EUDVariable":
         self._rvalue = True
         return self
 
-    def checkNonRValue(self):
+    def checkNonRValue(self) -> None:
         if isRValueStrict and self._rvalue:
             raise EPError(_("Trying to modify value of l-value variable"))
 
     # -------
 
-    def SetMask(self, value):
+    def SetMask(self, value: "Dword") -> bt.Action:
         return bt.SetMemory(self.getMaskAddr(), bt.SetTo, value)
 
-    def AddMask(self, value):
+    def AddMask(self, value: "Dword") -> bt.Action:
         return bt.SetMemory(self.getMaskAddr(), bt.Add, value)
 
-    def SubtractMask(self, value):
+    def SubtractMask(self, value: "Dword") -> bt.Action:
         return bt.SetMemory(self.getMaskAddr(), bt.Subtract, value)
 
     # -------
 
-    def SetMaskX(self, value, mask):
+    def SetMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:
         return bt.SetMemoryX(self.getMaskAddr(), bt.SetTo, value, mask)
 
-    def AddMaskX(self, value, mask):
+    def AddMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:
         return bt.SetMemoryX(self.getMaskAddr(), bt.Add, value, mask)
 
-    def SubtractMaskX(self, value, mask):
+    def SubtractMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:
         return bt.SetMemoryX(self.getMaskAddr(), bt.Subtract, value, mask)
 
     # -------
@@ -172,13 +215,13 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def MaskAtLeastX(self, value, mask):
+    def MaskAtLeastX(self, value: "Dword", mask: "Dword") -> bt.Condition:
         return bt.MemoryX(self.getMaskAddr(), bt.AtLeast, value, mask)
 
-    def MaskAtMostX(self, value, mask):
+    def MaskAtMostX(self, value: "Dword", mask: "Dword") -> bt.Condition:
         return bt.MemoryX(self.getMaskAddr(), bt.AtMost, value, mask)
 
-    def MaskExactlyX(self, value, mask):
+    def MaskExactlyX(self, value: "Dword", mask: "Dword") -> bt.Condition:
         return bt.MemoryX(self.getMaskAddr(), bt.Exactly, value, mask)
 
     # -------
@@ -197,15 +240,15 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def SetDestX(self, dest, mask):
+    def SetDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:
         dest = _ProcessDest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.SetTo, dest, mask)
 
-    def AddDestX(self, dest, mask):
+    def AddDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:
         dest = _ProcessDest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.Add, dest, mask)
 
-    def SubtractDestX(self, dest, mask):
+    def SubtractDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:
         dest = _ProcessDest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.Subtract, dest, mask)
 

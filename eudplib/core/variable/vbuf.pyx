@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Copyright (c) 2014 trgk
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,13 +21,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-'''
+"""
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from libc.stdint cimport uint32_t, uint8_t
 from libc.string cimport memset
 
 from collections import deque
+from typing import Literal
 
 from ... import utils as ut
 from .. import rawtrigger as bt
@@ -41,13 +42,13 @@ class EUDVarBuffer(EUDObject):
     72 bytes per variable.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self._vdict = {}
         self._initvals = []
 
-    def DynamicConstructed(self):
+    def DynamicConstructed(self) -> Literal[True] -> None:
         return True
 
     def CreateVarTrigger(self, v, initval):
@@ -62,15 +63,15 @@ class EUDVarBuffer(EUDObject):
         self._vdict[v] = ret
         return ret
 
-    def GetDataSize(self):
+    def GetDataSize(self) -> int:
         return 2408 + 72 * (len(self._initvals) - 1)
 
-    def CollectDependency(self, emitbuffer):
+    def CollectDependency(self, emitbuffer) -> None:
         for initval in self._initvals:
             if type(initval) is not int:
                 emitbuffer.WriteDword(initval)
 
-    def WritePayload(self, emitbuffer):
+    def WritePayload(self, emitbuffer) -> None:
         emitbuffer.WriteSpace(4)
 
         for _ in range(4):
@@ -146,7 +147,7 @@ class EUDCustomVarBuffer(EUDObject):
     72 bytes per variable.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self._vdict = {}
