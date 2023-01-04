@@ -199,7 +199,6 @@ def IntOrConstExpr(baseobj: ConstExpr | None, offset: int, rlocmode: int) -> int
 
 
 _ConstExpr = TypeVar("_ConstExpr", bound=ConstExpr)
-_ConstExprProxy = TypeVar("_ConstExprProxy", bound=ExprProxy[ConstExpr])
 
 
 class Forward(ConstExpr):
@@ -215,7 +214,7 @@ class Forward(ConstExpr):
         ...
 
     @overload
-    def __lshift__(self, expr: _ConstExprProxy) -> _ConstExprProxy:
+    def __lshift__(self, expr: ExprProxy[_ConstExpr]) -> ExprProxy[_ConstExpr]:
         ...
 
     @overload
