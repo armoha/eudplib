@@ -48,7 +48,7 @@ cdef class ConstExpr:
         self.offset: int = offset & 0xFFFFFFFF
         self.rlocmode: int = rlocmode & 0xFFFFFFFF
 
-    cpdef RlocInt_C Evaluate(self) -> RlocInt_C:
+    cpdef RlocInt_C Evaluate(self):
         if self.rlocmode:
             return self.baseobj.Evaluate() * self.rlocmode // 4 + self.offset  # type: ignore[union-attr]
         else:
@@ -248,7 +248,7 @@ cdef class Forward(ConstExpr):
     def Reset(self) -> None:
         self._expr = None
 
-    cpdef RlocInt_C Evaluate(self) -> RlocInt_C:
+    cpdef RlocInt_C Evaluate(self):
         if self._expr is None:
             raise ut.EPError(_("Forward not initialized"))
         return self._expr.Evaluate()
@@ -275,7 +275,7 @@ cdef class Forward(ConstExpr):
 Evaluable: TypeAlias = ConstExpr | int | ExprProxy[ConstExpr] | RlocInt_C
 
 
-cpdef RlocInt_C Evaluate(x: Evaluable) -> RlocInt_C:
+cpdef RlocInt_C Evaluate(x: Evaluable):
     """Evaluate expressions"""
     expr = ut.unProxy(x)
     if isinstance(expr, ConstExpr):

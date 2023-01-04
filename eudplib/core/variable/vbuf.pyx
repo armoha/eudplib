@@ -28,12 +28,16 @@ from libc.stdint cimport uint32_t, uint8_t
 from libc.string cimport memset
 
 from collections import deque
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from ... import utils as ut
 from .. import rawtrigger as bt
 from ..allocator import RegisterCreatePayloadCallback
 from ..eudobj import EUDObject
+
+if TYPE_CHECKING:
+    from ..allocator import ConstExpr
+    from .eudv import VariableTriggerForward
 
 
 class EUDVarBuffer(EUDObject):
@@ -45,10 +49,10 @@ class EUDVarBuffer(EUDObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self._vdict = {}
-        self._initvals = []
+        self._vdict: dict["VariableTriggerForward", int] = {}
+        self._initvals: list[int | ConstExpr] = []
 
-    def DynamicConstructed(self) -> Literal[True] -> None:
+    def DynamicConstructed(self) -> Literal[True]:
         return True
 
     def CreateVarTrigger(self, v, initval):
@@ -129,7 +133,7 @@ class EUDVarBuffer(EUDObject):
 _evb = None
 
 
-def RegisterNewVariableBuffer():
+def RegisterNewVariableBuffer() -> None:
     global _evb
     _evb = EUDVarBuffer()
 
@@ -147,7 +151,7 @@ class EUDCustomVarBuffer(EUDObject):
     72 bytes per variable.
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
 
         self._vdict = {}
