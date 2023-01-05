@@ -36,7 +36,7 @@ def _RELIMP(path, mod_name):  # relative path import
     import inspect
     import pathlib
 
-    p = pathlib.Path(inspect.getabsfile(inspect.currentframe())).parent
+    p = pathlib.Path(inspect.getabsfile(inspect.currentframe().f_back))
     for s in path.split("."):
         if s == "":
             p = p.parent
