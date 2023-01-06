@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from ...utils import ExprProxy
 
 
-class Payload:
+class Payload:  # FIXME: typing Payload raises TypeError: a bytes-like object is required, not 'list'
     def __init__(self, data, prttable, orttable):
         self.data = data
         self.prttable = prttable
