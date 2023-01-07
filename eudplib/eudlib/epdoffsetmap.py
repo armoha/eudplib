@@ -501,7 +501,7 @@ _EPDCUnitMap: Any = EPDOffsetMap((
 class EPDCUnitMap(_EPDCUnitMap):
     def set_color(self, player):
         player = c.EncodePlayer(player)
-        check_sprite = c.Deaths(0, c.Exactly, 0)
+        check_sprite = c.Deaths(0, c.Exactly, 0, 0)
         color_epd = c.EUDVariable()
         sprite_epd = self._epd + 0x00C // 4
         c.VProc(sprite_epd, sprite_epd.SetDest(ut.EPD(check_sprite) + 1))
