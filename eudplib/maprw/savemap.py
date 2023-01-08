@@ -24,6 +24,7 @@ THE SOFTWARE.
 """
 
 import binascii
+from collections.abc import Callable
 import os
 
 from ..core import RegisterCreatePayloadCallback
@@ -54,7 +55,7 @@ def getTraceMap() -> None:
 RegisterCreatePayloadCallback(getTraceMap)
 
 
-def SaveMap(fname: str, rootf, *, sectorSize=None) -> None:
+def SaveMap(fname: str, rootf: Callable, *, sectorSize=None) -> None:
     """Save output map with root function.
 
     :param fname: Path for output map.

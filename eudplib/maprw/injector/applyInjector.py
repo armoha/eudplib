@@ -42,7 +42,7 @@ def PRT_SkipPayloadRelocator(enable: bool) -> None:
     skip_payload_relocator = enable
 
 
-def applyInjector(chkt: CHK, root) -> None:
+def applyInjector(chkt: CHK, root: c.Forward | c.RawTrigger) -> None:
     # Create injector triggers
     bsm = BlockStruManager()
     prev_bsm = SetCurrentBlockStruManager(bsm)

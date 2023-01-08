@@ -37,10 +37,10 @@ if TYPE_CHECKING:
 
 
 class Payload:
-    def __init__(self, data: Any, prttable: "list[int]", orttable: "list[int]") -> None:
-        self.data: Any = data
-        self.prttable: "Final[list[int]]" = prttable
-        self.orttable: "Final[list[int]]" = orttable
+    def __init__(self, data, prttable, orttable):
+        self.data = data
+        self.prttable = prttable
+        self.orttable = orttable
 
 
 _packerData: "dict[str, list[int]]" = {}
@@ -122,7 +122,7 @@ class PayloadBuffer:
         self._datacur += spacesize
 
     # Internally used
-    def CreatePayload(self):
+    def CreatePayload(self) -> Payload:
         return Payload(self._data, self._prttable, self._orttable)
 
 

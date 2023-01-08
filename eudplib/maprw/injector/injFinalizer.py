@@ -174,7 +174,9 @@ def _FlipProp(trigepd) -> None:
     cs.EUDEndWhile()
 
 
-def CreateInjectFinalizer(chkt: CHK, root, mrgndata: bytes | None = None) -> c.Forward:
+def CreateInjectFinalizer(
+    chkt: CHK, root: c.Forward | c.RawTrigger, mrgndata: bytes | None = None
+) -> c.Forward:
     rtt.AllocTrigTriggerLink()
     c.EP_SetRValueStrictMode(False)
 
