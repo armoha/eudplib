@@ -37,7 +37,9 @@ if TYPE_CHECKING:
 
 
 class Payload:
-    def __init__(self, data: bytes | bytearray, prttable: "list[int]", orttable: "list[int]") -> None:
+    def __init__(
+        self, data: bytes | bytearray, prttable: "list[int]", orttable: "list[int]"
+    ) -> None:
         self.data: "Final[bytes | bytearray]" = data
         self.prttable: "Final[list[int]]" = prttable
         self.orttable: "Final[list[int]]" = orttable
