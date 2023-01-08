@@ -29,11 +29,11 @@ from .. import core as c
 from .. import trigger as tg
 
 
-def DoActions(*actions, preserved=True):
+def DoActions(*actions, preserved=True) -> tuple[c.Forward, c.RawTrigger]:
     return tg.Trigger(actions=actions, preserved=preserved)
 
 
-def EUDJump(nextptr):
+def EUDJump(nextptr) -> None:
     if isinstance(nextptr, c.EUDVariable):
         t = c.Forward()
         c.SeqCompute([(ut.EPD(t + 4), c.SetTo, nextptr)])
@@ -42,13 +42,13 @@ def EUDJump(nextptr):
         c.RawTrigger(nextptr=nextptr)
 
 
-def EUDJumpIf(conditions, ontrue, *, _actions=None):
+def EUDJumpIf(conditions, ontrue, *, _actions=None) -> None:
     onfalse = c.Forward()
     tg.EUDBranch(conditions, ontrue, onfalse, _actions=_actions)
     onfalse << c.NextTrigger()
 
 
-def EUDJumpIfNot(conditions, onfalse, *, _actions=None):
+def EUDJumpIfNot(conditions, onfalse, *, _actions=None) -> None:
     ontrue = c.Forward()
     tg.EUDBranch(conditions, ontrue, onfalse, _actions=_actions)
     ontrue << c.NextTrigger()

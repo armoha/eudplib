@@ -24,21 +24,23 @@ THE SOFTWARE.
 """
 
 
+from collections.abc import Callable
+from typing import NoReturn
 from eudplib.localize import _
 
 
 class CtrlStruOpener:
-    def __init__(self, f):
-        self._f = f
+    def __init__(self, f: Callable) -> None:
+        self._f: Callable = f
         self._called = False
 
-    def __del__(self):
+    def __del__(self) -> None:
         if not self._called:
             raise RuntimeError(
                 _("Control structures must be double-parenthesised.") + "\n ex) EUDInfLoop()()"
             )
 
-    def __bool__(self):
+    def __bool__(self) -> NoReturn:
         raise RuntimeError(
             _("Control structures must be double-parenthesised.") + "\n ex) EUDInfLoop()()"
         )

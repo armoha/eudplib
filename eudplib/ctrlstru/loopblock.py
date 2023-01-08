@@ -23,6 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from collections.abc import Iterator
+from typing import Any, Literal
+
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
@@ -37,8 +40,8 @@ def _IsLoopBlock(block):
 # -------
 
 
-def EUDInfLoop():
-    def _footer():
+def EUDInfLoop() -> CtrlStruOpener:
+    def _footer() -> Literal[True]:
         block = {
             "loopstart": c.NextTrigger(),
             "loopend": c.Forward(),
@@ -51,19 +54,19 @@ def EUDInfLoop():
     return CtrlStruOpener(_footer)
 
 
-def EUDEndInfLoop():
+def EUDEndInfLoop() -> None:
     block = ut.EUDPopBlock("infloopblock")[1]
     if not block["contpoint"].IsSet():
         block["contpoint"] << block["loopstart"]
-    EUDJump(block["loopstart"])
+    c.SetNextTrigger(block["loopstart"])
     block["loopend"] << c.NextTrigger()
 
 
 # -------
 
 
-def EUDLoopN():
-    def _footer(n):
+def EUDLoopN() -> CtrlStruOpener:
+    def _footer(n: int) -> Literal[True]:
         vardb = c.Db(4)
         c.RawTrigger(actions=c.SetMemory(vardb, c.SetTo, n))
 
@@ -81,21 +84,20 @@ def EUDLoopN():
     return CtrlStruOpener(_footer)
 
 
-def EUDEndLoopN():
+def EUDEndLoopN() -> None:
     block = ut.EUDPopBlock("loopnblock")[1]
     if not block["contpoint"].IsSet():
         block["contpoint"] << c.NextTrigger()
 
     vardb = block["vardb"]
-    c.RawTrigger(actions=c.SetMemory(vardb, c.Subtract, 1))
-    EUDJump(block["loopstart"])
+    c.RawTrigger(nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1))
     block["loopend"] << c.NextTrigger()
 
 
 # -------
 
 
-def EUDLoopRange(start, end=None):
+def EUDLoopRange(start, end=None) -> Iterator[c.EUDVariable]:
     ut.EUDCreateBlock("looprangeblock", None)
     if end is None:
         start, end = 0, start
@@ -113,8 +115,8 @@ def EUDLoopRange(start, end=None):
 # -------
 
 
-def EUDWhile():
-    def _header():
+def EUDWhile() -> CtrlStruOpener:
+    def _header() -> None:
         block = {
             "loopstart": c.NextTrigger(),
             "loopend": c.Forward(),
@@ -124,7 +126,7 @@ def EUDWhile():
 
         ut.EUDCreateBlock("whileblock", block)
 
-    def _footer(conditions, *, neg=False):
+    def _footer(conditions, *, neg=False) -> Literal[True]:
         block = ut.EUDPeekBlock("whileblock")[1]
         if neg:
             EUDJumpIf(conditions, block["loopend"])
@@ -137,13 +139,13 @@ def EUDWhile():
     return CtrlStruOpener(_footer)
 
 
-def EUDWhileNot():
+def EUDWhileNot() -> CtrlStruOpener:
     c = EUDWhile()
     return CtrlStruOpener(lambda conditions: c(conditions, neg=True))
 
 
-def _UnsafeWhileNot():
-    def _header():
+def _UnsafeWhileNot() -> CtrlStruOpener:
+    def _header() -> None:
         block = {
             "loopstart": c.NextTrigger(),
             "loopend": c.Forward(),
@@ -153,7 +155,7 @@ def _UnsafeWhileNot():
 
         ut.EUDCreateBlock("whileblock", block)
 
-    def _footer(conditions):
+    def _footer(conditions) -> Literal[True]:
         block = ut.EUDPeekBlock("whileblock")[1]
         c.RawTrigger(
             conditions=conditions,
@@ -166,18 +168,18 @@ def _UnsafeWhileNot():
     return CtrlStruOpener(_footer)
 
 
-def EUDEndWhile():
+def EUDEndWhile() -> None:
     block = ut.EUDPopBlock("whileblock")[1]
     if not block["contpoint"].IsSet():
         block["contpoint"] << block["loopstart"]
-    EUDJump(block["loopstart"])
+    c.SetNextTrigger(block["loopstart"])
     block["loopend"] << c.NextTrigger()
 
 
 # -------
 
 
-def _GetLastLoopBlock():
+def _GetLastLoopBlock() -> tuple[str, Any]:
     for block in reversed(ut.EUDGetBlockList()):
         if _IsLoopBlock(block[1]):
             return block
@@ -185,41 +187,41 @@ def _GetLastLoopBlock():
     raise ut.EPError(_("No loop block surrounding this code area"))
 
 
-def EUDLoopContinue():
+def EUDLoopContinue() -> None:
     block = _GetLastLoopBlock()[1]
     EUDJump(block["contpoint"])
 
 
-def EUDLoopContinueIf(conditions):
+def EUDLoopContinueIf(conditions) -> None:
     block = _GetLastLoopBlock()[1]
     EUDJumpIf(conditions, block["contpoint"])
 
 
-def EUDLoopContinueIfNot(conditions):
+def EUDLoopContinueIfNot(conditions) -> None:
     block = _GetLastLoopBlock()[1]
     EUDJumpIfNot(conditions, block["contpoint"])
 
 
-def EUDLoopIsContinuePointSet():
+def EUDLoopIsContinuePointSet() -> bool:
     block = _GetLastLoopBlock()[1]
     return block["contpoint"].IsSet()
 
 
-def EUDLoopSetContinuePoint():
+def EUDLoopSetContinuePoint() -> None:
     block = _GetLastLoopBlock()[1]
     block["contpoint"] << c.NextTrigger()
 
 
-def EUDLoopBreak():
+def EUDLoopBreak() -> None:
     block = _GetLastLoopBlock()[1]
     EUDJump(block["loopend"])
 
 
-def EUDLoopBreakIf(conditions):
+def EUDLoopBreakIf(conditions) -> None:
     block = _GetLastLoopBlock()[1]
     EUDJumpIf(conditions, block["loopend"])
 
 
-def EUDLoopBreakIfNot(conditions):
+def EUDLoopBreakIfNot(conditions) -> None:
     block = _GetLastLoopBlock()[1]
     EUDJumpIfNot(conditions, block["loopend"])

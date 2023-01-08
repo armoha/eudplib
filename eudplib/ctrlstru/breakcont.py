@@ -29,30 +29,30 @@ from . import loopblock as lb
 from . import swblock as sb
 
 
-def EUDContinue():
+def EUDContinue() -> None:
     return lb.EUDLoopContinue()
 
 
-def EUDContinueIf(conditions):
+def EUDContinueIf(conditions) -> None:
     return lb.EUDLoopContinueIf(conditions)
 
 
-def EUDContinueIfNot(conditions):
+def EUDContinueIfNot(conditions) -> None:
     return lb.EUDLoopContinueIfNot(conditions)
 
 
-def EUDSetContinuePoint():
+def EUDSetContinuePoint() -> None:
     return lb.EUDLoopSetContinuePoint()
 
 
-def EUDIsContinuePointSet():
+def EUDIsContinuePointSet() -> bool:
     return lb.EUDLoopIsContinuePointSet()
 
 
 # -------
 
 
-def EUDBreak():
+def EUDBreak() -> None:
     for block in reversed(ut.EUDGetBlockList()):
         if lb._IsLoopBlock(block[1]):
             lb.EUDLoopBreak()
@@ -64,7 +64,7 @@ def EUDBreak():
     raise ut.EPError(_("No loop/switch block surrounding this code area"))
 
 
-def EUDBreakIf(conditions):
+def EUDBreakIf(conditions) -> None:
     for block in reversed(ut.EUDGetBlockList()):
         if lb._IsLoopBlock(block[1]):
             lb.EUDLoopBreakIf(conditions)
@@ -76,7 +76,7 @@ def EUDBreakIf(conditions):
     raise ut.EPError(_("No loop/switch block surrounding this code area"))
 
 
-def EUDBreakIfNot(conditions):
+def EUDBreakIfNot(conditions) -> None:
     for block in reversed(ut.EUDGetBlockList()):
         if lb._IsLoopBlock(block[1]):
             lb.EUDLoopBreakIfNot(conditions)
