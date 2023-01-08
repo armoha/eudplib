@@ -25,7 +25,7 @@ THE SOFTWARE.
 """
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from cpython.bytes cimport PyBytes_AsString, PyBytes_FromStringAndSize
@@ -44,8 +44,8 @@ if TYPE_CHECKING:
 
 
 class Payload:
-    def __init__(self, data, prttable: "list[int]", orttable: "list[int]") -> None:
-        self.data = data
+    def __init__(self, data: Any, prttable: "list[int]", orttable: "list[int]") -> None:
+        self.data: Any = data
         self.prttable: "list[int]" = prttable
         self.orttable: "list[int]" = orttable
 
@@ -140,7 +140,7 @@ cdef class PayloadBuffer:
         self._datacur += spacesize
 
     # Internally used
-    def CreatePayload(self) -> Payload:
+    def CreatePayload(self):
         byteData = PyBytes_FromStringAndSize(<const char*>self._data, self._totlen)
         return Payload(byteData, self._prttable, self._orttable)
 
