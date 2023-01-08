@@ -84,7 +84,7 @@ def SetMemoryS(dest, modtype, value) -> "tuple[Action, Action]":
 def MoveCP(dest) -> Action:
     try:
         value = dest - _seed
-    except TypeError:
+    except (TypeError, AttributeError):
         value = _seed * (-1) + dest
     return SetMemoryC(0x6509B0, Add, value)
 
@@ -101,12 +101,12 @@ def SetMemoryC(dest, modtype, value) -> Action:
         elif modtype == 9:
             try:
                 _seed = _seed - value
-            except TypeError:
+            except (TypeError, AttributeError):
                 _seed = -value + _seed
         else:
             try:
                 _seed = _seed + value
-            except TypeError:
+            except (TypeError, AttributeError):
                 _seed = value + _seed
     flag = random.randint(0, 0xFF) & (0xFF - 2)
     return Action(_loc, 0, 0, 0, epd, value, u, 45, modtype, flag)
