@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
 
 from eudplib import utils as ut
 from eudplib.localize import _
@@ -37,10 +37,8 @@ if TYPE_CHECKING:
 
 
 class Payload:
-    def __init__(
-        self, data: bytes | bytearray | list, prttable: "list[int]", orttable: "list[int]"
-    ) -> None:
-        self.data: "Final[bytes | bytearray | list]" = data
+    def __init__(self, data, prttable: "list[int]", orttable: "list[int]") -> None:
+        self.data = data
         self.prttable: "Final[list[int]]" = prttable
         self.orttable: "Final[list[int]]" = orttable
 

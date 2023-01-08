@@ -25,7 +25,7 @@ THE SOFTWARE.
 """
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from cpython.bytes cimport PyBytes_AsString, PyBytes_FromStringAndSize
@@ -44,10 +44,10 @@ if TYPE_CHECKING:
 
 
 class Payload:
-    def __init__(self, data: bytes | bytearray | list, prttable: "list[int]", orttable: "list[int]") -> None:
-        self.data: "Final[bytes | bytearray | list]" = data
-        self.prttable: "Final[list[int]]" = prttable
-        self.orttable: "Final[list[int]]" = orttable
+    def __init__(self, data, prttable: "list[int]", orttable: "list[int]") -> None:
+        self.data = data
+        self.prttable: "list[int]" = prttable
+        self.orttable: "list[int]" = orttable
 
 
 _packerData: "dict[str, list[int]]" = {}
