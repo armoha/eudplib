@@ -232,9 +232,9 @@ def f_switch_test():
     # (Line 115) }
     # (Line 117) const ack = PVariable(list(1, 2, 3, 4, 5, 6, 7, 8));
 
-ack = _CGFW(lambda: [PVariable(FlattenList([1, 2, 3, 4, 5, 6, 7, 8]))], 1)
+ack = _CGFW(lambda: [PVariable(FlattenList([1, 2, 3, 4, 5, 6, 7, 8]))], 1)[0]
 # (Line 118) const ackMax = 8;
-ackMax = _CGFW(lambda: [8], 1)
+ackMax = _CGFW(lambda: [8], 1)[0]
 # (Line 119) function test_array() {
 @EUDFunc
 def f_test_array():

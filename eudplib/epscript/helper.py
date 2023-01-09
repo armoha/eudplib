@@ -56,7 +56,7 @@ def _RELIMP(path, mod_name):  # relative path import
 
 def _IGVA(varCount, exprListGen):
     try:
-        vList = [EUDVariable(x) for x in exprListGen()]
+        vList = List2Assignable([EUDVariable(x) for x in exprListGen()])
     except (TriggerScopeError, NameError):
         vList = EUDCreateVariables(varCount)
 

@@ -11,7 +11,7 @@ misc = _RELIMP("", "test_eps_misc")
 # (Line 8) square(4),
 # (Line 9) square(5)
 # (Line 10) ];
-a = _CGFW(lambda: [_ARR(FlattenList([f_square(1), f_square(2), f_square(3), f_square(4), f_square(5)]))], 1)
+a = _CGFW(lambda: [_ARR(FlattenList([f_square(1), f_square(2), f_square(3), f_square(4), f_square(5)]))], 1)[0]
 # (Line 12) function square(x) {
 @EUDFunc
 def f_square(x):
@@ -22,9 +22,9 @@ def f_square(x):
     # (Line 15) }
     # (Line 16) const receives = py_eval('[PVariable() for _ in range(8)]');
 
-receives = _CGFW(lambda: [eval('[PVariable() for _ in range(8)]')], 1)
+receives = _CGFW(lambda: [eval('[PVariable() for _ in range(8)]')], 1)[0]
 # (Line 17) const attack_gwpID = 4;
-attack_gwpID = _CGFW(lambda: [4], 1)
+attack_gwpID = _CGFW(lambda: [4], 1)[0]
 # (Line 18) function constv_thing() {
 @EUDFunc
 def f_constv_thing():
