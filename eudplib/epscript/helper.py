@@ -92,7 +92,7 @@ def _CGFW(exprf, retn):
         end << NextTrigger()
 
     EUDOnStart(_)
-    return List2Assignable(rets)
+    return rets
 
 
 def _ARR(items):  # EUDArray initialization

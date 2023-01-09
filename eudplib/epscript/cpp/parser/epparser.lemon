@@ -970,10 +970,10 @@ cdef_global_stmt ::= CONST nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B). {
         }
     });
     if(nameCount == 1) {
-        ps->gen << s << " = _CGFW(lambda: [" << B->data << "], 1)" << std::endl;
+        ps->gen << s << " = _CGFW(lambda: [" << B->data << "], 1)[0]" << std::endl;
     }
     else {
-        ps->gen << s << " = _CGFW(lambda: [" << B->data << "], " << nameCount << ")" << std::endl;
+        ps->gen << s << " = List2Assignable(_CGFW(lambda: [" << B->data << "], " << nameCount << "))" << std::endl;
     }
     delete A; delete B;
 }
