@@ -65,7 +65,7 @@ def _IGVA(varCount, exprListGen):
             SetVariables(vList, exprList)
 
         EUDOnStart(_)
-    return List2Assignable(vList)
+    return vList
 
 
 def _CGFW(exprf, retn):

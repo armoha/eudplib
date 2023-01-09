@@ -931,9 +931,12 @@ vdefAssign_global_stmt ::= VAR nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B).
             throw_error(7998, ("Redeclaration of variable \'" + varname + "\'"), A->line);
         }
     });
-
-    ps->gen << s << " = _IGVA(" << varCount << ", lambda: [" << B->data << "])" << std::endl;
-
+    if(varCount == 1) {
+        ps->gen << s << " = _IGVA(" << varCount << ", lambda: [" << B->data << "])[0]" << std::endl;
+    }
+    else {
+        ps->gen << s << " = List2Assignable(_IGVA(" << varCount << ", lambda: [" << B->data << "]))" << std::endl;
+    }
     delete A; delete B;
 }
 
