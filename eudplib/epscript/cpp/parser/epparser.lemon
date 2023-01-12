@@ -81,7 +81,7 @@ chunk ::= import_chunk SEMICOLON.
 chunk ::= fdef_chunk.
 chunk ::= fdecl_chunk.
 chunk ::= object_chunk.
-chunk ::= vdef_stmt SEMICOLON.
+chunk ::= vdef_global_stmt SEMICOLON.
 chunk ::= funccall_global_stmt SEMICOLON.
 chunk ::= vdefAssign_global_stmt SEMICOLON.
 chunk ::= cdef_global_stmt SEMICOLON.
@@ -108,27 +108,32 @@ relimp_path(A) ::= relimp_path(B) PERIOD NAME(C). {
     delete B;
     A = C;
 }
-relimp_chunk ::= relimp_path(A) SEMICOLON. {
-    std::string impPath, impModname;
-    impPathProcess(A->data, impPath, impModname);
-
-    if(!ps->closure.defModule(impModname)) {
-        throw_error(6754, "Importing already-declared module " + impModname, A->line);
-    }
-
-    ps->gen << impModname << " = _RELIMP(\"" << impPath << "\", \"" << impModname << "\")" << std::endl;
-    delete A;
-}
 relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
-
+    if(ps->closure.defGlobal(B->data)) {
+        throw_error(6755, "Module name clash with builtin: " + B->data, B->line);
+    }
     if(!ps->closure.defModule(B->data)) {
         throw_error(6754, "Importing already-declared module " + B->data, B->line);
     }
 
     ps->gen << B->data << " = _RELIMP(\"" << impPath << "\", \"" << impModname << "\")" << std::endl;
     delete A; delete B;
+}
+relimp_chunk ::= relimp_path(A) SEMICOLON. {
+    std::string impPath, impModname;
+    impPathProcess(A->data, impPath, impModname);
+
+    if(ps->closure.defGlobal(impModname)) {
+        throw_error(6755, "Module name clash with builtin: " + impModname, A->line);
+    }
+    if(!ps->closure.defModule(impModname)) {
+        throw_error(6754, "Importing already-declared module " + impModname, A->line);
+    }
+
+    ps->gen << impModname << " = _RELIMP(\"" << impPath << "\", \"" << impModname << "\")" << std::endl;
+    delete A;
 }
 
 dottedName(A) ::= NAME(B). { A = B; }
@@ -142,6 +147,9 @@ import_chunk ::= IMPORT dottedName(A) AS NAME(B). {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
+    if(ps->closure.defGlobal(B->data)) {
+        throw_error(6755, "Module name clash with builtin: " + B->data, B->line);
+    }
     if(!ps->closure.defModule(B->data)) {
         throw_error(6754, "Importing already-declared module " + B->data, B->line);
     }
@@ -155,6 +163,9 @@ import_chunk ::= IMPORT dottedName(A). {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
+    if(ps->closure.defGlobal(impModname)) {
+        throw_error(6755, "Module name clash with builtin: " + impModname, A->line);
+    }
     if(!ps->closure.defModule(impModname)) {
         throw_error(6754, "Importing already-declared module " + impModname, A->line);
     }
@@ -171,6 +182,9 @@ fdef_rettypes(A) ::= COLON exprList_nonEmpty(B). { A = B; }
 fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_rettypes(rets). {
     // Preprocess name
     funcNamePreprocess(name->data);
+    if(ps->closure.defGlobal(name->data)) {
+        throw_error(6756, "Function name clash with builtin: " + name->data, name->line);
+    }
     if(!ps->closure.defFunction(name->data)) {
         throw_error(4495, "Duplicate function " + name->data, name->line);
     }
@@ -242,6 +256,9 @@ fdef_chunk ::= fdef_header stmt . {
 fdecl_chunk  ::= FUNCTION NAME(name) LPAREN typedNameList RPAREN SEMICOLON. {
     // Preprocess name
     funcNamePreprocess(name->data);
+    if(ps->closure.defGlobal(name->data)) {
+        throw_error(6756, "Function name clash with builtin: " + name->data, name->line);
+    }
     if(!ps->closure.declareFunction(name->data)) {
         throw_error(72461, "Declaring function with non-function name " + name->data, name->line);
     }
@@ -254,6 +271,9 @@ object_body(A) ::= OBJECT NAME(name) LBRACKET. {
     ps->gen << "class " << name->data << "(EUDStruct):\n";
     ps->gen.indent();
 
+    if(ps->closure.defGlobal(name->data)) {
+        throw_error(6757, "Object name clash with builtin: " + name->data, name->line);
+    }
     if(!ps->closure.defConstant(name->data)) {
         throw_error(8228, "Declaring object with non-function name " + name->data, name->line);
     }
@@ -355,7 +375,7 @@ object_body(A) ::= object_body(B) method_chunk . {
     A->line = currentTokenizingLine;
 }
 
-object_chunk  ::= object_body(A) RBRACKET SEMICOLON. {
+object_chunk ::= object_body(A) RBRACKET SEMICOLON. {
     ps->gen << "_fields_ = [\n";
     subTokenListIter(A->subToken[1], [&](const Token* tok) {
         subTokenListIter(tok, [&](const Token* nameType) {
@@ -860,6 +880,29 @@ expr(A) ::= LNOT expr(B).  { A = negate(B); }
 
 
 // Statements
+vdef_global_stmt ::= VAR nameList_nonEmpty(A). {
+    std::string& s = A->data;
+    int varCount = std::count(s.begin(), s.end(), ',') + 1;
+
+    // Register variables.
+    commaListIter(s, [&](std::string& varname) {
+        if(ps->closure.defGlobal(varname)) {
+            throw_error(6758, "Variable name clash with builtin: " + varname, A->line);
+        }
+        if(!ps->closure.defVariable(varname)) {
+            throw_error(196, ("Redeclaration of variable \'" + varname + "\'"), A->line);
+        }
+    });
+
+    if(varCount == 1) {
+        ps->gen << s << " = EUDVariable()" << std::endl;
+    }
+    else {
+        ps->gen << s << " = EUDCreateVariables(" << varCount << ")" << std::endl;
+    }
+
+    delete A;
+}
 vdef_stmt ::= VAR nameList_nonEmpty(A). {
     std::string& s = A->data;
     int varCount = std::count(s.begin(), s.end(), ',') + 1;
@@ -927,6 +970,9 @@ vdefAssign_global_stmt ::= VAR nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B).
 
     // Register variables.
     commaListIter(s, [&](std::string& varname) {
+        if(ps->closure.defGlobal(varname)) {
+            throw_error(6758, "Variable name clash with builtin: " + varname, A->line);
+        }
         if(!ps->closure.defVariable(varname)) {
             throw_error(7998, ("Redeclaration of variable \'" + varname + "\'"), A->line);
         }
@@ -963,6 +1009,9 @@ cdef_global_stmt ::= CONST nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B). {
 
     // Register constants.
     commaListIter(s, [&](std::string& constname) {
+        if(ps->closure.defGlobal(constname)) {
+            throw_error(6759, "Constant name clash with builtin: " + constname, A->line);
+        }
         if(!ps->closure.defConstant(constname)) {
             throw_error(7719, ("Redeclaration of constant \'" + constname + "\'"), A->line);
         }

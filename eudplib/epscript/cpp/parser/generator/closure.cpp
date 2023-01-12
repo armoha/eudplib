@@ -37,6 +37,7 @@ public:
 
     // Defining variables
     bool declareFunction(std::string& name);
+    bool defGlobal(std::string& name);
     bool defFunction(std::string& name);
     bool defVariable(std::string& name);
     bool defConstant(std::string& name);
@@ -68,6 +69,7 @@ void ClosureManager::pushScope() { impl->pushScope(); }
 void ClosureManager::popScope() { impl->popScope(); }
 
 bool ClosureManager::declareFunction(std::string& name) { return impl->declareFunction(name); }
+bool ClosureManager::defGlobal(std::string& name) { return impl->defGlobal(name); }
 bool ClosureManager::defFunction(std::string& name) { return impl->defFunction(name); }
 bool ClosureManager::defVariable(std::string& name) { return impl->defVariable(name); }
 bool ClosureManager::defConstant(std::string& name) { return impl->defConstant(name); }
@@ -92,6 +94,10 @@ bool ClosureManagerImpl::defFunction(std::string &name) {
 
 bool ClosureManagerImpl::declareFunction(std::string &name){
     return defTableValue(name, TABLE_CONST | TABLE_FUNC | TABLE_DECLONLY);
+}
+
+bool ClosureManagerImpl::defGlobal(std::string &name) {
+    return isBuiltinConst(name);
 }
 
 bool ClosureManagerImpl::defVariable(std::string &name) {
