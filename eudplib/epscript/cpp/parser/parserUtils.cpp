@@ -102,12 +102,8 @@ void impPathProcess(const std::string& s, std::string& impPath, std::string& imp
     }
     else {
         path = s.substr(0, lastDot);
-        if(s[0] == '.') {
-            size_t i;
-            for(i = 1 ; s[i] == '.' ; i++) {}
-            if(i == lastDot + 1) path = "." + path;
-        }
         modname = s.substr(lastDot + 1);
+        if (path.find_first_not_of('.') == std::string::npos) path += '.';
     }
     if(strncmp(modname.c_str(), "py_", 3) == 0) {
         impPath = path;

@@ -5,37 +5,39 @@ from eudplib.epscript.helper import _IGVA, _CGFW, _ARR, _VARR, _SRET, _SV, _ATTW
 from .test_eps_misc import f_switch_test
 # (Line 2) import .test_eps_misc.f_test_array;
 from .test_eps_misc import f_test_array
-# (Line 3) function square();
-# (Line 5) const a = [
-# (Line 6) square(1),
-# (Line 7) square(2),
-# (Line 8) square(3),
-# (Line 9) square(4),
-# (Line 10) square(5)
-# (Line 11) ];
+# (Line 3) import unittests.test_eps_misc;
+from unittests import test_eps_misc
+# (Line 5) function square();
+# (Line 7) const a = [
+# (Line 8) square(1),
+# (Line 9) square(2),
+# (Line 10) square(3),
+# (Line 11) square(4),
+# (Line 12) square(5)
+# (Line 13) ];
 a = _CGFW(lambda: [_ARR(FlattenList([f_square(1), f_square(2), f_square(3), f_square(4), f_square(5)]))], 1)[0]
-# (Line 13) function square(x) {
+# (Line 15) function square(x) {
 @EUDFunc
 def f_square(x):
-    # (Line 14) const z = EUDArray(5);
+    # (Line 16) const z = EUDArray(5);
     z = EUDArray(5)
-    # (Line 15) return x * x; // + z.k;
+    # (Line 17) return x * x; // + z.k;
     EUDReturn(x * x)
-    # (Line 16) }
-    # (Line 17) const receives = py_eval('[PVariable() for _ in range(8)]');
+    # (Line 18) }
+    # (Line 19) const receives = py_eval('[PVariable() for _ in range(8)]');
 
 receives = _CGFW(lambda: [eval('[PVariable() for _ in range(8)]')], 1)[0]
-# (Line 18) const attack_gwpID = 4;
+# (Line 20) const attack_gwpID = 4;
 attack_gwpID = _CGFW(lambda: [4], 1)[0]
-# (Line 19) function constv_thing() {
+# (Line 21) function constv_thing() {
 @EUDFunc
 def f_constv_thing():
-    # (Line 20) foreach(i, pvar: py_enumerate(receives)) {}
+    # (Line 22) foreach(i, pvar: py_enumerate(receives)) {}
     for i, pvar in enumerate(receives):
-        # (Line 21) SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
+        # (Line 23) SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
         pass
 
-    # (Line 22) return a[0] + a[1] + a[2] + a[3] + a[4];
+    # (Line 24) return a[0] + a[1] + a[2] + a[3] + a[4];
     DoActions(SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID // 4, Add, _LSH(100,(attack_gwpID % 4 * 8)), _LSH(0xFF,(attack_gwpID % 4 * 8))))
     EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
-    # (Line 23) }
+    # (Line 25) }
