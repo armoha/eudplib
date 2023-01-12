@@ -33,5 +33,4 @@ def test_vmixedtrg():
 
     DoActions(SetDeaths(AllPlayers, SetTo, 0, 0), SetDeaths(AllPlayers, SetTo, 0, 2))
     a <<= 1
-    # FIXME: compile error only for Cython version...
     a -= Db(4)

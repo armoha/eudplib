@@ -239,12 +239,6 @@ install_manifest.txt
 CTestTestfile.cmake
 cmake-build-*/
 
-
-# cython thing
-eudplib/**/*.c
-eudplib/**/*.pyd
-eudplib/**/*.so
-
 # plib thing
 profile.json
 lprof_log.txt
