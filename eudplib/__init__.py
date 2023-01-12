@@ -43,7 +43,7 @@ from .trigtrg.runtrigtrg import (
 )
 from .utils import *
 
-__version__ = "0.73.24"
+__version__ = "0.73.25"
 
 import builtins
 import keyword
@@ -76,9 +76,6 @@ _alllist.append("eudplibVersion")
 _builtins = _alllist.copy()
 _builtins.extend(keyword.kwlist)
 _builtins.extend(dir(builtins))
-_builtins.remove("onPluginStart")
-_builtins.remove("beforeTriggerExec")
-_builtins.remove("afterTriggerExec")
 
 
 from .epscript.epscompile import setEpsGlobals
