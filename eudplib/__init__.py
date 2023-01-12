@@ -43,8 +43,10 @@ from .trigtrg.runtrigtrg import (
 )
 from .utils import *
 
-__version__ = "0.73.21"
+__version__ = "0.73.22"
 
+import builtins
+import keyword
 import types
 
 # remove modules from __all__
@@ -71,8 +73,11 @@ def eudplibVersion():
 
 
 _alllist.append("eudplibVersion")
+_builtins = _alllist.copy()
+_builtins.extend(keyword.kwlist)
+_builtins.extend(dir(builtins))
 
 
 from .epscript.epscompile import setEpsGlobals
 
-setEpsGlobals(_alllist)
+setEpsGlobals(_builtins)

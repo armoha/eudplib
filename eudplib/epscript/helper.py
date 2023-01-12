@@ -37,7 +37,10 @@ def _RELIMP(path, mod_name):  # relative path import
     from .epsimp import EPSLoader
 
     p = pathlib.Path(inspect.getabsfile(inspect.currentframe().f_back))
-    for s in path.split("."):
+    pathsplit = path.split(".")
+    if len(path) + 1 == len(pathsplit):  # path == '.' * len(path)
+        pathsplit = pathsplit[1:]
+    for s in pathsplit:
         if s == "":
             p = p.parent
         else:

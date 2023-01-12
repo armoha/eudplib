@@ -4,10 +4,10 @@ from eudplib.epscript.helper import _RELIMP, _IGVA, _CGFW, _ARR, _VARR, _SRET, _
 # (Line 1) import .test_eps_misc.f_switch_test;
 # (Line 2) import .test_eps_misc.f_test_array;
 f_switch_test = _RELIMP(".test_eps_misc", "f_switch_test")
-# (Line 3) import unittests.test_eps_misc;
+# (Line 4) import .test_eps_misc as misc;
 f_test_array = _RELIMP(".test_eps_misc", "f_test_array")
-from unittests import test_eps_misc
 # (Line 5) function square();
+misc = _RELIMP(".", "test_eps_misc")
 # (Line 7) const a = [
 # (Line 8) square(1),
 # (Line 9) square(2),
