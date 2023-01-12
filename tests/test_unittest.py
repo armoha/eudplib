@@ -77,4 +77,4 @@ print("--- %s seconds ---" % (time.time() - start_time))
 
 if DoCoverageTest:
     cov.stop()
-    cov.html_report(include=["C:\\gitclones\\eudtrglib\\eudplib\\*"])
+    cov.html_report(include=["C:\\eudplib\\*"])
