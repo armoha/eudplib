@@ -31,18 +31,11 @@ from .. import utils as ut
 from .utilf import f_playerexist
 
 
-class _EUDVariableFrom(c.EUDVariable):
-    def __init__(self, _from=None):
-        self._vartrigger = _from
-        self._varact = self._vartrigger + (8 + 320)
-        self._rvalue = False
-
-
 _EUDVArray8: Any = c.EUDVArray(8)  # FIXME : Unsupported dynamic base class
 
 
 class PVariable(_EUDVArray8):
-    def _casteudset(self, i, value):
+    def _casteudset(self, index: c.EUDVariable, value: c.EUDVariable) -> None:
         nptr = c.Forward()
         c.VProc(
             self._epd,
@@ -54,11 +47,13 @@ class PVariable(_EUDVArray8):
             ],
         )
         for k in range(3):
-            c.RawTrigger(conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k)))
+            c.RawTrigger(
+                conditions=index.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
+            )
         c.SetNextTrigger(value.GetVTable())
         nptr << c.NextTrigger()
 
-    def _pveudset(self, i, value):
+    def _pveudset(self, index: c.EUDVariable, value: c.EUDVariable) -> None:
         nptr = c.Forward()
         cs.DoActions(
             value.SetDest(self._epd + 348 // 4),
@@ -66,28 +61,30 @@ class PVariable(_EUDVArray8):
             c.SetNextPtr(value.GetVTable(), nptr),
         )
         for k in range(3):
-            c.RawTrigger(conditions=i.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k)))
+            c.RawTrigger(
+                conditions=index.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
+            )
         c.SetNextTrigger(value.GetVTable())
         nptr << c.NextTrigger()
 
-    def __setitem__(self, i, value):
-        i = c.EncodePlayer(i)
-        if not c.IsEUDVariable(i):
-            return self.set(i, value)
+    def __setitem__(self, index, value) -> None:
+        index = c.EncodePlayer(index)
+        if not c.IsEUDVariable(index):
+            return self.set(index, value)
         if c.IsConstExpr(self):
             if c.IsEUDVariable(value):
-                self._pveudset(i, value)
+                self._pveudset(index, value)
             else:
                 a0 = c.Forward()
                 cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
                 for k in range(2, -1, -1):
                     c.RawTrigger(
-                        conditions=i.AtLeastX(1, 2**k),
+                        conditions=index.AtLeastX(1, 2**k),
                         actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
                     )
                 c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
         elif c.IsEUDVariable(value):
-            self._casteudset(i, value)
+            self._casteudset(index, value)
         else:
             a0 = c.Forward()
             c.VProc(
@@ -99,7 +96,7 @@ class PVariable(_EUDVArray8):
             )
             for k in range(3):
                 c.RawTrigger(
-                    conditions=i.AtLeastX(1, 2**k),
+                    conditions=index.AtLeastX(1, 2**k),
                     actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
                 )
             c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
