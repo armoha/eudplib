@@ -28,30 +28,6 @@ from ..utils import (
     ep_warn,
     isUnproxyInstance,
 )
-from .epsimp import EPSLoader
-
-
-def _RELIMP(path, mod_name):  # relative path import
-    import importlib.util
-    import inspect
-    import pathlib
-
-    p = pathlib.Path(inspect.getabsfile(inspect.currentframe().f_back))
-    for s in path.split("."):
-        if s == "":
-            p = p.parent
-        else:
-            p = p / s
-    try:
-        spec = importlib.util.spec_from_file_location(mod_name, p / (mod_name + ".py"))
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-    except FileNotFoundError:
-        loader = EPSLoader(mod_name, str(p / (mod_name + ".eps")))
-        spec = importlib.util.spec_from_loader(mod_name, loader)
-        module = loader.create_module(spec)
-        loader.exec_module(module)
-    return module
 
 
 def _IGVA(varCount, exprListGen):

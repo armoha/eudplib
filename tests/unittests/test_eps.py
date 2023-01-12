@@ -13,7 +13,7 @@ from .test_eps_array import (
 )
 from .test_eps_compat import f_test_compatibility
 from .test_eps_cunit import f_test_cunit
-from .test_eps_epsfile import f_constv_thing, f_square, misc
+from .test_eps_epsfile import f_constv_thing, f_square, f_switch_test, f_test_array
 from .test_eps_object import f_test_nested_object, f_test_object, f_test_selftype_member
 
 
@@ -21,13 +21,13 @@ from .test_eps_object import f_test_nested_object, f_test_object, f_test_selftyp
 def test_epscript():
     test_equality("epScript compile 1", f_square(4), 16)
     test_equality("epScript compile 2", f_constv_thing(), 55)
-    a = misc.f_switch_test()
+    a = f_switch_test()
     test_equality(
         "epScript switch",
         [a[0], a[1], a[2], a[3], a[4], a[5]],
         [1239, 1243, 1246, 1256, 1258, 1260],
     )
-    test_equality("epScript array", misc.f_test_array(), 23)
+    test_equality("epScript array", f_test_array(), 23)
     v = f_test_write()
     test_equality(
         "epScript array write",

@@ -28,8 +28,8 @@
 #define LSQBRACKET                      28
 #define PERIOD                          29
 #define SEMICOLON                       30
-#define IMPORT                          31
-#define NAME                            32
+#define NAME                            31
+#define IMPORT                          32
 #define AS                              33
 #define COLON                           34
 #define FUNCTION                        35
