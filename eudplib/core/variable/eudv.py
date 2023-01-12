@@ -42,6 +42,7 @@ from ...utils import (
 )
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, Forward, IsConstExpr
+from ...localize import _
 from .vbase import VariableBase
 from .vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
 
@@ -256,8 +257,8 @@ class EUDVariable(VariableBase):
 
     def SetModifier(self, modifier):
         ep_assert(
-            modifier in (bt.SetTo, bt.Add, bt.Subtract),
-            "Unexpected modifier {}".format(modifier),
+            modifier is bt.SetTo or modifier is bt.Add or modifier is bt.Subtract,
+            _("Unexpected modifier {}").format(modifier),
         )
         modifier = bt.EncodeModifier(modifier) << 24
         return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000)
