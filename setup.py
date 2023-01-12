@@ -5,7 +5,7 @@ import textwrap
 
 from setuptools import find_packages, setup
 
-__version__ = "0.73.19"
+__version__ = "0.73.20"
 
 
 def parse_setuppy_commands():
@@ -112,23 +112,6 @@ def parse_setuppy_commands():
     raise RuntimeError("Unrecognized setuptools command: {}".format(args))
 
 
-def generate_cython():
-    try:
-        import Cython
-    except ImportError as e:
-        msg = "Cython needs to be installed in Python as a module"
-        raise OSError(msg) from e
-
-    cwd = os.path.abspath(os.path.dirname(__file__))
-    print("Cythonizing sources")
-    p = subprocess.call(
-        [sys.executable, os.path.join(cwd, "tools", "cythonize.py"), "eudplib"],
-        cwd=cwd,
-    )
-    if p != 0:
-        raise RuntimeError("Running cythonize failed!")
-
-
 if __name__ == "__main__":
     src_path = os.path.dirname(os.path.abspath(__file__))
     old_path = os.getcwd()
@@ -142,14 +125,7 @@ if __name__ == "__main__":
         # Raise errors for unsupported commands, improve help output, etc.
         run_build = parse_setuppy_commands()
 
-    if run_build:
-        if "sdist" not in sys.argv:
-            # Generate Cython sources, unless we're generating an sdist
-            generate_cython()
-
     try:
-        from Cython.Build import cythonize
-
         setup(
             name="eudplib",
             version=__version__,
@@ -158,7 +134,6 @@ if __name__ == "__main__":
                 "": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst", "*.mo", "eudplib/py.typed"]
             },
             include_package_data=True,
-            ext_modules=cythonize(["eudplib/**/*.pyx"], language_level="3"),
             python_requires=">=3.10",
             # metadata for upload to PyPI
             author="Trgk",
