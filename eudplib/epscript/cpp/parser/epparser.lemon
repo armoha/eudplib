@@ -76,6 +76,7 @@ chunks ::= chunks error. {
     throw_error(13494, "Chunk-level error");
 }
 
+chunk ::= relimp_chunk.
 chunk ::= import_chunk SEMICOLON.
 chunk ::= fdef_chunk.
 chunk ::= fdecl_chunk.
@@ -89,20 +90,48 @@ chunk ::= blockStmt. {
 }
 
 // Import_chunk
-leadingDot(A) ::= PERIOD. {
+relimp_start(A) ::= IMPORT PERIOD. {
     A = genEmpty();
     A->data = ".";
 }
-leadingDot(A) ::= leadingDot(B) PERIOD. {
+relimp_start(A) ::= relimp_start(B) PERIOD. {
     B->data = B->data + ".";
     A = B;
 }
-dottedName(A) ::= NAME(B). { A = B; }
-dottedName(A) ::= leadingDot(B) NAME(C). {
+relimp_path(A) ::= relimp_start(B) NAME(C). {
     C->data = B->data + C->data;
     delete B;
     A = C;
 }
+relimp_path(A) ::= relimp_path(B) PERIOD NAME(C). {
+    C->data = B->data + "." + C->data;
+    delete B;
+    A = C;
+}
+relimp_chunk ::= relimp_path(A) SEMICOLON. {
+    std::string impPath, impModname;
+    impPathProcess(A->data, impPath, impModname);
+
+    if(!ps->closure.defModule(impModname)) {
+        throw_error(6754, "Importing already-declared module " + impModname, A->line);
+    }
+
+    ps->gen << impModname << " = _RELIMP(\"" << impPath << "\", \"" << impModname << "\")" << std::endl;
+    delete A;
+}
+relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
+    std::string impPath, impModname;
+    impPathProcess(A->data, impPath, impModname);
+
+    if(!ps->closure.defModule(B->data)) {
+        throw_error(6754, "Importing already-declared module " + B->data, B->line);
+    }
+
+    ps->gen << B->data << " = _RELIMP(\"" << impPath << "\", \"" << impModname << "\")" << std::endl;
+    delete A; delete B;
+}
+
+dottedName(A) ::= NAME(B). { A = B; }
 dottedName(A) ::= dottedName(B) PERIOD NAME(C). {
     C->data = B->data + "." + C->data;
     delete B;

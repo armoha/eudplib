@@ -30,6 +30,48 @@ from ..utils import (
 )
 
 
+def _RELIMP(path, mod_name):  # relative path import
+    import importlib.util
+    import inspect
+    import pathlib
+    from .epsimp import EPSLoader
+
+    p = pathlib.Path(inspect.getabsfile(inspect.currentframe().f_back))
+    for s in path.split("."):
+        if s == "":
+            p = p.parent
+        else:
+            p = p / s
+
+    def py_module(mod_name, p):
+        spec = importlib.util.spec_from_file_location(mod_name, p / (mod_name + ".py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def eps_module(mod_name, p):
+        loader = EPSLoader(mod_name, str(p / (mod_name + ".eps")))
+        spec = importlib.util.spec_from_loader(mod_name, loader)
+        module = loader.create_module(spec)
+        loader.exec_module(module)
+        return module
+
+    try:
+        return py_module(mod_name, p)
+    except FileNotFoundError:
+        try:
+            return eps_module(mod_name, p)
+        except FileNotFoundError:
+            item_name = mod_name
+            mod_name = p.name
+            p = p.parent
+            try:
+                module = py_module(mod_name, p)
+            except FileNotFoundError:
+                module = eps_module(mod_name, p)
+            return getattr(module, item_name)
+
+
 def _IGVA(varCount, exprListGen):
     try:
         vList = List2Assignable([EUDVariable(x) for x in exprListGen()])
