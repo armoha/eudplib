@@ -5,7 +5,7 @@ import textwrap
 
 from setuptools import find_packages, setup
 
-__version__ = "0.73.20"
+__version__ = "0.73.21"
 
 
 def parse_setuppy_commands():
