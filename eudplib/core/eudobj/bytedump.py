@@ -24,23 +24,20 @@ THE SOFTWARE.
 """
 
 from .eudobj import EUDObject
+from ..allocator.payload import _PayloadBuffer
 
 
 class Db(EUDObject):
-
     """Class for raw data object"""
 
-    def __init__(self, b):
+    def __init__(self, b: bytes | int | str) -> None:
         super().__init__()
-        if type(b) == str:
-            b = (b + "\0").encode("UTF-8")
-        self.content = bytes(b)
+        if isinstance(b, str):
+            b = b.encode("UTF-8") + b"\0"
+        self.content: bytes = bytes(b)
 
-    def getValueAddr(self):
-        return self
-
-    def GetDataSize(self):
+    def GetDataSize(self) -> int:
         return len(self.content)
 
-    def WritePayload(self, pbuffer):
+    def WritePayload(self, pbuffer: _PayloadBuffer) -> None:
         pbuffer.WriteBytes(self.content)
