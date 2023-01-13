@@ -72,7 +72,7 @@ def modifyCodeLineno(codeobj: types.CodeType, codeMap):
             c = modifyCodeLineno(c, codeMap)
         new_co_consts.append(c)
 
-    try:
+    if sys.version_info >= (3, 11):
         # Python 3.11 change: Added co_qualname, co_exceptiontable
         codeobj = types.CodeType(
             codeobj.co_argcount,
@@ -94,7 +94,7 @@ def modifyCodeLineno(codeobj: types.CodeType, codeMap):
             codeobj.co_freevars,
             codeobj.co_cellvars,
         )
-    except AttributeError:  # Python 3.7~3.10
+    else:  # Python 3.7~3.10
         codeobj = types.CodeType(
             codeobj.co_argcount,
             codeobj.co_posonlyargcount,  # python 3.8 support (See PEP 570)
