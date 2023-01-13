@@ -59,7 +59,7 @@ from ..rawtrigger import (
 
 class createEncoder:
     @staticmethod
-    def _callee(depth=2, default=None) -> str:
+    def _callee(depth: int = 2, default=None) -> str:
         import sys
 
         try:

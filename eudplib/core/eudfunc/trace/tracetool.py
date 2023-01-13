@@ -47,7 +47,7 @@ from ...rawtrigger import (
 from ...variable import EUDVariable, SeqCompute
 from . import tracecrypt
 
-iHeader = os.urandom(16)
+iHeader: bytes = os.urandom(16)
 traceToolDataEPD = ut.EPD(Db(iHeader + bytes(4 * 2048)))
 recordTraceAct = Forward()
 PushTriggerScope()
