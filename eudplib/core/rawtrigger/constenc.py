@@ -55,10 +55,6 @@ class _Player(_Unique):
     pass
 
 
-class _PlayerGroup(_Player):
-    pass
-
-
 Player: TypeAlias = "_Player | Dword"
 P1 = _Player("P1")
 P2 = _Player("P2")
@@ -85,15 +81,15 @@ Player10 = _Player("Player10")
 Player11 = _Player("Player11")
 Player12 = _Player("Player12")
 CurrentPlayer = _Player("CurrentPlayer")
-Foes = _PlayerGroup("Foes")
-Allies = _PlayerGroup("Allies")
-NeutralPlayers = _PlayerGroup("NeutralPlayers")
-AllPlayers = _PlayerGroup("AllPlayers")
-Force1 = _PlayerGroup("Force1")
-Force2 = _PlayerGroup("Force2")
-Force3 = _PlayerGroup("Force3")
-Force4 = _PlayerGroup("Force4")
-NonAlliedVictoryPlayers = _PlayerGroup("NonAlliedVictoryPlayers")
+Foes = _Player("Foes")
+Allies = _Player("Allies")
+NeutralPlayers = _Player("NeutralPlayers")
+AllPlayers = _Player("AllPlayers")
+Force1 = _Player("Force1")
+Force2 = _Player("Force2")
+Force3 = _Player("Force3")
+Force4 = _Player("Force4")
+NonAlliedVictoryPlayers = _Player("NonAlliedVictoryPlayers")
 
 
 class _Score(_Unique):

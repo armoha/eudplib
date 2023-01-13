@@ -17,12 +17,12 @@ from ...trigtrg import trigtrg as tt
 - Initialize stage 2 & execute it
 - Modifies TRIG rawtrigger's nextptr. Modification is fixed in stage 3.
 """
-trglist = []
+trglist: list[bytes] = []
 
 
 def Trigger(
     *,
-    players: list = [tt.AllPlayers],
+    players: list[tt.Player] = [17],  # FIXME: Cannot determine type of "AllPlayers"  [has-type]
     conditions: list[bytes] | bytes = [],
     actions: list[bytes] | bytes = []
 ) -> None:

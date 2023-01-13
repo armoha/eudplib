@@ -266,7 +266,7 @@ class _CpHelper:
         SetNextTrigger(self._remove_start)
 
     @property  # read-only
-    def epd(self):
+    def epd(self) -> EUDVariable:
         return self.get_epd()
 
     def set_cp(self, offset, *, action=False):

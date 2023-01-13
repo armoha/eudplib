@@ -37,12 +37,12 @@ from ...trigtrg import trigtrg as tt
 - Initialize stage 2 & execute it
 - Modifies TRIG rawtrigger's nextptr. Modification is fixed in stage 3.
 """
-trglist = []
+trglist: list[bytes] = []
 
 
 def Trigger(
     *,
-    players: list = [tt.AllPlayers],
+    players: list[tt.Player] = [17],  # FIXME: Cannot determine type of "AllPlayers"  [has-type]
     conditions: list[bytes] | bytes = [],
     actions: list[bytes] | bytes = []
 ) -> None:
@@ -50,7 +50,9 @@ def Trigger(
     trglist.append(tt.Trigger(players, conditions, actions))
 
 
-def CopyDeaths(iplayer, oplayer, copyepd: bool = False, initvalue: int | None = None) -> None:
+def CopyDeaths(
+    iplayer: tt.Player, oplayer: tt.Player, copyepd: bool = False, initvalue: int | None = None
+) -> None:
     if initvalue is None:
         if copyepd:
             initvalue = tt.EPD(0)

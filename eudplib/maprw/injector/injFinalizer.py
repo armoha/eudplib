@@ -132,7 +132,7 @@ def _DispatchInlineCode(nextptr: c.EUDVariable, trigepd: c.EUDVariable, prop: in
     )
 
 
-def _FlipProp(trigepd) -> None:
+def _FlipProp(trigepd: c.EUDVariable) -> None:
     """Iterate through triggers and flip 'Trigger disabled' flag
 
     Also, dispatch inline codes
