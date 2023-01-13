@@ -31,7 +31,7 @@ from .tblformat import TBL
 
 class StringIdMap:
     def __init__(self) -> None:
-        self._s2id: "dict[bytes, int | None]" = {}
+        self._s2id: dict[bytes, int | None] = {}
 
     def AddItem(self, string: str | bytes, strid: int) -> None:
         byte = u2b(unProxy(string))

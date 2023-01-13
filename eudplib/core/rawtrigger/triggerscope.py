@@ -36,7 +36,7 @@ from ...utils import (
 from ..allocator import ConstExpr, Forward
 
 
-def PushTriggerScope() -> "Literal[True]":
+def PushTriggerScope() -> Literal[True]:
     EUDCreateBlock("triggerscope", {"nexttrigger_list": []})
     return True  # Allow `if PushTriggerScope()` syntax for indent
 

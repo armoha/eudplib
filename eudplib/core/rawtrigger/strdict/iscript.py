@@ -1,4 +1,4 @@
-DefIscriptDict: "dict[str, int]" = {
+DefIscriptDict: dict[str, int] = {
     "Scourge": 0,
     "Unknown1": 1,
     "Scourge Death": 2,

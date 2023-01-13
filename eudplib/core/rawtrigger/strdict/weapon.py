@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-DefWeaponDict: "dict[str, int]" = {
+DefWeaponDict: dict[str, int] = {
     "Gauss Rifle": 0,
     "Gauss Rifle (Raynor)": 1,
     "C-10 Concussion Rifle": 2,

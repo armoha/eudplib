@@ -29,7 +29,7 @@ from eudplib.utils import ep_warn
 
 from ..localize import _
 
-_objns: "dict[str, Any]" = {}
+_objns: dict[str, Any] = {}
 
 
 def EUDClearNamespace() -> None:
@@ -53,6 +53,6 @@ def EUDRegistered(func: Callable) -> Callable:
     return EUDRegisterObjectToNamespace(func.__name__, func)
 
 
-def GetEUDNamespace() -> "dict[str, Any]":
+def GetEUDNamespace() -> dict[str, Any]:
     """Get list of functions that inline code can use."""
     return _objns

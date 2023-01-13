@@ -55,7 +55,7 @@ def FlattenList(l: Any) -> list:
         return [l]
 
 
-def List2Assignable(l: "list[T]") -> "T | list[T]":
+def List2Assignable(l: list[T]) -> T | list[T]:
     if len(l) == 1:
         return l[0]
 
@@ -69,12 +69,12 @@ def Assignable2List(a: None) -> list:
 
 
 @overload
-def Assignable2List(a: "Iterable[T]") -> "list[T]":
+def Assignable2List(a: Iterable[T]) -> list[T]:
     ...
 
 
 @overload
-def Assignable2List(a: T) -> "list[T]":
+def Assignable2List(a: T) -> list[T]:
     ...
 
 
@@ -118,9 +118,9 @@ def SCMD2Text(s: str) -> str:
             return None
 
     state: int = 0
-    buf: "list[int]" = []
-    bufch: "list[str]" = []
-    out: "list[str]" = []
+    buf: list[int] = []
+    bufch: list[str] = []
+    out: list[str] = []
 
     # simple fsm
     for i in s:

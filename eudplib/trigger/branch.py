@@ -34,7 +34,7 @@ from .tpatcher import PatchCondition, _Condition
 
 
 def _EUDBranchSub(
-    conditions: "Sequence[Condition]",
+    conditions: Sequence[Condition],
     ontrue: c.ConstExpr,
     onfalse: c.ConstExpr,
     *,

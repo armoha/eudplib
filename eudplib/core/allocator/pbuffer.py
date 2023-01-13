@@ -43,7 +43,7 @@ class Payload:
         self.orttable = orttable
 
 
-_packerData: "dict[str, list[int]]" = {}
+_packerData: dict[str, list[int]] = {}
 
 
 class PayloadBuffer:
@@ -52,8 +52,8 @@ class PayloadBuffer:
     def __init__(self, totlen: int) -> None:
         self._data: bytearray = bytearray(totlen)
         self._totlen: int = totlen
-        self._prttable: "list[int]" = []
-        self._orttable: "list[int]" = []
+        self._prttable: list[int] = []
+        self._orttable: list[int] = []
         self._datastart: int
         self._datacur: int
 
@@ -92,7 +92,7 @@ class PayloadBuffer:
         self._data[self._datacur + 3] = (offset >> 24) & 0xFF
         self._datacur += 4
 
-    def WritePack(self, structformat: str, arglist: "list[Evaluable]") -> None:
+    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
         """
         ======= =======
           Char   Type
@@ -126,15 +126,15 @@ class PayloadBuffer:
         return Payload(self._data, self._prttable, self._orttable)
 
 
-def CreateStructPackerData(structformat: str) -> "list[int]":
+def CreateStructPackerData(structformat: str) -> list[int]:
     sizedict = {"B": 1, "H": 2, "I": 4}
     return [sizedict[s] for s in structformat]
 
 
 def _StructPacker(
-    sizelist: "list[int]",
+    sizelist: list[int],
     buf: PayloadBuffer,
-    arglist: "list[Evaluable]",
+    arglist: list[Evaluable],
 ) -> None:
     dpos = buf._datacur
     data = buf._data

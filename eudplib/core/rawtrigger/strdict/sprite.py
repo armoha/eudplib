@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-DefSpriteDict: "dict[str, int]" = {
+DefSpriteDict: dict[str, int] = {
     "2/38 Ash": 0,
     "2/39 Ash": 1,
     "2/41 Ash": 2,

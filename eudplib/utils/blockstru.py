@@ -33,8 +33,8 @@ block = tuple[str, Any]
 
 class BlockStruManager:
     def __init__(self) -> None:
-        self._blockstru: "list[block]" = []
-        self._lastblockdict: "dict[str, list[block]]" = {}
+        self._blockstru: list[block] = []
+        self._lastblockdict: dict[str, list[block]] = {}
 
     def empty(self) -> bool:
         return not self._blockstru
@@ -101,5 +101,5 @@ def EUDPopBlock(name: str) -> block:
     return lastblock
 
 
-def EUDGetBlockList() -> "list[block]":
+def EUDGetBlockList() -> list[block]:
     return _current_bsm._blockstru

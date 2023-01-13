@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-DefFlingyDict: "dict[str, int]" = {
+DefFlingyDict: dict[str, int] = {
     "Scourge": 0,
     "Broodling": 1,
     "Infested Terran": 2,

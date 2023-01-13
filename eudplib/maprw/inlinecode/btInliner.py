@@ -33,13 +33,13 @@ from ... import eudlib as sf
 from ... import utils as ut
 from ...trigtrg.runtrigtrg import _runner_cp
 
-sharedTriggers: "list[bytes | c.RawTrigger]" = []
-tStartEnd: TypeAlias = "tuple[c.ConstExpr, c.RawTrigger]"
+sharedTriggers: list[bytes | c.RawTrigger] = []
+tStartEnd: TypeAlias = tuple[c.ConstExpr, c.RawTrigger]
 
 
 def GetExecutingPlayers(
     bTrigger: bytes,
-) -> "tuple[bool, bool, bool, bool, bool, bool, bool, bool]":
+) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
     # Get executing players of the trigger.
     # If AllPlayers executes it, then pass it
     if bTrigger[320 + 2048 + 4 + 17] != 0:
@@ -117,7 +117,7 @@ def InlineCodifyBinaryTrigger(bTrigger: bytes) -> tStartEnd:
     return tStart, tEnd
 
 
-def CountConditionsAndActions(bTrigger: bytes) -> "tuple[int, int]":
+def CountConditionsAndActions(bTrigger: bytes) -> tuple[int, int]:
     cond_count, act_count = 0, 0
     for c in range(16):
         if bTrigger[c * 20 + 15] == 22:  # Always
@@ -172,7 +172,7 @@ def TryToShareTrigger(bTrigger: bytes) -> int | bytes:
 
 
 def InlineCodifyMultipleBinaryTriggers(
-    bTriggers: "Collection[bytes | int]",
+    bTriggers: Collection[bytes | int],
 ) -> tStartEnd:
     """Inline codify raw(binary) trigger data.
 

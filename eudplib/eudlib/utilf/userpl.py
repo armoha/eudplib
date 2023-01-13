@@ -30,7 +30,7 @@ from eudplib import utils as ut
 from ..memiof import f_bread_epd, f_dwread_epd
 
 _userp: c.EUDVariable = c.EUDVariable()
-_userp_fws: "set[tuple]" = set()
+_userp_fws: set[tuple] = set()
 
 
 def _f_inituserplayerid():
@@ -49,39 +49,39 @@ def IsUserCP() -> c.Condition:
     return ret
 
 
-def _action_all(action: c.Action) -> "tuple[c.Action, c.Action]":
+def _action_all(action: c.Action) -> tuple[c.Action, c.Action]:
     fw = c.Forward()
     ret = c.SetMemory(0x6509B0, c.SetTo, fw)
     fw << UserP_FW(ret, 20)
     return ret, action
 
 
-def DisplayTextAll(text) -> "tuple[c.Action, c.Action]":
+def DisplayTextAll(text) -> tuple[c.Action, c.Action]:
     """Action: DisplayText for everyone (including observers)"""
     return _action_all(c.DisplayText(text))
 
 
-def PlayWAVAll(soundpath) -> "tuple[c.Action, c.Action]":
+def PlayWAVAll(soundpath) -> tuple[c.Action, c.Action]:
     """Action: PlayWAV for everyone (including observers)"""
     return _action_all(c.PlayWAV(soundpath))
 
 
-def MinimapPingAll(location) -> "tuple[c.Action, c.Action]":
+def MinimapPingAll(location) -> tuple[c.Action, c.Action]:
     """Action: MinimapPing for everyone (including observers)"""
     return _action_all(c.MinimapPing(location))
 
 
-def CenterViewAll(location) -> "tuple[c.Action, c.Action]":
+def CenterViewAll(location) -> tuple[c.Action, c.Action]:
     """Action: CenterView for everyone (including observers)"""
     return _action_all(c.CenterView(location))
 
 
-def SetMissionObjectivesAll(text) -> "tuple[c.Action, c.Action]":
+def SetMissionObjectivesAll(text) -> tuple[c.Action, c.Action]:
     """Action: SetMissionObjectives for everyone (including observers)"""
     return _action_all(c.SetMissionObjectives(text))
 
 
-def TalkingPortraitAll(unit, time) -> "tuple[c.Action, c.Action]":
+def TalkingPortraitAll(unit, time) -> tuple[c.Action, c.Action]:
     """Action: TalkingPortrait for everyone (including observers)"""
     return _action_all(c.TalkingPortrait(unit, time))
 

@@ -22,7 +22,7 @@ _ = _gt
 
 
 def _excepthook(
-    type_: "type[BaseException]", value: BaseException, traceback: TracebackType | None
+    type_: type[BaseException], value: BaseException, traceback: TracebackType | None
 ) -> Any:
     # print("# FIXME: excepthook")
     v = list(value.args)

@@ -87,7 +87,7 @@ def _checkEPDAddr(epd):
 
 
 @functools.lru_cache(None)
-def EPDOffsetMap(ct: "tuple[tuple[str, int, int | type | str], ...]"):
+def EPDOffsetMap(ct: tuple[tuple[str, int, int | type | str], ...]):
     """Tuple of (name, offset, type) pairs
 
     name: str

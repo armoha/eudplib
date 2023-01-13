@@ -30,7 +30,7 @@ from .. import utils as ut
 from ..core.mapdata.mpqapi import MPQ
 from ..localize import _
 
-_addedFiles: "dict[bytes, tuple[str, bytes | None, bool]]" = {}
+_addedFiles: dict[bytes, tuple[str, bytes | None, bool]] = {}
 
 
 def UpdateFileListByListfile(mpqr: MPQ) -> None:
@@ -125,7 +125,7 @@ def UpdateMPQ(mpqw: MPQ) -> None:
                 raise ctypes.WinError(ctypes.get_last_error())
 
 
-def GetAddedFiles() -> "set[str]":
+def GetAddedFiles() -> set[str]:
     ret = set(fname for fname, content, isWave in _addedFiles.values())
     ret.add("staredit\\scenario.chk")
     ret.add("(listfile)")

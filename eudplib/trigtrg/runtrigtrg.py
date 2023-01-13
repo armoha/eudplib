@@ -36,8 +36,8 @@ if TYPE_CHECKING:
     from ..core.rawtrigger.constenc import Player, _Player
     from ..eudlib import EUDArray
 
-_runner_start: "list[c.Forward]" = [c.Forward() for _ in range(8)]
-_runner_end: "list[c.Forward]" = [c.Forward() for _ in range(8)]
+_runner_start: list[c.Forward] = [c.Forward() for _ in range(8)]
+_runner_end: list[c.Forward] = [c.Forward() for _ in range(8)]
 
 _runner_cp: c.EUDLightVariable = c.EUDLightVariable()
 

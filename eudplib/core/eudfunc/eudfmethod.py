@@ -33,7 +33,7 @@ from .. import variable as ev
 from ..eudstruct.selftype import SetSelfType, selftype
 from .eudtypedfuncn import EUDTypedFuncN, applyTypes
 
-_mth_classtype: "dict[Callable, type]" = {}
+_mth_classtype: dict[Callable, type] = {}
 
 
 def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):

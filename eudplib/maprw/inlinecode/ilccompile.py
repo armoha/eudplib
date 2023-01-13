@@ -60,7 +60,7 @@ def ComputeBaseInlineCodeGlobals() -> None:
     _inlineGlobals = G
 
 
-def GetInlineCodeGlobals() -> "dict[str, Any]":
+def GetInlineCodeGlobals() -> dict[str, Any]:
     """
     Return list of globals inline eudplib code can call.
     """

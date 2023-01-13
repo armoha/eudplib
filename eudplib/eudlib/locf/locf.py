@@ -168,12 +168,12 @@ _DilateLoc4 = _locfgen4(c.Add, c.Add, c.Add, c.Add, signed=True)
 
 
 @overload
-def f_setloc(locID, *coords, action: "Literal[True]") -> "list[c.Action]":
+def f_setloc(locID, *coords, action: Literal[True]) -> list[c.Action]:
     ...
 
 
 @overload
-def f_setloc(locID, *coords, action: "Literal[False]") -> None:
+def f_setloc(locID, *coords, action: Literal[False]) -> None:
     ...
 
 
@@ -209,12 +209,12 @@ def f_setloc(locID, *coords, action=False):
 
 
 @overload
-def f_addloc(locID, *coords, action: "Literal[True]") -> "list[c.Action]":
+def f_addloc(locID, *coords, action: Literal[True]) -> list[c.Action]:
     ...
 
 
 @overload
-def f_addloc(locID, *coords, action: "Literal[False]") -> None:
+def f_addloc(locID, *coords, action: Literal[False]) -> None:
     ...
 
 
@@ -250,12 +250,12 @@ def f_addloc(locID, *coords, action=False):
 
 
 @overload
-def f_dilateloc(locID, *coords, action: "Literal[True]") -> "list[c.Action]":
+def f_dilateloc(locID, *coords, action: Literal[True]) -> list[c.Action]:
     ...
 
 
 @overload
-def f_dilateloc(locID, *coords, action: "Literal[False]") -> None:
+def f_dilateloc(locID, *coords, action: Literal[False]) -> None:
     ...
 
 
@@ -300,7 +300,7 @@ def _GetLocTL(epd):
     return left, epd
 
 
-def f_getlocTL(locID, **kwargs) -> "tuple[c.EUDVariable, c.EUDVariable]":
+def f_getlocTL(locID, **kwargs) -> tuple[c.EUDVariable, c.EUDVariable]:
     """
     로케이션의 위(top), 왼쪽 (left) 좌표를 얻어냅니다.
     @param  {[type]} locID 로케이션 번호. $L(로케이션 이름) 으로 얻을 수 있습니다.

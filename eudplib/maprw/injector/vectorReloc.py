@@ -43,8 +43,8 @@ trglist = []
 def Trigger(
     *,
     players: list = [tt.AllPlayers],
-    conditions: "list[bytes] | bytes" = [],
-    actions: "list[bytes] | bytes" = []
+    conditions: list[bytes] | bytes = [],
+    actions: list[bytes] | bytes = []
 ) -> None:
     global trglist
     trglist.append(tt.Trigger(players, conditions, actions))
@@ -104,7 +104,7 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
     #############
     # STR SECTION
     #############
-    str_sled: "list[bytes]" = []
+    str_sled: list[bytes] = []
     mrgn_ort = mrgn + 836
     sledheader_prt = b"\0\0\0\0" + ut.i2b4(mrgn)
     sledheader_ort = b"\0\0\0\0" + ut.i2b4(mrgn_ort)

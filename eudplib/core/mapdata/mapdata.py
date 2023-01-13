@@ -36,7 +36,7 @@ _inited: bool = False
 _chkt: CHK | None = None
 _origchkt: CHK | None = None
 _rawfile: bytes | None = None
-_listfiles: "list[tuple[str, bytes | None]]" = []
+_listfiles: list[tuple[str, bytes | None]] = []
 
 
 def InitMapData(chkt: CHK, rawfile: bytes) -> None:
@@ -86,6 +86,6 @@ def GetRawFile() -> bytes:
     return _rawfile
 
 
-def IterListFiles() -> "Iterator[tuple[str, bytes | None]]":
+def IterListFiles() -> Iterator[tuple[str, bytes | None]]:
     for n, f in _listfiles:
         yield n, f

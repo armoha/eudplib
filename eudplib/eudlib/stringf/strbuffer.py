@@ -91,7 +91,7 @@ class StringBuffer:
 
     _method_template = c.Forward()
     _cpbranch = c.Forward()
-    _initlist: "list[c.ConstExpr | int]" = []
+    _initlist: list[c.ConstExpr | int] = []
 
     def __init__(self, content=None):
         """Constructor for StringBuffer

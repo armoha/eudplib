@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-DefIconDict: "dict[str, int]" = {
+DefIconDict: dict[str, int] = {
     "Marine": 0,
     "Ghost": 1,
     "Vulture": 2,

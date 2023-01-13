@@ -50,7 +50,7 @@ PLVarUnit, PLVarMask = ceil((0x58F500 - 0x58A364) / 48), 0
 # FIXME: PLVarDict = {}
 
 
-def GetPlayerLightVariable() -> "tuple[int, int]":
+def GetPlayerLightVariable() -> tuple[int, int]:
     global PLVarUnit, PLVarMask
     ret = (PLVarUnit, 1 << PLVarMask)
     PLVarMask += 1
@@ -60,7 +60,7 @@ def GetPlayerLightVariable() -> "tuple[int, int]":
     return ret
 
 
-def compare_sequence(src: int, seq: str) -> "list[c.Condition]":
+def compare_sequence(src: int, seq: str) -> list[c.Condition]:
     ut.ep_assert(isinstance(src, int) and isinstance(seq, str))
     seq += "\0"
     ret = []

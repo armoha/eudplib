@@ -94,7 +94,7 @@ class RawTrigger(EUDObject):
         conditions: None = None,
         actions: None = None,
         *,
-        preserved: "Literal[True]" = True,
+        preserved: Literal[True] = True,
         currentAction: None = None,
         trigSection: bytes
     ) -> None:
@@ -135,7 +135,7 @@ class RawTrigger(EUDObject):
             if conditions is None:
                 conditions = []
             conditions = ut.FlattenList(conditions)
-            _conditions: "list[Condition]" = list(map(_bool2Cond, conditions))
+            _conditions: list[Condition] = list(map(_bool2Cond, conditions))
 
             if actions is None:
                 actions = []

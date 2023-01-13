@@ -182,7 +182,7 @@ T = TypeVar("T")
 
 
 @overload
-def unProxy(x: "ExprProxy[T]") -> T:
+def unProxy(x: ExprProxy[T]) -> T:
     ...
 
 
