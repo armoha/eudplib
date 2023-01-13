@@ -20,7 +20,6 @@ public:
 
     // Defining variables
     bool declareFunction(std::string& name);
-    bool defGlobal(std::string& name);
     bool defFunction(std::string& name);
     bool defVariable(std::string& name);
     bool defConstant(std::string& name);

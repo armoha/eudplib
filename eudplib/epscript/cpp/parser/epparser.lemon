@@ -11,6 +11,7 @@
 #include "epparser.h"
 #include "generator/pygen.h"
 #include "generator/closure.h"
+#include "generator/eudplibGlobals.h"
 #include "parser.h"
 #include "tokenAdapter.h"
 #include "parserUtilities.h"
@@ -111,8 +112,14 @@ relimp_path(A) ::= relimp_path(B) PERIOD NAME(C). {
 relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
-    if(ps->closure.defGlobal(B->data)) {
-        throw_error(6755, "Module name clash with builtin: " + B->data, B->line);
+    if(isBuiltinConst(B->data)) {
+        throw_error(6755, "Name collision with eudplib global " + B->data, B->line);
+    }
+    if(isPyKeyword(B->data)) {
+        throw_error(6756, "Name collision with Python keyword " + B->data, B->line);
+    }
+    if(isPyBuiltin(B->data)) {
+        throw_error(6757, "Name collision with Python builtin " + B->data, B->line);
     }
     if(!ps->closure.defModule(B->data)) {
         throw_error(6754, "Importing already-declared module " + B->data, B->line);
@@ -125,8 +132,14 @@ relimp_chunk ::= relimp_path(A) SEMICOLON. {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
-    if(ps->closure.defGlobal(impModname)) {
-        throw_error(6755, "Module name clash with builtin: " + impModname, A->line);
+    if(isBuiltinConst(impModname)) {
+        throw_error(6755, "Name collision with eudplib global " + impModname, A->line);
+    }
+    if(isPyKeyword(impModname)) {
+        throw_error(6756, "Name collision with Python keyword " + impModname, A->line);
+    }
+    if(isPyBuiltin(impModname)) {
+        throw_error(6757, "Name collision with Python builtin " + impModname, A->line);
     }
     if(!ps->closure.defModule(impModname)) {
         throw_error(6754, "Importing already-declared module " + impModname, A->line);
@@ -147,8 +160,14 @@ import_chunk ::= IMPORT dottedName(A) AS NAME(B). {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
-    if(ps->closure.defGlobal(B->data)) {
-        throw_error(6755, "Module name clash with builtin: " + B->data, B->line);
+    if(isBuiltinConst(B->data)) {
+        throw_error(6755, "Name collision with eudplib global " + B->data, B->line);
+    }
+    if(isPyKeyword(B->data)) {
+        throw_error(6756, "Name collision with Python keyword " + B->data, B->line);
+    }
+    if(isPyBuiltin(B->data)) {
+        throw_error(6757, "Name collision with Python builtin " + B->data, B->line);
     }
     if(!ps->closure.defModule(B->data)) {
         throw_error(6754, "Importing already-declared module " + B->data, B->line);
@@ -163,8 +182,14 @@ import_chunk ::= IMPORT dottedName(A). {
     std::string impPath, impModname;
     impPathProcess(A->data, impPath, impModname);
 
-    if(ps->closure.defGlobal(impModname)) {
-        throw_error(6755, "Module name clash with builtin: " + impModname, A->line);
+    if(isBuiltinConst(impModname)) {
+        throw_error(6755, "Name collision with eudplib global " + impModname, A->line);
+    }
+    if(isPyKeyword(impModname)) {
+        throw_error(6756, "Name collision with Python keyword " + impModname, A->line);
+    }
+    if(isPyBuiltin(impModname)) {
+        throw_error(6757, "Name collision with Python builtin " + impModname, A->line);
     }
     if(!ps->closure.defModule(impModname)) {
         throw_error(6754, "Importing already-declared module " + impModname, A->line);
@@ -182,9 +207,9 @@ fdef_rettypes(A) ::= COLON exprList_nonEmpty(B). { A = B; }
 fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_rettypes(rets). {
     // Preprocess name
     funcNamePreprocess(name->data);
-    // if(ps->closure.defGlobal(name->data)) {
-    //     throw_error(6756, "Function name clash with builtin: " + name->data, name->line);
-    // }
+    if(isPyKeyword(name->data)) {
+        throw_error(6756, "Name collision with Python keyword " + name->data, name->line);
+    }
     if(!ps->closure.defFunction(name->data)) {
         throw_error(4495, "Duplicate function " + name->data, name->line);
     }
@@ -204,6 +229,9 @@ fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_retty
         auto typeToken = typedNameToken->subToken[1];
         std::string argname = argnameToken->data;
 
+        if(isPyKeyword(argname)) {
+            throw_error(6756, "Name collision with Python keyword " + argname, args->line);
+        }
         if(typeToken == nullptr) {
             if(!ps->closure.defVariable(argname)) {
                 throw_error(196, ("Redeclaration of variable \'" + argname + "\'"), args->line);
@@ -256,9 +284,9 @@ fdef_chunk ::= fdef_header stmt . {
 fdecl_chunk  ::= FUNCTION NAME(name) LPAREN typedNameList RPAREN SEMICOLON. {
     // Preprocess name
     funcNamePreprocess(name->data);
-    // if(ps->closure.defGlobal(name->data)) {
-    //     throw_error(6756, "Function name clash with builtin: " + name->data, name->line);
-    // }
+    if(isPyKeyword(name->data)) {
+        throw_error(6756, "Name collision with Python keyword " + name->data, name->line);
+    }
     if(!ps->closure.declareFunction(name->data)) {
         throw_error(72461, "Declaring function with non-function name " + name->data, name->line);
     }
@@ -271,8 +299,14 @@ object_body(A) ::= OBJECT NAME(name) LBRACKET. {
     ps->gen << "class " << name->data << "(EUDStruct):\n";
     ps->gen.indent();
 
-    if(ps->closure.defGlobal(name->data)) {
-        throw_error(6757, "Object name clash with builtin: " + name->data, name->line);
+    if(isBuiltinConst(name->data)) {
+        throw_error(6755, "Name collision with eudplib global " + name->data, name->line);
+    }
+    if(isPyKeyword(name->data)) {
+        throw_error(6756, "Name collision with Python keyword " + name->data, name->line);
+    }
+    if(isPyBuiltin(name->data)) {
+        throw_error(6757, "Name collision with Python builtin " + name->data, name->line);
     }
     if(!ps->closure.defConstant(name->data)) {
         throw_error(8228, "Declaring object with non-function name " + name->data, name->line);
@@ -315,6 +349,9 @@ method_header(H) ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_
         auto typeToken = typedNameToken->subToken[1];
         std::string argname = argnameToken->data;
 
+        if(isPyKeyword(argname)) {
+            throw_error(6756, "Name collision with Python keyword " + argname, args->line);
+        }
         if(typeToken == nullptr) {
             if(!ps->closure.defVariable(argname)) {
                 throw_error(2656, ("Redeclaration of variable \'" + argname + "\'"), args->line);
@@ -540,6 +577,9 @@ lambdaExprStart(A) ::= FUNCTION LPAREN typedNameList(args) RPAREN fdef_rettypes(
         auto typeToken = typedNameToken->subToken[1];
         std::string argname = argnameToken->data;
 
+        if(isPyKeyword(argname)) {
+            throw_error(6756, "Name collision with Python keyword " + argname, args->line);
+        }
         if(typeToken == nullptr) {
             if(!ps->closure.defVariable(argname)) {
                 throw_error(196, ("Redeclaration of variable \'" + argname + "\'"), args->line);
@@ -886,8 +926,14 @@ vdef_global_stmt ::= VAR nameList_nonEmpty(A). {
 
     // Register variables.
     commaListIter(s, [&](std::string& varname) {
-        if(ps->closure.defGlobal(varname)) {
-            throw_error(6758, "Variable name clash with builtin: " + varname, A->line);
+        if(isBuiltinConst(varname)) {
+            throw_error(6755, "Name collision with eudplib global " + varname, A->line);
+        }
+        if(isPyKeyword(varname)) {
+            throw_error(6756, "Name collision with Python keyword " + varname, A->line);
+        }
+        if(isPyBuiltin(varname)) {
+            throw_error(6757, "Name collision with Python builtin " + varname, A->line);
         }
         if(!ps->closure.defVariable(varname)) {
             throw_error(196, ("Redeclaration of variable \'" + varname + "\'"), A->line);
@@ -909,6 +955,9 @@ vdef_stmt ::= VAR nameList_nonEmpty(A). {
 
     // Register variables.
     commaListIter(s, [&](std::string& varname) {
+        if(isPyKeyword(varname)) {
+            throw_error(6756, "Name collision with Python keyword " + varname, A->line);
+        }
         if(!ps->closure.defVariable(varname)) {
             throw_error(196, ("Redeclaration of variable \'" + varname + "\'"), A->line);
         }
@@ -933,6 +982,9 @@ vdefAssign_stmt ::= VAR(X) nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B). {
 
     // Register variables.
     commaListIter(s, [&](std::string& varname) {
+        if(isPyKeyword(varname)) {
+            throw_error(6756, "Name collision with Python keyword " + varname, A->line);
+        }
         if(!ps->closure.defVariable(varname)) {
             throw_error(7998, ("Redeclaration of variable \'" + varname + "\'"), A->line);
         }
@@ -949,6 +1001,9 @@ vdefAssignStatic_stmt ::= STATIC VAR nameList_nonEmpty(A) ASSIGN exprList_nonEmp
 
     // Register variables.
     commaListIter(s, [&](std::string& varname) {
+        if(isPyKeyword(varname)) {
+            throw_error(6756, "Name collision with Python keyword " + varname, A->line);
+        }
         if(!ps->closure.defVariable(varname)) {
             throw_error(7998, ("Redeclaration of variable \'" + varname + "\'"), A->line);
         }
@@ -970,8 +1025,14 @@ vdefAssign_global_stmt ::= VAR nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B).
 
     // Register variables.
     commaListIter(s, [&](std::string& varname) {
-        if(ps->closure.defGlobal(varname)) {
-            throw_error(6758, "Variable name clash with builtin: " + varname, A->line);
+        if(isBuiltinConst(varname)) {
+            throw_error(6755, "Name collision with eudplib global " + varname, A->line);
+        }
+        if(isPyKeyword(varname)) {
+            throw_error(6756, "Name collision with Python keyword " + varname, A->line);
+        }
+        if(isPyBuiltin(varname)) {
+            throw_error(6757, "Name collision with Python builtin " + varname, A->line);
         }
         if(!ps->closure.defVariable(varname)) {
             throw_error(7998, ("Redeclaration of variable \'" + varname + "\'"), A->line);
@@ -990,6 +1051,9 @@ cdef_stmt ::= CONST(X) nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B). {
 
     // Register constants.
     commaListIter(s, [&](std::string& constname) {
+        if(isPyKeyword(constname)) {
+            throw_error(6756, "Name collision with Python keyword " + constname, A->line);
+        }
         if(!ps->closure.defConstant(constname)) {
             throw_error(7719, ("Redeclaration of constant \'" + constname + "\'"), A->line);
         }
@@ -1009,8 +1073,14 @@ cdef_global_stmt ::= CONST nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B). {
 
     // Register constants.
     commaListIter(s, [&](std::string& constname) {
-        if(ps->closure.defGlobal(constname)) {
-            throw_error(6759, "Constant name clash with builtin: " + constname, A->line);
+        if(isBuiltinConst(constname)) {
+            throw_error(6755, "Name collision with eudplib global " + constname, A->line);
+        }
+        if(isPyKeyword(constname)) {
+            throw_error(6756, "Name collision with Python keyword " + constname, A->line);
+        }
+        if(isPyBuiltin(constname)) {
+            throw_error(6757, "Name collision with Python builtin " + constname, A->line);
         }
         if(!ps->closure.defConstant(constname)) {
             throw_error(7719, ("Redeclaration of constant \'" + constname + "\'"), A->line);

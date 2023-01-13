@@ -11,6 +11,8 @@
 #include <pybind11/pybind11.h>
 
 extern std::unordered_set<std::string> builtinConstSet;
+extern std::unordered_set<std::string> pyKeywordSet;
+extern std::unordered_set<std::string> pyBuiltinSet;
 
 extern bool MAP_DEBUG;
 
@@ -27,6 +29,28 @@ void EPS_EXPORT registerPlibConstants(const char* zeroSeparatedStrings) {
         builtinConstSet.insert(globalName);
         p += globalName.size() + 1;
     } while ( *p);
+}
+
+void EPS_EXPORT registerPyKeywords(const char *zeroSeparatedStrings) {
+    const char *p = zeroSeparatedStrings;
+    std::vector<std::string> vector;
+
+    do {
+        std::string keywordName(p);
+        pyKeywordSet.insert(keywordName);
+        p += keywordName.size() + 1;
+    } while (*p);
+}
+
+void EPS_EXPORT registerPyBuiltins(const char *zeroSeparatedStrings) {
+    const char *p = zeroSeparatedStrings;
+    std::vector<std::string> vector;
+
+    do {
+        std::string builtinName(p);
+        pyBuiltinSet.insert(builtinName);
+        p += builtinName.size() + 1;
+    } while (*p);
 }
 
 int EPS_EXPORT getErrorCount() {

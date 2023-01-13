@@ -43,11 +43,23 @@ libeps.setDebugMode.argtypes = [c_int]
 libeps.getErrorCount.argtypes = []
 libeps.getErrorCount.restype = c_int
 libeps.registerPlibConstants.argtypes = [c_char_p]
+libeps.registerPyKeywords.argtypes = [c_char_p]
+libeps.registerPyBuiltins.argtypes = [c_char_p]
 
 
 def setEpsGlobals(globalList):
     globalList_C = b"\0".join(u2b(g) for g in globalList) + b"\0"
     libeps.registerPlibConstants(globalList_C)
+
+
+def setPyKeywords(keywordList):
+    keywordList_C = b"\0".join(u2b(g) for g in keywordList) + b"\0"
+    libeps.registerPyKeywords(keywordList_C)
+
+
+def setPyBuiltins(builtinList):
+    builtinList_C = b"\0".join(u2b(g) for g in builtinList) + b"\0"
+    libeps.registerPyBuiltins(builtinList_C)
 
 
 def epsCompile(filename, bCode):
