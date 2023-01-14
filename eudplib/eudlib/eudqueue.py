@@ -314,6 +314,7 @@ def EUDDeque(capacity):
                         SetMemory(append_act + 16, Add, 18),
                         SetMemory(jump + 4, Add, 72),
                         self._length.AddNumber(1),
+                        c.SetNextPtr(check_wrap, wrap_head),
                     ],
                 )
                 check_wrap << c.RawTrigger(
@@ -331,7 +332,6 @@ def EUDDeque(capacity):
                 wrap_tail << c.RawTrigger(
                     conditions=Memory(jumpleft + 4, c.AtLeast, deque + 72 * (capacity - 1)),
                     actions=[
-                        c.SetNextPtr(check_wrap, wrap_head),
                         SetMemory(appendleft_act + 16, Add, -(18 * capacity)),
                         SetMemory(jumpleft + 4, Add, -(72 * capacity)),
                         SetMemory(iter_init + 348, Add, -(18 * capacity)),
@@ -390,7 +390,6 @@ def EUDDeque(capacity):
                 wrap_head << c.RawTrigger(
                     conditions=Memory(jump + 4, c.AtMost, deque),
                     actions=[
-                        c.SetNextPtr(check_wrap, wrap_tail),
                         SetMemory(append_act + 16, Add, 18 * capacity),
                         SetMemory(jump + 4, Add, 72 * capacity),
                     ],
@@ -406,8 +405,11 @@ def EUDDeque(capacity):
                 )
                 c.RawTrigger(
                     actions=[
+                        c.SetNextPtr(check_wrap, wrap_tail),
                         SetMemory(appendleft_act + 16, Add, -18),
                         SetMemory(jumpleft + 4, Add, -72),
+                        SetMemory(iter_init + 348, Add, -18),
+                        SetMemory(iter_init + 380, Add, -72),
                         appendleft_act,
                         self._length.AddNumber(1),
                     ],
@@ -445,7 +447,7 @@ def EUDDeque(capacity):
             def clear():
                 c.RawTrigger(
                     actions=[
-                        SetMemory(jump + 4, c.SetTo, deque - 72),
+                        SetMemory(jump + 4, c.SetTo, deque),
                         SetMemory(jumpleft + 4, c.SetTo, deque - 72),
                         SetMemory(iter_init + 348, c.SetTo, EPD(deque) + 87),
                         SetMemory(iter_init + 380, c.SetTo, deque - 72),
