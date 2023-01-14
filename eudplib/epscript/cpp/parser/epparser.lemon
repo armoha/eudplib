@@ -207,8 +207,14 @@ fdef_rettypes(A) ::= COLON exprList_nonEmpty(B). { A = B; }
 fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_rettypes(rets). {
     // Preprocess name
     funcNamePreprocess(name->data);
+    if(isBuiltinConst(name->data)) {
+        throw_error(6755, "Name collision with eudplib global " + name->data, name->line);
+    }
     if(isPyKeyword(name->data)) {
         throw_error(6756, "Name collision with Python keyword " + name->data, name->line);
+    }
+    if(isPyBuiltin(name->data)) {
+        throw_error(6757, "Name collision with Python builtin " + name->data, name->line);
     }
     if(!ps->closure.defFunction(name->data)) {
         throw_error(4495, "Duplicate function " + name->data, name->line);
@@ -284,8 +290,14 @@ fdef_chunk ::= fdef_header stmt . {
 fdecl_chunk  ::= FUNCTION NAME(name) LPAREN typedNameList RPAREN SEMICOLON. {
     // Preprocess name
     funcNamePreprocess(name->data);
+    if(isBuiltinConst(name->data)) {
+        throw_error(6755, "Name collision with eudplib global " + name->data, name->line);
+    }
     if(isPyKeyword(name->data)) {
         throw_error(6756, "Name collision with Python keyword " + name->data, name->line);
+    }
+    if(isPyBuiltin(name->data)) {
+        throw_error(6757, "Name collision with Python builtin " + name->data, name->line);
     }
     if(!ps->closure.declareFunction(name->data)) {
         throw_error(72461, "Declaring function with non-function name " + name->data, name->line);
@@ -1079,7 +1091,7 @@ cdef_global_stmt ::= CONST nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B). {
         if(isPyKeyword(constname)) {
             throw_error(6756, "Name collision with Python keyword " + constname, A->line);
         }
-        if(isPyBuiltin(constname)) {
+        if(isPyBuiltin(constname) && checkPyBuiltinForEpsGlobalConst(constname)) {
             throw_error(6757, "Name collision with Python builtin " + constname, A->line);
         }
         if(!ps->closure.defConstant(constname)) {

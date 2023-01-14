@@ -51,5 +51,6 @@ void funcNamePreprocess(std::string &s);
 void impPathProcess(const std::string &s, std::string &impPath, std::string &impModname);
 std::string impPathGetModule(const std::string &s);
 std::string addStubCode(const std::string &s);
+bool checkPyBuiltinForEpsGlobalConst(std::string& name);
 
 #endif //EPSCRIPT_PARSERUTILITIES_H
