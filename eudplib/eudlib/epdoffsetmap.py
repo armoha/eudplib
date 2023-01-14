@@ -80,8 +80,9 @@ wdict = {
 }
 
 
-def _checkEPDAddr(epd):
-    if c.IsConstExpr(epd) and epd.rlocmode == 4:
+def _checkEPDAddr(epd: object) -> None:
+    u = ut.unProxy(epd)
+    if isinstance(u, c.ConstExpr) and u.rlocmode != 1:
         ut.ep_warn(_("EPD check warning. Don't use raw pointer address"))
         traceback.print_stack()
 
