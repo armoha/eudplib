@@ -1088,7 +1088,7 @@ cdef_global_stmt ::= CONST nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B). {
         if(isPyKeyword(constname)) {
             throw_error(6756, "Name collision with Python keyword " + constname, A->line);
         }
-        if(isPyBuiltin(constname) && checkPyBuiltinForEpsGlobalConst(constname)) {
+        if(checkPyBuiltinForEpsGlobalConst(constname)) {
             throw_error(6757, "Name collision with Python builtin " + constname, A->line);
         }
         if(!ps->closure.defConstant(constname)) {

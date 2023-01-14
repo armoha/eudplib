@@ -10,7 +10,6 @@
 
 extern int currentTokenizingLine;
 extern std::string currentModule;
-extern std::string pyBuiltinSet;
 
 int errorn = 0;
 
@@ -153,5 +152,5 @@ std::string addStubCode(const std::string& s) {
 
 bool checkPyBuiltinForEpsGlobalConst(std::string& name) {
     if(strncmp(currentModule.c_str(), "BGM", 3) == 0 && name == "str") return false;
-    return true;
+    return isPyBuiltin(name);
 }
