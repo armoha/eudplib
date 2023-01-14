@@ -166,7 +166,7 @@ def f_badd_epd(epd, subp, b):
     if isinstance(subp, int) and isinstance(b, int):
         cs.DoActions(c.SetDeathsX(epd, c.Add, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp)))
     else:
-        _bwriter(epd, subp, b)
+        _badder(epd, subp, b)
 
 
 @c.EUDFunc
