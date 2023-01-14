@@ -59,6 +59,7 @@ def test_equality(testname, real, expt):
 
     real = Assignable2List(real)
     expt = Assignable2List(expt)
+    assert len(real) == len(expt)
 
     setcp1()
     if EUDIf()([r == e for r, e in zip(real, expt)]):

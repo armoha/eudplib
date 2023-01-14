@@ -134,17 +134,16 @@ def f_getnextchatdst():
 
 @c.EUDTypedFunc([c.StatText], None)
 def GetTBLAddr(tblId):
+    STAT_TEXT_POINTER = ut.EPD(0x6D5A30)
     add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
-    if cs.EUDExecuteOnce()():
-        TBL_ptr, TBL_epd = f_dwepdread_epd(ut.EPD(0x6D5A30))
-        c.VProc(
-            [TBL_ptr, TBL_epd],
-            [
-                TBL_ptr.SetDest(ut.EPD(add_TBL_ptr) + 5),
-                TBL_epd.SetDest(ut.EPD(add_TBL_epd) + 5),
-            ],
-        )
-    cs.EUDEndExecuteOnce()
+    check_pointer = c.MemoryEPD(STAT_TEXT_POINTER, c.Exactly, 0)
+    if cs.EUDIfNot()(check_pointer):
+        from ...core.variable.evcommon import _ev
+
+        f_dwepdread_epd(STAT_TEXT_POINTER, ret=[_ev[4], ut.EPD(add_TBL_epd) + 5])
+        c.VProc(_ev[4], _ev[4].SetDest(ut.EPD(check_pointer) + 2))
+        c.VProc(_ev[4], _ev[4].SetDest(ut.EPD(add_TBL_ptr) + 5))
+    cs.EUDEndIf()
     r, m = c.f_div(tblId, 2)
     c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
     c.RawTrigger(actions=add_TBL_epd << r.AddNumber(0))

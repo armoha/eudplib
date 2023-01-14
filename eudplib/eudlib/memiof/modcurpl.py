@@ -104,3 +104,8 @@ def f_addcurpl(cp):
         c.VProc(cp, cp.SetDest(ut.EPD(0x6509B0)))
     else:
         cs.DoActions(c.AddCurrentPlayer(cp))
+
+
+c.PushTriggerScope()
+f_getcurpl()  # Force initialize f_getcurpl
+c.PopTriggerScope()
