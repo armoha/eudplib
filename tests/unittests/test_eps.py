@@ -57,8 +57,7 @@ def test_epscript():
             cases.append(0)
     cases.append(len(dq) + sum(dq))
     testname = DequeTest + "".join(chr(14 + i % 4) + str(x) for i, x in enumerate(cases))
-    f_printAll(testname)
-    test_equality("epScript EUDDeque", f_test_deque(), cases)
+    test_equality("epScript EUDDeque %s" % testname, f_test_deque(), cases)
 
     test_equality("epScript object", f_test_object(), 511)
     test_equality("epScript nested object", f_test_nested_object(), 127)
