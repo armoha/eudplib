@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, NoReturn, TypeVar
 
 from eudplib import utils as ut
@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 Self = TypeVar("Self", bound="VariableBase")
 
 
-class VariableBase(ABC):
+class VariableBase(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self) -> None:
         pass

@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 
 from eudplib import utils as ut
 
@@ -31,7 +31,7 @@ from ..allocator import ConstExpr, RlocInt_C
 from ..allocator.payload import GetObjectAddr, _PayloadBuffer
 
 
-class EUDObject(ConstExpr, ABC):
+class EUDObject(ConstExpr, metaclass=ABCMeta):
     """Class for standalone object on memory
 
     .. note::
