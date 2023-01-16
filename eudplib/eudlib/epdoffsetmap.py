@@ -23,10 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from collections.abc import Mapping
 import enum
-import traceback
 from typing import cast, ClassVar, Final, Literal, TYPE_CHECKING
 
 from .. import core as c
@@ -62,6 +61,7 @@ if TYPE_CHECKING:
 
 
 class MemberKind(enum.Enum):
+    # FIXME: __slots__ = ()
     DWORD = enum.auto()
     WORD = enum.auto()
     BYTE = enum.auto()
@@ -156,7 +156,11 @@ class MemberKind(enum.Enum):
                 f_bsubtract_epd(epd, subp, value)
 
 
-class Member:
+class BaseMember(metaclass=ABCMeta):
+    """Base descriptor class for EPDOffsetMap"""
+
+    __slots__ = ("name", "offset", "kind")
+
     name: Final[str]
     offset: Final[int]
     kind: Final[MemberKind]
@@ -166,32 +170,74 @@ class Member:
         self.offset = offset
         self.kind = kind
 
-    def read(self, epd) -> c.EUDVariable:
-        q, r = divmod(self.offset, 4)
-        return self.kind._read_func(epd + q, r)
+    @abstractmethod
+    def __get__(self, instance, owner=None):
+        ...
 
-    def write(self, epd, value) -> None:
+    @abstractmethod
+    def __set__(self, instance, value) -> None:
+        ...
+
+
+class Member(BaseMember):
+    """Descriptor for EPDOffsetMap"""
+
+    __slots__ = ()
+
+    def __get__(self, instance, owner=None) -> c.EUDVariable:
         q, r = divmod(self.offset, 4)
-        self.kind._write_func(epd + q, r, value)
+        if isinstance(instance, EPDOffsetMap):
+            return self.kind._read_func(instance._epd + q, r)
+        raise AttributeError
+
+    def __set__(self, instance, value) -> None:
+        q, r = divmod(self.offset, 4)
+        if isinstance(instance, EPDOffsetMap):
+            value = self.kind.cast(value)
+            self.kind._write_func(instance._epd + q, r, value)
+            return
+        raise AttributeError
+
+
+class CUnitMember(BaseMember):
+    """Descriptor for EPDOffsetMap"""
+
+    __slots__ = ()
+
+    def __get__(self, instance, owner=None) -> "CUnit":
+        from .cunit import CUnit
+
+        if isinstance(instance, EPDOffsetMap):
+            return CUnit.from_read(instance._epd + self.offset // 4)
+        raise AttributeError
+
+    def __set__(self, instance, value) -> None:
+        from .cunit import CUnit
+
+        q, r = divmod(self.offset, 4)
+        if isinstance(value, CUnit):
+            value = value.ptr
+        if isinstance(instance, EPDOffsetMap):
+            self.kind._write_func(instance._epd + q, r, value)
+            return
+        raise AttributeError
 
 
 def _checkEPDAddr(epd: object) -> None:
     u = ut.unProxy(epd)
     if isinstance(u, c.ConstExpr) and u.rlocmode != 1:
-        ut.ep_warn(_("EPD check warning. Don't use raw pointer address"))
-        traceback.print_stack()
+        raise ut.EPError(_("EPD check warning. Don't use raw pointer address"))
 
 
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
-    members: ClassVar[Mapping[str, Member]]
+    __slots__ = "_epd"
 
     def __init__(self, epd: int | c.EUDVariable) -> None:
-        _checkEPDAddr(epd)
         self._epd: int | c.EUDVariable = epd
         super().__init__(epd)
 
     def getepd(self, name: str) -> "c.EUDVariable | CUnit":
-        member = self.members[name]
+        member = type(self).__dict__[name]
         ut.ep_assert(member.kind.size == 4, _("Only dword can be read as epd"))
         epd = self._epd + member.offset // 4
         match member.kind:
@@ -205,7 +251,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
                 return f_epdread_epd(epd)
 
     def getdwepd(self, name: str) -> tuple[c.EUDVariable, "c.EUDVariable | CUnit"]:
-        member = self.members[name]
+        member = type(self).__dict__[name]
         ut.ep_assert(member.kind.size == 4, _("Only dword can be read as epd"))
         epd = self._epd + member.offset // 4
         match member.kind:
@@ -220,7 +266,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
                 return f_dwepdread_epd(epd)
 
     def getpos(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
-        member = self.members[name]
+        member = type(self).__dict__[name]
         ut.ep_assert(member.kind.size == 4, _("Only dword can be read as position"))
         match member.kind:
             case MemberKind.C_UNIT | MemberKind.C_SPRITE:
@@ -229,7 +275,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
                 return f_posread_epd(self._epd + member.offset // 4)
 
     def iaddattr(self, name: str, value) -> None:
-        member = self.members[name]
+        member = type(self).__dict__[name]
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         value = member.kind.cast(value)
@@ -237,14 +283,14 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     # TODO: add operator for Subtract
     def isubtractattr(self, name: str, value) -> None:
-        member = self.members[name]
+        member = type(self).__dict__[name]
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         value = member.kind.cast(value)
         member.kind._subtract_func(epd, subp, value)
 
     def isubattr(self, name: str, value) -> None:
-        member = self.members[name]
+        member = type(self).__dict__[name]
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         value = member.kind.cast(value)
@@ -284,7 +330,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     # Attribute comparisons
 
     def eqattr(self, name: str, value):
-        member = self.members[name]
+        member = type(self).__dict__[name]
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
@@ -298,7 +344,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         raise AttributeError
 
     def leattr(self, name, value):
-        member = self.members[name]
+        member = type(self).__dict__[name]
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
@@ -309,7 +355,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             return c.MemoryXEPD(epd, c.AtMost, c.f_bitlshift(value, 8 * subp), mask)
 
     def geattr(self, name, value):
-        member = self.members[name]
+        member = type(self).__dict__[name]
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
