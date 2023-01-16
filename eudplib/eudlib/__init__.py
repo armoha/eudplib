@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .epdoffsetmap import EPDOffsetMap
-from .cunit import CUnit, EPDCUnitMap
 from .eudarray import EUDArray
 from .eudgrp import EUDGrp
 from .eudqueue import EUDDeque, EUDQueue

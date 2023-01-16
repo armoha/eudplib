@@ -33,6 +33,7 @@ from .ctrlstru import *
 from .epscript import *
 from .eudlib import *
 from .maprw import *
+from .offsetmap import CUnit, EPDCUnitMap
 from .trigger import *
 from .trigtrg.runtrigtrg import (
     GetFirstTrigTrigger,

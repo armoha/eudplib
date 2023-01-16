@@ -1,5 +1,5 @@
 from helper import *
-from eudplib.eudlib.epdoffsetmap import Member, MemberKind
+from eudplib.offsetmap import EPDOffsetMap, Member, MemberKind
 
 
 class T(EPDOffsetMap):

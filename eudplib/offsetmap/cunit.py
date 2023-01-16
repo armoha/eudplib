@@ -30,14 +30,14 @@ from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
 from ..localize import _
-from .locf import f_setloc_epd
-from .memiof import (
+from ..eudlib.locf import f_setloc_epd
+from ..eudlib.memiof import (
     f_bwrite_epd,
     f_cunitepdread_epd,
     f_maskwrite_epd,
     f_spriteepdread_epd,
 )
-from .utilf.unlimiterflag import IsUnlimiterOn
+from ..eudlib.utilf.unlimiterflag import IsUnlimiterOn
 from .epdoffsetmap import CUnitMember, MemberKind, Member, EPDOffsetMap, EPDCache, PtrCache
 
 
@@ -474,6 +474,9 @@ class CUnit(EPDOffsetMap):
 
     def is_hallucination(self) -> c.Condition:
         return self.check_status_flag(0x40000000)
+
+    def is_air(self):
+        return self.check_status_flag(0x00000004)
 
     def is_in_building(self) -> c.Condition:
         return self.check_status_flag(0x00000020)

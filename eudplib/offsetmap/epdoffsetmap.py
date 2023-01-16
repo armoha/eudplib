@@ -32,7 +32,7 @@ from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
 from ..localize import _
-from .memiof import (
+from ..eudlib.memiof import (
     f_badd_epd,
     f_bread_epd,
     f_bsubtract_epd,
@@ -105,7 +105,7 @@ class MemberKind(enum.Enum):
             case _:
                 return 1
 
-    def _read_func(self, epd, subp) -> c.EUDVariable:
+    def read_epd(self, epd, subp) -> c.EUDVariable:
         match self:
             case MemberKind.BOOL:
                 return f_maskread_epd(epd, 1 << (8 * subp))
@@ -128,7 +128,7 @@ class MemberKind(enum.Enum):
                     case 1:
                         return f_bread_epd(epd, subp)
 
-    def _write_func(self, epd, subp, value) -> None:
+    def write_epd(self, epd, subp, value) -> None:
         match self.size:
             case 4:
                 f_dwwrite_epd(epd, value)
@@ -137,7 +137,7 @@ class MemberKind(enum.Enum):
             case 1:
                 f_bwrite_epd(epd, subp, value)
 
-    def _add_func(self, epd, subp, value) -> None:
+    def add_epd(self, epd, subp, value) -> None:
         match self.size:
             case 4:
                 f_dwadd_epd(epd, value)
@@ -146,7 +146,7 @@ class MemberKind(enum.Enum):
             case 1:
                 f_badd_epd(epd, subp, value)
 
-    def _subtract_func(self, epd, subp, value) -> None:
+    def subtract_epd(self, epd, subp, value) -> None:
         match self.size:
             case 4:
                 f_dwsubtract_epd(epd, value)
@@ -187,14 +187,14 @@ class Member(BaseMember):
     def __get__(self, instance, owner=None) -> c.EUDVariable:
         q, r = divmod(self.offset, 4)
         if isinstance(instance, EPDOffsetMap):
-            return self.kind._read_func(instance._epd + q, r)
+            return self.kind.read_epd(instance._epd + q, r)
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
         q, r = divmod(self.offset, 4)
         if isinstance(instance, EPDOffsetMap):
             value = self.kind.cast(value)
-            self.kind._write_func(instance._epd + q, r, value)
+            self.kind.write_epd(instance._epd + q, r, value)
             return
         raise AttributeError
 
@@ -218,7 +218,7 @@ class CUnitMember(BaseMember):
         if isinstance(value, CUnit):
             value = value.ptr
         if isinstance(instance, EPDOffsetMap):
-            self.kind._write_func(instance._epd + q, r, value)
+            self.kind.write_epd(instance._epd + q, r, value)
             return
         raise AttributeError
 
@@ -244,7 +244,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             case MemberKind.C_UNIT:
                 return CUnit.from_read(epd)
             case MemberKind.C_SPRITE:
-                return member.kind._read_func(epd, 0)
+                return member.kind.read_epd(epd, 0)
             case MemberKind.POSITION:
                 raise ut.EPError(_("Only dword can be read as epd"))
             case _:
@@ -279,7 +279,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         value = member.kind.cast(value)
-        member.kind._add_func(epd, subp, value)
+        member.kind.add_epd(epd, subp, value)
 
     # TODO: add operator for Subtract
     def isubtractattr(self, name: str, value) -> None:
@@ -287,14 +287,14 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         value = member.kind.cast(value)
-        member.kind._subtract_func(epd, subp, value)
+        member.kind.subtract_epd(epd, subp, value)
 
     def isubattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
         offsetEPD, subp = divmod(member.offset, 4)
         epd = self._epd + offsetEPD
         value = member.kind.cast(value)
-        member.kind._add_func(epd, subp, -value)
+        member.kind.add_epd(epd, subp, -value)
 
     def imulattr(self, name, value):
         raise AttributeError
