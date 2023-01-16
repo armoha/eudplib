@@ -141,14 +141,12 @@ class MemberKind(enum.Enum):
 class BaseMember(metaclass=ABCMeta):
     """Base descriptor class for EPDOffsetMap"""
 
-    __slots__ = ("name", "offset", "kind")
+    __slots__ = ("offset", "kind")
 
-    name: Final[str]
     offset: Final[int]
     kind: Final[MemberKind]
 
-    def __init__(self, name: str, offset: int, kind: MemberKind) -> None:
-        self.name = name
+    def __init__(self, offset: int, kind: MemberKind) -> None:
         self.offset = offset
         self.kind = kind
 
@@ -185,6 +183,9 @@ class CUnitMember(BaseMember):
     """Descriptor for EPDOffsetMap"""
 
     __slots__ = ()
+
+    def __init__(self, offset: int) -> None:
+        super().__init__(offset, MemberKind.C_UNIT)
 
     def __get__(self, instance, owner=None) -> "CUnit":
         from .cunit import CUnit

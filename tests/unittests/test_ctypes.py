@@ -3,11 +3,11 @@ from eudplib.offsetmap import EPDOffsetMap, Member, MemberKind
 
 
 class T(EPDOffsetMap):
-    a = Member("a", 0x0000, MemberKind.DWORD)
-    b = Member("b", 0x0000, MemberKind.WORD)
-    c = Member("c", 0x0002, MemberKind.WORD)
-    d = Member("d", 0x0004, MemberKind.DWORD)
-    e = Member("e", 0x0007, MemberKind.BYTE)
+    a = Member(0x00, MemberKind.DWORD)
+    b = Member(0x00, MemberKind.WORD)
+    c = Member(0x02, MemberKind.WORD)
+    d = Member(0x04, MemberKind.DWORD)
+    e = Member(0x07, MemberKind.BYTE)
 
 
 @TestInstance
