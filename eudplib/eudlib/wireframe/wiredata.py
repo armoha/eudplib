@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from ...utils import ep_assert
 
 # fmt: off

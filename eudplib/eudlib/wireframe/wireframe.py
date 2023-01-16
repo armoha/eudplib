@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from bisect import insort_right
 
 from eudplib import core as c

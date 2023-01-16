@@ -5,8 +5,7 @@ import os
 
 beginning_str = """\
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-
+# -*- coding: utf-8 -*-\
 """
 
 print('Auto "license inserter')

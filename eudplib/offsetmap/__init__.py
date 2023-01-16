@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from .cunit import CUnit, EPDCUnitMap
 from .epdoffsetmap import EPDOffsetMap, Member, MemberKind, CUnitMember, BaseMember
 

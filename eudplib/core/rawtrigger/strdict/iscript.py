@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 DefIscriptDict: dict[str, int] = {
     "Scourge": 0,
     "Unknown1": 1,
