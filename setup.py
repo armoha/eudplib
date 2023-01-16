@@ -1,11 +1,11 @@
+__version__ = "0.73.28"
+
 import os
 import subprocess
 import sys
 import textwrap
 
 from setuptools import find_packages, setup
-
-__version__ = "0.73.28"
 
 
 def parse_setuppy_commands():

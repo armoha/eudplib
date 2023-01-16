@@ -5,6 +5,7 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
+__version__ = "0.73.28"
 
 from .localize import *
 
@@ -25,8 +26,6 @@ from .trigtrg.runtrigtrg import (
     TrigTriggerEnd,
 )
 from .utils import *
-
-__version__ = "0.73.28"
 
 import builtins
 import keyword
