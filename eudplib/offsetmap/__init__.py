@@ -2,7 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from .cunit import CUnit, EPDCUnitMap
-from .epdoffsetmap import EPDOffsetMap, Member, MemberKind, CUnitMember, BaseMember
+from .epdoffsetmap import (
+    EPDOffsetMap,
+    Member,
+    MemberKind,
+    CUnitMember,
+    UnsupportedMember,
+    BaseMember,
+)
 
 __all__ = (
     "CUnit",
@@ -11,5 +18,6 @@ __all__ = (
     "Member",
     "MemberKind",
     "CUnitMember",
+    "UnsupportedMember",
     "BaseMember",
 )

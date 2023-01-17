@@ -8,7 +8,7 @@
 from abc import ABCMeta, abstractmethod
 from collections.abc import Mapping
 import enum
-from typing import cast, ClassVar, Final, Literal, TYPE_CHECKING
+from typing import cast, ClassVar, Final, Literal, NoReturn, TYPE_CHECKING
 
 from .. import core as c
 from .. import ctrlstru as cs
@@ -155,6 +155,21 @@ class BaseMember(metaclass=ABCMeta):
     @abstractmethod
     def __set__(self, instance, value) -> None:
         ...
+
+
+class UnsupportedMember(BaseMember):
+    """Not supported EUD"""
+
+    __slots__ = "name"
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner=None) -> NoReturn:
+        raise ut.EPError(_("Unsupported EUD: {}").format(self.name))
+
+    def __set__(self, instance, value) -> NoReturn:
+        raise ut.EPError(_("Unsupported EUD: {}").format(self.name))
 
 
 class Member(BaseMember):

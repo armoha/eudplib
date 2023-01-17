@@ -20,7 +20,15 @@ from ..eudlib.memiof import (
     f_spriteepdread_epd,
 )
 from ..eudlib.utilf.unlimiterflag import IsUnlimiterOn
-from .epdoffsetmap import CUnitMember, MemberKind, Member, EPDOffsetMap, EPDCache, PtrCache
+from .epdoffsetmap import (
+    CUnitMember,
+    MemberKind,
+    Member,
+    EPDOffsetMap,
+    UnsupportedMember,
+    EPDCache,
+    PtrCache,
+)
 
 
 T = TypeVar("T", bound="CUnit")
@@ -30,11 +38,11 @@ int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
 class CUnit(EPDOffsetMap):
     __slots__ = "_ptr"
 
-    prev = CUnitMember(0x000)
-    next = CUnitMember(0x004)  # link
-    hp = Member(0x008, MemberKind.DWORD)
+    # TODO: add docstring for descriptor
+    prevUnit = CUnitMember(0x000)
+    nextUnit = CUnitMember(0x004)  # link
     # displayed value is ceil(healthPoints/256)
-    hitPoints = Member(0x008, MemberKind.DWORD)
+    hp = Member(0x008, MemberKind.DWORD)
     sprite = Member(0x00C, MemberKind.C_SPRITE)
     moveTargetXY = Member(0x010, MemberKind.POSITION)
     moveTargetPosition = Member(0x010, MemberKind.POSITION)
@@ -104,10 +112,10 @@ class CUnit(EPDOffsetMap):
     previousPlayerUnit = CUnitMember(0x068)
     nextPlayerUnit = CUnitMember(0x06C)  # player_link
     subUnit = CUnitMember(0x070)
-    orderQHead = Member(0x074, MemberKind.DWORD)
-    orderQueueHead = Member(0x074, MemberKind.DWORD)  # COrder
-    orderQTail = Member(0x078, MemberKind.DWORD)
-    orderQueueTail = Member(0x078, MemberKind.DWORD)
+    orderQHead = UnsupportedMember(0x074, MemberKind.DWORD)
+    orderQueueHead = UnsupportedMember(0x074, MemberKind.DWORD)  # COrder
+    orderQTail = UnsupportedMember(0x078, MemberKind.DWORD)
+    orderQueueTail = UnsupportedMember(0x078, MemberKind.DWORD)
     autoTargetUnit = CUnitMember(0x07C)
     # larva, in-transit, addons
     connectedUnit = CUnitMember(0x080)
@@ -118,8 +126,8 @@ class CUnit(EPDOffsetMap):
     _unknown_0x086 = Member(0x086, MemberKind.BYTE)
     attackNotifyTimer = Member(0x087, MemberKind.BYTE)
     # zerg buildings while morphing
-    previousUnitType = Member(0x088, MemberKind.TRG_UNIT)
-    lastEventTimer = Member(0x08A, MemberKind.BYTE)
+    previousUnitType = UnsupportedMember(0x088, MemberKind.TRG_UNIT)
+    lastEventTimer = UnsupportedMember(0x08A, MemberKind.BYTE)
     # 17 = was completed (train, morph), 174 = was attacked
     lastEventColor = Member(0x08B, MemberKind.BYTE)
     _unused_0x08C = Member(0x08C, MemberKind.WORD)
@@ -157,14 +165,14 @@ class CUnit(EPDOffsetMap):
     remainingBuildTime = Member(0x0AC, MemberKind.WORD)
     previousHP = Member(0x0AE, MemberKind.WORD)
     # alphaID (StoredUnit)
-    loadedUnitIndex0 = Member(0x0B0, MemberKind.WORD)
-    loadedUnitIndex1 = Member(0x0B2, MemberKind.WORD)
-    loadedUnitIndex2 = Member(0x0B4, MemberKind.WORD)
-    loadedUnitIndex3 = Member(0x0B6, MemberKind.WORD)
-    loadedUnitIndex4 = Member(0x0B8, MemberKind.WORD)
-    loadedUnitIndex5 = Member(0x0BA, MemberKind.WORD)
-    loadedUnitIndex6 = Member(0x0BC, MemberKind.WORD)
-    loadedUnitIndex7 = Member(0x0BE, MemberKind.WORD)
+    loadedUnitIndex0 = UnsupportedMember(0x0B0, MemberKind.WORD)
+    loadedUnitIndex1 = UnsupportedMember(0x0B2, MemberKind.WORD)
+    loadedUnitIndex2 = UnsupportedMember(0x0B4, MemberKind.WORD)
+    loadedUnitIndex3 = UnsupportedMember(0x0B6, MemberKind.WORD)
+    loadedUnitIndex4 = UnsupportedMember(0x0B8, MemberKind.WORD)
+    loadedUnitIndex5 = UnsupportedMember(0x0BA, MemberKind.WORD)
+    loadedUnitIndex6 = UnsupportedMember(0x0BC, MemberKind.WORD)
+    loadedUnitIndex7 = UnsupportedMember(0x0BE, MemberKind.WORD)
     mineCount = Member(0x0C0, MemberKind.BYTE)  # 0x0C0 union, vulture
     spiderMineCount = Member(0x0C0, MemberKind.BYTE)
     pInHanger = CUnitMember(0x0C0)
@@ -232,8 +240,8 @@ class CUnit(EPDOffsetMap):
     secondaryOrderX = Member(0x0E8, MemberKind.WORD)
     secondaryOrderY = Member(0x0EA, MemberKind.WORD)
     currentBuildUnit = CUnitMember(0x0EC)
-    previousBurrowedUnit = CUnitMember(0x0F0)
-    nextBurrowedUnit = CUnitMember(0x0F4)
+    previousBurrowedUnit = UnsupportedMember(0x0F0)
+    nextBurrowedUnit = UnsupportedMember(0x0F4)
     rallyXY = Member(0x0F8, MemberKind.POSITION)
     rallyPosition = Member(0x0F8, MemberKind.POSITION)
     rallyX = Member(0x0F8, MemberKind.WORD)
@@ -241,17 +249,17 @@ class CUnit(EPDOffsetMap):
     rallyUnit = CUnitMember(0x0FC)
     prevPsiProvider = CUnitMember(0x0F8)
     nextPsiProvider = CUnitMember(0x0FC)
-    path = Member(0x100, MemberKind.DWORD)
+    path = UnsupportedMember(0x100, MemberKind.DWORD)
     pathingCollisionInterval = Member(0x104, MemberKind.BYTE)
     pathingFlags = Member(0x105, MemberKind.BYTE)
     _unused_0x106 = Member(0x106, MemberKind.BYTE)
     isBeingHealed = Member(0x107, MemberKind.BOOL)
-    contourBoundsLU = Member(0x108, MemberKind.DWORD)
-    contourBoundsL = Member(0x108, MemberKind.WORD)
-    contourBoundsU = Member(0x10A, MemberKind.WORD)
-    contourBoundsRB = Member(0x10C, MemberKind.DWORD)
-    contourBoundsR = Member(0x10C, MemberKind.WORD)
-    contourBoundsB = Member(0x10E, MemberKind.WORD)
+    contourBoundsLU = UnsupportedMember(0x108, MemberKind.DWORD)
+    contourBoundsL = UnsupportedMember(0x108, MemberKind.WORD)
+    contourBoundsU = UnsupportedMember(0x10A, MemberKind.WORD)
+    contourBoundsRB = UnsupportedMember(0x10C, MemberKind.DWORD)
+    contourBoundsR = UnsupportedMember(0x10C, MemberKind.WORD)
+    contourBoundsB = UnsupportedMember(0x10E, MemberKind.WORD)
     removeTimer = Member(0x110, MemberKind.WORD)
     matrixDamage = Member(0x112, MemberKind.WORD)
     defenseMatrixDamage = Member(0x112, MemberKind.WORD)
@@ -285,16 +293,16 @@ class CUnit(EPDOffsetMap):
     acidSporeTime6 = Member(0x12D, MemberKind.BYTE)
     acidSporeTime7 = Member(0x12E, MemberKind.BYTE)
     acidSporeTime8 = Member(0x12F, MemberKind.BYTE)
-    bulletBehaviour3by3AttackSequence = Member(0x130, MemberKind.WORD)
-    offsetIndex3by3 = Member(0x130, MemberKind.WORD)
-    _padding_0x132 = Member(0x132, MemberKind.WORD)
-    pAI = Member(0x134, MemberKind.DWORD)
-    airStrength = Member(0x138, MemberKind.WORD)
-    groundStrength = Member(0x13A, MemberKind.WORD)
-    finderIndexLeft = Member(0x13C, MemberKind.DWORD)
-    finderIndexRight = Member(0x140, MemberKind.DWORD)
-    finderIndexTop = Member(0x144, MemberKind.DWORD)
-    finderIndexBottom = Member(0x148, MemberKind.DWORD)
+    bulletBehaviour3by3AttackSequence = UnsupportedMember(0x130, MemberKind.WORD)
+    offsetIndex3by3 = UnsupportedMember(0x130, MemberKind.WORD)
+    _padding_0x132 = UnsupportedMember(0x132, MemberKind.WORD)
+    pAI = UnsupportedMember(0x134, MemberKind.DWORD)
+    airStrength = UnsupportedMember(0x138, MemberKind.WORD)
+    groundStrength = UnsupportedMember(0x13A, MemberKind.WORD)
+    finderIndexLeft = UnsupportedMember(0x13C, MemberKind.DWORD)
+    finderIndexRight = UnsupportedMember(0x140, MemberKind.DWORD)
+    finderIndexTop = UnsupportedMember(0x144, MemberKind.DWORD)
+    finderIndexBottom = UnsupportedMember(0x148, MemberKind.DWORD)
     repulseUnknown = Member(0x14C, MemberKind.BYTE)
     repulseAngle = Member(0x14D, MemberKind.BYTE)
     driftPos = Member(0x14E, MemberKind.WORD)
