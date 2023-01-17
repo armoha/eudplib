@@ -3,6 +3,7 @@
 
 from .wireframe import (
     InitialWireframe,
+    Is64BitWireframe,
     SetGrpWire,
     SetTranWire,
     SetWirefram,

@@ -208,3 +208,12 @@ def SetWireframes(unit, wireframe):
     SetTranWire(unit, wireframe)
     SetGrpWire(unit, wireframe)
     SetWirefram(unit, wireframe)
+
+
+def Is64BitWireframe() -> c.Condition:
+    """Local (desync) condition: check whether StarCraft is 32 bit or 64 bit, by inspecting wireframe.
+
+    Is64BitWireframe() loads custom wireframes, causing wireframe graphic glitches by StarCraft.
+    """
+    InitialWireframe.init()
+    return is64bit.IsSet()
