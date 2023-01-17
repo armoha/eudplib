@@ -5,17 +5,12 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from typing import Any, Generic, Protocol, TypeVar, overload
+import types
+from typing import Any, Generic, TypeAlias, TypeVar, overload
 
 from eudplib.localize import _
 
 T_co = TypeVar("T_co", covariant=True)
-
-
-class Castable(Protocol):
-    @classmethod
-    def cast(cls, _from):
-        return cls(_from=_from)
 
 
 class ExprProxy(Generic[T_co]):
@@ -179,7 +174,10 @@ def unProxy(x):
     return x
 
 
-def isUnproxyInstance(x: object, cls: type | tuple[type | tuple[Any, ...], ...]) -> bool:
+_ClassInfo: TypeAlias = type | types.UnionType | tuple["_ClassInfo", ...]
+
+
+def isUnproxyInstance(x: object, cls: _ClassInfo) -> bool:
     if isinstance(x, cls):
         return True
     if isinstance(unProxy(x), cls):

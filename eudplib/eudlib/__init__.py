@@ -17,11 +17,4 @@ from .qgcf import *
 from .stringf import *
 from .unitgroup import UnitGroup
 from .utilf import *
-from .wireframe import (
-    InitialWireframe,
-    Is64BitWireframe,
-    SetGrpWire,
-    SetTranWire,
-    SetWirefram,
-    SetWireframes,
-)
+from .wireframe import *
