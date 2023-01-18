@@ -473,7 +473,7 @@ class CSprite(EPDOffsetMap):
     prev = CSpriteMember(0x00)
     next = CSpriteMember(0x04)
     sprite = Member(0x08, MemberKind.SPRITE)
-    player = Member(0x0A, MemberKind.TRG_PLAYER)  # officially "creator"
+    playerID = Member(0x0A, MemberKind.TRG_PLAYER)  # officially "creator"
     # 0 <= selectionIndex <= 11. Index in the selection area at bottom of screen.
     selectionIndex = Member(0x0B, MemberKind.BYTE)
     # Player bits indicating the visibility for a player (not hidden by the fog-of-war)
@@ -490,9 +490,11 @@ class CSprite(EPDOffsetMap):
     flags = Member(0x0E, MemberKind.BYTE)
     selectionTimer = Member(0x0F, MemberKind.BYTE)
     index = Member(0x10, MemberKind.WORD)
-    unkflags_12 = Member(0x12, MemberKind.BYTE)
-    unkflags_13 = Member(0x13, MemberKind.BYTE)
-    position = Member(0x14, MemberKind.POSITION)
+    unknown0x12 = Member(0x12, MemberKind.BYTE)
+    unknown0x13 = Member(0x13, MemberKind.BYTE)
+    pos = Member(0x14, MemberKind.POSITION)
+    posX = Member(0x14, MemberKind.POSITION_X)
+    posY = Member(0x16, MemberKind.POSITION_Y)
     mainGraphic = Member(0x18, MemberKind.DWORD)  # officially "pImagePrimary"
     imageHead = Member(0x1C, MemberKind.DWORD)
     imageTail = Member(0x20, MemberKind.DWORD)

@@ -57,7 +57,7 @@ class CUnit(EPDOffsetMap):
     movementFlags = Member(0x020, MemberKind.BYTE)
     # current direction the unit is facing
     currentDirection1 = Member(0x021, MemberKind.BYTE)
-    flingyTurnRadius = Member(0x022, MemberKind.BYTE)
+    turnRadius = Member(0x022, MemberKind.BYTE)  # flingy
     # usually only differs from the currentDirection field for units that can accelerate
     # and travel in a different direction than they are facing. For example Mutalisks can change
     # the direction they are facing faster than then can change the direction they are moving.
@@ -72,15 +72,15 @@ class CUnit(EPDOffsetMap):
     haltX = Member(0x02C, MemberKind.DWORD)
     haltY = Member(0x030, MemberKind.DWORD)
     topSpeed = Member(0x034, MemberKind.DWORD)
-    flingyTopSpeed = Member(0x034, MemberKind.DWORD)
     currentSpeed1 = Member(0x038, MemberKind.DWORD)
     currentSpeed2 = Member(0x03C, MemberKind.DWORD)
     currentVelocityX = Member(0x040, MemberKind.DWORD)
     currentVelocityY = Member(0x044, MemberKind.DWORD)
-    flingyAcceleration = Member(0x048, MemberKind.WORD)
+    acceleration = Member(0x048, MemberKind.WORD)
     currentDirection2 = Member(0x04A, MemberKind.BYTE)
     velocityDirection2 = Member(0x04B, MemberKind.BYTE)  # pathing related
     playerID = Member(0x04C, MemberKind.TRG_PLAYER)
+    owner = Member(0x04C, MemberKind.TRG_PLAYER)
     orderID = Member(0x04D, MemberKind.UNIT_ORDER)
     orderState = Member(0x04E, MemberKind.BYTE)
     orderSignal = Member(0x04F, MemberKind.BYTE)
@@ -88,19 +88,18 @@ class CUnit(EPDOffsetMap):
     unknown0x52 = Member(0x052, MemberKind.WORD)  # 2-byte padding
     cooldown = Member(0x054, MemberKind.DWORD)
     orderTimer = Member(0x054, MemberKind.BYTE)
-    mainOrderTimer = Member(0x054, MemberKind.BYTE)
     gCooldown = Member(0x055, MemberKind.BYTE)
-    groundWeaponCooldown = Member(0x055, MemberKind.BYTE)
     aCooldown = Member(0x056, MemberKind.BYTE)
-    airWeaponCooldown = Member(0x056, MemberKind.BYTE)
     spellCooldown = Member(0x057, MemberKind.BYTE)
+    groundWeaponCooldown = Member(0x055, MemberKind.BYTE)
+    airWeaponCooldown = Member(0x056, MemberKind.BYTE)
     orderTargetPos = Member(0x058, MemberKind.POSITION)  # ActionFocus
     orderTargetXY = Member(0x058, MemberKind.POSITION)
     orderTargetX = Member(0x058, MemberKind.POSITION_X)
     orderTargetY = Member(0x05A, MemberKind.POSITION_Y)
     orderTarget = CUnitMember(0x05C)
     orderTargetUnit = CUnitMember(0x05C)
-    shields = Member(0x060, MemberKind.DWORD)
+    shield = Member(0x060, MemberKind.DWORD)
     unitID = Member(0x064, MemberKind.TRG_UNIT)
     unitType = Member(0x064, MemberKind.TRG_UNIT)
     unknown0x66 = Member(0x066, MemberKind.WORD)  # 2-byte padding
@@ -120,7 +119,7 @@ class CUnit(EPDOffsetMap):
     # Prevent "Your forces are under attack." on every attack
     attackNotifyTimer = Member(0x087, MemberKind.BYTE)
     # zerg buildings while morphing
-    previousUnitType = UnsupportedMember(0x088, MemberKind.TRG_UNIT)
+    prevUnitType = UnsupportedMember(0x088, MemberKind.TRG_UNIT)
     lastEventTimer = UnsupportedMember(0x08A, MemberKind.BYTE)
     # 17 = was completed (train, morph), 174 = was attacked
     lastEventColor = UnsupportedMember(0x08B, MemberKind.BYTE)
@@ -155,7 +154,7 @@ class CUnit(EPDOffsetMap):
     # Remaining bulding time; also used by powerups (flags) as the timer for returning to their original location.
     remainingBuildTime = Member(0x0AC, MemberKind.WORD)
     #  The HP of the unit before it changed (example Drone->Hatchery, the Drone's HP will be stored here)
-    previousHp = Member(0x0AE, MemberKind.WORD)
+    prevHp = Member(0x0AE, MemberKind.WORD)
     # alphaID (StoredUnit)
     loadedUnit1 = UnsupportedMember(0x0B0, MemberKind.WORD)
     loadedUnit2 = UnsupportedMember(0x0B2, MemberKind.WORD)
@@ -264,7 +263,7 @@ class CUnit(EPDOffsetMap):
     pathingCollisionInterval = Member(0x104, MemberKind.BYTE)
     # 0x01 = uses pathing; 0x02 = ?; 0x04 = ?
     pathingFlags = Member(0x105, MemberKind.BYTE)
-    unused0x106 = Member(0x106, MemberKind.BYTE)
+    unknown0x106 = Member(0x106, MemberKind.BYTE)
     # 1 if a medic is currently healing this unit
     isBeingHealed = Member(0x107, MemberKind.BOOL)
     # A rect that specifies the closest contour (collision) points
@@ -294,7 +293,7 @@ class CUnit(EPDOffsetMap):
     # counts/cycles up from 0 to 7 (inclusive). See also 0x85
     cycleCounter = Member(0x122, MemberKind.BYTE)
     # Each bit corresponds to the player who has optical flared this unit
-    isBlind = Member(0x123, MemberKind.BYTE)  # bool in BWAPI
+    blindFlags = Member(0x123, MemberKind.BYTE)  # bool in BWAPI
     maelstromTimer = Member(0x124, MemberKind.BYTE)
     # Might be afterburner timer or ultralisk roar timer
     unusedTimer = Member(0x125, MemberKind.BYTE)
@@ -310,8 +309,8 @@ class CUnit(EPDOffsetMap):
     acidSporeTime8 = Member(0x12F, MemberKind.BYTE)
     # Cycles between 0-12 for each bullet fired by this unit (if it uses a "Attack 3x3 area" weapon)
     offsetIndex3by3 = UnsupportedMember(0x130, MemberKind.WORD)
-    padding0x132 = UnsupportedMember(0x132, MemberKind.WORD)
-    pAI = UnsupportedMember(0x134, MemberKind.DWORD)
+    unknown0x132 = UnsupportedMember(0x132, MemberKind.WORD)  # padding
+    AI = UnsupportedMember(0x134, MemberKind.DWORD)
     airStrength = UnsupportedMember(0x138, MemberKind.WORD)
     groundStrength = UnsupportedMember(0x13A, MemberKind.WORD)
     finderIndexLeft = UnsupportedMember(0x13C, MemberKind.DWORD)
