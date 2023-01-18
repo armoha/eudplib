@@ -16,6 +16,7 @@ from ...trigtrg.runtrigtrg import TrigTriggerBegin, TrigTriggerEnd
 from ...utils import EPD
 from ..memiof import f_bread_cp, f_cunitepdread_epd, f_dwepdread_epd, f_setcurpl2cpcache
 from .unlimiterflag import IsUnlimiterOn
+from ...offsetmap import CUnit
 
 
 def EUDLoopList(header_offset, break_offset=None) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
@@ -101,6 +102,11 @@ def EUDLoopNewUnit(
     ut.EUDPopBlock("newunitloop")
 
 
+def EUDLoopNewCUnit(allowance: int = 2) -> Iterator[CUnit]:
+    for ptr, epd in EUDLoopNewUnit(allowance):
+        yield CUnit(epd, ptr=ptr)
+
+
 def EUDLoopUnit2() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
     1700개 유닛을 도는 방식으로 작동합니다.
@@ -151,6 +157,14 @@ def EUDLoopUnit2() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     cs.EUDEndWhile()
 
 
+def EUDLoopCUnit() -> Iterator[CUnit]:
+    """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
+    1700개 유닛을 도는 방식으로 작동합니다.
+    """
+    for ptr, epd in EUDLoopUnit2():
+        yield CUnit(epd, ptr=ptr)
+
+
 def EUDLoopPlayerUnit(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     player = c.EncodePlayer(player)
     first_player_unit = 0x6283F8
@@ -166,6 +180,11 @@ def EUDLoopPlayerUnit(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("playerunitloop")
+
+
+def EUDLoopPlayerCUnit(player) -> Iterator[CUnit]:
+    for ptr, epd in EUDLoopPlayerUnit(player):
+        yield CUnit(epd, ptr=ptr)
 
 
 def EUDLoopBullet() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
