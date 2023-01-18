@@ -96,7 +96,7 @@ def EncodeAIScript(ais: _Arg, issueError: bool = False) -> _Dword:
                 sl += "\n" + _(" - Suggestion: {}").format(match)
 
         elif len(ai) == 4:
-            if ais in DefAIScriptDict.values():
+            if ai in DefAIScriptDict.values():
                 return ut.b2i4(ai)
             sl = _("Cannot encode string {} as {}.").format(ai, "AIScript")
             for match in difflib.get_close_matches(ai, DefAIScriptDict.values()):
