@@ -6,7 +6,7 @@
 # Please see the LICENSE file that should have been included as part of this package.
 
 from collections.abc import Mapping
-from typing import cast, ClassVar, TypeAlias, TypeVar
+from typing import cast, ClassVar
 
 from .. import core as c
 from .. import ctrlstru as cs
@@ -22,30 +22,28 @@ from ..eudlib.memiof import (
 from ..eudlib.utilf.unlimiterflag import IsUnlimiterOn
 from .epdoffsetmap import (
     CUnitMember,
+    CSpriteMember,
     MemberKind,
     Member,
     EPDOffsetMap,
     UnsupportedMember,
     EPDCache,
     PtrCache,
+    T,
+    int_or_var,
 )
-
-
-T = TypeVar("T", bound="CUnit")
-int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
 
 
 class CUnit(EPDOffsetMap):
     __slots__ = "_ptr"
 
     # TODO: add docstring for descriptor
-    prevUnit = CUnitMember(0x000)
-    nextUnit = CUnitMember(0x004)  # link
+    prev = CUnitMember(0x000)
+    next = CUnitMember(0x004)  # link
     # displayed value is ceil(healthPoints/256)
     hp = Member(0x008, MemberKind.DWORD)
-    sprite = Member(0x00C, MemberKind.C_SPRITE)
-    moveTargetXY = Member(0x010, MemberKind.POSITION)
-    moveTargetPosition = Member(0x010, MemberKind.POSITION)
+    sprite = CSpriteMember(0x00C)
+    moveTargetPos = Member(0x010, MemberKind.POSITION)
     moveTargetX = Member(0x010, MemberKind.POSITION_X)
     moveTargetY = Member(0x012, MemberKind.POSITION_Y)
     moveTarget = CUnitMember(0x014)
@@ -56,20 +54,23 @@ class CUnit(EPDOffsetMap):
     # The desired position
     nextTargetWaypoint = Member(0x01C, MemberKind.POSITION)
     movementFlags = Member(0x020, MemberKind.BYTE)
-    direction = Member(0x021, MemberKind.BYTE)
     # current direction the unit is facing
+    direction = Member(0x021, MemberKind.BYTE)
     currentDirection1 = Member(0x021, MemberKind.BYTE)
     flingyTurnRadius = Member(0x022, MemberKind.BYTE)
-    flingyTurnSpeed = Member(0x022, MemberKind.BYTE)
+    # usually only differs from the currentDirection field for units that can accelerate
+    # and travel in a different direction than they are facing. For example Mutalisks can change
+    # the direction they are facing faster than then can change the direction they are moving.
     velocityDirection1 = Member(0x023, MemberKind.BYTE)
     flingyID = Member(0x024, MemberKind.FLINGY)
     _unknown_0x026 = Member(0x026, MemberKind.BYTE)
     flingyMovementType = Member(0x027, MemberKind.BYTE)
+    # Current position of the unit
     pos = Member(0x028, MemberKind.POSITION)
-    position = Member(0x028, MemberKind.POSITION)
     posX = Member(0x028, MemberKind.POSITION_X)
-    positionX = Member(0x028, MemberKind.POSITION_X)
     posY = Member(0x02A, MemberKind.POSITION_Y)
+    position = Member(0x028, MemberKind.POSITION)
+    positionX = Member(0x028, MemberKind.POSITION_X)
     positionY = Member(0x02A, MemberKind.POSITION_Y)
     haltX = Member(0x02C, MemberKind.DWORD)
     haltY = Member(0x030, MemberKind.DWORD)
@@ -84,8 +85,8 @@ class CUnit(EPDOffsetMap):
     velocityDirection2 = Member(0x04B, MemberKind.BYTE)  # pathing related
     owner = Member(0x04C, MemberKind.TRG_PLAYER)
     playerID = Member(0x04C, MemberKind.TRG_PLAYER)
-    order = Member(0x04D, MemberKind.BYTE)
-    orderID = Member(0x04D, MemberKind.BYTE)
+    order = Member(0x04D, MemberKind.UNIT_ORDER)
+    orderID = Member(0x04D, MemberKind.UNIT_ORDER)
     orderState = Member(0x04E, MemberKind.BYTE)
     orderSignal = Member(0x04F, MemberKind.BYTE)
     orderUnitType = Member(0x050, MemberKind.TRG_UNIT)
@@ -98,15 +99,15 @@ class CUnit(EPDOffsetMap):
     aCooldown = Member(0x056, MemberKind.BYTE)
     airWeaponCooldown = Member(0x056, MemberKind.BYTE)
     spellCooldown = Member(0x057, MemberKind.BYTE)
+    orderTargetPos = Member(0x058, MemberKind.POSITION)  # ActionFocus
     orderTargetXY = Member(0x058, MemberKind.POSITION)
-    orderTargetPosition = Member(0x058, MemberKind.POSITION)  # ActionFocus
     orderTargetX = Member(0x058, MemberKind.POSITION_X)
     orderTargetY = Member(0x05A, MemberKind.POSITION_Y)
     orderTarget = CUnitMember(0x05C)
     orderTargetUnit = CUnitMember(0x05C)
     shield = Member(0x060, MemberKind.DWORD)
     shieldPoints = Member(0x060, MemberKind.DWORD)
-    unitId = Member(0x064, MemberKind.TRG_UNIT)
+    unitID = Member(0x064, MemberKind.TRG_UNIT)
     unitType = Member(0x064, MemberKind.TRG_UNIT)
     _unknown_0x066 = Member(0x066, MemberKind.WORD)  # 2-byte padding
     previousPlayerUnit = CUnitMember(0x068)
@@ -141,24 +142,19 @@ class CUnit(EPDOffsetMap):
     currentButtonSet = Member(0x094, MemberKind.WORD)
     isCloaked = Member(0x096, MemberKind.BOOL)
     movementState = Member(0x097, MemberKind.BYTE)
-    buildQ12 = Member(0x098, MemberKind.DWORD)
-    buildQ1 = Member(0x098, MemberKind.TRG_UNIT)
     buildQueue1 = Member(0x098, MemberKind.TRG_UNIT)
-    buildQ2 = Member(0x09A, MemberKind.TRG_UNIT)
     buildQueue2 = Member(0x09A, MemberKind.TRG_UNIT)
-    buildQ34 = Member(0x09C, MemberKind.DWORD)
-    buildQ3 = Member(0x09C, MemberKind.TRG_UNIT)
     buildQueue3 = Member(0x09C, MemberKind.TRG_UNIT)
-    buildQ4 = Member(0x09E, MemberKind.TRG_UNIT)
     buildQueue4 = Member(0x09E, MemberKind.TRG_UNIT)
-    buildQ5 = Member(0x0A0, MemberKind.TRG_UNIT)
     buildQueue5 = Member(0x0A0, MemberKind.TRG_UNIT)
+    buildQueue12 = Member(0x098, MemberKind.DWORD)
+    buildQueue34 = Member(0x09C, MemberKind.DWORD)
     energy = Member(0x0A2, MemberKind.WORD)
     buildQueueSlot = Member(0x0A4, MemberKind.BYTE)
     uniquenessIdentifier = Member(0x0A5, MemberKind.BYTE)
     targetOrderSpecial = Member(0x0A5, MemberKind.BYTE)
-    secondaryOrder = Member(0x0A6, MemberKind.BYTE)
-    secondaryOrderID = Member(0x0A6, MemberKind.BYTE)
+    secondaryOrder = Member(0x0A6, MemberKind.UNIT_ORDER)
+    secondaryOrderID = Member(0x0A6, MemberKind.UNIT_ORDER)
     buildingOverlayState = Member(0x0A7, MemberKind.BYTE)
     hpGain = Member(0x0A8, MemberKind.WORD)  # buildRepairHpGain
     shieldGain = Member(0x0AA, MemberKind.WORD)
@@ -173,20 +169,24 @@ class CUnit(EPDOffsetMap):
     loadedUnitIndex5 = UnsupportedMember(0x0BA, MemberKind.WORD)
     loadedUnitIndex6 = UnsupportedMember(0x0BC, MemberKind.WORD)
     loadedUnitIndex7 = UnsupportedMember(0x0BE, MemberKind.WORD)
-    mineCount = Member(0x0C0, MemberKind.BYTE)  # 0x0C0 union, vulture
+    # union (0xC0 ~ 0xCF) //==================================
+    # vulture
     spiderMineCount = Member(0x0C0, MemberKind.BYTE)
-    pInHanger = CUnitMember(0x0C0)
-    pOutHanger = CUnitMember(0x0C4)
-    inHangerCount = Member(0x0C8, MemberKind.BYTE)
-    outHangerCount = Member(0x0C9, MemberKind.BYTE)  # carrier
+    # carrier, reaver
+    inHangarChild = CUnitMember(0x0C0)
+    outHangarChild = CUnitMember(0x0C4)
+    inHangarCount = Member(0x0C8, MemberKind.BYTE)
+    outHangarCount = Member(0x0C9, MemberKind.BYTE)
+    # interceptor, scarab
     parent = CUnitMember(0x0C0)
     prevFighter = CUnitMember(0x0C4)
     nextFighter = CUnitMember(0x0C8)
-    inHanger = Member(0x0CC, MemberKind.BOOL)
-    isOutsideHangar = Member(0x0CC, MemberKind.BOOL)  # fighter
-    _unknown_00 = Member(0x0C0, MemberKind.DWORD)
-    _unknown_04 = Member(0x0C4, MemberKind.DWORD)
+    isOutsideHangar = Member(0x0CC, MemberKind.BOOL)
+    # beacon
+    _beacon_unknown_0xC0 = Member(0x0C0, MemberKind.DWORD)
+    _beacon_unknown_0xC4 = Member(0x0C4, MemberKind.DWORD)
     flagSpawnFrame = Member(0x0C8, MemberKind.DWORD)  # beacon
+    # building /==============================================
     addon = CUnitMember(0x0C0)
     addonBuildType = Member(0x0C4, MemberKind.TRG_UNIT)
     upgradeResearchTime = Member(0x0C6, MemberKind.WORD)
@@ -196,7 +196,9 @@ class CUnit(EPDOffsetMap):
     landingTimer = Member(0x0CB, MemberKind.BYTE)
     creepTimer = Member(0x0CC, MemberKind.BYTE)
     upgradeLevel = Member(0x0CD, MemberKind.BYTE)
-    __E = Member(0x0CE, MemberKind.WORD)  # building
+    # _padding_CE
+    # ==============================================/ building
+    # worker
     pPowerup = CUnitMember(0x0C0)
     targetResourcePosition = Member(0x0C4, MemberKind.POSITION)
     targetResourceX = Member(0x0C4, MemberKind.WORD)
@@ -230,42 +232,50 @@ class CUnit(EPDOffsetMap):
     prevHarvestUnit = CUnitMember(0x0D4)
     nextHarvestUnit = CUnitMember(0x0D8)  # gatherer
     statusFlags = Member(0x0DC, MemberKind.DWORD)
+    # Type of resource chunk carried by this worker.
+    # None = 0x00,
+    # Vespene = 0x01,
+    # Minerals = 0x02,
+    # GasOrMineral = 0x03,
+    # PowerUp = 0x04
     resourceType = Member(0x0E0, MemberKind.BYTE)
     wireframeRandomizer = Member(0x0E1, MemberKind.BYTE)
     secondaryOrderState = Member(0x0E2, MemberKind.BYTE)
+    # Counts down from 15 to 0 when most orders are given, or when the unit moves after reaching a patrol location
     recentOrderTimer = Member(0x0E3, MemberKind.BYTE)
     # which players can detect this unit (cloaked/burrowed)
     visibilityStatus = Member(0x0E4, MemberKind.DWORD)
-    secondaryOrderPosition = Member(0x0E8, MemberKind.POSITION)
-    secondaryOrderX = Member(0x0E8, MemberKind.WORD)
-    secondaryOrderY = Member(0x0EA, MemberKind.WORD)
+    secondaryOrderPos = Member(0x0E8, MemberKind.POSITION)
+    secondaryOrderX = Member(0x0E8, MemberKind.POSITION_X)
+    secondaryOrderY = Member(0x0EA, MemberKind.POSITION_Y)
     currentBuildUnit = CUnitMember(0x0EC)
-    previousBurrowedUnit = UnsupportedMember(0x0F0)
-    nextBurrowedUnit = UnsupportedMember(0x0F4)
+    prevBurrowedUnit = UnsupportedMember(0x0F0, MemberKind.C_UNIT)
+    nextBurrowedUnit = UnsupportedMember(0x0F4, MemberKind.C_UNIT)
     rallyXY = Member(0x0F8, MemberKind.POSITION)
     rallyPosition = Member(0x0F8, MemberKind.POSITION)
     rallyX = Member(0x0F8, MemberKind.WORD)
     rallyY = Member(0x0FA, MemberKind.WORD)
     rallyUnit = CUnitMember(0x0FC)
-    prevPsiProvider = CUnitMember(0x0F8)
+    prevPsiProvider = CUnitMember(0x0F8)  # not supported?
     nextPsiProvider = CUnitMember(0x0FC)
     path = UnsupportedMember(0x100, MemberKind.DWORD)
     pathingCollisionInterval = Member(0x104, MemberKind.BYTE)
+    # 0x01 = uses pathing; 0x02 = ?; 0x04 = ?
     pathingFlags = Member(0x105, MemberKind.BYTE)
     _unused_0x106 = Member(0x106, MemberKind.BYTE)
+    # 1 if a medic is currently healing this unit
     isBeingHealed = Member(0x107, MemberKind.BOOL)
+    # A rect that specifies the closest contour (collision) points
     contourBoundsLU = UnsupportedMember(0x108, MemberKind.DWORD)
     contourBoundsL = UnsupportedMember(0x108, MemberKind.WORD)
     contourBoundsU = UnsupportedMember(0x10A, MemberKind.WORD)
     contourBoundsRB = UnsupportedMember(0x10C, MemberKind.DWORD)
     contourBoundsR = UnsupportedMember(0x10C, MemberKind.WORD)
     contourBoundsB = UnsupportedMember(0x10E, MemberKind.WORD)
+    # Hallucination, Dark Swarm, Disruption Web, Broodling (but not Scanner Sweep according to BWAPI)
     removeTimer = Member(0x110, MemberKind.WORD)
-    matrixDamage = Member(0x112, MemberKind.WORD)
-    defenseMatrixDamage = Member(0x112, MemberKind.WORD)
     defensiveMatrixHp = Member(0x112, MemberKind.WORD)
-    matrixTimer = Member(0x114, MemberKind.BYTE)
-    defenseMatrixTimer = Member(0x114, MemberKind.BYTE)
+    defensiveMatrixTimer = Member(0x114, MemberKind.BYTE)
     stimTimer = Member(0x115, MemberKind.BYTE)
     ensnareTimer = Member(0x116, MemberKind.BYTE)
     lockdownTimer = Member(0x117, MemberKind.BYTE)
@@ -273,15 +283,18 @@ class CUnit(EPDOffsetMap):
     stasisTimer = Member(0x119, MemberKind.BYTE)
     plagueTimer = Member(0x11A, MemberKind.BYTE)
     stormTimer = Member(0x11B, MemberKind.BYTE)
+    # Used to tell if a unit is under psi storm	(is "stormTimer" in BWAPI)
     isUnderStorm = Member(0x11B, MemberKind.BYTE)
     irradiatedBy = CUnitMember(0x11C)
     irradiatePlayerID = Member(0x120, MemberKind.BYTE)
+    # Each bit corrisponds to the player who has parasited this unit
     parasiteFlags = Member(0x121, MemberKind.BYTE)
+    # counts/cycles up from 0 to 7 (inclusive). See also 0x85
     cycleCounter = Member(0x122, MemberKind.BYTE)
-    isBlind = Member(0x123, MemberKind.BYTE)
+    isBlind = Member(0x123, MemberKind.BYTE)  # is bool in BWAPI
     blindFlags = Member(0x123, MemberKind.BYTE)
     maelstromTimer = Member(0x124, MemberKind.BYTE)
-    _unused_0x125 = Member(0x125, MemberKind.BYTE)
+    # Might be afterburner timer or ultralisk roar timer
     unusedTimer = Member(0x125, MemberKind.BYTE)
     acidSporeCount = Member(0x126, MemberKind.BYTE)
     acidSporeTime0 = Member(0x127, MemberKind.BYTE)
@@ -293,7 +306,7 @@ class CUnit(EPDOffsetMap):
     acidSporeTime6 = Member(0x12D, MemberKind.BYTE)
     acidSporeTime7 = Member(0x12E, MemberKind.BYTE)
     acidSporeTime8 = Member(0x12F, MemberKind.BYTE)
-    bulletBehaviour3by3AttackSequence = UnsupportedMember(0x130, MemberKind.WORD)
+    # Cycles between 0-12 for each bullet fired by this unit (if it uses a "Attack 3x3 area" weapon)
     offsetIndex3by3 = UnsupportedMember(0x130, MemberKind.WORD)
     _padding_0x132 = UnsupportedMember(0x132, MemberKind.WORD)
     pAI = UnsupportedMember(0x134, MemberKind.DWORD)
@@ -303,14 +316,11 @@ class CUnit(EPDOffsetMap):
     finderIndexRight = UnsupportedMember(0x140, MemberKind.DWORD)
     finderIndexTop = UnsupportedMember(0x144, MemberKind.DWORD)
     finderIndexBottom = UnsupportedMember(0x148, MemberKind.DWORD)
-    repulseUnknown = Member(0x14C, MemberKind.BYTE)
+    repulseUnknown = Member(0x14C, MemberKind.BYTE)  # updated only when air unit is being pushed
     repulseAngle = Member(0x14D, MemberKind.BYTE)
-    driftPos = Member(0x14E, MemberKind.WORD)
-    bRepMtxXY = Member(0x14E, MemberKind.WORD)  # mapsizex / 1.5 max
-    bRepMtxX = Member(0x14E, MemberKind.BYTE)
-    bRepMtxY = Member(0x14F, MemberKind.BYTE)
-    driftPosX = Member(0x14E, MemberKind.BYTE)
-    driftPosY = Member(0x14F, MemberKind.BYTE)
+    driftPos = Member(0x14E, MemberKind.WORD)  # (mapsizex / 1.5 max)
+    driftX = Member(0x14E, MemberKind.BYTE)
+    driftY = Member(0x14F, MemberKind.BYTE)
 
     def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
         """EPD Constructor of CUnit. Use CUnit.from_ptr(ptr) for ptr value"""
@@ -323,18 +333,18 @@ class CUnit(EPDOffsetMap):
             u, p = ut.unProxy(epd), ut.unProxy(ptr)
             if isinstance(u, int):
                 if p is not None and not isinstance(p, int):
-                    raise ut.EPError(_("Invalid input for EPDCUnitMap: {}").format((epd, ptr)))
+                    raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
                 q, r = divmod(u - ut.EPD(0x59CCA8), 84)  # check epd
                 if r == 0 and 0 <= q < 1700:
                     _epd, self._ptr = u, 0x59CCA8 + 336 * q
                 else:
-                    raise ut.EPError(_("Invalid input for EPDCUnitMap: {}").format((epd, ptr)))
+                    raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
             elif isinstance(u, c.EUDVariable):
                 if p is not None and not isinstance(p, c.EUDVariable):
-                    raise ut.EPError(_("Invalid input for EPDCUnitMap: {}").format((epd, ptr)))
+                    raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
                 _epd, self._ptr = u, p
             else:
-                raise ut.EPError(_("Invalid input for EPDCUnitMap: {}").format((epd, ptr)))
+                raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
 
         super().__init__(_epd)
 

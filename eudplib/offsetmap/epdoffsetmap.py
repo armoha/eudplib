@@ -8,7 +8,7 @@
 from abc import ABCMeta, abstractmethod
 from collections.abc import Mapping
 import enum
-from typing import cast, ClassVar, Final, Literal, NoReturn, TYPE_CHECKING
+from typing import cast, ClassVar, Final, Literal, NoReturn, TypeAlias, TypeVar, TYPE_CHECKING
 
 from .. import core as c
 from .. import ctrlstru as cs
@@ -50,11 +50,12 @@ class MemberKind(enum.Enum):
     C_SPRITE = enum.auto()
     TRG_UNIT = enum.auto()
     TRG_PLAYER = enum.auto()
-    ORDER = enum.auto()
+    UNIT_ORDER = enum.auto()
     POSITION = enum.auto()
     POSITION_X = enum.auto()
     POSITION_Y = enum.auto()
     FLINGY = enum.auto()
+    SPRITE = enum.auto()
     UPGRADE = enum.auto()
     TECH = enum.auto()
 
@@ -66,10 +67,12 @@ class MemberKind(enum.Enum):
                 return c.EncodeUnit(other)
             case MemberKind.TRG_PLAYER:
                 return c.EncodePlayer(other)
-            case MemberKind.ORDER:
+            case MemberKind.UNIT_ORDER:
                 return c.EncodeUnitOrder(other)
             case MemberKind.FLINGY:
                 return c.EncodeFlingy(other)
+            case MemberKind.SPRITE:
+                return c.EncodeSprite(other)
             case MemberKind.UPGRADE:
                 return c.EncodeUpgrade(other)
             case MemberKind.TECH:
@@ -212,6 +215,29 @@ class CUnitMember(BaseMember):
 
         q, r = divmod(self.offset, 4)
         if isinstance(value, CUnit):
+            value = value.ptr
+        if isinstance(instance, EPDOffsetMap):
+            self.kind.write_epd(instance._epd + q, r, value)
+            return
+        raise AttributeError
+
+
+class CSpriteMember(BaseMember):
+    """Descriptor for EPDOffsetMap"""
+
+    __slots__ = ()
+
+    def __init__(self, offset: int) -> None:
+        super().__init__(offset, MemberKind.C_SPRITE)
+
+    def __get__(self, instance, owner=None) -> "CSprite":
+        if isinstance(instance, EPDOffsetMap):
+            return CSprite.from_read(instance._epd + self.offset // 4)
+        raise AttributeError
+
+    def __set__(self, instance, value) -> None:
+        q, r = divmod(self.offset, 4)
+        if isinstance(value, CSprite):
             value = value.ptr
         if isinstance(instance, EPDOffsetMap):
             self.kind.write_epd(instance._epd + q, r, value)
@@ -432,3 +458,97 @@ def PtrCache(epd: c.EUDVariable) -> c.EUDVariable:
     skip << c.RawTrigger(actions=c.SetNextPtr(check, update))
     end << c.NextTrigger()
     return ptr
+
+
+T = TypeVar("T", bound="CUnit")
+int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
+
+
+class CSprite(EPDOffsetMap):
+    __slots__ = "_ptr"
+
+    prev = CSpriteMember(0x00)
+    next = CSpriteMember(0x04)
+    sprite = Member(0x08, MemberKind.SPRITE)
+    player = Member(0x0A, MemberKind.TRG_PLAYER)  # officially "creator"
+    # 0 <= selectionIndex <= 11. Index in the selection area at bottom of screen.
+    selectionIndex = Member(0x0B, MemberKind.BYTE)
+    # Player bits indicating the visibility for a player (not hidden by the fog-of-war)
+    visibilityFlags = Member(0x0C, MemberKind.BYTE)
+    elevationLevel = Member(0x0D, MemberKind.BYTE)
+    # 0x01  Draw selection circle.
+    # 0x02  Ally selection?
+    # 0x04  Ally selection?
+    # 0x08  Draw HP bar, Selected
+    # 0x10
+    # 0x20  Hidden
+    # 0x40  Burrowed
+    # 0x80  Iscript unbreakable code section.
+    flags = Member(0x0E, MemberKind.BYTE)
+    selectionTimer = Member(0x0F, MemberKind.BYTE)
+    index = Member(0x10, MemberKind.WORD)
+    unkflags_12 = Member(0x12, MemberKind.BYTE)
+    unkflags_13 = Member(0x13, MemberKind.BYTE)
+    position = Member(0x14, MemberKind.POSITION)
+    mainGraphic = Member(0x18, MemberKind.DWORD)  # officially "pImagePrimary"
+    imageHead = Member(0x1C, MemberKind.DWORD)
+    imageTail = Member(0x20, MemberKind.DWORD)
+
+    def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
+        """EPD Constructor of CSprite. Use CSprite.from_ptr(ptr) for ptr value"""
+        _epd: int | c.EUDVariable
+        self._ptr: int | c.EUDVariable | None
+
+        if isinstance(epd, CSprite):
+            _epd, self._ptr = epd._epd, epd._ptr
+        else:
+            u, p = ut.unProxy(epd), ut.unProxy(ptr)
+            if isinstance(u, int):
+                if p is not None and not isinstance(p, int):
+                    raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+                q, r = divmod(u - ut.EPD(0x59CCA8), 84)  # check epd
+                if r == 0 and 0 <= q < 1700:
+                    _epd, self._ptr = u, 0x59CCA8 + 336 * q
+                else:
+                    raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+            elif isinstance(u, c.EUDVariable):
+                if p is not None and not isinstance(p, c.EUDVariable):
+                    raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+                _epd, self._ptr = u, p
+            else:
+                raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+
+        super().__init__(_epd)
+
+    @classmethod
+    def cast(cls: type[T], _from: int_or_var) -> T:
+        return cls(_from)
+
+    @classmethod
+    def from_ptr(cls: type[T], ptr: int_or_var) -> T:
+        epd: int | c.EUDVariable
+        u = ut.unProxy(ptr)
+        # check ptr
+        if isinstance(u, int):
+            q, r = divmod(u - 0x59CCA8, 336)
+            if r == 0 and 0 <= q < 1700:
+                epd = ut.EPD(u)
+            else:
+                raise ut.EPError(_("Invalid input for EPDCUnitMap: {}").format(ptr))
+        elif isinstance(u, c.EUDVariable):
+            epd = EPDCache(u)
+        else:
+            raise ut.EPError(_("Invalid input for EPDCUnitMap: {}").format(epd))
+
+        return cls(epd, ptr=u)
+
+    @classmethod
+    def from_read(cls: type[T], epd) -> T:
+        _ptr, _epd = f_spriteepdread_epd(epd)
+        return cls(_epd, ptr=_ptr)
+
+    @property
+    def ptr(self) -> int | c.EUDVariable:
+        if self._ptr is not None:
+            return self._ptr
+        return PtrCache(cast(c.EUDVariable, self._epd))
