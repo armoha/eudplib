@@ -35,6 +35,7 @@ from ..eudlib.memiof import (
     f_wsubtract_epd,
     f_wwrite_epd,
 )
+from ..eudlib.memiof.memifgen import _mapXYmask
 
 if TYPE_CHECKING:
     from .cunit import CUnit
@@ -99,9 +100,11 @@ class MemberKind(enum.Enum):
             case MemberKind.TRG_UNIT | MemberKind.FLINGY:
                 return f_bread_epd(epd, subp)
             case MemberKind.POSITION:
-                return f_maskread_epd(epd, 0x1FFF1FFF)
-            case MemberKind.POSITION_X | MemberKind.POSITION_Y:
-                return f_maskread_epd(epd, 0x1FFF << (8 * subp))
+                return f_maskread_epd(epd, (lambda x, y: x + 65536 * y)(*_mapXYmask()))
+            case MemberKind.POSITION_X:
+                return f_maskread_epd(epd, _mapXYmask()[0] << (8 * subp))
+            case MemberKind.POSITION_Y:
+                return f_maskread_epd(epd, _mapXYmask()[1] << (8 * subp))
             case _:
                 match self.size:
                     case 4:
@@ -460,7 +463,7 @@ def PtrCache(epd: c.EUDVariable) -> c.EUDVariable:
     return ptr
 
 
-T = TypeVar("T", bound="CUnit")
+T = TypeVar("T", bound="CSprite")
 int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
 
 

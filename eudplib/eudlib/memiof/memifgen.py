@@ -122,7 +122,7 @@ def f_readgen_cp(mask, *args, docstring=None, _fdict={}, _check_empty=False):
     return _subfdict[key]
 
 
-def _getMapSize():
+def _mapXYmask():
     from ...core.mapdata import GetChkTokenized
 
     chkt = GetChkTokenized()
@@ -131,7 +131,7 @@ def _getMapSize():
     x, y = (x - 1).bit_length(), (y - 1).bit_length()
     x = 2 ** (x + 5) - 1
     y = 2 ** (y + 5) - 1
-    return x + y * 0x10000
+    return x, y
 
 
 f_cunitread_epd = f_readgen_epd(0x3FFFF0, (0x400008, lambda x: x), _check_empty=True)
@@ -184,7 +184,7 @@ def _posread_epd():
     f = getattr(_posread_epd, "f", None)
     if f is None:
         f = f_readgen_epd(
-            _getMapSize(),
+            (lambda x, y: x + 65536 * y)(*_mapXYmask()),
             (0, lambda x: x if x <= 0xFFFF else 0),
             (0, lambda y: y >> 16),
         )
@@ -200,7 +200,7 @@ def f_posread_cp(cpoffset, **kwargs):
     _rf = getattr(f_posread_cp, "_rf", None)
     if _rf is None:
         _rf = f_readgen_cp(
-            _getMapSize(),
+            (lambda x, y: x + 65536 * y)(*_mapXYmask()),
             (0, lambda x: x if x <= 0xFFFF else 0),
             (0, lambda y: y >> 16),
         )

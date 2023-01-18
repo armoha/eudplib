@@ -6,7 +6,7 @@
 # Please see the LICENSE file that should have been included as part of this package.
 
 from collections.abc import Mapping
-from typing import cast, ClassVar
+from typing import cast, ClassVar, TypeVar
 
 from .. import core as c
 from .. import ctrlstru as cs
@@ -29,9 +29,10 @@ from .epdoffsetmap import (
     UnsupportedMember,
     EPDCache,
     PtrCache,
-    T,
     int_or_var,
 )
+
+T = TypeVar("T", bound="CUnit")
 
 
 class CUnit(EPDOffsetMap):
@@ -287,7 +288,7 @@ class CUnit(EPDOffsetMap):
     isUnderStorm = Member(0x11B, MemberKind.BYTE)
     irradiatedBy = CUnitMember(0x11C)
     irradiatePlayerID = Member(0x120, MemberKind.BYTE)
-    # Each bit corrisponds to the player who has parasited this unit
+    # Each bit corresponds to the player who has parasited this unit
     parasiteFlags = Member(0x121, MemberKind.BYTE)
     # counts/cycles up from 0 to 7 (inclusive). See also 0x85
     cycleCounter = Member(0x122, MemberKind.BYTE)
