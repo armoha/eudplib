@@ -5,32 +5,78 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from collections.abc import Mapping
-from typing import cast, ClassVar, TypeVar
+from typing import cast, TypeVar
 
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
 from ..localize import _
-from ..eudlib.locf import f_setloc_epd
-from ..eudlib.memiof import (
-    f_bwrite_epd,
-    f_cunitepdread_epd,
-    f_maskwrite_epd,
-    f_spriteepdread_epd,
-)
-from ..eudlib.utilf.unlimiterflag import IsUnlimiterOn
 from .epdoffsetmap import (
+    EPDOffsetMap,
+    EPDCache,
+    PtrCache,
+)
+from .member import (
     CUnitMember,
     CSpriteMember,
     MemberKind,
     Member,
-    EPDOffsetMap,
     UnsupportedMember,
-    EPDCache,
-    PtrCache,
-    int_or_var,
+    EnumMember,
+    Flag,
 )
+from .csprite import int_or_var
+
+
+class MovementFlags(EnumMember):
+    OrderedAtLeastOnce = Flag(0x01)
+    Accelerating = Flag(0x02)
+    Braking = Flag(0x04)
+    StartingAttack = Flag(0x08)
+    Moving = Flag(0x10)
+    Lifted = Flag(0x20)
+    Unknown = Flag(0x40)
+    AlwaysZero = Flag(0x80)
+    HoverUnit = Flag(0xC1)
+
+
+class StatusFlags(EnumMember):
+    Completed = Flag(0x00000001)
+    GroundedBuilding = Flag(0x00000002)  # a building that is on the ground
+    InAir = Flag(0x00000004)
+    Disabled = Flag(0x00000008)  # Protoss Unpowered
+    Burrowed = Flag(0x00000010)
+    InBuilding = Flag(0x00000020)
+    InTransport = Flag(0x00000040)
+    CanBeChased = Flag(0x00000080)
+    RequiresDetection = Flag(0x00000100)
+    Cloaked = Flag(0x00000200)
+    DoodadStatesThing = Flag(0x00000400)  # protoss unpowered buildings have this flag set
+    CloakingForFree = Flag(0x00000800)  # Requires no energy to cloak
+    CanNotReceiveOrders = Flag(0x00001000)
+    NoBrkCodeStart = Flag(0x00002000)  # Unbreakable code section in iscript
+    UNKNOWN2 = Flag(0x00004000)
+    CanNotAttack = Flag(0x00008000)
+    CanTurnAroundToAttack = Flag(0x00010000)  # canAttack? named IsAUnit in BWAPI
+    IsBuilding = Flag(0x00020000)
+    IgnoreTileCollision = Flag(0x00040000)
+    Unmovable = Flag(0x00080000)
+    IsNormal = Flag(0x00100000)  # 1 for "normal" units, 0 for hallucinated units
+    # if set, other units wont collide with the unit (like burrowed units)
+    NoCollide = Flag(0x00200000)
+    UNKNOWN5 = Flag(0x00400000)
+    # if set, the unit wont collide with other units (like workers gathering)
+    IsGathering = Flag(0x00800000)
+    UNKNOWN6 = Flag(0x01000000)
+    UNKNOWN7 = Flag(0x02000000)  # Turret related
+    Invincible = Flag(0x04000000)
+    HoldingPosition = Flag(0x08000000)  # Set if the unit is currently holding position
+    SpeedUpgrade = Flag(0x10000000)
+    CooldownUpgrade = Flag(0x20000000)
+    IsHallucination = Flag(0x40000000)  # 1 for hallucinated units, 0 for "normal" units
+    # Set for when the unit is self-destructing (scarab, scourge, infested terran)
+    IsSelfDestructing = Flag(0x80000000)
+
 
 T = TypeVar("T", bound="CUnit")
 
@@ -54,7 +100,7 @@ class CUnit(EPDOffsetMap):
     nextMovementWaypoint = Member(0x018, MemberKind.POSITION)
     # The desired position
     nextTargetWaypoint = Member(0x01C, MemberKind.POSITION)
-    movementFlags = Member(0x020, MemberKind.BYTE)
+    movementFlags = MovementFlags(0x020, MemberKind.BYTE)
     # current direction the unit is facing
     currentDirection1 = Member(0x021, MemberKind.BYTE)
     turnRadius = Member(0x022, MemberKind.BYTE)  # flingy
@@ -82,6 +128,7 @@ class CUnit(EPDOffsetMap):
     playerID = Member(0x04C, MemberKind.TRG_PLAYER)
     owner = Member(0x04C, MemberKind.TRG_PLAYER)
     orderID = Member(0x04D, MemberKind.UNIT_ORDER)
+    order = Member(0x04D, MemberKind.UNIT_ORDER)
     orderState = Member(0x04E, MemberKind.BYTE)
     orderSignal = Member(0x04F, MemberKind.BYTE)
     orderUnitType = Member(0x050, MemberKind.TRG_UNIT)
@@ -233,7 +280,7 @@ class CUnit(EPDOffsetMap):
     powerupOriginY = Member(0x0D2, MemberKind.POSITION_Y)  # powerup
     powerupCarryingUnit = CUnitMember(0x0D4)
     # \\\\\\\\\\\\\\\=================================// union
-    statusFlags = Member(0x0DC, MemberKind.DWORD)
+    statusFlags = StatusFlags(0x0DC, MemberKind.DWORD)
     # Type of resource chunk carried by this worker.
     # None = 0x00,
     # Vespene = 0x01,
@@ -373,6 +420,8 @@ class CUnit(EPDOffsetMap):
 
     @classmethod
     def from_read(cls: type[T], epd) -> T:
+        from ..eudlib.memiof import f_cunitepdread_epd
+
         _ptr, _epd = f_cunitepdread_epd(epd)
         return cls(_epd, ptr=_ptr)
 
@@ -383,6 +432,8 @@ class CUnit(EPDOffsetMap):
         return PtrCache(cast(c.EUDVariable, self._epd))
 
     def set_color(self, player) -> None:
+        from ..eudlib.memiof import f_bwrite_epd, f_spriteepdread_epd
+
         player = c.EncodePlayer(player)
         color_epd = c.EUDVariable()
         sprite_epd = self._epd + 0x00C // 4
@@ -404,12 +455,14 @@ class CUnit(EPDOffsetMap):
         return c.MemoryXEPD(self._epd + 0x0DC // 4, c.Exactly, value, mask)
 
     def set_status_flag(self, value, mask=None) -> None:
+        from ..eudlib.memiof import f_maskwrite_epd
+
         if mask is None:
             mask = value
         f_maskwrite_epd(self._epd + 0x0DC // 4, value, mask)
 
     def clear_status_flag(self, mask) -> None:
-        f_maskwrite_epd(self._epd + 0x0DC // 4, 0, mask)
+        self.set_status_flag(0, mask)
 
     def reset_buildq(self, Q1=0xE4) -> None:
         self.buildQ12 = 0xE40000 + Q1
@@ -465,8 +518,14 @@ class CUnit(EPDOffsetMap):
         self.clear_status_flag(0x00100000)
 
     def is_dying(self) -> tuple[c.Condition, c.Condition]:
+        from ..eudlib.utilf.unlimiterflag import IsUnlimiterOn
+
         ut.ep_assert(not IsUnlimiterOn(), "Can't detect unit dying with [unlimiter]")
-        return (self.order == 0, self.sprite >= 1)
+        # return (self.order == 0, self.sprite >= 1)
+        return (
+            c.MemoryXEPD(self._epd + 0x4D // 4, c.Exactly, 0, 0xFF00),
+            c.MemoryEPD(self._epd + 0x0C // 4, c.AtLeast, 1),
+        )
 
     def is_completed(self) -> c.Condition:
         return self.check_status_flag(0x00000001)
@@ -487,6 +546,8 @@ class CUnit(EPDOffsetMap):
         return self.check_status_flag(0x00000010)
 
     def setloc(self, location) -> None:
+        from ..eudlib.locf import f_setloc_epd
+
         f_setloc_epd(location, self._epd + 0x28 // 4)
 
 
