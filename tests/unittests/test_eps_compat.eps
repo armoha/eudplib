@@ -21,5 +21,6 @@ with expect_eperror():\n\
     cond.__lshift__(Memory(empty, AtLeast, 1));
     if (cond) { ret += 1 << 3; }
     ret += x;
+    if(Is64BitWireframe()) {}
     return ret;
 }
