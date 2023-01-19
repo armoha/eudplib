@@ -8,6 +8,7 @@ _sys.path.insert(1, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "
 
 
 from eudplib import *
+from eudplib.eudlib.utilf.datadumper import _add_datadumper
 
 _testFailed = EUDLightVariable()
 _failedTest = EUDArray(1024)

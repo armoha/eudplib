@@ -52,7 +52,6 @@ def _MainStarter(mf: Callable) -> c.Forward:
         _f_inituserplayerid()
         _f_initisusercp()
         _f_initstacktrace()
-        _f_datadumper()
 
         for func in startFunctionList1:
             func()
@@ -60,6 +59,7 @@ def _MainStarter(mf: Callable) -> c.Forward:
         start2 = c.Forward()
         c.SetNextTrigger(start2)
 
+        _f_datadumper()
         mf_start = c.NextTrigger()
         mf()
 
