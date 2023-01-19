@@ -12,7 +12,6 @@ from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
 from ...eudlib.utilf.userpl import _f_initisusercp, _f_inituserplayerid
-from ...eudlib.utilf.datadumper import _f_datadumper
 from ...localize import _
 from ...utils import EPError, ep_assert
 
@@ -59,7 +58,6 @@ def _MainStarter(mf: Callable) -> c.Forward:
         start2 = c.Forward()
         c.SetNextTrigger(start2)
 
-        _f_datadumper()
         mf_start = c.NextTrigger()
         mf()
 
