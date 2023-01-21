@@ -82,8 +82,6 @@ T = TypeVar("T", bound="CUnit")
 
 
 class CUnit(EPDOffsetMap):
-    __slots__ = "_ptr"
-
     # TODO: add docstring for descriptor
     prev = CUnitMember(0x000)
     next = CUnitMember(0x004)  # link

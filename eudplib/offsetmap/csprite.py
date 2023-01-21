@@ -29,8 +29,6 @@ int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
 
 
 class CSprite(EPDOffsetMap):
-    __slots__ = "_ptr"
-
     prev = CSpriteMember(0x00)
     next = CSpriteMember(0x04)
     sprite = Member(0x08, MemberKind.SPRITE)
