@@ -33,6 +33,10 @@ def f_test_compatibility():
         # (Line 23) ret += x;
     EUDEndIf()
     ret.__iadd__(x)
-    # (Line 24) return ret;
+    # (Line 24) if(Is64BitWireframe()) {}
+    if EUDIf()(Is64BitWireframe()):
+        # (Line 25) return ret;
+        pass
+    EUDEndIf()
     EUDReturn(ret)
-    # (Line 25) }
+    # (Line 26) }

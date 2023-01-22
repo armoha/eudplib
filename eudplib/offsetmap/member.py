@@ -76,12 +76,15 @@ class MemberKind(enum.Enum):
             f_epdspriteread_epd,
             f_maskread_epd,
             f_wread_epd,
+            f_readgen_epd,
         )
         from ..eudlib.memiof.memifgen import _mapXYmask
 
         match self:
             case MemberKind.BOOL:
-                return f_maskread_epd(epd, 1 << (8 * subp))
+                shift = 8 * subp
+                f_boolread_epd = f_readgen_epd(1 << shift, (0, lambda x: 1))
+                return f_boolread_epd(epd)
             case MemberKind.C_UNIT:
                 return f_cunitepdread_epd(epd)
             case MemberKind.C_SPRITE:
@@ -91,9 +94,13 @@ class MemberKind(enum.Enum):
             case MemberKind.POSITION:
                 return f_maskread_epd(epd, (lambda x, y: x + 65536 * y)(*_mapXYmask()))
             case MemberKind.POSITION_X:
-                return f_maskread_epd(epd, _mapXYmask()[0] << (8 * subp))
+                shift = 8 * subp
+                f_xread_epd = f_readgen_epd(_mapXYmask()[0] << shift, (0, lambda x: x >> shift))
+                return f_xread_epd(epd)
             case MemberKind.POSITION_Y:
-                return f_maskread_epd(epd, _mapXYmask()[1] << (8 * subp))
+                shift = 8 * subp
+                f_yread_epd = f_readgen_epd(_mapXYmask()[1] << shift, (0, lambda x: x >> shift))
+                return f_yread_epd(epd)
             case _:
                 match self.size:
                     case 4:
@@ -147,6 +154,7 @@ class BaseMember(metaclass=ABCMeta):
     kind: Final[MemberKind]
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
+        ut.ep_assert(offset % 4 + kind.size <= 4, _("Malaligned member"))
         self.offset = offset
         self.kind = kind
 
