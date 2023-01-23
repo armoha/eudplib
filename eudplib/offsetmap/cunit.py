@@ -373,24 +373,29 @@ class CUnit(EPDOffsetMap):
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
-        if isinstance(epd, CUnit):
-            _epd, self._ptr = epd._epd, epd._ptr
-        else:
+        if not isinstance(epd, CUnit):
             u, p = ut.unProxy(epd), ut.unProxy(ptr)
-            if isinstance(u, int):
-                if p is not None and not isinstance(p, int):
-                    raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
-                q, r = divmod(u - ut.EPD(0x59CCA8), 84)  # check epd
-                if r == 0 and 0 <= q < 1700:
-                    _epd, self._ptr = u, 0x59CCA8 + 336 * q
-                else:
-                    raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
-            elif isinstance(u, c.EUDVariable):
-                if p is not None and not isinstance(p, c.EUDVariable):
-                    raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
-                _epd, self._ptr = u, p
+        else:
+            u, p = epd._epd, epd._ptr
+        if isinstance(u, int):
+            if p is not None and not isinstance(p, int):
+                raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
+            q, r = divmod(u - ut.EPD(0x59CCA8), 84)  # check epd
+            if r == 0 and 0 <= q < 1700:
+                _epd, self._ptr = u, 0x59CCA8 + 336 * q
             else:
                 raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
+        elif isinstance(u, c.EUDVariable):
+            if p is not None:
+                if not isinstance(p, c.EUDVariable):
+                    raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
+                _epd, self._ptr = c.EUDCreateVariables(2)
+                c.SetVariables((_epd, self._ptr), (u, p))
+            else:
+                _epd = c.EUDVariable()
+                _epd << u
+        else:
+            raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
 
         super().__init__(_epd)
 
