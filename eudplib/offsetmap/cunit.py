@@ -431,7 +431,7 @@ class CUnit(EPDOffsetMap):
 
     @property
     def ptr(self) -> int | c.EUDVariable:
-        if self.__getattribute__("_ptr") is not None:
+        if self._ptr is not None:
             return self._ptr
         return PtrCache(cast(c.EUDVariable, self._epd))
 
