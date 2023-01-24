@@ -16,5 +16,6 @@ function test_cunit() {
     u.die();
     if (a[0x4C/4] == 0x12340007) ret += 64;
     if (u.is_dying()) ret += 128;
+    u.cgive(P1);
     return ret;
 }

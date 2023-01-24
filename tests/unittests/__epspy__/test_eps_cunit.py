@@ -50,7 +50,9 @@ def f_test_cunit():
     EUDEndIf()
     if EUDIf()(u.is_dying()):
         ret.__iadd__(128)
-        # (Line 19) return ret;
+        # (Line 19) u.cgive(P1);
     EUDEndIf()
+    u.cgive(P1)
+    # (Line 20) return ret;
     EUDReturn(ret)
-    # (Line 20) }
+    # (Line 21) }

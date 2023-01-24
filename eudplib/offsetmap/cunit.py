@@ -392,6 +392,7 @@ class CUnit(EPDOffsetMap):
                 _epd, self._ptr = c.EUDCreateVariables(2)
                 c.SetVariables((_epd, self._ptr), (u, p))
             else:
+                self._ptr = None
                 _epd = c.EUDVariable()
                 _epd << u
         else:
@@ -430,9 +431,12 @@ class CUnit(EPDOffsetMap):
 
     @property
     def ptr(self) -> int | c.EUDVariable:
-        if self._ptr is not None:
+        if self.__getattribute__("_ptr") is not None:
             return self._ptr
         return PtrCache(cast(c.EUDVariable, self._epd))
+
+    def cgive(self, player) -> None:
+        _cgive(self, player)
 
     def set_color(self, player) -> None:
         from ..eudlib.memiof import f_bwrite_epd, f_spriteepdread_epd
@@ -552,6 +556,45 @@ class CUnit(EPDOffsetMap):
         from ..eudlib.locf import f_setloc_epd
 
         f_setloc_epd(location, self._epd + 0x28 // 4)
+
+
+@c.EUDTypedFunc([CUnit, c.TrgPlayer])
+def _cgive(unit, new_owner):
+    from ..eudlib.memiof import f_dwwrite_epd
+
+    if cs.EUDIf()(unit.order == 0):
+        c.EUDReturn()
+    cs.EUDEndIf()
+    prev_owner = unit.owner
+    unit.owner = new_owner
+    if cs.EUDIf()(unit.subUnit >= 0x59CCA8):
+        unit.subUnit.owner = new_owner
+    cs.EUDEndIf()
+    prv, nxt = unit.prevPlayerUnit, unit.nextPlayerUnit
+    if cs.EUDIf()(prv == 0):
+        f_dwwrite_epd(ut.EPD(0x6283F8) + prev_owner, nxt.ptr)
+    if cs.EUDElse()():
+        unit.prevPlayerUnit = nxt
+    cs.EUDEndIf()
+    if cs.EUDIfNot()(nxt == 0):
+        unit.nextPlayerUnit = prv
+    cs.EUDEndIf()
+    new_header = ut.EPD(0x6283F8) + new_owner
+    ptr = unit.ptr
+    if cs.EUDIf()(c.MemoryEPD(new_header, c.AtLeast, 0x59CCA8)):
+        new_prev = CUnit.from_read(new_header)
+        new_next = new_prev.nextPlayerUnit
+        new_prev.nextPlayerUnit = ptr
+        unit.prevPlayerUnit = new_prev
+        unit.nextPlayerUnit = new_next
+        if cs.EUDIfNot()(new_next == 0):
+            new_next.prevPlayerUnit = ptr
+        cs.EUDEndIf()
+    if cs.EUDElse()():
+        f_dwwrite_epd(new_header, ptr)
+        unit.prevPlayerUnit = 0
+        unit.nextPlayerUnit = 0
+    cs.EUDEndIf()
 
 
 EPDCUnitMap = CUnit

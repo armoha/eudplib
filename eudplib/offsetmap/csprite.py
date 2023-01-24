@@ -74,6 +74,7 @@ class CSprite(EPDOffsetMap):
                 _epd, self._ptr = c.EUDCreateVariables(2)
                 c.SetVariables((_epd, self._ptr), (u, p))
             else:
+                self._ptr = None
                 _epd = c.EUDVariable()
                 _epd << u
         else:
