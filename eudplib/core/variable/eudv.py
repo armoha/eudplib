@@ -5,9 +5,10 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
+from collections.abc import Iterator
 import traceback
-from sys import getrefcount
-from typing import TYPE_CHECKING, TypeVar, overload
+import sys
+from typing import Any, TYPE_CHECKING, TypeVar, overload
 
 from ...localize import _
 from ...utils import (
@@ -66,9 +67,29 @@ def _ProcessDest(dest):
     return dest
 
 
-def IsRValue(obj) -> bool:
-    # FIXME: Can we handle wrapped (ExprProxy) variables?
-    return getrefcount(unProxy(obj)) == 3
+def _is_rvalue(obj: object, refcount: int = 3) -> bool:
+    if isinstance(obj, EUDVariable) and sys.getrefcount(obj) != refcount:
+        return False
+    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.getValue(), 4):
+        return False
+    return True
+
+
+def _yield_and_check_rvalue(
+    obj: Any, refcount: int = 3, is_rvalue: bool = True
+) -> Iterator[tuple[Any, bool]]:
+    is_rvalue &= sys.getrefcount(obj) == refcount
+    if isinstance(obj, ExprProxy):
+        return _yield_and_check_rvalue(obj.getValue(), 4, is_rvalue)
+    if isinstance(obj, EUDVariable):
+        yield obj, is_rvalue
+    elif isinstance(obj, (bytes, str)) or hasattr(obj, "dontFlatten"):
+        yield obj, False
+    else:
+        try:
+            return (_yield_and_check_rvalue(subobj, refcount + 2, is_rvalue) for subobj in obj)
+        except TypeError:  # obj is not iterable
+            yield obj, False
 
 
 # Unused variable don't need to be allocated.
@@ -291,23 +312,23 @@ class EUDVariable(VariableBase):
     # -------
 
     def __add__(self, other):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__iadd__(other)
-        if IsEUDVariable(other) and IsRValue(other):
+        if IsEUDVariable(other) and _is_rvalue(other):
             return other.__iadd__(self)
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
     def __radd__(self, other):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__iadd__(other)
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
     def __sub__(self, other):
-        if IsEUDVariable(other) and IsRValue(other):
+        if IsEUDVariable(other) and _is_rvalue(other):
             VProc(
                 self,  # -other += self
                 [
@@ -318,7 +339,7 @@ class EUDVariable(VariableBase):
                 ],
             )  # 1T 7A
             return other
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__isub__(other)
         t = EUDVariable()
         # FIXME: unsupported EUD error after EUDStruct.free() with IsConstExpr
@@ -341,7 +362,7 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rsub__(self, other):
-        if IsRValue(self) and IsConstExpr(other):
+        if _is_rvalue(self) and IsConstExpr(other):
             bt.RawTrigger(  # -self += other
                 actions=[
                     self.AddNumberX(0xFFFFFFFF, 0x55555555),
@@ -371,12 +392,12 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __neg__(self):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.ineg()
         return (0 - self).makeR()
 
     def __invert__(self):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.iinvert()
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, 0xFFFFFFFF), (t, bt.Subtract, self)])
@@ -403,9 +424,9 @@ class EUDVariable(VariableBase):
     # -------
 
     def __and__(self, other):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__iand__(other)
-        if IsEUDVariable(other) and IsRValue(other):
+        if IsEUDVariable(other) and _is_rvalue(other):
             return other.__iand__(self)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -424,7 +445,7 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rand__(self, other):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__iand__(other)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -443,9 +464,9 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __or__(self, other):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__ior__(other)
-        if IsEUDVariable(other) and IsRValue(other):
+        if IsEUDVariable(other) and _is_rvalue(other):
             return other.__ior__(self)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -458,7 +479,7 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __ror__(self, other):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__ior__(other)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -488,9 +509,9 @@ class EUDVariable(VariableBase):
         return self
 
     def __xor__(self, other):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__ixor__(other)
-        if IsEUDVariable(other) and IsRValue(other):
+        if IsEUDVariable(other) and _is_rvalue(other):
             return other.__ixor__(self)
         t = EUDVariable()
         if IsConstExpr(other):
@@ -510,7 +531,7 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rxor__(self, other):
-        if IsRValue(self):
+        if _is_rvalue(self):
             return self.__ixor__(other)
         t = EUDVariable()
         if IsConstExpr(other):

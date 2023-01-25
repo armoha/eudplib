@@ -18,7 +18,6 @@ from ..core import (
     SetVariables,
     f_bitlshift,
 )
-from ..core.variable.eudv import IsRValue
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
 from ..eudlib import EUDArray
 from ..maprw import EUDOnStart
@@ -464,9 +463,11 @@ def _L2V(l):  # logic to value
 
 
 def _LVAR(vs):
+    from ..core.variable.eudv import _yield_and_check_rvalue
+
     ret, ops = [], []
-    for v in FlattenList(vs):
-        if IsEUDVariable(v) and IsRValue(v):
+    for value, is_rvalue in _yield_and_check_rvalue(vs):
+        if IsEUDVariable(v) and is_rvalue:
             ret.append(v.makeL())
         else:
             nv = EUDVariable()
