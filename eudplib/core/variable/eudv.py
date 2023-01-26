@@ -80,14 +80,15 @@ def _yield_and_check_rvalue(
 ) -> Iterator[tuple[Any, bool]]:
     is_rvalue &= sys.getrefcount(obj) == refcount
     if isinstance(obj, ExprProxy):
-        return _yield_and_check_rvalue(obj.getValue(), 4, is_rvalue)
-    if isinstance(obj, EUDVariable):
+        yield from _yield_and_check_rvalue(obj.getValue(), 4, is_rvalue)
+    elif isinstance(obj, EUDVariable):
         yield obj, is_rvalue
     elif isinstance(obj, (bytes, str)) or hasattr(obj, "dontFlatten"):
         yield obj, False
     else:
         try:
-            return (_yield_and_check_rvalue(subobj, refcount + 2, is_rvalue) for subobj in obj)
+            for subobj in obj:
+                yield from _yield_and_check_rvalue(subobj, refcount + 2, is_rvalue)
         except TypeError:  # obj is not iterable
             yield obj, False
 
@@ -905,9 +906,21 @@ def NonSeqCompute(assignpairs):
 
 
 def SetVariables(srclist, dstlist, mdtlist=None):
+    errlist = []  # FIXME: replace to ExceptionGroup
+    is_srclist_rvalue = bool(sys.getrefcount(srclist) <= 3)
     srclist = FlattenList(srclist)
     dstlist = FlattenList(dstlist)
-    ep_assert(len(srclist) == len(dstlist), _("Input/output size mismatch"))
+    if len(srclist) != len(dstlist):
+        errlist.append(EPError(_("Input/output size mismatch")))
+    if is_srclist_rvalue:
+        for nth, src in enumerate(srclist):
+            src = unProxy(src)
+            if isinstance(src, EUDVariable) and sys.getrefcount(src) <= 5:
+                errlist.append(EPError(_("src{} is RValue variable").format(nth)))
+    if len(errlist) == 1:
+        raise EPError(errlist[0])
+    elif errlist:
+        raise EPError(errlist)
 
     if mdtlist is None:
         mdtlist = [bt.SetTo] * len(srclist)
