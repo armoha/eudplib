@@ -907,16 +907,16 @@ def NonSeqCompute(assignpairs):
 
 def SetVariables(srclist, dstlist, mdtlist=None):
     errlist = []  # FIXME: replace to ExceptionGroup
-    is_srclist_rvalue = bool(sys.getrefcount(srclist) <= 3)
+    if sys.getrefcount(srclist) == 3:
+        nth = 0
+        for src, is_rvalue in _yield_and_check_rvalue(srclist, 4):
+            if isinstance(src, EUDVariable) and is_rvalue:
+                errlist.append(EPError(_("src{} is RValue variable").format(nth)))
+            nth += 1
     srclist = FlattenList(srclist)
     dstlist = FlattenList(dstlist)
     if len(srclist) != len(dstlist):
         errlist.append(EPError(_("Input/output size mismatch")))
-    if is_srclist_rvalue:
-        for nth, src in enumerate(srclist):
-            src = unProxy(src)
-            if isinstance(src, EUDVariable) and sys.getrefcount(src) <= 5:
-                errlist.append(EPError(_("src{} is RValue variable").format(nth)))
     if len(errlist) == 1:
         raise EPError(errlist[0])
     elif errlist:
