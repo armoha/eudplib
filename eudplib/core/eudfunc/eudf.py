@@ -11,7 +11,7 @@ import inspect
 from ... import utils as ut
 from ...localize import _
 from ..rawtrigger import CurrentPlayer
-from ..variable import EUDVariable
+from ..variable import EUDVariable, IsEUDVariable
 from ..variable.evcommon import _ev
 from .eudtypedfuncn import EUDFullFuncN, EUDTypedFuncN, EUDXTypedFuncN, applyTypes
 
@@ -145,20 +145,23 @@ def _EUDPredefineReturn(*frets):
     3. Don't modify Dest in function body!
     4. No EUDFunc call in function body!
     """
-    while frets:
-        try:
-            ret = ut.FlattenList(_ev[slice(*frets)])
-            if ret:
-                frets = ret
-                break
-        except IndexError:
+    ut.ep_assert(frets)
+    if len(frets) <= 2 and all(isinstance(ret, int) for ret in frets):
+        while len(_ev) < max(frets):
             _ev.append(EUDVariable())
-        else:
-            _ev.append(EUDVariable())
+        rets = _ev[slice(*frets)]
+
+    elif all(IsEUDVariable(ret) for ret in frets):
+        rets = frets
+
+    else:
+        raise ut.EPError(_("Invalid return variable: {}").format(frets))
+
+    rets = ut.FlattenList(rets)
 
     def wrapper(f):
-        f._frets = frets
-        f._retn = len(frets)
+        f._frets = rets
+        f._retn = len(rets)
         return f
 
     return wrapper
