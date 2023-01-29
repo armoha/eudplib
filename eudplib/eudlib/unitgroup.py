@@ -5,6 +5,8 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
+from collections.abc import Iterator
+
 from ..core import (
     Add,
     AtLeast,
@@ -93,88 +95,6 @@ class UnitGroup:
         self.varray = varray
         self.trg = EUDVariable(self.varray + 72 * capacity)
         self.pos = EUDVariable(EPD(self.varray) + 87 + 18 * capacity)
-
-        class _CPLoop:
-            def __init__(self, parent):
-                self._parent = parent
-
-            def __iter__(self):
-                loopstart, pos, check_death = Forward(), Forward(), Forward()
-                trg, tpos, loopvar = (
-                    self._parent.trg,
-                    self._parent.pos,
-                    self._parent.loopvar,
-                )
-
-                VProc(
-                    [trg, tpos],
-                    [
-                        trg.SetDest(EPD(loopstart)),
-                        tpos.SetDest(EPD(pos)),
-                        SetNextPtr(loopvar.GetVTable(), check_death),
-                    ],
-                )
-
-                def reset_cp():
-                    PushTriggerScope()
-                    reset_nextptr = RawTrigger(
-                        actions=SetNextPtr(loopvar.GetVTable(), check_death)
-                    )
-                    PopTriggerScope()
-                    nextptr = Forward()
-                    RawTrigger(
-                        nextptr=loopvar.GetVTable(),
-                        actions=[
-                            SetNextPtr(loopvar.GetVTable(), reset_nextptr),
-                            SetNextPtr(reset_nextptr, nextptr),
-                        ],
-                    )
-                    nextptr << NextTrigger()
-
-                if _UnsafeWhileNot()(Memory(loopstart, AtLeast, varray + 72 * capacity)):
-                    block = EUDPeekBlock("whileblock")[1]
-                    PushTriggerScope()  # remove entry
-                    remove_end = Forward()
-                    remove_start = RawTrigger(
-                        nextptr=trg.GetVTable(),
-                        actions=[
-                            trg.SetDest(EPD(trg.GetVTable()) + 1),
-                            SetNextPtr(loopvar.GetVTable(), remove_end),
-                            loopvar.SetDest(0),  # pos가 이 액션의 값 칸
-                        ],
-                    )
-                    pos << remove_start + 328 + 32 * 2 + 20
-                    remove_end << RawTrigger(
-                        actions=[
-                            trg.AddNumber(72),
-                            tpos.AddNumber(18),
-                            loopvar.SetDest(EPD(0x6509B0)),
-                            SetNextPtr(loopvar.GetVTable(), check_death),
-                        ]
-                    )
-                    SetNextTrigger(block["contpoint"])
-                    PopTriggerScope()
-
-                    loopstart << block["loopstart"] + 4
-                    check_death << NextTrigger()
-
-                    def get_epd():
-                        ret = EUDVariable()
-                        VProc(loopvar, loopvar.SetDest(ret))
-                        DoActions(
-                            SetNextPtr(loopvar.GetVTable(), check_death),
-                            loopvar.SetDest(EPD(0x6509B0)),
-                            ret.SubtractNumber(19),
-                        )
-                        return ret
-
-                    # EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
-                    yield _CpHelper(0x4C // 4, reset_cp, remove_start, get_epd)
-                    EUDSetContinuePoint()
-                    DoActions(SetMemory(loopstart, Add, 72), SetMemory(pos, Add, 18))
-                EUDEndWhile()
-                ep_assert(pos.IsSet(), "unit.dying must be added")
-
         self.cploop = _CPLoop(self)
 
     def add(self, unit_epd):
@@ -205,44 +125,95 @@ class UnitGroup:
             )
 
 
-# TODO: Add EPDCUnitMap-like convenient methods
+class _CPLoop:
+    def __init__(self, parent):
+        self._parent = parent
+
+    def __iter__(self):
+        loopstart, pos, check_death = Forward(), Forward(), Forward()
+        trg, tpos, loopvar, varray, capacity = (
+            self._parent.trg,
+            self._parent.pos,
+            self._parent.loopvar,
+            self._parent.varray,
+            self._parent.capacity,
+        )
+        VProc(
+            [trg, tpos],
+            [
+                trg.SetDest(EPD(loopstart)),
+                tpos.SetDest(EPD(pos)),
+                SetNextPtr(loopvar.GetVTable(), check_death),
+            ],
+        )
+
+        def reset_cp():
+            PushTriggerScope()
+            reset_nextptr = RawTrigger(actions=SetNextPtr(loopvar.GetVTable(), check_death))
+            PopTriggerScope()
+            nextptr = Forward()
+            RawTrigger(
+                nextptr=loopvar.GetVTable(),
+                actions=[
+                    SetNextPtr(loopvar.GetVTable(), reset_nextptr),
+                    SetNextPtr(reset_nextptr, nextptr),
+                ],
+            )
+            nextptr << NextTrigger()
+
+        if _UnsafeWhileNot()(Memory(loopstart, AtLeast, varray + 72 * capacity)):
+            block = EUDPeekBlock("whileblock")[1]
+            PushTriggerScope()  # remove entry
+            remove_end = Forward()
+            remove_start = RawTrigger(
+                nextptr=trg.GetVTable(),
+                actions=[
+                    trg.SetDest(EPD(trg.GetVTable()) + 1),
+                    SetNextPtr(loopvar.GetVTable(), remove_end),
+                    loopvar.SetDest(0),  # pos가 이 액션의 값 칸
+                ],
+            )
+            pos << remove_start + 328 + 32 * 2 + 20
+            remove_end << RawTrigger(
+                actions=[
+                    trg.AddNumber(72),
+                    tpos.AddNumber(18),
+                    loopvar.SetDest(EPD(0x6509B0)),
+                    SetNextPtr(loopvar.GetVTable(), check_death),
+                ]
+            )
+            SetNextTrigger(block["contpoint"])
+            PopTriggerScope()
+
+            loopstart << block["loopstart"] + 4
+            check_death << NextTrigger()
+
+            def get_epd():
+                ret = EUDVariable()
+                VProc(loopvar, loopvar.SetDest(ret))
+                DoActions(
+                    SetNextPtr(loopvar.GetVTable(), check_death),
+                    loopvar.SetDest(EPD(0x6509B0)),
+                    ret.SubtractNumber(19),
+                )
+                return ret
+
+            # EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
+            yield _CpHelper(0x4C // 4, reset_cp, remove_start, get_epd)
+            EUDSetContinuePoint()
+            DoActions(SetMemory(loopstart, Add, 72), SetMemory(pos, Add, 18))
+        EUDEndWhile()
+        ep_assert(pos.IsSet(), "unit.dying must be added")
+
+
+# TODO: Add CUnit-like convenient methods
 class _CpHelper:
     def __init__(self, offset, resetf, remove, epdf):
         self.offset = offset
         self._reset = resetf
         self._remove_start = remove
         self.get_epd = epdf
-
-        class Dying:
-            def __iter__(nonself):
-                dying_end, check_death, dying_block = Forward(), Forward(), Forward()
-                RawTrigger(
-                    actions=[
-                        self.move_cp(0x08 // 4, action=True),
-                        SetNextPtr(check_death, dying_end),
-                    ]
-                )
-                RawTrigger(
-                    conditions=Deaths(CurrentPlayer, Exactly, 0, 0),
-                    actions=[
-                        self.move_cp(0x4C // 4, action=True),
-                        SetDeathsX(CurrentPlayer, SetTo, 0, 0, 0xFF00),
-                        self.move_cp(0x08 // 4, action=True),
-                    ],
-                )
-                self.move_cp(0x4C // 4)
-                check_death << RawTrigger(
-                    nextptr=dying_end,
-                    conditions=DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00),
-                    actions=SetNextPtr(check_death, dying_block),
-                )
-                dying_block << NextTrigger()
-                yield self
-                self.remove()
-                self.offset = 19
-                dying_end << NextTrigger()
-
-        self.dying = Dying()
+        self.dying = _Dying(self)
 
     def remove(self):
         SetNextTrigger(self._remove_start)
@@ -287,3 +258,36 @@ class _CpHelper:
                 DoActions(SetMemory(0x6509B0, mod, val))
         except NameError:
             pass
+
+
+class _Dying:
+    def __init__(self, helper):
+        self._helper: _CpHelper = helper
+
+    def __iter__(self) -> Iterator[_CpHelper]:
+        dying_end, check_death, dying_block = Forward(), Forward(), Forward()
+        RawTrigger(
+            actions=[
+                self._helper.move_cp(0x08 // 4, action=True),
+                SetNextPtr(check_death, dying_end),
+            ]
+        )
+        RawTrigger(
+            conditions=Deaths(CurrentPlayer, Exactly, 0, 0),
+            actions=[
+                self._helper.move_cp(0x4C // 4, action=True),
+                SetDeathsX(CurrentPlayer, SetTo, 0, 0, 0xFF00),
+                self._helper.move_cp(0x08 // 4, action=True),
+            ],
+        )
+        self._helper.move_cp(0x4C // 4)
+        check_death << RawTrigger(
+            nextptr=dying_end,
+            conditions=DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00),
+            actions=SetNextPtr(check_death, dying_block),
+        )
+        dying_block << NextTrigger()
+        yield self._helper
+        self._helper.remove()
+        self._helper.offset = 19
+        dying_end << NextTrigger()
