@@ -463,10 +463,15 @@ def _L2V(l):  # logic to value
 
 
 def _LVAR(vs):
+    import sys
     from ..core.variable.eudv import _yield_and_check_rvalue
 
     ret, ops = [], []
-    for v, is_rvalue in _yield_and_check_rvalue(vs):
+    if sys.version_info >= (3, 11):
+        refcount = 3
+    else:
+        refcount = 4
+    for v, is_rvalue in _yield_and_check_rvalue(vs, refcount):
         if IsEUDVariable(v) and is_rvalue:
             ret.append(v.makeL())
         else:

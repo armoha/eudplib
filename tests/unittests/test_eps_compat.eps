@@ -16,6 +16,8 @@ with expect_eperror():\n\
     Trigger(empty + 1, ret.AddNumber(1 << 2))\n\
 with expect_eperror():\n\
     SetVariables(ret, -1, EUDVariable(EncodeModifier(SetTo)))\n\
+");
+    py_exec("from helper import *\n\
 with expect_eperror():\n\
     SetVariables(EUDVariable(), 1)\n\
 with expect_eperror():\n\
@@ -24,6 +26,38 @@ pv = PVariable()\n\
 with expect_eperror():\n\
     SetVariables(pv[0], 1)\n\
 ");
+    const tc = GetTriggerCounter();
+    var x0 = EUDVariable(0);
+    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+
+    var x1 = list(EUDVariable(0));
+    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+
+    var x2 = list(list(EUDVariable(0)));
+    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+
+    var x3 = ExprProxy(EUDVariable(0));
+    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+
+    var x4 = ExprProxy(ExprProxy(EUDVariable(0)));
+    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+
+    var x5, y5 = EUDVariable(0), EUDVariable(0);
+    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+
+    var x6, y6 = list(EUDVariable(0), EUDVariable(0));
+    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+
+    var x7, y7, z7 = EUDCreateVariables(3);
+    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+
+    const vlist = EUDCreateVariables(3);
+    var x8, y8, z8 = vlist;
+    ep_assert(tc != GetTriggerCounter(), "Wrongly elide var copy");
+
+    const tc2 = GetTriggerCounter();
+    var x9, y9, z9 = list(vlist[2], vlist[1], vlist[0]);
+    ep_assert(tc2 != GetTriggerCounter(), "Wrongly elide var copy");
 
     cond.__lshift__(Memory(empty, AtLeast, 1));
     if (cond) { ret += 1 << 3; }

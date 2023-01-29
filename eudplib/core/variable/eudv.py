@@ -75,12 +75,18 @@ def _is_rvalue(obj: object, refcount: int = 3) -> bool:
     return True
 
 
+if sys.version_info >= (3, 11):
+    _initial_refcount = 2
+else:
+    _initial_refcount = 3
+
+
 def _yield_and_check_rvalue(
-    obj: Any, refcount: int = 3, is_rvalue: bool = True
+    obj: Any, refcount: int = _initial_refcount, is_rvalue: bool = True
 ) -> Iterator[tuple[Any, bool]]:
     is_rvalue &= sys.getrefcount(obj) == refcount
     if isinstance(obj, ExprProxy):
-        yield from _yield_and_check_rvalue(obj.getValue(), 4, is_rvalue)
+        yield from _yield_and_check_rvalue(obj.getValue(), 3, is_rvalue)
     elif isinstance(obj, EUDVariable):
         yield obj, is_rvalue
     elif isinstance(obj, (bytes, str)) or hasattr(obj, "dontFlatten"):
@@ -88,7 +94,7 @@ def _yield_and_check_rvalue(
     else:
         try:
             for subobj in obj:
-                yield from _yield_and_check_rvalue(subobj, refcount + 2, is_rvalue)
+                yield from _yield_and_check_rvalue(subobj, 4, is_rvalue)
         except TypeError:  # obj is not iterable
             yield obj, False
 
@@ -916,10 +922,16 @@ def NonSeqCompute(assignpairs):
 
 
 def SetVariables(srclist, dstlist, mdtlist=None) -> None:
+    if sys.version_info >= (3, 11):
+        srclist_refcount = 2
+        refcount = 3
+    else:
+        srclist_refcount = 3
+        refcount = 4
     errlist = []  # FIXME: replace to ExceptionGroup
-    if sys.getrefcount(srclist) == 3:
+    if sys.getrefcount(srclist) == srclist_refcount:
         nth = 0
-        for src, is_rvalue in _yield_and_check_rvalue(srclist, 4):
+        for src, is_rvalue in _yield_and_check_rvalue(srclist, refcount):
             if isinstance(src, EUDVariable) and is_rvalue:
                 errlist.append(EPError(_("src{} is RValue variable").format(nth)))
             nth += 1
@@ -928,9 +940,12 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:
     if len(srclist) != len(dstlist):
         errlist.append(EPError(_("Input/output size mismatch")))
     if len(errlist) == 1:
-        raise EPError(errlist[0])
+        raise errlist[0]
     elif errlist:
-        raise EPError(errlist)
+        if sys.version_info >= (3, 11):
+            raise ExceptionGroup(_("Multiple error occurred on SetVariables:"), errlist)
+        else:
+            raise EPError(_("Multiple error occurred on SetVariables:"), errlist)
 
     if mdtlist is None:
         mdtlist = [bt.SetTo] * len(srclist)
