@@ -1,4 +1,4 @@
-__version__ = "0.74.7"
+__version__ = "0.74.8"
 
 import os
 import subprocess
@@ -134,7 +134,7 @@ if __name__ == "__main__":
                 "": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst", "*.mo", "eudplib/py.typed"]
             },
             include_package_data=True,
-            python_requires=">=3.10",
+            python_requires=">=3.10, <3.12",
             # metadata for upload to PyPI
             author="Trgk",
             author_email="whyask37@naver.com",

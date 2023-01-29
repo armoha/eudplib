@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2023-01-29 21:41+0900\n"
+"POT-Creation-Date: 2023-01-29 22:45+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -428,40 +428,45 @@ msgstr ""
 msgid "Must put Trigger into onPluginStart, beforeTriggerExec or afterTriggerExec"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\variable\eudv.py:186
+#: C:\eudplib\eudplib\core\variable\eudv.py:192
 msgid "Trying to modify value of r-value variable"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\variable\eudv.py:265
+#: C:\eudplib\eudplib\core\variable\eudv.py:271
 msgid "Unexpected modifier {}"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\variable\eudv.py:560
-#: C:\eudplib\eudplib\core\variable\eudv.py:577
-#: C:\eudplib\eudplib\core\variable\eudv.py:588
-#: C:\eudplib\eudplib\core\variable\eudv.py:604
-#: C:\eudplib\eudplib\core\variable\eudv.py:620
+#: C:\eudplib\eudplib\core\variable\eudv.py:566
+#: C:\eudplib\eudplib\core\variable\eudv.py:583
+#: C:\eudplib\eudplib\core\variable\eudv.py:594
+#: C:\eudplib\eudplib\core\variable\eudv.py:610
+#: C:\eudplib\eudplib\core\variable\eudv.py:626
 msgid "{}: Comparing with temporary variable."
 msgstr ""
 
-#: C:\eudplib\eudplib\core\variable\eudv.py:596
+#: C:\eudplib\eudplib\core\variable\eudv.py:602
 msgid "No unsigned number can be leq than {}"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\variable\eudv.py:612
+#: C:\eudplib\eudplib\core\variable\eudv.py:618
 msgid "No unsigned number can be greater than {}"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\variable\eudv.py:901
+#: C:\eudplib\eudplib\core\variable\eudv.py:907
 msgid "dst and src have intersection"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\variable\eudv.py:924
+#: C:\eudplib\eudplib\core\variable\eudv.py:936
 msgid "src{} is RValue variable"
 msgstr ""
 
-#: C:\eudplib\eudplib\core\variable\eudv.py:929
+#: C:\eudplib\eudplib\core\variable\eudv.py:941
 msgid "Input/output size mismatch"
+msgstr ""
+
+#: C:\eudplib\eudplib\core\variable\eudv.py:946
+#: C:\eudplib\eudplib\core\variable\eudv.py:948
+msgid "Multiple error occurred on SetVariables:"
 msgstr ""
 
 #: C:\eudplib\eudplib\ctrlstru\breakcont.py:46
