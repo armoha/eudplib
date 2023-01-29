@@ -5,9 +5,11 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
+from typing import Literal, overload
 
 from ..core import (
+    Action,
     Add,
     AtLeast,
     AtMost,
@@ -88,7 +90,7 @@ class UnitGroup:
     ```
     """
 
-    def __init__(self, capacity):
+    def __init__(self, capacity: int) -> None:
         self.capacity = capacity
         self.loopvar = EUDVariable(EPD(0x6509B0), SetTo, 0)
         varray = EUDVArray(capacity)(dest=self.loopvar, nextptr=self.loopvar.GetVTable())
@@ -97,7 +99,7 @@ class UnitGroup:
         self.pos = EUDVariable(EPD(self.varray) + 87 + 18 * capacity)
         self.cploop = _CPLoop(self)
 
-    def add(self, unit_epd):
+    def add(self, unit_epd) -> None:
         if IsEUDVariable(unit_epd):
             # Occupy 2T, Run 4T 10A
             SeqCompute(
@@ -126,10 +128,10 @@ class UnitGroup:
 
 
 class _CPLoop:
-    def __init__(self, parent):
+    def __init__(self, parent: UnitGroup) -> None:
         self._parent = parent
 
-    def __iter__(self):
+    def __iter__(self) -> "Iterator[_CpHelper]":
         loopstart, pos, check_death = Forward(), Forward(), Forward()
         trg, tpos, loopvar, varray, capacity = (
             self._parent.trg,
@@ -147,7 +149,7 @@ class _CPLoop:
             ],
         )
 
-        def reset_cp():
+        def reset_cp() -> None:
             PushTriggerScope()
             reset_nextptr = RawTrigger(actions=SetNextPtr(loopvar.GetVTable(), check_death))
             PopTriggerScope()
@@ -188,7 +190,7 @@ class _CPLoop:
             loopstart << block["loopstart"] + 4
             check_death << NextTrigger()
 
-            def get_epd():
+            def get_epd() -> EUDVariable:
                 ret = EUDVariable()
                 VProc(loopvar, loopvar.SetDest(ret))
                 DoActions(
@@ -208,26 +210,49 @@ class _CPLoop:
 
 # TODO: Add CUnit-like convenient methods
 class _CpHelper:
-    def __init__(self, offset, resetf, remove, epdf):
+    def __init__(
+        self,
+        offset,
+        resetf: Callable[[], None],
+        remove: RawTrigger,
+        epdf: Callable[[], EUDVariable],
+    ) -> None:
         self.offset = offset
         self._reset = resetf
         self._remove_start = remove
         self.get_epd = epdf
         self.dying = _Dying(self)
 
-    def remove(self):
+    def remove(self) -> None:
         SetNextTrigger(self._remove_start)
 
     @property  # read-only
     def epd(self) -> EUDVariable:
         return self.get_epd()
 
-    def set_cp(self, offset, *, action=False):
+    @overload
+    def set_cp(self, offset, *, action: Literal[False] = False) -> None:
+        ...
+
+    @overload
+    def set_cp(self, offset, *, action: Literal[True]) -> Action:
+        ...
+
+    def set_cp(self, offset, *, action: bool = False) -> Action | None:
         self._reset()
         self.offset = 19
         return self.move_cp(offset, action=False)
 
-    def move_cp(self, offset, *, action=False):
+    @overload
+    def move_cp(self, offset, *, action: Literal[False] = False) -> None:
+        ...
+
+    @overload
+    def move_cp(self, offset, *, action: Literal[True]) -> Action:
+        ...
+
+    def move_cp(self, offset, *, action: bool = False) -> Action | None:
+        mod, val = None, None
         try:
             if offset > self.offset:
                 mod, val = Add, offset - self.offset
@@ -251,17 +276,16 @@ class _CpHelper:
             else:
                 raise e
         self.offset = offset
-        try:
+        if mod and val:
             if action:
                 return SetMemory(0x6509B0, mod, val)
             else:
                 DoActions(SetMemory(0x6509B0, mod, val))
-        except NameError:
-            pass
+        return None
 
 
 class _Dying:
-    def __init__(self, helper):
+    def __init__(self, helper: _CpHelper) -> None:
         self._helper: _CpHelper = helper
 
     def __iter__(self) -> Iterator[_CpHelper]:

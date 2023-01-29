@@ -5,6 +5,7 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
+from collections.abc import Sequence
 import functools
 import itertools
 import os.path
@@ -37,7 +38,7 @@ def FlattenList(l: Any) -> list:
         return [l]
 
 
-def List2Assignable(l: list[T]) -> T | list[T]:
+def List2Assignable(l: Sequence[T]) -> T | Sequence[T]:
     if len(l) == 1:
         return l[0]
 
@@ -168,7 +169,7 @@ def find_data_file(filename: BytesPath, file: BytesPath) -> bytes:
     ...
 
 
-def find_data_file(filename, file):
+def find_data_file(filename, file) -> str | bytes:
     if getattr(sys, "frozen", False):
         # The application is frozen
         datadir = os.path.dirname(sys.executable)

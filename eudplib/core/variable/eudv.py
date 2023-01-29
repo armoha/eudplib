@@ -5,7 +5,7 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 import traceback
 import sys
 from typing import Any, TYPE_CHECKING, TypeVar, overload
@@ -209,13 +209,13 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def MaskAtLeast(self, value):
+    def MaskAtLeast(self, value: "Dword") -> bt.Condition:
         return bt.Memory(self.getMaskAddr(), bt.AtLeast, value)
 
-    def MaskAtMost(self, value):
+    def MaskAtMost(self, value: "Dword") -> bt.Condition:
         return bt.Memory(self.getMaskAddr(), bt.AtMost, value)
 
-    def MaskExactly(self, value):
+    def MaskExactly(self, value: "Dword") -> bt.Condition:
         return bt.Memory(self.getMaskAddr(), bt.Exactly, value)
 
     # -------
@@ -231,15 +231,15 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def SetDest(self, dest):
+    def SetDest(self, dest) -> bt.Action:
         dest = _ProcessDest(dest)
         return bt.SetMemory(self.getDestAddr(), bt.SetTo, dest)
 
-    def AddDest(self, dest):
+    def AddDest(self, dest) -> bt.Action:
         dest = _ProcessDest(dest)
         return bt.SetMemory(self.getDestAddr(), bt.Add, dest)
 
-    def SubtractDest(self, dest):
+    def SubtractDest(self, dest) -> bt.Action:
         dest = _ProcessDest(dest)
         return bt.SetMemory(self.getDestAddr(), bt.Subtract, dest)
 
@@ -259,7 +259,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def SetModifier(self, modifier):
+    def SetModifier(self, modifier) -> bt.Action:
         ep_assert(
             modifier is bt.SetTo or modifier is bt.Add or modifier is bt.Subtract,
             _("Unexpected modifier {}").format(modifier),
@@ -269,13 +269,13 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def QueueAssignTo(self, dest):
+    def QueueAssignTo(self, dest) -> list[bt.Action]:
         return [self.SetDest(dest), self.SetModifier(bt.SetTo)]
 
-    def QueueAddTo(self, dest):
+    def QueueAddTo(self, dest) -> list[bt.Action]:
         return [self.SetDest(dest), self.SetModifier(bt.Add)]
 
-    def QueueSubtractTo(self, dest):
+    def QueueSubtractTo(self, dest) -> list[bt.Action]:
         return [self.SetDest(dest), self.SetModifier(bt.Subtract)]
 
     # -------
@@ -665,7 +665,17 @@ def IsEUDVariable(x: object) -> bool:
 # ---------
 
 
-def VProc(v, actions):
+@overload
+def VProc(v: EUDVariable, actions) -> bt.RawTrigger:
+    ...
+
+
+@overload
+def VProc(v: Sequence[EUDVariable], actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
+    ...
+
+
+def VProc(v, actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
     v = FlattenList(v)
     actions = FlattenList(actions)
     end = Forward()
@@ -685,7 +695,7 @@ def VProc(v, actions):
 
 
 # From vbuffer.py
-def EUDCreateVariables(varn):
+def EUDCreateVariables(varn: int):
     return List2Assignable([EUDVariable() for _ in range(varn)])
 
 
@@ -735,7 +745,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
     last_pairs = None
     nonConstActions = list()
 
-    def _RemoveDuplicateActions():
+    def _RemoveDuplicateActions() -> None:
         if last_pairs is None:
             return
         last_src, last_dst, last_mdt = last_pairs
@@ -905,7 +915,7 @@ def NonSeqCompute(assignpairs):
     SeqCompute(constpairs + varassignpairs)
 
 
-def SetVariables(srclist, dstlist, mdtlist=None):
+def SetVariables(srclist, dstlist, mdtlist=None) -> None:
     errlist = []  # FIXME: replace to ExceptionGroup
     if sys.getrefcount(srclist) == 3:
         nth = 0

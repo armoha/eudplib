@@ -22,12 +22,12 @@ class EPWarning(Warning):
     pass
 
 
-def ep_assert(statement, message="Assertion failed") -> None:
+def ep_assert(statement: object, message: object = "Assertion failed") -> None:
     if not statement:
         raise EPError(message)
 
 
-def ep_eprint(*args, **kwargs) -> None:
+def ep_eprint(*args: object, **kwargs) -> None:
     print(*args, file=sys.stderr, **kwargs)
 
 

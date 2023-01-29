@@ -17,7 +17,7 @@ from .eudarray import EUDArray
 
 
 class _ObjPoolData(c.ConstExpr):
-    def __init__(self, size: int, max_fieldn: int = 8):
+    def __init__(self, size: int, max_fieldn: int = 8) -> None:
         super().__init__(self)
         self._vdict: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
         self.size = size
@@ -33,7 +33,7 @@ class _ObjPoolData(c.ConstExpr):
 
 
 class ObjPool:
-    def __init__(self, size: int, max_fieldn: int = 8):
+    def __init__(self, size: int, max_fieldn: int = 8) -> None:
         self.size = size
         self.max_fieldn = max_fieldn
         self.remaining = c.EUDVariable(size)
@@ -41,7 +41,7 @@ class ObjPool:
         self.baseobj = _ObjPoolData(size, max_fieldn)
         self.data = EUDArray([72 * max_fieldn * i for i in range(size)])
 
-    def full(self):
+    def full(self) -> bool:
         return self.remaining == 0
 
     @c.EUDMethod
@@ -65,7 +65,7 @@ class ObjPool:
         data.constructor(*args, **kwargs)
         return data
 
-    def free(self, basetype, data):
+    def free(self, basetype, data) -> None:
         ut.ep_assert(
             len(basetype._fields_) <= self.max_fieldn,
             _("Only structs less than {} fields can be allocated").format(self.max_fieldn),
@@ -87,14 +87,14 @@ class _GlobalObjPool:
 globalPool = _GlobalObjPool(pool=None, max_fieldn=8, max_object_num=32768)
 
 
-def SetGlobalPoolFieldN(fieldn: int):
+def SetGlobalPoolFieldN(fieldn: int) -> None:
     global globalPool
     ut.ep_assert(globalPool.pool is None, "Global object pool is already initialized.")
     globalPool.max_fieldn = fieldn
     globalPool.max_object_num = 8 * 32768 // fieldn
 
 
-def GetGlobalPool():
+def GetGlobalPool() -> ObjPool:
     global globalPool
     if globalPool.pool is None:
         size, max_fieldn = globalPool.max_object_num, globalPool.max_fieldn

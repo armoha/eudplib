@@ -18,7 +18,7 @@ class EUDArrayData(c.EUDObject):
     Structure for storing multiple values.
     """
 
-    def __init__(self, arr):
+    def __init__(self, arr) -> None:
         super().__init__()
         self.dontFlatten = True
 
@@ -33,22 +33,22 @@ class EUDArrayData(c.EUDObject):
             self._datas = arr
             self._arrlen = len(arr)
 
-    def GetDataSize(self):
+    def GetDataSize(self) -> int:
         return self._arrlen * 4
 
-    def WritePayload(self, buf):
+    def WritePayload(self, buf) -> None:
         for item in self._datas:
             buf.WriteDword(item)
 
     # --------
 
-    def GetArraySize(self):
+    def GetArraySize(self) -> int:
         """Get size of array"""
         return self._arrlen
 
 
 class EUDArray(ut.ExprProxy):
-    def __init__(self, initval=None, *, _from=None):
+    def __init__(self, initval=None, *, _from=None) -> None:
         if _from is not None:
             dataObj = _from
 
@@ -60,10 +60,10 @@ class EUDArray(ut.ExprProxy):
         self._epd = ut.EPD(self)
         self.dontFlatten = True
 
-    def get(self, key):
+    def get(self, key) -> c.EUDVariable:
         return f_dwread_epd(self._epd + key)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> c.EUDVariable:
         return self.get(key)
 
     def set(self, key, item):
