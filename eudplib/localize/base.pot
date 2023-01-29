@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2023-01-04 20:28+0900\n"
+"POT-Creation-Date: 2023-01-29 21:41+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,736 +15,760 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:109
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:119
+#: C:\eudplib\eudplib\core\allocator\constexpr.py:91
+#: C:\eudplib\eudplib\core\allocator\constexpr.py:101
 msgid "Address not divisible; {} is not a factor of {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:227
+#: C:\eudplib\eudplib\core\allocator\constexpr.py:207
 msgid "Reforwarding without reset is not allowed"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:229
+#: C:\eudplib\eudplib\core\allocator\constexpr.py:209
 msgid "Cannot forward to None"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:245
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:250
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:258
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:263
-#: E:\eudplib\eudplib\trigger\tpatcher.py:107
-#: E:\eudplib\eudplib\trigger\tpatcher.py:130
-#: E:\eudplib\eudplib\trigger\tpatcher.py:248
+#: C:\eudplib\eudplib\core\allocator\constexpr.py:225
+#: C:\eudplib\eudplib\core\allocator\constexpr.py:230
+#: C:\eudplib\eudplib\trigger\tpatcher.py:88
+#: C:\eudplib\eudplib\trigger\tpatcher.py:111
+#: C:\eudplib\eudplib\trigger\tpatcher.py:229
 msgid "Forward not initialized"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:278
+#: C:\eudplib\eudplib\core\allocator\constexpr.py:254
 msgid "Only ConstExpr can be Evaluated, not {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\constexpr.py:279
+#: C:\eudplib\eudplib\core\allocator\constexpr.py:255
 msgid "ExprProxy {} does not wrap ConstExpr, instead {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:86
-#: E:\eudplib\eudplib\core\allocator\payload.py:97
+#: C:\eudplib\eudplib\core\allocator\payload.py:68
+#: C:\eudplib\eudplib\core\allocator\payload.py:79
 msgid "Invalid type"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:130
-#: E:\eudplib\eudplib\core\allocator\payload.py:139
+#: C:\eudplib\eudplib\core\allocator\payload.py:112
+#: C:\eudplib\eudplib\core\allocator\payload.py:121
 msgid "Collected unexpected object: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:156
+#: C:\eudplib\eudplib\core\allocator\payload.py:138
 msgid "[Stage 1/3] CollectObjects"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:173
-#: E:\eudplib\eudplib\core\allocator\payload.py:206
+#: C:\eudplib\eudplib\core\allocator\payload.py:155
+#: C:\eudplib\eudplib\core\allocator\payload.py:188
 msgid " - Collected {} / {} objects"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:192
+#: C:\eudplib\eudplib\core\allocator\payload.py:174
 msgid "No object collected"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:210
+#: C:\eudplib\eudplib\core\allocator\payload.py:192
 msgid "ShufflePayload has been turned off."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:309
+#: C:\eudplib\eudplib\core\allocator\payload.py:291
 msgid "[Stage 2/3] AllocObjects"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:320
-#: E:\eudplib\eudplib\core\allocator\payload.py:323
+#: C:\eudplib\eudplib\core\allocator\payload.py:302
+#: C:\eudplib\eudplib\core\allocator\payload.py:305
 msgid " - Allocated {} / {} objects"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:341
+#: C:\eudplib\eudplib\core\allocator\payload.py:323
 msgid "Occupation map length ({}) & Object size mismatch for object ({})"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:345
-#: E:\eudplib\eudplib\core\allocator\payload.py:347
+#: C:\eudplib\eudplib\core\allocator\payload.py:327
+#: C:\eudplib\eudplib\core\allocator\payload.py:329
 msgid " - Preprocessed {} / {} objects"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:349
+#: C:\eudplib\eudplib\core\allocator\payload.py:331
 msgid " - Allocating objects.."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:365
+#: C:\eudplib\eudplib\core\allocator\payload.py:347
 msgid "[Stage 3/3] ConstructPayload"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:378
+#: C:\eudplib\eudplib\core\allocator\payload.py:360
 msgid "obj.GetDataSize()({}) != Real payload size({}) for object {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:383
-#: E:\eudplib\eudplib\core\allocator\payload.py:385
+#: C:\eudplib\eudplib\core\allocator\payload.py:365
+#: C:\eudplib\eudplib\core\allocator\payload.py:367
 msgid " - Written {} / {} objects"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\payload.py:438
+#: C:\eudplib\eudplib\core\allocator\payload.py:420
 msgid "Can't calculate object address now"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\pbuffer.py:80
+#: C:\eudplib\eudplib\core\allocator\pbuffer.py:62
 msgid "Non-const dwords must be aligned to 4byte"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\pbuffer.py:86
+#: C:\eudplib\eudplib\core\allocator\pbuffer.py:68
 msgid "rlocmode should be 1 or 4"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\pbuffer.py:149
+#: C:\eudplib\eudplib\core\allocator\pbuffer.py:131
 msgid "Cannot write non-const in byte/word/nonalligned dword."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\rlocint.py:65
-#: E:\eudplib\eudplib\core\allocator\rlocint.py:72
+#: C:\eudplib\eudplib\core\allocator\rlocint.py:47
+#: C:\eudplib\eudplib\core\allocator\rlocint.py:54
 msgid "Cannot divide RlocInt with non-const"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\rlocint.py:74
+#: C:\eudplib\eudplib\core\allocator\rlocint.py:56
 msgid "Divide by zero"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\allocator\rlocint.py:77
+#: C:\eudplib\eudplib\core\allocator\rlocint.py:59
 msgid "RlocInt not divisible by {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:40
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:74
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:102
-#: E:\eudplib\eudplib\core\eudfunc\eudfmethod.py:43
+#: C:\eudplib\eudplib\core\eudfunc\eudf.py:22
+#: C:\eudplib\eudplib\core\eudfunc\eudf.py:56
+#: C:\eudplib\eudplib\core\eudfunc\eudf.py:84
+#: C:\eudplib\eudplib\core\eudfunc\eudfmethod.py:25
 msgid "No variadic arguments (*args) allowed for EUDFunc."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:43
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:77
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:105
-#: E:\eudplib\eudplib\core\eudfunc\eudfmethod.py:46
+#: C:\eudplib\eudplib\core\eudfunc\eudf.py:25
+#: C:\eudplib\eudplib\core\eudfunc\eudf.py:59
+#: C:\eudplib\eudplib\core\eudfunc\eudf.py:87
+#: C:\eudplib\eudplib\core\eudfunc\eudfmethod.py:28
 msgid "No variadic keyword arguments (**kwargs) allowed for EUDFunc."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudf.py:98
+#: C:\eudplib\eudplib\core\eudfunc\eudf.py:80
 msgid "Different number of variables({}) from initial values({})"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:122
+#: C:\eudplib\eudplib\core\eudfunc\eudfptr.py:104
 msgid "{} is not an EUDFuncN"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:130
+#: C:\eudplib\eudplib\core\eudfunc\eudfptr.py:112
 msgid "Function requires {} arguments (Expected {})"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfptr.py:134
+#: C:\eudplib\eudplib\core\eudfunc\eudfptr.py:116
 msgid "Function returns {} values (Expected {})"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:137
+#: C:\eudplib\eudplib\core\eudfunc\eudfuncn.py:119
 msgid "Block start/end mismatch inside function"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:163
+#: C:\eudplib\eudplib\core\eudfunc\eudfuncn.py:145
 msgid "Number of returned values should be constant."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:164
+#: C:\eudplib\eudplib\core\eudfunc\eudfuncn.py:146
 msgid " (From function %s)"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:194
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:236
+#: C:\eudplib\eudplib\core\eudfunc\eudfuncn.py:176
+#: C:\eudplib\eudplib\core\eudfunc\eudfuncn.py:218
 msgid "Return number mismatch : "
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudfuncn.py:224
+#: C:\eudplib\eudplib\core\eudfunc\eudfuncn.py:206
 msgid "Argument number mismatch : "
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:54
+#: C:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:36
 msgid "Different number of variables({}) from type declarations({})"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:106
+#: C:\eudplib\eudplib\core\eudfunc\eudtypedfuncn.py:88
 msgid "Different number of arguments({}) from mask declarations({})."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudfunc\trace\tracetool.py:68
+#: C:\eudplib\eudplib\core\eudfunc\trace\tracetool.py:50
 msgid "Must call SaveMap first"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\eudstruct.py:159
+#: C:\eudplib\eudplib\core\eudstruct\eudstruct.py:141
 msgid "Unknown field name {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\eudstruct.py:174
+#: C:\eudplib\eudplib\core\eudstruct\eudstruct.py:156
 msgid "Cannot reassign another value to eudstruct."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:51
+#: C:\eudplib\eudplib\core\eudstruct\vararray.py:33
 msgid "{} items expected, got {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:54
-#: E:\eudplib\eudplib\eudlib\eudarray.py:50
+#: C:\eudplib\eudplib\core\eudstruct\vararray.py:36
+#: C:\eudplib\eudplib\eudlib\eudarray.py:32
 msgid "Invalid item #{}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:56
-#: E:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:127
+#: C:\eudplib\eudplib\core\eudstruct\vararray.py:38
+#: C:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:109
 msgid "nextptr should be ConstExpr"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:135
+#: C:\eudplib\eudplib\core\eudstruct\vararray.py:117
 msgid "EUDVArray index out of bounds."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\eudstruct\vararray.py:353
+#: C:\eudplib\eudplib\core\eudstruct\vararray.py:335
 msgid "Can't iterate EUDVArray"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\inlinens.py:43
+#: C:\eudplib\eudplib\core\inlinens.py:25
 msgid "Duplicated name {} for EUDRegisterObjectToNamespace"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\chktok.py:45
+#: C:\eudplib\eudplib\core\mapdata\chktok.py:27
 msgid "Length of section name cannot be longer than 4"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\fixmapdata.py:115
+#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:97
 msgid "[Warning] Input map has 0000.00 null tiles"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\fixmapdata.py:117
+#: C:\eudplib\eudplib\core\mapdata\fixmapdata.py:99
 msgid "Replaced them to 0000.01, because they cause desync."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\mapdata.py:57
-#: E:\eudplib\eudplib\core\mapdata\mapdata.py:72
-#: E:\eudplib\eudplib\core\mapdata\mapdata.py:79
-#: E:\eudplib\eudplib\core\mapdata\mapdata.py:85
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:82
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:88
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:94
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:100
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:106
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:112
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:118
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:124
-#: E:\eudplib\eudplib\maprw\injector\payloadInit.py:36
-#: E:\eudplib\eudplib\maprw\injector\vectorReloc.py:80
+#: C:\eudplib\eudplib\core\mapdata\mapdata.py:39
+#: C:\eudplib\eudplib\core\mapdata\mapdata.py:54
+#: C:\eudplib\eudplib\core\mapdata\mapdata.py:61
+#: C:\eudplib\eudplib\core\mapdata\mapdata.py:67
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:64
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:70
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:76
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:82
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:88
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:94
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:100
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:106
+#: C:\eudplib\eudplib\maprw\injector\payloadInit.py:36
+#: C:\eudplib\eudplib\maprw\injector\vectorReloc.py:64
 msgid "Must use LoadMap first"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:92
+#: C:\eudplib\eudplib\core\mapdata\mpqapi.py:74
 msgid "You need to install stormlib before using eudplib."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:137
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:143
+#: C:\eudplib\eudplib\core\mapdata\mpqapi.py:119
+#: C:\eudplib\eudplib\core\mapdata\mpqapi.py:125
 msgid "Loading StormLib failed."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:152
-#: E:\eudplib\eudplib\core\mapdata\mpqapi.py:165
+#: C:\eudplib\eudplib\core\mapdata\mpqapi.py:134
+#: C:\eudplib\eudplib\core\mapdata\mpqapi.py:147
 msgid "Duplicate opening"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\proptable.py:61
+#: C:\eudplib\eudplib\core\mapdata\proptable.py:43
 msgid "Invalid property type"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\proptable.py:75
+#: C:\eudplib\eudplib\core\mapdata\proptable.py:57
 msgid "Unit property table overflow"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\stringmap.py:49
+#: C:\eudplib\eudplib\core\mapdata\stringmap.py:31
 msgid "Ambiguous string: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:282
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:378
+#: C:\eudplib\eudplib\core\mapdata\tblformat.py:265
+#: C:\eudplib\eudplib\core\mapdata\tblformat.py:361
 msgid "Invalid type for string"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:320
-#: E:\eudplib\eudplib\core\mapdata\tblformat.py:390
+#: C:\eudplib\eudplib\core\mapdata\tblformat.py:303
+#: C:\eudplib\eudplib\core\mapdata\tblformat.py:373
 msgid "String table overflow"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:160
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:142
 msgid "Can't disable non-const Action flags"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:168
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:150
 msgid "Invalid fields for action{} {}:"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:229
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:158
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:211
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:140
 msgid "invalid {}: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:234
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:216
 msgid "Actions cannot be shared by two triggers."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:236
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:165
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:218
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:147
 msgid "Trigger should not be null."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:237
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:219
 msgid "Triggers out of range"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:245
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:227
 msgid "Orphan action. This often happens when you try to do arithmetics with actions."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:258
-#: E:\eudplib\eudplib\core\rawtrigger\action.py:273
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:189
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:204
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:240
+#: C:\eudplib\eudplib\core\rawtrigger\action.py:255
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:171
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:186
 msgid "Found EUDVariable {} in field {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:118
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:100
 msgid "Can't disable non-const Condition flags"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:126
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:108
 msgid "Invalid fields for condition{} {}:"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:163
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:145
 msgid "Condition cannot be shared by two triggers."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:166
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:148
 msgid "Condition index should be 0 to 15"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:175
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:157
 msgid "Orphan condition. This often happens when you try to do arithmetics with conditions."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:210
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:192
 msgid "To prevent error, Condition can't be put into if."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:244
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:226
 msgid "Bring and Command can't exchange AtMost and Exactly/AtLeast"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:250
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:232
 msgid "Invalid comparison \"{}\" in trigger index {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:260
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:242
 msgid "Can't negate EUDX condition"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:265
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:247
 msgid "Can't negate condition with comparison"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\condition.py:267
+#: C:\eudplib\eudplib\core\rawtrigger\condition.py:249
 msgid "Can't negate condition"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\constenc.py:301
-#: E:\eudplib\eudplib\core\rawtrigger\constenc.py:584
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:119
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:162
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:165
+#: C:\eudplib\eudplib\core\rawtrigger\constenc.py:289
+#: C:\eudplib\eudplib\core\rawtrigger\constenc.py:571
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:107
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:141
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:144
 msgid "[Warning] \"{}\" is not a {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:144
+#: C:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:126
 msgid "Too many conditions"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:145
+#: C:\eudplib\eudplib\core\rawtrigger\rawtriggerdef.py:127
 msgid "Too many actions"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:97
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:144
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:79
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:126
 msgid "Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:791
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:773
 msgid "SetKills Player should be only P1~P12 or CurrentPlayer"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\stockact.py:793
+#: C:\eudplib\eudplib\core\rawtrigger\stockact.py:775
 msgid "SetKills Unit should be at most 227"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:100
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:89
 msgid "AIScript name too short"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:105
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:113
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:158
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:94
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:101
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:137
 msgid "Cannot encode string {} as {}."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:107
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:115
-#: E:\eudplib\eudplib\core\rawtrigger\strenc.py:160
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:96
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:103
+#: C:\eudplib\eudplib\core\rawtrigger\strenc.py:139
 msgid " - Suggestion: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\rawtrigger\triggerscope.py:50
-#: E:\eudplib\eudplib\core\rawtrigger\triggerscope.py:63
+#: C:\eudplib\eudplib\core\rawtrigger\triggerscope.py:32
+#: C:\eudplib\eudplib\core\rawtrigger\triggerscope.py:45
 msgid "Must put Trigger into onPluginStart, beforeTriggerExec or afterTriggerExec"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:181
-msgid "Trying to modify value of l-value variable"
+#: C:\eudplib\eudplib\core\variable\eudv.py:186
+msgid "Trying to modify value of r-value variable"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:555
-#: E:\eudplib\eudplib\core\variable\eudv.py:572
-#: E:\eudplib\eudplib\core\variable\eudv.py:583
-#: E:\eudplib\eudplib\core\variable\eudv.py:599
-#: E:\eudplib\eudplib\core\variable\eudv.py:615
+#: C:\eudplib\eudplib\core\variable\eudv.py:265
+msgid "Unexpected modifier {}"
+msgstr ""
+
+#: C:\eudplib\eudplib\core\variable\eudv.py:560
+#: C:\eudplib\eudplib\core\variable\eudv.py:577
+#: C:\eudplib\eudplib\core\variable\eudv.py:588
+#: C:\eudplib\eudplib\core\variable\eudv.py:604
+#: C:\eudplib\eudplib\core\variable\eudv.py:620
 msgid "{}: Comparing with temporary variable."
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:591
+#: C:\eudplib\eudplib\core\variable\eudv.py:596
 msgid "No unsigned number can be leq than {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:607
+#: C:\eudplib\eudplib\core\variable\eudv.py:612
 msgid "No unsigned number can be greater than {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:886
+#: C:\eudplib\eudplib\core\variable\eudv.py:901
 msgid "dst and src have intersection"
 msgstr ""
 
-#: E:\eudplib\eudplib\core\variable\eudv.py:906
+#: C:\eudplib\eudplib\core\variable\eudv.py:924
+msgid "src{} is RValue variable"
+msgstr ""
+
+#: C:\eudplib\eudplib\core\variable\eudv.py:929
 msgid "Input/output size mismatch"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\breakcont.py:64
-#: E:\eudplib\eudplib\ctrlstru\breakcont.py:76
-#: E:\eudplib\eudplib\ctrlstru\breakcont.py:88
+#: C:\eudplib\eudplib\ctrlstru\breakcont.py:46
+#: C:\eudplib\eudplib\ctrlstru\breakcont.py:58
+#: C:\eudplib\eudplib\ctrlstru\breakcont.py:70
 msgid "No loop/switch block surrounding this code area"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\cshelper.py:38
-#: E:\eudplib\eudplib\ctrlstru\cshelper.py:43
+#: C:\eudplib\eudplib\ctrlstru\cshelper.py:22
+#: C:\eudplib\eudplib\ctrlstru\cshelper.py:27
 msgid "Control structures must be double-parenthesised."
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\loopblock.py:185
+#: C:\eudplib\eudplib\ctrlstru\loopblock.py:169
 msgid "No loop block surrounding this code area"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:65
+#: C:\eudplib\eudplib\ctrlstru\simpleblock.py:47
 msgid "Cannot have EUDElseIf after EUDElse"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:98
+#: C:\eudplib\eudplib\ctrlstru\simpleblock.py:80
 msgid "Cannot have EUDElse after EUDElse"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\simpleblock.py:157
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:84
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:101
+#: C:\eudplib\eudplib\ctrlstru\simpleblock.py:139
+#: C:\eudplib\eudplib\ctrlstru\swblock.py:66
+#: C:\eudplib\eudplib\ctrlstru\swblock.py:83
 msgid "Block start/end mismatch"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:80
+#: C:\eudplib\eudplib\ctrlstru\swblock.py:62
 msgid "Invalid selector start for EUDSwitch"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:89
+#: C:\eudplib\eudplib\ctrlstru\swblock.py:71
 msgid "Duplicate cases"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:90
+#: C:\eudplib\eudplib\ctrlstru\swblock.py:72
 msgid "cases out of mask"
 msgstr ""
 
-#: E:\eudplib\eudplib\ctrlstru\swblock.py:104
+#: C:\eudplib\eudplib\ctrlstru\swblock.py:86
 msgid "Duplicate default"
 msgstr ""
 
-#: E:\eudplib\eudplib\epscript\epsimp.py:137
+#: C:\eudplib\eudplib\epscript\epsimp.py:119
 msgid "[epScript] Compiling \"{}\"..."
 msgstr ""
 
-#: E:\eudplib\eudplib\epscript\epsimp.py:140
+#: C:\eudplib\eudplib\epscript\epsimp.py:122
 msgid " - Compiled failed for {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:85
-msgid "EPD check warning. Don't use raw pointer address"
-msgstr ""
-
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:119
-msgid "Invalid EPDOffsetMap member type: {}"
-msgstr ""
-
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:122
-msgid "EPDOffsetMap members should be aligned"
-msgstr ""
-
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:148
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:158
-msgid "Only dword can be read as epd"
-msgstr ""
-
-#: E:\eudplib\eudplib\eudlib\epdoffsetmap.py:168
-msgid "Only dword can be read as position"
-msgstr ""
-
-#: E:\eudplib\eudplib\eudlib\eudarray.py:94
+#: C:\eudplib\eudplib\eudlib\eudarray.py:76
 msgid "Can't iterate EUDArray"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\locf\locf.py:183
-#: E:\eudplib\eudplib\eudlib\locf\locf.py:224
-#: E:\eudplib\eudplib\eudlib\locf\locf.py:265
+#: C:\eudplib\eudplib\eudlib\locf\locf.py:165
+#: C:\eudplib\eudplib\eudlib\locf\locf.py:206
+#: C:\eudplib\eudplib\eudlib\locf\locf.py:247
 msgid "number of coordinates should be 2 or 4."
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\memiof\byterw.py:250
+#: C:\eudplib\eudplib\eudlib\memiof\byterw.py:232
 msgid "copyto target should be EUDByteReader/Writer/Stream"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:254
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:262
-#: E:\eudplib\eudplib\eudlib\memiof\dwepdio.py:270
+#: C:\eudplib\eudplib\eudlib\memiof\dwepdio.py:236
+#: C:\eudplib\eudplib\eudlib\memiof\dwepdio.py:244
+#: C:\eudplib\eudplib\eudlib\memiof\dwepdio.py:252
 msgid "safe read functions are deprecated in 0.61 and will be removed in 0.63"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\objpool.py:79
-#: E:\eudplib\eudplib\eudlib\objpool.py:89
+#: C:\eudplib\eudplib\eudlib\objpool.py:61
+#: C:\eudplib\eudplib\eudlib\objpool.py:71
 msgid "Only structs less than {} fields can be allocated"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\stringf\cpstr.py:56
+#: C:\eudplib\eudplib\eudlib\stringf\cpstr.py:38
 msgid "Invalid string section name: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\stringf\cpstr.py:92
+#: C:\eudplib\eudplib\eudlib\stringf\cpstr.py:74
 msgid "Unexpected type for CPString: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\stringf\eudprint.py:314
+#: C:\eudplib\eudplib\eudlib\stringf\eudprint.py:296
 msgid "Object with unknown parameter type {} given to f_eudprint."
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:53
+#: C:\eudplib\eudplib\eudlib\stringf\fmtprint.py:35
 msgid "Max string recursion exceeded"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:69
-#: E:\eudplib\eudplib\eudlib\stringf\fmtprint.py:74
+#: C:\eudplib\eudplib\eudlib\stringf\fmtprint.py:51
+#: C:\eudplib\eudplib\eudlib\stringf\fmtprint.py:56
 msgid "cannot switch from manual field specification to automatic field numbering"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\stringf\pname.py:128
+#: C:\eudplib\eudplib\eudlib\stringf\pname.py:110
 msgid "IsPName player should be Player1 to Player8 or CurrentPlayer, not {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\utilf\binsearch.py:51
-#: E:\eudplib\eudplib\eudlib\utilf\binsearch.py:95
+#: C:\eudplib\eudplib\eudlib\utilf\binsearch.py:33
+#: C:\eudplib\eudplib\eudlib\utilf\binsearch.py:77
 msgid "maxv must be greater than minv"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\utilf\listloop.py:56
+#: C:\eudplib\eudplib\eudlib\utilf\listloop.py:39
 msgid "listloop mismatch"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:86
+#: C:\eudplib\eudplib\eudlib\utilf\pexist.py:68
 msgid "No player met condition for input map settings:"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:88
+#: C:\eudplib\eudplib\eudlib\utilf\pexist.py:70
 msgid " type {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:90
+#: C:\eudplib\eudplib\eudlib\utilf\pexist.py:72
 msgid " force {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:92
+#: C:\eudplib\eudplib\eudlib\utilf\pexist.py:74
 msgid " race {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\eudlib\utilf\pexist.py:93
+#: C:\eudplib\eudplib\eudlib\utilf\pexist.py:75
 msgid "Check out whether Start Locations are placed correctly."
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\injector\mainloop.py:104
+#: C:\eudplib\eudplib\maprw\injector\mainloop.py:85
 msgid "_MainStarter has not called"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\injector\vectorReloc.py:209
+#: C:\eudplib\eudplib\maprw\injector\vectorReloc.py:193
 msgid "MRGN section size bug"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:40
+#: C:\eudplib\eudplib\maprw\loadmap.py:22
 msgid "Loading map {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:42
+#: C:\eudplib\eudplib\maprw\loadmap.py:24
 msgid "input path is not a map file"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:46
+#: C:\eudplib\eudplib\maprw\loadmap.py:28
 msgid "input map does not exist"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:50
+#: C:\eudplib\eudplib\maprw\loadmap.py:32
 msgid "You lacks permission to get access rights for input map"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:51
-#: E:\eudplib\eudplib\maprw\savemap.py:90
-#: E:\eudplib\eudplib\maprw\savemap.py:106
+#: C:\eudplib\eudplib\maprw\loadmap.py:33
+#: C:\eudplib\eudplib\maprw\savemap.py:73
+#: C:\eudplib\eudplib\maprw\savemap.py:89
 msgid "Try to turn off antivirus or StarCraft"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:56
+#: C:\eudplib\eudplib\maprw\loadmap.py:38
 msgid "Fail to open input map"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\loadmap.py:60
+#: C:\eudplib\eudplib\maprw\loadmap.py:42
 msgid "Fail to extract scenario.chk, maybe invalid scx"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\mpqadd.py:62
+#: C:\eudplib\eudplib\maprw\mpqadd.py:44
 msgid "MPQ filename duplicate : \"{}\""
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\mpqadd.py:83
+#: C:\eudplib\eudplib\maprw\mpqadd.py:65
 msgid "Invalid content type"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\mpqadd.py:124
+#: C:\eudplib\eudplib\maprw\mpqadd.py:106
 msgid "Failed adding file {} to mpq: May be duplicate"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:47
+#: C:\eudplib\eudplib\maprw\savemap.py:30
 msgid "Empty trace header"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:65
+#: C:\eudplib\eudplib\maprw\savemap.py:48
 msgid "Saving to {}..."
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:89
-#: E:\eudplib\eudplib\maprw\savemap.py:105
+#: C:\eudplib\eudplib\maprw\savemap.py:72
+#: C:\eudplib\eudplib\maprw\savemap.py:88
 msgid "You lacks permission to get access rights for output map"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:95
-#: E:\eudplib\eudplib\maprw\savemap.py:111
+#: C:\eudplib\eudplib\maprw\savemap.py:78
+#: C:\eudplib\eudplib\maprw\savemap.py:94
 msgid "Fail to access output map ({})"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:98
+#: C:\eudplib\eudplib\maprw\savemap.py:81
 msgid "Fail to export input map data to output map"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:114
+#: C:\eudplib\eudplib\maprw\savemap.py:97
 msgid "Fail to add scenario.chk"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:116
+#: C:\eudplib\eudplib\maprw\savemap.py:99
 msgid "Fail to compact MPQ"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:121
+#: C:\eudplib\eudplib\maprw\savemap.py:104
 msgid "Writing trace file to {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\maprw\savemap.py:123
+#: C:\eudplib\eudplib\maprw\savemap.py:106
 msgid "Unreachable callback error"
 msgstr ""
 
-#: E:\eudplib\eudplib\trigger\tpatcher.py:121
+#: C:\eudplib\eudplib\offsetmap\csprite.py:64
+#: C:\eudplib\eudplib\offsetmap\csprite.py:69
+#: C:\eudplib\eudplib\offsetmap\csprite.py:73
+#: C:\eudplib\eudplib\offsetmap\csprite.py:81
+#: C:\eudplib\eudplib\offsetmap\csprite.py:99
+#: C:\eudplib\eudplib\offsetmap\csprite.py:103
+msgid "Invalid input for CSprite: {}"
+msgstr ""
+
+#: C:\eudplib\eudplib\offsetmap\cunit.py:382
+#: C:\eudplib\eudplib\offsetmap\cunit.py:387
+#: C:\eudplib\eudplib\offsetmap\cunit.py:391
+#: C:\eudplib\eudplib\offsetmap\cunit.py:399
+#: C:\eudplib\eudplib\offsetmap\cunit.py:417
+#: C:\eudplib\eudplib\offsetmap\cunit.py:421
+msgid "Invalid input for CUnit: {}"
+msgstr ""
+
+#: C:\eudplib\eudplib\offsetmap\epdoffsetmap.py:30
+#: C:\eudplib\eudplib\offsetmap\epdoffsetmap.py:40
+#: C:\eudplib\eudplib\offsetmap\epdoffsetmap.py:48
+#: C:\eudplib\eudplib\offsetmap\epdoffsetmap.py:62
+msgid "Only dword can be read as epd"
+msgstr ""
+
+#: C:\eudplib\eudplib\offsetmap\epdoffsetmap.py:70
+#: C:\eudplib\eudplib\offsetmap\epdoffsetmap.py:73
+msgid "Only dword can be read as position"
+msgstr ""
+
+#: C:\eudplib\eudplib\offsetmap\member.py:157
+msgid "Malaligned member"
+msgstr ""
+
+#: C:\eudplib\eudplib\offsetmap\member.py:179
+#: C:\eudplib\eudplib\offsetmap\member.py:182
+msgid "Unsupported EUD: {}"
+msgstr ""
+
+#: C:\eudplib\eudplib\trigger\tpatcher.py:102
 msgid "Condition is always True"
 msgstr ""
 
-#: E:\eudplib\eudplib\trigger\tpatcher.py:123
-#: E:\eudplib\eudplib\trigger\tpatcher.py:265
+#: C:\eudplib\eudplib\trigger\tpatcher.py:104
+#: C:\eudplib\eudplib\trigger\tpatcher.py:246
 msgid "Invalid input for condition: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\trigger\tpatcher.py:133
+#: C:\eudplib\eudplib\trigger\tpatcher.py:114
 msgid "Action expected, found {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\trigger\tpatcher.py:263
+#: C:\eudplib\eudplib\trigger\tpatcher.py:244
 msgid "Condition is always False"
 msgstr ""
 
-#: E:\eudplib\eudplib\trigger\triggerdef.py:55
+#: C:\eudplib\eudplib\trigger\triggerdef.py:37
 msgid "preserved should be bool"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\blockstru.py:75
+#: C:\eudplib\eudplib\utils\blockstru.py:57
 msgid "Block not found: {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\blockstru.py:82
-#: E:\eudplib\eudplib\utils\blockstru.py:96
+#: C:\eudplib\eudplib\utils\blockstru.py:64
+#: C:\eudplib\eudplib\utils\blockstru.py:78
 msgid "Block starting/ending mismatch"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\blockstru.py:83
-#: E:\eudplib\eudplib\utils\blockstru.py:97
+#: C:\eudplib\eudplib\utils\blockstru.py:65
+#: C:\eudplib\eudplib\utils\blockstru.py:79
 msgid "    - Started with {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\blockstru.py:84
-#: E:\eudplib\eudplib\utils\blockstru.py:98
+#: C:\eudplib\eudplib\utils\blockstru.py:66
+#: C:\eudplib\eudplib\utils\blockstru.py:80
 msgid "    - Ended with {}"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\exprproxy.py:50
+#: C:\eudplib\eudplib\utils\exprproxy.py:27
 msgid "Type {} is not castable"
 msgstr ""
 
-#: E:\eudplib\eudplib\utils\ubconv.py:47 E:\eudplib\eudplib\utils\ubconv.py:56
-#: E:\eudplib\eudplib\utils\ubconv.py:65 E:\eudplib\eudplib\utils\ubconv.py:74
+#: C:\eudplib\eudplib\utils\ubconv.py:29 C:\eudplib\eudplib\utils\ubconv.py:38
+#: C:\eudplib\eudplib\utils\ubconv.py:47 C:\eudplib\eudplib\utils\ubconv.py:56
 msgid "Invalid type {}"
 msgstr ""
 

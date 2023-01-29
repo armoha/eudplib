@@ -183,7 +183,7 @@ class EUDVariable(VariableBase):
 
     def checkNonRValue(self) -> None:
         if isRValueStrict and self._rvalue:
-            raise EPError(_("Trying to modify value of l-value variable"))
+            raise EPError(_("Trying to modify value of r-value variable"))
 
     # -------
 

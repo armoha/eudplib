@@ -414,11 +414,11 @@ class CUnit(EPDOffsetMap):
             if r == 0 and 0 <= q < 1700:
                 epd = ut.EPD(u)
             else:
-                raise ut.EPError(_("Invalid input for EPDCUnitMap: {}").format(ptr))
+                raise ut.EPError(_("Invalid input for CUnit: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
             epd = EPDCache(u)
         else:
-            raise ut.EPError(_("Invalid input for EPDCUnitMap: {}").format(epd))
+            raise ut.EPError(_("Invalid input for CUnit: {}").format(epd))
 
         return cls(epd, ptr=u)
 
