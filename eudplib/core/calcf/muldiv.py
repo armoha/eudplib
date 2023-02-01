@@ -111,6 +111,8 @@ def f_constmul(number):
             ret = _mulf._frets[0]
             ret << 0
             for i in ut.RandList(range(32)):
+                if (2**i * number) & 0xFFFFFFFF == 0:
+                    continue
                 rt.RawTrigger(
                     conditions=a.AtLeastX(1, 2**i),
                     actions=ret.AddNumber(2**i * number),
