@@ -6,7 +6,7 @@
 # Please see the LICENSE file that should have been included as part of this package.
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, NoReturn, TypeVar
+from typing import TYPE_CHECKING, Literal, overload, TypeVar
 
 from eudplib import utils as ut
 from eudplib.localize import _
@@ -114,14 +114,31 @@ class VariableBase(metaclass=ABCMeta):
         "In-place invert (x << ~x)"
         return self.__ixor__(0xFFFFFFFF)
 
-    def ineg(self: Self) -> Self:
+    @overload
+    def ineg(self: Self, *, action: Literal[False] = False) -> Self:
+        ...
+
+    @overload
+    def ineg(self: Self, *, action: Literal[True]) -> list[bt.Action]:
+        ...
+
+    def ineg(self: Self, *, action: bool = False) -> Self | list[bt.Action]:
         "In-place negate (x << -x)"
+        actions = [
+            self.AddNumberX(0xFFFFFFFF, 0x55555555),
+            self.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+            self.AddNumber(1),
+        ]
+        if action:
+            return actions
+        else:
+            bt.RawTrigger(actions=actions)
+            return self
+
+    def iabs(self: Self) -> Self:
         bt.RawTrigger(
-            actions=[
-                self.AddNumberX(0xFFFFFFFF, 0x55555555),
-                self.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
-                self.AddNumber(1),
-            ]
+            conditions=self >= 0x80000000,
+            actions=self.ineg(action=True),
         )
         return self
 
