@@ -3,7 +3,6 @@ from helper import *
 
 @TestInstance
 def test_dwpatch():
-
     # Initial value
     DoActions(SetMemory(0x58A364, SetTo, 1234), SetMemory(0x58A368, SetTo, 5678))
 

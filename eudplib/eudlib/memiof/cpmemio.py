@@ -184,7 +184,7 @@ def f_wwrite_cp(cpo, subp, w):
             ),
             [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
         )
-    except (TypeError):
+    except TypeError:
         if not (isinstance(cpo, int) and cpo == 0):
             cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
         _wwriter(subp, w)
@@ -218,7 +218,7 @@ def f_bwrite_cp(cpo, subp, b):
             ),
             [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
         )
-    except (TypeError):
+    except TypeError:
         if not (isinstance(cpo, int) and cpo == 0):
             cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
         _bwriter(subp, b)

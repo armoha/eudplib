@@ -253,7 +253,7 @@ def _is_CP_less_than_start(actions):
 def R2L(colors, colors_dict={}):
     try:
         _f = colors_dict[colors]
-    except (KeyError):
+    except KeyError:
 
         @c.EUDFunc
         def _f():

@@ -318,7 +318,6 @@ def AllocObjects() -> None:
         dwoccupmap = obja.EndWrite()
         dwoccupmap_dict[obj] = dwoccupmap
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
-
             raise ut.EPError(
                 _("Occupation map length ({}) & Object size mismatch for object ({})").format(
                     len(dwoccupmap), (obj.GetDataSize() + 3) >> 2

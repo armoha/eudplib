@@ -35,7 +35,6 @@ class _EUDFormatter(string.Formatter):
             raise ValueError(_("Max string recursion exceeded"))
         result = []
         for literal_text, field_name, format_spec, conversion in self.parse(format_string):
-
             # output the literal text
             if literal_text:
                 result.append(literal_text)

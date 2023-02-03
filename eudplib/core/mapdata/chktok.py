@@ -100,7 +100,6 @@ class CHK:
         del self.sections[sectionname]
 
     def optimize(self) -> None:
-
         # Delete unused sections
         # fmt: off
         used_section = [
