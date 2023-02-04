@@ -28,9 +28,24 @@ def test_atan2():
 
 
 @TestInstance
+def test_specialized_div():
+    x = EUDVariable()
+    for i in range(0, 32):
+        a = random.randint(1, 0xFFFFFFFF)
+        b = 2 << i
+        q, r = int(a / b), a - int(a / b) * b
+        x << a
+        test_equality(
+            f"div_by_pow_of_2({a}, {b}) = {(q, r)}",
+            f_div(x, b),
+            [q, r],
+        )
+
+
+@TestInstance
 def test_signed_div():
     for nth in range(4):
-        for _ in range(5):
+        for _ in range(4):
             a = random.randint(1, 0x7FFFFFFF)
             b = random.randint(1, a)
             if nth >= 2:

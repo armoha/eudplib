@@ -159,13 +159,21 @@ def f_constdiv(number):
                 if 2**i * number >= 2**32:
                     continue
 
-                rt.RawTrigger(
-                    conditions=a.AtLeast(2**i * number),
-                    actions=[
-                        a.SubtractNumber(2**i * number),
-                        quotient.AddNumber(2**i),
-                    ],
-                )
+                if number & (number - 1) == 0:
+                    rt.RawTrigger(
+                        conditions=a.AtLeastX(1, 2**i * number),
+                        actions=quotient.AddNumber(2**i),
+                    )
+                else:
+                    rt.RawTrigger(
+                        conditions=a.AtLeast(2**i * number),
+                        actions=[
+                            a.SubtractNumber(2**i * number),
+                            quotient.AddNumber(2**i),
+                        ],
+                    )
+            if number & (number - 1) == 0:
+                a &= number - 1
             # return quotient, a
 
         divfdict[number] = _divf
