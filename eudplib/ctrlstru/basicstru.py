@@ -16,7 +16,7 @@ def DoActions(*actions, preserved=True) -> tuple[c.Forward, c.RawTrigger]:
 
 
 def EUDJump(nextptr) -> None:
-    if isinstance(nextptr, c.EUDVariable):
+    if c.IsEUDVariable(nextptr):
         t = c.Forward()
         c.SeqCompute([(ut.EPD(t + 4), c.SetTo, nextptr)])
         t << c.RawTrigger()

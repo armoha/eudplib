@@ -5,25 +5,29 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
+from collections.abc import Callable
+import math
 from eudplib import utils as ut
 
 from .. import allocator as ac
 from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .. import variable as ev
+from ..variable.evcommon import _ev
+from ...localize import _
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 
 
 def f_mul(a, b, **kwargs):
     """Calculate a * b"""
-    if isinstance(a, ev.EUDVariable) and isinstance(b, ev.EUDVariable):
-        return _f_mul(a, b, **kwargs)
+    if ev.IsEUDVariable(a) and ev.IsEUDVariable(b):
+        return _eud_mul(a, b, **kwargs)
 
-    elif isinstance(a, ev.EUDVariable):
-        return f_constmul(b)(a, **kwargs)
+    elif ev.IsEUDVariable(a):
+        return _const_mul(b)(a, **kwargs)
 
-    elif isinstance(b, ev.EUDVariable):
-        return f_constmul(a)(b, **kwargs)
+    elif ev.IsEUDVariable(b):
+        return _const_mul(a)(b, **kwargs)
 
     try:
         ret = kwargs["ret"][0]
@@ -34,12 +38,25 @@ def f_mul(a, b, **kwargs):
 
 
 def f_div(a, b, **kwargs):
-    """Calculate (a//b, a%b)"""
-    if isinstance(b, ev.EUDVariable):
-        return _f_div(a, b, **kwargs)
+    """Calculates quotient and remainder of a by b, with unsigned division.
 
-    elif isinstance(a, ev.EUDVariable):
-        return f_constdiv(b)(a, **kwargs)
+    For signed division, uses `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."""
+    if ut.isUnproxyInstance(a, int) and a < 0:
+        raise ut.EPError(
+            _("Can't use negative dividend for unsigned division: {}").format(a),
+            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+        )
+    if ut.isUnproxyInstance(b, int) and b < 0:
+        raise ut.EPError(
+            _("Can't use negative divider for unsigned division: {}").format(a),
+            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+        )
+
+    if ev.IsEUDVariable(b):
+        return _eud_div(a, b, **kwargs)
+
+    elif ev.IsEUDVariable(a):
+        return _const_div(b)(a, **kwargs)
 
     if b:
         q, m = divmod(a, b)
@@ -53,10 +70,72 @@ def f_div(a, b, **kwargs):
     return vq, vm
 
 
+def _quot(a, b, **kwargs):
+    """Calculate (a//b)"""
+    if ut.isUnproxyInstance(a, int) and a < 0:
+        raise ut.EPError(
+            _("Can't use negative dividend for unsigned division: {}").format(a),
+            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+        )
+    if ut.isUnproxyInstance(b, int) and b < 0:
+        raise ut.EPError(
+            _("Can't use negative divider for unsigned division: {}").format(a),
+            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+        )
+
+    if isinstance(b, ev.EUDVariable):
+        return _eud_quot(a, b, **kwargs)
+
+    elif isinstance(a, ev.EUDVariable):
+        return _const_quot(b)(a, **kwargs)
+
+    if b:
+        q = a // b
+    else:
+        q = 0xFFFFFFFF, a
+    try:
+        vq = kwargs["ret"][0]
+    except KeyError:
+        vq = ev.EUDVariable()
+    ev.SeqCompute([(vq, rt.SetTo, q)])
+    return vq
+
+
+def _rem(a, b, **kwargs):
+    """Calculate (a%b)"""
+    if ut.isUnproxyInstance(a, int) and a < 0:
+        raise ut.EPError(
+            _("Can't use negative dividend for unsigned division: {}").format(a),
+            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+        )
+    if ut.isUnproxyInstance(b, int) and b < 0:
+        raise ut.EPError(
+            _("Can't use negative divider for unsigned division: {}").format(a),
+            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+        )
+
+    if isinstance(b, ev.EUDVariable):
+        return _eud_rem(a, b, **kwargs)
+
+    elif isinstance(a, ev.EUDVariable):
+        return _const_rem(b)(a, **kwargs)
+
+    if b:
+        m = a % b
+    else:
+        m = a
+    try:
+        vm = kwargs["ret"][0]
+    except KeyError:
+        vm = ev.EUDVariable()
+    ev.SeqCompute([(vm, rt.SetTo, m)])
+    return vm
+
+
 # -------
 
 
-def f_constmul(number):
+def _const_mul(number: int) -> Callable:
     """
     f_constnum(a)(b) calculates b * a.
 
@@ -64,7 +143,7 @@ def f_constmul(number):
     :return: Function taking one parameter.
     """
     number &= 0xFFFFFFFF
-    if not hasattr(f_constmul, "mulfdict"):
+    if not hasattr(_const_mul, "mulfdict"):
         from .bitwise import f_bitlshift
 
         @ef.EUDFunc
@@ -85,20 +164,24 @@ def f_constmul(number):
 
             return pow2
 
-        f_constmul.mulfdict = {
-            0xFFFFFFFF: _mul_1,
-            0: _mul0,
-            1: _mul1,
-            2**1: _mul_pow2(1),
-            2**2: _mul_pow2(2),
-            2**3: _mul_pow2(3),
-            2**4: _mul_pow2(4),
-            2**5: _mul_pow2(5),
-            2**6: _mul_pow2(6),
-            2**7: _mul_pow2(7),
-        }
+        setattr(
+            _const_mul,
+            "mulfdict",
+            {
+                0xFFFFFFFF: _mul_1,
+                0: _mul0,
+                1: _mul1,
+                2**1: _mul_pow2(1),
+                2**2: _mul_pow2(2),
+                2**3: _mul_pow2(3),
+                2**4: _mul_pow2(4),
+                2**5: _mul_pow2(5),
+                2**6: _mul_pow2(6),
+                2**7: _mul_pow2(7),
+            },
+        )
 
-    mulfdict = f_constmul.mulfdict
+    mulfdict = getattr(_const_mul, "mulfdict")
 
     try:
         return mulfdict[number]
@@ -123,14 +206,14 @@ def f_constmul(number):
         return _mulf
 
 
-def f_constdiv(number):
+def _const_div(number: int) -> Callable:
     """
-    f_constdiv(a)(b) calculates (b // a, b % a)
+    _const_div(a)(b) calculates (b // a, b % a)
 
-    :param number: Constant integer to divide other numbers by.
+    :param number: Constant positive integer to divide other numbers by.
     :return: Function taking one parameter.
     """
-    if not hasattr(f_constdiv, "divfdict"):
+    if not hasattr(_const_div, "divfdict"):
 
         @ef.EUDFunc
         def _div0(x):
@@ -140,9 +223,9 @@ def f_constdiv(number):
         def _div1(x):
             return x, 0
 
-        f_constdiv.divfdict = {0: _div0, 1: _div1}
+        setattr(_const_div, "divfdict", {0: _div0, 1: _div1})
 
-    divfdict = f_constdiv.divfdict
+    divfdict = getattr(_const_div, "divfdict")
 
     try:
         return divfdict[number]
@@ -180,13 +263,127 @@ def f_constdiv(number):
         return _divf
 
 
+def _const_quot(number: int) -> Callable:
+    """
+    _const_quot(a)(b) calculates (b // a)
+
+    :param number: Constant positive integer to divide other numbers by.
+    :return: Function taking one parameter.
+    """
+    if not hasattr(_const_quot, "quotfdict"):
+
+        @ef.EUDFunc
+        def _quot0(x):
+            return -1
+
+        @ef.EUDFunc
+        def _quot1(x):
+            return x
+
+        setattr(_const_quot, "quotfdict", {0: _quot0, 1: _quot1})
+
+    quotfdict = getattr(_const_quot, "quotfdict")
+
+    try:
+        return quotfdict[number]
+    except KeyError:
+
+        if number & (number - 1) == 0:  # a // powOf2 = a >> log2(powOf2)
+
+            @_EUDPredefineReturn(1)
+            @_EUDPredefineParam(1)
+            @ef.EUDFunc
+            def _quotf(quotient):
+                ev.vbase.VariableBase.__irshift__(quotient, int(math.log2(number)))
+                # return quotient
+
+        else:
+
+            @_EUDPredefineReturn(1)
+            @ef.EUDFunc
+            def _quotf(a):
+                quotient = _quotf._frets[0]
+                quotient << 0
+                for i in range(31, -1, -1):
+                    # number too big
+                    if 2**i * number >= 2**32:
+                        continue
+
+                    rt.RawTrigger(
+                        conditions=a.AtLeast(2**i * number),
+                        actions=[
+                            a.SubtractNumber(2**i * number),
+                            quotient.AddNumber(2**i),
+                        ],
+                    )
+                # return quotient
+
+        quotfdict[number] = _quotf
+        return _quotf
+
+
+def _const_rem(number: int) -> Callable:
+    """
+    _const_rem(a)(b) calculates (b // a)
+
+    :param number: Constant positive integer to divide other numbers by.
+    :return: Function taking one parameter.
+    """
+    if not hasattr(_const_rem, "remfdict"):
+
+        @ef.EUDFunc
+        def _rem0(x):
+            return x
+
+        @ef.EUDFunc
+        def _rem1(x):
+            return 0
+
+        setattr(_const_rem, "remfdict", {0: _rem0, 1: _rem1})
+
+    remfdict = getattr(_const_rem, "remfdict")
+
+    try:
+        return remfdict[number]
+    except KeyError:
+
+        if number & (number - 1) == 0:
+
+            @_EUDPredefineReturn(1)
+            @_EUDPredefineParam(1)
+            @ef.EUDFunc
+            def _remf(remainder):
+                remainder &= number - 1
+                # return remainder
+
+        else:
+
+            @_EUDPredefineReturn(1)
+            @_EUDPredefineParam(1)
+            @ef.EUDFunc
+            def _remf(a):
+                for i in range(31, -1, -1):
+                    # number too big
+                    if 2**i * number >= 2**32:
+                        continue
+
+                    rt.RawTrigger(
+                        conditions=a.AtLeast(2**i * number),
+                        actions=a.SubtractNumber(2**i * number),
+                    )
+                # return remainder
+
+        remfdict[number] = _remf
+        return _remf
+
+
 # -------
 
 
 @_EUDPredefineReturn(1)
 @ef.EUDFunc
-def _f_mul(a, b):
-    ret = _f_mul._frets[0]
+def _eud_mul(a, b):
+    ret = _eud_mul._frets[0]
     endmul, reset_nptr = ac.Forward(), ac.Forward()
 
     # Init
@@ -222,7 +419,7 @@ def _f_mul(a, b):
 
 
 @ef.EUDFunc
-def _f_div(a, b):
+def _eud_div(a, b):
     ret, x = ev.EUDCreateVariables(2)
 
     # Init
@@ -261,3 +458,19 @@ def _f_div(a, b):
         chain_x1[i] << cx1 + 20
 
     return ret, a  # a : remainder
+
+
+def _eud_quot(a, b, **kwargs):
+    ret = kwargs.get("ret")
+    if ret is not None:
+        ret.append(_ev[4])
+    quot = _eud_div(a, b, **kwargs)[0]
+    return ret[0] if ret else quot
+
+
+def _eud_rem(a, b, **kwargs):
+    ret = kwargs.get("ret")
+    if ret is not None:
+        ret.insert(0, _ev[4])
+    rem = _eud_div(a, b, **kwargs)[1]
+    return ret[1] if ret else rem

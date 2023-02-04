@@ -32,7 +32,7 @@ def f_lengthdir(length, angle):
     # MAIN LOGIC
 
     if cs.EUDIf()(angle >= 360):
-        angle << c.f_div(angle, 360)[1]
+        angle %= 360
     cs.EUDEndIf()
 
     # sign of cos, sin
@@ -80,8 +80,13 @@ def f_lengthdir(length, angle):
     tablesin = f_dwread_epd(tableangle)
 
     # calculate lengthdir: cos, sin * 65536
-    ldir_x = c.f_div(c.f_mul(tablecos, length), 65536)[0]
-    ldir_y = c.f_div(c.f_mul(tablesin, length), 65536)[0]
+    ldir_x = tablecos
+    ldir_x *= length
+    ldir_x //= 65536
+
+    ldir_y = tablesin
+    ldir_y *= length
+    ldir_y //= 65536
 
     # restore sign of cos, sin
     c.RawTrigger(
@@ -168,9 +173,13 @@ def f_lengthdir_256(length, angle):
     tablesin = f_dwread_epd(tableangle)
 
     # calculate lengthdir: cos, sin * 65536
-    ldir_x = c.f_div(c.f_mul(tablecos, length), 65536)[0]
-    ldir_y = c.f_div(c.f_mul(tablesin, length), 65536)[0]
-    signedness = c.EUDVariable()
+    ldir_x = tablecos
+    ldir_x *= length
+    ldir_x //= 65536
+
+    ldir_y = tablesin
+    ldir_y *= length
+    ldir_y //= 65536
 
     # restore sign of cos, sin
     c.RawTrigger(

@@ -79,8 +79,8 @@ def main():
             unitx, unity = f_dwbreak(coord)[0:2]
 
             # Convert coordinates to tile coordinates
-            tileunitx = f_div(unitx, 32)[0]
-            tileunity = f_div(unity, 32)[0]
+            tileunitx = unitx // 32
+            tileunity = unity // 32
 
             # creep -> continue
             creepval = f_creepread(tileunitx, tileunity)

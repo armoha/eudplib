@@ -33,7 +33,7 @@ def test_xvmixedtrg():
     )
 
     DoActions(a.SetNumber(15), a.SetMask(19))
-    DoActions(SetDeaths(a, SetTo, f_div(40, a)[0], a))
+    DoActions(SetDeaths(a, SetTo, 40 // a, a))
     d1 = EUDVariable()
     d1 << a
     d2, d3 = f_div(40, a)

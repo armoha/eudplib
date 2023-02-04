@@ -5,15 +5,15 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from ...utils import EPD, RandList
+from ...utils import EPD, RandList, isUnproxyInstance
 from .. import allocator as ac
 from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .. import variable as ev
 from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ..variable import SeqCompute
-from ..variable.evcommon import _ev, _selfadder, _xv
-from .muldiv import f_div, f_mul
+from ..variable.evcommon import _selfadder, _xv
+from .muldiv import _quot
 
 _x = _xv[0]
 
@@ -175,9 +175,10 @@ def f_bitlshift(a, b, _fdict={}, **kwargs):
 
 def f_bitrshift(a, b, **kwargs):
     """Calculate a >> b"""
-    if isinstance(b, int) and b >= 32:
+    if isUnproxyInstance(b, int) and b >= 32:
+        ret = kwargs.get("ret")
+        if ret is not None:
+            ev.SeqCompute([(ret[0], rt.SetTo, 0)])
+            return ret[0]
         return 0
-    ret = kwargs.get("ret")
-    if ret is not None:
-        ret.append(_ev[4])
-    return f_div(a, _exp2(b), **kwargs)[0]
+    return _quot(a, _exp2(b), **kwargs)
