@@ -78,19 +78,21 @@ def f_div_floor(a, b):
 
     quotient, modulo = c.f_div(a, b)
 
-    if cs.EUDIf()((1 <= _signflag, _signflag <= 2, modulo >= 1)):
-        # modulo << -modulo + b
-        c.VProc(
-            b,
-            [
-                quotient.AddNumber(1),
-                modulo.ineg(action=True),
-                b.QueueAddTo(modulo),
-            ],
-        )
-    cs.EUDEndIf()
+    check, ontrue, onfalse = [c.Forward() for _ in range(3)]
+    check << c.RawTrigger(  # modulo << -modulo + b
+        nextptr=onfalse,
+        conditions=(1 <= _signflag, _signflag <= 2, modulo >= 1),
+        actions=[
+            c.SetNextPtr(check, b.GetVTable()),
+            c.SetNextPtr(b.GetVTable(), ontrue),
+            quotient.AddNumber(1),
+            modulo.ineg(action=True),
+            b.QueueAddTo(modulo),
+        ],
+    )
+    ontrue << c.RawTrigger(actions=c.SetNextPtr(check, onfalse))
     # when only one of divider or dividend is negative, quotient is negative
-    c.RawTrigger(
+    onfalse << c.RawTrigger(
         conditions=(1 <= _signflag, _signflag <= 2),
         actions=quotient.ineg(action=True),
     )
@@ -132,19 +134,21 @@ def f_div_euclid(a, b):
 
     quotient, modulo = c.f_div(a, b)
 
-    if cs.EUDIf()((_signflag.ExactlyX(1, 1), modulo >= 1)):
-        # modulo << -modulo + b
-        c.VProc(
-            b,
-            [
-                quotient.AddNumber(1),
-                modulo.ineg(action=True),
-                b.QueueAddTo(modulo),
-            ],
-        )
-    cs.EUDEndIf()
+    check, ontrue, onfalse = [c.Forward() for _ in range(3)]
+    check << c.RawTrigger(  # modulo << -modulo + b
+        nextptr=onfalse,
+        conditions=(_signflag.ExactlyX(1, 1), modulo >= 1),
+        actions=[
+            c.SetNextPtr(check, b.GetVTable()),
+            c.SetNextPtr(b.GetVTable(), ontrue),
+            quotient.AddNumber(1),
+            modulo.ineg(action=True),
+            b.QueueAddTo(modulo),
+        ],
+    )
+    ontrue << c.RawTrigger(actions=c.SetNextPtr(check, onfalse))
     # when only one of divider or dividend is negative, quotient is negative
-    c.RawTrigger(
+    onfalse << c.RawTrigger(
         conditions=(1 <= _signflag, _signflag <= 2),
         actions=quotient.ineg(action=True),
     )
