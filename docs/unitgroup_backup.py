@@ -67,10 +67,11 @@ class UnitGroup:
     // example usage
     function afterTriggerExec() {
         const zerglings = UnitGroup(1000);
-        foreach(ptr, epd : EUDLoopNewUnit()) {
-            const cunit = EPDCUnitMap(epd);
-            if (cunit.unitId = $U("Zerg Zergling")) {
+        foreach(cunit : EUDLoopNewCUnit()) {
+            epdswitch(cunit + 0x64/4, 255) {
+            case $U("Zerg Zergling"):
                 zerglings.add(epd);
+                break;
             }
         }
         foreach(unit : zerglings.cploop) {
