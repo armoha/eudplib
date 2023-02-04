@@ -31,11 +31,21 @@ def EPD(p: Any, **kwargs) -> Any:
     from .. import core as c
 
     if c.IsEUDVariable(p):
+        if sys.getrefcount(p) <= 2:
+            mask = 0b111
+            c.RawTrigger(
+                actions=[
+                    p.AddNumber(-0x58A364),
+                    p.SetNumberX(0, mask >> 1),
+                ]
+                + [p.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(30)]
+            )
+            return p
         if not hasattr(EPD, "_eudf"):
             c.PushTriggerScope()
             setter = c.SetDeaths(0, c.SetTo, 0, 0)
             vaddr = setter + 20
-            mask = (1 << (2 + 1)) - 1
+            mask = 0b111
             ftrg = c.RawTrigger(
                 nextptr=0,
                 actions=[
