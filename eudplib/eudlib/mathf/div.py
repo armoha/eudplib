@@ -78,9 +78,16 @@ def f_div_floor(a, b):
 
     quotient, modulo = c.f_div(a, b)
 
-    if cs.EUDIf()((modulo >= 1, 1 <= _signflag, _signflag <= 2)):
-        quotient += 1
-        modulo << b - modulo
+    if cs.EUDIf()((1 <= _signflag, _signflag <= 2, modulo >= 1)):
+        # modulo << -modulo + b
+        c.VProc(
+            b,
+            [
+                quotient.AddNumber(1),
+                modulo.ineg(action=True),
+                b.QueueAddTo(modulo),
+            ],
+        )
     cs.EUDEndIf()
     # when only one of divider or dividend is negative, quotient is negative
     c.RawTrigger(
@@ -126,8 +133,15 @@ def f_div_euclid(a, b):
     quotient, modulo = c.f_div(a, b)
 
     if cs.EUDIf()((_signflag.ExactlyX(1, 1), modulo >= 1)):
-        quotient += 1
-        modulo << b - modulo
+        # modulo << -modulo + b
+        c.VProc(
+            b,
+            [
+                quotient.AddNumber(1),
+                modulo.ineg(action=True),
+                b.QueueAddTo(modulo),
+            ],
+        )
     cs.EUDEndIf()
     # when only one of divider or dividend is negative, quotient is negative
     c.RawTrigger(
