@@ -287,7 +287,6 @@ def _const_quot(number: int) -> Callable:
     try:
         return quotfdict[number]
     except KeyError:
-
         if number & (number - 1) == 0:  # a // powOf2 = a >> log2(powOf2)
 
             @_EUDPredefineReturn(1)
@@ -346,7 +345,6 @@ def _const_rem(number: int) -> Callable:
     try:
         return remfdict[number]
     except KeyError:
-
         if number & (number - 1) == 0:
 
             @_EUDPredefineReturn(1)

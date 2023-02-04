@@ -16,31 +16,53 @@ from typing import Any, TypeVar, overload
 T = TypeVar("T")
 
 
-def EPD(p: Any) -> Any:
+def EPD(p: Any, **kwargs) -> Any:
     from ..core.allocator.constexpr import IsConstExpr
 
     if IsConstExpr(p):
-        return (p + (-0x58A364)) // 4
+        epd = (p + (-0x58A364)) // 4
+        if "ret" in kwargs:
+            from .. import core as c
+
+            c.SeqCompute([(kwargs["ret"][0], c.SetTo, epd)])
+            return kwargs["ret"][0]
+        return epd
 
     from .. import core as c
 
     if c.IsEUDVariable(p):
         if not hasattr(EPD, "_eudf"):
+            c.PushTriggerScope()
+            setter = c.SetDeaths(0, c.SetTo, 0, 0)
+            vaddr = setter + 20
+            mask = (1 << (2 + 1)) - 1
+            ftrg = c.RawTrigger(
+                nextptr=0,
+                actions=[
+                    c.SetMemory(vaddr, c.Add, -0x58A364),
+                    c.SetMemoryX(vaddr, c.SetTo, 0, mask >> 1),
+                ]
+                + [c.SetMemoryX(vaddr, c.Subtract, (mask >> 1) << t, mask << t) for t in range(30)]
+                + [setter],
+            )
+            c.PopTriggerScope()
 
-            @c.EUDFunc
-            def _EPD(ptr_to_epd):
-                mask = (1 << (2 + 1)) - 1
-                c.RawTrigger(
-                    actions=[
-                        ptr_to_epd.AddNumber(-0x58A364),
-                        ptr_to_epd.SetNumberX(0, mask >> 1),
-                    ]
-                    + [ptr_to_epd.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(30)],
-                )
-                return ptr_to_epd
+            setattr(EPD, "_eudf", (ftrg, setter))
 
-            setattr(EPD, "_eudf", _EPD)
-        return getattr(EPD, "_eudf")(p)
+        ret = kwargs["ret"][0] if "ret" in kwargs else c.EUDVariable()
+        ftrg, setter = getattr(EPD, "_eudf")
+        nexttrg = c.Forward()
+        dst = EPD(ret.getValueAddr()) if c.IsEUDVariable(ret) else ret
+        c.SeqCompute(
+            [
+                (EPD(ftrg) + 1, c.SetTo, nexttrg),
+                (EPD(setter) + 4, c.SetTo, dst),
+                (EPD(setter) + 5, c.SetTo, p),
+            ]
+        )
+        c.SetNextTrigger(ftrg)
+        nexttrg << c.NextTrigger()
+        return ret
 
     from .eperror import EPError
     from ..localize import _
