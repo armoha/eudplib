@@ -7,7 +7,6 @@
 
 from collections.abc import Sequence
 import functools
-import itertools
 import os.path
 import random
 import sys
@@ -18,7 +17,35 @@ T = TypeVar("T")
 
 
 def EPD(p: Any) -> Any:
-    return (p + (-0x58A364)) // 4
+    from ..core.allocator.constexpr import IsConstExpr
+
+    if IsConstExpr(p):
+        return (p + (-0x58A364)) // 4
+
+    from .. import core as c
+
+    if c.IsEUDVariable(p):
+        if not hasattr(EPD, "_eudf"):
+
+            @c.EUDFunc
+            def _EPD(ptr_to_epd):
+                mask = (1 << (2 + 1)) - 1
+                c.RawTrigger(
+                    actions=[
+                        ptr_to_epd.AddNumber(-0x58A364),
+                        ptr_to_epd.SetNumberX(0, mask >> 1),
+                    ]
+                    + [ptr_to_epd.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(30)],
+                )
+                return ptr_to_epd
+
+            setattr(EPD, "_eudf", _EPD)
+        return getattr(EPD, "_eudf")(p)
+
+    from .eperror import EPError
+    from ..localize import _
+
+    raise EPError(_("Invalid input for EPD: {}").format(p))
 
 
 # -------

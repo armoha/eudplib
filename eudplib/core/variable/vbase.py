@@ -147,10 +147,10 @@ class VariableBase(metaclass=ABCMeta):
         bt.RawTrigger(
             actions=[
                 [
-                    self.SetNumberX(0, (mask >> 1) << (n + 1)),
-                    self.AddNumberX((mask >> 1) << n, mask << n),
+                    self.SetNumberX(0, (mask >> 1) << (t + 1)),
+                    self.AddNumberX((mask >> 1) << t, mask << t),
                 ]
-                for n in reversed(range(32 - n))
+                for t in reversed(range(32 - n))
             ]
             + [self.SetNumberX(0, mask >> 1)]  # lowest n bits
         )
@@ -160,7 +160,7 @@ class VariableBase(metaclass=ABCMeta):
         mask = (1 << (n + 1)) - 1
         bt.RawTrigger(
             actions=[self.SetNumberX(0, mask >> 1)]  # lowest n bits
-            + [self.SubtractNumberX((mask >> 1) << n, mask << n) for n in range(32 - n)]
+            + [self.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(32 - n)]
         )
         return self
 
