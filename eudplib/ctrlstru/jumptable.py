@@ -42,30 +42,35 @@ class EUDJumpBuffer(c.EUDObject):
     def WritePayload(self, emitbuffer):
         for nextptr in self._nextptrs[:17]:
             emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(12)
-            emitbuffer.WriteDword(0)  # nocond
+            emitbuffer.WriteSpace(15)
+            emitbuffer.WriteByte(0)  # nocond
         for nextptr in self._nextptrs[17:118]:
             emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(4)
-            emitbuffer.WriteDword(0)  # noact
-            emitbuffer.WriteSpace(4)
-            emitbuffer.WriteDword(0)  # nocond
+            emitbuffer.WriteSpace(6)
+            emitbuffer.WriteByte(0)  # noact
+            emitbuffer.WriteSpace(8)
+            emitbuffer.WriteByte(0)  # nocond
         for nextptr in self._nextptrs[118:]:
             emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(4)
-            emitbuffer.WriteDword(0)  # noact
-            emitbuffer.WriteDword(8)  # flags
-            emitbuffer.WriteDword(0)  # nocond
-        emitbuffer.WriteSpace(8)
-        emitbuffer.WriteDword(0)  # noact
-        emitbuffer.WriteDword(8)  # flags
+            emitbuffer.WriteSpace(6)
+            emitbuffer.WriteByte(0)  # noact
+            emitbuffer.WriteSpace(1)
+            emitbuffer.WriteByte(8)  # flags
+            emitbuffer.WriteSpace(6)
+            emitbuffer.WriteByte(0)  # nocond
+        emitbuffer.WriteSpace(10)
+        emitbuffer.WriteByte(0)  # noact
+        emitbuffer.WriteSpace(1)
+        emitbuffer.WriteByte(8)  # flags
         for _ in range(16):
-            emitbuffer.WriteSpace(12)
-            emitbuffer.WriteDword(0)  # noact
-            emitbuffer.WriteDword(8)  # flags
+            emitbuffer.WriteSpace(17)
+            emitbuffer.WriteByte(0)  # noact
+            emitbuffer.WriteSpace(1)
+            emitbuffer.WriteByte(8)  # flags
         for _ in range(117 - 16):
-            emitbuffer.WriteSpace(16)
-            emitbuffer.WriteDword(8)  # flags
+            emitbuffer.WriteSpace(19)
+            emitbuffer.WriteByte(8)  # flags
+        emitbuffer.WriteSpace(3)
 
 
 _jtb = None

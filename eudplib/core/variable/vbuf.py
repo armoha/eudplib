@@ -69,9 +69,10 @@ class EUDVarBuffer(EUDObject):
             emitbuffer.WriteDword(initval)
             emitbuffer.WriteDword(0x072D0000)  # unit, acttype, SetTo
             emitbuffer.WriteDword(0x43530000)  # actflag, SC
-            emitbuffer.WriteDword(4)  # flags
+            emitbuffer.WriteByte(4)  # flags
             if i == len(self._initvals) - 1:
                 break
+            emitbuffer.WriteSpace(3)
             emitbuffer.WriteDword(0)  # nextptr
             emitbuffer.WriteSpace(15)
             emitbuffer.WriteByte(0)  # nocond
@@ -79,16 +80,16 @@ class EUDVarBuffer(EUDObject):
             emitbuffer.WriteByte(0)  # noact
             emitbuffer.WriteSpace(13)
 
-        emitbuffer.WriteSpace(22)
+        emitbuffer.WriteSpace(25)
         emitbuffer.WriteByte(0)  # noact
         emitbuffer.WriteSpace(45)
-        emitbuffer.WriteDword(4)  # flags
+        emitbuffer.WriteByte(4)  # flags
 
         for _ in range(27):
-            emitbuffer.WriteSpace(68)
-            emitbuffer.WriteDword(4)  # flags
+            emitbuffer.WriteSpace(71)
+            emitbuffer.WriteByte(4)  # flags
 
-        emitbuffer.WriteSpace(28)
+        emitbuffer.WriteSpace(31)
 
 
 _evb = None
@@ -183,12 +184,13 @@ class EUDCustomVarBuffer(EUDObject):
             emitbuffer.WriteDword(initvals[2])  # initval
             emitbuffer.WriteDword(initvals[3])  # unit, acttype, modifier
             emitbuffer.WriteDword(0x43530000)  # actflag, SC
-            emitbuffer.WriteDword(4)  # flags
+            emitbuffer.WriteByte(4)  # flags
             if i == len(self._actnptr_pairs) + len(self._5acts) - 1:
                 break
             if len(initvals) <= 4:
-                emitbuffer.WriteSpace(19)
+                emitbuffer.WriteSpace(22)
             else:
+                emitbuffer.WriteSpace(3)
                 emitbuffer.WriteDword(initvals[4])  # nextptr
                 emitbuffer.WriteSpace(15)
             emitbuffer.WriteByte(0)  # nocond
@@ -196,16 +198,16 @@ class EUDCustomVarBuffer(EUDObject):
             emitbuffer.WriteByte(0)  # noact
             emitbuffer.WriteSpace(13)
 
-        emitbuffer.WriteSpace(22)
+        emitbuffer.WriteSpace(25)
         emitbuffer.WriteByte(0)  # noact
         emitbuffer.WriteSpace(45)
-        emitbuffer.WriteDword(4)  # flags
+        emitbuffer.WriteByte(4)  # flags
 
         for _ in range(27):
-            emitbuffer.WriteSpace(68)
-            emitbuffer.WriteDword(4)  # flags
+            emitbuffer.WriteSpace(71)
+            emitbuffer.WriteByte(4)  # flags
 
-        emitbuffer.WriteSpace(28)
+        emitbuffer.WriteSpace(31)
 
 
 _ecvb = None
