@@ -56,50 +56,39 @@ class EUDVarBuffer(EUDObject):
     def WritePayload(self, emitbuffer) -> None:
         emitbuffer.WriteSpace(4)
 
-        for _ in range(4):
+        for i in range(5):
             emitbuffer.WriteDword(0)  # nextptr
             emitbuffer.WriteSpace(15)
             emitbuffer.WriteByte(0)  # nocond
-            emitbuffer.WriteSpace(52)
+            emitbuffer.WriteSpace(52 if i < 4 else 16)
 
-        emitbuffer.WriteDword(0)  # nextptr
-        emitbuffer.WriteSpace(15)
-        emitbuffer.WriteByte(0)  # nocond
-        emitbuffer.WriteSpace(16)
-
-        output = bytearray(72 * len(self._initvals))
-
-        for i in range(len(self._initvals)):
-            # 'preserve rawtrigger'
-            output[72 * i : 72 * i + 4] = b"\xFF\xFF\xFF\xFF"
-            output[72 * i + 24 : 72 * i + 28] = b"\0\0\x2D\x07"
-            output[72 * i + 28 : 72 * i + 32] = b"\0\0SC"
-            output[72 * i + 32 : 72 * i + 36] = b"\x04\0\0\0"
-
-        heads = 0
         for i, initval in enumerate(self._initvals):
-            heade = 72 * i + 20
-            if initval == 0:
-                continue
-            elif isinstance(initval, int):
-                output[heade : heade + 4] = ut.i2b4(initval)
-                continue
-            emitbuffer.WriteBytes(output[heads:heade])
+            emitbuffer.WriteDword(0xFFFFFFFF)  # bitmask
+            emitbuffer.WriteSpace(12)
+            emitbuffer.WriteDword(0)  # player
             emitbuffer.WriteDword(initval)
-            heads = 72 * i + 24
+            emitbuffer.WriteDword(0x072D0000)  # unit, acttype, SetTo
+            emitbuffer.WriteDword(0x43530000)  # actflag, SC
+            emitbuffer.WriteDword(4)  # flags
+            if i == len(self._initvals) - 1:
+                break
+            emitbuffer.WriteDword(0)  # nextptr
+            emitbuffer.WriteSpace(15)
+            emitbuffer.WriteByte(0)  # nocond
+            emitbuffer.WriteSpace(2)
+            emitbuffer.WriteByte(0)  # noact
+            emitbuffer.WriteSpace(13)
 
-        emitbuffer.WriteBytes(output[heads:])
-
-        emitbuffer.WriteSpace(32)
+        emitbuffer.WriteSpace(22)
+        emitbuffer.WriteByte(0)  # noact
+        emitbuffer.WriteSpace(45)
         emitbuffer.WriteDword(4)  # flags
-        emitbuffer.WriteSpace(27)
-        emitbuffer.WriteByte(0)  # currentAction
 
         for _ in range(27):
-            emitbuffer.WriteSpace(40)
+            emitbuffer.WriteSpace(68)
             emitbuffer.WriteDword(4)  # flags
-            emitbuffer.WriteSpace(27)
-            emitbuffer.WriteByte(0)  # currentAction
+
+        emitbuffer.WriteSpace(28)
 
 
 _evb = None
@@ -172,60 +161,51 @@ class EUDCustomVarBuffer(EUDObject):
                     emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer):
-        output = bytearray(72 * (len(self._actnptr_pairs) + len(self._5acts)))
-
         emitbuffer.WriteSpace(4)
 
         for i in range(5):
             try:
                 emitbuffer.WriteDword(self._5nptrs[i])  # nextptr
             except IndexError:
-                emitbuffer.WriteDword(0)
-            emitbuffer.WriteSpace(15)
-            emitbuffer.WriteByte(0)  # nocond
-            if i < 4:
-                emitbuffer.WriteSpace(52)
+                emitbuffer.WriteSpace(19)
             else:
-                emitbuffer.WriteSpace(16)
-
-        for i in range(len(self._actnptr_pairs) + len(self._5acts)):
-            # 'preserve rawtrigger'
-            output[72 * i : 72 * i + 4] = b"\xFF\xFF\xFF\xFF"
-            output[72 * i + 24 : 72 * i + 28] = b"\0\0\x2D\x07"
-            output[72 * i + 28 : 72 * i + 32] = b"\0\0SC"
-            output[72 * i + 32 : 72 * i + 36] = b"\x04\0\0\0"
-
-        heads = 0
+                emitbuffer.WriteSpace(15)
+            emitbuffer.WriteByte(0)  # nocond
+            emitbuffer.WriteSpace(52 if i < 4 else 16)
 
         from itertools import chain
 
         # bitmask, player, initval, modifier, nptr
-        offsets = (0, 16, 20, 24, 36)
-        initials = (0xFFFFFFFF, 0, 0, 0x072D0000, 0)
         for i, initvals in enumerate(chain(self._actnptr_pairs, self._5acts)):
-            for initval, offset, initial in zip(initvals, offsets, initials):
-                heade = 72 * i + offset
-                if initval == initial:
-                    continue
-                elif isinstance(initval, int):
-                    output[heade : heade + 4] = ut.i2b4(initval)
-                    continue
-                emitbuffer.WriteBytes(output[heads:heade])
-                emitbuffer.WriteDword(initval)
-                heads = 72 * i + offset + 4
+            emitbuffer.WriteDword(initvals[0])  # bitmask
+            emitbuffer.WriteSpace(12)
+            emitbuffer.WriteDword(initvals[1])  # player
+            emitbuffer.WriteDword(initvals[2])  # initval
+            emitbuffer.WriteDword(initvals[3])  # unit, acttype, modifier
+            emitbuffer.WriteDword(0x43530000)  # actflag, SC
+            emitbuffer.WriteDword(4)  # flags
+            if i == len(self._actnptr_pairs) + len(self._5acts) - 1:
+                break
+            if len(initvals) <= 4:
+                emitbuffer.WriteSpace(19)
+            else:
+                emitbuffer.WriteDword(initvals[4])  # nextptr
+                emitbuffer.WriteSpace(15)
+            emitbuffer.WriteByte(0)  # nocond
+            emitbuffer.WriteSpace(2)
+            emitbuffer.WriteByte(0)  # noact
+            emitbuffer.WriteSpace(13)
 
-        emitbuffer.WriteBytes(output[heads:])
-
-        emitbuffer.WriteSpace(32)
+        emitbuffer.WriteSpace(22)
+        emitbuffer.WriteByte(0)  # noact
+        emitbuffer.WriteSpace(45)
         emitbuffer.WriteDword(4)  # flags
-        emitbuffer.WriteSpace(27)
-        emitbuffer.WriteByte(0)  # currentAction
 
         for _ in range(27):
-            emitbuffer.WriteSpace(40)
+            emitbuffer.WriteSpace(68)
             emitbuffer.WriteDword(4)  # flags
-            emitbuffer.WriteSpace(27)
-            emitbuffer.WriteByte(0)  # currentAction
+
+        emitbuffer.WriteSpace(28)
 
 
 _ecvb = None
