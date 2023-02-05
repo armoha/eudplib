@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Literal
 from ... import utils as ut
 from .. import rawtrigger as bt
 from ..allocator import RegisterCreatePayloadCallback
+from ..allocator.payload import _PayloadHelper
 from ..eudobj import EUDObject
 
 if TYPE_CHECKING:
@@ -34,19 +35,19 @@ class EUDVarBuffer(EUDObject):
         return True
 
     def CreateVarTrigger(self, v, initval):
-        ret = self + (72 * len(self._initvals))
+        ret = self + (72 * len(self._initvals) - 4)
         self._initvals.append(initval)
         self._vdict[v] = ret
         return ret
 
     def CreateMultipleVarTriggers(self, v, initvals):
-        ret = self + (72 * len(self._initvals))
+        ret = self + (72 * len(self._initvals) - 4)
         self._initvals.extend(initvals)
         self._vdict[v] = ret
         return ret
 
     def GetDataSize(self) -> int:
-        return 2408 + 72 * (len(self._initvals) - 1)
+        return 2376 + 72 * (len(self._initvals) - 1)
 
     def CollectDependency(self, emitbuffer) -> None:
         for initval in self._initvals:
@@ -54,42 +55,26 @@ class EUDVarBuffer(EUDObject):
                 emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer) -> None:
-        emitbuffer.WriteSpace(4)
-
-        for i in range(5):
-            emitbuffer.WriteDword(0)  # nextptr
-            emitbuffer.WriteSpace(15)
-            emitbuffer.WriteByte(0)  # nocond
-            emitbuffer.WriteSpace(52 if i < 4 else 16)
-
-        for i, initval in enumerate(self._initvals):
-            emitbuffer.WriteDword(0xFFFFFFFF)  # bitmask
-            emitbuffer.WriteSpace(12)
-            emitbuffer.WriteDword(0)  # player
-            emitbuffer.WriteDword(initval)
-            emitbuffer.WriteDword(0x072D0000)  # unit, acttype, SetTo
-            emitbuffer.WriteDword(0x43530000)  # actflag, SC
-            emitbuffer.WriteByte(4)  # flags
-            if i == len(self._initvals) - 1:
-                break
-            emitbuffer.WriteSpace(3)
-            emitbuffer.WriteDword(0)  # nextptr
-            emitbuffer.WriteSpace(15)
-            emitbuffer.WriteByte(0)  # nocond
-            emitbuffer.WriteSpace(2)
-            emitbuffer.WriteByte(0)  # noact
-            emitbuffer.WriteSpace(13)
-
-        emitbuffer.WriteSpace(25)
-        emitbuffer.WriteByte(0)  # noact
-        emitbuffer.WriteSpace(45)
-        emitbuffer.WriteByte(4)  # flags
-
-        for _ in range(27):
-            emitbuffer.WriteSpace(71)
-            emitbuffer.WriteByte(4)  # flags
-
-        emitbuffer.WriteSpace(31)
+        count = len(self._initvals)
+        with _PayloadHelper(emitbuffer) as emitbuffer:
+            for i in range(32 + count):
+                emitbuffer.WriteDword(0) if i < count else emitbuffer.WriteSpace(4)
+                emitbuffer.WriteSpace(15)
+                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)
+                emitbuffer.WriteSpace(2)
+                emitbuffer.WriteByte(0) if 5 <= i < 5 + count else emitbuffer.WriteSpace(1)
+                emitbuffer.WriteSpace(13)
+                if 4 <= i < 4 + count:
+                    emitbuffer.WriteDword(0xFFFFFFFF)  # bitmask
+                    emitbuffer.WriteSpace(12)
+                    emitbuffer.WriteDword(0)  # player
+                    emitbuffer.WriteDword(self._initvals[i - 4])
+                    emitbuffer.WriteDword(0x072D0000)  # unit, acttype, SetTo
+                    emitbuffer.WriteDword(0x43530000)  # actflag, SC
+                else:
+                    emitbuffer.WriteSpace(32)
+                emitbuffer.WriteByte(4) if 32 <= i else emitbuffer.WriteSpace(1)
+                emitbuffer.WriteSpace(3)
 
 
 _evb = None
@@ -117,97 +102,62 @@ class EUDCustomVarBuffer(EUDObject):
         super().__init__()
 
         self._vdict = {}
-        self._5nptrs = deque([], maxlen=5)
-        self._actnptr_pairs = []
-        self._5acts = deque([], maxlen=5)
+        self._nptrs = []
+        self._acts = []
 
     def DynamicConstructed(self):
         return True
 
     def CreateVarTrigger(self, v, initval):
         # bitmask, player, #, modifier, nptr
-        ret = self + 72 * (len(self._actnptr_pairs) + len(self._5acts))
-        if len(self._5acts) == 5:
-            act = self._5acts.popleft()
-            act.append(initval[4])
-            self._actnptr_pairs.append(act)
-        else:
-            self._5nptrs.append(initval[4])
-        self._5acts.append(deque(initval[0:4], maxlen=5))
+        ret = self + (72 * len(self._acts) - 4)
+        self._nptrs.append(initval[4])
+        self._acts.append(initval[0:4])
         if v is not None:
             self._vdict[v] = ret
         return ret
 
     def CreateMultipleVarTriggers(self, v, initvals):
-        ret = self + 72 * (len(self._actnptr_pairs) + len(self._5acts))
+        ret = self + (72 * len(self._acts) - 4)
         for initval in initvals:
             self.CreateVarTrigger(None, initval)
         self._vdict[v] = ret
         return ret
 
     def GetDataSize(self):
-        return 2408 + 72 * (len(self._actnptr_pairs) + len(self._5acts) - 1)
+        return 2376 + 72 * (len(self._acts) - 1)
 
     def CollectDependency(self, emitbuffer):
-        for initval in self._5nptrs:
-            if type(initval) is not int:
-                emitbuffer.WriteDword(initval)
-        for initvals in self._actnptr_pairs:
-            for initval in initvals:
-                if type(initval) is not int:
-                    emitbuffer.WriteDword(initval)
-        for initvals in self._5acts:
+        for nptr in self._nptrs:
+            if type(nptr) is not int:
+                emitbuffer.WriteDword(nptr)
+        for initvals in self._acts:
             for initval in initvals:
                 if type(initval) is not int:
                     emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer):
-        emitbuffer.WriteSpace(4)
-
-        for i in range(5):
-            try:
-                emitbuffer.WriteDword(self._5nptrs[i])  # nextptr
-            except IndexError:
-                emitbuffer.WriteSpace(19)
-            else:
+        count = len(self._acts)
+        with _PayloadHelper(emitbuffer) as emitbuffer:
+            for i in range(32 + count):
+                emitbuffer.WriteDword(self._nptrs[i]) if i < count else emitbuffer.WriteSpace(4)
                 emitbuffer.WriteSpace(15)
-            emitbuffer.WriteByte(0)  # nocond
-            emitbuffer.WriteSpace(52 if i < 4 else 16)
-
-        from itertools import chain
-
-        # bitmask, player, initval, modifier, nptr
-        for i, initvals in enumerate(chain(self._actnptr_pairs, self._5acts)):
-            emitbuffer.WriteDword(initvals[0])  # bitmask
-            emitbuffer.WriteSpace(12)
-            emitbuffer.WriteDword(initvals[1])  # player
-            emitbuffer.WriteDword(initvals[2])  # initval
-            emitbuffer.WriteDword(initvals[3])  # unit, acttype, modifier
-            emitbuffer.WriteDword(0x43530000)  # actflag, SC
-            emitbuffer.WriteByte(4)  # flags
-            if i == len(self._actnptr_pairs) + len(self._5acts) - 1:
-                break
-            if len(initvals) <= 4:
-                emitbuffer.WriteSpace(22)
-            else:
+                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)
+                emitbuffer.WriteSpace(2)
+                emitbuffer.WriteByte(0) if 5 <= i < 5 + count else emitbuffer.WriteSpace(1)
+                emitbuffer.WriteSpace(13)
+                if 4 <= i < 4 + count:
+                    initvals = self._acts[i - 4]
+                    emitbuffer.WriteDword(initvals[0])  # bitmask
+                    emitbuffer.WriteSpace(12)
+                    emitbuffer.WriteDword(initvals[1])  # player
+                    emitbuffer.WriteDword(initvals[2])
+                    emitbuffer.WriteDword(initvals[3])  # unit, acttype, SetTo
+                    emitbuffer.WriteDword(0x43530000)  # actflag, SC
+                else:
+                    emitbuffer.WriteSpace(32)
+                emitbuffer.WriteByte(4) if 32 <= i else emitbuffer.WriteSpace(1)
                 emitbuffer.WriteSpace(3)
-                emitbuffer.WriteDword(initvals[4])  # nextptr
-                emitbuffer.WriteSpace(15)
-            emitbuffer.WriteByte(0)  # nocond
-            emitbuffer.WriteSpace(2)
-            emitbuffer.WriteByte(0)  # noact
-            emitbuffer.WriteSpace(13)
-
-        emitbuffer.WriteSpace(25)
-        emitbuffer.WriteByte(0)  # noact
-        emitbuffer.WriteSpace(45)
-        emitbuffer.WriteByte(4)  # flags
-
-        for _ in range(27):
-            emitbuffer.WriteSpace(71)
-            emitbuffer.WriteByte(4)  # flags
-
-        emitbuffer.WriteSpace(31)
 
 
 _ecvb = None
