@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from .. import core as c
+from ..core.allocator.payload import _PayloadHelper
 
 
 class EUDJumpBuffer(c.EUDObject):
     """Jump table buffer
 
-    8 bytes per nextptr.
+    20 bytes per nextptr.
     """
 
     def __init__(self):
@@ -20,19 +21,19 @@ class EUDJumpBuffer(c.EUDObject):
         return True
 
     def CreateJumpTrigger(self, v, nextptr):
-        ret = self + (8 * len(self._nextptrs) - 4)
+        ret = self + (20 * len(self._nextptrs) - 4)
         self._nextptrs.append(nextptr)
         self._jdict[v] = ret
         return ret
 
     def CreateMultipleJumpTriggers(self, v, nextptrs):
-        ret = self + (8 * len(self._nextptrs) - 4)
+        ret = self + (20 * len(self._nextptrs) - 4)
         self._nextptrs.extend(nextptrs)
         self._jdict[v] = ret
         return ret
 
     def GetDataSize(self):
-        return 2376 + 8 * (len(self._nextptrs) - 1)
+        return 2376 + 20 * (len(self._nextptrs) - 1)
 
     def CollectDependency(self, emitbuffer):
         for nextptr in self._nextptrs:
@@ -40,38 +41,19 @@ class EUDJumpBuffer(c.EUDObject):
                 emitbuffer.WriteDword(nextptr)
 
     def WritePayload(self, emitbuffer):
-        _space = 0
-
-        def space(n):
-            nonlocal _space
-            _space += n
-
-        def flush():
-            nonlocal _space
-            if _space:
-                emitbuffer.WriteSpace(_space)
-                _space = 0
-
-        def byte(b):
-            flush()
-            emitbuffer.WriteByte(b)
-
-        def dword(dw):
-            flush()
-            emitbuffer.WriteDword(dw)
-
-        for i in range(296 + len(self._nextptrs)):
-            if i < len(self._nextptrs):
-                dword(self._nextptrs[i])
-            else:
-                space(4)
-            if i < 296:
-                space(4)
-            else:
-                byte(8)
-                space(3)
-
-        flush()
+        count = len(self._nextptrs)
+        with _PayloadHelper(emitbuffer) as emitbuffer:
+            for i in range(118 + count):
+                emitbuffer.WriteDword(self._nextptrs[i]) if i < count else emitbuffer.WriteSpace(4)
+                emitbuffer.WriteSpace(6)
+                emitbuffer.WriteByte(0) if 16 <= i < 16 + count else emitbuffer.WriteSpace(1)
+                emitbuffer.WriteSpace(1)
+                emitbuffer.WriteByte(8) if 118 <= i else emitbuffer.WriteSpace(1)
+                emitbuffer.WriteSpace(3)
+                if i == 118 + count - 1:
+                    break
+                emitbuffer.WriteSpace(3)
+                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)
 
 
 _jtb = None

@@ -260,13 +260,13 @@ class ObjAllocator:
         # Add occupation index
         self._occupmap.extend([1] * (ssize >> 2))
         ssize &= 3
-        for i in range(ssize):
+        for _ in range(ssize):
             self._Occup1()
 
     def WriteBytes(self, b: bytes) -> None:
         ssize = len(b)
         self._occupmap.extend([1] * (ssize >> 2))
-        for i in range(ssize & 3):
+        for _ in range(ssize & 3):
             self._Occup1()
 
     def WriteSpace(self, ssize: int) -> None:
@@ -417,3 +417,28 @@ def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
 
     else:
         raise ut.EPError(_("Can't calculate object address now"))
+
+
+class _PayloadHelper:
+    def __init__(self, emitbuffer: _PayloadBuffer) -> None:
+        self.emitbuffer = emitbuffer
+        self.space: int = 0
+
+    def __enter__(self) -> "_PayloadHelper":
+        self.space = 0
+        return self
+
+    def WriteSpace(self, spacesize: int) -> None:
+        self.space += spacesize
+
+    def __getattr__(self, name):
+        self.flush()
+        return getattr(self.emitbuffer, name)
+
+    def flush(self) -> None:
+        if self.space:
+            self.emitbuffer.WriteSpace(self.space)
+            self.space = 0
+
+    def __exit__(self, type, value, trackback) -> None:
+        self.flush()
