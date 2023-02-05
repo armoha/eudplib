@@ -7,7 +7,7 @@ from .. import core as c
 class EUDJumpBuffer(c.EUDObject):
     """Jump table buffer
 
-    20 bytes per nextptr.
+    8 bytes per nextptr.
     """
 
     def __init__(self):
@@ -20,19 +20,19 @@ class EUDJumpBuffer(c.EUDObject):
         return True
 
     def CreateJumpTrigger(self, v, nextptr):
-        ret = self + (20 * len(self._nextptrs) - 4)
+        ret = self + (8 * len(self._nextptrs) - 4)
         self._nextptrs.append(nextptr)
         self._jdict[v] = ret
         return ret
 
     def CreateMultipleJumpTriggers(self, v, nextptrs):
-        ret = self + (20 * len(self._nextptrs) - 4)
+        ret = self + (8 * len(self._nextptrs) - 4)
         self._nextptrs.extend(nextptrs)
         self._jdict[v] = ret
         return ret
 
     def GetDataSize(self):
-        return 2356 + 20 * len(self._nextptrs)
+        return 2376 + 8 * (len(self._nextptrs) - 1)
 
     def CollectDependency(self, emitbuffer):
         for nextptr in self._nextptrs:
@@ -40,37 +40,38 @@ class EUDJumpBuffer(c.EUDObject):
                 emitbuffer.WriteDword(nextptr)
 
     def WritePayload(self, emitbuffer):
-        for nextptr in self._nextptrs[:17]:
-            emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(15)
-            emitbuffer.WriteByte(0)  # nocond
-        for nextptr in self._nextptrs[17:118]:
-            emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(6)
-            emitbuffer.WriteByte(0)  # noact
-            emitbuffer.WriteSpace(8)
-            emitbuffer.WriteByte(0)  # nocond
-        for nextptr in self._nextptrs[118:]:
-            emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(6)
-            emitbuffer.WriteByte(0)  # noact
-            emitbuffer.WriteSpace(1)
-            emitbuffer.WriteByte(8)  # flags
-            emitbuffer.WriteSpace(6)
-            emitbuffer.WriteByte(0)  # nocond
-        emitbuffer.WriteSpace(10)
-        emitbuffer.WriteByte(0)  # noact
-        emitbuffer.WriteSpace(1)
-        emitbuffer.WriteByte(8)  # flags
-        for _ in range(16):
-            emitbuffer.WriteSpace(17)
-            emitbuffer.WriteByte(0)  # noact
-            emitbuffer.WriteSpace(1)
-            emitbuffer.WriteByte(8)  # flags
-        for _ in range(117 - 16):
-            emitbuffer.WriteSpace(19)
-            emitbuffer.WriteByte(8)  # flags
-        emitbuffer.WriteSpace(3)
+        _space = 0
+
+        def space(n):
+            nonlocal _space
+            _space += n
+
+        def flush():
+            nonlocal _space
+            if _space:
+                emitbuffer.WriteSpace(_space)
+                _space = 0
+
+        def byte(b):
+            flush()
+            emitbuffer.WriteByte(b)
+
+        def dword(dw):
+            flush()
+            emitbuffer.WriteDword(dw)
+
+        for i in range(296 + len(self._nextptrs)):
+            if i < len(self._nextptrs):
+                dword(self._nextptrs[i])
+            else:
+                space(4)
+            if i < 296:
+                space(4)
+            else:
+                byte(8)
+                space(3)
+
+        flush()
 
 
 _jtb = None
