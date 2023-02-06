@@ -16,7 +16,11 @@ if DoCoverageTest:
 helper.LoadMap("outputmap/basemap/basemap_wireframe.scx")
 helper.EP_SetRValueStrictMode(True)
 
-helper.InitialWireframe.wireframes("Terran Marine", "Protoss Archon")
+helper.InitialWireframe.wireframes("Terran Ghost", "Protoss Archon")
+helper.InitialWireframe.wireframes(
+    "Terran Siege Tank (Tank Mode)", "Terran Siege Tank (Tank Mode)"
+)
+helper.InitialWireframe.wireframes("Protoss Probe", "Terran Siege Tank (Tank Mode)")
 helper.InitialWireframe.wireframes("Terran Goliath", "Terran Dropship")
 
 

@@ -59,9 +59,12 @@ class InitialWireframe:
                     init = [ut.i2b2(data[0])]
                     for n in range(size):
                         x = 2 * src[n] if n in src else 2 * n
-                        init.append(ut.i2b2(data[x] >> 16))
-                        init.append(ut.i2b4(data[x + 1]))
-                        init.append(ut.i2b2(data[x + 2]))
+                        if x == 2 * n:
+                            init.append(bytes(8))
+                        else:
+                            init.append(ut.i2b2(data[x] >> 16))
+                            init.append(ut.i2b4(data[x + 1]))
+                            init.append(ut.i2b2(data[x + 2]))
                     init.append(ut.i2b2(data[-2] >> 16))
                     init.append(ut.i2b4(data[-1]))
                     init = c.Db(b"".join(init))
@@ -88,9 +91,12 @@ class InitialWireframe:
                 init = [ut.i2b2(data[2 * src[key_min]])]
                 for n in range(key_min, key_max + 1):
                     x = 2 * src[n] if n in src else 2 * n
-                    init.append(ut.i2b2(data[x] >> 16))
-                    init.append(ut.i2b4(data[x + 1]))
-                    init.append(ut.i2b2(data[x + 2]))
+                    if x == 2 * n:
+                        init.append(bytes(8))
+                    else:
+                        init.append(ut.i2b2(data[x] >> 16))
+                        init.append(ut.i2b4(data[x + 1]))
+                        init.append(ut.i2b2(data[x + 2]))
                 init.append(ut.i2b2(data[2 * src[key_max] + 2] >> 16))
                 init = c.Db(b"".join(init))
                 ut.ep_assert(
