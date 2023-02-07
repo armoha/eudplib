@@ -36,6 +36,7 @@ class InitialWireframe:
     @classmethod
     def _init(cls):
         global is64bit, tranwire, grpwire, wirefram
+        print("RUN INIT")
         f_epdread_epd(ut.EPD(0x68C1F4), ret=[tranwire])
         f_epdread_epd(ut.EPD(0x68C1FC), ret=[grpwire])
         f_epdread_epd(ut.EPD(0x68C204), ret=[wirefram])
@@ -87,17 +88,19 @@ class InitialWireframe:
             def init32(ptr, src, data):
                 if not src:
                     return
-                key_min, key_max = min(src.keys()), max(src.keys())
-                init = [ut.i2b2(data[2 * src[key_min]])]
+                key_min = min(min(src.keys()), 5)  # Terran Siege Tank (Tank Mode)
+                key_max = max(max(src.keys()), 87)  # Aldaris (Templar)
+                wf = lambda n: 2 * src[n] if n in src else 2 * n
+                init = [ut.i2b2(data[wf(key_min)])]
                 for n in range(key_min, key_max + 1):
-                    x = 2 * src[n] if n in src else 2 * n
+                    x = wf(n)
                     if x == 2 * n:
                         init.append(bytes(8))
                     else:
                         init.append(ut.i2b2(data[x] >> 16))
                         init.append(ut.i2b4(data[x + 1]))
                         init.append(ut.i2b2(data[x + 2]))
-                init.append(ut.i2b2(data[2 * src[key_max] + 2] >> 16))
+                init.append(ut.i2b2(data[x + 2] >> 16))
                 init = c.Db(b"".join(init))
                 ut.ep_assert(
                     len(init.content) == (key_max - key_min + 1) * 8 + 4,
