@@ -127,7 +127,7 @@ def f_readgen_cp(
     initvals = tuple(arg[0] for arg in args)
     vals = tuple(tuple(arg[1](i) for i in ut.bits(mask)) for arg in args)
 
-    readerfunc = _read_cp_func(mask, initvals, *vals)
+    readerfunc = _read_cp_func(mask, initvals, *vals, _check_empty=_check_empty)
     if docstring:
         readerfunc.__doc__ = docstring
     return readerfunc
