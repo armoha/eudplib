@@ -49,5 +49,9 @@ def test_unitgroup():
     result = [1 if i in indexes else 3 if (i - 19) in indexes else 0 for i in range(26)]
     test_equality("UnitGroup dying test", [m[i] for i in range(26)], result)
 
-    for ptr, epd in EUDLoopNewUnit():
-        pass
+    count = EUDVariable()
+    DoActions(CreateUnit(12, "Zerg Broodling", 64, P8), count.SetNumber(0))
+    for cunit in EUDLoopPlayerCUnit(P8):
+        count += 1
+        Trigger(cunit.eqattr("unitType", "Zerg Broodling"), count.AddNumber(100))
+    test_equality("EUDLoopPlayerCUnit test", count, 1212)
