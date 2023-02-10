@@ -6,6 +6,7 @@
 # Please see the LICENSE file that should have been included as part of this package.
 
 from collections.abc import Callable
+from ..eudfunc.eudtypedfuncn import EUDTypedFuncN
 import math
 from eudplib import utils as ut
 
@@ -206,7 +207,7 @@ def _const_mul(number: int) -> Callable:
         return _mulf
 
 
-def _const_div(number: int) -> Callable:
+def _const_div(number: int) -> EUDTypedFuncN:
     """
     _const_div(a)(b) calculates (b // a, b % a)
 

@@ -12,13 +12,14 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ...core.eudfunc.eudtypedfuncn import EUDTypedFuncN
 from . import modcurpl as cp
 
 
 @functools.cache
 def _read_epd_func(
     mask: int, initvals: tuple[int, ...], *args: tuple[int, ...], _check_empty: bool = False
-) -> Callable:
+) -> EUDTypedFuncN:
     @_EUDPredefineReturn(len(args))
     @_EUDPredefineParam(c.CurrentPlayer)
     @c.EUDFunc
@@ -58,7 +59,7 @@ def f_readgen_epd(
     *args: tuple[int, Callable[[int], int]],
     docstring: str | None = None,
     _check_empty: bool = False
-) -> Callable:
+) -> EUDTypedFuncN:
     mask = mask & 0xFFFFFFFF
     initvals = tuple(arg[0] for arg in args)
     vals = tuple(tuple(arg[1](i) for i in ut.bits(mask)) for arg in args)
