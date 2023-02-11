@@ -59,22 +59,52 @@ class EUDVarBuffer(EUDObject):
         with _PayloadHelper(emitbuffer) as emitbuffer:
             for i in range(32 + count):
                 emitbuffer.WriteDword(0) if i < count else emitbuffer.WriteSpace(4)
-                emitbuffer.WriteSpace(15)
-                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)
-                emitbuffer.WriteSpace(2)
+                # emitbuffer.WriteSpace(15)  # empty condition
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)  # condtype
+                # emitbuffer.WriteSpace(1)  # empty condition (continued)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)  # condflag
                 emitbuffer.WriteByte(0) if 5 <= i < 5 + count else emitbuffer.WriteSpace(1)
-                emitbuffer.WriteSpace(13)
+                # emitbuffer.WriteSpace(1)  # empty action2
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0) if 5 <= i < 5 + count else emitbuffer.WriteSpace(1)
+                # emitbuffer.WriteSpace(11)  # empty action2 (continued)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
                 if 4 <= i < 4 + count:
                     emitbuffer.WriteDword(0xFFFFFFFF)  # bitmask
-                    emitbuffer.WriteSpace(12)
+                    # emitbuffer.WriteSpace(12)  # text string, wav string, time
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
                     emitbuffer.WriteDword(0)  # player
                     emitbuffer.WriteDword(self._initvals[i - 4])
                     emitbuffer.WriteDword(0x072D0000)  # unit, acttype, SetTo
                     emitbuffer.WriteDword(0x43530000)  # actflag, SC
                 else:
-                    emitbuffer.WriteSpace(32)
+                    # emitbuffer.WriteSpace(32)  # empty action1
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
                 emitbuffer.WriteByte(4) if 32 <= i else emitbuffer.WriteSpace(1)
-                emitbuffer.WriteSpace(3)
+                # emitbuffer.WriteSpace(3)  # trigger flags
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
 
 
 _evb = None
@@ -141,23 +171,53 @@ class EUDCustomVarBuffer(EUDObject):
         with _PayloadHelper(emitbuffer) as emitbuffer:
             for i in range(32 + count):
                 emitbuffer.WriteDword(self._nptrs[i]) if i < count else emitbuffer.WriteSpace(4)
-                emitbuffer.WriteSpace(15)
-                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)
-                emitbuffer.WriteSpace(2)
+                # emitbuffer.WriteSpace(15)  # empty condition
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)  # condtype
+                # emitbuffer.WriteSpace(1)  # empty condition (continued)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0) if i < count else emitbuffer.WriteSpace(1)  # condflag
                 emitbuffer.WriteByte(0) if 5 <= i < 5 + count else emitbuffer.WriteSpace(1)
-                emitbuffer.WriteSpace(13)
+                # emitbuffer.WriteSpace(1)  # empty action2
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0) if 5 <= i < 5 + count else emitbuffer.WriteSpace(1)
+                # emitbuffer.WriteSpace(11)  # empty action2 (continued)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
                 if 4 <= i < 4 + count:
                     initvals = self._acts[i - 4]
                     emitbuffer.WriteDword(initvals[0])  # bitmask
-                    emitbuffer.WriteSpace(12)
+                    # emitbuffer.WriteSpace(12)  # text string, wav string, time
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
                     emitbuffer.WriteDword(initvals[1])  # player
                     emitbuffer.WriteDword(initvals[2])
                     emitbuffer.WriteDword(initvals[3])  # unit, acttype, SetTo
                     emitbuffer.WriteDword(0x43530000)  # actflag, SC
                 else:
-                    emitbuffer.WriteSpace(32)
+                    # emitbuffer.WriteSpace(32)  # empty action1
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
+                    emitbuffer.WriteDword(0xFFFFFFFF)
                 emitbuffer.WriteByte(4) if 32 <= i else emitbuffer.WriteSpace(1)
-                emitbuffer.WriteSpace(3)
+                # emitbuffer.WriteSpace(3)  # trigger flags
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
 
 
 _ecvb = None
