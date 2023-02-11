@@ -36,7 +36,6 @@ class InitialWireframe:
     @classmethod
     def _init(cls):
         global is64bit, tranwire, grpwire, wirefram
-        print("RUN INIT")
         f_epdread_epd(ut.EPD(0x68C1F4), ret=[tranwire])
         f_epdread_epd(ut.EPD(0x68C1FC), ret=[grpwire])
         f_epdread_epd(ut.EPD(0x68C204), ret=[wirefram])
