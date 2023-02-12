@@ -3,6 +3,7 @@ line-length = 99 # override black's default line-length
 exclude = '''
 /(
     \.git
+  | \.hg
   | \.mypy_cache
   | \.tox
   | venv
@@ -11,6 +12,7 @@ exclude = '''
   | buck-out
   | build
   | dist
+  | .*writebuf\.py
 )/
 '''
 
