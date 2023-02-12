@@ -82,6 +82,7 @@ chunk ::= import_chunk SEMICOLON.
 chunk ::= fdef_chunk.
 chunk ::= fdecl_chunk.
 chunk ::= object_chunk.
+chunk ::= class_chunk.
 chunk ::= vdef_global_stmt SEMICOLON.
 chunk ::= funccall_global_stmt SEMICOLON.
 chunk ::= vdefAssign_global_stmt SEMICOLON.
@@ -422,6 +423,72 @@ object_body(A) ::= object_body(B) method_chunk . {
 }
 
 object_chunk ::= object_body(A) RBRACKET SEMICOLON. {
+    ps->gen << "_fields_ = [\n";
+    subTokenListIter(A->subToken[1], [&](const Token* tok) {
+        subTokenListIter(tok, [&](const Token* nameType) {
+            ps->gen.indent();
+            if(nameType->subToken[1]) {
+                ps->gen << "('" << nameType->subToken[0]->data << "', " << nameType->subToken[1]->data << "),\n";
+            }
+            else {
+                ps->gen << "'" << nameType->subToken[0]->data << "',\n";
+            }
+            ps->gen.unindent(false);
+        });
+    });
+    ps->gen << "]\n";
+    ps->closure.popScope();
+    ps->gen.unindent(true);
+    delete A;
+}
+
+
+/// Class declaration
+
+class_header(A) ::= CLASS NAME(name) LBRACKET. {
+    ps->gen << "class " << name->data << ":\n";
+    ps->gen.indent();
+
+    if(isBuiltinConst(name->data)) {
+        throw_error(6755, "Name collision with eudplib global " + name->data, name->line);
+    }
+    if(isPyKeyword(name->data)) {
+        throw_error(6756, "Name collision with Python keyword " + name->data, name->line);
+    }
+    if(isPyBuiltin(name->data)) {
+        throw_error(6757, "Name collision with Python builtin " + name->data, name->line);
+    }
+    if(!ps->closure.defConstant(name->data)) {
+        throw_error(8228, "Declaring object with non-function name " + name->data, name->line);
+    }
+    ps->closure.pushScope();
+
+    A = genEmpty();
+    A->subToken[0] = name;
+    A->subToken[1] = nullptr;
+}
+
+class_body(A) ::= class_header(B). {
+    A = B;
+}
+
+class_body(A) ::= class_body(B) VAR typedNameList_nonEmpty(varList) SEMICOLON. {
+    A = B;
+
+    // Append to subTokenList
+    Token* t = genEmpty();
+    t->subToken[0] = varList;
+    t->subToken[1] = nullptr;
+    subTokenListGetTail(A)->subToken[1] = t;
+    A->line = currentTokenizingLine;
+}
+
+class_body(A) ::= class_body(B) method_chunk . {
+    A = B;
+    A->line = currentTokenizingLine;
+}
+
+class_chunk ::= class_body(A) RBRACKET. {
     ps->gen << "_fields_ = [\n";
     subTokenListIter(A->subToken[1], [&](const Token* tok) {
         subTokenListIter(tok, [&](const Token* nameType) {

@@ -24,6 +24,7 @@ const char *getTokenTypeString(int type)
         {TOKEN_STATIC, "TOKEN_STATIC"},
         {TOKEN_FUNCTION, "TOKEN_FUNCTION"},
         {TOKEN_OBJECT, "TOKEN_OBJECT"},
+        {TOKEN_CLASS, "TOKEN_CLASS"},
         {TOKEN_L2V, "TOKEN_L2V"},
         {TOKEN_IF, "TOKEN_IF"},
         {TOKEN_ELSE, "TOKEN_ELSE"},
