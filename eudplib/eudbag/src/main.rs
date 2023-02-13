@@ -218,6 +218,7 @@ impl fmt::Display for Layout {
 }
 
 fn main() {
+    use Item::*;
     #[rustfmt::skip]
     let distance = vec![
       20,
@@ -259,66 +260,6 @@ fn main() {
         }
         None => (),
     };
-    /*
-    > 8 action size: 292, 197.26027397260273%
-    epd 0 : ['t9nextptr']
-    epd 1~3 are empty
-    epd 4 : ['t9nocond']
-    epd 5 : ['t7noact', 't9condflag=0']
-    epd 6 : ['t7actflag=0']
-    epd 7 is empty
-    epd 8 : ['t8a0mask=~0']
-    epd 9 : ['t1flags']
-    epd 10~11 are empty
-    epd 12 : ['t8a0dest']
-    epd 13 : ['t8a0value']
-    epd 14 : ['t8a0unit=0', 't8a0type=45', 't8a0SetTo']
-    epd 15 : ['t8a0flags', 't8a0SC']
-    epd 16 : ['t8a1mask=~0']
-    epd 17~19 are empty
-    epd 20 : ['t8a1dest']
-    epd 21 : ['t8a1value']
-    epd 22 : ['t8a1unit=0', 't8a1type=45', 't8a1SetTo']
-    epd 23 : ['t8a1flags', 't8a1SC']
-    epd 24 : ['t8a2mask=~0']
-    epd 25~27 are empty
-    epd 28 : ['t8a2dest']
-    epd 29 : ['t8a2value']
-    epd 30 : ['t8a2unit=0', 't8a2type=45', 't8a2SetTo']
-    epd 31 : ['t8a2flags', 't8a2SC']
-    epd 32 : ['t8a3mask=~0']
-    epd 33~35 are empty
-    epd 36 : ['t8a3dest']
-    epd 37 : ['t8a3value']
-    epd 38 : ['t8a3unit=0', 't8a3type=45', 't8a3SetTo']
-    epd 39 : ['t8a3flags', 't8a3SC']
-    epd 40 : ['t8a4mask=~0']
-    epd 41~43 are empty
-    epd 44 : ['t8a4dest']
-    epd 45 : ['t8a4value']
-    epd 46 : ['t8a4unit=0', 't8a4type=45', 't8a4SetTo']
-    epd 47 : ['t8a4flags', 't8a4SC']
-    epd 48 : ['t8a5mask=~0']
-    epd 49~51 are empty
-    epd 52 : ['t8a5dest']
-    epd 53 : ['t8a5value']
-    epd 54 : ['t8a5unit=0', 't8a5type=45', 't8a5SetTo']
-    epd 55 : ['t8a5flags', 't8a5SC']
-    epd 56 : ['t8a6mask=~0']
-    epd 57~59 are empty
-    epd 60 : ['t8a6dest']
-    epd 61 : ['t8a6value']
-    epd 62 : ['t8a6unit=0', 't8a6type=45', 't8a6SetTo']
-    epd 63 : ['t8a6flags', 't8a6SC']
-    epd 64 : ['t8a7mask=~0']
-    epd 65~67 are empty
-    epd 68 : ['t8a7dest']
-    epd 69 : ['t8a7value']
-    epd 70 : ['t8a7unit=0', 't8a7type=45', 't8a7SetTo']
-    epd 71 : ['t8a7flags', 't8a7SC']
-    epd 72 is empty
-    */
-    use Item::*;
     #[rustfmt::skip]
     let layout = vec![
         NextPtr, Space(15), NoCondType, Space(2), NoActType, Space(9),
