@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .. import core as c
+from ..core.allocator.payload import _PayloadHelper
 
 
 class EUDJumpBuffer(c.EUDObject):
@@ -32,7 +33,7 @@ class EUDJumpBuffer(c.EUDObject):
         return ret
 
     def GetDataSize(self):
-        return 2356 + 20 * len(self._nextptrs)
+        return 2376 + 20 * (len(self._nextptrs) - 1)
 
     def CollectDependency(self, emitbuffer):
         for nextptr in self._nextptrs:
@@ -40,32 +41,22 @@ class EUDJumpBuffer(c.EUDObject):
                 emitbuffer.WriteDword(nextptr)
 
     def WritePayload(self, emitbuffer):
-        for nextptr in self._nextptrs[:17]:
-            emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(12)
-            emitbuffer.WriteDword(0)  # nocond
-        for nextptr in self._nextptrs[17:118]:
-            emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(4)
-            emitbuffer.WriteDword(0)  # noact
-            emitbuffer.WriteSpace(4)
-            emitbuffer.WriteDword(0)  # nocond
-        for nextptr in self._nextptrs[118:]:
-            emitbuffer.WriteDword(nextptr)  # nextptr
-            emitbuffer.WriteSpace(4)
-            emitbuffer.WriteDword(0)  # noact
-            emitbuffer.WriteDword(8)  # flags
-            emitbuffer.WriteDword(0)  # nocond
-        emitbuffer.WriteSpace(8)
-        emitbuffer.WriteDword(0)  # noact
-        emitbuffer.WriteDword(8)  # flags
-        for _ in range(16):
-            emitbuffer.WriteSpace(12)
-            emitbuffer.WriteDword(0)  # noact
-            emitbuffer.WriteDword(8)  # flags
-        for _ in range(117 - 16):
-            emitbuffer.WriteSpace(16)
-            emitbuffer.WriteDword(8)  # flags
+        count = len(self._nextptrs)
+        with _PayloadHelper(emitbuffer) as emitbuffer:
+            for i in range(118 + count):
+                emitbuffer.WriteDword(self._nextptrs[i]) if i < count else emitbuffer.WriteSpace(4)
+                # emitbuffer.WriteSpace(8)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteByte(8) if 118 <= i else emitbuffer.WriteSpace(1)  # trgflag
+                # emitbuffer.WriteSpace(3)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteByte(0xFF)
+                if i == 118 + count - 1:
+                    break
+                # emitbuffer.WriteSpace(4)
+                emitbuffer.WriteDword(0xFFFFFFFF)
 
 
 _jtb = None
