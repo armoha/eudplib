@@ -25,6 +25,7 @@ enum TokenType
     TOKEN_FUNCTION,
     TOKEN_OBJECT,
     TOKEN_CLASS,
+    TOKEN_EXTENDS,
     TOKEN_L2V,
     TOKEN_ONCE,
     TOKEN_IF,
