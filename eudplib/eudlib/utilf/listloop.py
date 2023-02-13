@@ -172,11 +172,27 @@ def EUDLoopPlayerUnit(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     ptr, epd = f_cunitepdread_epd(ut.EPD(first_player_unit) + player)
 
     if cs.EUDWhile()(ptr >= 1):
+        next_unit, nextptr = c.Forward(), c.Forward()
+        # /*0x06C*/ BW::CUnit*  nextPlayerUnit;
+        # f_cunitepdread_epd(epd + 0x6C // 4, ret=[EPD(next_unit) + 5, EPD(next_unit) + 13])
+        c.VProc(
+            epd,
+            [
+                c.SetMemory(0x6509B0, c.SetTo, 0x6C // 4),
+                epd.QueueAddTo(EPD(0x6509B0)),
+                f_cunitepdread_epd._frets[0].SetDest(EPD(next_unit) + 5),
+                f_cunitepdread_epd._frets[1].SetDest(EPD(next_unit) + 13),
+                c.SetMemory(f_cunitepdread_epd._nptr, c.SetTo, nextptr),
+            ],
+        )
+        c.SetNextTrigger(f_cunitepdread_epd._fstart)
+        nextptr << c.NextTrigger()
         yield ptr, epd
         cs.EUDSetContinuePoint()
-        # /*0x06C*/ BW::CUnit*  nextPlayerUnit;
-        epd += 0x6C // 4
-        f_cunitepdread_epd(epd, ret=[ptr, epd])
+        cs.DoActions(
+            next_unit << ptr.SetNumber(0),
+            epd.SetNumber(0),
+        )
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("playerunitloop")
