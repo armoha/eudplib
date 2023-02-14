@@ -113,7 +113,7 @@ class UnitGroup:
                     (None, None, unit_epd),
                 ]
             )
-            unit_epd -= 0x4C // 4
+            SeqCompute([(unit_epd, Add, -(0x4C // 4))])
         else:
             # Occupy 1T, Run 4T 9A
             global _assign_helper
