@@ -4,21 +4,37 @@
 # All rights reserved.
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
+import functools
 from ..core.allocator.payload import _PayloadHelper
 from .. import core as c
 from .. import utils as ut
 from . import layout
 
 
+class BagTriggerForward(c.ConstExpr):
+    def __init__(self, nptr, init_acts) -> None:
+        super().__init__(self)
+        self._nptr = nptr
+        self._init_acts = init_acts
+
+    def Evaluate(self):
+        bb = GetCurrentBagBuffer(len(self._init_acts))
+        try:
+            return bb._vdict[self].Evaluate()
+        except KeyError:
+            vt = bb.CreateVarTrigger(self, self._nptr, self._init_acts)
+            return vt.Evaluate()
+
+
 class EUDBagBuffer(c.EUDObject):
     def __init__(self, var_count: int) -> None:
         ut.ep_assert(1 <= var_count <= 64)
         super().__init__()
-        self._vdict = {}
+        self._vdict: dict[BagTriggerForward, c.ConstExpr] = {}
         self._var_count = var_count
         self._overlap_distance = layout._overlap_distance[var_count]
-        self._nptrs = list()
-        self._acts = list()
+        self._nptrs: list[int | c.ConstExpr] = list()
+        self._acts: list[list[int | c.ConstExpr]] = list()
 
     def DynamicConstructed(self):
         return True
@@ -56,3 +72,8 @@ class EUDBagBuffer(c.EUDObject):
         count = len(self._acts)
         with _PayloadHelper(emitbuffer) as emitbuffer:
             layout._write_payload[self._var_count](emitbuffer, count, self._nptrs, self._acts)
+
+
+@functools.cache
+def GetCurrentBagBuffer(var_count: int) -> EUDBagBuffer:
+    return EUDBagBuffer(var_count)
