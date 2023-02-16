@@ -60,13 +60,25 @@ class EUDArray(ut.ExprProxy):
         self._epd = ut.EPD(self)
         self.dontFlatten = True
 
+    def _bound_check(self, index: object) -> None:
+        index = ut.unProxy(index)
+        if isinstance(index, int) and hasattr(self, "length"):
+            ut.ep_assert(
+                0 <= index < self.length,
+                _("index out of bounds: EUDArray.length is {} but the index is {}").format(
+                    self.length, index
+                ),
+            )
+
     def get(self, key) -> c.EUDVariable:
+        self._bound_check(key)
         return f_dwread_epd(self._epd + key)
 
     def __getitem__(self, key) -> c.EUDVariable:
         return self.get(key)
 
     def set(self, key, item):
+        self._bound_check(key)
         return iset(self._epd, key, c.SetTo, item)
 
     def __setitem__(self, key, item):
@@ -80,17 +92,21 @@ class EUDArray(ut.ExprProxy):
     # [0, 1, 2] of (self._epd, key) are variable
     #  × val is variable or not
     def iadditem(self, key, val):
+        self._bound_check(key)
         return iset(self._epd, key, c.Add, val)
 
     # FIXME: add operator for f_dwsubtract_epd
     def isubtractitem(self, key, val):
+        self._bound_check(key)
         return iset(self._epd, key, c.Subtract, val)
 
     def isubitem(self, key, val):
+        self._bound_check(key)
         return isub(self._epd, key, val)
 
     # defined when val is power of 2
     def imulitem(self, key, val):
+        self._bound_check(key)
         if not isinstance(val, int):
             raise AttributeError
         if val == 0:
@@ -105,6 +121,7 @@ class EUDArray(ut.ExprProxy):
 
     # defined when val is power of 2
     def ifloordivitem(self, key, val):
+        self._bound_check(key)
         if not isinstance(val, int):
             raise AttributeError
         if val == 0:
@@ -119,6 +136,7 @@ class EUDArray(ut.ExprProxy):
 
     # defined when val is power of 2
     def imoditem(self, key, val):
+        self._bound_check(key)
         if not isinstance(val, int):
             raise AttributeError
         if val == 0:
@@ -131,57 +149,71 @@ class EUDArray(ut.ExprProxy):
     # FIXME: merge logic with EUDVariable and VariableBase
 
     def ilshiftitem(self, key, val):
+        self._bound_check(key)
         if isinstance(val, int):
             return ilshift(self._epd, key, val)
         raise AttributeError
 
     def irshiftitem(self, key, val):
+        self._bound_check(key)
         if isinstance(val, int):
             return irshift(self._epd, key, val)
         raise AttributeError
 
     def ipowitem(self, key, val):
+        self._bound_check(key)
         if isinstance(val, int) and val == 1:
             return
         raise AttributeError
 
     def ianditem(self, key, val):
+        self._bound_check(key)
         iand(self._epd, key, val)
 
     def ioritem(self, key, val):
+        self._bound_check(key)
         ior(self._epd, key, val)
 
     def ixoritem(self, key, val):
+        self._bound_check(key)
         ixor(self._epd, key, val)
 
     # FIXME: Add operator?
-    def iinvert(self, key):
+    def iinvertitem(self, key):
+        self._bound_check(key)
         return self.ixoritem(key, 0xFFFFFFFF)
 
-    def inot(self, key):
+    def inotitem(self, key):
+        self._bound_check(key)
         raise AttributeError
 
     # item comparisons
     def eqitem(self, key, val):
+        self._bound_check(key)
         return c.MemoryEPD(self._epd + key, c.Exactly, val)
 
     def neitem(self, key, val):
         from .utilf import EUDNot
 
+        self._bound_check(key)
         return EUDNot(c.MemoryEPD(self._epd + key, c.Exactly, val))
 
     def leitem(self, key, val):
+        self._bound_check(key)
         return c.MemoryEPD(self._epd + key, c.AtMost, val)
 
     def geitem(self, key, val):
+        self._bound_check(key)
         return c.MemoryEPD(self._epd + key, c.AtLeast, val)
 
     def ltitem(self, key, val):
         from .utilf import EUDNot
 
+        self._bound_check(key)
         return EUDNot(c.MemoryEPD(self._epd + key, c.AtLeast, val))
 
     def gtitem(self, key, val):
         from .utilf import EUDNot
 
+        self._bound_check(key)
         return EUDNot(c.MemoryEPD(self._epd + key, c.AtMost, val))

@@ -11,11 +11,11 @@ from math import log2
 from typing import NoReturn
 
 from ...localize import _
-from ...utils import EPD, EPError, ExprProxy, ep_assert, isUnproxyInstance
+from ...utils import EPD, EPError, ExprProxy, ep_assert, unProxy
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, Forward, IsConstExpr
 from ..curpl import GetCPCache
-from ..inplacecw import cpset, iand, ilshift, ior, irshift, iset, isub, ixor
+from ..inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
 from ..variable import EUDLightVariable, EUDVariable, IsEUDVariable, SeqCompute, VProc
 from ..variable.eudv import _ProcessDest
 from ..variable.vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
@@ -85,6 +85,16 @@ class BitsTrg:
 def EUDVArray(size: int, basetype: type | None = None):
     ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
+    def _bound_check(index: object) -> None:
+        index = unProxy(unProxy)
+        if isinstance(index, int):
+            ep_assert(
+                0 <= index < size,
+                _("index out of bounds: the length of EUDVArray is {} but the index is {}").format(
+                    size, index
+                ),
+            )
+
     class _EUDVArray(ExprProxy):
         def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None) -> None:
             # Initialization from value
@@ -114,7 +124,7 @@ def EUDVArray(size: int, basetype: type | None = None):
             if IsEUDVariable(i):
                 r = self._eudget(i, **kwargs)
             else:
-                ep_assert(i < size, _("EUDVArray index out of bounds."))
+                _bound_check(i)
                 if IsEUDVariable(self):
                     r = self._get(i, **kwargs)
                 else:
@@ -234,6 +244,7 @@ def EUDVArray(size: int, basetype: type | None = None):
             return r
 
         def set(self, i, val) -> None:
+            _bound_check(i)
             self._set(i, bt.SetTo, val)
 
         def _set(self, i, modifier, val) -> None:
@@ -335,13 +346,16 @@ def EUDVArray(size: int, basetype: type | None = None):
             raise EPError(_("Can't iterate EUDVArray"))
 
         def iadditem(self, i, val) -> None:
+            _bound_check(i)
             self._set(i, bt.Add, val)
 
         # FIXME: add operator for Subtract
         def isubtractitem(self, i, val) -> None:
+            _bound_check(i)
             self._set(i, bt.Subtract, val)
 
         def isubitem(self, i, val) -> None:
+            _bound_check(i)
             if not IsEUDVariable(val):
                 self._set(i, bt.Add, -val)
                 return
@@ -398,6 +412,7 @@ def EUDVArray(size: int, basetype: type | None = None):
 
         # defined when val is power of 2
         def imulitem(self, i, val) -> None:
+            _bound_check(i)
             if not isinstance(val, int):
                 raise AttributeError
             if val == 0:
@@ -414,6 +429,7 @@ def EUDVArray(size: int, basetype: type | None = None):
 
         # defined when val is power of 2
         def ifloordivitem(self, i, val) -> None:
+            _bound_check(i)
             if not isinstance(val, int):
                 raise AttributeError
             if val == 0:
@@ -429,6 +445,7 @@ def EUDVArray(size: int, basetype: type | None = None):
 
         # defined when val is power of 2
         def imoditem(self, i, val) -> None:
+            _bound_check(i)
             if not isinstance(val, int):
                 raise AttributeError
             if val == 0:
@@ -442,6 +459,7 @@ def EUDVArray(size: int, basetype: type | None = None):
         # FIXME: merge logic with EUDVariable and VariableBase
 
         def ilshiftitem(self, i, n) -> None:
+            _bound_check(i)
             if not isinstance(n, int):
                 raise AttributeError
             if not IsEUDVariable(i):
@@ -502,6 +520,7 @@ def EUDVArray(size: int, basetype: type | None = None):
             nptr << bt.NextTrigger()
 
         def irshiftitem(self, i, n) -> None:
+            _bound_check(i)
             if not isinstance(n, int):
                 raise AttributeError
             if not IsEUDVariable(i):
@@ -556,11 +575,13 @@ def EUDVArray(size: int, basetype: type | None = None):
             nptr << bt.NextTrigger()
 
         def ipowitem(self, i, val) -> None:
+            _bound_check(i)
             if isinstance(val, int) and val == 1:
                 return
             raise AttributeError
 
         def ianditem(self, i, val) -> None:
+            _bound_check(i)
             if not IsEUDVariable(i):
                 iand(self._epd, 18 * i + 87, val)
                 return
@@ -636,6 +657,7 @@ def EUDVArray(size: int, basetype: type | None = None):
             nptr << bt.NextTrigger()
 
         def ioritem(self, i, val) -> None:
+            _bound_check(i)
             if not IsEUDVariable(i):
                 ior(self._epd, 18 * i + 87, val)
                 return
@@ -707,6 +729,7 @@ def EUDVArray(size: int, basetype: type | None = None):
             nptr << bt.NextTrigger()
 
         def ixoritem(self, i, val) -> None:
+            _bound_check(i)
             if not IsEUDVariable(i):
                 ixor(self._epd, 18 * i + 87, val)
                 return
@@ -799,19 +822,23 @@ def EUDVArray(size: int, basetype: type | None = None):
 
         # FIXME: Add operator?
         def iinvertitem(self, i) -> None:
+            _bound_check(i)
             self.ixoritem(i, 0xFFFFFFFF)
             return
 
         def inotitem(self, i) -> NoReturn:
+            _bound_check(i)
             raise AttributeError
 
         # item comparisons
         def eqitem(self, i, val) -> bt.Condition:
+            _bound_check(i)
             if not IsEUDVariable(i):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val)
             raise AttributeError
 
         def neitem(self, i, val):
+            _bound_check(i)
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
@@ -819,16 +846,19 @@ def EUDVArray(size: int, basetype: type | None = None):
             raise AttributeError
 
         def leitem(self, i, val) -> bt.Condition:
+            _bound_check(i)
             if not IsEUDVariable(i):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val)
             raise AttributeError
 
         def geitem(self, i, val) -> bt.Condition:
+            _bound_check(i)
             if not IsEUDVariable(i):
                 return bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val)
             raise AttributeError
 
         def ltitem(self, i, val):
+            _bound_check(i)
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
@@ -836,6 +866,7 @@ def EUDVArray(size: int, basetype: type | None = None):
             raise AttributeError
 
         def gtitem(self, i, val):
+            _bound_check(i)
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
