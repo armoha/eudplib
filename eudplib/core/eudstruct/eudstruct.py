@@ -23,9 +23,14 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
         fielddict = {}
         for index, nametype in enumerate(fields):
             if isinstance(nametype, str):
-                fielddict[nametype] = (index, None)
+                fieldname = nametype
+                field_index_type = (index, None)
             else:
-                fielddict[nametype[0]] = (index, nametype[1])
+                fieldname = nametype[0]
+                field_index_type = (index, nametype[1])
+            if fieldname in fielddict:
+                raise ut.EPError(_("Duplicated field name: {}").format(fieldname))
+            fielddict[fieldname] = field_index_type
         self._fielddict = fielddict
 
         if _from is not None:
