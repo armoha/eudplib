@@ -540,13 +540,34 @@ subobject_body ::= subobject_body CONST typedNameList_nonEmpty(varList) SEMICOLO
     delete varList;
 }
 
+subobject_body ::= subobject_body VAR(X) nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B) SEMICOLON. {
+    delete X;
+
+    std::string& s = A->data;
+    int varCount = std::count(s.begin(), s.end(), ',') + 1;
+
+    // Register variables.
+    commaListIter(s, [&](std::string& varname) {
+        if(isPyKeyword(varname)) {
+            throw_error(6756, "Name collision with Python keyword " + varname, A->line);
+        }
+        if(!ps->closure.defVariable(varname)) {
+            throw_error(7998, ("Redeclaration of variable \'" + varname + "\'"), A->line);
+        }
+    });
+
+    ps->gen << s << " = _LVAR([" << B->data << "])" << std::endl;
+
+    delete A; delete B;
+}
+
 subobject_chunk ::= subobject_body RBRACKET SEMICOLON. {
     ps->closure.popScope();
     ps->gen.unindent(true);
     ps->gen << "]\n";
 }
 
-class_header(A) ::= class_header(B) subobject_chunk. {
+class_body(A) ::= class_header(B) subobject_chunk. {
     A = B;
 }
 
