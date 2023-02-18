@@ -2,6 +2,12 @@ use std::fmt;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 
+use bit_set::BitSet;
+
+fn compute_overlap(overlap: BitSet, offset: usize, step: usize) -> bool {
+    true
+}
+
 #[deny(non_snake_case)]
 #[derive(Clone, Debug)]
 enum Item {
@@ -101,11 +107,11 @@ impl Layout {
         None
     }
     fn insert(&mut self, offset: u16, item: Item) -> Option<()> {
-        println!("insert {item:?} at {offset}");
+        // println!("insert {item:?} at {offset}");
         match self.find_insert(offset, item) {
             Some((n, ret)) => {
                 self.layout.remove(n);
-                println!("... Ok! {ret:?} at {n}");
+                // println!("... Ok! {ret:?} at {n}");
                 for item in ret.into_iter().rev() {
                     self.layout.insert(n, item);
                 }
@@ -285,6 +291,15 @@ fn main() {
             NoActFlag => print!("F"),
             TrgFlag => print!("T"),
             Breakpoint => print!("|"),
+        }
+    }
+    println!("");
+    for n in 1..=64 {
+        for distance in [336, 336 * 2, 336 * 4] {
+            match Layout::with_action_count_and_distance(n as u16, distance) {
+                Some(layout) => println!("CUnitVar{n} distance {distance}"),
+                None => (),
+            }
         }
     }
 }
