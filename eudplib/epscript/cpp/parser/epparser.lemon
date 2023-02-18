@@ -427,6 +427,12 @@ object_chunk ::= object_body(A) RBRACKET SEMICOLON. {
     subTokenListIter(A->subToken[1], [&](const Token* tok) {
         subTokenListIter(tok, [&](const Token* nameType) {
             ps->gen.indent();
+            if(isPyKeyword(nameType->subToken[0]->data)) {
+                throw_error(6756, "Name collision with Python keyword " + nameType->subToken[0]->data, A->line);
+            }
+            if(!ps->closure.defConstant(nameType->subToken[0]->data)) {
+                throw_error(7720, ("Duplicated field name \'" + nameType->subToken[0]->data + "\'"), A->line);
+            }
             if(nameType->subToken[1]) {
                 ps->gen << "('" << nameType->subToken[0]->data << "', " << nameType->subToken[1]->data << "),\n";
             }
@@ -491,6 +497,59 @@ class_header(A) ::= CLASS NAME(name) EXTENDS NAME(parent) LBRACKET. {
     A->subToken[1] = nullptr;
 }
 
+subobject_body ::= OBJECT LBRACKET. {
+    ps->gen << "_subobject_ = [\n";
+    ps->gen.indent();
+
+    ps->closure.pushScope();
+}
+
+subobject_body ::= subobject_body VAR typedNameList_nonEmpty(varList) SEMICOLON. {
+    subTokenListIter(varList, [&](const Token* nameType) {
+        if(isPyKeyword(nameType->subToken[0]->data)) {
+            throw_error(6756, "Name collision with Python keyword " + nameType->subToken[0]->data, currentTokenizingLine);
+        }
+        if(!ps->closure.defConstant(nameType->subToken[0]->data)) {
+            throw_error(7720, ("Duplicated field name \'" + nameType->subToken[0]->data + "\'"), currentTokenizingLine);
+        }
+        if(nameType->subToken[1]) {
+            ps->gen << "('" << nameType->subToken[0]->data << "', " << nameType->subToken[1]->data << "),\n";
+        }
+        else {
+            ps->gen << "'" << nameType->subToken[0]->data << "',\n";
+        }
+    });
+    delete varList;
+}
+
+subobject_body ::= subobject_body CONST typedNameList_nonEmpty(varList) SEMICOLON. {
+    subTokenListIter(varList, [&](const Token* nameType) {
+        if(isPyKeyword(nameType->subToken[0]->data)) {
+            throw_error(6756, "Name collision with Python keyword " + nameType->subToken[0]->data, currentTokenizingLine);
+        }
+        if(!ps->closure.defConstant(nameType->subToken[0]->data)) {
+            throw_error(7720, ("Duplicated field name \'" + nameType->subToken[0]->data + "\'"), currentTokenizingLine);
+        }
+        if(nameType->subToken[1]) {
+            ps->gen << "('" << nameType->subToken[0]->data << "', " << nameType->subToken[1]->data << ", 'const'),\n";
+        }
+        else {
+            ps->gen << "('" << nameType->subToken[0]->data << "', None, 'const'),\n";
+        }
+    });
+    delete varList;
+}
+
+subobject_chunk ::= subobject_body RBRACKET SEMICOLON. {
+    ps->closure.popScope();
+    ps->gen.unindent(true);
+    ps->gen << "]\n";
+}
+
+class_header(A) ::= class_header(B) subobject_chunk. {
+    A = B;
+}
+
 class_body(A) ::= class_header(B). {
     A = B;
 }
@@ -516,6 +575,12 @@ class_chunk ::= class_body(A) RBRACKET. {
     subTokenListIter(A->subToken[1], [&](const Token* tok) {
         subTokenListIter(tok, [&](const Token* nameType) {
             ps->gen.indent();
+            if(isPyKeyword(nameType->subToken[0]->data)) {
+                throw_error(6756, "Name collision with Python keyword " + nameType->subToken[0]->data, A->line);
+            }
+            if(!ps->closure.defConstant(nameType->subToken[0]->data)) {
+                throw_error(7720, ("Duplicated field name \'" + nameType->subToken[0]->data + "\'"), A->line);
+            }
             if(nameType->subToken[1]) {
                 ps->gen << "('" << nameType->subToken[0]->data << "', " << nameType->subToken[1]->data << "),\n";
             }
