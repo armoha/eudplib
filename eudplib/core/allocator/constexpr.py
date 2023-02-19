@@ -266,8 +266,10 @@ def Evaluate(x: Evaluable) -> RlocInt_C:
     if isinstance(expr, (int, RlocInt_C)):
         return toRlocInt(expr)
     if x is expr:
-        raise AttributeError(_("Only ConstExpr can be Evaluated, not {}").format(x))
-    raise AttributeError(_("ExprProxy {} does not wrap ConstExpr, instead {}").format(x, expr))
+        raise AttributeError(_("Only ConstExpr can be Evaluated, not {}").format(repr(x)))
+    raise AttributeError(
+        _("ExprProxy {} does not wrap ConstExpr, instead {}").format(x, repr(expr))
+    )
 
 
 def IsConstExpr(x) -> bool:

@@ -33,7 +33,7 @@ def EUDVArrayData(size):
                 _("{} items expected, got {}").format(size, len(initvars)),
             )
             for i, item in enumerate(initvars):
-                ep_assert(IsConstExpr(item), _("Invalid item #{}").format(i))
+                ep_assert(IsConstExpr(item), _("Invalid item #{}").format(repr(i)))
             if not all(isinstance(x, int) and x == 0 for x in (dest, nextptr)):
                 ep_assert(IsConstExpr(nextptr), _("nextptr should be ConstExpr"))
                 initvars = [

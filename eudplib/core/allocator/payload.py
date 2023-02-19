@@ -109,7 +109,7 @@ class ObjCollector:
         if isinstance(obj, (ConstExpr, ExprProxy, RlocInt_C)):
             Evaluate(obj)
             return
-        raise ut.EPError(_("Collected unexpected object: {}").format(obj))
+        raise ut.EPError(_("Collected unexpected object: {}").format(repr(obj)))
 
     def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
         for arg in arglist:
@@ -118,7 +118,7 @@ class ObjCollector:
             if isinstance(arg, (ConstExpr, ExprProxy, RlocInt_C)):
                 Evaluate(arg)
                 continue
-            raise ut.EPError(_("Collected unexpected object: {}").format(arg))
+            raise ut.EPError(_("Collected unexpected object: {}").format(repr(arg)))
 
     def WriteBytes(self, b: bytes) -> None:
         pass
