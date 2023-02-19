@@ -14,30 +14,33 @@ from .vararray import EUDVArray
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
-    def __init__(self, *args, _from=None, **kwargs):
-        basetype = type(self)
-        fields = basetype._fields_
-        fieldn = len(fields)
-
-        # Fill fielddict
+    def __init__(self, *args, _from=None, **kwargs) -> None:
         fielddict = {}
-        for index, nametype in enumerate(fields):
-            if isinstance(nametype, str):
-                fieldname = nametype
-                field_index_type = (index, None)
-            else:
-                fieldname = nametype[0]
-                field_index_type = (index, nametype[1])
-            if fieldname in fielddict:
-                raise ut.EPError(_("Duplicated field name: {}").format(fieldname))
-            fielddict[fieldname] = field_index_type
-        self._fielddict = fielddict
+        fieldcount = 0
+        for basetype in reversed(type(self).__mro__):
+            if not hasattr(basetype, "_fields_"):
+                continue
+
+            for nametype in basetype._fields_:
+                if isinstance(nametype, str):  # "fieldname"
+                    fieldname = nametype
+                    fieldtype = None
+                else:  # ("fieldname", fieldtype)
+                    fieldname = nametype[0]
+                    fieldtype = nametype[1]
+
+                if fieldname in fielddict:
+                    raise ut.EPError(_("Duplicated field name: {}").format(fieldname))
+                fielddict[fieldname] = (fieldcount, fieldtype)
+                fieldcount += 1
+
+        self._fielddict: dict[str, tuple[int, type | None]] = fielddict
 
         if _from is not None:
-            super().__init__(EUDVArray(fieldn).cast(_from))
+            super().__init__(EUDVArray(fieldcount).cast(_from))
             self._initialized = True
         else:
-            super().__init__(EUDVArray(fieldn)([0] * fieldn))
+            super().__init__(EUDVArray(fieldcount)([0] * fieldcount))
             self.isPooled = False
             self._initialized = True
             self.constructor_static(*args, **kwargs)
