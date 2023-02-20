@@ -1,0 +1,26 @@
+class TestBag extends EUDBag {
+    object {
+        const unit: CUnit;
+        const n;
+        var a;
+        var b = 2;
+        const c = 3;
+    };
+}
+const testgroup = TestBag(100);
+function test_bag() {
+    for(var n = 1; n <= 5; n++) {
+        const unit = CUnit.from_read(EPD(0x628438));
+        CreateUnit(1, "Protoss Observer", P1, "Anywhere");
+        TestBag.add(unit, n, 1);
+    }
+    var ret = 0;
+    foreach(obj: testgroup) {
+        ret += obj.n;  // (1~5)
+        ret += 100;
+        if (obj.unit.unitType == $U("Protoss Observer")) ret += 1000;
+        if (obj.unit.owner == P1) ret += 10000;
+        if (obj.a == 1 && obj.b == 2 && obj.c == 3) ret += 100000;
+    }
+    return ret;  // 555515
+}

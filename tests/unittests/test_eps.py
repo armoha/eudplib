@@ -11,6 +11,8 @@ from .test_eps_array import (
     f_test_queue_wraparound,
     f_test_write,
 )
+
+# FIXME: from .test_eps_bag import f_test_bag
 from .test_eps_compat import f_test_compatibility, stat
 from .test_eps_cunit import f_test_cunit
 from .test_eps_epsfile import f_constv_thing, f_square, f_switch_test, f_test_array
@@ -67,3 +69,4 @@ def test_epscript():
     test_equality(
         "epScript stat_txt.tbl", stat.f_test_stattext(), [ord(c) for c in stat.expected_result]
     )
+    # FIXME: test_equality("epScript EUDBag", f_test_bag(), 555515)
