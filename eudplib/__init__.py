@@ -5,18 +5,22 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-__version__ = "0.74.9"
+__version__ = "0.74.10"
 
 from .localize import *
 
 oldGlobals = set(globals().keys())
+
+import builtins
+import keyword
+import types
 
 from .core import *
 from .ctrlstru import *
 from .epscript import *
 from .eudlib import *
 from .maprw import *
-from .offsetmap import CUnit, EPDCUnitMap, CSprite
+from .offsetmap import CSprite, CUnit, EPDCUnitMap
 from .trigger import *
 from .trigtrg.runtrigtrg import (
     GetFirstTrigTrigger,
@@ -26,10 +30,6 @@ from .trigtrg.runtrigtrg import (
     TrigTriggerEnd,
 )
 from .utils import *
-
-import builtins
-import keyword
-import types
 
 # remove modules from __all__
 
@@ -57,7 +57,7 @@ def eudplibVersion():
 _alllist.append("eudplibVersion")
 
 
-from .epscript.epscompile import setEpsGlobals, setPyKeywords, setPyBuiltins
+from .epscript.epscompile import setEpsGlobals, setPyBuiltins, setPyKeywords
 
 setEpsGlobals(_alllist)
 setPyKeywords(keyword.kwlist)
