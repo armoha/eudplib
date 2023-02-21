@@ -137,7 +137,7 @@ class Condition(ConstExpr):
 
         for i, field in enumerate(self.fields):
             if (i < 3 and not IsConstExpr(field)) or (i >= 3 and not isinstance(field, int)):
-                error.append("\t" + _("invalid {}: {}").format(fieldname[i], field))
+                error.append("\t" + _("invalid {}: {}").format(fieldname[i], repr(field)))
 
         raise ut.EPError("\n".join(error))
 
