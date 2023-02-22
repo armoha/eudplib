@@ -45,18 +45,12 @@ class EUDJumpBuffer(c.EUDObject):
         with _PayloadHelper(emitbuffer) as emitbuffer:
             for i in range(118 + count):
                 emitbuffer.WriteDword(self._nextptrs[i]) if i < count else emitbuffer.WriteSpace(4)
-                # emitbuffer.WriteSpace(8)
-                emitbuffer.WriteDword(0xFFFFFFFF)
-                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteSpace(8)
                 emitbuffer.WriteByte(8) if 118 <= i else emitbuffer.WriteSpace(1)  # trgflag
-                # emitbuffer.WriteSpace(3)
-                emitbuffer.WriteByte(0xFF)
-                emitbuffer.WriteByte(0xFF)
-                emitbuffer.WriteByte(0xFF)
+                emitbuffer.WriteSpace(3)
                 if i == 118 + count - 1:
                     break
-                # emitbuffer.WriteSpace(4)
-                emitbuffer.WriteDword(0xFFFFFFFF)
+                emitbuffer.WriteSpace(4)
 
 
 _jtb = None
