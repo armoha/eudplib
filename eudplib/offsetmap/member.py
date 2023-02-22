@@ -5,15 +5,15 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from abc import ABCMeta, abstractmethod
 import enum
-from typing import Final, Literal, NoReturn, TYPE_CHECKING
+from abc import ABCMeta, abstractmethod
+from typing import TYPE_CHECKING, Final, Literal, NoReturn
 
-from ..trigger import Trigger
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
 from ..localize import _
+from ..trigger import Trigger
 
 if TYPE_CHECKING:
     from .csprite import CSprite
@@ -75,8 +75,8 @@ class MemberKind(enum.Enum):
             f_dwread_epd,
             f_epdspriteread_epd,
             f_maskread_epd,
-            f_wread_epd,
             f_readgen_epd,
+            f_wread_epd,
         )
         from ..eudlib.memiof.memifgen import _mapXYmask
 
@@ -112,7 +112,7 @@ class MemberKind(enum.Enum):
                 raise AttributeError
 
     def write_epd(self, epd, subp, value) -> None:
-        from ..eudlib.memiof import f_dwwrite_epd, f_wwrite_epd, f_bwrite_epd
+        from ..eudlib.memiof import f_bwrite_epd, f_dwwrite_epd, f_wwrite_epd
 
         match self.size:
             case 4:
@@ -123,7 +123,7 @@ class MemberKind(enum.Enum):
                 f_bwrite_epd(epd, subp, value)
 
     def add_epd(self, epd, subp, value) -> None:
-        from ..eudlib.memiof import f_dwadd_epd, f_wadd_epd, f_badd_epd
+        from ..eudlib.memiof import f_badd_epd, f_dwadd_epd, f_wadd_epd
 
         match self.size:
             case 4:
@@ -134,7 +134,7 @@ class MemberKind(enum.Enum):
                 f_badd_epd(epd, subp, value)
 
     def subtract_epd(self, epd, subp, value) -> None:
-        from ..eudlib.memiof import f_dwsubtract_epd, f_wsubtract_epd, f_bsubtract_epd
+        from ..eudlib.memiof import f_bsubtract_epd, f_dwsubtract_epd, f_wsubtract_epd
 
         match self.size:
             case 4:
