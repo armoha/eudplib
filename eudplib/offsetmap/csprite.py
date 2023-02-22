@@ -5,12 +5,13 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from typing import cast, TypeVar, TypeAlias
+from typing import TypeAlias, TypeVar, cast
+
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
-from .epdoffsetmap import EPDOffsetMap, EPDCache, PtrCache
-from .member import EnumMember, Flag, Member, CSpriteMember, MemberKind
+from .epdoffsetmap import EPDCache, EPDOffsetMap, PtrCache
+from .member import CSpriteMember, EnumMember, Flag, Member, MemberKind
 
 
 class CSpriteFlags(EnumMember):
@@ -29,6 +30,7 @@ int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
 
 
 class CSprite(EPDOffsetMap):
+    __slots__ = "_ptr"
     prev = CSpriteMember(0x00)
     next = CSpriteMember(0x04)
     sprite = Member(0x08, MemberKind.SPRITE)

@@ -5,27 +5,23 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from typing import cast, TypeVar
+from typing import TypeVar, cast
 
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
 from ..localize import _
-from .epdoffsetmap import (
-    EPDOffsetMap,
-    EPDCache,
-    PtrCache,
-)
+from .csprite import int_or_var
+from .epdoffsetmap import EPDCache, EPDOffsetMap, PtrCache
 from .member import (
-    CUnitMember,
     CSpriteMember,
-    MemberKind,
-    Member,
-    UnsupportedMember,
+    CUnitMember,
     EnumMember,
     Flag,
+    Member,
+    MemberKind,
+    UnsupportedMember,
 )
-from .csprite import int_or_var
 
 
 class MovementFlags(EnumMember):
@@ -82,6 +78,7 @@ T = TypeVar("T", bound="CUnit")
 
 
 class CUnit(EPDOffsetMap):
+    __slots__ = "_ptr"
     # TODO: add docstring for descriptor
     prev = CUnitMember(0x000)
     next = CUnitMember(0x004)  # link
@@ -192,6 +189,7 @@ class CUnit(EPDOffsetMap):
     targetOrderSpecial = Member(0x0A5, MemberKind.BYTE)
     uniquenessIdentifier = Member(0x0A5, MemberKind.BYTE)
     secondaryOrder = Member(0x0A6, MemberKind.UNIT_ORDER)
+    secondaryOrderID = Member(0x0A6, MemberKind.UNIT_ORDER)
     # 0 means the building has the largest amount of fire/blood
     buildingOverlayState = Member(0x0A7, MemberKind.BYTE)
     hpGain = Member(0x0A8, MemberKind.WORD)  # buildRepairHpGain
