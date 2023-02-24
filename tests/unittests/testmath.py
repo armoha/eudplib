@@ -53,17 +53,25 @@ def test_signed_div():
             if nth % 2 == 1:
                 b = -b
             q, r = int(a / b), a - int(a / b) * b
+
+            x = a if random.random() < 0.5 else EUDVariable(a)
+            y = b if random.random() < 0.5 else EUDVariable(b)
+            s = "EV{}".format(a) if IsEUDVariable(x) else str(a)
+            t = "EV{}".format(b) if IsEUDVariable(y) else str(b)
+
             test_equality(
-                f"div_towards_zero({a}, {b}) = {(q, r)}",
-                f_div_towards_zero(a, b),
+                f"div_towards_zero({s}, {t}) = {(q, r)}",
+                f_div_towards_zero(x, y),
                 [q, r],
             )
+
             EP_SetRValueStrictMode(False)
-            test_equality(f"div_floor({a}, {b}) = {divmod(a, b)}", f_div_floor(a, b), divmod(a, b))
+            test_equality(f"div_floor({s}, {t}) = {divmod(a, b)}", f_div_floor(x, y), divmod(a, b))
+
             # https://github.com/rust-lang/rust/blob/91eb6f9acfcfde6832d547959ad2d95b1ac0b5dc/library/core/src/num/int_macros.rs#L2115-L2130
             r = r + abs(b) if r < 0 else r
             q = (a - r) // b
-            test_equality(f"div_euclid({a}, {b}) = {(q, r)})", f_div_euclid(a, b), [q, r])
+            test_equality(f"div_euclid({s}, {t}) = {(q, r)})", f_div_euclid(x, y), [q, r])
             EP_SetRValueStrictMode(True)
 
 
