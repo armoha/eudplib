@@ -11,7 +11,8 @@ import inspect
 from ... import utils as ut
 from ...localize import _
 from ..rawtrigger import CurrentPlayer
-from ..variable.evcommon import _cp, _ev
+from ..variable import EUDVariable
+from ..variable.evcommon import _ev
 from .eudtypedfuncn import EUDFullFuncN, EUDTypedFuncN, EUDXTypedFuncN, applyTypes
 
 
@@ -124,9 +125,9 @@ def _EUDPredefineParam(*args):
                 fnargs.extend(arg)
                 break
         except IndexError:
-            _ev.append(c.EUDVariable())
+            _ev.append(EUDVariable())
         else:
-            _ev.append(c.EUDVariable())
+            _ev.append(EUDVariable())
 
     def wrapper(f):
         f._fargs = fnargs
@@ -151,9 +152,9 @@ def _EUDPredefineReturn(*frets):
                 frets = ret
                 break
         except IndexError:
-            _ev.append(c.EUDVariable())
+            _ev.append(EUDVariable())
         else:
-            _ev.append(c.EUDVariable())
+            _ev.append(EUDVariable())
 
     def wrapper(f):
         f._frets = frets
