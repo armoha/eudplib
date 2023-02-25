@@ -105,8 +105,8 @@ class UnitGroup:
             # Occupy 2T, Run 4T 10A
             SeqCompute(
                 [
-                    (self.trg, Subtract, 72),
-                    (self.pos, Subtract, 18),
+                    (self.trg, Add, -72),
+                    (self.pos, Add, -18),
                     (unit_epd, Add, 0x4C // 4),
                     (EPD(unit_epd._varact) + 6, SetTo, 0x072D0000),
                     (EPD(unit_epd.getDestAddr()), None, self.pos),
