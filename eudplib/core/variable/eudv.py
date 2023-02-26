@@ -5,10 +5,10 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from collections.abc import Iterator, Sequence
-import traceback
 import sys
-from typing import Any, TYPE_CHECKING, TypeVar, overload
+import traceback
+from collections.abc import Iterator, Sequence
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 from ...localize import _
 from ...utils import (
@@ -25,7 +25,6 @@ from ...utils import (
 )
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, Forward, IsConstExpr
-from ...localize import _
 from .vbase import VariableBase
 from .vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
 
@@ -909,7 +908,7 @@ def NonSeqCompute(assignpairs):
     varpairlists = list()
     for pairlist in varassigndict.values():
         pairlist.sort(key=lambda x: id(x[0]))
-        pairlist.sort(key=lambda x: x[1]._name)
+        pairlist.sort(key=lambda x: getattr(x[1], "_name", ""))
         varpairlists.append(pairlist)
 
     varassignpairs = list()

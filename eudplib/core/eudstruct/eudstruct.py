@@ -152,7 +152,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
 
     # Utilities
 
-    def asVariable(self):
+    def asVariable(self):  # FIXME: has no usage
         if IsConstExpr(self):
             var = EUDVariable(self)
         else:

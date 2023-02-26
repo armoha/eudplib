@@ -18,6 +18,7 @@ import types
 from .core import *
 from .ctrlstru import *
 from .epscript import *
+from .eudbag import EUDBag
 from .eudlib import *
 from .maprw import *
 from .offsetmap import CSprite, CUnit, EPDCUnitMap
