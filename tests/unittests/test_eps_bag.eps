@@ -2,17 +2,20 @@ class TestBag extends EUDBag {
     object {
         const unit: CUnit;
         const n;
-        var a;
+        var a, b;
+        const c: EUDArray;
+        /* TODO: support default value
         var b = 2;
         const c = 3;
+        */
     };
 }
 const testgroup = TestBag(100);
 function test_bag() {
     for(var n = 1; n <= 5; n++) {
         const unit = CUnit.from_read(EPD(0x628438));
-        CreateUnit(1, "Protoss Observer", P1, "Anywhere");
-        TestBag.add(unit, n, 1);
+        CreateUnit(1, "Protoss Observer", "Anywhere", P1);
+        testgroup.add(unit, n, 1, 2, 3);
     }
     var ret = 0;
     foreach(obj: testgroup) {

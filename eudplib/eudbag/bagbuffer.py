@@ -5,24 +5,25 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 import functools
-from ..core.allocator.payload import _PayloadHelper
+
 from .. import core as c
 from .. import utils as ut
+from ..core.allocator.payload import _PayloadHelper
 from . import layout
 
 
 class BagTriggerForward(c.ConstExpr):
-    def __init__(self, nptr, init_acts) -> None:
+    def __init__(self, nptr, init_acts_list) -> None:
         super().__init__(self)
         self._nptr = nptr
-        self._init_acts = init_acts
+        self._init_acts_list = init_acts_list
 
     def Evaluate(self):
-        bb = GetCurrentBagBuffer(len(self._init_acts))
+        bb = GetCurrentBagBuffer(len(self._init_acts_list[0]))
         try:
             return bb._vdict[self].Evaluate()
         except KeyError:
-            vt = bb.CreateVarTrigger(self, self._nptr, self._init_acts)
+            vt = bb.CreateMultipleVarTriggers(self, self._nptr, self._init_acts_list)
             return vt.Evaluate()
 
 
@@ -41,7 +42,7 @@ class EUDBagBuffer(c.EUDObject):
 
     def CreateVarTrigger(self, v, nptr, init_acts):
         # init_acts = ((bitmask, player, #, modifier), ...)
-        ret = self + (self._overlap_distance * self._acts - 4)
+        ret = self + (self._overlap_distance * len(self._acts) - 4)
         self._nptrs.append(nptr)
         self._acts.append(init_acts)
         if v is not None:
@@ -49,7 +50,7 @@ class EUDBagBuffer(c.EUDObject):
         return ret
 
     def CreateMultipleVarTriggers(self, v, nptr, init_acts_list):
-        ret = self + (self._overlap_distance * self._acts - 4)
+        ret = self + (self._overlap_distance * len(self._acts) - 4)
         for init_acts in init_acts_list:
             self.CreateVarTrigger(None, nptr, init_acts)
         self._vdict[v] = ret
