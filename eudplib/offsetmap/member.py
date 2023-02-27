@@ -175,7 +175,7 @@ class UnsupportedMember(BaseMember):
     def __set_name__(self, owner, name):
         self.name = name
 
-    def __get__(self, instance, owner=None) -> NoReturn:
+    def __get__(self, instance, owner=None) -> "UnsupportedMember":
         if instance is None:
             return self
         raise ut.EPError(_("Unsupported EUD: {}").format(self.name))
@@ -189,7 +189,7 @@ class Member(BaseMember):
 
     __slots__ = ()
 
-    def __get__(self, instance, owner=None) -> c.EUDVariable:
+    def __get__(self, instance, owner=None) -> "c.EUDVariable | Member":
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
@@ -280,7 +280,7 @@ class CUnitMember(BaseMember):
     def __init__(self, offset: int) -> None:
         super().__init__(offset, MemberKind.C_UNIT)
 
-    def __get__(self, instance, owner=None) -> "CUnit":
+    def __get__(self, instance, owner=None) -> "CUnit | CUnitMember":
         from .cunit import CUnit
         from .epdoffsetmap import EPDOffsetMap
 
@@ -311,7 +311,7 @@ class CSpriteMember(BaseMember):
     def __init__(self, offset: int) -> None:
         super().__init__(offset, MemberKind.C_SPRITE)
 
-    def __get__(self, instance, owner=None) -> "CSprite":
+    def __get__(self, instance, owner=None) -> "CSprite | CSpriteMember":
         from .csprite import CSprite
         from .epdoffsetmap import EPDOffsetMap
 
