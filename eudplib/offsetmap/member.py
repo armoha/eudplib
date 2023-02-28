@@ -176,6 +176,8 @@ class UnsupportedMember(BaseMember):
         self.name = name
 
     def __get__(self, instance, owner=None) -> NoReturn:
+        if instance is None:
+            return self
         raise ut.EPError(_("Unsupported EUD: {}").format(self.name))
 
     def __set__(self, instance, value) -> NoReturn:
@@ -190,6 +192,8 @@ class Member(BaseMember):
     def __get__(self, instance, owner=None) -> c.EUDVariable:
         from .epdoffsetmap import EPDOffsetMap
 
+        if instance is None:
+            return self
         q, r = divmod(self.offset, 4)
         if isinstance(instance, EPDOffsetMap):
             return self.kind.read_epd(instance._epd + q, r)
@@ -216,6 +220,8 @@ class EnumMember(BaseMember):
     def __get__(self, instance, owner=None) -> "EnumMember":
         from .epdoffsetmap import EPDOffsetMap
 
+        if instance is None:
+            return self
         if isinstance(instance, EPDOffsetMap):
             self._epd = instance._epd
             return self
@@ -278,6 +284,8 @@ class CUnitMember(BaseMember):
         from .cunit import CUnit
         from .epdoffsetmap import EPDOffsetMap
 
+        if instance is None:
+            return self
         if isinstance(instance, EPDOffsetMap):
             return CUnit.from_read(instance._epd + self.offset // 4)
         raise AttributeError
@@ -307,6 +315,8 @@ class CSpriteMember(BaseMember):
         from .csprite import CSprite
         from .epdoffsetmap import EPDOffsetMap
 
+        if instance is None:
+            return self
         if isinstance(instance, EPDOffsetMap):
             return CSprite.from_read(instance._epd + self.offset // 4)
         raise AttributeError
