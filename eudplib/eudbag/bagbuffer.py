@@ -5,15 +5,20 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 import functools
+from collections.abc import Sequence
 
 from .. import core as c
 from .. import utils as ut
+from ..core.allocator import RegisterCreatePayloadCallback
 from ..core.allocator.payload import _PayloadHelper
+from ..localize import _
 from . import layout
 
 
 class BagTriggerForward(c.ConstExpr):
-    def __init__(self, nptr, init_acts_list) -> None:
+    def __init__(
+        self, nptr, init_acts_list: Sequence[Sequence[Sequence[int | c.ConstExpr]]]
+    ) -> None:
         super().__init__(self)
         self._nptr = nptr
         self._init_acts_list = init_acts_list
@@ -35,25 +40,29 @@ class EUDBagBuffer(c.EUDObject):
         self._var_count = var_count
         self._overlap_distance = layout._overlap_distance[var_count]
         self._nptrs: list[int | c.ConstExpr] = list()
-        self._acts: list[list[int | c.ConstExpr]] = list()
+        self._acts: list[Sequence[Sequence[int | c.ConstExpr]]] = list()
 
     def DynamicConstructed(self):
         return True
 
-    def CreateVarTrigger(self, v, nptr, init_acts):
+    def CreateVarTrigger(self, v, nptr, init_acts: Sequence[Sequence[int | c.ConstExpr]]):
         # init_acts = ((bitmask, player, #, modifier), ...)
         ret = self + (self._overlap_distance * len(self._acts) - 4)
         self._nptrs.append(nptr)
+        ut.ep_assert(len(init_acts) == self._var_count)
+        ut.ep_assert(all(len(action) == 4 for action in init_acts))
         self._acts.append(init_acts)
         if v is not None:
-            self._vdict[v] = ret
+            self._vdict[v] = ret  # type: ignore[assignment]
         return ret
 
-    def CreateMultipleVarTriggers(self, v, nptr, init_acts_list):
+    def CreateMultipleVarTriggers(
+        self, v, nptr, init_acts_list: Sequence[Sequence[Sequence[int | c.ConstExpr]]]
+    ):
         ret = self + (self._overlap_distance * len(self._acts) - 4)
         for init_acts in init_acts_list:
             self.CreateVarTrigger(None, nptr, init_acts)
-        self._vdict[v] = ret
+        self._vdict[v] = ret  # type: ignore[assignment]
         return ret
 
     def GetDataSize(self):
@@ -75,6 +84,19 @@ class EUDBagBuffer(c.EUDObject):
             layout._write_payload[self._var_count](emitbuffer, count, self._nptrs, self._acts)
 
 
-@functools.cache
+_bb: list[EUDBagBuffer | None] = [None] * 64
+
+
+def RegisterNewBagBuffer() -> None:
+    global _bb
+    for n in range(64):
+        _bb[n] = EUDBagBuffer(n + 1)
+
+
 def GetCurrentBagBuffer(var_count: int) -> EUDBagBuffer:
-    return EUDBagBuffer(var_count)
+    buffer = _bb[var_count - 1]
+    ut.ep_assert(buffer, _("Failed to initialize EUDBagBuffer(var_count={})").format(var_count))
+    return buffer
+
+
+RegisterCreatePayloadCallback(RegisterNewBagBuffer)
