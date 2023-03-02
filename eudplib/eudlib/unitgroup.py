@@ -38,7 +38,7 @@ from ..core import (
 )
 from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
 from ..ctrlstru.loopblock import _UnsafeWhileNot
-from ..utils import EPD, EUDCreateBlock, EUDPeekBlock, ep_assert
+from ..utils import EPD, EUDPeekBlock, ep_assert
 
 _assign_helper = EUDVariable()
 
