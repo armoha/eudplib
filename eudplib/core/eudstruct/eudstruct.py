@@ -129,7 +129,11 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
             return attr
 
     def setfield(self, name, value):
-        attrid, _ = self._fielddict[name]
+        from ..eudfunc.consttype import createEncoder
+
+        attrid, attrtype = self._fielddict[name]
+        if isinstance(attrtype, createEncoder):
+            value = attrtype.cast(value)
         self.set(attrid, value)
 
     def __getattr__(self, name):
