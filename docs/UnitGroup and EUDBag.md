@@ -252,8 +252,8 @@ function unit.remove() {
 ## Trigger Control flow
 
 # EUDBag
-A contiguous array type **kept sorted**, consists of 0 condition 1~64 actions Triggers.\
-Generalization of UnitGroup to array of 1~64 action Triggers.
+A contiguous array type **kept sorted**, consists of 0 condition 1\~64 actions Triggers.\
+Generalization of UnitGroup to array of 1\~64 action Triggers.
 ## In-memory Layout
 ```js
 Trigger1(
