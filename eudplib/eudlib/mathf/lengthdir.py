@@ -126,7 +126,7 @@ def f_lengthdir_256(length, angle):
     sdb = c.Db(b"".join(slist))
 
     # MAIN LOGIC
-    cs.DoActions(angle.SetNumberX(0, ~255))
+    cs.DoActions(angle.AddNumber(192), angle.SetNumberX(0, ~255))
 
     # sign of cos, sin
     sign = c.EUDLightVariable()

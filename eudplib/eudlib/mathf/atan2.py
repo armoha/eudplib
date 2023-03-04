@@ -267,4 +267,5 @@ def f_atan2_256(y, x):
             ],
         )
     cs.EUDEndSwitch()
+    c.RawTrigger(actions=atan_value.AddNumberX(64, 255))
     return atan_value
