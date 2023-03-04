@@ -80,12 +80,38 @@ function remove(index) {
 Internally uses `EUDVArray(capacity)` = array of Triggers with 0 condition 1 SetDeaths action
 ```py
 layout of UnitGroup(capacity=N)
+┌───────────┬───────────┬───────────┐
+│Trigger 1  │Trigger 2  │Trigger 3  │
+│           │           │           │
+│           │           │           │
+│           │           │           │
+└─────┬─────┴─────┬─────┴───────┬───┘
+      │           │             │
+      │           │             │
+      │     ┌─────▼─────┐       │
+      └────►│LoopVar    │◄──────┘
+            │           │
+            │           │
+            │           │
+            └───────────┘
 
-Trigger1(nextptr=LoopVarTrigger, actions=loopvar.SetNumber(Value1))
-Trigger2(nextptr=LoopVarTrigger, actions=loopvar.SetNumber(Value2))
-Trigger3(nextptr=LoopVarTrigger, actions=loopvar.SetNumber(Value3))
+Trigger1(
+    nextptr=LoopVarTrigger,
+    actions=loopvar.SetNumber(Value1)
+)
+Trigger2(
+    nextptr=LoopVarTrigger,
+    actions=loopvar.SetNumber(Value2)
+)
+Trigger3(
+    nextptr=LoopVarTrigger,
+    actions=loopvar.SetNumber(Value3)
+)
 .......
-TriggerN(nextptr=LoopVarTrigger, actions=loopvar.SetNumber(ValueN))
+TriggerN(
+    nextptr=LoopVarTrigger,
+    actions=loopvar.SetNumber(ValueN)
+)
 ```
 The distance between TriggerX and TriggerX+1 are fixed to 72 bytes. (Minimal overlapping distance for 0 condition 1 action Triggers)
 
@@ -94,14 +120,20 @@ All triggers in `UnitGroup` *point* to loopvar (See below): their nextptrs point
 ## loopvar
 loopvar is EUDVariable whose value are assigned by triggers of UnitGroup.
 ```js
-LoopVarTrigger(nextptr=?, actions=SetMemory(destination?, SetTo, value?))
+LoopVarTrigger(
+    nextptr=?,
+    actions=SetMemory(destination?, SetTo, value?)
+)
 ```
 Its nextptr and destination should be assigned before *use*. Its value is assigned by `UnitGroup`.
 
 Currently, `UnitGroup` only supports `.cploop` so destination of loopvar is initially set to edit `CurrentPlayer` (0x6509B0). (Its destination can be changed temporarily in `unit.epd` and `unit.remove()`)
 ```py
 UnitGroup.loopvar = EUDVariable(EPD(0x6509B0), SetTo, 0)
-UnitGroup.varray = EUDVArray(capacity)(dest=UnitGroup.loopvar, nextptr=UnitGroup.loopvar.GetVTable())
+UnitGroup.varray = EUDVArray(capacity)(
+    dest=UnitGroup.loopvar,
+    nextptr=UnitGroup.loopvar.GetVTable()
+)
 ```
 
 ## UnitGroup.add(unitEPD)
