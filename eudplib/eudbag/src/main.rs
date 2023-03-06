@@ -190,7 +190,7 @@ impl fmt::Display for Layout {
             buf.WriteDword(val[i - {1}][{0}][1])
             buf.WriteDword(val[i - {1}][{0}][2])
             buf.WriteDword(val[i - {1}][{0}][3])
-            buf.WriteDword(val[i - {1}][{0}][4])
+            buf.WriteDword(0x43530000)
         else:
             buf.WriteSpace(16)",
                     n,
