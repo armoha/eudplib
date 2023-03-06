@@ -31,10 +31,11 @@ from ..utils import (
 )
 
 
-def _RELIMP(path, mod_name):  # relative path import
+def _RELIMP(path, mod_name, _cache={}):  # relative path import
     import importlib.util
     import inspect
     import pathlib
+
     from .epsimp import EPSLoader
 
     p = pathlib.Path(inspect.getabsfile(inspect.currentframe().f_back))
@@ -46,6 +47,9 @@ def _RELIMP(path, mod_name):  # relative path import
             p = p.parent
         else:
             p = p / s
+
+    if p in _cache:
+        return _cache[p]
 
     def py_module(mod_name, p):
         spec = importlib.util.spec_from_file_location(mod_name, p / (mod_name + ".py"))
@@ -61,19 +65,25 @@ def _RELIMP(path, mod_name):  # relative path import
         return module
 
     try:
-        return py_module(mod_name, p)
+        module = py_module(mod_name, p)
     except FileNotFoundError:
         try:
-            return eps_module(mod_name, p)
+            module = eps_module(mod_name, p)
         except FileNotFoundError:
             item_name = mod_name
             mod_name = p.name
             p = p.parent
-            try:
-                module = py_module(mod_name, p)
-            except FileNotFoundError:
-                module = eps_module(mod_name, p)
+            if p in _cache:
+                module = _cache[p]
+            else:
+                try:
+                    module = py_module(mod_name, p)
+                except FileNotFoundError:
+                    module = eps_module(mod_name, p)
+                _cache[p] = module
             return getattr(module, item_name)
+    _cache[p] = module
+    return module
 
 
 def _IGVA(varCount, exprListGen):
@@ -464,6 +474,7 @@ def _L2V(l):  # logic to value
 
 def _LVAR(vs):
     import sys
+
     from ..core.variable.eudv import _yield_and_check_rvalue
 
     ret, ops = [], []
