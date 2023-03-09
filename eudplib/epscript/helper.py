@@ -48,8 +48,9 @@ def _RELIMP(path, mod_name, _cache={}):  # relative path import
         else:
             p = p / s
 
-    if p in _cache:
-        return _cache[p]
+    abs_path = p / mod_name
+    if abs_path in _cache:
+        return _cache[abs_path]
 
     def py_module(mod_name, p):
         spec = importlib.util.spec_from_file_location(mod_name, p / (mod_name + ".py"))
@@ -73,16 +74,17 @@ def _RELIMP(path, mod_name, _cache={}):  # relative path import
             item_name = mod_name
             mod_name = p.name
             p = p.parent
-            if p in _cache:
-                module = _cache[p]
+            abs_path = p / mod_name
+            if abs_path in _cache:
+                module = _cache[abs_path]
             else:
                 try:
                     module = py_module(mod_name, p)
                 except FileNotFoundError:
                     module = eps_module(mod_name, p)
-                _cache[p] = module
+                _cache[abs_path] = module
             return getattr(module, item_name)
-    _cache[p] = module
+    _cache[abs_path] = module
     return module
 
 
