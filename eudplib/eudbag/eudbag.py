@@ -315,7 +315,7 @@ class EUDBag:
                 actions=[
                     self.trg.SetDest(EPD(self.trg.GetVTable()) + 1),
                     c.SetMemory(self.loopvar + 4, c.SetTo, remove_end),
-                    loopvar.SetDest(0),  # pos가 이 액션의 값 칸
+                    # loopvar.SetDest(0),  # pos가 이 액션의 값 칸
                 ],
             )
             pos << remove_start + 328 + 32 * 2 + 20
@@ -323,9 +323,9 @@ class EUDBag:
                 actions=[
                     self.trg.AddNumber(self.objdistance),
                     self.pos.AddNumber(self.objdistance // 4),
-                    loopvar.SetDest(EPD(0x6509B0)),
+                    # loopvar.SetDest(EPD(0x6509B0)),
                     c.SetMemory(self.loopvar + 4, c.SetTo, loopstart),
-                    SetNextPtr(loopvar.GetVTable(), loopbody),
+                    # c.SetNextPtr(loopvar.GetVTable(), loopbody),
                 ]
             )
             c.SetNextTrigger(block["contpoint"])
