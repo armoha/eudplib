@@ -107,7 +107,7 @@ Trigger3(
     nextptr=LoopVarTrigger,
     actions=loopvar.SetNumber(Value3)
 )
-.......
+......
 TriggerN(
     nextptr=LoopVarTrigger,
     actions=loopvar.SetNumber(ValueN)
@@ -224,7 +224,6 @@ function UnitGroup.cploop() {
 `UnitGroup.remove(index)` moves **first** active element to removed index.\
 `UnitGroup.trg` stores first active entry of `UnitGroup`.
 
-To execute first active Trigger and feed loopvar with first unitEPD, we'll run `UnitGroup.trg` and order it to edit nextptr of `UnitGroup.trg` itself(!).
 ```js
 function unit.remove() {
     const SetLoopVarDest = Forward();
@@ -335,5 +334,8 @@ LoopVarTrigger(
 ```
 ## EUDBag.add(value1, value2, ... , valueM)
 ## foreach(subobject: EUDBag) { ... }
+
+
+
 ## Subobject
 ## entry.remove()
