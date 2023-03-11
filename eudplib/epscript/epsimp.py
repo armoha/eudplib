@@ -144,7 +144,7 @@ class EPSLoader(SourceFileLoader):
         for lineno, line in enumerate(data.split(b"\n")):
             match = lineno_regex.match(line)
             if match:
-                codeLine.append(lineno + 1)
+                codeLine.append(lineno + 3)
                 codeMap.append(int(match.group(1)))
 
         # Reconstruct code data
