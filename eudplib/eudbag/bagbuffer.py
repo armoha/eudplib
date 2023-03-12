@@ -95,7 +95,8 @@ def RegisterNewBagBuffer() -> None:
 
 def GetCurrentBagBuffer(var_count: int) -> EUDBagBuffer:
     buffer = _bb[var_count - 1]
-    ut.ep_assert(buffer, _("Failed to initialize EUDBagBuffer(var_count={})").format(var_count))
+    if buffer is None:
+        raise ut.EPError(_("Failed to initialize EUDBagBuffer(var_count={})").format(var_count))
     return buffer
 
 
