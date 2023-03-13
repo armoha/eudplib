@@ -5,7 +5,7 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-__version__ = "0.74.12"
+__version__ = "0.75.0.dev1"
 
 from .localize import *
 
