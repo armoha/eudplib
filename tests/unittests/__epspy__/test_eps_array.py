@@ -270,67 +270,91 @@ def f_test_queue_wraparound():
     for v in q3:
         _ARRW(ret, 2).__iadd__(v)
         iter.__iadd__(1)
-        # (Line 144) q3.append(5);
+        # (Line 143) q3.append(5);
 
     q3.append(5)
     # (Line 145) foreach(v : q3) { ret[3] += v; iter++; }
     for v in q3:
         _ARRW(ret, 3).__iadd__(v)
         iter.__iadd__(1)
-        # (Line 147) q3.popleft();
+        # (Line 146) q3.popleft();
 
     q3.popleft()
     # (Line 148) foreach(v : q3) { ret[4] += v; iter++; }
     for v in q3:
         _ARRW(ret, 4).__iadd__(v)
         iter.__iadd__(1)
-        # (Line 150) q3.append(6);
+        # (Line 149) q3.append(6);
 
     q3.append(6)
-    # (Line 151) q3.append(7);
+    # (Line 150) q3.append(7);
     q3.append(7)
-    # (Line 152) foreach(v : q3) { ret[5] += v; iter++; }
+    # (Line 152) foreach(v : q3) {
     for v in q3:
+        # (Line 153) if (v == 5) continue;
+        if EUDIf()(v == 5):
+            EUDContinue()
+            # (Line 154) ret[5] += v;
+        EUDEndIf()
+        _ARRW(ret, 5).__iadd__(v)
+        # (Line 155) EUDSetContinuePoint();
+        EUDSetContinuePoint()
+        # (Line 156) iter++;
+        iter.__iadd__(1)
+        # (Line 157) }
+        # (Line 158) q3.append(8);
+
+    q3.append(8)
+    # (Line 159) q3.append(9);
+    q3.append(9)
+    # (Line 160) foreach(v : q3) {
+    for v in q3:
+        # (Line 161) if (v == 8) break;
+        if EUDIf()(v == 8):
+            EUDBreak()
+            # (Line 162) ret[5] += v; iter++;
+        EUDEndIf()
         _ARRW(ret, 5).__iadd__(v)
         iter.__iadd__(1)
-        # (Line 153) ret.append(iter);
+        # (Line 163) }
+        # (Line 164) ret.append(iter);
 
     ret.append(iter)
-    # (Line 154) return List2Assignable(ret);
+    # (Line 165) return List2Assignable(ret);
     EUDReturn(List2Assignable(ret))
-    # (Line 155) }
-    # (Line 156) const methods = py_eval('{\
+    # (Line 166) }
+    # (Line 167) const methods = py_eval('{\
 
-# (Line 159) }');
+# (Line 170) }');
 methods = _CGFW(lambda: [eval('{    "append": "a",   "appendleft": "aL",    "pop":    "p",   "popleft":    "pL"}')], 1)[0]
-# (Line 160) const DequeCases = py_eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])');
+# (Line 171) const DequeCases = py_eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])');
 DequeCases = _CGFW(lambda: [eval('random.sample(sorted(methods), 27, counts=[9, 9, 9, 9])')], 1)[0]
-# (Line 161) const DequeTest = py_eval("''.join(methods[name] for name in DequeCases)");
+# (Line 172) const DequeTest = py_eval("''.join(methods[name] for name in DequeCases)");
 DequeTest = _CGFW(lambda: [eval("''.join(methods[name] for name in DequeCases)")], 1)[0]
-# (Line 162) const dq = EUDDeque(7)();
+# (Line 173) const dq = EUDDeque(7)();
 dq = _CGFW(lambda: [EUDDeque(7)()], 1)[0]
-# (Line 163) function test_deque() {
+# (Line 174) function test_deque() {
 @EUDFunc
 def f_test_deque():
-    # (Line 164) const ret = py_list();
+    # (Line 175) const ret = py_list();
     ret = list()
-    # (Line 165) var pushes = 1;
+    # (Line 176) var pushes = 1;
     pushes = _LVAR([1])
-    # (Line 166) const a = function () { dq.append(pushes); pushes++; };
+    # (Line 177) const a = function () { dq.append(pushes); pushes++; };
     @EUDFunc
     def _lambda1():
         dq.append(pushes)
         pushes.__iadd__(1)
 
     a = _lambda1
-    # (Line 167) const aL = function () { dq.appendleft(pushes); pushes++; };
+    # (Line 178) const aL = function () { dq.appendleft(pushes); pushes++; };
     @EUDFunc
     def _lambda2():
         dq.appendleft(pushes)
         pushes.__iadd__(1)
 
     aL = _lambda2
-    # (Line 168) const _p = function() { if (dq.empty()) return 0; else return dq.pop(); };
+    # (Line 179) const _p = function() { if (dq.empty()) return 0; else return dq.pop(); };
     @EUDFunc
     def _lambda3():
         if EUDIf()(dq.empty()):
@@ -340,7 +364,7 @@ def f_test_deque():
         EUDEndIf()
 
     _p = _lambda3
-    # (Line 169) const _pL = function() { if (dq.empty()) return 0; else return dq.popleft(); };
+    # (Line 180) const _pL = function() { if (dq.empty()) return 0; else return dq.popleft(); };
     @EUDFunc
     def _lambda4():
         if EUDIf()(dq.empty()):
@@ -350,25 +374,25 @@ def f_test_deque():
         EUDEndIf()
 
     _pL = _lambda4
-    # (Line 170) const p = py_eval('lambda s=ret, f=_p: s.append(f())');
+    # (Line 181) const p = py_eval('lambda s=ret, f=_p: s.append(f())');
     p = eval('lambda s=ret, f=_p: s.append(f())')
-    # (Line 171) const pL = py_eval('lambda s=ret, f=_pL: s.append(f())');
+    # (Line 182) const pL = py_eval('lambda s=ret, f=_pL: s.append(f())');
     pL = eval('lambda s=ret, f=_pL: s.append(f())')
-    # (Line 172) const methodMap = py_eval('{\
-    # (Line 175) }');
+    # (Line 183) const methodMap = py_eval('{\
+    # (Line 186) }');
     methodMap = eval('{        "append":     a,    "pop":     p,        "appendleft": aL,   "popleft": pL,    }')
-    # (Line 176) foreach(method : DequeCases) { methodMap[method](); }
+    # (Line 187) foreach(method : DequeCases) { methodMap[method](); }
     for method in DequeCases:
         methodMap[method]()
-        # (Line 177) var sum = dq.length;
+        # (Line 188) var sum = dq.length;
 
     sum = _LVAR([dq.length])
-    # (Line 178) foreach(element: dq) { sum += element; }
+    # (Line 189) foreach(element: dq) { sum += element; }
     for element in dq:
         sum.__iadd__(element)
-        # (Line 179) ret.append(sum);
+        # (Line 190) ret.append(sum);
 
     ret.append(sum)
-    # (Line 180) return List2Assignable(ret);
+    # (Line 191) return List2Assignable(ret);
     EUDReturn(List2Assignable(ret))
-    # (Line 181) }
+    # (Line 192) }
