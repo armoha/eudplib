@@ -283,6 +283,12 @@ def EUDDeque(capacity):
 
             def iter():
                 yield_point, end = c.Forward(), c.Forward()
+                block = {
+                    "loopstart": iter_start,
+                    "loopend": end,
+                    "contpoint": c.Forward(),
+                }
+                EUDCreateBlock("loopqueueblock", block)
                 c.RawTrigger(
                     nextptr=iter_init,
                     actions=[
@@ -290,8 +296,13 @@ def EUDDeque(capacity):
                         SetMemory(iter_jump + 348, c.SetTo, yield_point),
                     ],
                 )
+
                 yield_point << c.NextTrigger()
                 yield ret
+
+                block = EUDPopBlock("loopqueueblock")[1]
+                if not block["contpoint"].IsSet():
+                    block["contpoint"] << iter_contpoint
                 c.SetNextTrigger(iter_contpoint)
                 end << c.NextTrigger()
 
