@@ -337,7 +337,8 @@ class EUDBag:
             subobject = _Subobject(self._subobject_fields)
             yield subobject
 
-            cs.EUDSetContinuePoint()
+            if not block["contpoint"].IsSet():
+                cs.EUDSetContinuePoint()
             subobject._update()
             cs.DoActions(
                 c.SetMemory(loopstart, c.Add, self.objdistance),

@@ -87,8 +87,10 @@ def EUDLoopRange(start, end=None) -> Iterator[c.EUDVariable]:
     v = c.EUDVariable()
     v << start
     if EUDWhile()(v < end):
+        block = ut.EUDPeekBlock("whileblock")[1]
         yield v
-        EUDLoopSetContinuePoint()
+        if not block["contpoint"].IsSet():
+            EUDLoopSetContinuePoint()
         v += 1
     EUDEndWhile()
     ut.EUDPopBlock("looprangeblock")

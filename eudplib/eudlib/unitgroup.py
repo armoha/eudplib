@@ -203,7 +203,8 @@ class _CPLoop:
 
             # EUDIf()(DeathsX(CurrentPlayer, Exactly, 0, 0, 0xFF00)):
             yield _CpHelper(0x4C // 4, reset_cp, remove_start, get_epd)
-            EUDSetContinuePoint()
+            if not block["contpoint"].IsSet():
+                EUDSetContinuePoint()
             DoActions(SetMemory(loopstart, Add, 72), SetMemory(pos, Add, 18))
         EUDEndWhile()
         ep_assert(pos.IsSet(), "unit.dying must be added")
