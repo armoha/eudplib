@@ -26,9 +26,13 @@ class StringIdMap:
         byte = u2utf8(unProxy(string))
         if byte not in self._s2id:
             byte = u2b(unProxy(string))
+        if byte not in self._s2id:
+            raise KeyError(string)
         retid = self._s2id.get(byte)
         if retid is None:
-            raise KeyError(_("Ambiguous string: {}").format(string))
+            raise KeyError(
+                _("Ambiguous string; multiple entries have duplicated contents: {}").format(string)
+            )
         return retid
 
 
