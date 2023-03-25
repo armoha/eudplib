@@ -75,6 +75,7 @@ class StatusFlags(EnumMember):
 
 
 T = TypeVar("T", bound="CUnit")
+_unsafe_flag = False
 
 
 class CUnit(EPDOffsetMap):
@@ -368,6 +369,7 @@ class CUnit(EPDOffsetMap):
 
     def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
         """EPD Constructor of CUnit. Use CUnit.from_ptr(ptr) for ptr value"""
+        global _unsafe_flag
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
@@ -377,7 +379,7 @@ class CUnit(EPDOffsetMap):
             u, p = epd._epd, epd._ptr
         if isinstance(u, int):
             if p is not None and not isinstance(p, int):
-                raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
+                raise ut.EPError(_("CUnit epd and ptr must be same type: {}").format((epd, ptr)))
             q, r = divmod(u - ut.EPD(0x59CCA8), 84)  # check epd
             if r == 0 and 0 <= q < 1700:
                 _epd, self._ptr = u, 0x59CCA8 + 336 * q
@@ -386,16 +388,25 @@ class CUnit(EPDOffsetMap):
         elif isinstance(u, c.EUDVariable):
             if p is not None:
                 if not isinstance(p, c.EUDVariable):
-                    raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
-                _epd, self._ptr = c.EUDCreateVariables(2)
-                c.SetVariables((_epd, self._ptr), (u, p))
+                    raise ut.EPError(
+                        _("CUnit epd and ptr must be same type: {}").format((epd, ptr))
+                    )
+                if _unsafe_flag:
+                    _epd, self._ptr = u, p
+                else:
+                    _epd, self._ptr = c.EUDCreateVariables(2)
+                    c.SetVariables((_epd, self._ptr), (u, p))  # Copy data
             else:
                 self._ptr = None
-                _epd = c.EUDVariable()
-                _epd << u
+                if _unsafe_flag:
+                    _epd = u
+                else:
+                    _epd = c.EUDVariable()
+                    _epd << u  # Copy data
         else:
             raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
 
+        _unsafe_flag = False
         super().__init__(_epd)
 
     @classmethod

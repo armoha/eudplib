@@ -43,7 +43,11 @@ def applyTypes(typesdecl, varlist):
         if vartype == ev.EUDVariable or vartype is None:
             rets.append(var)
         else:
+            from ...offsetmap.cunit import CUnit, _unsafe_flag
+
+            _unsafe_flag = True
             rets.append(vartype.cast(var))
+            _unsafe_flag = False
 
     return rets
 
