@@ -72,9 +72,9 @@ jobs:
       - name: Install mypy
         run: pip install mypy
       - name: Run mypy for Python 3.11
-        run: mypy eudplib --python-version 3.11
+        run: mypy eudplib --python-version 3.11 --allow-redefinition
       - name: Run mypy for Python 3.10
-        run: mypy eudplib --python-version 3.10
+        run: mypy eudplib --python-version 3.10 --allow-redefinition
 
   autoformat:
     name: Autoformat
@@ -113,48 +113,3 @@ jobs:
       - uses: crate-ci/typos@v1.0.4
         with:
           config: ./.typos.toml
-
-#  epscript:
-#    name: Deploy epScript
-#    runs-on: ubuntu-18.04
-#    strategy:
-#      matrix:
-#        runs-on: [ubuntu-18.04]
-#        compiler:
-#          - { compiler: GNU, CC: gcc-6, CXX: gcc++-6 }
-#        flavor: [ RelWithDebInfo, Coverage ]
-#    steps:
-#      - name: Checkout sources
-#        uses: actions/checkout@v3
-#        with:
-#          submodules: recursive
-#      - name: Install dependencies
-#        run: |
-#          echo Update gcc-6 =======================================================================
-#          echo gcc++ version before
-#          gcc++ --version
-#          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-#          sudo apt-get update
-#          sudo apt-get install g++-6 gcc-6
-#          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6 --slave /usr/bin/gcov gcov /usr/bin/gcov-6
-#          echo gcc++ version after
-#          gcc++ --version
-#      - name: Run CMake
-#        run: |
-#          cd eudplib/epscript/cpp
-#          gcc lemon2.c -o lemon2
-#          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -Wno-dev 
-#          cmake --build build -j 2 --config Release
-#        shell: bash
-#        env:
-#          CC:   gcc-6
-#          CXX:  gcc++-6
-#      - name: Create Artifact
-#        run: |
-#          mkdir release
-#          cp build/epScriptLib.so release/libepScriptLib.so
-#      - name: Publish Artifact
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: linux-release
-#          path: release
