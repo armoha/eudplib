@@ -540,25 +540,22 @@ subobject_body ::= subobject_body CONST typedNameList_nonEmpty(varList) SEMICOLO
     delete varList;
 }
 
-subobject_body ::= subobject_body VAR(X) nameList_nonEmpty(A) ASSIGN exprList_nonEmpty(B) SEMICOLON. {
-    delete X;
-
-    std::string& s = A->data;
-    int varCount = std::count(s.begin(), s.end(), ',') + 1;
-
-    // Register variables.
-    commaListIter(s, [&](std::string& varname) {
-        if(isPyKeyword(varname)) {
-            throw_error(6756, "Name collision with Python keyword " + varname, A->line);
+subobject_body ::= subobject_body STATIC typedNameList_nonEmpty(varList) SEMICOLON. {
+    subTokenListIter(varList, [&](const Token* nameType) {
+        if(isPyKeyword(nameType->subToken[0]->data)) {
+            throw_error(6756, "Name collision with Python keyword " + nameType->subToken[0]->data, currentTokenizingLine);
         }
-        if(!ps->closure.defVariable(varname)) {
-            throw_error(7998, ("Redeclaration of variable \'" + varname + "\'"), A->line);
+        if(!ps->closure.defConstant(nameType->subToken[0]->data)) {
+            throw_error(7720, ("Duplicated field name \'" + nameType->subToken[0]->data + "\'"), currentTokenizingLine);
+        }
+        if(nameType->subToken[1]) {
+            ps->gen << "('" << nameType->subToken[0]->data << "', " << nameType->subToken[1]->data << ", 'static'),\n";
+        }
+        else {
+            ps->gen << "('" << nameType->subToken[0]->data << "', None, 'static'),\n";
         }
     });
-
-    ps->gen << s << " = _LVAR([" << B->data << "])" << std::endl;
-
-    delete A; delete B;
+    delete varList;
 }
 
 subobject_chunk ::= subobject_body RBRACKET SEMICOLON. {
