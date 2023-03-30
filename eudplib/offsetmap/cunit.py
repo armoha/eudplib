@@ -25,6 +25,7 @@ from .member import (
 
 
 class MovementFlags(EnumMember):
+    __slots__ = ()
     OrderedAtLeastOnce = Flag(0x01)
     Accelerating = Flag(0x02)
     Braking = Flag(0x04)
@@ -37,6 +38,7 @@ class MovementFlags(EnumMember):
 
 
 class StatusFlags(EnumMember):
+    __slots__ = ()
     Completed = Flag(0x00000001)
     GroundedBuilding = Flag(0x00000002)  # a building that is on the ground
     InAir = Flag(0x00000004)

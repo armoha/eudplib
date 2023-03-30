@@ -15,6 +15,7 @@ from .member import CSpriteMember, EnumMember, Flag, Member, MemberKind
 
 
 class CSpriteFlags(EnumMember):
+    __slots__ = ()
     DrawSelCircle = Flag(0x01)  # Draw selection circle
     AllySel1 = Flag(0x02)
     AllySel2 = Flag(0x04)
