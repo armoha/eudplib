@@ -225,7 +225,7 @@ fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_retty
     // args->data is a comma-separated list of (name, type). To pair names and types,
     // we store varname in odd loops and define variables on even loops.
     std::string argname;
-    std::vector<std::string> argnames, types;
+    std::vector<std::string> argnames, argtypes;
     bool isTypedFunction = !!rets;
 
     subTokenListIter(args, [&](const Token* typedNameToken) {
@@ -241,7 +241,7 @@ fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_retty
                 throw_error(196, ("Redeclaration of variable \'" + argname + "\'"), args->line);
             }
             argnames.push_back(argname);
-            types.push_back("None");
+            argtypes.push_back("None");
         }
         else {
             isTypedFunction = true;
@@ -249,7 +249,7 @@ fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_retty
                 throw_error(7714, ("Redeclaration of typed constant \'" + argname + "\'"), args->line);
             }
             argnames.push_back(argname);
-            types.push_back(typeToken->data);
+            argtypes.push_back(typeToken->data);
         }
     });
 
@@ -261,7 +261,7 @@ fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_retty
     else {
         if(MAP_DEBUG) ps->gen << "@EUDTracedTypedFunc([";
         else ps->gen << "@EUDTypedFunc([";
-        writeStringList(ps->gen, types);
+        writeStringList(ps->gen, argtypes);
         if(!rets) ps->gen << "])" << std::endl;
         else ps->gen << "], [" << rets->data << "])" << std::endl;
     }
@@ -352,8 +352,9 @@ method_header(H) ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_
     }
 
     std::string argname;
-    std::vector<std::string> argnames, types;
+    std::vector<std::string> argnames, argtypes, rettypes;
     bool isTypedFunction = !!rets;
+
     subTokenListIter(args, [&](const Token* typedNameToken) {
         auto argnameToken = typedNameToken->subToken[0];
         auto typeToken = typedNameToken->subToken[1];
@@ -367,7 +368,7 @@ method_header(H) ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_
                 throw_error(2656, ("Redeclaration of variable \'" + argname + "\'"), args->line);
             }
             argnames.push_back(argname);
-            types.push_back("None");
+            argtypes.push_back("None");
         }
         else {
             isTypedFunction = true;
@@ -375,7 +376,7 @@ method_header(H) ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_
                 throw_error(9788, ("Redeclaration of typed constant \'" + argname + "\'"), args->line);
             }
             argnames.push_back(argname);
-            types.push_back(typeToken->data);
+            argtypes.push_back(typeToken->data);
         }
     });
 
@@ -387,7 +388,7 @@ method_header(H) ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_
     else {
         if(MAP_DEBUG) ps->gen << "@EUDTracedTypedMethod([";
         else ps->gen << "@EUDTypedMethod([";
-        writeStringList(ps->gen, types);
+        writeStringList(ps->gen, argtypes);
         if(!rets) ps->gen << "])" << std::endl;
         else ps->gen << "], [" << rets->data << "])" << std::endl;
     }
@@ -733,8 +734,8 @@ lambdaExprStart(A) ::= FUNCTION LPAREN typedNameList(args) RPAREN fdef_rettypes(
     // Register variables.
     // we store varname in odd loops and define variables on even loops.
     std::string argname;
-    std::vector<std::string> argnames, types;
-    bool isTypedFunction = false;
+    std::vector<std::string> argnames, argtypes, rettypes;
+    bool isTypedFunction = !!rets;
 
     subTokenListIter(args, [&](const Token* typedNameToken) {
         auto argnameToken = typedNameToken->subToken[0];
@@ -749,7 +750,7 @@ lambdaExprStart(A) ::= FUNCTION LPAREN typedNameList(args) RPAREN fdef_rettypes(
                 throw_error(196, ("Redeclaration of variable \'" + argname + "\'"), args->line);
             }
             argnames.push_back(argname);
-            types.push_back("None");
+            argtypes.push_back("None");
         }
         else {
             isTypedFunction = true;
@@ -757,7 +758,7 @@ lambdaExprStart(A) ::= FUNCTION LPAREN typedNameList(args) RPAREN fdef_rettypes(
                 throw_error(7714, ("Redeclaration of typed constant \'" + argname + "\'"), args->line);
             }
             argnames.push_back(argname);
-            types.push_back(typeToken->data);
+            argtypes.push_back(typeToken->data);
         }
     });
 
@@ -769,7 +770,7 @@ lambdaExprStart(A) ::= FUNCTION LPAREN typedNameList(args) RPAREN fdef_rettypes(
     else {
         if(MAP_DEBUG) ps->gen << "@EUDTracedTypedFunc([";
         else ps->gen << "@EUDTypedFunc([";
-        writeStringList(ps->gen, types);
+        writeStringList(ps->gen, argtypes);
         if(!rets) ps->gen << "])" << std::endl;
         else ps->gen << "], [" << rets->data << "])" << std::endl;
     }
