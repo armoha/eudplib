@@ -191,81 +191,81 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
     def iaddattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.iadditem(attrid, value)
 
     # FIXME: add operator for Subtract
     def isubtractattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.isubtractitem(attrid, value)
 
     def isubattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.isubitem(attrid, value)
 
     def imulattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.imulitem(attrid, value)
 
     def ifloordivattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.ifloordivitem(attrid, value)
 
     def imodattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.imoditem(attrid, value)
 
     def ilshiftattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.ilshiftitem(attrid, value)
 
     def irshiftattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.irshiftitem(attrid, value)
 
     def ipowattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.ipowitem(attrid, value)
 
     def iandattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.ianditem(attrid, value)
 
     def iorattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.ioritem(attrid, value)
 
     def ixorattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.ixoritem(attrid, value)
 
     # FIXME: Add operator for x[i] = ~x[i]
     def iinvertattr(self, name, value):
         attrid, _, attrmut = self._fielddict[name]
         if attrmut != "var":
-            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
+            raise ut.EPError(_("Cannot reassign non-var field: {}").format(name))
         self.iinvertitem(attrid, value)
 
     # Attribute comparisons

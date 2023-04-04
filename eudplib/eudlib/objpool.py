@@ -58,8 +58,20 @@ class ObjPool:
     def alloc(self, basetype, *args, **kwargs):
         ut.ep_assert(
             len(basetype._fields_) <= self.max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(self.max_fieldn),
+            _("Only structs less than {} fields can be allocated").format(self.max_fieldn)
+            + "\n\t- "
+            + _("Use objFieldN option to increase field limit"),
         )
+        ut.ep_assert(
+            all(
+                isinstance(field, str)
+                or len(field) == 2
+                or (len(field) == 3 and field[2] != "static")
+                for field in basetype._fields_
+            ),
+            _("Structs with static field can not be allocated"),
+        )
+
         data = self._alloc()
         data = basetype.cast(data)
         data.constructor(*args, **kwargs)
