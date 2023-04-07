@@ -369,10 +369,15 @@ def ConstructPayload() -> Payload:
 
 
 _on_create_payload_callbacks: list[Callable] = []
+_on_alloc_objects_callbacks: list[Callable] = []
 
 
 def RegisterCreatePayloadCallback(f: Callable) -> None:
     _on_create_payload_callbacks.append(f)
+
+
+def _RegisterAllocObjectsCallback(f: Callable) -> None:
+    _on_alloc_objects_callbacks.append(f)
 
 
 def CreatePayload(root: "EUDObject | Forward") -> Payload:
@@ -380,6 +385,8 @@ def CreatePayload(root: "EUDObject | Forward") -> Payload:
     for f in _on_create_payload_callbacks:
         f()
     CollectObjects(root)
+    for f in _on_alloc_objects_callbacks:
+        f()
     AllocObjects()
     return ConstructPayload()
 

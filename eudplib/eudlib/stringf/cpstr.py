@@ -8,6 +8,7 @@
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
+from eudplib.core.allocator.payload import _RegisterAllocObjectsCallback
 from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import GetStringSectionName
 from eudplib.localize import _
@@ -16,7 +17,7 @@ from ..memiof import f_dwepdread_epd, f_dwread_epd, f_wread_epd
 
 
 @c.EUDTypedFunc([c.TrgString])
-def GetMapStringAddr(strId):
+def _GetMapStringAddr(strId):
     add_STR_ptr, add_STR_epd = c.Forward(), c.Forward()
     if cs.EUDExecuteOnce()():
         STR_ptr, STR_epd = 0x191943C8, ut.EPD(0x191943C8)
@@ -38,6 +39,44 @@ def GetMapStringAddr(strId):
         raise ut.EPError(_("Invalid string section name: {}").format(str_chunk_name))
     c.RawTrigger(actions=add_STR_ptr << ret.AddNumber(0))
     c.EUDReturn(ret)
+
+
+_const_strptr: dict[int, c.Forward] = {}
+
+
+def _initialize_queries():
+    from ...core.mapdata.stringmap import GetStringMap
+
+    strmap = GetStringMap()
+    strmap.Finalize()
+    STR_ADDRESS = 0x191943C8
+    non_existing_id = []
+    for strId, offsetQuery in _const_strptr.items():
+        try:
+            offsetQuery._expr = c.ConstExpr(
+                None, STR_ADDRESS + strmap._stroffset[strmap._dataindextb[strId - 1]], 0
+            )
+        except IndexError:
+            non_existing_id.append(strId)
+
+    if non_existing_id:
+        raise ut.EPError(
+            _("GetMapStringAddr(strId) for non-existing string ID(s): {}").format(non_existing_id)
+        )
+
+
+_RegisterAllocObjectsCallback(_initialize_queries)
+
+
+def GetMapStringAddr(strId):
+    global _const_strptr
+    strId = c.EncodeString(strId)
+    if isinstance(strId, int):
+        if strId not in _const_strptr:
+            _const_strptr[strId] = c.Forward()
+            _const_strptr[strId] << 0
+        return _const_strptr[strId]
+    return _GetMapStringAddr(strId)
 
 
 def _s2b(x):

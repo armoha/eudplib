@@ -68,21 +68,23 @@ class TBL:
         load_entry: Literal[2, 4] = 2,
         save_entry: Literal[2, 4] = 4,
     ) -> None:
-        #
+        self._loadentry: Literal[2, 4] = load_entry
+        self._saveentry: Literal[2, 4] = save_entry
+
         # datatb : table of strings                       : string data table
         # dataindextb : string id -> data id              : string offset table
         # stringmap : string -> representative string id
-        #
-
         self._datatb: list[bytes] = []
         self._stringmap: dict[bytes, int] = {}
         self._dataindextb: list[int] = []  # String starts from #1
         self._capacity: int = save_entry  # Size of STR section
-        self._loadentry: Literal[2, 4] = load_entry
-        self._saveentry: Literal[2, 4] = save_entry
         self._emptystring: list[tuple[int, bytes] | int] = []
         self._loaded: bool = False
         self._first_extended_string: bytes | None = None
+
+        self._finalized: bool = False
+        self._tbldata: bytes = b""
+        self._stroffset: list[int] = []
 
         if content is not None:
             if init_chkt:
@@ -91,8 +93,12 @@ class TBL:
                 self.LoadTBL(content)
 
     def LoadTBL(self, content: bytes) -> None:
+        # ut.ep_assert(not self._loaded, "String data are already loaded")
         self._datatb.clear()
         self._stringmap.clear()
+        self._dataindextb.clear()
+        self._emptystring.clear()
+        self._first_extended_string = None
         self._capacity = self._saveentry
 
         size = self._loadentry
@@ -127,8 +133,12 @@ class TBL:
     def LoadTBLWithChk(
         self, content: bytes, init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap]"
     ) -> None:
+        # ut.ep_assert(not self._loaded, "String data are already loaded")
         self._datatb.clear()
         self._stringmap.clear()
+        self._dataindextb.clear()
+        self._emptystring.clear()
+        self._first_extended_string = None
         self._capacity = self._saveentry
 
         chkt, unitmap, locmap, swmap = init_chkt
@@ -256,6 +266,7 @@ class TBL:
         self._loaded = True
 
     def AddString(self, string: str | bytes) -> int:
+        ut.ep_assert(not self._finalized, _("Can't add new string after finalization"))
         # Starcraft: Remastered uses both utf-8 and multibyte encoding.
         if isinstance(string, str):
             try:
@@ -325,15 +336,17 @@ class TBL:
                 return self.AddString(string) + 1
 
     def SaveTBL(self) -> bytes:
-        outbytes = []
+        if self._finalized:
+            return self._tbldata
 
         # calculate offset of each string
-        stroffset = []
+        outbytes = []
+        self._stroffset.clear()
         size = self._saveentry
         outindex = roundup_by_4(size * len(self._dataindextb) + size)
 
         for s in self._datatb:
-            stroffset.append(outindex)
+            self._stroffset.append(outindex)
             outindex += roundup_by_4(len(s) + 1)
         i2b = i2bn(size)
 
@@ -342,7 +355,7 @@ class TBL:
 
         # String offsets
         for dataidx in self._dataindextb:
-            outbytes.append(i2b(stroffset[dataidx]))
+            outbytes.append(i2b(self._stroffset[dataidx]))
 
         tablesize = size * (len(self._dataindextb) + 1)
         for _ in range(roundup_by_4(tablesize) - tablesize):
@@ -354,9 +367,16 @@ class TBL:
             for _ in range(roundup_by_4(len(s) + 1) - len(s)):
                 outbytes.append(b"\0")
 
-        return b"".join(outbytes)
+        self._tbldata = b"".join(outbytes)
+        return self._tbldata
+
+    def Finalize(self) -> tuple[bytes, list[int]]:
+        self.SaveTBL()
+        self._finalized = True
+        return self._tbldata, self._stroffset
 
     def ForceAddString(self, string: str | bytes) -> int:
+        ut.ep_assert(not self._finalized, _("Can't add new string after finalization"))
         string = ut.u2b(string)  # Starcraft uses multibyte encoding.
         if not isinstance(string, bytes):
             raise ut.EPError(_("Invalid type for string"))
