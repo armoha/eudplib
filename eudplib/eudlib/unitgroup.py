@@ -39,6 +39,7 @@ from ..core import (
 from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
 from ..ctrlstru.loopblock import _UnsafeWhileNot
 from ..utils import EPD, EUDPeekBlock, ep_assert
+from .memiof.modcurpl import f_setcurpl2cpcache
 
 _assign_helper = EUDVariable()
 
@@ -207,6 +208,8 @@ class _CPLoop:
                 EUDSetContinuePoint()
             DoActions(SetMemory(loopstart, Add, 72), SetMemory(pos, Add, 18))
         EUDEndWhile()
+
+        f_setcurpl2cpcache()
         ep_assert(pos.IsSet(), "unit.dying must be added")
 
 
