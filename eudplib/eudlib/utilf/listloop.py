@@ -12,11 +12,11 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from ...offsetmap import CUnit
 from ...trigtrg.runtrigtrg import TrigTriggerBegin, TrigTriggerEnd
 from ...utils import EPD
 from ..memiof import f_bread_cp, f_cunitepdread_epd, f_dwepdread_epd, f_setcurpl2cpcache
 from .unlimiterflag import IsUnlimiterOn
-from ...offsetmap import CUnit
 
 
 def EUDLoopList(header_offset, break_offset=None) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
@@ -71,8 +71,8 @@ def EUDLoopNewUnit(
     ut.ep_assert(isinstance(allowance, int))
     firstUnitPtr = EPD(0x628430)
     ut.EUDCreateBlock("newunitloop", "newlo")
-    tos0 = c.EUDLightVariable()
-    tos0 << 0
+    tos0 = c.EUDLightVariable(0)
+    # tos0 << 0
 
     ptr, epd = f_cunitepdread_epd(firstUnitPtr)
     if cs.EUDWhileNot()(ptr == 0):
@@ -99,6 +99,7 @@ def EUDLoopNewUnit(
         f_cunitepdread_epd(epd, ret=[ptr, epd])
     cs.EUDEndWhile()
 
+    f_setcurpl2cpcache([], tos0.SetNumber(0))
     ut.EUDPopBlock("newunitloop")
 
 
