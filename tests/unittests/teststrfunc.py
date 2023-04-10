@@ -4,6 +4,9 @@ from helper import *
 @TestInstance
 def test_strbuffer():
     test_assert("LocalLocale test", [LocalLocale == "koUS"])
+    foo = Db(4)
+    f_sprintf(foo, "{}", LocalLocale)
+    test_equality("LocalLocale print test", b2i4(b"koUS"), f_dwread(foo))
 
     origcp = f_getcurpl()
 

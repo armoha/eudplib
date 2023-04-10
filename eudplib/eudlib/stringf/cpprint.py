@@ -211,6 +211,10 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
     """
     args = ut.FlattenList(args)
     for arg in args:
+        try:
+            arg = arg.fmt()
+        except AttributeError:
+            pass
         if ut.isUnproxyInstance(arg, str):
             arg = arg.encode(encoding)
         elif ut.isUnproxyInstance(arg, int):

@@ -1,5 +1,8 @@
 from ...core import (
     AllPlayers,
+    Db,
+    EUDFunc,
+    EUDReturn,
     EUDVariable,
     Exactly,
     Memory,
@@ -7,7 +10,8 @@ from ...core import (
     SetMemory,
     SetTo,
 )
-from ...utils import ExprProxy, ep_assert
+from ...ctrlstru import EUDEndSwitch, EUDSwitch, EUDSwitchCase, EUDSwitchDefault
+from ...utils import EPD, ExprProxy, ep_assert
 from .cpprint import f_raise_CCMU
 
 LOCALES = (
@@ -50,6 +54,22 @@ class LocalLocale(ExprProxy):
             ep_assert(other in LOCALES)
             other = 1 + LOCALES.index(other)
         return super().__ne__(other)
+
+    @staticmethod
+    @EUDFunc
+    def _fmt(locale):
+        EUDSwitch(locale)
+        for i, _locale in enumerate(LOCALES):
+            if EUDSwitchCase()(i + 1):
+                EUDReturn(EPD(Db(_locale)))
+        if EUDSwitchDefault()():
+            EUDReturn(EPD(Db("(unknown locale)")))
+        EUDEndSwitch()
+
+    def fmt(self):
+        from .eudprint import epd2s
+
+        return epd2s(LocalLocale._fmt(self))
 
 
 LocalLocale = LocalLocale(EUDVariable(0))

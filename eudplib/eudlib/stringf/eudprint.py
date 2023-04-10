@@ -266,6 +266,10 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
             else:
                 return (argument,)
 
+        try:
+            arg = arg.fmt()
+        except AttributeError:
+            pass
         if ut.isUnproxyInstance(arg, str):
             arg = arg.encode(encoding)
         elif ut.isUnproxyInstance(arg, int):
