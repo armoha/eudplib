@@ -35,7 +35,52 @@ class ExprProxy(Generic[T_co]):
     def __hash__(self) -> int:
         return id(self)
 
+    # Forbid in-place operators
+
+    def __iadd__(self, k):
+        raise AttributeError
+
+    def __iand__(self, k):
+        raise AttributeError
+
+    def __iconcat__(self, k):
+        raise AttributeError
+
+    def __ifloordiv__(self, k):
+        raise AttributeError
+
+    def __ilshift__(self, k):
+        raise AttributeError
+
+    def __imod__(self, k):
+        raise AttributeError
+
+    def __imul__(self, k):
+        raise AttributeError
+
+    def __imatmul__(self, k):
+        raise AttributeError
+
+    def __ior__(self, k):
+        raise AttributeError
+
+    def __ipow__(self, k):
+        raise AttributeError
+
+    def __irshift__(self, k):
+        raise AttributeError
+
+    def __isub__(self, k):
+        raise AttributeError
+
+    def __itruediv__(self, k):
+        raise AttributeError
+
+    def __ixor__(self, k):
+        raise AttributeError
+
     # Proxy arithmetic operators
+
     def __lshift__(self, k):
         return self._value << k
 
