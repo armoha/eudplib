@@ -70,7 +70,7 @@ class EUDArray(ut.ExprProxy):
     def fmt(self, formatter):
         if isinstance(self.length, int):
             formatter.write_str("[")
-            for i in range(length):
+            for i in range(self.length):
                 formatter.write_fmt("{}" if i == 0 else ", {}", self[i])
             formatter.write_str("]")
         else:
@@ -78,7 +78,7 @@ class EUDArray(ut.ExprProxy):
 
     def _bound_check(self, index: object) -> None:
         index = ut.unProxy(index)
-        if isinstance(index, int) and hasattr(self, "length"):
+        if isinstance(index, int) and isinstance(self.length, int):
             ut.ep_assert(
                 0 <= index < self.length,
                 _("index out of bounds: EUDArray.length is {} but the index is {}").format(
