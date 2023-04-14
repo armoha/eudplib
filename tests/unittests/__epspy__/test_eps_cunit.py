@@ -7,12 +7,12 @@ def f_test_cunit():
     # (Line 2) const sp = [0x2468ACE0, 0x13579BDF, 0xFEDCBA98, 0x76543210];
     sp = _ARR(FlattenList([0x2468ACE0, 0x13579BDF, 0xFEDCBA98, 0x76543210]))
     # (Line 3) const a = [
-    # (Line 4) 0, -1, -2, sp, -4 , -5, -6, -7, -8, -9,
-    # (Line 5) -10, -11, -12, -13, -14, -15, -16, -17, -18,
-    # (Line 6) 0x12345607, 0x89ABCDEF];
-    a = _ARR(FlattenList([0, -1, -2, sp, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, 0x12345607, 0x89ABCDEF]))
-    # (Line 7) const u = EPDCUnitMap(EUDVariable(EPD(a)));
-    u = EPDCUnitMap(EUDVariable(EPD(a)))
+    # (Line 4) 0,  -1,  -2,  sp,  -4,  -5,  -6,  -7,  -8, -9,
+    # (Line 5) -10, -11, -12, -13, -14, -15, -16, -17, -18, 0x12345607,
+    # (Line 6) 0x89ABCDEF, 0xEDACEDAC, 0xEDACEDAC, 0xEDACEDAC, 0x2200011, 0x4400033, 0xFFFF0055];
+    a = _ARR(FlattenList([0, -1, -2, sp, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, 0x12345607, 0x89ABCDEF, 0xEDACEDAC, 0xEDACEDAC, 0xEDACEDAC, 0x2200011, 0x4400033, 0xFFFF0055]))
+    # (Line 7) const u = CUnit(EUDVariable(EPD(a)));
+    u = CUnit(EUDVariable(EPD(a)))
     # (Line 8) var ret = 0;
     ret = _LVAR([0])
     # (Line 9) if (u.order == 0x56) ret += 1;
@@ -40,19 +40,43 @@ def f_test_cunit():
     # (Line 15) if (u.orderUnitType == py_str("Artanis")) ret += 32;
     if EUDIf()(_ATTC(u, 'orderUnitType') == str("Artanis")):
         ret.__iadd__(32)
-        # (Line 16) u.die();
+        # (Line 16) u.set_color(P12);
+    EUDEndIf()
+    u.set_color(P12)
+    # (Line 17) if (sp[2] == 0xFE0BBA98) ret += 64;
+    if EUDIf()(_ARRC(sp, 2) == 0xFE0BBA98):
+        ret.__iadd__(64)
+        # (Line 18) u.cgive(P2);
+    EUDEndIf()
+    u.cgive(P2)
+    # (Line 19) if (u.owner == P2) ret += 128;
+    if EUDIf()(_ATTC(u, 'owner') == P2):
+        ret.__iadd__(128)
+        # (Line 20) u.die();
     EUDEndIf()
     u.die()
-    # (Line 17) if (a[0x4C/4] == 0x12340007) ret += 64;
-    if EUDIf()(_ARRC(a, 0x4C // 4) == 0x12340007):
-        ret.__iadd__(64)
-        # (Line 18) if (u.is_dying()) ret += 128;
+    # (Line 21) if (a[0x4C/4] == 0x12340001) ret += 256;
+    if EUDIf()(_ARRC(a, 0x4C // 4) == 0x12340001):
+        ret.__iadd__(256)
+        # (Line 22) if (u.is_dying()) ret += 512;
     EUDEndIf()
     if EUDIf()(u.is_dying()):
-        ret.__iadd__(128)
-        # (Line 19) u.cgive(P1);
+        ret.__iadd__(512)
+        # (Line 23) if (!u.are_buildq_empty()) ret += 1024;
     EUDEndIf()
-    u.cgive(P1)
-    # (Line 20) return ret;
+    if EUDIf()(u.are_buildq_empty(), neg=True):
+        ret.__iadd__(1024)
+        # (Line 24) if (u.check_buildq(EUDVariable(0x11))) ret += 2048;
+    EUDEndIf()
+    if EUDIf()(u.check_buildq(EUDVariable(0x11))):
+        ret.__iadd__(2048)
+        # (Line 31) u.reset_buildq();
+    EUDEndIf()
+    u.reset_buildq()
+    # (Line 32) if (u.are_buildq_empty()) ret += 32768;
+    if EUDIf()(u.are_buildq_empty()):
+        ret.__iadd__(32768)
+        # (Line 33) return ret;
+    EUDEndIf()
     EUDReturn(ret)
-    # (Line 21) }
+    # (Line 34) }

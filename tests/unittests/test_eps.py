@@ -62,7 +62,7 @@ def test_epscript():
     test_equality("epScript object", f_test_object(), 511)
     test_equality("epScript nested object", f_test_nested_object(), 127)
     test_equality("epScript all object array", f_test_selftype_member(), 5)
-    test_equality("epScript EPDCUnitMap", f_test_cunit(), 255)
+    test_equality("epScript EPDCUnitMap", f_test_cunit(), 4095 + 32768)
     test_equality("epScript compatibility", f_test_compatibility(), 32)
     test_equality(
         "epScript stat_txt.tbl", stat.f_test_stattext(), [ord(c) for c in stat.expected_result]

@@ -1,10 +1,10 @@
 function test_cunit() {
     const sp = [0x2468ACE0, 0x13579BDF, 0xFEDCBA98, 0x76543210];
     const a = [
-        0, -1, -2, sp, -4 , -5, -6, -7, -8, -9,
-        -10, -11, -12, -13, -14, -15, -16, -17, -18,
-        0x12345607, 0x89ABCDEF];
-    const u = EPDCUnitMap(EUDVariable(EPD(a)));
+          0,  -1,  -2,  sp,  -4,  -5,  -6,  -7,  -8, -9,
+        -10, -11, -12, -13, -14, -15, -16, -17, -18, 0x12345607,
+        0x89ABCDEF, 0xEDACEDAC, 0xEDACEDAC, 0xEDACEDAC, 0x2200011, 0x4400033, 0xFFFF0055];
+    const u = CUnit(EUDVariable(EPD(a)));
     var ret = 0;
     if (u.order == 0x56) ret += 1;
     if (u.owner == P8) ret += 2;
@@ -13,9 +13,22 @@ function test_cunit() {
     if (u.orderUnitType == 0xCDEF) ret += 16;
     wwrite_epd(EPD(a) + 0x50/4, 0, $U("Artanis"));
     if (u.orderUnitType == py_str("Artanis")) ret += 32;
+    u.set_color(P12);
+    if (sp[2] == 0xFE0BBA98) ret += 64;
+    u.cgive(P2);
+    if (u.owner == P2) ret += 128;
     u.die();
-    if (a[0x4C/4] == 0x12340007) ret += 64;
-    if (u.is_dying()) ret += 128;
-    u.cgive(P1);
+    if (a[0x4C/4] == 0x12340001) ret += 256;
+    if (u.is_dying()) ret += 512;
+    if (!u.are_buildq_empty()) ret += 1024;
+    if (u.check_buildq(EUDVariable(0x11))) ret += 2048;
+    /*
+    if (u.check_buildq("Terran Medic")) ret += 2048;
+    if (u.check_buildq(EUDVariable(0x33))) ret += 4096;
+    if (u.check_buildq("Protoss Archon")) ret += 8192;
+    if (u.check_buildq("Protoss Scarab")) ret += 16384;
+    */
+    u.reset_buildq();
+    if (u.are_buildq_empty()) ret += 32768;
     return ret;
 }
