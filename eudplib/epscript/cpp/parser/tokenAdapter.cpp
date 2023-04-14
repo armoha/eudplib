@@ -14,7 +14,6 @@ int getConvertedType(int type) {
         case TOKEN_STATIC: return STATIC;
         case TOKEN_FUNCTION: return FUNCTION;
         case TOKEN_OBJECT: return OBJECT;
-        case TOKEN_CLASS: return CLASS;
         case TOKEN_EXTENDS: return EXTENDS;
         case TOKEN_L2V: return L2V;
         case TOKEN_ONCE: return ONCE;

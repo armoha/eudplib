@@ -91,21 +91,12 @@ def f_test_compatibility():
     # (Line 67) return ret;
     EUDReturn(ret)
     # (Line 68) }
-    # (Line 69) class ParticleBag extends EUDStruct {
+    # (Line 69) object ParticleBag extends EUDStruct {
 
-# (Line 70) object {
+# (Line 70) var a;
 class ParticleBag(EUDStruct):
-    # (Line 71) var a;
-    _subobject_ = [
-        # (Line 72) const b;
-        'a',
-        # (Line 73) };
-        ('b', None, 'const'),
-        # (Line 74) var a;
-
-    ]
-    # (Line 75) var b;
-    # (Line 76) }
+    # (Line 71) var b;
+    # (Line 72) };
     _fields_ = [
         'a',
         'b',

@@ -159,7 +159,6 @@ Token* TokenizerImpl::getToken() {
         if(identifier == "function") return TK(TOKEN_FUNCTION);
         if(identifier == "object") return TK(TOKEN_OBJECT);
         if(identifier == "extends") return TK(TOKEN_EXTENDS);
-        if(identifier == "class") return TK(TOKEN_CLASS);
         if(identifier == "l2v") return TK(TOKEN_L2V);
         if(identifier == "once") return TK(TOKEN_ONCE);
         if(identifier == "if") return TK(TOKEN_IF);
