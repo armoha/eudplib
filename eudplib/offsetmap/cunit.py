@@ -512,10 +512,111 @@ class CUnit(EPDOffsetMap):
     def clear_status_flag(self, mask) -> None:
         self.set_status_flag(0, mask)
 
+    def are_buildq_empty(self) -> [c.Condition]:
+        return [
+            self.eqattr("buildQueue12", 0xE400E4),
+            self.eqattr("buildQueue34", 0xE400E4),
+            self.eqattr("buildQueue5", 0xE4),
+        ]
+
+    @staticmethod
+    @c.EUDTypedFunc([None, c.TrgUnit])
+    def _check_buildq(unit, unit_type):
+        from ..eudlib import f_setcurpl2cpcache
+        from ..trigger import Trigger
+
+        CUnit._check_buildq._frets = [c.SetDeaths(0, c.SetTo, 0, 0)]
+        CUnit._check_buildq._retn = 1
+        ret = c.EUDLightVariable(_from=CUnit._check_buildq._frets[0])
+        c.VProc(
+            unit,
+            [
+                ret.SetNumber(0),
+                c.SetMemory(0x6509B0, c.SetTo, 0x98 // 4),
+                unit.QueueAddTo(ut.EPD(0x6509B0)),
+            ],
+        )
+        Trigger(
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+            ret.SetNumber(1),
+        )
+        if cs.EUDIfNot()(ret == 1):
+            unit65536 = unit_type * 65536  # Does not change CurrentPlayer
+            Trigger(
+                c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0xFFFF0000, 0),
+                ret.SetNumber(1),
+            )
+            c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
+            Trigger(
+                c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+                ret.SetNumber(1),
+            )
+            Trigger(
+                c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0xFFFF0000, 0),
+                ret.SetNumber(1),
+            )
+            c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
+            Trigger(
+                c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+                ret.SetNumber(1),
+            )
+        cs.EUDEndIf()
+        f_setcurpl2cpcache()
+        # return False
+
+    @staticmethod
+    @c.EUDTypedFunc([None, c.TrgUnit, None])
+    def _check_buildq_const(unit, unit_type, unit65536):
+        from ..eudlib import f_setcurpl2cpcache
+        from ..trigger import Trigger
+
+        CUnit._check_buildq_const._frets = [c.SetDeaths(0, c.SetTo, 0, 0)]
+        CUnit._check_buildq_const._retn = 1
+        ret = c.EUDLightVariable(_from=CUnit._check_buildq_const._frets[0])
+        c.VProc(
+            unit,
+            [
+                ret.SetNumber(0),
+                c.SetMemory(0x6509B0, c.SetTo, 0x98 // 4),
+                unit.QueueAddTo(ut.EPD(0x6509B0)),
+            ],
+        )
+        Trigger(
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+            ret.SetNumber(1),
+        )
+        Trigger(
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0xFFFF0000, 0),
+            ret.SetNumber(1),
+        )
+        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
+        Trigger(
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+            ret.SetNumber(1),
+        )
+        Trigger(
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0xFFFF0000, 0),
+            ret.SetNumber(1),
+        )
+        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
+        Trigger(
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+            ret.SetNumber(1),
+        )
+        f_setcurpl2cpcache()
+        # return False
+
+    def check_buildq(self, unit: c.TrgUnit) -> c.Condition:
+        unit_type = c.EncodeUnit(unit)
+        if isinstance(unit_type, int):
+            return CUnit._check_buildq_const(self, unit_type, unit_type * 65536)
+        else:
+            return CUnit._check_buildq(self, unit)
+
     def reset_buildq(self, Q1=0xE4) -> None:
-        self.buildQ12 = 0xE40000 + Q1
-        self.buildQ34 = 0xE400E4
-        self.buildQ5 = 0xE4
+        self.buildQueue12 = 0xE40000 + Q1
+        self.buildQueue34 = 0xE400E4
+        self.buildQueue5 = 0xE4
 
     def die(self) -> None:
         self.order = 0
