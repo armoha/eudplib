@@ -436,8 +436,8 @@ class CUnit(EPDOffsetMap):
         return PtrCache(cast(c.EUDVariable, self._epd))
 
     @staticmethod
-    @c.EUDTypedFunc([None, c.TrgPlayer])
-    def _cgive(unit, new_owner):
+    @c.EUDTypedFunc([None, None, c.TrgPlayer])
+    def _cgive(unit, ptr, new_owner):
         from ..eudlib.memiof import f_dwwrite_epd
 
         unit = CUnit.cast(unit)
@@ -459,7 +459,7 @@ class CUnit(EPDOffsetMap):
             unit.nextPlayerUnit = prv
         cs.EUDEndIf()
         new_header = ut.EPD(0x6283F8) + new_owner
-        ptr = unit.ptr
+        # ptr = unit.ptr
         if cs.EUDIf()(c.MemoryEPD(new_header, c.AtLeast, 0x59CCA8)):
             new_prev = CUnit.from_read(new_header)
             new_next = new_prev.nextPlayerUnit
@@ -476,7 +476,7 @@ class CUnit(EPDOffsetMap):
         cs.EUDEndIf()
 
     def cgive(self, player) -> None:
-        CUnit._cgive(self, player)
+        CUnit._cgive(self, self.ptr, player)
 
     @staticmethod
     @c.EUDTypedFunc([None, c.TrgPlayer])
@@ -484,11 +484,16 @@ class CUnit(EPDOffsetMap):
         from ..eudlib.memiof import f_bwrite_epd, f_spriteepdread_epd
 
         color_epd = c.EUDVariable()
-        sprite_epd = self._epd + 0x0C // 4
         check_sprite = c.MemoryEPD(0, c.Exactly, 0)
-        c.VProc(sprite_epd, sprite_epd.SetDest(ut.EPD(check_sprite) + 1))
+        c.VProc(
+            unit,
+            [
+                unit.AddNumber(0x0C // 4),
+                unit.SetDest(ut.EPD(check_sprite) + 1),
+            ],
+        )
         if cs.EUDIfNot()(check_sprite):
-            f_spriteepdread_epd(sprite_epd, ret=[ut.EPD(check_sprite) + 2, color_epd])
+            f_spriteepdread_epd(unit, ret=[ut.EPD(check_sprite) + 2, color_epd])
         cs.EUDEndIf()
         if cs.EUDIfNot()(color_epd <= 2):
             f_bwrite_epd(color_epd + 2, 2, color_player)
