@@ -6,7 +6,7 @@
 # Please see the LICENSE file that should have been included as part of this package.
 
 from abc import ABCMeta
-from typing import cast, TypeAlias, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias, TypeVar, cast
 
 from .. import core as c
 from .. import utils as ut
@@ -137,10 +137,13 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         epd = self._epd + offsetEPD
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
         value = member.kind.cast(value)
-        if subp == 0:
-            return c.MemoryXEPD(epd, c.Exactly, value, mask)
-        else:
-            return c.MemoryXEPD(epd, c.Exactly, c.f_bitlshift(value, 8 * subp), mask)
+        if subp != 0:
+            value = c.f_bitlshift(value, 8 * subp)
+        if isinstance(value, int) and value & ~mask:
+            raise ut.EPError(
+                _("{} is out of range({}) for {} Member {}").format(value, mask, type(self), name)
+            )
+        return c.MemoryXEPD(epd, c.Exactly, value, mask)
 
     def neattr(self, name, value):
         raise AttributeError
@@ -151,10 +154,13 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         epd = self._epd + offsetEPD
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
         value = member.kind.cast(value)
-        if subp == 0:
-            return c.MemoryXEPD(epd, c.AtMost, value, mask)
-        else:
-            return c.MemoryXEPD(epd, c.AtMost, c.f_bitlshift(value, 8 * subp), mask)
+        if subp != 0:
+            value = c.f_bitlshift(value, 8 * subp)
+        if isinstance(value, int) and value & ~mask:
+            raise ut.EPError(
+                _("{} is out of range({}) for {} Member {}").format(value, mask, type(self), name)
+            )
+        return c.MemoryXEPD(epd, c.AtMost, value, mask)
 
     def geattr(self, name, value):
         member = type(self).__dict__[name]
@@ -162,10 +168,13 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         epd = self._epd + offsetEPD
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
         value = member.kind.cast(value)
-        if subp == 0:
-            return c.MemoryXEPD(epd, c.AtLeast, value, mask)
-        else:
-            return c.MemoryXEPD(epd, c.AtLeast, c.f_bitlshift(value, 8 * subp), mask)
+        if subp != 0:
+            value = c.f_bitlshift(value, 8 * subp)
+        if isinstance(value, int) and value & ~mask:
+            raise ut.EPError(
+                _("{} is out of range({}) for {} Member {}").format(value, mask, type(self), name)
+            )
+        return c.MemoryXEPD(epd, c.AtLeast, value, mask)
 
     def ltattr(self, name, value):
         raise AttributeError
