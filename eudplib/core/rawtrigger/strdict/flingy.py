@@ -201,7 +201,7 @@ DefFlingyDict: dict[str, int] = {
     "Xel'Naga Temple": 197,
     "Scantid": 198,
     "Kakaru": 199,
-    "Ursado": 200,
+    "Ursadon": 200,
     "Optical Flare Grenade": 201,
     "Halo Rockets": 202,
     "Subterranean Spines": 203,
