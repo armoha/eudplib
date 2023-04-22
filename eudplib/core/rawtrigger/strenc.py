@@ -7,7 +7,7 @@
 
 import difflib
 from collections.abc import Callable, Mapping
-from typing import TYPE_CHECKING, TypeAlias, TypeVar, overload
+from typing import TYPE_CHECKING, TypeAlias, overload
 
 from eudplib import utils as ut
 from eudplib.localize import _

@@ -8,7 +8,19 @@
 from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, TypeAlias, overload
 
-from .consttype import ConstType, Dword, Word, Byte, _Dword, _Byte, T, U, _ExprProxy, _Arg, __ExprProxy, __Arg
+from .consttype import (
+    ConstType,
+    Dword,
+    Byte,
+    _Dword,
+    _Byte,
+    T,
+    U,
+    _ExprProxy,
+    _Arg,
+    __ExprProxy,
+    __Arg,
+)
 from ...localize import _
 from ...utils import ExprProxy, EPError, unProxy
 from ..mapdata import GetPropertyIndex, UnitProperty

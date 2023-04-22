@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from ..allocator.payload import RlocInt_C, _PayloadBuffer
     from .rawtriggerdef import RawTrigger
 
-
 _acttypes: dict[int, str] = {
     0: "(no action)",
     1: "Victory",
@@ -259,7 +258,7 @@ class Action(ConstExpr):
 
     def getDestAddr(self) -> ConstExpr:
         ut.ep_assert(self.fields[7] == 45)
-        return self + 16   # type: ignore[return-value]
+        return self + 16  # type: ignore[return-value]
 
     def getValueAddr(self) -> ConstExpr:
         ut.ep_assert(self.fields[7] == 45)
