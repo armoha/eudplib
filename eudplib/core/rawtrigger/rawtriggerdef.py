@@ -43,9 +43,20 @@ def _bool2Cond(x: bool | Condition) -> Condition:
         return x
 
 
-def Disabled(arg: Condition | Action) -> None:
+@overload
+def Disabled(arg: Condition) -> Condition:
+    ...
+
+
+@overload
+def Disabled(arg: Action) -> Action:
+    ...
+
+
+def Disabled(arg: Condition | Action) -> Condition | Action:
     """Disable condition or action"""
     arg.Disabled()
+    return arg
 
 
 Trigger: TypeAlias = "ConstExpr | int | None"
