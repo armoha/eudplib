@@ -1,19 +1,6 @@
-[tool.black]
-line-length = 99 # override black's default line-length
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | \.tox
-  | venv
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+[tool.ruff]
+select = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
+line-length = 79
 
-[tool.isort]
-# make it compatible with black
-profile = "black" 
+[tool.ruff.isort]
+known-first-party = ["eudplib", "tests"]
