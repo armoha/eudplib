@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 import os
 
@@ -17,7 +16,7 @@ for root, dirs, files in os.walk("../eudplib"):
 
         if f[-3:] == ".py":
             finalpath = os.path.join(root, f)
-            code = open(finalpath, "r", encoding="UTF-8").read()
+            code = open(finalpath, encoding="utf-8").read()
             totsize += len(code)
             linen = code.count("\n") + 1
             print("%-40s : %4d" % (finalpath, linen))
