@@ -1,7 +1,6 @@
 __version__ = "0.76.0"
 
 import os
-import subprocess
 import sys
 import textwrap
 
@@ -75,7 +74,7 @@ def parse_setuppy_commands():
             with `twine upload -s <filenames>` instead.
             """,
         clean="""
-            `setup.py clean` is not supported, use one of the following instead:
+            `setup.py clean` is not supported, use one of the following:
               - `git clean -xdf` (cleans all files)
               - `git clean -Xdf` (cleans all versioned files, doesn't touch
                                   files that aren't checked into the git repo)
@@ -109,7 +108,7 @@ def parse_setuppy_commands():
             return False
 
     # If we got here, we didn't detect what setup.py command was given
-    raise RuntimeError("Unrecognized setuptools command: {}".format(args))
+    raise RuntimeError(f"Unrecognized setuptools command: {args}")
 
 
 if __name__ == "__main__":
@@ -131,7 +130,15 @@ if __name__ == "__main__":
             version=__version__,
             packages=find_packages(),
             package_data={
-                "": ["*.c", "*.pyx", "*.dll", "*.dylib", "*.lst", "*.mo", "eudplib/py.typed"]
+                "": [
+                    "*.c",
+                    "*.pyx",
+                    "*.dll",
+                    "*.dylib",
+                    "*.lst",
+                    "*.mo",
+                    "eudplib/py.typed",
+                ]
             },
             include_package_data=True,
             python_requires=">=3.10, <3.12",
@@ -143,7 +150,7 @@ if __name__ == "__main__":
             description="EUD Trigger generator",
             license="MIT license",
             keywords="starcraft rawtrigger eud",
-            url="https://github.com/armoha/eudplib",  # project home page, if any
+            url="https://github.com/armoha/eudplib",
         )
     finally:
         del sys.path[0]
