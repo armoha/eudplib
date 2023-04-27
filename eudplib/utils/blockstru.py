@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from typing import Any
 
@@ -25,14 +25,14 @@ class BlockStruManager:
 _current_bsm = BlockStruManager()  # Default one
 
 
-def SetCurrentBlockStruManager(bsm: BlockStruManager) -> BlockStruManager:
+def set_blockstru_manager(bsm: BlockStruManager) -> BlockStruManager:
     global _current_bsm
     old_bsm = _current_bsm
     _current_bsm = bsm
     return old_bsm
 
 
-def EUDCreateBlock(name: str, userdata: Any) -> None:
+def EUDCreateBlock(name: str, userdata: Any) -> None:  # noqa: N802
     _blockstru = _current_bsm._blockstru
     _lastblockdict = _current_bsm._lastblockdict
 
@@ -44,12 +44,12 @@ def EUDCreateBlock(name: str, userdata: Any) -> None:
     _lastblockdict[name].append(block)
 
 
-def EUDGetLastBlock() -> block:
+def EUDGetLastBlock() -> block:  # noqa: N802
     _blockstru = _current_bsm._blockstru
     return _blockstru[-1]
 
 
-def EUDGetLastBlockOfName(name: str) -> block:
+def EUDGetLastBlockOfName(name: str) -> block:  # noqa: N802
     _lastblockdict = _current_bsm._lastblockdict
     try:
         return _lastblockdict[name][-1]
@@ -57,7 +57,7 @@ def EUDGetLastBlockOfName(name: str) -> block:
         raise EPError(_("Block not found: {}").format(name))
 
 
-def EUDPeekBlock(name: str) -> block:
+def EUDPeekBlock(name: str) -> block:  # noqa: N802
     lastblock = EUDGetLastBlock()
     ep_assert(
         lastblock[0] == name,
@@ -68,7 +68,7 @@ def EUDPeekBlock(name: str) -> block:
     return lastblock
 
 
-def EUDPopBlock(name: str) -> block:
+def EUDPopBlock(name: str) -> block:  # noqa: N802
     _blockstru = _current_bsm._blockstru
     _lastblockdict = _current_bsm._lastblockdict
 
@@ -83,5 +83,5 @@ def EUDPopBlock(name: str) -> block:
     return lastblock
 
 
-def EUDGetBlockList() -> list[block]:
+def EUDGetBlockList() -> list[block]:  # noqa: N802
     return _current_bsm._blockstru

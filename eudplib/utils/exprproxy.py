@@ -1,12 +1,12 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import types
-from typing import Any, Generic, TypeAlias, TypeVar, overload
+from typing import Generic, TypeAlias, TypeVar, overload
 
 from eudplib.localize import _
 
@@ -24,7 +24,9 @@ class ExprProxy(Generic[T_co]):
         try:
             return cls(_from=_from)
         except TypeError as e:
-            raise TypeError(_("Type {} is not castable").format(cls.__name__), e)
+            raise TypeError(
+                _("Type {} is not castable").format(cls.__name__), e
+            )
 
     def getValue(self) -> T_co:
         return self._value
@@ -213,7 +215,7 @@ def unProxy(x: T) -> T:
     ...
 
 
-def unProxy(x):
+def unProxy(x):  # noqa: N802
     while isinstance(x, ExprProxy):
         x = x.getValue()
     return x
@@ -222,7 +224,7 @@ def unProxy(x):
 _ClassInfo: TypeAlias = type | types.UnionType | tuple["_ClassInfo", ...]
 
 
-def isUnproxyInstance(x: object, cls: _ClassInfo) -> bool:
+def isUnproxyInstance(x: object, cls: _ClassInfo) -> bool:  # noqa: N802
     if isinstance(x, cls):
         return True
     if isinstance(unProxy(x), cls):

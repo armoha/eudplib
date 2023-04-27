@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import functools
 import os.path
@@ -15,7 +15,7 @@ from typing import Any, TypeVar, overload
 T = TypeVar("T")
 
 
-def EPD(p: Any, **kwargs) -> Any:
+def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
     from ..core.allocator.constexpr import IsConstExpr
 
     if IsConstExpr(p):
@@ -37,7 +37,10 @@ def EPD(p: Any, **kwargs) -> Any:
                     p.AddNumber(-0x58A364),
                     p.SetNumberX(0, mask >> 1),
                 ]
-                + [p.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(30)]
+                + [
+                    p.SubtractNumberX((mask >> 1) << t, mask << t)
+                    for t in range(30)
+                ]
             )
             return p
         if not hasattr(EPD, "_eudf"):
@@ -51,7 +54,12 @@ def EPD(p: Any, **kwargs) -> Any:
                     c.SetMemory(vaddr, c.Add, -0x58A364),
                     c.SetMemoryX(vaddr, c.SetTo, 0, mask >> 1),
                 ]
-                + [c.SetMemoryX(vaddr, c.Subtract, (mask >> 1) << t, mask << t) for t in range(30)]
+                + [
+                    c.SetMemoryX(
+                        vaddr, c.Subtract, (mask >> 1) << t, mask << t
+                    )
+                    for t in range(30)
+                ]
                 + [setter],
             )
             c.PopTriggerScope()
@@ -82,26 +90,26 @@ def EPD(p: Any, **kwargs) -> Any:
 # -------
 
 
-def FlattenList(l: Any) -> list:
-    if isinstance(l, (bytes, str)) or hasattr(l, "dontFlatten"):
-        return [l]
+def FlattenList(lst: Any) -> list:  # noqa: N802
+    if isinstance(lst, (bytes, str)) or hasattr(lst, "dontFlatten"):
+        return [lst]
 
     try:
         ret = []
-        for item in l:
+        for item in lst:
             ret.extend(FlattenList(item))
         return ret
 
-    except TypeError:  # l is not iterable
-        return [l]
+    except TypeError:  # lst is not iterable
+        return [lst]
 
 
-def List2Assignable(l: Sequence[T]) -> T | Sequence[T]:
-    if len(l) == 1:
-        return l[0]
+def List2Assignable(lst: Sequence[T]) -> T | Sequence[T]:  # noqa: N802
+    if len(lst) == 1:
+        return lst[0]
 
     else:
-        return l
+        return lst
 
 
 @overload
@@ -119,7 +127,7 @@ def Assignable2List(a: T) -> list[T]:
     ...
 
 
-def Assignable2List(a: Any) -> list:
+def Assignable2List(a: Any) -> list:  # noqa: N802
     if a is None:
         return []
 
@@ -138,7 +146,7 @@ cachedfunc = functools.cache
 # Original code from TrigEditPlus::ConvertString_SCMD2ToRaw
 
 
-def SCMD2Text(s: str) -> str:
+def SCMD2Text(s: str) -> str:  # noqa: N802
     #
     # normal -> xdigitinput1 -> xdigitinput2 -> xdigitinput3 -> normal
     #        '<'           xdigit          xdigit            '>'

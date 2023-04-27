@@ -1,16 +1,16 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
-from typing import TYPE_CHECKING, Any
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from eudplib.core.eudobj import EUDObject
 
 
-def StackObjects(
+def stack_objects(
     found_objects: "list[EUDObject]",
     dwoccupmap_dict: "dict[EUDObject, list[int]]",
     alloctable: "dict[EUDObject, int]",

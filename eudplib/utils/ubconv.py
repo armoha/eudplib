@@ -1,20 +1,15 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 
 from ..localize import _
 from .eperror import EPError
 
 g_encoding: str = "cp949"
-
-
-def UbconvSetEncoding(encoding: str) -> None:
-    global g_encoding
-    g_encoding = encoding
 
 
 def u2b(s: str | bytes) -> bytes:

@@ -4,7 +4,9 @@ import os as _os
 import random as _random
 import sys as _sys
 
-_sys.path.insert(1, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..")))
+_sys.path.insert(
+    1, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), ".."))
+)
 
 
 from eudplib import *
@@ -104,7 +106,10 @@ def test_operator(testname, realf, exptf=None):
             real.append(realf(*inputs))
             expt.append(exptf(*rnums) & 0xFFFFFFFF)
 
-        test_assert("Operator test : %s" % testname, [r == e for r, e in zip(real, expt)])
+        test_assert(
+            "Operator test : %s" % testname,
+            [r == e for r, e in zip(real, expt)],
+        )
 
 
 class expect_eperror:
