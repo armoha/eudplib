@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import functools
 from typing import TYPE_CHECKING, overload
@@ -11,8 +11,7 @@ from typing import TYPE_CHECKING, overload
 from .. import core as c
 from ..core import ConstExpr, EUDVariable
 from ..ctrlstru import EUDJumpIf
-from ..localize import _
-from ..utils import EPError, ExprProxy, unProxy
+from ..utils import ExprProxy
 
 if TYPE_CHECKING:
     from ..core.rawtrigger.constenc import Player, TrgPlayer
@@ -31,7 +30,7 @@ c.PopTriggerScope()
 
 
 @c.EUDFunc
-def RunTrigTrigger() -> None:
+def RunTrigTrigger() -> None:  # noqa: N802
     from .. import eudlib as sf
 
     oldcp = sf.f_getcurpl()
@@ -39,7 +38,11 @@ def RunTrigTrigger() -> None:
     for player in range(8):
         skipt = c.Forward()
         EUDJumpIf(
-            c.Memory(0x51A280 + 12 * player + 4, c.Exactly, 0x51A280 + 12 * player + 4),
+            c.Memory(
+                0x51A280 + 12 * player + 4,
+                c.Exactly,
+                0x51A280 + 12 * player + 4,
+            ),
             skipt,
         )
         nt = c.Forward()
@@ -52,7 +55,9 @@ def RunTrigTrigger() -> None:
             ],
         )
         nt << c.RawTrigger(
-            actions=c.SetNextPtr(_runner_end[player], ~(0x51A280 + player * 12 + 4))
+            actions=c.SetNextPtr(
+                _runner_end[player], ~(0x51A280 + player * 12 + 4)
+            )
         )
         skipt << c.NextTrigger()
 
@@ -63,32 +68,34 @@ def RunTrigTrigger() -> None:
 
 
 @functools.cache
-def AllocTrigTriggerLink() -> "tuple[EUDArray, EUDArray, EUDArray]":
+def _alloc_trigtrigger_link() -> "tuple[EUDArray, EUDArray, EUDArray]":
     from .. import eudlib as sf
 
     return sf.EUDArray(8), sf.EUDArray(8), sf.EUDArray(_runner_end)
 
 
-def GetFirstTrigTrigger(player: "Player") -> EUDVariable:
+def GetFirstTrigTrigger(player: "Player") -> EUDVariable:  # noqa: N802
     """Get dlist start of trig-trigger for player"""
     player = c.EncodePlayer(player)
-    orig_tstart, _orig_tend, _runner_end_array = AllocTrigTriggerLink()
+    orig_tstart, _orig_tend, _runner_end_array = _alloc_trigtrigger_link()
     return orig_tstart[player]
 
 
-def GetLastTrigTrigger(player: "Player") -> EUDVariable:
+def GetLastTrigTrigger(player: "Player") -> EUDVariable:  # noqa: N802
     """Get dlist end of trig-trigger for player"""
     player = c.EncodePlayer(player)
-    _orig_tstart, orig_tend, _runner_end_array = AllocTrigTriggerLink()
+    _orig_tstart, orig_tend, _runner_end_array = _alloc_trigtrigger_link()
     return orig_tend[player]
 
 
-def TrigTriggerBegin(player: "Player") -> EUDVariable:
+def TrigTriggerBegin(player: "Player") -> EUDVariable:  # noqa: N802
     return GetFirstTrigTrigger(player)
 
 
 @overload
-def TrigTriggerEnd(player: "int | TrgPlayer | ExprProxy[int | TrgPlayer]") -> c.Forward:
+def TrigTriggerEnd(
+    player: "int | TrgPlayer | ExprProxy[int | TrgPlayer]"
+) -> c.Forward:
     ...
 
 
@@ -99,8 +106,8 @@ def TrigTriggerEnd(
     ...
 
 
-def TrigTriggerEnd(player):
-    _orig_tstart, _orig_tend, runner_end_array = AllocTrigTriggerLink()
+def TrigTriggerEnd(player):  # noqa: N802
+    _orig_tstart, _orig_tend, runner_end_array = _alloc_trigtrigger_link()
     player = c.EncodePlayer(player)
     if isinstance(player, int):
         return _runner_end[player]

@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from struct import pack
 from typing import TypeAlias
@@ -89,15 +89,16 @@ from ..core.rawtrigger.constenc import (
     TrgAllyStatus,
     TrgComparison,
     TrgCount,
-    _KillsSpecialized,
+    TrgOrder,
     TrgModifier,
+    TrgOrder,
     TrgPlayer,
     TrgPropState,
     TrgResource,
-    TrgOrder,
     TrgScore,
     TrgSwitchAction,
     TrgSwitchState,
+    _KillsSpecialized,
 )
 from ..core.rawtrigger.strenc import (
     EncodeAIScript,
@@ -106,8 +107,7 @@ from ..core.rawtrigger.strenc import (
     EncodeSwitch,
     EncodeUnit,
 )
-from ..localize import _
-from ..utils import EPD, FlattenList, b2i2, ep_assert, u2b, unProxy
+from ..utils import EPD, FlattenList, ep_assert
 
 """
 Defines stock conditions & actions. You are most likely to use only conditions
@@ -117,7 +117,7 @@ condition / actions.
  ex) You want to create 'Create Unit' action:
    1. Remove spaces. 'CreateUnit'
    2. Find 'CreateUnit' in this file. You'll see the following function def.
-     def CreateUnit(Number, Unit, Where, ForPlayer):
+     def CreateUnit(Number, unit, where, for_player):
    3. Make your action as mentioned here.
      ex) CreateUnit(30, 'Terran Marine', 'Anywhere', Player1)
 """
@@ -140,7 +140,7 @@ AIScript: TypeAlias = str | int | bytes
 _Switch: TypeAlias = str | int | bytes
 
 
-def Condition(
+def Condition(  # noqa: N802
     locid: int,
     player: int,
     amount: int,
@@ -150,7 +150,7 @@ def Condition(
     restype: int,
     flag: int,
     *,
-    eudx: int = 0
+    eudx: int = 0,
 ) -> bytes:
     if player < 0:
         player += 0x100000000  # EPD
@@ -172,7 +172,7 @@ def Condition(
     )
 
 
-def Action(
+def Action(  # noqa: N802
     locid1: int,
     strid: int,
     wavid: int,
@@ -184,7 +184,7 @@ def Action(
     amount: int,
     flags: int,
     *,
-    eudx: int = 0
+    eudx: int = 0,
 ) -> bytes:
     if player1 < 0:
         player1 += 0x100000000  # EPD
@@ -211,7 +211,7 @@ def Action(
     )
 
 
-def Trigger(
+def Trigger(  # noqa: N802
     players: list[Player],
     conditions: list[bytes] | bytes = [],
     actions: list[bytes] | bytes = [],
@@ -219,9 +219,9 @@ def Trigger(
     conditions = FlattenList(conditions)
     actions = FlattenList(actions)
 
-    ep_assert(type(players) is list)
-    ep_assert(type(conditions) is list)
-    ep_assert(type(actions) is list)
+    ep_assert(isinstance(players, list))
+    ep_assert(isinstance(conditions, list))
+    ep_assert(isinstance(actions, list))
     ep_assert(len(conditions) <= 16)
     ep_assert(len(actions) <= 64)
     peff = bytearray(28)
@@ -229,558 +229,627 @@ def Trigger(
         peff[EncodePlayer(p)] = 1
 
     b = b"".join(
-        conditions
-        + [bytes(20 * (16 - len(conditions)))]
-        + actions
-        + [bytes(32 * (64 - len(actions)))]
-        + [b"\x04\0\0\0"]
-        + [bytes(peff)]
+        [
+            *conditions,
+            bytes(20 * (16 - len(conditions))),
+            *actions,
+            bytes(32 * (64 - len(actions))),
+            b"\x04\0\0\0",
+            bytes(peff),
+        ]
     )
     ep_assert(len(b) == 2400)
     return b
 
 
 # predefined conditions
-def NoCondition() -> bytes:
+def NoCondition() -> bytes:  # noqa: N802
     return Condition(0, 0, 0, 0, 0, 0, 0, 0)
 
 
-def CountdownTimer(Comparison: Comparison, Time: int) -> bytes:
-    Comparison = EncodeComparison(Comparison)
-    return Condition(0, 0, Time, 0, Comparison, 1, 0, 0)
+def CountdownTimer(comparison: Comparison, time: int) -> bytes:  # noqa: N802
+    comparison = EncodeComparison(comparison)
+    return Condition(0, 0, time, 0, comparison, 1, 0, 0)
 
 
-def Command(Player: Player, Comparison: Comparison, Number: int, Unit: Unit) -> bytes:
-    Player = EncodePlayer(Player)
-    Comparison = EncodeComparison(Comparison)
-    Unit = EncodeUnit(Unit)
-    return Condition(0, Player, Number, Unit, Comparison, 2, 0, 0)
-
-
-def Bring(
-    Player: Player, Comparison: Comparison, Number: int, Unit: Unit, Location: Location
+def Command(  # noqa: N802
+    player: Player, comparison: Comparison, number: int, unit: Unit
 ) -> bytes:
-    Player = EncodePlayer(Player)
-    Comparison = EncodeComparison(Comparison)
-    Unit = EncodeUnit(Unit)
-    Location = EncodeLocation(Location)
-    return Condition(Location, Player, Number, Unit, Comparison, 3, 0, 0)
+    player = EncodePlayer(player)
+    comparison = EncodeComparison(comparison)
+    unit = EncodeUnit(unit)
+    return Condition(0, player, number, unit, comparison, 2, 0, 0)
 
 
-def Accumulate(
-    Player: Player, Comparison: Comparison, Number: int, ResourceType: Resource
+def Bring(  # noqa: N802
+    player: Player,
+    comparison: Comparison,
+    number: int,
+    unit: Unit,
+    location: Location,
 ) -> bytes:
-    Player = EncodePlayer(Player)
-    Comparison = EncodeComparison(Comparison)
-    ResourceType = EncodeResource(ResourceType)
-    return Condition(0, Player, Number, 0, Comparison, 4, ResourceType, 0)
+    player = EncodePlayer(player)
+    comparison = EncodeComparison(comparison)
+    unit = EncodeUnit(unit)
+    location = EncodeLocation(location)
+    return Condition(location, player, number, unit, comparison, 3, 0, 0)
 
 
-def __Kills__internal(Player: Player, Comparison: Comparison, Number: int, Unit: Unit) -> bytes:
-    Player = EncodePlayer(Player)
-    Comparison = EncodeComparison(Comparison)
-    Unit = EncodeUnit(Unit)
-    return Condition(0, Player, Number, Unit, Comparison, 5, 0, 0)
+def Accumulate(  # noqa: N802
+    player: Player,
+    comparison: Comparison,
+    number: int,
+    resource_type: Resource,
+) -> bytes:
+    player = EncodePlayer(player)
+    comparison = EncodeComparison(comparison)
+    resource_type = EncodeResource(resource_type)
+    return Condition(0, player, number, 0, comparison, 4, resource_type, 0)
+
+
+def __kills__internal(
+    player: Player, comparison: Comparison, number: int, unit: Unit
+) -> bytes:
+    player = EncodePlayer(player)
+    comparison = EncodeComparison(comparison)
+    unit = EncodeUnit(unit)
+    return Condition(0, player, number, unit, comparison, 5, 0, 0)
 
 
 Kills = _KillsSpecialized("Kills")
-Kills._internalf = __Kills__internal
+Kills._internalf = __kills__internal
 
 
-def CommandMost(Unit: Unit) -> bytes:
-    Unit = EncodeUnit(Unit)
-    return Condition(0, 0, 0, Unit, 0, 6, 0, 0)
+def CommandMost(unit: Unit) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    return Condition(0, 0, 0, unit, 0, 6, 0, 0)
 
 
-def CommandMostAt(Unit: Unit, Location: Location) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Location = EncodeLocation(Location)
-    return Condition(Location, 0, 0, Unit, 0, 7, 0, 0)
+def CommandMostAt(unit: Unit, location: Location) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    location = EncodeLocation(location)
+    return Condition(location, 0, 0, unit, 0, 7, 0, 0)
 
 
-def MostKills(Unit: Unit) -> bytes:
-    Unit = EncodeUnit(Unit)
-    return Condition(0, 0, 0, Unit, 0, 8, 0, 0)
+def MostKills(unit: Unit) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    return Condition(0, 0, 0, unit, 0, 8, 0, 0)
 
 
-def HighestScore(TrgScore: _Score) -> bytes:
-    TrgScore = EncodeScore(TrgScore)
-    return Condition(0, 0, 0, 0, 0, 9, TrgScore, 0)
+def HighestScore(score_type: _Score) -> bytes:  # noqa: N802
+    score_type = EncodeScore(score_type)
+    return Condition(0, 0, 0, 0, 0, 9, score_type, 0)
 
 
-def MostResources(ResourceType: Resource) -> bytes:
-    ResourceType = EncodeResource(ResourceType)
-    return Condition(0, 0, 0, 0, 0, 10, ResourceType, 0)
+def MostResources(resource_type: Resource) -> bytes:  # noqa: N802
+    resource_type = EncodeResource(resource_type)
+    return Condition(0, 0, 0, 0, 0, 10, resource_type, 0)
 
 
-def Switch(Switch: _Switch, State: SwitchState) -> bytes:
-    Switch = EncodeSwitch(Switch)
-    State = EncodeSwitchState(State)
-    return Condition(0, 0, 0, 0, State, 11, Switch, 0)
+def Switch(switch: _Switch, state: SwitchState) -> bytes:  # noqa: N802
+    switch = EncodeSwitch(switch)
+    state = EncodeSwitchState(state)
+    return Condition(0, 0, 0, 0, state, 11, switch, 0)
 
 
-def ElapsedTime(Comparison: Comparison, Time: int) -> bytes:
-    Comparison = EncodeComparison(Comparison)
-    return Condition(0, 0, Time, 0, Comparison, 12, 0, 0)
+def ElapsedTime(comparison: Comparison, time: int) -> bytes:  # noqa: N802
+    comparison = EncodeComparison(comparison)
+    return Condition(0, 0, time, 0, comparison, 12, 0, 0)
 
 
-def Briefing() -> bytes:
+def Briefing() -> bytes:  # noqa: N802
     return Condition(0, 0, 0, 0, 0, 13, 0, 0)
 
 
-def Opponents(Player: Player, Comparison: Comparison, Number: int) -> bytes:
-    Player = EncodePlayer(Player)
-    Comparison = EncodeComparison(Comparison)
-    return Condition(0, Player, Number, 0, Comparison, 14, 0, 0)
+def Opponents(player: Player, comparison: Comparison, number: int) -> bytes:  # noqa: N802
+    player = EncodePlayer(player)
+    comparison = EncodeComparison(comparison)
+    return Condition(0, player, number, 0, comparison, 14, 0, 0)
 
 
-def Deaths(Player: Player, Comparison: Comparison, Number: int, Unit: Unit) -> bytes:
-    Player = EncodePlayer(Player)
-    Comparison = EncodeComparison(Comparison)
-    Unit = EncodeUnit(Unit)
-    return Condition(0, Player, Number, Unit, Comparison, 15, 0, 0)
+def Deaths(  # noqa: N802
+    player: Player, comparison: Comparison, number: int, unit: Unit
+) -> bytes:
+    player = EncodePlayer(player)
+    comparison = EncodeComparison(comparison)
+    unit = EncodeUnit(unit)
+    return Condition(0, player, number, unit, comparison, 15, 0, 0)
 
 
-def CommandLeast(Unit: Unit) -> bytes:
-    Unit = EncodeUnit(Unit)
-    return Condition(0, 0, 0, Unit, 0, 16, 0, 0)
+def CommandLeast(unit: Unit) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    return Condition(0, 0, 0, unit, 0, 16, 0, 0)
 
 
-def CommandLeastAt(Unit: Unit, Location: Location) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Location = EncodeLocation(Location)
-    return Condition(Location, 0, 0, Unit, 0, 17, 0, 0)
+def CommandLeastAt(unit: Unit, location: Location) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    location = EncodeLocation(location)
+    return Condition(location, 0, 0, unit, 0, 17, 0, 0)
 
 
-def LeastKills(Unit: Unit) -> bytes:
-    Unit = EncodeUnit(Unit)
-    return Condition(0, 0, 0, Unit, 0, 18, 0, 0)
+def LeastKills(unit: Unit) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    return Condition(0, 0, 0, unit, 0, 18, 0, 0)
 
 
-def LowestScore(TrgScore: _Score) -> bytes:
-    TrgScore = EncodeScore(TrgScore)
-    return Condition(0, 0, 0, 0, 0, 19, TrgScore, 0)
+def LowestScore(score_type: _Score) -> bytes:  # noqa: N802
+    score_type = EncodeScore(score_type)
+    return Condition(0, 0, 0, 0, 0, 19, score_type, 0)
 
 
-def LeastResources(ResourceType: Resource) -> bytes:
-    ResourceType = EncodeResource(ResourceType)
-    return Condition(0, 0, 0, 0, 0, 20, ResourceType, 0)
+def LeastResources(resource_type: Resource) -> bytes:  # noqa: N802
+    resource_type = EncodeResource(resource_type)
+    return Condition(0, 0, 0, 0, 0, 20, resource_type, 0)
 
 
-def Score(Player: Player, TrgScore: _Score, Comparison: Comparison, Number: int) -> bytes:
-    Player = EncodePlayer(Player)
-    TrgScore = EncodeScore(TrgScore)
-    Comparison = EncodeComparison(Comparison)
-    return Condition(0, Player, Number, 0, Comparison, 21, TrgScore, 0)
+def Score(  # noqa: N802
+    player: Player, score_type: _Score, comparison: Comparison, number: int
+) -> bytes:
+    player = EncodePlayer(player)
+    score_type = EncodeScore(score_type)
+    comparison = EncodeComparison(comparison)
+    return Condition(0, player, number, 0, comparison, 21, score_type, 0)
 
 
-def Always() -> bytes:
+def Always() -> bytes:  # noqa: N802
     return Condition(0, 0, 0, 0, 0, 22, 0, 0)
 
 
-def Never() -> bytes:
+def Never() -> bytes:  # noqa: N802
     return Condition(0, 0, 0, 0, 0, 23, 0, 0)
 
 
 # predefined Action
-def NoAction() -> bytes:
+def NoAction() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 0, 0, 4)
 
 
-def Victory() -> bytes:
+def Victory() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 1, 0, 4)
 
 
-def Defeat() -> bytes:
+def Defeat() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 2, 0, 4)
 
 
-def PreserveTrigger() -> bytes:
+def PreserveTrigger() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 3, 0, 4)
 
 
-def Wait(Time: int) -> bytes:
-    return Action(0, 0, 0, Time, 0, 0, 0, 4, 0, 4)
+def Wait(time: int) -> bytes:  # noqa: N802
+    return Action(0, 0, 0, time, 0, 0, 0, 4, 0, 4)
 
 
-def PauseGame() -> bytes:
+def PauseGame() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 5, 0, 4)
 
 
-def UnpauseGame() -> bytes:
+def UnpauseGame() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 6, 0, 4)
 
 
-def Transmission(
-    Unit: Unit,
-    Where: Location,
-    WAVName: String,
-    TimeModifier: Modifier,
-    Time: int,
-    Text: String,
-    AlwaysDisplay: int = 4,
+def Transmission(  # noqa: N802
+    unit: Unit,
+    where: Location,
+    sound_name: String,
+    time_modifier: Modifier,
+    time: int,
+    text: String,
+    AlwaysDisplay: int = 4,  # noqa: N803
 ) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Where = EncodeLocation(Where)
-    WAVName = EncodeString(WAVName)
-    TimeModifier = EncodeModifier(TimeModifier)
-    Text = EncodeString(Text)
-    return Action(Where, Text, WAVName, Time, 0, 0, Unit, 7, TimeModifier, 4)
+    unit = EncodeUnit(unit)
+    where = EncodeLocation(where)
+    sound_name = EncodeString(sound_name)
+    modifier = EncodeModifier(time_modifier)
+    text = EncodeString(text)
+    return Action(where, text, sound_name, time, 0, 0, unit, 7, modifier, 4)
 
 
-def PlayWAV(WAVName: String) -> bytes:
-    WAVName = EncodeString(WAVName)
-    return Action(0, 0, WAVName, 0, 0, 0, 0, 8, 0, 4)
+def PlayWAV(sound_name: String) -> bytes:  # noqa: N802
+    sound_name = EncodeString(sound_name)
+    return Action(0, 0, sound_name, 0, 0, 0, 0, 8, 0, 4)
 
 
-def DisplayText(Text: String, AlwaysDisplay: int = 4) -> bytes:
-    Text = EncodeString(Text)
-    return Action(0, Text, 0, 0, 0, 0, 0, 9, 0, 4)
+def DisplayText(text: String, AlwaysDisplay: int = 4) -> bytes:  # noqa: N802, N803
+    text = EncodeString(text)
+    return Action(0, text, 0, 0, 0, 0, 0, 9, 0, 4)
 
 
-def CenterView(Where: Location) -> bytes:
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, 0, 0, 0, 10, 0, 4)
+def CenterView(where: Location) -> bytes:  # noqa: N802
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, 0, 0, 0, 10, 0, 4)
 
 
-def CreateUnitWithProperties(
-    Count: int, Unit: Unit, Where: Location, Player: Player, Properties: UnitProperty | bytes
+def CreateUnitWithProperties(  # noqa: N802
+    count: int,
+    unit: Unit,
+    where: Location,
+    player: Player,
+    properties: UnitProperty | bytes,
 ) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Where = EncodeLocation(Where)
-    Player = EncodePlayer(Player)
-    properties = EncodeProperty(Properties)
-    return Action(Where, 0, 0, 0, Player, properties, Unit, 11, Count, 28)
+    unit = EncodeUnit(unit)
+    where = EncodeLocation(where)
+    player = EncodePlayer(player)
+    prop = EncodeProperty(properties)
+    return Action(where, 0, 0, 0, player, prop, unit, 11, count, 28)
 
 
-def SetMissionObjectives(Text: String) -> bytes:
-    Text = EncodeString(Text)
-    return Action(0, Text, 0, 0, 0, 0, 0, 12, 0, 4)
+def SetMissionObjectives(text: String) -> bytes:  # noqa: N802
+    text = EncodeString(text)
+    return Action(0, text, 0, 0, 0, 0, 0, 12, 0, 4)
 
 
-def SetSwitch(Switch: _Switch, State: SwitchAction) -> bytes:
-    Switch = EncodeSwitch(Switch)
-    State = EncodeSwitchAction(State)
-    return Action(0, 0, 0, 0, 0, Switch, 0, 13, State, 4)
+def SetSwitch(switch: _Switch, state: SwitchAction) -> bytes:  # noqa: N802
+    switch = EncodeSwitch(switch)
+    state = EncodeSwitchAction(state)
+    return Action(0, 0, 0, 0, 0, switch, 0, 13, state, 4)
 
 
-def SetCountdownTimer(TimeModifier: Modifier, Time: int) -> bytes:
-    TimeModifier = EncodeModifier(TimeModifier)
-    return Action(0, 0, 0, Time, 0, 0, 0, 14, TimeModifier, 4)
+def SetCountdownTimer(time_modifier: Modifier, time: int) -> bytes:  # noqa: N802
+    modifier = EncodeModifier(time_modifier)
+    return Action(0, 0, 0, time, 0, 0, 0, 14, modifier, 4)
 
 
-def RunAIScript(Script: AIScript) -> bytes:
-    Script = EncodeAIScript(Script)
-    return Action(0, 0, 0, 0, 0, Script, 0, 15, 0, 4)
+def RunAIScript(script: AIScript) -> bytes:  # noqa: N802
+    script = EncodeAIScript(script)
+    return Action(0, 0, 0, 0, 0, script, 0, 15, 0, 4)
 
 
-def RunAIScriptAt(Script: AIScript, Where: Location) -> bytes:
-    Script = EncodeAIScript(Script)
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, 0, Script, 0, 16, 0, 4)
+def RunAIScriptAt(script: AIScript, where: Location) -> bytes:  # noqa: N802
+    script = EncodeAIScript(script)
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, 0, script, 0, 16, 0, 4)
 
 
-def LeaderBoardControl(Unit: Unit, Label: String) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, 0, Unit, 17, 0, 20)
+def LeaderBoardControl(unit: Unit, label: String) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    label = EncodeString(label)
+    return Action(0, label, 0, 0, 0, 0, unit, 17, 0, 20)
 
 
-def LeaderBoardControlAt(Unit: Unit, Location: Location, Label: String) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Location = EncodeLocation(Location)
-    Label = EncodeString(Label)
-    return Action(Location, Label, 0, 0, 0, 0, Unit, 18, 0, 20)
+def LeaderBoardControlAt(  # noqa: N802
+    unit: Unit, location: Location, label: String
+) -> bytes:
+    unit = EncodeUnit(unit)
+    location = EncodeLocation(location)
+    label = EncodeString(label)
+    return Action(location, label, 0, 0, 0, 0, unit, 18, 0, 20)
 
 
-def LeaderBoardResources(ResourceType: Resource, Label: String) -> bytes:
-    ResourceType = EncodeResource(ResourceType)
-    Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, 0, ResourceType, 19, 0, 4)
+def LeaderBoardResources(resource_type: Resource, label: String) -> bytes:  # noqa: N802
+    resource_type = EncodeResource(resource_type)
+    label = EncodeString(label)
+    return Action(0, label, 0, 0, 0, 0, resource_type, 19, 0, 4)
 
 
-def LeaderBoardKills(Unit: Unit, Label: String) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, 0, Unit, 20, 0, 20)
+def LeaderBoardKills(unit: Unit, label: String) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    label = EncodeString(label)
+    return Action(0, label, 0, 0, 0, 0, unit, 20, 0, 20)
 
 
-def LeaderBoardScore(TrgScore: _Score, Label: String) -> bytes:
-    TrgScore = EncodeScore(TrgScore)
-    Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, 0, TrgScore, 21, 0, 4)
+def LeaderBoardScore(score_type: _Score, label: String) -> bytes:  # noqa: N802
+    score_type = EncodeScore(score_type)
+    label = EncodeString(label)
+    return Action(0, label, 0, 0, 0, 0, score_type, 21, 0, 4)
 
 
-def KillUnit(Unit: Unit, Player: Player) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Player = EncodePlayer(Player)
-    return Action(0, 0, 0, 0, Player, 0, Unit, 22, 0, 20)
+def KillUnit(unit: Unit, player: Player) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    player = EncodePlayer(player)
+    return Action(0, 0, 0, 0, player, 0, unit, 22, 0, 20)
 
 
-def KillUnitAt(Count: Count, Unit: Unit, Where: Location, ForPlayer: Player) -> bytes:
-    Count = EncodeCount(Count)
-    Unit = EncodeUnit(Unit)
-    Where = EncodeLocation(Where)
-    ForPlayer = EncodePlayer(ForPlayer)
-    return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 23, Count, 20)
+def KillUnitAt(  # noqa: N802
+    count: Count, unit: Unit, where: Location, for_player: Player
+) -> bytes:
+    count = EncodeCount(count)
+    unit = EncodeUnit(unit)
+    where = EncodeLocation(where)
+    for_player = EncodePlayer(for_player)
+    return Action(where, 0, 0, 0, for_player, 0, unit, 23, count, 20)
 
 
-def RemoveUnit(Unit: Unit, Player: Player) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Player = EncodePlayer(Player)
-    return Action(0, 0, 0, 0, Player, 0, Unit, 24, 0, 20)
+def RemoveUnit(unit: Unit, player: Player) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    player = EncodePlayer(player)
+    return Action(0, 0, 0, 0, player, 0, unit, 24, 0, 20)
 
 
-def RemoveUnitAt(Count: Count, Unit: Unit, Where: Location, ForPlayer: Player) -> bytes:
-    Count = EncodeCount(Count)
-    Unit = EncodeUnit(Unit)
-    Where = EncodeLocation(Where)
-    ForPlayer = EncodePlayer(ForPlayer)
-    return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 25, Count, 20)
+def RemoveUnitAt(  # noqa: N802
+    count: Count, unit: Unit, where: Location, for_player: Player
+) -> bytes:
+    count = EncodeCount(count)
+    unit = EncodeUnit(unit)
+    where = EncodeLocation(where)
+    for_player = EncodePlayer(for_player)
+    return Action(where, 0, 0, 0, for_player, 0, unit, 25, count, 20)
 
 
-def SetResources(Player: Player, Modifier: Modifier, Amount: int, ResourceType: Resource) -> bytes:
-    Player = EncodePlayer(Player)
-    Modifier = EncodeModifier(Modifier)
-    ResourceType = EncodeResource(ResourceType)
-    return Action(0, 0, 0, 0, Player, Amount, ResourceType, 26, Modifier, 4)
+def SetResources(  # noqa: N802
+    player: Player, modifier: Modifier, amount: int, resource_type: Resource
+) -> bytes:
+    player = EncodePlayer(player)
+    modifier = EncodeModifier(modifier)
+    resource_type = EncodeResource(resource_type)
+    return Action(0, 0, 0, 0, player, amount, resource_type, 26, modifier, 4)
 
 
-def SetScore(Player: Player, Modifier: Modifier, Amount: int, TrgScore: _Score) -> bytes:
-    Player = EncodePlayer(Player)
-    Modifier = EncodeModifier(Modifier)
-    TrgScore = EncodeScore(TrgScore)
-    return Action(0, 0, 0, 0, Player, Amount, TrgScore, 27, Modifier, 4)
+def SetScore(  # noqa: N802
+    player: Player, modifier: Modifier, amount: int, score_type: _Score
+) -> bytes:
+    player = EncodePlayer(player)
+    modifier = EncodeModifier(modifier)
+    score_type = EncodeScore(score_type)
+    return Action(0, 0, 0, 0, player, amount, score_type, 27, modifier, 4)
 
 
-def MinimapPing(Where: Location) -> bytes:
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, 0, 0, 0, 28, 0, 4)
+def MinimapPing(where: Location) -> bytes:  # noqa: N802
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, 0, 0, 0, 28, 0, 4)
 
 
-def TalkingPortrait(Unit: Unit, Time: int) -> bytes:
-    Unit = EncodeUnit(Unit)
-    return Action(0, 0, 0, Time, 0, 0, Unit, 29, 0, 20)
+def TalkingPortrait(unit: Unit, time: int) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    return Action(0, 0, 0, time, 0, 0, unit, 29, 0, 20)
 
 
-def MuteUnitSpeech() -> bytes:
+def MuteUnitSpeech() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 30, 0, 4)
 
 
-def UnMuteUnitSpeech() -> bytes:
+def UnMuteUnitSpeech() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 31, 0, 4)
 
 
-def LeaderBoardComputerPlayers(State: PropState) -> bytes:
-    State = EncodePropState(State)
-    return Action(0, 0, 0, 0, 0, 0, 0, 32, State, 4)
+def LeaderBoardComputerPlayers(state: PropState) -> bytes:  # noqa: N802
+    state = EncodePropState(state)
+    return Action(0, 0, 0, 0, 0, 0, 0, 32, state, 4)
 
 
-def LeaderBoardGoalControl(Goal: int, Unit: Unit, Label: String) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, Goal, Unit, 33, 0, 20)
+def LeaderBoardGoalControl(goal: int, unit: Unit, label: String) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    label = EncodeString(label)
+    return Action(0, label, 0, 0, 0, goal, unit, 33, 0, 20)
 
 
-def LeaderBoardGoalControlAt(Goal: int, Unit: Unit, Location: Location, Label: String) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Location = EncodeLocation(Location)
-    Label = EncodeString(Label)
-    return Action(Location, Label, 0, 0, 0, Goal, Unit, 34, 0, 20)
-
-
-def LeaderBoardGoalResources(Goal: int, ResourceType: Resource, Label: String) -> bytes:
-    ResourceType = EncodeResource(ResourceType)
-    Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, Goal, ResourceType, 35, 0, 4)
-
-
-def LeaderBoardGoalKills(Goal: int, Unit: Unit, Label: String) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, Goal, Unit, 36, 0, 20)
-
-
-def LeaderBoardGoalScore(Goal: int, TrgScore: _Score, Label: String) -> bytes:
-    TrgScore = EncodeScore(TrgScore)
-    Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, Goal, TrgScore, 37, 0, 4)
-
-
-def MoveLocation(Location: Location, OnUnit: Unit, Owner: Player, DestLocation: Location) -> bytes:
-    Location = EncodeLocation(Location)
-    OnUnit = EncodeUnit(OnUnit)
-    Owner = EncodePlayer(Owner)
-    DestLocation = EncodeLocation(DestLocation)
-    return Action(DestLocation, 0, 0, 0, Owner, Location, OnUnit, 38, 0, 20)
-
-
-def MoveUnit(
-    Count: Count, UnitType: Unit, Owner: Player, StartLocation: Location, DestLocation: Location
+def LeaderBoardGoalControlAt(  # noqa: N802
+    goal: int, unit: Unit, location: Location, label: String
 ) -> bytes:
-    Count = EncodeCount(Count)
-    UnitType = EncodeUnit(UnitType)
-    Owner = EncodePlayer(Owner)
-    StartLocation = EncodeLocation(StartLocation)
-    DestLocation = EncodeLocation(DestLocation)
-    return Action(StartLocation, 0, 0, 0, Owner, DestLocation, UnitType, 39, Count, 20)
+    unit = EncodeUnit(unit)
+    location = EncodeLocation(location)
+    label = EncodeString(label)
+    return Action(location, label, 0, 0, 0, goal, unit, 34, 0, 20)
 
 
-def LeaderBoardGreed(Goal: int) -> bytes:
-    return Action(0, 0, 0, 0, 0, Goal, 0, 40, 0, 4)
-
-
-def SetNextScenario(ScenarioName: String) -> bytes:
-    ScenarioName = EncodeString(ScenarioName)
-    return Action(0, ScenarioName, 0, 0, 0, 0, 0, 41, 0, 4)
-
-
-def SetDoodadState(State: PropState, Unit: Unit, Owner: Player, Where: Location) -> bytes:
-    State = EncodePropState(State)
-    Unit = EncodeUnit(Unit)
-    Owner = EncodePlayer(Owner)
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, Owner, 0, Unit, 42, State, 20)
-
-
-def SetInvincibility(State: PropState, Unit: Unit, Owner: Player, Where: Location) -> bytes:
-    State = EncodePropState(State)
-    Unit = EncodeUnit(Unit)
-    Owner = EncodePlayer(Owner)
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, Owner, 0, Unit, 43, State, 20)
-
-
-def CreateUnit(Number: int, Unit: Unit, Where: Location, ForPlayer: Player) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Where = EncodeLocation(Where)
-    ForPlayer = EncodePlayer(ForPlayer)
-    return Action(Where, 0, 0, 0, ForPlayer, 0, Unit, 44, Number, 20)
-
-
-def SetDeaths(Player: Player, Modifier: Modifier, Number: int, Unit: Unit) -> bytes:
-    Player = EncodePlayer(Player)
-    Modifier = EncodeModifier(Modifier)
-    Unit = EncodeUnit(Unit)
-    return Action(0, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20)
-
-
-def Order(
-    Unit: Unit, Owner: Player, StartLocation: Location, TrgOrder: _Order, DestLocation: Location
+def LeaderBoardGoalResources(  # noqa: N802
+    goal: int, resource_type: Resource, label: String
 ) -> bytes:
-    Unit = EncodeUnit(Unit)
-    Owner = EncodePlayer(Owner)
-    StartLocation = EncodeLocation(StartLocation)
-    TrgOrder = EncodeOrder(TrgOrder)
-    DestLocation = EncodeLocation(DestLocation)
-    return Action(StartLocation, 0, 0, 0, Owner, DestLocation, Unit, 46, TrgOrder, 20)
+    resource_type = EncodeResource(resource_type)
+    label = EncodeString(label)
+    return Action(0, label, 0, 0, 0, goal, resource_type, 35, 0, 4)
 
 
-def Comment(Text: String) -> bytes:
-    Text = EncodeString(Text)
-    return Action(0, Text, 0, 0, 0, 0, 0, 47, 0, 4)
+def LeaderBoardGoalKills(goal: int, unit: Unit, label: String) -> bytes:  # noqa: N802
+    unit = EncodeUnit(unit)
+    label = EncodeString(label)
+    return Action(0, label, 0, 0, 0, goal, unit, 36, 0, 20)
 
 
-def GiveUnits(Count: Count, Unit: Unit, Owner: Player, Where: Location, NewOwner: Player) -> bytes:
-    Count = EncodeCount(Count)
-    Unit = EncodeUnit(Unit)
-    Owner = EncodePlayer(Owner)
-    Where = EncodeLocation(Where)
-    NewOwner = EncodePlayer(NewOwner)
-    return Action(Where, 0, 0, 0, Owner, NewOwner, Unit, 48, Count, 20)
-
-
-def ModifyUnitHitPoints(
-    Count: Count, Unit: Unit, Owner: Player, Where: Location, Percent: int
+def LeaderBoardGoalScore(  # noqa: N802
+    goal: int, score_type: _Score, label: String
 ) -> bytes:
-    Count = EncodeCount(Count)
-    Unit = EncodeUnit(Unit)
-    Owner = EncodePlayer(Owner)
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, Owner, Percent, Unit, 49, Count, 20)
+    score_type = EncodeScore(score_type)
+    label = EncodeString(label)
+    return Action(0, label, 0, 0, 0, goal, score_type, 37, 0, 4)
 
 
-def ModifyUnitEnergy(
-    Count: Count, Unit: Unit, Owner: Player, Where: Location, Percent: int
+def MoveLocation(  # noqa: N802
+    location: Location, on_unit: Unit, owner: Player, dest_location: Location
 ) -> bytes:
-    Count = EncodeCount(Count)
-    Unit = EncodeUnit(Unit)
-    Owner = EncodePlayer(Owner)
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, Owner, Percent, Unit, 50, Count, 20)
+    location = EncodeLocation(location)
+    on_unit = EncodeUnit(on_unit)
+    owner = EncodePlayer(owner)
+    dest_location = EncodeLocation(dest_location)
+    return Action(dest_location, 0, 0, 0, owner, location, on_unit, 38, 0, 20)
 
 
-def ModifyUnitShields(
-    Count: Count, Unit: Unit, Owner: Player, Where: Location, Percent: int
+def MoveUnit(  # noqa: N802
+    count: Count,
+    unit_type: Unit,
+    owner: Player,
+    start_location: Location,
+    dest_location: Location,
 ) -> bytes:
-    Count = EncodeCount(Count)
-    Unit = EncodeUnit(Unit)
-    Owner = EncodePlayer(Owner)
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, Owner, Percent, Unit, 51, Count, 20)
+    count = EncodeCount(count)
+    unit = EncodeUnit(unit_type)
+    owner = EncodePlayer(owner)
+    startloc = EncodeLocation(start_location)
+    dest_location = EncodeLocation(dest_location)
+    return Action(startloc, 0, 0, 0, owner, dest_location, unit, 39, count, 20)
 
 
-def ModifyUnitResourceAmount(Count: Count, Owner: Player, Where: Location, NewValue: int) -> bytes:
-    Count = EncodeCount(Count)
-    Owner = EncodePlayer(Owner)
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, Owner, NewValue, 0, 52, Count, 4)
+def LeaderBoardGreed(goal: int) -> bytes:  # noqa: N802
+    return Action(0, 0, 0, 0, 0, goal, 0, 40, 0, 4)
 
 
-def ModifyUnitHangarCount(
-    Add: int, Count: Count, Unit: Unit, Owner: Player, Where: Location
+def SetNextScenario(scenario_name: String) -> bytes:  # noqa: N802
+    scenario_name = EncodeString(scenario_name)
+    return Action(0, scenario_name, 0, 0, 0, 0, 0, 41, 0, 4)
+
+
+def SetDoodadState(  # noqa: N802
+    state: PropState, unit: Unit, owner: Player, where: Location
 ) -> bytes:
-    Count = EncodeCount(Count)
-    Unit = EncodeUnit(Unit)
-    Owner = EncodePlayer(Owner)
-    Where = EncodeLocation(Where)
-    return Action(Where, 0, 0, 0, Owner, Add, Unit, 53, Count, 20)
+    state = EncodePropState(state)
+    unit = EncodeUnit(unit)
+    owner = EncodePlayer(owner)
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, owner, 0, unit, 42, state, 20)
 
 
-def PauseTimer() -> bytes:
+def SetInvincibility(  # noqa: N802
+    state: PropState, unit: Unit, owner: Player, where: Location
+) -> bytes:
+    state = EncodePropState(state)
+    unit = EncodeUnit(unit)
+    owner = EncodePlayer(owner)
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, owner, 0, unit, 43, state, 20)
+
+
+def CreateUnit(  # noqa: N802
+    number: int, unit: Unit, where: Location, for_player: Player
+) -> bytes:
+    unit = EncodeUnit(unit)
+    where = EncodeLocation(where)
+    for_player = EncodePlayer(for_player)
+    return Action(where, 0, 0, 0, for_player, 0, unit, 44, number, 20)
+
+
+def SetDeaths(  # noqa: N802
+    player: Player, modifier: Modifier, number: int, unit: Unit
+) -> bytes:
+    player = EncodePlayer(player)
+    modifier = EncodeModifier(modifier)
+    unit = EncodeUnit(unit)
+    return Action(0, 0, 0, 0, player, number, unit, 45, modifier, 20)
+
+
+def Order(  # noqa: N802
+    unit: Unit,
+    owner: Player,
+    start_location: Location,
+    order_type: _Order,
+    dest_location: Location,
+) -> bytes:
+    unit = EncodeUnit(unit)
+    owner = EncodePlayer(owner)
+    startloc = EncodeLocation(start_location)
+    order_type = EncodeOrder(order_type)
+    dest_location = EncodeLocation(dest_location)
+    return Action(
+        startloc, 0, 0, 0, owner, dest_location, unit, 46, order_type, 20
+    )
+
+
+def Comment(text: String) -> bytes:  # noqa: N802
+    text = EncodeString(text)
+    return Action(0, text, 0, 0, 0, 0, 0, 47, 0, 4)
+
+
+def GiveUnits(  # noqa: N802
+    count: Count, unit: Unit, owner: Player, where: Location, new_owner: Player
+) -> bytes:
+    count = EncodeCount(count)
+    unit = EncodeUnit(unit)
+    owner = EncodePlayer(owner)
+    where = EncodeLocation(where)
+    new_owner = EncodePlayer(new_owner)
+    return Action(where, 0, 0, 0, owner, new_owner, unit, 48, count, 20)
+
+
+def ModifyUnitHitPoints(  # noqa: N802
+    count: Count, unit: Unit, owner: Player, where: Location, percent: int
+) -> bytes:
+    count = EncodeCount(count)
+    unit = EncodeUnit(unit)
+    owner = EncodePlayer(owner)
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, owner, percent, unit, 49, count, 20)
+
+
+def ModifyUnitEnergy(  # noqa: N802
+    count: Count, unit: Unit, owner: Player, where: Location, percent: int
+) -> bytes:
+    count = EncodeCount(count)
+    unit = EncodeUnit(unit)
+    owner = EncodePlayer(owner)
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, owner, percent, unit, 50, count, 20)
+
+
+def ModifyUnitShields(  # noqa: N802
+    count: Count, unit: Unit, owner: Player, where: Location, percent: int
+) -> bytes:
+    count = EncodeCount(count)
+    unit = EncodeUnit(unit)
+    owner = EncodePlayer(owner)
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, owner, percent, unit, 51, count, 20)
+
+
+def ModifyUnitResourceAmount(  # noqa: N802
+    count: Count, owner: Player, where: Location, new_value: int
+) -> bytes:
+    count = EncodeCount(count)
+    owner = EncodePlayer(owner)
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, owner, new_value, 0, 52, count, 4)
+
+
+def ModifyUnitHangarCount(  # noqa: N802
+    add: int, count: Count, unit: Unit, owner: Player, where: Location
+) -> bytes:
+    count = EncodeCount(count)
+    unit = EncodeUnit(unit)
+    owner = EncodePlayer(owner)
+    where = EncodeLocation(where)
+    return Action(where, 0, 0, 0, owner, add, unit, 53, count, 20)
+
+
+def PauseTimer() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 54, 0, 4)
 
 
-def UnpauseTimer() -> bytes:
+def UnpauseTimer() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 55, 0, 4)
 
 
-def Draw() -> bytes:
+def Draw() -> bytes:  # noqa: N802
     return Action(0, 0, 0, 0, 0, 0, 0, 56, 0, 4)
 
 
-def SetAllianceStatus(Player: Player, Status: AllyStatus) -> bytes:
-    Player = EncodePlayer(Player)
-    Status = EncodeAllyStatus(Status)
-    return Action(0, 0, 0, 0, Player, 0, Status, 57, 0, 4)
+def SetAllianceStatus(player: Player, status: AllyStatus) -> bytes:  # noqa: N802
+    player = EncodePlayer(player)
+    status = EncodeAllyStatus(status)
+    return Action(0, 0, 0, 0, player, 0, status, 57, 0, 4)
 
 
 # compound triggers
-def Memory(dest: int, cmptype: Comparison, value: int) -> bytes:
+def Memory(dest: int, cmptype: Comparison, value: int) -> bytes:  # noqa: N802
     return Deaths(EPD(dest), cmptype, value, 0)
 
 
-def SetMemory(dest: int, modtype, value: int) -> bytes:
+def SetMemory(dest: int, modtype, value: int) -> bytes:  # noqa: N802
     return SetDeaths(EPD(dest), modtype, value, 0)
 
 
-def DeathsX(Player: Player, Comparison: Comparison, Number: int, Unit: Unit, Mask: int) -> bytes:
-    Player = EncodePlayer(Player)
-    Comparison = EncodeComparison(Comparison)
-    Unit = EncodeUnit(Unit)
-    return Condition(Mask, Player, Number, Unit, Comparison, 15, 0, 0, eudx=0x4353)
+def DeathsX(  # noqa: N802
+    player: Player, comparison: Comparison, number: int, unit: Unit, mask: int
+) -> bytes:
+    player = EncodePlayer(player)
+    comparison = EncodeComparison(comparison)
+    unit = EncodeUnit(unit)
+    return Condition(
+        mask, player, number, unit, comparison, 15, 0, 0, eudx=0x4353
+    )
 
 
-def MemoryX(dest: int, cmptype: Comparison, value: int, mask: int) -> bytes:
+def MemoryX(dest: int, cmptype: Comparison, value: int, mask: int) -> bytes:  # noqa: N802
     return DeathsX(EPD(dest), cmptype, value, 0, mask)
 
 
-def SetDeathsX(Player: Player, Modifier: Modifier, Number: int, Unit: Unit, Mask: int) -> bytes:
-    Player = EncodePlayer(Player)
-    Modifier = EncodeModifier(Modifier)
-    Unit = EncodeUnit(Unit)
-    return Action(Mask, 0, 0, 0, Player, Number, Unit, 45, Modifier, 20, eudx=0x4353)
+def SetDeathsX(  # noqa: N802
+    player: Player, modifier: Modifier, number: int, unit: Unit, mask: int
+) -> bytes:
+    player = EncodePlayer(player)
+    modifier = EncodeModifier(modifier)
+    unit = EncodeUnit(unit)
+    return Action(
+        mask, 0, 0, 0, player, number, unit, 45, modifier, 20, eudx=0x4353
+    )
 
 
-def SetMemoryX(dest: int, modtype: Modifier, value: int, mask: int) -> bytes:
+def SetMemoryX(dest: int, modtype: Modifier, value: int, mask: int) -> bytes:  # noqa: N802
     return SetDeathsX(EPD(dest), modtype, value, 0, mask)
