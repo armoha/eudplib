@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from collections.abc import Iterable
 
@@ -55,7 +55,9 @@ def Trigger(
         for act in actions:
             patched_actions.append(PatchAction(act))
 
-        tend = c.RawTrigger(conditions=patched_conds, actions=patched_actions, preserved=preserved)
+        tend = c.RawTrigger(
+            conditions=patched_conds, actions=patched_actions, preserved=preserved
+        )
 
     else:
         # Extended trigger
@@ -100,7 +102,9 @@ def Trigger(
         # Revert conditions
         cend << c.NextTrigger()
         for i in range(0, len(condts), 64):
-            tend = c.RawTrigger(actions=[c.SetNextPtr(cts, cend) for cts in condts[i : i + 64]])
+            tend = c.RawTrigger(
+                actions=[c.SetNextPtr(cts, cend) for cts in condts[i : i + 64]]
+            )
 
         if not preserved:
             skipt << c.NextTrigger()

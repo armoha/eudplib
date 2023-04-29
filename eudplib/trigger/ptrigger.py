@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from collections.abc import Iterable
 from typing import TypeAlias
@@ -28,7 +28,9 @@ def InitPTrigger() -> None:
         _pinfos = [c.GetPlayerInfo(player) for player in range(8)]
 
 
-def PTrigger(players: Players, conditions: Conditions = None, actions: Actions = None) -> None:
+def PTrigger(
+    players: Players, conditions: Conditions = None, actions: Actions = None
+) -> None:
     """Execute trigger by player basis
 
     :param players: Players the trigger should execute with. When Current
@@ -100,7 +102,9 @@ def PTrigger(players: Players, conditions: Conditions = None, actions: Actions =
 
     Trigger(conditions, actions)
 
-    c.RawTrigger(actions=[c.SetNextPtr(t2, t3), c.SetMemory(offset_curpl, c.Add, ut.EPD(pdb))])
+    c.RawTrigger(
+        actions=[c.SetNextPtr(t2, t3), c.SetMemory(offset_curpl, c.Add, ut.EPD(pdb))]
+    )
 
     t3 << c.RawTrigger(
         actions=[

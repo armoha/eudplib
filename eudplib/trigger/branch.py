@@ -1,16 +1,16 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from collections.abc import Iterable, Sequence
 
 from eudplib import utils as ut
 
 from .. import core as c
-from ..core import Action, Condition, Forward, RawTrigger
+from ..core import Condition, Forward, RawTrigger
 from ..core.rawtrigger.rawtriggerdef import _Action
 from .tpatcher import PatchCondition, _Condition
 
@@ -20,7 +20,7 @@ def _EUDBranchSub(
     ontrue: c.ConstExpr,
     onfalse: c.ConstExpr,
     *,
-    _actions: _Action | None = None
+    _actions: _Action | None = None,
 ) -> None:
     """
     Reduced version of EUDBranch with following restructions.
@@ -32,7 +32,9 @@ def _EUDBranchSub(
 
     brtrg = Forward()
     tjtrg = Forward()
-    brtrg << RawTrigger(nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg))
+    brtrg << RawTrigger(
+        nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg)
+    )
     if _actions:
         actions = ut.FlattenList(_actions)
     else:
@@ -46,7 +48,7 @@ def EUDBranch(
     ontrue: c.ConstExpr,
     onfalse: c.ConstExpr,
     *,
-    _actions: _Action | None = None
+    _actions: _Action | None = None,
 ) -> None:
     """Branch by whether conditions is satisfied or not.
 

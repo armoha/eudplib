@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from typing import Literal, overload
 
@@ -35,7 +35,7 @@ def ApplyPatchTable(initepd, obj, patchTable: list[list[int | None]]) -> None:
     for i, patchEntry in enumerate(patchTable):
         patchFields = patchEntry
         for fieldSize in patchFields:
-            if type(fieldSize) is int:
+            if isinstance(fieldSize, int):
                 memoryFiller = {
                     -1: _filldw,
                     0: _fillloword,
@@ -77,7 +77,7 @@ _Condition = ConstExpr | ConstCondition | ExprProxy[ConstExpr]
 
 def isCastable(cond) -> bool:
     # EUDArray, EUDVArray, EUDStruct, DBString
-    return isinstance(cond, ExprProxy) and not type(cond) is ExprProxy
+    return isinstance(cond, ExprProxy) and type(cond) is not ExprProxy
 
 
 def PatchCondition(cond: _Condition) -> Condition:
@@ -203,7 +203,11 @@ def IsConditionNegatable(cond) -> bool:
                 return True
             elif comparison != 10:
                 return False
-            elif condtype == 15 and isinstance(cond.fields[8], int) and cond.fields[8] == 0x4353:
+            elif (
+                condtype == 15
+                and isinstance(cond.fields[8], int)
+                and cond.fields[8] == 0x4353
+            ):
                 mask = cond.fields[0]
                 if not isinstance(mask, int):
                     return False
