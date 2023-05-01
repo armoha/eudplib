@@ -1,12 +1,12 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from collections.abc import Callable, Mapping
-from typing import TYPE_CHECKING, TypeAlias, overload
+from typing import TypeAlias, overload
 
 from .consttype import (
     ConstType,
@@ -24,10 +24,6 @@ from .consttype import (
 from ...localize import _
 from ...utils import ExprProxy, EPError, unProxy
 from ..mapdata import GetPropertyIndex, UnitProperty
-
-if TYPE_CHECKING:
-    from ..allocator import ConstExpr
-    from ..variable import EUDVariable
 
 
 class TrgAllyStatus(ConstType):
@@ -221,7 +217,7 @@ class _KillsSpecialized(TrgScore):
         super().__init__(name)
         self._internalf: Callable
 
-    # Player: Player, Comparison: Comparison, Number: Dword, Unit: Unit
+    # TODO: player: Player, comparison: Comparison, number: Dword, unit: Unit
     # ) -> Condition
     def __call__(self, a, b, c, d):
         return self._internalf(a, b, c, d)
