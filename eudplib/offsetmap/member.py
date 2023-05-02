@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2023 by Armoha.
 # All rights reserved.
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
@@ -61,9 +60,21 @@ class MemberKind(enum.Enum):
     @property
     def size(self) -> Literal[1, 2, 4]:
         match self:
-            case MemberKind.DWORD | MemberKind.C_UNIT | MemberKind.C_SPRITE | MemberKind.POSITION:
+            case (
+                MemberKind.DWORD
+                | MemberKind.C_UNIT
+                | MemberKind.C_SPRITE
+                | MemberKind.POSITION
+            ):
                 return 4
-            case MemberKind.WORD | MemberKind.TRG_UNIT | MemberKind.POSITION_X | MemberKind.POSITION_Y | MemberKind.FLINGY | MemberKind.SPRITE:
+            case (
+                MemberKind.WORD
+                | MemberKind.TRG_UNIT
+                | MemberKind.POSITION_X
+                | MemberKind.POSITION_Y
+                | MemberKind.FLINGY
+                | MemberKind.SPRITE
+            ):
                 return 2
             case _:
                 return 1
@@ -95,11 +106,15 @@ class MemberKind(enum.Enum):
                 return f_maskread_epd(epd, (lambda x, y: x + 65536 * y)(*_mapXYmask()))
             case MemberKind.POSITION_X:
                 shift = 8 * subp
-                f_xread_epd = f_readgen_epd(_mapXYmask()[0] << shift, (0, lambda x: x >> shift))
+                f_xread_epd = f_readgen_epd(
+                    _mapXYmask()[0] << shift, (0, lambda x: x >> shift)
+                )
                 return f_xread_epd(epd)
             case MemberKind.POSITION_Y:
                 shift = 8 * subp
-                f_yread_epd = f_readgen_epd(_mapXYmask()[1] << shift, (0, lambda x: x >> shift))
+                f_yread_epd = f_readgen_epd(
+                    _mapXYmask()[1] << shift, (0, lambda x: x >> shift)
+                )
                 return f_yread_epd(epd)
             case _:
                 match self.size:

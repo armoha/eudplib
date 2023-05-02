@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 from typing import TypeAlias
 
 from eudplib import utils as ut
@@ -55,7 +55,8 @@ class RlocInt_C:
             other = other.offset
         ut.ep_assert(other != 0, _("Divide by zero"))
         ut.ep_assert(
-            (self.rlocmode == 0) or (self.rlocmode % other == 0 and self.offset % other == 0),
+            (self.rlocmode == 0)
+            or (self.rlocmode % other == 0 and self.offset % other == 0),
             _("RlocInt not divisible by {}").format(other),
         )
         return RlocInt_C((self.offset // other) & 0xFFFFFFFF, self.rlocmode // other)

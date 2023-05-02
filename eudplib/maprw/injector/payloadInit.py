@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 from collections.abc import ByteString
 
 from eudplib import utils as ut
 
-from ... import core as c
 from ...core.allocator.pbuffer import Payload
 from ...core.mapdata.chktok import CHK
 from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
@@ -22,15 +20,18 @@ trglist: list[bytes] = []
 
 def Trigger(
     *,
-    players: list[tt.Player] = [17],  # FIXME: Cannot determine type of "AllPlayers"  [has-type]
+    # FIXME: Cannot determine type of "AllPlayers" [has-type]
+    players: list[tt.Player] = [17],
     conditions: list[bytes] | bytes = [],
-    actions: list[bytes] | bytes = []
+    actions: list[bytes] | bytes = [],
 ) -> None:
     global trglist
     trglist.append(tt.Trigger(players, conditions, actions))
 
 
-def InitializePayload(chkt: CHK, payload: Payload, mrgndata: ByteString | None = None) -> None:
+def InitializePayload(
+    chkt: CHK, payload: Payload, mrgndata: ByteString | None = None
+) -> None:
     strmap = GetStringMap()
     if strmap is None:
         raise ut.EPError(_("Must use LoadMap first"))

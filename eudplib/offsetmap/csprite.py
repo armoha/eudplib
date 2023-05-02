@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2023 by Armoha.
 # All rights reserved.
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
@@ -73,7 +72,9 @@ class CSprite(EPDOffsetMap):
         elif isinstance(u, c.EUDVariable):
             if p is not None:
                 if not isinstance(p, c.EUDVariable):
-                    raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+                    raise ut.EPError(
+                        _("Invalid input for CSprite: {}").format((epd, ptr))
+                    )
                 _epd, self._ptr = c.EUDCreateVariables(2)
                 c.SetVariables((_epd, self._ptr), (u, p))
             else:

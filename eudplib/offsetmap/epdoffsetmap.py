@@ -1,12 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2019 by Armoha.
 # All rights reserved.
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
 from abc import ABCMeta
-from typing import TYPE_CHECKING, TypeAlias, TypeVar, cast
+from typing import TYPE_CHECKING, cast
 
 from .. import core as c
 from .. import utils as ut
@@ -43,7 +42,9 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
                 return f_epdread_epd(epd)
 
-    def getdwepd(self, name: str) -> tuple[c.EUDVariable, "c.EUDVariable | CUnit | CSprite"]:
+    def getdwepd(
+        self, name: str
+    ) -> tuple[c.EUDVariable, "c.EUDVariable | CUnit | CSprite"]:
         member = type(self).__dict__[name]
         ut.ep_assert(member.kind.size == 4, _("Only dword can be read as epd"))
         epd = self._epd + member.offset // 4
@@ -141,7 +142,9 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(value, int) and value & ~mask:
             raise ut.EPError(
-                _("{} is out of range({}) for {} Member {}").format(value, mask, type(self), name)
+                _("{} is out of range({}) for {} Member {}").format(
+                    value, mask, type(self), name
+                )
             )
         return c.MemoryXEPD(epd, c.Exactly, value, mask)
 
@@ -158,7 +161,9 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(value, int) and value & ~mask:
             raise ut.EPError(
-                _("{} is out of range({}) for {} Member {}").format(value, mask, type(self), name)
+                _("{} is out of range({}) for {} Member {}").format(
+                    value, mask, type(self), name
+                )
             )
         return c.MemoryXEPD(epd, c.AtMost, value, mask)
 
@@ -172,7 +177,9 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(value, int) and value & ~mask:
             raise ut.EPError(
-                _("{} is out of range({}) for {} Member {}").format(value, mask, type(self), name)
+                _("{} is out of range({}) for {} Member {}").format(
+                    value, mask, type(self), name
+                )
             )
         return c.MemoryXEPD(epd, c.AtLeast, value, mask)
 

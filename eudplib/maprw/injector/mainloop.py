@@ -1,14 +1,13 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from collections.abc import Callable
 
 from ... import core as c
-from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
 from ...eudlib.stringf.locale import _detect_locale
@@ -30,7 +29,8 @@ def _hasAlreadyStarted() -> bool:
 def EUDOnStart(func: Callable) -> None:
     # FIXME: Callable[[], ...]
     ep_assert(
-        hasAlreadyStarted < 2, "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262"
+        hasAlreadyStarted < 2,
+        "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262",
     )
     if hasAlreadyStarted == 0:
         startFunctionList1.append(func)
