@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2023 by Armoha.
 # All rights reserved.
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
@@ -19,7 +18,7 @@ from .member import (
     Flag,
 )
 
-__all__ = (
+__all__ = [
     "CUnit",
     "EPDCUnitMap",
     "CSprite",
@@ -32,4 +31,4 @@ __all__ = (
     "BaseMember",
     "EnumMember",
     "Flag",
-)
+]

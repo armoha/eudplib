@@ -1,11 +1,10 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
-from collections.abc import Sequence
 from random import random
 
 from ... import utils as ut
@@ -40,7 +39,9 @@ def PreprocessInlineCode(chkt: CHK) -> None:
     chkt.setsection("TRIG", trigSection)
 
 
-def PreprocessTrigSection(trigSection: bytes) -> tuple[list[tuple[int, tStartEnd]], bytes]:
+def PreprocessTrigSection(
+    trigSection: bytes
+) -> tuple[list[tuple[int, tStartEnd]], bytes]:
     """Fetch inline codes & compiles them"""
     ComputeBaseInlineCodeGlobals()
     if _inliningRate >= 1.0:
@@ -86,25 +87,7 @@ def ConsecutiveInlineTrigSection(
 ) -> tuple[list[tuple[int, tStartEnd]], bytes]:
     inlineCodes: list[tuple[int, tStartEnd]] = []
     trigSegments: list[bytes] = []
-    pTriggers: tuple[
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-        list[bytes],
-    ] = (
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-    )
+    pTriggers: list[list[bytes]] = [[] for _ in range(8)]
 
     def appendPTriggers(p):
         if pTriggers[p]:

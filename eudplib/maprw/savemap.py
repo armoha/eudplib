@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import binascii
 from collections.abc import Callable
@@ -78,7 +78,9 @@ def SaveMap(fname: str, rootf: Callable, *, sectorSize=None) -> None:
             raise EPError(_("Fail to access output map ({})").format(GetLastError()))
         for n, f in mapdata.IterListFiles():
             if f:
-                ep_assert(mw.PutFile(n, f), _("Fail to export input map data to output map"))
+                ep_assert(
+                    mw.PutFile(n, f), _("Fail to export input map data to output map")
+                )
     else:
         # Process by modifying existing mpqfile
         try:

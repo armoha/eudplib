@@ -1,12 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import ctypes
-import sys
 
 from .. import utils as ut
 from ..core.mapdata.mpqapi import MPQ
@@ -41,7 +40,9 @@ def MPQCheckFile(fname: str) -> bytes:
 
     fname_key = ut.u2b(normpath(normcase(fname)))
 
-    ut.ep_assert(fname_key not in _addedFiles, _('MPQ filename duplicate : "{}"').format(fname))
+    ut.ep_assert(
+        fname_key not in _addedFiles, _('MPQ filename duplicate : "{}"').format(fname)
+    )
 
     return fname_key
 
@@ -103,7 +104,9 @@ def UpdateMPQ(mpqw: MPQ) -> None:
             else:
                 ret = mpqw.PutFile(fname, content)
             if not ret:
-                ut.ep_eprint(_("Failed adding file {} to mpq: May be duplicate").format(fname))
+                ut.ep_eprint(
+                    _("Failed adding file {} to mpq: May be duplicate").format(fname)
+                )
                 raise ctypes.WinError(ctypes.get_last_error())
 
 

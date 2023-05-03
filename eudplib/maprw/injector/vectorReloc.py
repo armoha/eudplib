@@ -1,13 +1,12 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from eudplib import utils as ut
 
-from ... import core as c
 from ...core.allocator.pbuffer import Payload
 from ...core.mapdata.chktok import CHK
 from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
@@ -24,16 +23,20 @@ trglist: list[bytes] = []
 
 def Trigger(
     *,
-    players: list[tt.Player] = [17],  # FIXME: Cannot determine type of "AllPlayers"  [has-type]
+    # FIXME: Cannot determine type of "AllPlayers"  [has-type]
+    players: list[tt.Player] = [17],
     conditions: list[bytes] | bytes = [],
-    actions: list[bytes] | bytes = []
+    actions: list[bytes] | bytes = [],
 ) -> None:
     global trglist
     trglist.append(tt.Trigger(players, conditions, actions))
 
 
 def CopyDeaths(
-    iplayer: tt.Player, oplayer: tt.Player, copyepd: bool = False, initvalue: int | None = None
+    iplayer: tt.Player,
+    oplayer: tt.Player,
+    copyepd: bool = False,
+    initvalue: int | None = None,
 ) -> None:
     if initvalue is None:
         if copyepd:
@@ -106,7 +109,8 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
             + tt.Trigger(
                 players=[tt.AllPlayers],
                 actions=[
-                    tt.SetMemory(mrgn + 328 + 32 * j + 16, tt.Add, pch[j]) for j in range(packn)
+                    tt.SetMemory(mrgn + 328 + 32 * j + 16, tt.Add, pch[j])
+                    for j in range(packn)
                 ],
             )
         )
@@ -140,7 +144,11 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
         + tt.Trigger(
             players=[tt.AllPlayers],
             actions=[
-                tt.SetMemory(mrgn_ort + 328 + 32 * j + 16, tt.Add, 0xFFFFFFFF - prevoffset[j])
+                tt.SetMemory(
+                    mrgn_ort + 328 + 32 * j + 16,
+                    tt.Add,
+                    0xFFFFFFFF - prevoffset[j],
+                )
                 for j in range(packn)
             ]
             + [tt.SetMemory(mrgn_ort + 4, tt.Add, 4)],  # skip garbage area
@@ -153,7 +161,11 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
     strsled_offset = len(str_section) + str_padding_length + 0x191943C8
     payload_offset = strsled_offset + len(sled_completed) + 4
     str_section = (
-        str_section + bytes(str_padding_length) + sled_completed + bytes(4) + payload.data
+        str_section
+        + bytes(str_padding_length)
+        + sled_completed
+        + bytes(4)
+        + payload.data
     )
     chkt.setsection(GetStringSectionName(), str_section)
 
@@ -167,7 +179,8 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
         + tt.Trigger(
             players=[tt.AllPlayers],
             actions=[  # SetDeaths actions in MRGN initially points to EPD(payload - 4)
-                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4) for _ in range(packn)
+                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset // 4)
+                for _ in range(packn)
             ]
             + [tt.SetMemory(mrgn + 4, tt.Add, 2408)],
         )
@@ -179,7 +192,8 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
         + tt.Trigger(
             players=[tt.AllPlayers],
             actions=[
-                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset) for _ in range(packn)
+                tt.SetMemory(payload_offset - 4, tt.Add, payload_offset)
+                for _ in range(packn)
             ]
             + [tt.SetMemory(mrgn_ort + 4, tt.Add, 2408)],
         )
@@ -259,7 +273,9 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
     # Previous rawtrigger datas
 
     oldtrigraw = chkt.getsection("TRIG")
-    oldtrigs = [oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)]
+    oldtrigs = [
+        oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)
+    ]
     proc_trigs = []
 
     # Collect only enabled triggers

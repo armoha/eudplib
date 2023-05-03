@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 
 from collections.abc import ByteString, Collection
@@ -11,7 +11,6 @@ from typing import TypeAlias
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ... import eudlib as sf
 from ... import utils as ut
 from ...trigtrg.runtrigtrg import _runner_cp
 
@@ -101,15 +100,15 @@ def InlineCodifyBinaryTrigger(bTrigger: bytes) -> tStartEnd:
 
 def CountConditionsAndActions(bTrigger: bytes) -> tuple[int, int]:
     cond_count, act_count = 0, 0
-    for c in range(16):
-        if bTrigger[c * 20 + 15] == 22:  # Always
+    for cond in range(16):
+        if bTrigger[cond * 20 + 15] == 22:  # Always
             continue
-        elif bTrigger[c * 20 + 15] >= 1:
+        elif bTrigger[cond * 20 + 15] >= 1:
             cond_count += 1
-    for a in range(64):
-        if bTrigger[320 + a * 32 + 26] in (47,):  # Comment
+    for act in range(64):
+        if bTrigger[320 + act * 32 + 26] in (47,):  # Comment
             continue
-        elif bTrigger[320 + a * 32 + 26] >= 1:
+        elif bTrigger[320 + act * 32 + 26] >= 1:
             act_count += 1
     return cond_count, act_count
 
