@@ -1,16 +1,15 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import random
 
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
-from ... import trigger as trg
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
 from ...eudlib.memiof.mblockio import _repaddsd_epd
@@ -25,7 +24,9 @@ from ..inlinecode.ilcprocesstrig import GetInlineCodeList
 """
 
 
-def _DispatchInlineCode(nextptr: c.EUDVariable, trigepd: c.EUDVariable, prop: int) -> None:
+def _DispatchInlineCode(
+    nextptr: c.EUDVariable, trigepd: c.EUDVariable, prop: int
+) -> None:
     cs0 = c.Forward()  # set cs0+20 to codeStart
     cs1 = c.Forward()  # set cs1+20 to ut.EPD(codeEnd) + 1
     cs2 = c.Forward()  # set cs2+20 to cs_a0_epd + 4
@@ -159,7 +160,7 @@ def _FlipProp(trigepd: c.EUDVariable) -> None:
 def CreateInjectFinalizer(
     chkt: CHK, root: c.Forward | c.RawTrigger, mrgndata: bytes | None = None
 ) -> c.Forward:
-    rtt.AllocTrigTriggerLink()
+    rtt._alloc_trigtrigger_link()
     c.EP_SetRValueStrictMode(False)
 
     pts = 0x51A280
@@ -217,7 +218,9 @@ def CreateInjectFinalizer(
                 actions=c.SetNextPtr(tstart, _t0),
             )
 
-            _t0 << c.RawTrigger(nextptr=tmcheckt, actions=c.SetNextPtr(tstart, trs))  # reset
+            _t0 << c.RawTrigger(
+                nextptr=tmcheckt, actions=c.SetNextPtr(tstart, trs)
+            )  # reset
 
             c.PopTriggerScope()
 
@@ -226,7 +229,7 @@ def CreateInjectFinalizer(
 
             # If there were triggers
             if cs.EUDIfNot()(prevtstart == ~(pts + player * 12 + 4)):
-                orig_tstart, orig_tend, _runner_end_array = rtt.AllocTrigTriggerLink()
+                orig_tstart, orig_tend, _runner_end_array = rtt._alloc_trigtrigger_link()
                 link_trs = c.Forward()
                 vs = [prevtstart, prevtend, prevtend_epd]
                 acts = [
