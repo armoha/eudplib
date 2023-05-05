@@ -1,17 +1,15 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2019 by Armoha.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from typing import Any
 
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
-from .utilf import f_playerexist
-
 
 _EUDVArray8: Any = c.EUDVArray(8)  # FIXME : Unsupported dynamic base class
 

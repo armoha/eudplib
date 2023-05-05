@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2022 by Armoha.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from collections.abc import Callable, Iterator
 from typing import Literal, overload
@@ -12,7 +12,6 @@ from ..core import (
     Action,
     Add,
     AtLeast,
-    AtMost,
     ConstExpr,
     CurrentPlayer,
     Deaths,
@@ -95,7 +94,9 @@ class UnitGroup:
     def __init__(self, capacity: int) -> None:
         self.capacity = capacity
         self.loopvar = EUDVariable(EPD(0x6509B0), SetTo, 0)
-        varray = EUDVArray(capacity)(dest=self.loopvar, nextptr=self.loopvar.GetVTable())
+        varray = EUDVArray(capacity)(
+            dest=self.loopvar, nextptr=self.loopvar.GetVTable()
+        )
         self.varray = varray
         self.trg = EUDVariable(self.varray + 72 * capacity)
         self.pos = EUDVariable(EPD(self.varray) + 87 + 18 * capacity)
@@ -153,7 +154,9 @@ class _CPLoop:
 
         def reset_cp() -> None:
             PushTriggerScope()
-            reset_nextptr = RawTrigger(actions=SetNextPtr(loopvar.GetVTable(), check_death))
+            reset_nextptr = RawTrigger(
+                actions=SetNextPtr(loopvar.GetVTable(), check_death)
+            )
             PopTriggerScope()
             nextptr = Forward()
             RawTrigger(

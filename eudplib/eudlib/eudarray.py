@@ -1,16 +1,16 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 from math import log2
 
 from .. import core as c
 from .. import utils as ut
-from ..core.inplacecw import cpset, iand, ilshift, ior, irshift, iset, isub, ixor
+from ..core.inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
 from ..localize import _
-from .memiof import f_dwadd_epd, f_dwread_epd, f_dwwrite_epd, f_setcurpl2cpcache
+from .memiof import f_dwread_epd, f_dwwrite_epd
 
 
 class EUDArrayData(c.EUDObject):

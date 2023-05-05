@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import struct
 from collections.abc import Iterable
@@ -13,7 +13,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..allocator import IsConstExpr
-from ..eudobj import Db, EUDObject
+from ..eudobj import EUDObject
 from .action import Action
 from .condition import Condition
 from .triggerscope import NextTrigger, _RegisterTrigger

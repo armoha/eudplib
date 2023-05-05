@@ -1,21 +1,14 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
-
-from collections.abc import Iterable
-from typing import Any, TYPE_CHECKING
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 from eudplib import utils as ut
 from eudplib.localize import _
 
-from .constexpr import ConstExpr, Evaluable, Evaluate
-from .rlocint import RlocInt_C
-
-if TYPE_CHECKING:
-    from ...utils import ExprProxy
+from .constexpr import Evaluable, Evaluate
 
 
 class Payload:
@@ -59,7 +52,9 @@ class PayloadBuffer:
         number = Evaluate(obj)
 
         if number.rlocmode:
-            ut.ep_assert(self._datacur % 4 == 0, _("Non-const dwords must be aligned to 4byte"))
+            ut.ep_assert(
+                self._datacur % 4 == 0, _("Non-const dwords must be aligned to 4byte")
+            )
             if number.rlocmode == 1:
                 self._prttable.append(self._datacur)
             elif number.rlocmode == 4:
@@ -128,7 +123,9 @@ def _StructPacker(
         ri = Evaluate(arg)
 
         if not (ri.rlocmode == 0 or (argsize == 4 and dpos % 4 == 0)):
-            raise ut.EPError(_("Cannot write non-const in byte/word/nonalligned dword."))
+            raise ut.EPError(
+                _("Cannot write non-const in byte/word/nonalligned dword.")
+            )
 
         if ri.rlocmode == 1:
             prttb.append(dpos)

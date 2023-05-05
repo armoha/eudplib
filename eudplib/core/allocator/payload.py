@@ -1,18 +1,17 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import time
 from collections.abc import Callable
 from enum import Enum
 from typing import TYPE_CHECKING, TypeAlias
 
-from eudplib import utils as ut
 from eudplib.localize import _
-from eudplib.utils import RandList, ep_assert, stackobjs
+from eudplib.utils import RandList, EPError, ep_assert, stackobjs
 
 from .constexpr import ConstExpr, Evaluable, Evaluate, Forward
 from .pbuffer import Payload, PayloadBuffer
@@ -65,7 +64,7 @@ def CompressPayload(mode: bool) -> None:
     disable it.
     """
     global _payload_compress
-    ut.ep_assert(mode in (True, False), _("Invalid type") + f": {mode}")
+    ep_assert(mode in (True, False), _("Invalid type") + f": {mode}")
     _payload_compress = True if mode else False
 
 
@@ -76,7 +75,7 @@ def ShufflePayload(mode: bool) -> None:
     disable it.
     """
     global _payload_shuffle
-    ut.ep_assert(mode in (True, False), _("Invalid type") + f": {mode}")
+    ep_assert(mode in (True, False), _("Invalid type") + f": {mode}")
     _payload_shuffle = True if mode else False
 
 
@@ -109,7 +108,7 @@ class ObjCollector:
         if isinstance(obj, (ConstExpr, ExprProxy, RlocInt_C)):
             Evaluate(obj)
             return
-        raise ut.EPError(_("Collected unexpected object: {}").format(repr(obj)))
+        raise EPError(_("Collected unexpected object: {}").format(repr(obj)))
 
     def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
         for arg in arglist:
@@ -118,7 +117,7 @@ class ObjCollector:
             if isinstance(arg, (ConstExpr, ExprProxy, RlocInt_C)):
                 Evaluate(arg)
                 continue
-            raise ut.EPError(_("Collected unexpected object: {}").format(repr(arg)))
+            raise EPError(_("Collected unexpected object: {}").format(repr(arg)))
 
     def WriteBytes(self, b: bytes) -> None:
         pass
@@ -171,7 +170,7 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
             objc.EndWrite()
 
     if len(_found_objects_set) == 0:
-        raise ut.EPError(_("No object collected"))
+        raise EPError(_("No object collected"))
 
     if _payload_shuffle:
         # Shuffle objects -> Randomize(?) addresses
@@ -185,7 +184,9 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
 
     # Final
     lprint(
-        _(" - Collected {} / {} objects").format(len(_found_objects), len(_found_objects)),
+        _(" - Collected {} / {} objects").format(
+            len(_found_objects), len(_found_objects)
+        ),
         flush=True,
     )
     if not _payload_shuffle:
@@ -318,20 +319,20 @@ def AllocObjects() -> None:
         dwoccupmap = obja.EndWrite()
         dwoccupmap_dict[obj] = dwoccupmap
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
-            raise ut.EPError(
-                _("Occupation map length ({}) & Object size mismatch for object ({})").format(
-                    len(dwoccupmap), (obj.GetDataSize() + 3) >> 2
-                )
-            )
+            e = _("Occupation map length ({}) & Object size mismatch for object ({})")  # noqa: E501
+            e = e.format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
+            raise EPError(e)
         lprint(_(" - Preprocessed {} / {} objects").format(i + 1, objn))
 
     lprint(_(" - Preprocessed {} / {} objects").format(objn, objn), flush=True)
 
     lprint(_(" - Allocating objects.."), flush=True)
-    stackobjs.StackObjects(_found_objects, dwoccupmap_dict, _alloctable)
+    stackobjs.stack_objects(_found_objects, dwoccupmap_dict, _alloctable)
 
     # Get payload length
-    _payload_size = max(map(lambda obj: _alloctable[obj] + obj.GetDataSize(), _found_objects))
+    _payload_size = max(
+        map(lambda obj: _alloctable[obj] + obj.GetDataSize(), _found_objects)
+    )
 
     phase = None
 
@@ -354,7 +355,7 @@ def ConstructPayload() -> Payload:
         pbuf.StartWrite(objaddr)
         obj.WritePayload(pbuf)
         written_bytes = pbuf.EndWrite()
-        ut.ep_assert(
+        ep_assert(
             written_bytes == objsize,
             _("obj.GetDataSize()({}) != Real payload size({}) for object {}").format(
                 objsize, written_bytes, obj
@@ -423,4 +424,4 @@ def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
         return RlocInt_C(_alloctable[obj], 4)
 
     else:
-        raise ut.EPError(_("Can't calculate object address now"))
+        raise EPError(_("Can't calculate object address now"))

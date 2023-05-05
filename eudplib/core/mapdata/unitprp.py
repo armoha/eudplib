@@ -1,11 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
-from ctypes import *
+from ctypes import LittleEndianStructure, c_ushort, c_byte, c_uint
 from struct import pack, unpack_from
 
 from eudplib import utils as ut
@@ -50,7 +50,7 @@ class UnitProperty(LittleEndianStructure):
         - shield   : 0~100(%)   you should give hitpoint None to make 100%% HP.
         - energy   : 0~100(%)
         - resource : 0~4294967295
-        - hanger   : 0~65536 (Count)
+        - hanger   : 0~65536 (count)
 
         Special properties : True(Enabled)/False(Disabled)/None(Don't care)
 
@@ -62,10 +62,14 @@ class UnitProperty(LittleEndianStructure):
 
         >>> UnitProperty(hitpoint = 50, burrowed = True) # HP 50%, burrowed
         """
-        ut.ep_assert(hitpoint is None or (isinstance(hitpoint, int) and 0 <= hitpoint <= 100))
+        ut.ep_assert(
+            hitpoint is None or (isinstance(hitpoint, int) and 0 <= hitpoint <= 100)
+        )
         ut.ep_assert(shield is None or (isinstance(shield, int) and 0 <= shield <= 100))
         ut.ep_assert(energy is None or (isinstance(energy, int) and 0 <= energy <= 100))
-        ut.ep_assert(resource is None or (isinstance(resource, int) and 0 <= resource <= 65535))
+        ut.ep_assert(
+            resource is None or (isinstance(resource, int) and 0 <= resource <= 65535)
+        )
         ut.ep_assert(hanger is None or (isinstance(hanger, int) and 0 <= hanger <= 255))
 
         ut.ep_assert(cloaked in [None, True, False])

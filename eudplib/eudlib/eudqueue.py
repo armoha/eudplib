@@ -1,17 +1,15 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2022 by Armoha.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import functools
 
 from .. import core as c
 from ..core import Add, EUDVArray, Memory, SetMemory
 from ..core.eudfunc.eudf import _EUDPredefineParam
-from ..ctrlstru import EUDSetContinuePoint, EUDWhile
-from ..ctrlstru.loopblock import _UnsafeWhileNot
 from ..utils import EPD, EUDCreateBlock, EUDPopBlock, ep_assert
 
 
@@ -24,7 +22,9 @@ def EUDQueue(capacity):
         def __init__(self):
             ret = c.EUDVariable()
             pop = c.EUDVariable(ret, c.SetTo, 0)
-            queue = EUDVArray(capacity)(dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable())
+            queue = EUDVArray(capacity)(
+                dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable()
+            )
             append_act = SetMemory(queue + 348, c.SetTo, 0)
             jumpleft = c.Forward()
             self._length = c.EUDVariable(0)
@@ -45,7 +45,9 @@ def EUDQueue(capacity):
             )
             iter_start << c.RawTrigger(
                 nextptr=0,  # by iter_init
-                conditions=Memory(append_act + 16, c.Exactly, 0),  # by iter_init, iter_contpoint
+                conditions=Memory(
+                    append_act + 16, c.Exactly, 0
+                ),  # by iter_init, iter_contpoint
                 actions=c.SetNextPtr(iter_start, 0),  # end by __iter__ call
             )
             iter_jump << c.RawTrigger(
@@ -59,7 +61,9 @@ def EUDQueue(capacity):
             )
             iter_contpoint = c.RawTrigger(
                 nextptr=iter_start,
-                conditions=Memory(iter_start + 16, c.AtLeast, EPD(queue) + 87 + 18 * capacity),
+                conditions=Memory(
+                    iter_start + 16, c.AtLeast, EPD(queue) + 87 + 18 * capacity
+                ),
                 actions=[
                     SetMemory(iter_start + 16, Add, -(18 * capacity)),
                     SetMemory(iter_jump + 4, Add, -(72 * capacity)),
@@ -115,7 +119,9 @@ def EUDQueue(capacity):
                     ],
                 )
                 wrap_tail << c.RawTrigger(
-                    conditions=Memory(jumpleft + 4, c.AtLeast, queue + 72 * (capacity - 1)),
+                    conditions=Memory(
+                        jumpleft + 4, c.AtLeast, queue + 72 * (capacity - 1)
+                    ),
                     actions=[
                         c.SetNextPtr(check_wrap, wrap_head),
                         SetMemory(jumpleft + 4, Add, -(72 * capacity)),
@@ -124,7 +130,9 @@ def EUDQueue(capacity):
                     ],
                 )
                 wrap_head << c.RawTrigger(
-                    conditions=Memory(append_act + 16, c.AtLeast, EPD(queue) + 87 + 18 * capacity),
+                    conditions=Memory(
+                        append_act + 16, c.AtLeast, EPD(queue) + 87 + 18 * capacity
+                    ),
                     actions=SetMemory(append_act + 16, Add, -(18 * capacity)),
                 )
 
@@ -146,7 +154,9 @@ def EUDQueue(capacity):
                     ],
                 )
                 wraparound << c.RawTrigger(
-                    conditions=Memory(jumpleft + 4, c.AtLeast, queue + 72 * (capacity - 1)),
+                    conditions=Memory(
+                        jumpleft + 4, c.AtLeast, queue + 72 * (capacity - 1)
+                    ),
                     actions=[
                         SetMemory(jumpleft + 4, Add, -(72 * capacity)),
                         SetMemory(iter_init + 348, Add, -(18 * capacity)),
@@ -237,7 +247,9 @@ def EUDDeque(capacity):
         def __init__(self):
             ret = c.EUDVariable()
             pop = c.EUDVariable(ret, c.SetTo, 0)
-            deque = EUDVArray(capacity)(dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable())
+            deque = EUDVArray(capacity)(
+                dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable()
+            )
             append_act = SetMemory(deque + 348, c.SetTo, 0)
             appendleft_act = SetMemory(deque + 348, c.SetTo, 0)
             jump, jumpleft = c.Forward(), c.Forward()
@@ -259,7 +271,9 @@ def EUDDeque(capacity):
             )
             iter_start << c.RawTrigger(
                 nextptr=0,  # by iter_init
-                conditions=Memory(append_act + 16, c.Exactly, 0),  # by iter_init, iter_contpoint
+                conditions=Memory(
+                    append_act + 16, c.Exactly, 0
+                ),  # by iter_init, iter_contpoint
                 actions=c.SetNextPtr(iter_start, 0),  # end by __iter__ call
             )
             iter_jump << c.RawTrigger(
@@ -273,7 +287,9 @@ def EUDDeque(capacity):
             )
             iter_contpoint = c.RawTrigger(
                 nextptr=iter_start,
-                conditions=Memory(iter_start + 16, c.AtLeast, EPD(deque) + 87 + 18 * capacity),
+                conditions=Memory(
+                    iter_start + 16, c.AtLeast, EPD(deque) + 87 + 18 * capacity
+                ),
                 actions=[
                     SetMemory(iter_start + 16, Add, -(18 * capacity)),
                     SetMemory(iter_jump + 4, Add, -(72 * capacity)),
@@ -334,7 +350,9 @@ def EUDDeque(capacity):
                     ],
                 )
                 wrap_tail << c.RawTrigger(
-                    conditions=Memory(jumpleft + 4, c.AtLeast, deque + 72 * (capacity - 1)),
+                    conditions=Memory(
+                        jumpleft + 4, c.AtLeast, deque + 72 * (capacity - 1)
+                    ),
                     actions=[
                         SetMemory(appendleft_act + 16, Add, -(18 * capacity)),
                         SetMemory(jumpleft + 4, Add, -(72 * capacity)),
@@ -343,7 +361,9 @@ def EUDDeque(capacity):
                     ],
                 )
                 wrap_head << c.RawTrigger(
-                    conditions=Memory(append_act + 16, c.AtLeast, EPD(deque) + 87 + 18 * capacity),
+                    conditions=Memory(
+                        append_act + 16, c.AtLeast, EPD(deque) + 87 + 18 * capacity
+                    ),
                     actions=[
                         SetMemory(append_act + 16, Add, -(18 * capacity)),
                         SetMemory(jump + 4, Add, -(72 * capacity)),
@@ -438,7 +458,9 @@ def EUDDeque(capacity):
                     ],
                 )
                 wraparound << c.RawTrigger(
-                    conditions=Memory(jumpleft + 4, c.AtLeast, deque + 72 * (capacity - 1)),
+                    conditions=Memory(
+                        jumpleft + 4, c.AtLeast, deque + 72 * (capacity - 1)
+                    ),
                     actions=[
                         SetMemory(appendleft_act + 16, Add, -(18 * capacity)),
                         SetMemory(jumpleft + 4, Add, -(72 * capacity)),
