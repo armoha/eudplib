@@ -1,16 +1,16 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import functools
 import itertools
 
 from ... import utils as ut
 from ...localize import _
-from ...utils.blockstru import BlockStruManager, SetCurrentBlockStruManager
+from ...utils.blockstru import BlockStruManager, set_blockstru_manager
 from .. import allocator as ac
 from .. import rawtrigger as bt
 from .. import variable as ev
@@ -90,7 +90,7 @@ class EUDFuncN:
 
         # Initialize new namespace
         f_bsm = BlockStruManager()
-        prev_bsm = SetCurrentBlockStruManager(f_bsm)
+        prev_bsm = set_blockstru_manager(f_bsm)
         bt.PushTriggerScope()
 
         self._CreateFuncArgs()
@@ -125,7 +125,7 @@ class EUDFuncN:
 
         # Finalize
         ut.ep_assert(f_bsm.empty(), _("Block start/end mismatch inside function"))
-        SetCurrentBlockStruManager(prev_bsm)
+        set_blockstru_manager(prev_bsm)
 
         # No return -> set return count to 0
         if self._retn is None:
