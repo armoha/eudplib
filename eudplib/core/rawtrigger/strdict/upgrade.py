@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 DefUpgradeDict: dict[str, int] = {
     "Terran Infantry Armor": 0,
     "Terran Vehicle Plating": 1,

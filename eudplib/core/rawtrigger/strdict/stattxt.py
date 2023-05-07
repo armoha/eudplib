@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 DefStatTextDict: dict[str, int] = {
     # unit names
     "Terran Marine": 1,

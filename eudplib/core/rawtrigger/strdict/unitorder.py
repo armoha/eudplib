@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 DefUnitOrderDict: dict[str, int] = {
     "Die": 0,  # Causes the unit to die. Normal units run the death iscript animation,
     # while hallucinated units have the sound/sprite spawned and then are removed.

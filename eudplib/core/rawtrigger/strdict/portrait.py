@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 DefPortraitDict: dict[str, int] = {
     "Marine": 0,
     "Ghost": 1,
