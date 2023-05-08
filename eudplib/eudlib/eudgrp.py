@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import struct
 
@@ -19,7 +19,7 @@ class EUDGrp(c.EUDObject):
 
     def __init__(self, content):
         super().__init__()
-        if type(content) is str:
+        if isinstance(content, str):
             content = open(content, "rb").read()
         self._content = content
 

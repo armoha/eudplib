@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 """
 String table manager. Internally used in eudplib.
 """
@@ -132,7 +132,9 @@ class TBL:
         self._loaded = True
 
     def LoadTBLWithChk(
-        self, content: bytes, init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap]"
+        self,
+        content: bytes,
+        init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap]",
     ) -> None:
         # ut.ep_assert(not self._loaded, "String data are already loaded")
         self._datatb.clear()
@@ -234,9 +236,9 @@ class TBL:
                     if nextstring != b"":
                         if j in unitdict and unit_name_encoding:
                             try:
-                                nextstring = (nextstring.decode(unit_name_encoding)).encode(
-                                    "utf-8"
-                                )
+                                nextstring = (
+                                    nextstring.decode(unit_name_encoding)
+                                ).encode("utf-8")
                             except UnicodeDecodeError:
                                 pass
                         self._emptystring.append((i - 1, nextstring))
@@ -313,7 +315,9 @@ class TBL:
                 self._capacity += roundup_by_4(len(string) + 1) + self._saveentry
             self._stringmap[string] = stringindex
 
-        ut.ep_assert(self._capacity < (1 << (8 * self._saveentry)), _("String table overflow"))
+        ut.ep_assert(
+            self._capacity < (1 << (8 * self._saveentry)), _("String table overflow")
+        )
 
         return stringindex
 
@@ -359,13 +363,13 @@ class TBL:
             outbytes.append(i2b(self._stroffset[dataidx]))
 
         tablesize = size * (len(self._dataindextb) + 1)
-        for _ in range(roundup_by_4(tablesize) - tablesize):
+        for _n in range(roundup_by_4(tablesize) - tablesize):
             outbytes.append(b"\0")
 
         # String data
         for s in self._datatb:
             outbytes.append(s)
-            for _ in range(roundup_by_4(len(s) + 1) - len(s)):
+            for _n in range(roundup_by_4(len(s) + 1) - len(s)):
                 outbytes.append(b"\0")
 
         self._tbldata = b"".join(outbytes)
@@ -392,6 +396,8 @@ class TBL:
         # string + b'\0' + string offset
         self._capacity += roundup_by_4(len(string) + 1) + self._saveentry
 
-        ut.ep_assert(self._capacity < (1 << (8 * self._saveentry)), _("String table overflow"))
+        ut.ep_assert(
+            self._capacity < (1 << (8 * self._saveentry)), _("String table overflow")
+        )
 
         return stringindex

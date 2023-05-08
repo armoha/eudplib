@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
-# This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
-# Please see the LICENSE file that should have been included as part of this package.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 
 import weakref
 from dataclasses import dataclass
@@ -28,7 +28,9 @@ class _ObjPoolData(c.ConstExpr):
         try:
             return evb._vdict[self].Evaluate()
         except KeyError:
-            ret = evb.CreateMultipleVarTriggers(self, [0] * (self.max_fieldn * self.size))
+            ret = evb.CreateMultipleVarTriggers(
+                self, [0] * (self.max_fieldn * self.size)
+            )
             return ret.Evaluate()
 
 
@@ -58,7 +60,9 @@ class ObjPool:
     def alloc(self, basetype, *args, **kwargs):
         ut.ep_assert(
             len(basetype._fielddict) <= self.max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(self.max_fieldn),
+            _("Only structs less than {} fields can be allocated").format(
+                self.max_fieldn
+            ),
         )
         data = self._alloc()
         data = basetype.cast(data)
@@ -68,7 +72,9 @@ class ObjPool:
     def free(self, basetype, data) -> None:
         ut.ep_assert(
             len(basetype._fielddict) <= self.max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(self.max_fieldn),
+            _("Only structs less than {} fields can be allocated").format(
+                self.max_fieldn
+            ),
         )
 
         data = basetype.cast(data)
