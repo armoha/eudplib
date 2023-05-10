@@ -9,7 +9,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ...core.variable.evcommon import _ev
 from ...localize import _
-from ...utils import EPD, EPError, RandList
+from ...utils import EPD, EPError, _rand_lst
 from . import dwepdio as dwm
 from . import modcurpl as cp
 
@@ -46,7 +46,9 @@ class EUDByteReader:
         """Seek EUDByteReader to specific address"""
         # convert offset to epd offset & suboffset
         c.f_div(offset, 4, ret=[EPD(self._read) + 5, self._suboffset])
-        c.RawTrigger(actions=c.SetMemory(self._read + 20, c.Add, -(0x58A364 // 4)))
+        c.RawTrigger(
+            actions=c.SetMemory(self._read + 20, c.Add, -(0x58A364 // 4))
+        )
 
     # -------
 
@@ -59,21 +61,30 @@ class EUDByteReader:
         case = [c.Forward() for _ in range(5)]
         ret = _ev[4]
 
-        cs.DoActions(self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0))
+        cs.DoActions(
+            self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0)
+        )
 
         for i in range(4):
             case[i] << c.NextTrigger()
             if i < 3:
                 cs.EUDJumpIfNot(self._suboffset == i, case[i + 1])
-            for j in RandList(range(8)):
+            for j in _rand_lst(range(8)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)),
+                    conditions=c.DeathsX(
+                        c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)
+                    ),
                     actions=ret.AddNumber(2**j),
                 )
             if i < 3:
-                c.RawTrigger(nextptr=case[-1], actions=self._suboffset.AddNumber(1))
+                c.RawTrigger(
+                    nextptr=case[-1], actions=self._suboffset.AddNumber(1)
+                )
             else:  # suboffset == 3
-                cs.DoActions(c.SetMemory(self._read + 20, c.Add, 1), self._suboffset.SetNumber(0))
+                cs.DoActions(
+                    c.SetMemory(self._read + 20, c.Add, 1),
+                    self._suboffset.SetNumber(0),
+                )
 
         case[-1] << c.NextTrigger()
         cp.f_setcurpl2cpcache()
@@ -114,7 +125,9 @@ class EUDByteWriter:
         """Seek EUDByteWriter to specific address"""
         # convert offset to epd offset & suboffset
         c.f_div(offset, 4, ret=[EPD(self._write + 344), self._suboffset])
-        c.RawTrigger(actions=c.SetMemory(self._write + 344, c.Add, -(0x58A364 // 4)))
+        c.RawTrigger(
+            actions=c.SetMemory(self._write + 344, c.Add, -(0x58A364 // 4))
+        )
 
     # -------
 
@@ -132,11 +145,15 @@ class EUDByteWriter:
             cs.EUDBreak()
         for i in range(1, 4):
             if cs.EUDSwitchCase()(i):
-                cs.DoActions(c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)))
-                for j in RandList(range(8)):
+                cs.DoActions(
+                    c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i))
+                )
+                for j in _rand_lst(range(8)):
                     c.RawTrigger(
                         conditions=byte.AtLeastX(1, 2**j),
-                        actions=c.SetMemory(self._write + 348, c.Add, 2 ** (j + i * 8)),
+                        actions=c.SetMemory(
+                            self._write + 348, c.Add, 2 ** (j + i * 8)
+                        ),
                     )
                 cs.EUDBreak()
 
@@ -173,7 +190,9 @@ class EUDByteWriter:
                     conditions=self._suboffset.Exactly(i),
                     actions=[
                         c.SetMemory(self._write + 348, c.SetTo, 0),
-                        c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)),
+                        c.SetMemory(
+                            self._write + 328, c.SetTo, 0xFF << (8 * i)
+                        ),
                     ],
                 )
             c.SetNextTrigger(self._write)
@@ -181,7 +200,10 @@ class EUDByteWriter:
         nextptr = c.Forward()
         c.RawTrigger(
             nextptr=self._const[0],
-            actions=[c.SetMemory(self._const[i] + 348, c.SetTo, byte << (8 * i)) for i in range(4)]
+            actions=[
+                c.SetMemory(self._const[i] + 348, c.SetTo, byte << (8 * i))
+                for i in range(4)
+            ]
             + [c.SetNextPtr(self._return, nextptr)],
         )
         nextptr << c.NextTrigger()
@@ -204,7 +226,10 @@ class EUDByteStream:
         if c.IsEUDVariable(epdoffset):
             c.VProc(
                 epdoffset,
-                [epdoffset.QueueAssignTo(self._offset), self._suboffset.SetNumber(0)],
+                [
+                    epdoffset.QueueAssignTo(self._offset),
+                    self._suboffset.SetNumber(0),
+                ],
             )
         else:
             c.RawTrigger(
@@ -229,7 +254,9 @@ class EUDByteStream:
         elif isinstance(bytestream, EUDByteWriter):
             offset = EPD(bytestream._write) + 4
         else:
-            raise EPError(_("copyto target should be EUDByteReader/Writer/Stream"))
+            raise EPError(
+                _("copyto target should be EUDByteReader/Writer/Stream")
+            )
         c.VProc(
             [self._offset, self._suboffset],
             [
@@ -249,21 +276,30 @@ class EUDByteStream:
         case = [c.Forward() for _ in range(5)]
         ret = _ev[4]
 
-        c.VProc(self._offset, [self._offset.SetDest(EPD(0x6509B0)), ret.SetNumber(0)])
+        c.VProc(
+            self._offset,
+            [self._offset.SetDest(EPD(0x6509B0)), ret.SetNumber(0)],
+        )
 
         for i in range(4):
             case[i] << c.NextTrigger()
             if i < 3:
                 cs.EUDJumpIfNot(self._suboffset == i, case[i + 1])
-            for j in RandList(range(8)):
+            for j in _rand_lst(range(8)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)),
+                    conditions=c.DeathsX(
+                        c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)
+                    ),
                     actions=ret.AddNumber(2**j),
                 )
             if i < 3:
-                c.RawTrigger(nextptr=case[-1], actions=self._suboffset.AddNumber(1))
+                c.RawTrigger(
+                    nextptr=case[-1], actions=self._suboffset.AddNumber(1)
+                )
             else:  # suboffset == 3
-                cs.DoActions(self._offset.AddNumber(1), self._suboffset.SetNumber(0))
+                cs.DoActions(
+                    self._offset.AddNumber(1), self._suboffset.SetNumber(0)
+                )
 
         case[-1] << c.NextTrigger()
         cp.f_setcurpl2cpcache()
@@ -299,10 +335,12 @@ class EUDByteStream:
         for i in range(1, 4):
             if cs.EUDSwitchCase()(i):
                 cs.DoActions(c.SetMemory(write, c.SetTo, 0xFF << (8 * i)))
-                for j in RandList(range(8)):
+                for j in _rand_lst(range(8)):
                     c.RawTrigger(
                         conditions=byte.AtLeastX(1, 2**j),
-                        actions=c.SetMemory(write + 20, c.Add, 2 ** (j + i * 8)),
+                        actions=c.SetMemory(
+                            write + 20, c.Add, 2 ** (j + i * 8)
+                        ),
                     )
                 cs.EUDBreak()
 

@@ -78,7 +78,7 @@ def InitializePayload(
     pts = 0x51A284
     curpl = 0x6509B0
 
-    for player in ut.RandList(range(8)):
+    for player in ut._rand_lst(range(8)):
         triggerend = ~(pts + player * 12)
 
         Trigger(
@@ -90,7 +90,7 @@ def InitializePayload(
         )
 
     # read pts[player].lasttrigger
-    for e in ut.RandList(range(2, 32)):
+    for e in ut._rand_lst(range(2, 32)):
         Trigger(
             conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2**e),
             actions=tt.SetDeaths(11, tt.Add, 2**e, 0),
@@ -103,7 +103,7 @@ def InitializePayload(
             tt.SetMemory(curpl, tt.SetTo, ut.EPD(4)),
         ]
     )
-    for e in ut.RandList(range(2, 32)):
+    for e in ut._rand_lst(range(2, 32)):
         Trigger(
             conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2**e),
             actions=[
@@ -134,7 +134,9 @@ def InitializePayload(
     # Previous rawtrigger datas
 
     oldtrigraw = chkt.getsection("TRIG")
-    oldtrigs = [oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)]
+    oldtrigs = [
+        oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)
+    ]
     proc_trigs = []
 
     # Collect only enabled triggers

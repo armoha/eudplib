@@ -29,7 +29,9 @@ def GetExecutingPlayers(
     return tuple(
         (
             bool(bTrigger[320 + 2048 + 4 + player])
-            or bool(bTrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force])
+            or bool(
+                bTrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force]
+            )
         )
         for player in range(8)
     )  # type: ignore
@@ -84,7 +86,7 @@ def InlineCodifyBinaryTrigger(bTrigger: bytes) -> tStartEnd:
             tEnd = c.RawTrigger()
         else:
             cs.EUDSwitch(cp)
-            for player in ut.RandList(range(8)):
+            for player in ut._rand_lst(range(8)):
                 if playerExecutesTrigger[player]:
                     if cs.EUDSwitchCase()(player):
                         c.RawTrigger(trigSection=bTrigger)

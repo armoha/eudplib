@@ -45,13 +45,21 @@ def f_div(a, b, **kwargs):
     For signed division, uses `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."""
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(a),
-            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+            _("Can't use negative dividend for unsigned division: {}").format(
+                a
+            ),
+            _(
+                "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
+            ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(a),
-            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+            _("Can't use negative divider for unsigned division: {}").format(
+                a
+            ),
+            _(
+                "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
+            ),
         )
 
     if ev.IsEUDVariable(b):
@@ -76,13 +84,21 @@ def _quot(a, b, **kwargs):
     """Calculate (a//b)"""
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(a),
-            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+            _("Can't use negative dividend for unsigned division: {}").format(
+                a
+            ),
+            _(
+                "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
+            ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(a),
-            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+            _("Can't use negative divider for unsigned division: {}").format(
+                a
+            ),
+            _(
+                "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
+            ),
         )
 
     if isinstance(b, ev.EUDVariable):
@@ -107,13 +123,21 @@ def _rem(a, b, **kwargs):
     """Calculate (a%b)"""
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(a),
-            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+            _("Can't use negative dividend for unsigned division: {}").format(
+                a
+            ),
+            _(
+                "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
+            ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(a),
-            _("For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."),
+            _("Can't use negative divider for unsigned division: {}").format(
+                a
+            ),
+            _(
+                "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
+            ),
         )
 
     if isinstance(b, ev.EUDVariable):
@@ -197,7 +221,7 @@ def _const_mul(number: int) -> Callable:
             ret = ev.EUDLightVariable(_from=_mulf._frets[0])
 
             ret << 0
-            for i in ut.RandList(range(32)):
+            for i in ut._rand_lst(range(32)):
                 if (2**i * number) & 0xFFFFFFFF == 0:
                     continue
                 rt.RawTrigger(
@@ -234,7 +258,10 @@ def _const_div(number: int) -> EUDTypedFuncN:
     try:
         return divfdict[number]
     except KeyError:
-        quot, rem = rt.SetDeaths(0, rt.SetTo, 0, 0), rt.SetDeaths(0, rt.SetTo, 0, 0)
+        quot, rem = (
+            rt.SetDeaths(0, rt.SetTo, 0, 0),
+            rt.SetDeaths(0, rt.SetTo, 0, 0),
+        )
 
         @_EUDPredefineParam((ut.EPD(rem) + 5,))
         @ef.EUDFunc
@@ -429,7 +456,7 @@ def _eud_mul(a, b):
             rt.RawTrigger(
                 nextptr=p4,
                 conditions=a.ExactlyX(0, remaining_bits),
-                actions=ut.RandList(acts),
+                actions=ut._rand_lst(acts),
             )
             p4 << ev.VProc(b, b.SetDest(b))  # b += b
 
@@ -451,7 +478,12 @@ def _eud_div(a, b):
 
     # Fill in chain
     for i in range(32):
-        ev.SeqCompute([(ut.EPD(chain_x0[i]), rt.SetTo, x), (ut.EPD(chain_x1[i]), rt.SetTo, x)])
+        ev.SeqCompute(
+            [
+                (ut.EPD(chain_x0[i]), rt.SetTo, x),
+                (ut.EPD(chain_x1[i]), rt.SetTo, x),
+            ]
+        )
 
         # Skip if over 0x80000000
         p1, p2, p3 = ac.Forward(), ac.Forward(), ac.Forward()

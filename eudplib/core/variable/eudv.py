@@ -17,7 +17,7 @@ from ...utils import (
     ExprProxy,
     FlattenList,
     List2Assignable,
-    RandList,
+    _rand_lst,
     ep_assert,
     ep_warn,
     isUnproxyInstance,
@@ -69,7 +69,7 @@ def _ProcessDest(dest):
 def _is_rvalue(obj: object, refcount: int = 3) -> bool:
     if isinstance(obj, EUDVariable) and sys.getrefcount(obj) != refcount:
         return False
-    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.getValue(), 4):
+    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.get_value(), 4):
         return False
     return True
 
@@ -85,7 +85,7 @@ def _yield_and_check_rvalue(
 ) -> Iterator[tuple[Any, bool]]:
     is_rvalue &= sys.getrefcount(obj) == refcount
     if isinstance(obj, ExprProxy):
-        yield from _yield_and_check_rvalue(obj.getValue(), 3, is_rvalue)
+        yield from _yield_and_check_rvalue(obj.get_value(), 3, is_rvalue)
     elif isinstance(obj, EUDVariable):
         yield obj, is_rvalue
     elif isinstance(obj, (bytes, str)) or hasattr(obj, "dontFlatten"):
@@ -143,7 +143,9 @@ class EUDVariable(VariableBase):
     ) -> None:
         ...
 
-    def __init__(self, initval_or_epd=0, modifier=None, initval=None, /, *, nextptr=None) -> None:
+    def __init__(
+        self, initval_or_epd=0, modifier=None, initval=None, /, *, nextptr=None
+    ) -> None:
         if modifier is None and initval is None and nextptr is None:
             initial_pair = initval_or_epd
         else:
@@ -266,11 +268,15 @@ class EUDVariable(VariableBase):
 
     def SetModifier(self, modifier) -> bt.Action:
         ep_assert(
-            modifier is bt.SetTo or modifier is bt.Add or modifier is bt.Subtract,
+            modifier is bt.SetTo
+            or modifier is bt.Add
+            or modifier is bt.Subtract,
             _("Unexpected modifier {}").format(modifier),
         )
         modifier = bt.EncodeModifier(modifier) << 24
-        return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000)
+        return bt.SetDeathsX(
+            EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000
+        )
 
     # -------
 
@@ -423,7 +429,12 @@ class EUDVariable(VariableBase):
         if IsConstExpr(other):
             return super().__iand__(other)  # 1A
         write = self.SetNumberX(0, 0xFFFFFFFF)
-        SeqCompute([(EPD(write), bt.SetTo, 0xFFFFFFFF), (EPD(write), bt.Subtract, other)])
+        SeqCompute(
+            [
+                (EPD(write), bt.SetTo, 0xFFFFFFFF),
+                (EPD(write), bt.Subtract, other),
+            ]
+        )
         bt.RawTrigger(actions=write)  # 1T 6A
         return self
 
@@ -511,7 +522,9 @@ class EUDVariable(VariableBase):
                 ],
             )
             VProc(other, other.SetMask(0xAAAAAAAA))  # 3T 8A
-            bt.RawTrigger(actions=other.SetMask(0xFFFFFFFF))  # FIXME: restore to previous mask???
+            bt.RawTrigger(
+                actions=other.SetMask(0xFFFFFFFF)
+            )  # FIXME: restore to previous mask???
         return self
 
     def __xor__(self, other):
@@ -533,7 +546,9 @@ class EUDVariable(VariableBase):
                 ],
             )
             VProc(other, other.SetMask(0xAAAAAAAA))
-            bt.RawTrigger(actions=other.SetMask(0xFFFFFFFF))  # FIXME: restore to previous mask???
+            bt.RawTrigger(
+                actions=other.SetMask(0xFFFFFFFF)
+            )  # FIXME: restore to previous mask???
         return t.makeR()
 
     def __rxor__(self, other):
@@ -552,7 +567,9 @@ class EUDVariable(VariableBase):
                 ]
             )
             VProc(other, other.SetMask(0xAAAAAAAA))
-            bt.RawTrigger(actions=other.SetMask(0xFFFFFFFF))  # FIXME: restore to previous mask???
+            bt.RawTrigger(
+                actions=other.SetMask(0xFFFFFFFF)
+            )  # FIXME: restore to previous mask???
         return t.makeR()
 
     # -------
@@ -609,12 +626,16 @@ class EUDVariable(VariableBase):
             ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             t = EUDVariable()
-            SeqCompute(((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other)))
+            SeqCompute(
+                ((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other))
+            )
             return t.Exactly(0)
 
     def __gt__(self, other):
         if isinstance(other, int) and other >= 0xFFFFFFFF:
-            ep_warn(_("No unsigned number can be greater than {}").format(other))
+            ep_warn(
+                _("No unsigned number can be greater than {}").format(other)
+            )
             traceback.print_stack()
             return [bt.Never()]  # No unsigned number is less than 0
 
@@ -676,7 +697,9 @@ def VProc(v: EUDVariable, actions) -> bt.RawTrigger:
 
 
 @overload
-def VProc(v: Sequence[EUDVariable], actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
+def VProc(
+    v: Sequence[EUDVariable], actions
+) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
     ...
 
 
@@ -791,11 +814,15 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
         else:
             nonConstAction.append(src.SetModifier(mdt))
 
-        nonConstActions.append([nonConstAction, bt.SetNextPtr(src.GetVTable(), vt_nextptr)])
+        nonConstActions.append(
+            [nonConstAction, bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
+        )
         last_pairs = src, dst, mdt
 
     _RemoveDuplicateActions()
-    bt.RawTrigger(nextptr=nextptr, actions=[actionlist, RandList(nonConstActions)])
+    bt.RawTrigger(
+        nextptr=nextptr, actions=[actionlist, _rand_lst(nonConstActions)]
+    )
 
     vt_nextptr << bt.NextTrigger()
 
@@ -808,7 +835,9 @@ def SeqCompute(assignpairs):
     # Record previous dst, mdt for src to optimize duplicate actions
     import inspect
 
-    srcdictsub = inspect.signature(_SeqComputeSub).parameters["_srcdict"].default
+    srcdictsub = (
+        inspect.signature(_SeqComputeSub).parameters["_srcdict"].default
+    )
     srcdict = {}
 
     # Sublist of assignments to put in _SeqComputeSub
@@ -903,7 +932,9 @@ def NonSeqCompute(assignpairs):
     if len(assignpairs) == len(constpairs):
         SeqCompute(assignpairs)
         return
-    ep_assert(dstvarset.isdisjoint(srcvarset), _("dst and src have intersection"))
+    ep_assert(
+        dstvarset.isdisjoint(srcvarset), _("dst and src have intersection")
+    )
 
     varpairlists = list()
     for pairlist in varassigndict.values():
@@ -932,7 +963,9 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:
         nth = 0
         for src, is_rvalue in _yield_and_check_rvalue(srclist, refcount):
             if isinstance(src, EUDVariable) and is_rvalue:
-                errlist.append(EPError(_("src{} is RValue variable").format(nth)))
+                errlist.append(
+                    EPError(_("src{} is RValue variable").format(nth))
+                )
             nth += 1
     srclist = FlattenList(srclist)
     dstlist = FlattenList(dstlist)
@@ -942,9 +975,13 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:
         raise errlist[0]
     elif errlist:
         if sys.version_info >= (3, 11):
-            raise ExceptionGroup(_("Multiple error occurred on SetVariables:"), errlist)
+            raise ExceptionGroup(
+                _("Multiple error occurred on SetVariables:"), errlist
+            )
         else:
-            raise EPError(_("Multiple error occurred on SetVariables:"), errlist)
+            raise EPError(
+                _("Multiple error occurred on SetVariables:"), errlist
+            )
 
     if mdtlist is None:
         mdtlist = [bt.SetTo] * len(srclist)

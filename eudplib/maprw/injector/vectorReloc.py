@@ -46,7 +46,7 @@ def CopyDeaths(
 
     Trigger(actions=tt.SetDeaths(oplayer, tt.SetTo, initvalue, 0))
 
-    for i in ut.RandList(range(2, 32)):
+    for i in ut._rand_lst(range(2, 32)):
         if copyepd:
             subval = 2 ** (i - 2)
 
@@ -217,7 +217,7 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
     pts = 0x51A280
     curpl = 0x6509B0
 
-    for player in ut.RandList(range(8)):
+    for player in ut._rand_lst(range(8)):
         triggerend = ~(0x51A284 + player * 12)
 
         Trigger(
@@ -229,7 +229,7 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
         )
 
     # read pts[player].lasttrigger
-    for e in ut.RandList(range(2, 32)):
+    for e in ut._rand_lst(range(2, 32)):
         Trigger(
             conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2**e),
             actions=tt.SetDeaths(11, tt.Add, 2**e, 0),
@@ -242,7 +242,7 @@ def CreateVectorRelocator(chkt: CHK, payload: Payload) -> None:
             tt.SetMemory(curpl, tt.SetTo, ut.EPD(4)),
         ]
     )
-    for e in ut.RandList(range(2, 32)):
+    for e in ut._rand_lst(range(2, 32)):
         Trigger(
             conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2**e),
             actions=[

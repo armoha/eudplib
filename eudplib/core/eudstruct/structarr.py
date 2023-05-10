@@ -31,7 +31,9 @@ class _EUDStruct_Metaclass(type):
                     basetype._fields_[i] = (fieldname, cls)
 
                 if fieldname in fielddict:
-                    raise EPError(_("Duplicated field name: {}").format(fieldname))
+                    raise EPError(
+                        _("Duplicated field name: {}").format(fieldname)
+                    )
                 fielddict[fieldname] = (fieldcount, fieldtype)
                 fieldcount += 1
 
@@ -72,10 +74,10 @@ class EUDStructArray(ExprProxy, metaclass=_EUDStruct_Metaclass):
             inst[i] = self[i]
 
     def __getitem__(self, index):
-        return self.getValue()[index]
+        return self.get_value()[index]
 
     def __setitem__(self, index, newval):
-        self.getValue()[index] = newval
+        self.get_value()[index] = newval
 
     def __getattr__(self, name):
         return super().__getattr__(name)
@@ -91,7 +93,10 @@ class _EUDStructArray:
 
     def __call__(self, initvar=None, *, _from=None) -> EUDStructArray:
         return EUDStructArray(
-            initvar=initvar, _from=_from, _times=self._times, _basetype=self._basetype
+            initvar=initvar,
+            _from=_from,
+            _times=self._times,
+            _basetype=self._basetype,
         )
 
     def cast(self, _from):

@@ -43,7 +43,7 @@ def _filllsbyte(dstepd: Constant, v1: EUDVariable) -> None:
 @c.EUDFunc
 def _fill_b__(v1) -> None:
     _lobytefilter << 0
-    for i in ut.RandList(range(8)):
+    for i in ut._rand_lst(range(8)):
         c.RawTrigger(
             conditions=v1.AtLeastX(1, 2**i),
             actions=_lobytefilter.AddNumber(2 ** (i + 8)),
@@ -59,7 +59,7 @@ def _filllobyte(dstepd: Constant, v1: Constant | EUDVariable) -> None:
 @c.EUDFunc
 def _fill__b_(v1) -> None:
     _hibytefilter << 0
-    for i in ut.RandList(range(8)):
+    for i in ut._rand_lst(range(8)):
         c.RawTrigger(
             conditions=v1.AtLeastX(1, 2**i),
             actions=_hibytefilter.AddNumber(2 ** (i + 16)),
@@ -75,7 +75,7 @@ def _fillhibyte(dstepd: Constant, v1: Constant | EUDVariable) -> None:
 @c.EUDFunc
 def _fill___b(v1) -> None:
     _msbytefilter << 0
-    for i in ut.RandList(range(8)):
+    for i in ut._rand_lst(range(8)):
         c.RawTrigger(
             conditions=v1.AtLeastX(1, 2**i),
             actions=_msbytefilter.AddNumber(2 ** (i + 24)),

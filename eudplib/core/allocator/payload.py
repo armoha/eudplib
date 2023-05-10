@@ -11,7 +11,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, TypeAlias
 
 from eudplib.localize import _
-from eudplib.utils import RandList, EPError, ep_assert, stackobjs
+from eudplib.utils import _rand_lst, EPError, ep_assert, stackobjs
 
 from .constexpr import ConstExpr, Evaluable, Evaluate, Forward
 from .pbuffer import Payload, PayloadBuffer
@@ -117,7 +117,9 @@ class ObjCollector:
             if isinstance(arg, (ConstExpr, ExprProxy, RlocInt_C)):
                 Evaluate(arg)
                 continue
-            raise EPError(_("Collected unexpected object: {}").format(repr(arg)))
+            raise EPError(
+                _("Collected unexpected object: {}").format(repr(arg))
+            )
 
     def WriteBytes(self, b: bytes) -> None:
         pass
@@ -176,7 +178,7 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
         # Shuffle objects -> Randomize(?) addresses
         if _rootobj:
             _found_objects_set.remove(_rootobj)
-        _found_objects = [_rootobj] + RandList(_found_objects_set)
+        _found_objects = [_rootobj] + _rand_lst(_found_objects_set)
 
     # cleanup
     _found_objects_set.clear()
@@ -303,7 +305,9 @@ def AllocObjects() -> None:
             lprint(_(" - Allocated {} / {} objects").format(i + 1, objn))
         _payload_size = lallocaddr
 
-        lprint(_(" - Allocated {} / {} objects").format(objn, objn), flush=True)
+        lprint(
+            _(" - Allocated {} / {} objects").format(objn, objn), flush=True
+        )
         phase = None
         return
 
@@ -319,7 +323,9 @@ def AllocObjects() -> None:
         dwoccupmap = obja.EndWrite()
         dwoccupmap_dict[obj] = dwoccupmap
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
-            e = _("Occupation map length ({}) & Object size mismatch for object ({})")  # noqa: E501
+            e = _(
+                "Occupation map length ({}) & Object size mismatch for object ({})"
+            )  # noqa: E501
             e = e.format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
             raise EPError(e)
         lprint(_(" - Preprocessed {} / {} objects").format(i + 1, objn))
@@ -357,9 +363,9 @@ def ConstructPayload() -> Payload:
         written_bytes = pbuf.EndWrite()
         ep_assert(
             written_bytes == objsize,
-            _("obj.GetDataSize()({}) != Real payload size({}) for object {}").format(
-                objsize, written_bytes, obj
-            ),
+            _(
+                "obj.GetDataSize()({}) != Real payload size({}) for object {}"
+            ).format(objsize, written_bytes, obj),
         )
 
         lprint(_(" - Written {} / {} objects").format(i + 1, objn))

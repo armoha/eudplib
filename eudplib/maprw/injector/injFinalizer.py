@@ -60,7 +60,7 @@ def _DispatchInlineCode(
         ]
         t << c.RawTrigger(
             conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, funcID, v)],
-            actions=ut.RandList(acts),
+            actions=ut._rand_lst(acts),
         )
         nt << c.NextTrigger()
 
@@ -148,7 +148,8 @@ def _FlipProp(trigepd: c.EUDVariable) -> None:
 
         # Dispatch inline code
         if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 0x10000000, u)):
-            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 4, u))  # Preserve
+            # Preserve
+            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 4, u))
             _DispatchInlineCode(nexttrig, trigepd, prop)
         cs.EUDEndIf()
 
@@ -186,10 +187,14 @@ def CreateInjectFinalizer(
         if mrgndata is None:
             mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
             mrgndata_db = c.Db(mrgndata)
-            sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
+            sf.f_repmovsd_epd(
+                ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4
+            )
         else:
             mrgndata_db = c.Db(mrgndata)
-            _repaddsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
+            _repaddsd_epd(
+                ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4
+            )
 
         # Flip TRIG properties
         i = c.EUDVariable()
@@ -204,7 +209,7 @@ def CreateInjectFinalizer(
         curtime = c.EUDVariable()
         tmcheckt = c.Forward()
 
-        for player in ut.RandList(range(8)):
+        for player in ut._rand_lst(range(8)):
             trs = rtt._runner_start[player]
             tre = rtt._runner_end[player]
 
@@ -225,11 +230,17 @@ def CreateInjectFinalizer(
             c.PopTriggerScope()
 
             prevtstart = sf.f_dwread_epd(ut.EPD(pts) + player * 3 + 2)
-            prevtend, prevtend_epd = sf.f_dwepdread_epd(ut.EPD(pts) + player * 3 + 1)
+            prevtend, prevtend_epd = sf.f_dwepdread_epd(
+                ut.EPD(pts) + player * 3 + 1
+            )
 
             # If there were triggers
             if cs.EUDIfNot()(prevtstart == ~(pts + player * 12 + 4)):
-                orig_tstart, orig_tend, _runner_end_array = rtt._alloc_trigtrigger_link()
+                (
+                    orig_tstart,
+                    orig_tend,
+                    _runner_end_array,
+                ) = rtt._alloc_trigtrigger_link()
                 link_trs = c.Forward()
                 vs = [prevtstart, prevtend, prevtend_epd]
                 acts = [
@@ -242,7 +253,7 @@ def CreateInjectFinalizer(
                     prevtend_epd.AddNumber(1),
                     prevtend_epd.SetDest(ut.EPD(link_trs) + 4),
                 ]
-                c.VProc(ut.RandList(vs), ut.RandList(acts))
+                c.VProc(ut._rand_lst(vs), ut._rand_lst(acts))
                 c.VProc(
                     prevtstart,
                     [
@@ -262,7 +273,9 @@ def CreateInjectFinalizer(
             cs.EUDEndIf()
 
             # Set current player to 1.
-            c.RawTrigger(nextptr=0x80000000, actions=c.SetMemory(0x6509B0, c.SetTo, 0))
+            c.RawTrigger(
+                nextptr=0x80000000, actions=c.SetMemory(0x6509B0, c.SetTo, 0)
+            )
         c.PopTriggerScope()
 
         # lasttime << curtime

@@ -28,7 +28,7 @@ class ExprProxy(Generic[T_co]):
                 _("Type {} is not castable").format(cls.__name__), e
             )
 
-    def getValue(self) -> T_co:
+    def get_value(self) -> T_co:
         return self._value
 
     def __len__(self):
@@ -217,7 +217,7 @@ def unProxy(x: T) -> T:
 
 def unProxy(x):  # noqa: N802
     while isinstance(x, ExprProxy):
-        x = x.getValue()
+        x = x.get_value()
     return x
 
 

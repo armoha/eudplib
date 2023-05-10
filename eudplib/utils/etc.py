@@ -247,7 +247,7 @@ def find_data_file(filename, file) -> str | bytes:
     return os.path.join(datadir, filename)
 
 
-def RandList(lst: Iterable) -> list:
+def _rand_lst(lst: Iterable) -> list:
     lst = list(lst)
     random.shuffle(lst)
     return lst

@@ -19,7 +19,7 @@ def _reader():
     ptr, epd = [c.EUDLightVariable(_from=fret) for fret in _reader._frets]
 
     cs.DoActions(ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)))
-    for i in ut.RandList(range(32)):
+    for i in ut._rand_lst(range(32)):
         c.RawTrigger(
             conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i),
             actions=[
@@ -62,25 +62,31 @@ def _wreader(subp):
 
     w << 0
     cs.EUDSwitch(subp)
-    for bits in ut.RandList(range(3)):
+    for bits in ut._rand_lst(range(3)):
         if cs.EUDSwitchCase()(bits):
             byte = 8 * bits
-            for power in ut.RandList(range(byte, byte + 16)):
+            for power in ut._rand_lst(range(byte, byte + 16)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
+                    conditions=c.DeathsX(
+                        c.CurrentPlayer, c.AtLeast, 1, 0, 2**power
+                    ),
                     actions=w.AddNumber(2 ** (power - byte)),
                 )
             cs.EUDBreak()
     if cs.EUDSwitchCase()(3):
-        for power in ut.RandList(range(24, 32)):
+        for power in ut._rand_lst(range(24, 32)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
+                conditions=c.DeathsX(
+                    c.CurrentPlayer, c.AtLeast, 1, 0, 2**power
+                ),
                 actions=w.AddNumber(2 ** (power - 24)),
             )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-        for power in ut.RandList(range(8)):
+        for power in ut._rand_lst(range(8)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
+                conditions=c.DeathsX(
+                    c.CurrentPlayer, c.AtLeast, 1, 0, 2**power
+                ),
                 actions=w.AddNumber(2 ** (power + 8)),
             )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, -1))
@@ -103,11 +109,13 @@ def _breader(subp):
     b = c.EUDVariable()
     b << 0
     cs.EUDSwitch(subp)
-    for i in ut.RandList(range(4)):
+    for i in ut._rand_lst(range(4)):
         if cs.EUDSwitchCase()(i):
-            for j in ut.RandList(range(8 * i, 8 * i + 8)):
+            for j in ut._rand_lst(range(8 * i, 8 * i + 8)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                    conditions=c.DeathsX(
+                        c.CurrentPlayer, c.AtLeast, 1, 0, 2**j
+                    ),
                     actions=b.AddNumber(2 ** (j - 8 * i)),
                 )
 
@@ -129,9 +137,13 @@ def f_dwwrite_cp(cpo, value):
     if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
         return c.VProc(value, value.QueueAssignTo(c.CurrentPlayer))
     cs.DoActions(
-        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
+        []
+        if isinstance(cpo, int) and cpo == 0
+        else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0),
-        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
+        []
+        if isinstance(cpo, int) and cpo == 0
+        else c.SetMemory(0x6509B0, c.Add, -cpo),
     )
 
 
@@ -139,9 +151,13 @@ def f_dwadd_cp(cpo, value):
     if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
         return c.VProc(value, value.QueueAddTo(c.CurrentPlayer))
     cs.DoActions(
-        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
+        []
+        if isinstance(cpo, int) and cpo == 0
+        else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.Add, value, 0),
-        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
+        []
+        if isinstance(cpo, int) and cpo == 0
+        else c.SetMemory(0x6509B0, c.Add, -cpo),
     )
 
 
@@ -149,18 +165,26 @@ def f_dwsubtract_cp(cpo, value):
     if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
         return c.VProc(value, value.QueueSubtractTo(c.CurrentPlayer))
     cs.DoActions(
-        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
+        []
+        if isinstance(cpo, int) and cpo == 0
+        else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0),
-        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
+        []
+        if isinstance(cpo, int) and cpo == 0
+        else c.SetMemory(0x6509B0, c.Add, -cpo),
     )
 
 
 @c.EUDFunc
 def _wwriter(subp, w):
     cs.EUDSwitch(subp)
-    for i in ut.RandList(range(3)):
+    for i in ut._rand_lst(range(3)):
         if cs.EUDSwitchCase()(i):
-            c.RawTrigger(actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i)))
+            c.RawTrigger(
+                actions=c.SetDeathsX(
+                    c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i)
+                )
+            )
             c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256**i))])
             cs.EUDBreak()
 
@@ -177,7 +201,9 @@ def _wwriter(subp, w):
 def f_wwrite_cp(cpo, subp, w):
     try:
         cs.DoActions(
-            [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
+            []
+            if isinstance(cpo, int) and cpo == 0
+            else c.SetMemory(0x6509B0, c.Add, cpo),
             c.SetDeathsX(
                 c.CurrentPlayer,
                 c.SetTo,
@@ -185,7 +211,9 @@ def f_wwrite_cp(cpo, subp, w):
                 0,
                 65535 << (8 * subp),
             ),
-            [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
+            []
+            if isinstance(cpo, int) and cpo == 0
+            else c.SetMemory(0x6509B0, c.Add, -cpo),
         )
     except TypeError:
         if not (isinstance(cpo, int) and cpo == 0):
@@ -198,9 +226,13 @@ def f_wwrite_cp(cpo, subp, w):
 @c.EUDFunc
 def _bwriter(subp, b):
     cs.EUDSwitch(subp)
-    for i in ut.RandList(range(4)):
+    for i in ut._rand_lst(range(4)):
         if cs.EUDSwitchCase()(i):
-            c.RawTrigger(actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 << (8 * i)))
+            c.RawTrigger(
+                actions=c.SetDeathsX(
+                    c.CurrentPlayer, c.SetTo, 0, 0, 255 << (8 * i)
+                )
+            )
 
             c.SeqCompute([(c.CurrentPlayer, c.Add, b * (256**i))])
             cs.EUDBreak()
@@ -211,7 +243,9 @@ def _bwriter(subp, b):
 def f_bwrite_cp(cpo, subp, b):
     try:
         cs.DoActions(
-            [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
+            []
+            if isinstance(cpo, int) and cpo == 0
+            else c.SetMemory(0x6509B0, c.Add, cpo),
             c.SetDeathsX(
                 c.CurrentPlayer,
                 c.SetTo,
@@ -219,7 +253,9 @@ def f_bwrite_cp(cpo, subp, b):
                 0,
                 255 << (8 * subp),
             ),
-            [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
+            []
+            if isinstance(cpo, int) and cpo == 0
+            else c.SetMemory(0x6509B0, c.Add, -cpo),
         )
     except TypeError:
         if not (isinstance(cpo, int) and cpo == 0):
@@ -231,7 +267,11 @@ def f_bwrite_cp(cpo, subp, b):
 
 def f_maskwrite_cp(cpo, value, mask):
     cs.DoActions(
-        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, cpo),
+        []
+        if isinstance(cpo, int) and cpo == 0
+        else c.SetMemory(0x6509B0, c.Add, cpo),
         c.SetDeathsX(c.CurrentPlayer, c.SetTo, value, 0, mask),
-        [] if isinstance(cpo, int) and cpo == 0 else c.SetMemory(0x6509B0, c.Add, -cpo),
+        []
+        if isinstance(cpo, int) and cpo == 0
+        else c.SetMemory(0x6509B0, c.Add, -cpo),
     )

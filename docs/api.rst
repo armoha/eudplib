@@ -729,7 +729,6 @@ Trigger Scope
 -   **QueueGameCommand_Select**
 -   **QueueGameCommand_TrainUnit**
 -   **QueueGameCommand_UseCheat**
--   **RandList**
 -   **RlocInt**
 -   **RlocInt_C**
 -   **SetDeathsX**

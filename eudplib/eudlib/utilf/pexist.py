@@ -28,11 +28,13 @@ def f_playerexist(player):
     cs.EUDSwitch(player)
     block = ut.EUDGetLastBlockOfName("swblock")[1]
     block["_actions"] = ret.SetNumber(1)
-    for p in ut.RandList(range(8)):
+    for p in ut._rand_lst(range(8)):
         if cs.EUDSwitchCase()(p):
             c.RawTrigger(
                 nextptr=block["swend"],
-                conditions=c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)),
+                conditions=c.Memory(
+                    pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)
+                ),
                 actions=ret.SetNumber(0),
             )
 
@@ -65,15 +67,17 @@ def EUDLoopPlayer(
             plist.append(p)
     ut.EUDCreateBlock("loopplayerblock", None)
     if not plist:
-        errmsg = _("No player met condition for input map settings:")
+        e = []
+        e.append(_("No player met condition for input map settings:"))
         if ptype:
-            errmsg += _(" type {}").format(ptype)
+            e.append(_(" type {}").format(ptype))
         if force:
-            errmsg += _(" force {}").format(force)
+            e.append(_(" force {}").format(force))
         if race:
-            errmsg += _(" race {}").format(race)
-        errmsg += "\n" + _("Check out whether Start Locations are placed correctly.")
-        raise ut.EPError(errmsg)
+            e.append(_(" race {}").format(race))
+        e.append("\n")
+        e.append(_("Check out whether Start Locations are placed correctly."))
+        raise ut.EPError("".join(e))
     start, end = min(plist), max(plist)
 
     v = c.EUDVariable()

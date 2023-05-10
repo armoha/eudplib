@@ -19,11 +19,16 @@ def f_setcurpl(cp, *, actions=[], set_modifier=True):
         cpcache = c.curpl.GetCPCache()
         c.VProc(
             cp,
-            actions + cp.QueueAssignTo(cpcache) if set_modifier else [cp.SetDest(cpcache)],
+            actions + cp.QueueAssignTo(cpcache)
+            if set_modifier
+            else [cp.SetDest(cpcache)],
         )
         c.VProc(
             [cp, cpcache],
-            [cp.SetDest(ut.EPD(cpcond) + 2), cpcache.SetDest(ut.EPD(0x6509B0))],
+            [
+                cp.SetDest(ut.EPD(cpcond) + 2),
+                cpcache.SetDest(ut.EPD(0x6509B0)),
+            ],
         )
     else:
         cs.DoActions(c.SetCurrentPlayer(cp))
@@ -32,7 +37,9 @@ def f_setcurpl(cp, *, actions=[], set_modifier=True):
 def f_setcurpl2cpcache(v=[], actions=[]):
     cpcache = c.curpl.GetCPCache()
     if v:
-        trg = c.VProc([v] + [cpcache], [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))])
+        trg = c.VProc(
+            [v] + [cpcache], [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))]
+        )
     else:
         trg = c.VProc(cpcache, [actions] + [cpcache.SetDest(ut.EPD(0x6509B0))])
 
@@ -50,10 +57,12 @@ def _f_updatecpcache():
             SetMemoryC(cpcond + 8, c.SetTo, 0),
         ]
     )
-    for i in ut.RandList(range(32)):
+    for i in ut._rand_lst(range(32)):
         u = random.randint(234, 65535)
         c.RawTrigger(
-            conditions=c.DeathsX(ut.EPD(0x6509B0) - 12 * u, c.AtLeast, 1, u, 2**i),
+            conditions=c.DeathsX(
+                ut.EPD(0x6509B0) - 12 * u, c.AtLeast, 1, u, 2**i
+            ),
             actions=[
                 SetMemoryC(cpcache.getValueAddr(), c.Add, 2**i),
                 SetMemoryC(cpcond + 8, c.Add, 2**i),

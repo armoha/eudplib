@@ -5,7 +5,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ...utils import EPD, RandList, isUnproxyInstance
+from ...utils import EPD, _rand_lst, isUnproxyInstance
 from .. import allocator as ac
 from .. import eudfunc as ef
 from .. import rawtrigger as rt
@@ -71,7 +71,9 @@ def f_bitsplit(a):
     bits = ev.EUDCreateVariables(32)
     rt.RawTrigger(actions=[bits[i].SetNumber(0) for i in range(32)])
     for i in range(31, -1, -1):
-        rt.RawTrigger(conditions=a.AtLeastX(1, 2**i), actions=bits[i].SetNumber(1))
+        rt.RawTrigger(
+            conditions=a.AtLeastX(1, 2**i), actions=bits[i].SetNumber(1)
+        )
     return bits
 
 
@@ -86,7 +88,7 @@ def _exp2_vv(n):
     ret = ev.EUDLightVariable(_from=_exp2_vv._frets[0])
 
     ret << 0
-    for i in RandList(range(32)):
+    for i in _rand_lst(range(32)):
         rt.RawTrigger(conditions=[n == i], actions=ret.SetNumber(2**i))
     # return ret
 
@@ -106,7 +108,9 @@ def _f_bitlshift(a, b):
     loopend = ac.Forward()
     loopcnt = ac.Forward()
 
-    rt.RawTrigger(actions=[rt.SetNextPtr(a.GetVTable(), loopcnt), a.QueueAddTo(a)])
+    rt.RawTrigger(
+        actions=[rt.SetNextPtr(a.GetVTable(), loopcnt), a.QueueAddTo(a)]
+    )
 
     loopstart << rt.RawTrigger(
         nextptr=a.GetVTable(),

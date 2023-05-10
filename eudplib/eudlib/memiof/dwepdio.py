@@ -21,7 +21,9 @@ from .modcurpl import f_setcurpl2cpcache
 def f_dwepdread_epd(targetplayer):
     f_dwepdread_epd._frets = [c.SetDeaths(0, c.SetTo, 0, 0) for _ in range(2)]
     f_dwepdread_epd._retn = 2
-    ptr, epd = [c.EUDLightVariable(_from=fret) for fret in f_dwepdread_epd._frets]
+    ptr, epd = [
+        c.EUDLightVariable(_from=fret) for fret in f_dwepdread_epd._frets
+    ]
 
     u = random.randint(234, 65535)
     acts = [
@@ -29,13 +31,16 @@ def f_dwepdread_epd(targetplayer):
         epd.SetNumber(ut.EPD(0)),
         c.SetMemory(0x6509B0, c.Add, -12 * u),
     ]
-    cs.DoActions(ut.RandList(acts))
+    cs.DoActions(ut._rand_lst(acts))
 
-    for i in ut.RandList(range(32)):
-        acts = [ptr.AddNumber(2**i), epd.AddNumber(2 ** (i - 2)) if i >= 2 else []]
+    for i in ut._rand_lst(range(32)):
+        acts = [
+            ptr.AddNumber(2**i),
+            epd.AddNumber(2 ** (i - 2)) if i >= 2 else [],
+        ]
         c.RawTrigger(
             conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
-            actions=ut.RandList(acts),
+            actions=ut._rand_lst(acts),
         )
 
     f_setcurpl2cpcache()  # FIXME: integrate with function return
@@ -55,8 +60,8 @@ def f_dwread_epd(targetplayer):
         ptr.SetNumber(0),
         c.SetMemory(0x6509B0, c.Add, -12 * u),
     ]
-    cs.DoActions(ut.RandList(acts))
-    for i in ut.RandList(range(32)):
+    cs.DoActions(ut._rand_lst(acts))
+    for i in ut._rand_lst(range(32)):
         c.RawTrigger(
             conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
             actions=ptr.AddNumber(2**i),
@@ -79,8 +84,8 @@ def f_epdread_epd(targetplayer):
         ptr.SetNumber(ut.EPD(0)),
         c.SetMemory(0x6509B0, c.Add, -12 * u),
     ]
-    cs.DoActions(ut.RandList(acts))
-    for i in ut.RandList(range(2, 32)):
+    cs.DoActions(ut._rand_lst(acts))
+    for i in ut._rand_lst(range(2, 32)):
         c.RawTrigger(
             conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
             actions=ptr.AddNumber(2 ** (i - 2)),
@@ -113,7 +118,9 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
                 if sum(bitandflags) == 0:
                     continue
                 c.RawTrigger(
-                    conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i)],
+                    conditions=[
+                        c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i)
+                    ],
                     actions=[
                         flagv.AddNumber(2**i)
                         for j, flagv in enumerate(flagsv)
@@ -185,7 +192,7 @@ def f_dwbreak(number):
         ],
     )
 
-    for i in ut.RandList(range(8, 32)):
+    for i in ut._rand_lst(range(8, 32)):
         byteidx = i // 8
         wordidx = i // 16
         byteexp = i % 8
@@ -239,7 +246,9 @@ def f_dwbreak2(number):
 
 def f_dwepdread_epd_safe(*args, **kwargs):
     warnings.warn(
-        _("safe read functions are deprecated in 0.61 and will be removed in 0.63"),
+        _(
+            "safe read functions are deprecated in 0.61 and will be removed in 0.63"
+        ),
         DeprecationWarning,
     )
     return f_dwepdread_epd(*args, **kwargs)
@@ -247,7 +256,9 @@ def f_dwepdread_epd_safe(*args, **kwargs):
 
 def f_dwread_epd_safe(*args, **kwargs):
     warnings.warn(
-        _("safe read functions are deprecated in 0.61 and will be removed in 0.63"),
+        _(
+            "safe read functions are deprecated in 0.61 and will be removed in 0.63"
+        ),
         DeprecationWarning,
     )
     return f_dwread_epd(*args, **kwargs)
@@ -255,7 +266,9 @@ def f_dwread_epd_safe(*args, **kwargs):
 
 def f_epdread_epd_safe(*args, **kwargs):
     warnings.warn(
-        _("safe read functions are deprecated in 0.61 and will be removed in 0.63"),
+        _(
+            "safe read functions are deprecated in 0.61 and will be removed in 0.63"
+        ),
         DeprecationWarning,
     )
     return f_epdread_epd(*args, **kwargs)
