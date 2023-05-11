@@ -21,14 +21,14 @@ _pdbtable: dict[bytes, c.Db] = {}
 Players: TypeAlias = TrgPlayer | int | Iterable[TrgPlayer | int | Iterable]
 
 
-def InitPTrigger() -> None:
+def init_ptrigger() -> None:
     """(Internal) Enable PTrigger. Internally called by eudplib"""
     global _pinfos
     if not _pinfos:
         _pinfos = [c.GetPlayerInfo(player) for player in range(8)]
 
 
-def PTrigger(
+def PTrigger(  # noqa: N802
     players: Players, conditions: Conditions = None, actions: Actions = None
 ) -> None:
     """Execute trigger by player basis
@@ -40,7 +40,7 @@ def PTrigger(
     :param actions: List of actions.
     """
 
-    InitPTrigger()
+    init_ptrigger()
 
     players = ut.FlattenList(players)
     effp: list[bool] = [False] * 8
@@ -57,9 +57,9 @@ def PTrigger(
             effp[player] = True
 
         elif 0x12 <= player <= 0x15:  # Force 1 ~ 4
-            forceIndex = player - 0x12
+            force_index = player - 0x12
             for p in range(8):
-                if _pinfos[p].force == forceIndex:
+                if _pinfos[p].force == force_index:
                     effp[p] = True
 
         elif player == 0x11:  # All players
@@ -86,7 +86,10 @@ def PTrigger(
     t1 << c.RawTrigger(
         nextptr=t3,
         conditions=c.Memory(offset_curpl, c.AtMost, 7),
-        actions=[c.SetNextPtr(t1, t2), c.SetMemory(offset_curpl, c.Add, ut.EPD(pdb))],
+        actions=[
+            c.SetNextPtr(t1, t2),
+            c.SetMemory(offset_curpl, c.Add, ut.EPD(pdb)),
+        ],
     )
 
     t2 << c.RawTrigger(
@@ -103,7 +106,10 @@ def PTrigger(
     Trigger(conditions, actions)
 
     c.RawTrigger(
-        actions=[c.SetNextPtr(t2, t3), c.SetMemory(offset_curpl, c.Add, ut.EPD(pdb))]
+        actions=[
+            c.SetNextPtr(t2, t3),
+            c.SetMemory(offset_curpl, c.Add, ut.EPD(pdb)),
+        ]
     )
 
     t3 << c.RawTrigger(

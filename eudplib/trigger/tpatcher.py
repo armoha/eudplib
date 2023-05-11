@@ -30,28 +30,36 @@ from .filler import (
 )
 
 
-def ApplyPatchTable(initepd, obj, patchTable: list[list[int | None]]) -> None:
-    fieldName = 0
-    for i, patchEntry in enumerate(patchTable):
-        patchFields = patchEntry
-        for fieldSize in patchFields:
-            if isinstance(fieldSize, int):
-                memoryFiller = {
+def apply_patch_table(
+    initepd, obj, patch_table: list[list[int | None]]
+) -> None:
+    field_name = 0
+    for i, patch_entry in enumerate(patch_table):
+        patch_fields = patch_entry
+        for field_size in patch_fields:
+            if isinstance(field_size, int):
+                memory_filler = {
                     -1: _filldw,
                     0: _fillloword,
                     2: _filllsbyte,
                     3: _filllobyte,
                     4: _fillhibyte,
                     5: _fillmsbyte,
-                }[fieldSize]
-                field = obj.fields[fieldName]
+                }[field_size]
+                field = obj.fields[field_name]
                 if c.IsEUDVariable(field):
-                    memoryFiller(initepd + i, field)
-                    obj.fields[fieldName] = 0
-            fieldName += 1
+                    memory_filler(initepd + i, field)
+                    obj.fields[field_name] = 0
+            field_name += 1
 
 
-condpt: list[list[int | None]] = [[-1], [-1], [-1], [0, 4, 5], [2, 3, None, None]]
+condpt: list[list[int | None]] = [
+    [-1],
+    [-1],
+    [-1],
+    [0, 4, 5],
+    [2, 3, None, None],
+]
 
 actpt: list[list[int | None]] = [
     [-1],
@@ -75,20 +83,22 @@ ConstCondition = (
 _Condition = ConstExpr | ConstCondition | ExprProxy[ConstExpr]
 
 
-def isCastable(cond) -> bool:
+def is_castable(cond) -> bool:
     # EUDArray, EUDVArray, EUDStruct, DBString
     return isinstance(cond, ExprProxy) and type(cond) is not ExprProxy
 
 
-def PatchCondition(cond: _Condition) -> Condition:
-    is_castable = isCastable(cond)
+def patch_condition(cond: _Condition) -> Condition:
+    castable = is_castable(cond)
     condition = unProxy(cond)
     if isinstance(condition, Forward):
         if condition._expr is None:
             raise EPError(_("Forward not initialized"))
         condition = condition._expr
     if isinstance(condition, EUDLightBool):
-        return c.MemoryX(condition.getValueAddr(), c.AtLeast, 1, condition._mask)
+        return c.MemoryX(
+            condition.getValueAddr(), c.AtLeast, 1, condition._mask
+        )
     if isinstance(condition, (EUDVariable, EUDLightVariable)):
         return c.Memory(condition.getValueAddr(), c.AtLeast, 1)
 
@@ -96,15 +106,17 @@ def PatchCondition(cond: _Condition) -> Condition:
     if isinstance(condition, (bool, int)):
         return c.Always() if condition else c.Never()
     if isinstance(condition, Condition):
-        ApplyPatchTable(EPD(condition), condition, condpt)
+        apply_patch_table(EPD(condition), condition, condpt)
         return condition
-    if is_castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
+    if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
         ep_warn(_("Condition is always True"))
         return c.Always() if condition != 0 else c.Never()
     raise EPError(_("Invalid input for condition: {}").format(cond))
 
 
-def PatchAction(act: Action | Forward | ExprProxy[Action | Forward]) -> Action:
+def patch_action(
+    act: Action | Forward | ExprProxy[Action | Forward]
+) -> Action:
     action = unProxy(act)
     if isinstance(action, Forward):
         if action._expr is None:
@@ -112,63 +124,67 @@ def PatchAction(act: Action | Forward | ExprProxy[Action | Forward]) -> Action:
         action = action._expr  # type: ignore[assignment]
     if not isinstance(action, Action):
         raise EPError(_("Action expected, found {}").format(act))
-    ApplyPatchTable(EPD(action), action, actpt)
+    apply_patch_table(EPD(action), action, actpt)
     return action
 
 
 @overload
-def IsConditionConst(cond: Condition | ExprProxy[Condition]) -> bool:
+def is_const_cond(cond: Condition | ExprProxy[Condition]) -> bool:
     ...
 
 
 @overload
-def IsConditionConst(cond: ConstCondition) -> Literal[True]:
+def is_const_cond(cond: ConstCondition) -> Literal[True]:
     ...
 
 
-def IsConditionConst(cond) -> bool:
-    is_castable = isCastable(cond)
+def is_const_cond(cond) -> bool:
+    castable = is_castable(cond)
     cond = unProxy(cond)
     if isinstance(cond, Forward):
         if cond._expr is None:
             return False
         cond = cond._expr
-    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):
+    if isinstance(
+        cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)
+    ):
         return True
 
     if isinstance(cond, Condition):
-        fieldName = 0
-        for condFields in condpt:
-            for fieldSize in condFields:
-                if isinstance(fieldSize, int):
-                    field = cond.fields[fieldName]
+        field_name = 0
+        for cond_fields in condpt:
+            for field_size in cond_fields:
+                if isinstance(field_size, int):
+                    field = cond.fields[field_name]
                     if c.IsEUDVariable(field):
                         return False
-                fieldName += 1
+                field_name += 1
         return True
-    if is_castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):
+    if castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):
         return True
     return False
 
 
 @overload
-def IsConditionNegatable(cond: Condition | ExprProxy[Condition]) -> bool:
+def is_nagatable_cond(cond: Condition | ExprProxy[Condition]) -> bool:
     ...
 
 
 @overload
-def IsConditionNegatable(cond: ConstCondition) -> Literal[True]:
+def is_nagatable_cond(cond: ConstCondition) -> Literal[True]:
     ...
 
 
-def IsConditionNegatable(cond) -> bool:
-    is_castable = isCastable(cond)
+def is_nagatable_cond(cond) -> bool:
+    castable = is_castable(cond)
     cond = unProxy(cond)
     if isinstance(cond, Forward):
         if cond._expr is None:
             return False
         cond = cond._expr
-    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):
+    if isinstance(
+        cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)
+    ):
         return True
 
     if isinstance(cond, Condition):
@@ -192,12 +208,12 @@ def IsConditionNegatable(cond) -> bool:
                 return True
             if comparison == 0 and amount <= 1:
                 return True
+            # AtMost and Exactly/AtLeast behaves differently in Bring/Command
+            # (AtMost counts buildings on construction and does not count Egg)
+            # So only exchanging (Exactly, 0) <-> (AtLeast, 1) is sound.
+            #
+            # See: https://cafe.naver.com/edac/book5095361/96809
             if condtype in bring_or_command:
-                # AtMost and Exactly/AtLeast behaves differently in Bring or Command.
-                # (ex. AtMost counts buildings on construction and does not count Egg/Cocoon)
-                # So only exchanging (Exactly, 0) <-> (AtLeast, 1) is sound.
-                #
-                # See: https://cafe.naver.com/edac/book5095361/96809
                 return False
             if comparison in (0, 1):
                 return True
@@ -220,13 +236,13 @@ def IsConditionNegatable(cond) -> bool:
             elif amount == 0xFFFFFFFF:
                 return True
         return False
-    if is_castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):
+    if castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):
         return True
     return False
 
 
-def NegateCondition(cond: _Condition) -> Condition:
-    is_castable = isCastable(cond)
+def negate_cond(cond: _Condition) -> Condition:
+    castable = is_castable(cond)
     condition = unProxy(cond)
     if isinstance(condition, Forward):
         if condition._expr is None:
@@ -244,7 +260,7 @@ def NegateCondition(cond: _Condition) -> Condition:
     if isinstance(condition, Condition):
         condition.Negate()
         return condition
-    if is_castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
+    if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
         ep_warn(_("Condition is always False"))
         return c.Never() if condition == 0 else c.Always()
     raise EPError(_("Invalid input for condition: {}").format(cond))

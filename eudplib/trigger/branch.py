@@ -12,10 +12,10 @@ from eudplib import utils as ut
 from .. import core as c
 from ..core import Condition, Forward, RawTrigger
 from ..core.rawtrigger.rawtriggerdef import _Action
-from .tpatcher import PatchCondition, _Condition
+from .tpatcher import _Condition, patch_condition
 
 
-def _EUDBranchSub(
+def _branch_sub(
     conditions: Sequence[Condition],
     ontrue: c.ConstExpr,
     onfalse: c.ConstExpr,
@@ -33,7 +33,9 @@ def _EUDBranchSub(
     brtrg = Forward()
     tjtrg = Forward()
     brtrg << RawTrigger(
-        nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg)
+        nextptr=onfalse,
+        conditions=conditions,
+        actions=c.SetNextPtr(brtrg, tjtrg),
     )
     if _actions:
         actions = ut.FlattenList(_actions)
@@ -43,7 +45,7 @@ def _EUDBranchSub(
     tjtrg << RawTrigger(nextptr=ontrue, actions=actions)
 
 
-def EUDBranch(
+def EUDBranch(  # noqa: N802
     conditions: _Condition | Iterable[_Condition | Iterable],
     ontrue: c.ConstExpr,
     onfalse: c.ConstExpr,
@@ -57,7 +59,7 @@ def EUDBranch(
     :param onfalse: When any of the conditions are false, this branch is taken.
     """
     conditions = ut.FlattenList(conditions)
-    conds = list(map(PatchCondition, conditions))
+    conds = list(map(patch_condition, conditions))
 
     if len(conds) == 0:
         RawTrigger(nextptr=ontrue, actions=_actions)  # Just jump
@@ -69,8 +71,8 @@ def EUDBranch(
         subonfalse = onfalse
 
         if i + 16 < len(conds):
-            _EUDBranchSub(conds[i : i + 16], subontrue, subonfalse)
+            _branch_sub(conds[i : i + 16], subontrue, subonfalse)
             subontrue << c.NextTrigger()
             continue
-        _EUDBranchSub(conds[i:], subontrue, subonfalse, _actions=_actions)
+        _branch_sub(conds[i:], subontrue, subonfalse, _actions=_actions)
         subontrue << ontrue

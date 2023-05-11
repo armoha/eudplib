@@ -36,7 +36,7 @@ from ..core import (
     VProc,
 )
 from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
-from ..ctrlstru.loopblock import _UnsafeWhileNot
+from ..ctrlstru.loopblock import _unsafe_whilenot
 from ..utils import EPD, EUDPeekBlock, ep_assert
 from .memiof.modcurpl import f_setcurpl2cpcache
 
@@ -168,7 +168,9 @@ class _CPLoop:
             )
             nextptr << NextTrigger()
 
-        if _UnsafeWhileNot()(Memory(loopstart, AtLeast, varray + 72 * capacity)):
+        if _unsafe_whilenot()(
+            Memory(loopstart, AtLeast, varray + 72 * capacity)
+        ):
             block = EUDPeekBlock("whileblock")[1]
             PushTriggerScope()  # remove entry
             remove_end = Forward()
@@ -269,7 +271,9 @@ class _CpHelper:
         except TypeError as e:
             if isinstance(offset, ConstExpr) and isinstance(self.offset, int):
                 mod, val = Add, offset - self.offset
-            elif isinstance(offset, int) and isinstance(self.offset, ConstExpr):
+            elif isinstance(offset, int) and isinstance(
+                self.offset, ConstExpr
+            ):
                 mod, val = Subtract, self.offset - offset
             elif (
                 isinstance(offset, ConstExpr)

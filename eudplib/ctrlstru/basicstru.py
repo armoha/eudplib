@@ -11,11 +11,11 @@ from .. import core as c
 from .. import trigger as tg
 
 
-def DoActions(*actions, preserved=True) -> tuple[c.Forward, c.RawTrigger]:
+def DoActions(*actions, preserved=True) -> tuple[c.Forward, c.RawTrigger]:  # noqa: N802
     return tg.Trigger(actions=actions, preserved=preserved)
 
 
-def EUDJump(nextptr) -> None:
+def EUDJump(nextptr) -> None:  # noqa: N802
     if c.IsEUDVariable(nextptr):
         t = c.Forward()
         c.SeqCompute([(ut.EPD(t + 4), c.SetTo, nextptr)])
@@ -24,19 +24,19 @@ def EUDJump(nextptr) -> None:
         c.RawTrigger(nextptr=nextptr)
 
 
-def EUDJumpIf(conditions, ontrue, *, _actions=None) -> None:
+def EUDJumpIf(conditions, ontrue, *, _actions=None) -> None:  # noqa: N802
     onfalse = c.Forward()
     tg.EUDBranch(conditions, ontrue, onfalse, _actions=_actions)
     onfalse << c.NextTrigger()
 
 
-def EUDJumpIfNot(conditions, onfalse, *, _actions=None) -> None:
+def EUDJumpIfNot(conditions, onfalse, *, _actions=None) -> None:  # noqa: N802
     ontrue = c.Forward()
     tg.EUDBranch(conditions, ontrue, onfalse, _actions=_actions)
     ontrue << c.NextTrigger()
 
 
-def EUDTernary(conditions, *, neg=False):
+def EUDTernary(conditions, *, neg=False):  # noqa: N802
     v = c.EUDVariable()
     t = c.Forward()
     end = c.Forward()

@@ -8,6 +8,7 @@
 
 from collections.abc import Callable
 from typing import NoReturn
+
 from eudplib.localize import _
 
 
@@ -19,12 +20,14 @@ class CtrlStruOpener:
     def __del__(self) -> None:
         if not self._called:
             raise RuntimeError(
-                _("Control structures must be double-parenthesised.") + "\n ex) EUDInfLoop()()"
+                _("Control structures must be double-parenthesised.")
+                + "\n ex) EUDInfLoop()()"
             )
 
     def __bool__(self) -> NoReturn:
         raise RuntimeError(
-            _("Control structures must be double-parenthesised.") + "\n ex) EUDInfLoop()()"
+            _("Control structures must be double-parenthesised.")
+            + "\n ex) EUDInfLoop()()"
         )
 
     def __call__(self, *args, **kwargs):

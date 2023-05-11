@@ -21,7 +21,9 @@ _msbytefilter = c.EUDXVariable(0, 0xFF000000)
 Constant: TypeAlias = ConstExpr | int | RlocInt_C
 
 
-def _filldw(dstepd: Constant | EUDVariable, v1: Constant | EUDVariable) -> None:
+def _filldw(
+    dstepd: Constant | EUDVariable, v1: Constant | EUDVariable
+) -> None:
     c.SeqCompute(((dstepd, c.SetTo, v1),))
 
 

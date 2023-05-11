@@ -7,7 +7,7 @@
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
-from eudplib.trigger.tpatcher import NegateCondition
+from eudplib.trigger.tpatcher import negate_cond
 from eudplib.utils.eperror import EPError
 
 
@@ -77,7 +77,7 @@ def EUDNot(cond):
             return False
         return True
     try:
-        return NegateCondition(cond)
+        return negate_cond(cond)
     except (AttributeError, EPError):
         pass
     v = c.EUDLightBool()

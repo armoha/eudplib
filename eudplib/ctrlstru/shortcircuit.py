@@ -33,7 +33,9 @@ class EUDSCAnd:
             c.RawTrigger(actions=self.v.Set())
         else:
             self.v = c.EUDVariable()
-            self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.SetNumber(0))
+            self.fb = c.RawTrigger(
+                nextptr=self.jb, actions=self.v.SetNumber(0)
+            )
             c.PopTriggerScope()
             self.v << True
 
@@ -53,7 +55,7 @@ class EUDSCAnd:
             else:
                 EUDJumpIfNot(cond, self.fb)
         else:
-            is_const_cond = tg.tpatcher.IsConditionConst(cond)
+            is_const_cond = tg.tpatcher.is_const_cond(cond)
             nt_list = self.scope[1]["nexttrigger_list"]
             if nt_list != [self.side_effect]:
                 # has side-effect
@@ -71,8 +73,8 @@ class EUDSCAnd:
                     EUDJumpIfNot(cond, self.fb)
             elif is_const_cond:
                 if neg:
-                    if tg.tpatcher.IsConditionNegatable(cond):
-                        cond = tg.tpatcher.NegateCondition(cond)
+                    if tg.tpatcher.is_nagatable_cond(cond):
+                        cond = tg.tpatcher.negate_cond(cond)
                         self.cond.append(cond)
                     else:
                         self.Patch()

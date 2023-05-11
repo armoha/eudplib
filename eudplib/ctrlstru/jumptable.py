@@ -15,30 +15,30 @@ class EUDJumpBuffer(c.EUDObject):
         self._jdict = {}
         self._nextptrs = []
 
-    def DynamicConstructed(self):
+    def DynamicConstructed(self):  # noqa: N802
         return True
 
-    def CreateJumpTrigger(self, v, nextptr):
+    def create_jump_trigger(self, v, nextptr):
         ret = self + (20 * len(self._nextptrs) - 4)
         self._nextptrs.append(nextptr)
         self._jdict[v] = ret
         return ret
 
-    def CreateMultipleJumpTriggers(self, v, nextptrs):
+    def create_jump_triggers(self, v, nextptrs):
         ret = self + (20 * len(self._nextptrs) - 4)
         self._nextptrs.extend(nextptrs)
         self._jdict[v] = ret
         return ret
 
-    def GetDataSize(self):
+    def GetDataSize(self):  # noqa: N802
         return 2356 + 20 * len(self._nextptrs)
 
-    def CollectDependency(self, emitbuffer):
+    def CollectDependency(self, emitbuffer):  # noqa: N802
         for nextptr in self._nextptrs:
-            if type(nextptr) is not int:
+            if not isinstance(nextptr, int):
                 emitbuffer.WriteDword(nextptr)
 
-    def WritePayload(self, emitbuffer):
+    def WritePayload(self, emitbuffer):  # noqa: N802
         for nextptr in self._nextptrs[:17]:
             emitbuffer.WriteDword(nextptr)  # nextptr
             emitbuffer.WriteSpace(12)
@@ -70,16 +70,16 @@ class EUDJumpBuffer(c.EUDObject):
 _jtb = None
 
 
-def RegisterNewJumpBuffer():
+def register_new_jumpbuffer():
     global _jtb
     _jtb = EUDJumpBuffer()
 
 
-def GetCurrentJumpBuffer():
+def get_current_jumpbuffer():
     return _jtb
 
 
-c.RegisterCreatePayloadCallback(RegisterNewJumpBuffer)
+c.RegisterCreatePayloadCallback(register_new_jumpbuffer)
 
 
 # Unused jump table don't need to be allocated.
@@ -88,10 +88,10 @@ class JumpTriggerForward(c.ConstExpr):
         super().__init__(self)
         self._nextptrs = nextptrs
 
-    def Evaluate(self):
-        jtb = GetCurrentJumpBuffer()
+    def Evaluate(self):  # noqa: N802
+        jtb = get_current_jumpbuffer()
         try:
             return jtb._jdict[self].Evaluate()
         except KeyError:
-            jt = jtb.CreateMultipleJumpTriggers(self, self._nextptrs)
+            jt = jtb.create_jump_triggers(self, self._nextptrs)
             return jt.Evaluate()

@@ -18,8 +18,12 @@ TODO : Remove code duplication if possible.
 """
 
 
-def EUDIf():
-    block = {"ifend": c.Forward(), "next_elseif": c.Forward(), "conditional": True}
+def EUDIf():  # noqa: N802
+    block = {
+        "ifend": c.Forward(),
+        "next_elseif": c.Forward(),
+        "conditional": True,
+    }
     ut.EUDCreateBlock("ifblock", block)
 
     def _footer(conditions, *, neg=False):
@@ -33,7 +37,7 @@ def EUDIf():
     return CtrlStruOpener(_footer)
 
 
-def EUDIfNot():
+def EUDIfNot():  # noqa: N802
     c = EUDIf()
     return CtrlStruOpener(lambda conditions: c(conditions, neg=True))
 
@@ -41,10 +45,13 @@ def EUDIfNot():
 # -------
 
 
-def EUDElseIf():
+def EUDElseIf():  # noqa: N802
     def _header():
         block = ut.EUDPeekBlock("ifblock")[1]
-        ut.ep_assert(block["next_elseif"] is not None, _("Cannot have EUDElseIf after EUDElse"))
+        ut.ep_assert(
+            block["next_elseif"] is not None,
+            _("Cannot have EUDElseIf after EUDElse"),
+        )
 
         # Finish previous if/elseif block
         EUDJump(block["ifend"])
@@ -66,7 +73,7 @@ def EUDElseIf():
     return CtrlStruOpener(_footer)
 
 
-def EUDElseIfNot():
+def EUDElseIfNot():  # noqa: N802
     c = EUDElseIf()
     return CtrlStruOpener(lambda conditions: c(conditions, neg=True))
 
@@ -74,10 +81,13 @@ def EUDElseIfNot():
 # -------
 
 
-def EUDElse():
+def EUDElse():  # noqa: N802
     def _footer():
         block = ut.EUDPeekBlock("ifblock")[1]
-        ut.ep_assert(block["next_elseif"] is not None, _("Cannot have EUDElse after EUDElse"))
+        ut.ep_assert(
+            block["next_elseif"] is not None,
+            _("Cannot have EUDElse after EUDElse"),
+        )
 
         # Finish previous if/elseif block
         EUDJump(block["ifend"])
@@ -88,7 +98,7 @@ def EUDElse():
     return CtrlStruOpener(_footer)
 
 
-def EUDEndIf():
+def EUDEndIf():  # noqa: N802
     lb = ut.EUDPopBlock("ifblock")
     block = lb[1]
 
@@ -103,7 +113,7 @@ def EUDEndIf():
 # -------
 
 
-def EUDExecuteOnce():
+def EUDExecuteOnce():  # noqa: N802
     def _header():
         block = {
             "blockstart": c.Forward(),
@@ -134,7 +144,7 @@ def EUDExecuteOnce():
     return CtrlStruOpener(_footer)
 
 
-def EUDEndExecuteOnce():
+def EUDEndExecuteOnce():  # noqa: N802
     lb = ut.EUDPopBlock("executeonceblock")
     ut.ep_assert(lb[0] == "executeonceblock", _("Block start/end mismatch"))
     block = lb[1]

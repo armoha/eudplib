@@ -17,11 +17,11 @@ from .cshelper import CtrlStruOpener
 from .jumptable import JumpTriggerForward
 
 
-def _IsSwitchBlockId(idf):
+def _is_switch_blockid(idf):
     return idf == "swblock"
 
 
-def EPDSwitch(epd, mask=0xFFFFFFFF):
+def EPDSwitch(epd, mask=0xFFFFFFFF):  # noqa: N802
     epd = c.EncodePlayer(epd)
     epd = ut.unProxy(epd)
     block = {
@@ -38,7 +38,7 @@ def EPDSwitch(epd, mask=0xFFFFFFFF):
     return True
 
 
-def EUDSwitch(var, mask=0xFFFFFFFF):
+def EUDSwitch(var, mask=0xFFFFFFFF):  # noqa: N802
     var = ut.unProxy(var)
     block = {
         "targetvar": var,
@@ -54,7 +54,7 @@ def EUDSwitch(var, mask=0xFFFFFFFF):
     return True
 
 
-def EUDSwitchCase():
+def EUDSwitchCase():  # noqa: N802
     def _footer(*numbers):
         for number in numbers:
             ut.ep_assert(
@@ -69,7 +69,10 @@ def EUDSwitchCase():
         for number in numbers:
             case = number & block["bitmask"]
             ut.ep_assert(case not in block["casebrlist"], _("Duplicate cases"))
-            ut.ep_assert(block["bitmask"] == 0xFFFFFFFF or case == number, _("cases out of mask"))
+            ut.ep_assert(
+                block["bitmask"] == 0xFFFFFFFF or case == number,
+                _("cases out of mask"),
+            )
             block["casebrlist"][case] = c.NextTrigger()
 
         return True
@@ -77,7 +80,7 @@ def EUDSwitchCase():
     return CtrlStruOpener(_footer)
 
 
-def EUDSwitchDefault():
+def EUDSwitchDefault():  # noqa: N802
     def _footer():
         lb = ut.EUDGetLastBlock()
         ut.ep_assert(lb[0] == "swblock", _("Block start/end mismatch"))
@@ -91,22 +94,22 @@ def EUDSwitchDefault():
     return CtrlStruOpener(_footer)
 
 
-def EUDSwitchBreak():
+def eudswitch_break():
     block = ut.EUDGetLastBlockOfName("swblock")[1]
     EUDJump(block["swend"])
 
 
-def EUDSwitchBreakIf(conditions):
+def eudswitch_break_if(conditions):
     block = ut.EUDGetLastBlockOfName("swblock")[1]
     EUDJumpIf(conditions, block["swend"])
 
 
-def EUDSwitchBreakIfNot(conditions):
+def eudswitch_break_ifnot(conditions):
     block = ut.EUDGetLastBlockOfName("swblock")[1]
     EUDJumpIfNot(conditions, block["swend"])
 
 
-def EUDEndSwitch():
+def EUDEndSwitch():  # noqa: N802
     lb = ut.EUDPopBlock("swblock")
     block = lb[1]
     swend = block["swend"]
@@ -141,7 +144,10 @@ def EUDEndSwitch():
         swend << c.NextTrigger()
         return
 
-    if len(casekeylist) == 2 and casebrlist[casekeylist[0]] == casebrlist[casekeylist[1]]:
+    if (
+        len(casekeylist) == 2
+        and casebrlist[casekeylist[0]] == casebrlist[casekeylist[1]]
+    ):
 
         def popcount(x):
             x -= (x >> 1) & 0x55555555
@@ -166,7 +172,11 @@ def EUDEndSwitch():
         # use simple comparisons
         branch, nextbranch = c.Forward(), c.Forward()
         restore = c.SetMemory(branch + 4, c.SetTo, nextbranch)
-        c.RawTrigger(actions=[restore, block["_actions"]] if "_actions" in block else restore)
+        c.RawTrigger(
+            actions=[restore, block["_actions"]]
+            if "_actions" in block
+            else restore
+        )
         for case in casekeylist:
             branch << c.RawTrigger(
                 conditions=c.MemoryXEPD(epd, c.Exactly, case, bitmask),
@@ -193,13 +203,17 @@ def EUDEndSwitch():
     if density >= 0.4:
         # use jump table
         if (~keyor | keyand) & bitmask != 0:
-            check_invariant = c.MemoryXEPD(epd, c.Exactly, keyand, (~keyor | keyand) & bitmask)
+            check_invariant = c.MemoryXEPD(
+                epd, c.Exactly, keyand, (~keyor | keyand) & bitmask
+            )
             EUDJumpIfNot(check_invariant, defbranch)
 
         def powerset(iterable):
             "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
             s = list(iterable)
-            return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+            return chain.from_iterable(
+                combinations(s, r) for r in range(len(s) + 1)
+            )
 
         keylist = sorted(map(sum, powerset(keybits)))
         jump_table = JumpTriggerForward(
@@ -223,7 +237,9 @@ def EUDEndSwitch():
         else:
             restore = c.SetNextPtr(jumper, jump_table)
             lastbit = c.RawTrigger(
-                actions=[restore, block["_actions"]] if "_actions" in block else restore
+                actions=[restore, block["_actions"]]
+                if "_actions" in block
+                else restore
             )
 
         for i, bit in enumerate(keybits):
@@ -252,28 +268,34 @@ def EUDEndSwitch():
         )
         reset = []
 
-        def Reset():
+        def _reset():
             nonlocal reset
             return [c.SetNextPtr(trg, nptr) for trg, nptr in reset]
 
-        def KeySelector(keys):
+        def _key_selector(keys):
             nonlocal reset
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
                 if reset:
-                    c.RawTrigger(actions=Reset())
+                    c.RawTrigger(actions=_reset())
                 c.RawTrigger(
                     nextptr=cpcache.GetVTable(),
-                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
-                    actions=c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
+                    conditions=c.MemoryXEPD(
+                        cmpplayer, c.Exactly, keys[0], bitmask
+                    ),
+                    actions=c.SetNextPtr(
+                        cpcache.GetVTable(), casebrlist[keys[0]]
+                    ),
                 )
 
             elif len(keys) == 2:
                 br1, jump1, br2 = c.Forward(), c.Forward(), c.Forward()
                 br1 << c.RawTrigger(
                     nextptr=br2,
-                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
-                    actions=[c.SetNextPtr(br1, jump1), Reset()],
+                    conditions=c.MemoryXEPD(
+                        cmpplayer, c.Exactly, keys[0], bitmask
+                    ),
+                    actions=[c.SetNextPtr(br1, jump1), _reset()],
                 )
                 jump1 << c.RawTrigger(
                     nextptr=cpcache.GetVTable(),
@@ -282,46 +304,52 @@ def EUDEndSwitch():
                         c.SetNextPtr(br1, br2),
                     ],
                 )
-                br2 << KeySelector(keys[1:])
+                br2 << _key_selector(keys[1:])
 
             elif len(keys) >= 3:
                 branch, br1, br2 = c.Forward(), c.Forward(), c.Forward()
                 midpos = len(keys) // 2
                 branch << c.RawTrigger(
                     nextptr=br1,
-                    conditions=c.MemoryXEPD(cmpplayer, c.AtLeast, keys[midpos], bitmask),
+                    conditions=c.MemoryXEPD(
+                        cmpplayer, c.AtLeast, keys[midpos], bitmask
+                    ),
                     actions=[
                         c.SetNextPtr(branch, br2),
-                        Reset(),
+                        _reset(),
                     ],
                 )
-                br1 << KeySelector(keys[:midpos])
+                br1 << _key_selector(keys[:midpos])
                 reset.clear()
                 reset.append((branch, br1))
-                br2 << KeySelector(keys[midpos:])
+                br2 << _key_selector(keys[midpos:])
 
             else:  # len(keys) == 0
                 return defbranch
 
             return ret
 
-        KeySelector(casekeylist)
+        _key_selector(casekeylist)
     else:  # use binary search
         reset = []
 
-        def Reset():
+        def _reset():
             nonlocal reset
             return [c.SetNextPtr(trg, nptr) for trg, nptr in reset]
 
-        def KeySelector(keys):
+        def _key_selector(keys):
             nonlocal reset
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
-                branch, jump, goto_defbranch = c.Forward(), c.Forward(), c.Forward()
+                branch, jump, goto_defbranch = (
+                    c.Forward(),
+                    c.Forward(),
+                    c.Forward(),
+                )
                 branch << c.RawTrigger(
                     nextptr=goto_defbranch,
                     conditions=c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
-                    actions=[c.SetNextPtr(branch, jump), Reset()],
+                    actions=[c.SetNextPtr(branch, jump), _reset()],
                 )
                 jump << c.RawTrigger(
                     nextptr=casebrlist[keys[0]],
@@ -330,7 +358,7 @@ def EUDEndSwitch():
                 if reset:
                     goto_defbranch << c.RawTrigger(
                         nextptr=defbranch,
-                        actions=Reset(),
+                        actions=_reset(),
                     )
                 else:
                     goto_defbranch << defbranch
@@ -340,35 +368,37 @@ def EUDEndSwitch():
                 br1 << c.RawTrigger(
                     nextptr=br2,
                     conditions=c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
-                    actions=[c.SetNextPtr(br1, jump1), Reset()],
+                    actions=[c.SetNextPtr(br1, jump1), _reset()],
                 )
                 jump1 << c.RawTrigger(
                     nextptr=casebrlist[keys[0]],
                     actions=c.SetNextPtr(br1, br2),
                 )
-                br2 << KeySelector(keys[1:])
+                br2 << _key_selector(keys[1:])
 
             elif len(keys) >= 3:
                 branch, br1, br2 = c.Forward(), c.Forward(), c.Forward()
                 midpos = len(keys) // 2
                 branch << c.RawTrigger(
                     nextptr=br1,
-                    conditions=c.MemoryXEPD(epd, c.AtLeast, keys[midpos], bitmask),
+                    conditions=c.MemoryXEPD(
+                        epd, c.AtLeast, keys[midpos], bitmask
+                    ),
                     actions=[
                         c.SetNextPtr(branch, br2),
-                        Reset(),
+                        _reset(),
                     ],
                 )
-                br1 << KeySelector(keys[:midpos])
+                br1 << _key_selector(keys[:midpos])
                 reset.clear()
                 reset.append((branch, br1))
-                br2 << KeySelector(keys[midpos:])
+                br2 << _key_selector(keys[midpos:])
 
             else:  # len(keys) == 0
                 return defbranch
 
             return ret
 
-        KeySelector(casekeylist)
+        _key_selector(casekeylist)
 
     swend << c.NextTrigger()

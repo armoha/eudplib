@@ -11,60 +11,60 @@ from . import loopblock as lb
 from . import swblock as sb
 
 
-def EUDContinue() -> None:
-    return lb.EUDLoopContinue()
+def EUDContinue() -> None:  # noqa: N802
+    return lb.eudloop_continue()
 
 
-def EUDContinueIf(conditions) -> None:
-    return lb.EUDLoopContinueIf(conditions)
+def EUDContinueIf(conditions) -> None:  # noqa: N802
+    return lb.eudloop_continue_if(conditions)
 
 
-def EUDContinueIfNot(conditions) -> None:
-    return lb.EUDLoopContinueIfNot(conditions)
+def EUDContinueIfNot(conditions) -> None:  # noqa: N802
+    return lb.eudloop_continue_ifnot(conditions)
 
 
-def EUDSetContinuePoint() -> None:
-    return lb.EUDLoopSetContinuePoint()
+def EUDSetContinuePoint() -> None:  # noqa: N802
+    return lb.set_continuepoint()
 
 
-def EUDIsContinuePointSet() -> bool:
-    return lb.EUDLoopIsContinuePointSet()
+def EUDIsContinuePointSet() -> bool:  # noqa: N802
+    return lb.is_continuepoint_set()
 
 
 # -------
 
 
-def EUDBreak() -> None:
+def EUDBreak() -> None:  # noqa: N802
     for block in reversed(ut.EUDGetBlockList()):
-        if lb._IsLoopBlock(block[1]):
-            lb.EUDLoopBreak()
+        if lb._is_loopblock(block[1]):
+            lb.eudloop_break()
             return
-        elif sb._IsSwitchBlockId(block[0]):
-            sb.EUDSwitchBreak()
+        elif sb._is_switch_blockid(block[0]):
+            sb.eudswitch_break()
             return
 
     raise ut.EPError(_("No loop/switch block surrounding this code area"))
 
 
-def EUDBreakIf(conditions) -> None:
+def EUDBreakIf(conditions) -> None:  # noqa: N802
     for block in reversed(ut.EUDGetBlockList()):
-        if lb._IsLoopBlock(block[1]):
-            lb.EUDLoopBreakIf(conditions)
+        if lb._is_loopblock(block[1]):
+            lb.eudloop_break_if(conditions)
             return
-        elif sb._IsSwitchBlockId(block[0]):
-            sb.EUDSwitchBreakIf(conditions)
+        elif sb._is_switch_blockid(block[0]):
+            sb.eudswitch_break_if(conditions)
             return
 
     raise ut.EPError(_("No loop/switch block surrounding this code area"))
 
 
-def EUDBreakIfNot(conditions) -> None:
+def EUDBreakIfNot(conditions) -> None:  # noqa: N802
     for block in reversed(ut.EUDGetBlockList()):
-        if lb._IsLoopBlock(block[1]):
-            lb.EUDLoopBreakIfNot(conditions)
+        if lb._is_loopblock(block[1]):
+            lb.eudloop_break_ifnot(conditions)
             return
-        elif sb._IsSwitchBlockId(block[0]):
-            sb.EUDSwitchBreakIfNot(conditions)
+        elif sb._is_switch_blockid(block[0]):
+            sb.eudswitch_break_ifnot(conditions)
             return
 
     raise ut.EPError(_("No loop/switch block surrounding this code area"))

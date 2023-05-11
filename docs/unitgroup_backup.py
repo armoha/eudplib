@@ -35,7 +35,7 @@ from ..core import (
     VProc,
 )
 from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
-from ..ctrlstru.loopblock import _UnsafeWhileNot
+from ..ctrlstru.loopblock import _unsafe_whilenot
 from ..utils import EPD, EUDCreateBlock, EUDPeekBlock, ep_assert
 from .memiof import f_maskread_epd
 
@@ -93,10 +93,14 @@ class UnitGroup:
     def __init__(self, capacity):
         self.capacity = capacity
         self.loopvar = EUDVariable(EPD(0x6509B0), SetTo, 0)
-        varray = EUDVArray(capacity)(dest=self.loopvar, nextptr=self.loopvar.GetVTable())
+        varray = EUDVArray(capacity)(
+            dest=self.loopvar, nextptr=self.loopvar.GetVTable()
+        )
         self.varray = varray
         self.idvar = EUDVariable(0, SetTo, 0)
-        id_varray = EUDVArray(capacity)(dest=self.idvar, nextptr=self.idvar.GetVTable())
+        id_varray = EUDVArray(capacity)(
+            dest=self.idvar, nextptr=self.idvar.GetVTable()
+        )
         self.trg = EUDVariable(self.varray + 72 * capacity)
         self.pos = EUDVariable(EPD(self.varray) + 87 + 18 * capacity)
         self.cploop = _CPLoop(self)
@@ -116,7 +120,11 @@ class UnitGroup:
                     (self.trg, Subtract, 72),
                     (self.pos, Subtract, 18),
                     (unit_epd, Add, 0x4C // 4 - 0xA4 // 4),
-                    (EPD(unit_epd._varact) + 6, SetTo, 0x072D0000),  # QueueAssignTo(self.pos)
+                    (
+                        EPD(unit_epd._varact) + 6,
+                        SetTo,
+                        0x072D0000,
+                    ),  # QueueAssignTo(self.pos)
                     (EPD(unit_epd.getDestAddr()), None, self.pos),
                     (None, None, unit_epd),
                 ]
@@ -147,7 +155,9 @@ class _CPLoop:
 
         def reset_cp():
             PushTriggerScope()
-            reset_nextptr = RawTrigger(actions=SetNextPtr(loopvar.GetVTable(), check_death))
+            reset_nextptr = RawTrigger(
+                actions=SetNextPtr(loopvar.GetVTable(), check_death)
+            )
             PopTriggerScope()
             nextptr = Forward()
             RawTrigger(
@@ -159,7 +169,9 @@ class _CPLoop:
             )
             nextptr << NextTrigger()
 
-        if _UnsafeWhileNot()(Memory(loopstart, AtLeast, varray + 72 * capacity)):
+        if _unsafe_whilenot()(
+            Memory(loopstart, AtLeast, varray + 72 * capacity)
+        ):
             block = EUDPeekBlock("whileblock")[1]
             PushTriggerScope()  # remove entry
             remove_end = Forward()
@@ -234,7 +246,9 @@ class _CpHelper:
         except TypeError as e:
             if isinstance(offset, ConstExpr) and isinstance(self.offset, int):
                 mod, val = Add, offset - self.offset
-            elif isinstance(offset, int) and isinstance(self.offset, ConstExpr):
+            elif isinstance(offset, int) and isinstance(
+                self.offset, ConstExpr
+            ):
                 mod, val = Subtract, self.offset - offset
             elif (
                 isinstance(offset, ConstExpr)

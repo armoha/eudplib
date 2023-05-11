@@ -19,7 +19,7 @@ UnitGroup이 고장나지 않으려고 .cploop를 매 프레임 실행할 필요
 ```js
 foreach(cunit : UnitGroup.cploop) {
     foreach(removed : cunit.remove_event) {
-        
+
     }
     foreach(dead : cunit.dying) {
 
@@ -56,7 +56,7 @@ SetNextPtr(idvar.GetVTable(), self._parent.varray)
 
 # UnitGroup의 추가 순서는 뒤에서 앞으로
 # UnitGroup의 순회 순서는 앞에서 뒤으로
-if _UnsafeWhileNot()(UnitGroup의 맨 뒤에 도달):
+if _unsafe_whilenot()(UnitGroup의 맨 뒤에 도달):
     트리거 실행 순서
     1. block["loopstart"] : UnitGroup의 끝까지 순회했는지 체크
     2. id_varray : idvar에 id값 복사

@@ -11,14 +11,18 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from .. import core as c
-from .tpatcher import PatchAction, PatchCondition
+from .tpatcher import patch_action, patch_condition
 
-Conditions = c.Condition | bool | Iterable[c.Condition | bool | Iterable | None] | None
+Conditions = (
+    c.Condition | bool | Iterable[c.Condition | bool | Iterable | None] | None
+)
 Actions = c.Action | Iterable[c.Action | Iterable | None] | None
 
 
-def Trigger(
-    conditions: Conditions = None, actions: Actions = None, preserved: bool = True
+def Trigger(  # noqa: N802
+    conditions: Conditions = None,
+    actions: Actions = None,
+    preserved: bool = True,
 ) -> tuple[c.Forward, c.RawTrigger]:
     """General easy-to-use trigger
 
@@ -49,14 +53,16 @@ def Trigger(
     if len(conditions) <= 16 and len(actions) <= 64:
         patched_conds = []
         for cond in conditions:
-            patched_conds.append(PatchCondition(cond))
+            patched_conds.append(patch_condition(cond))
 
         patched_actions = []
         for act in actions:
-            patched_actions.append(PatchAction(act))
+            patched_actions.append(patch_action(act))
 
         tend = c.RawTrigger(
-            conditions=patched_conds, actions=patched_actions, preserved=preserved
+            conditions=patched_conds,
+            actions=patched_actions,
+            preserved=preserved,
         )
 
     else:
@@ -71,7 +77,7 @@ def Trigger(
 
             patched_conds = []
             for cond in conds:
-                patched_conds.append(PatchCondition(cond))
+                patched_conds.append(patch_condition(cond))
 
             nextcond = c.Forward()
             cts << c.RawTrigger(
@@ -92,7 +98,7 @@ def Trigger(
             acts = actions[i : i + 64]
             patched_actions = []
             for act in acts:
-                patched_actions.append(PatchAction(act))
+                patched_actions.append(patch_action(act))
 
             tend = c.RawTrigger(actions=patched_actions)
 
