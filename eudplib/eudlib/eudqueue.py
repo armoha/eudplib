@@ -12,7 +12,7 @@ from ..core import Add, EUDVArray, Memory, SetMemory
 from ..core.eudfunc.eudf import _EUDPredefineParam
 from ..ctrlstru import EUDSetContinuePoint, EUDWhile
 from ..ctrlstru.loopblock import _UnsafeWhileNot
-from ..utils import EPD, ep_assert
+from ..utils import EPD, EUDCreateBlock, EUDPopBlock, ep_assert
 
 
 @functools.cache
@@ -69,6 +69,12 @@ def EUDQueue(capacity):
 
             def iter():
                 yield_point, end = c.Forward(), c.Forward()
+                block = {
+                    "loopstart": iter_start,
+                    "loopend": end,
+                    "contpoint": c.Forward(),
+                }
+                EUDCreateBlock("loopqueueblock", block)
                 c.RawTrigger(
                     nextptr=iter_init,
                     actions=[
@@ -76,8 +82,13 @@ def EUDQueue(capacity):
                         SetMemory(iter_jump + 348, c.SetTo, yield_point),
                     ],
                 )
+
                 yield_point << c.NextTrigger()
                 yield ret
+
+                block = EUDPopBlock("loopqueueblock")[1]
+                if not block["contpoint"].IsSet():
+                    block["contpoint"] << iter_contpoint
                 c.SetNextTrigger(iter_contpoint)
                 end << c.NextTrigger()
 
