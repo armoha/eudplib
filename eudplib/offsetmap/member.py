@@ -104,7 +104,9 @@ class MemberKind(enum.Enum):
             case MemberKind.TRG_UNIT | MemberKind.FLINGY:
                 return f_bread_epd(epd, subp)
             case MemberKind.POSITION:
-                return f_maskread_epd(epd, (lambda x, y: x + 65536 * y)(*_mapXYmask()))
+                return f_maskread_epd(
+                    epd, (lambda x, y: x + 65536 * y)(*_mapXYmask())
+                )
             case MemberKind.POSITION_X:
                 shift = 8 * subp
                 f_xread_epd = f_readgen_epd(
@@ -150,7 +152,11 @@ class MemberKind(enum.Enum):
                 f_badd_epd(epd, subp, value)
 
     def subtract_epd(self, epd, subp, value) -> None:
-        from ..eudlib.memiof import f_bsubtract_epd, f_dwsubtract_epd, f_wsubtract_epd
+        from ..eudlib.memiof import (
+            f_bsubtract_epd,
+            f_dwsubtract_epd,
+            f_wsubtract_epd,
+        )
 
         match self.size:
             case 4:
@@ -269,7 +275,10 @@ class Flag:
             mask = self.mask << (8 * r)
             ret = c.EUDVariable()
             ret << True
-            Trigger(c.MemoryXEPD(epd, c.AtMost, mask - 1, mask), ret.SetNumber(False))
+            Trigger(
+                c.MemoryXEPD(epd, c.AtMost, mask - 1, mask),
+                ret.SetNumber(False),
+            )
             return ret
         raise AttributeError
 

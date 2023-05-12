@@ -69,7 +69,9 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def getpos(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
         member = type(self).__dict__[name]
-        ut.ep_assert(member.kind.size == 4, _("Only dword can be read as position"))
+        ut.ep_assert(
+            member.kind.size == 4, _("Only dword can be read as position")
+        )
         match member.kind:
             case MemberKind.C_UNIT | MemberKind.C_SPRITE:
                 raise ut.EPError(_("Only dword can be read as position"))
@@ -80,23 +82,23 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def iaddattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offsetEPD, subp = divmod(member.offset, 4)
-        epd = self._epd + offsetEPD
+        offset_epd, subp = divmod(member.offset, 4)
+        epd = self._epd + offset_epd
         value = member.kind.cast(value)
         member.kind.add_epd(epd, subp, value)
 
     # TODO: add operator for Subtract
     def isubtractattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offsetEPD, subp = divmod(member.offset, 4)
-        epd = self._epd + offsetEPD
+        offset_epd, subp = divmod(member.offset, 4)
+        epd = self._epd + offset_epd
         value = member.kind.cast(value)
         member.kind.subtract_epd(epd, subp, value)
 
     def isubattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offsetEPD, subp = divmod(member.offset, 4)
-        epd = self._epd + offsetEPD
+        offset_epd, subp = divmod(member.offset, 4)
+        epd = self._epd + offset_epd
         value = member.kind.cast(value)
         member.kind.add_epd(epd, subp, -value)
 
@@ -135,8 +137,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def eqattr(self, name: str, value):
         member = type(self).__dict__[name]
-        offsetEPD, subp = divmod(member.offset, 4)
-        epd = self._epd + offsetEPD
+        offset_epd, subp = divmod(member.offset, 4)
+        epd = self._epd + offset_epd
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
@@ -154,8 +156,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def leattr(self, name, value):
         member = type(self).__dict__[name]
-        offsetEPD, subp = divmod(member.offset, 4)
-        epd = self._epd + offsetEPD
+        offset_epd, subp = divmod(member.offset, 4)
+        epd = self._epd + offset_epd
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
@@ -170,8 +172,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def geattr(self, name, value):
         member = type(self).__dict__[name]
-        offsetEPD, subp = divmod(member.offset, 4)
-        epd = self._epd + offsetEPD
+        offset_epd, subp = divmod(member.offset, 4)
+        epd = self._epd + offset_epd
         mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
@@ -215,12 +217,14 @@ c.RawTrigger(
 c.PopTriggerScope()
 
 
-def EPDCache(ptr: c.EUDVariable) -> c.EUDVariable:
+def epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
     epd = c.EUDVariable(0)
     is_ptr_equal = ptr.Exactly(0)
-    check, update, skip, end = [c.Forward() for _ in range(4)]
+    check, update, skip, end = (c.Forward() for _ in range(4))
     check << c.RawTrigger(
-        nextptr=update, conditions=is_ptr_equal, actions=c.SetNextPtr(check, skip)
+        nextptr=update,
+        conditions=is_ptr_equal,
+        actions=c.SetNextPtr(check, skip),
     )
     update << c.VProc(
         ptr,
@@ -236,12 +240,14 @@ def EPDCache(ptr: c.EUDVariable) -> c.EUDVariable:
     return epd
 
 
-def PtrCache(epd: c.EUDVariable) -> c.EUDVariable:
+def ptr_cache(epd: c.EUDVariable) -> c.EUDVariable:
     ptr = c.EUDVariable()
     is_epd_equal = epd.Exactly(0)
-    check, update, skip, end = [c.Forward() for _ in range(4)]
+    check, update, skip, end = (c.Forward() for _ in range(4))
     check << c.RawTrigger(
-        nextptr=update, conditions=is_epd_equal, actions=c.SetNextPtr(check, skip)
+        nextptr=update,
+        conditions=is_epd_equal,
+        actions=c.SetNextPtr(check, skip),
     )
     update << c.VProc(
         epd,

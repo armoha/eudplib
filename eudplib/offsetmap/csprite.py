@@ -10,7 +10,7 @@ from typing import TypeAlias, TypeVar, cast
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
-from .epdoffsetmap import EPDCache, EPDOffsetMap, PtrCache
+from .epdoffsetmap import EPDOffsetMap, epd_cache, ptr_cache
 from .member import CSpriteMember, EnumMember, Flag, Member, MemberKind
 
 
@@ -30,15 +30,18 @@ T = TypeVar("T", bound="CSprite")
 int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
 
 
+# ruff: noqa: N815
 class CSprite(EPDOffsetMap):
     __slots__ = "_ptr"
     prev = CSpriteMember(0x00)
     next = CSpriteMember(0x04)
     sprite = Member(0x08, MemberKind.SPRITE)
     playerID = Member(0x0A, MemberKind.TRG_PLAYER)  # officially "creator"
-    # 0 <= selectionIndex <= 11. Index in the selection area at bottom of screen.
+    # 0 <= selectionIndex <= 11.
+    # Index in the selection area at bottom of screen.
     selectionIndex = Member(0x0B, MemberKind.BYTE)
-    # Player bits indicating the visibility for a player (not hidden by the fog-of-war)
+    # Player bits indicating the visibility for a player
+    # (not hidden by the fog-of-war)
     visibilityFlags = Member(0x0C, MemberKind.BYTE)
     elevationLevel = Member(0x0D, MemberKind.BYTE)
     flags = CSpriteFlags(0x0E, MemberKind.BYTE)
@@ -53,8 +56,14 @@ class CSprite(EPDOffsetMap):
     imageHead = Member(0x1C, MemberKind.DWORD)
     imageTail = Member(0x20, MemberKind.DWORD)
 
-    def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
-        """EPD Constructor of CSprite. Use CSprite.from_ptr(ptr) for ptr value"""
+    def __init__(
+        self, epd: int_or_var, *, ptr: int_or_var | None = None
+    ) -> None:
+        """
+        EPD Constructor of CSprite.
+
+        Use CSprite.from_ptr(ptr) for ptr value
+        """
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
@@ -64,12 +73,16 @@ class CSprite(EPDOffsetMap):
             u, p = epd._epd, epd._ptr
         if isinstance(u, int):
             if p is not None and not isinstance(p, int):
-                raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+                raise ut.EPError(
+                    _("Invalid input for CSprite: {}").format((epd, ptr))
+                )
             q, r = divmod(u - ut.EPD(0x629D98), 9)  # check epd
             if r == 0 and 0 <= q < 2500:
                 _epd, self._ptr = u, 0x629D98 + 36 * q
             else:
-                raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+                raise ut.EPError(
+                    _("Invalid input for CSprite: {}").format((epd, ptr))
+                )
         elif isinstance(u, c.EUDVariable):
             if p is not None:
                 if not isinstance(p, c.EUDVariable):
@@ -83,7 +96,9 @@ class CSprite(EPDOffsetMap):
                 _epd = c.EUDVariable()
                 _epd << u
         else:
-            raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+            raise ut.EPError(
+                _("Invalid input for CSprite: {}").format((epd, ptr))
+            )
 
         super().__init__(_epd)
 
@@ -101,9 +116,11 @@ class CSprite(EPDOffsetMap):
             if r == 0 and 0 <= q < 1700:
                 epd = ut.EPD(u)
             else:
-                raise ut.EPError(_("Invalid input for CSprite: {}").format(ptr))
+                raise ut.EPError(
+                    _("Invalid input for CSprite: {}").format(ptr)
+                )
         elif isinstance(u, c.EUDVariable):
-            epd = EPDCache(u)
+            epd = epd_cache(u)
         else:
             raise ut.EPError(_("Invalid input for CSprite: {}").format(epd))
 
@@ -120,4 +137,4 @@ class CSprite(EPDOffsetMap):
     def ptr(self) -> int | c.EUDVariable:
         if self._ptr is not None:
             return self._ptr
-        return PtrCache(cast(c.EUDVariable, self._epd))
+        return ptr_cache(cast(c.EUDVariable, self._epd))

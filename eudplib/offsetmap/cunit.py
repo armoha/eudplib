@@ -12,7 +12,7 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 from ..localize import _
 from .csprite import int_or_var
-from .epdoffsetmap import EPDCache, EPDOffsetMap, PtrCache
+from .epdoffsetmap import EPDOffsetMap, epd_cache, ptr_cache
 from .member import (
     CSpriteMember,
     CUnitMember,
@@ -82,13 +82,15 @@ class StatusFlags(EnumMember):
     IsHallucination = Flag(
         0x40000000
     )  # 1 for hallucinated units, 0 for "normal" units
-    # Set for when the unit is self-destructing (scarab, scourge, infested terran)
+    # Set for when the unit is self-destructing
+    # (scarab, scourge, infested terran)
     IsSelfDestructing = Flag(0x80000000)
 
 
 T = TypeVar("T", bound="CUnit")
 
 
+# ruff: noqa: N815
 class CUnit(EPDOffsetMap):
     __slots__ = "_ptr"
     # TODO: add docstring for descriptor
@@ -102,8 +104,9 @@ class CUnit(EPDOffsetMap):
     moveTargetY = Member(0x012, MemberKind.POSITION_Y)
     moveTarget = CUnitMember(0x014)
     moveTargetUnit = CUnitMember(0x014)
-    # The next way point in the path the unit is following to get to its destination.
-    # Equal to moveToPos for air units since they don't need to navigate around buildings.
+    # The next way point in the path the unit is following to get to
+    # its destination. Equal to moveToPos for air units since they
+    # don't need to navigate around buildings.
     nextMovementWaypoint = Member(0x018, MemberKind.POSITION)
     # The desired position
     nextTargetWaypoint = Member(0x01C, MemberKind.POSITION)
@@ -111,9 +114,10 @@ class CUnit(EPDOffsetMap):
     # current direction the unit is facing
     currentDirection1 = Member(0x021, MemberKind.BYTE)
     turnRadius = Member(0x022, MemberKind.BYTE)  # flingy
-    # usually only differs from the currentDirection field for units that can accelerate
-    # and travel in a different direction than they are facing. For example Mutalisks can change
-    # the direction they are facing faster than then can change the direction they are moving.
+    # usually only differs from the currentDirection field for units that
+    # can accelerate and travel in a different direction than they are facing.
+    # For example Mutalisks can change the direction they are facing
+    # faster than then can change the direction they are moving.
     velocityDirection1 = Member(0x023, MemberKind.BYTE)
     flingyID = Member(0x024, MemberKind.FLINGY)
     unknown0x26 = Member(0x026, MemberKind.BYTE)
@@ -184,7 +188,9 @@ class CUnit(EPDOffsetMap):
     lastAttackingPlayer = Member(0x090, MemberKind.TRG_PLAYER)
     secondaryOrderTimer = Member(0x091, MemberKind.BYTE)
     AIActionFlag = Member(0x092, MemberKind.BYTE)
-    # 2 = issued an order, 3 = interrupted an order, 4 = hide self before death (self-destruct?)
+    # 2 = issued an order
+    # 3 = interrupted an order
+    # 4 = hide self before death (self-destruct?)
     userActionFlags = Member(0x093, MemberKind.BYTE)
     currentButtonSet = Member(0x094, MemberKind.WORD)
     isCloaked = Member(0x096, MemberKind.BOOL)
@@ -206,9 +212,11 @@ class CUnit(EPDOffsetMap):
     buildingOverlayState = Member(0x0A7, MemberKind.BYTE)
     hpGain = Member(0x0A8, MemberKind.WORD)  # buildRepairHpGain
     shieldGain = Member(0x0AA, MemberKind.WORD)  # Shield gain on construction
-    # Remaining bulding time; also used by powerups (flags) as the timer for returning to their original location.
+    # Remaining bulding time; also used by powerups (flags)
+    # as the timer for returning to their original location.
     remainingBuildTime = Member(0x0AC, MemberKind.WORD)
-    #  The HP of the unit before it changed (example Drone->Hatchery, the Drone's HP will be stored here)
+    #  The HP of the unit before it changed
+    # (example Drone->Hatchery, the Drone's HP will be stored here)
     prevHp = Member(0x0AE, MemberKind.WORD)
     # alphaID (StoredUnit)
     loadedUnit1 = UnsupportedMember(0x0B0, MemberKind.WORD)
@@ -298,7 +306,8 @@ class CUnit(EPDOffsetMap):
     resourceType = Member(0x0E0, MemberKind.BYTE)
     wireframeRandomizer = Member(0x0E1, MemberKind.BYTE)
     secondaryOrderState = Member(0x0E2, MemberKind.BYTE)
-    # Counts down from 15 to 0 when most orders are given, or when the unit moves after reaching a patrol location
+    # Counts down from 15 to 0 when most orders are given,
+    # or when the unit moves after reaching a patrol location
     recentOrderTimer = Member(0x0E3, MemberKind.BYTE)
     # which players can detect this unit (cloaked/burrowed)
     visibilityStatus = Member(0x0E4, MemberKind.DWORD)
@@ -328,7 +337,8 @@ class CUnit(EPDOffsetMap):
     contourBoundsRB = UnsupportedMember(0x10C, MemberKind.DWORD)
     contourBoundsR = UnsupportedMember(0x10C, MemberKind.WORD)
     contourBoundsB = UnsupportedMember(0x10E, MemberKind.WORD)
-    # Hallucination, Dark Swarm, Disruption Web, Broodling (but not Scanner Sweep according to BWAPI)
+    # Hallucination, Dark Swarm, Disruption Web, Broodling
+    # (but not Scanner Sweep according to BWAPI)
     removeTimer = Member(0x110, MemberKind.WORD)
     defensiveMatrixHp = Member(0x112, MemberKind.WORD)
     defensiveMatrixTimer = Member(0x114, MemberKind.BYTE)
@@ -362,7 +372,8 @@ class CUnit(EPDOffsetMap):
     acidSporeTime6 = Member(0x12D, MemberKind.BYTE)
     acidSporeTime7 = Member(0x12E, MemberKind.BYTE)
     acidSporeTime8 = Member(0x12F, MemberKind.BYTE)
-    # Cycles between 0-12 for each bullet fired by this unit (if it uses a "Attack 3x3 area" weapon)
+    # Cycles between 0-12 for each bullet fired by this unit
+    # (if it uses a "Attack 3x3 area" weapon)
     offsetIndex3by3 = UnsupportedMember(0x130, MemberKind.WORD)
     unknown0x132 = UnsupportedMember(0x132, MemberKind.WORD)  # padding
     AI = UnsupportedMember(0x134, MemberKind.DWORD)
@@ -437,7 +448,7 @@ class CUnit(EPDOffsetMap):
             else:
                 raise ut.EPError(_("Invalid input for CUnit: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
-            epd = EPDCache(u)
+            epd = epd_cache(u)
         else:
             raise ut.EPError(_("Invalid input for CUnit: {}").format(epd))
 
@@ -454,7 +465,7 @@ class CUnit(EPDOffsetMap):
     def ptr(self) -> int | c.EUDVariable:
         if self._ptr is not None:
             return self._ptr
-        return PtrCache(cast(c.EUDVariable, self._epd))
+        return ptr_cache(cast(c.EUDVariable, self._epd))
 
     @staticmethod
     @c.EUDTypedFunc([None, None, c.TrgPlayer])
@@ -645,8 +656,8 @@ class CUnit(EPDOffsetMap):
         else:
             return CUnit._check_buildq(self, unit)
 
-    def reset_buildq(self, Q1=0xE4) -> None:
-        self.buildQueue12 = 0xE40000 + Q1
+    def reset_buildq(self, q1=0xE4) -> None:
+        self.buildQueue12 = 0xE40000 + q1
         self.buildQueue34 = 0xE400E4
         self.buildQueue5 = 0xE4
 
