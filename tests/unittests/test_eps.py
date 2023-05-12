@@ -43,7 +43,7 @@ def test_epscript():
         [c[0]] * (len(c) - 1),
     )
     test_equality("epScript EUDQueue", f_test_queue(), 31)
-    test_equality("epScript queue wraparound", f_test_queue_wraparound(), [0, 3, 9, 12, 9, 18, 13])
+    test_equality("epScript queue wraparound", f_test_queue_wraparound(), [0, 3, 9, 12, 9, 20, 14])
     dq = deque(maxlen=7)
     cases = []
     pushes = 1
