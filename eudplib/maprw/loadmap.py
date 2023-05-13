@@ -10,10 +10,10 @@ import os
 from ..core.mapdata import chktok, mapdata, mpqapi
 from ..localize import _
 from ..utils import EPError, ep_assert, ep_eprint
-from .mpqadd import UpdateFileListByListfile
+from .mpqadd import update_filelist_by_listfile
 
 
-def LoadMap(fname: str) -> None:
+def LoadMap(fname: str) -> None:  # noqa: N802
     """Load basemap from fname
 
     :param fname: Path for basemap.
@@ -42,7 +42,7 @@ def LoadMap(fname: str) -> None:
         raise EPError(_("Fail to extract scenario.chk, maybe invalid scx"))
     chkt.loadchk(b)
     mapdata.InitMapData(chkt, rawfile)
-    UpdateFileListByListfile(mpqr)
+    update_filelist_by_listfile(mpqr)
     for f in mpqr.EnumFiles():
         if f and f not in ("staredit\\scenario.chk", "(listfile)"):
             mapdata.AddListFiles(f, mpqr.Extract(f))

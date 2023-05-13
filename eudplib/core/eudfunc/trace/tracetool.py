@@ -46,14 +46,22 @@ def _f_initstacktrace() -> None:
     # that is really written in-game.
     # We will fill the trace stack 'magic code' on runtime, and later find the
     # magic code to locate the stack trace table.
-    if not traceHeader:
+    if not trace_header:
         raise ut.EPError(_("Must call SaveMap first"))
     RawTrigger(
         actions=[
-            SetMemoryEPD(traceToolDataEPD + 0, SetTo, ut.b2i4(traceHeader, 0x0)),
-            SetMemoryEPD(traceToolDataEPD + 1, SetTo, ut.b2i4(traceHeader, 0x4)),
-            SetMemoryEPD(traceToolDataEPD + 2, SetTo, ut.b2i4(traceHeader, 0x8)),
-            SetMemoryEPD(traceToolDataEPD + 3, SetTo, ut.b2i4(traceHeader, 0xC)),
+            SetMemoryEPD(
+                traceToolDataEPD + 0, SetTo, ut.b2i4(trace_header, 0x0)
+            ),
+            SetMemoryEPD(
+                traceToolDataEPD + 1, SetTo, ut.b2i4(trace_header, 0x4)
+            ),
+            SetMemoryEPD(
+                traceToolDataEPD + 2, SetTo, ut.b2i4(trace_header, 0x8)
+            ),
+            SetMemoryEPD(
+                traceToolDataEPD + 3, SetTo, ut.b2i4(trace_header, 0xC)
+            ),
         ],
     )
 
@@ -68,9 +76,9 @@ def _EUDTracePop() -> None:
 
 
 nextTraceId = 0
-traceMap: list[tuple[int, str]] = []
+trace_map: list[tuple[int, str]] = []
 traceKey = 0
-traceHeader: bytes = b""
+trace_header: bytes = b""
 
 
 def GetTraceStackDepth() -> EUDVariable:
@@ -87,11 +95,11 @@ def GetTraceStackDepth() -> EUDVariable:
 
 def _ResetTraceMap() -> None:
     """This function gets called by savemap.py::SaveMap to clear trace data."""
-    global nextTraceId, traceKey, traceHeader
+    global nextTraceId, traceKey, trace_header
     nextTraceId = 0
     traceKey = ut.b2i4(os.urandom(4))
-    traceMap.clear()
-    traceHeader = os.urandom(16)
+    trace_map.clear()
+    trace_header = os.urandom(16)
 
 
 def EUDTraceLog(lineno: int | None = None) -> None:
@@ -107,7 +115,11 @@ def EUDTraceLog(lineno: int | None = None) -> None:
     try:
         if lineno is None:
             lineno = frame.f_lineno
-        msg = "%s|%s|%s" % (frame.f_code.co_filename, frame.f_code.co_name, lineno)
+        msg = "%s|%s|%s" % (
+            frame.f_code.co_filename,
+            frame.f_code.co_name,
+            lineno,
+        )
     finally:
         # frame object should be dereferenced as quickly as possible.
         # https://docs.python.org/3/library/inspect.html#the-interpreter-stack
@@ -118,7 +130,7 @@ def EUDTraceLog(lineno: int | None = None) -> None:
     if v == 0:  # We don't allow logging 0.
         v = tracecrypt.mix(traceKey, nextTraceId)
         nextTraceId += 1
-    traceMap.append((v, str(msg)))
+    trace_map.append((v, str(msg)))
 
     EUDTraceLogRaw(v)
 
@@ -136,4 +148,4 @@ def EUDTraceLogRaw(v: int) -> None:
 
 
 def _GetTraceMap() -> tuple[tuple[bytes, bytes], list[tuple[int, str]]]:
-    return (iHeader, traceHeader), traceMap
+    return (iHeader, trace_header), trace_map

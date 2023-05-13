@@ -62,9 +62,15 @@ def InitMpqLibrary() -> None:
     try:
         if sys.platform.startswith("win32"):  # windows
             if struct.calcsize("P") == 4:  # 32bit
-                libstorm = DLL(find_data_file("StormLib32.dll", __file__), use_last_error=True)
+                libstorm = DLL(
+                    find_data_file("StormLib32.dll", __file__),
+                    use_last_error=True,
+                )
             else:  # 64bit
-                libstorm = DLL(find_data_file("StormLib64.dll", __file__), use_last_error=True)
+                libstorm = DLL(
+                    find_data_file("StormLib64.dll", __file__),
+                    use_last_error=True,
+                )
 
         else:  # elif sys.platform.startswith("darwin"):  # mac
             try:
@@ -84,11 +90,27 @@ def InitMpqLibrary() -> None:
         libstorm.SFileReadFile.restype = c_int
         libstorm.SFileCloseFile.restype = c_int
 
-        libstorm.SFileOpenArchive.argtypes = [c_wchar_p, c_int, c_int, c_void_p]
+        libstorm.SFileOpenArchive.argtypes = [
+            c_wchar_p,
+            c_int,
+            c_int,
+            c_void_p,
+        ]
         libstorm.SFileCloseArchive.argtypes = [c_void_p]
-        libstorm.SFileOpenFileEx.argtypes = [c_void_p, c_char_p, c_int, c_void_p]
+        libstorm.SFileOpenFileEx.argtypes = [
+            c_void_p,
+            c_char_p,
+            c_int,
+            c_void_p,
+        ]
         libstorm.SFileGetFileSize.argtypes = [c_void_p, c_void_p]
-        libstorm.SFileReadFile.argtypes = [c_void_p, c_char_p, c_int, c_void_p, c_int]
+        libstorm.SFileReadFile.argtypes = [
+            c_void_p,
+            c_char_p,
+            c_int,
+            c_void_p,
+            c_int,
+        ]
         libstorm.SFileCloseFile.argtypes = [c_void_p]
 
         # for MpqWrite
@@ -142,7 +164,9 @@ class MPQ:
         self.mpqh = h
         return True
 
-    def Create(self, fname: str, *, sectorSize: int = 3, fileCount: int = 1024) -> bool:
+    def Create(
+        self, fname: str, *, sector_size: int = 3, fileCount: int = 1024
+    ) -> bool:
         if self.mpqh is not None:
             raise RuntimeError(_("Duplicate opening"))
 
@@ -154,7 +178,7 @@ class MPQ:
         cinfo.dwFileFlags2 = 0
         cinfo.dwFileFlags3 = 0
         cinfo.dwAttrFlags = 0
-        cinfo.dwSectorSize = 2 ** (9 + sectorSize)
+        cinfo.dwSectorSize = 2 ** (9 + sector_size)
         cinfo.dwMaxFileCount = fileCount
         h = c_void_p()
         ret = self.libstorm.SFileCreateArchive2(fname, byref(cinfo), byref(h))
@@ -197,9 +221,13 @@ class MPQ:
 
         # Open file
         fileh = c_void_p()
-        ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2b(fname), 0, byref(fileh))
+        ret = self.libstorm.SFileOpenFileEx(
+            self.mpqh, u2b(fname), 0, byref(fileh)
+        )
         if not ret:
-            ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2utf8(fname), 0, byref(fileh))
+            ret = self.libstorm.SFileOpenFileEx(
+                self.mpqh, u2utf8(fname), 0, byref(fileh)
+            )
             if not ret:
                 return None
 
@@ -223,7 +251,12 @@ class MPQ:
     # Writer
 
     def PutFile(
-        self, fname: str, buffer: bytes, *, cmp1: int = MPQ_COMP_ZLIB, cmp2: int = MPQ_COMP_ZLIB
+        self,
+        fname: str,
+        buffer: bytes,
+        *,
+        cmp1: int = MPQ_COMP_ZLIB,
+        cmp2: int = MPQ_COMP_ZLIB,
     ):
         if not self.mpqh:
             return None
@@ -248,7 +281,9 @@ class MPQ:
                 self.mpqh,
                 tmpfname,
                 u2utf8(fname),
-                MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED | MPQ_FILE_REPLACEEXISTING,
+                MPQ_FILE_COMPRESS
+                | MPQ_FILE_ENCRYPTED
+                | MPQ_FILE_REPLACEEXISTING,
                 cmp1,
                 cmp2,
             )
@@ -256,7 +291,12 @@ class MPQ:
         return ret
 
     def PutWave(
-        self, fname: str, buffer: bytes, *, cmp1: int = MPQ_COMP_ZLIB, cmp2: int = MPQ_COMP_ZLIB
+        self,
+        fname: str,
+        buffer: bytes,
+        *,
+        cmp1: int = MPQ_COMP_ZLIB,
+        cmp2: int = MPQ_COMP_ZLIB,
     ) -> int | None:
         if not self.mpqh:
             return None
@@ -306,7 +346,9 @@ if __name__ == "__main__":
     a = mr.Extract("staredit\\scenario.chk")
     mr.Close()
     if a is None:
-        raise EPError("failed to extract staredit\\scenario.chk of basemap.scx")
+        raise EPError(
+            "failed to extract staredit\\scenario.chk of basemap.scx"
+        )
     print(len(a))
 
     if os.path.exists("test.scx"):

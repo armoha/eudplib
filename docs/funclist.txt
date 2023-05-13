@@ -16,7 +16,7 @@
 
     다만 STR이나 TRIG 단락은 eudplib에서도 쓰니까 웬만하면 변형하지 마세요
 
-* MPQAddFile(fname, content, isWave)
+* MPQAddFile(fname, content, is_wav)
     파일을 맵 MPQ에 넣습니다. content는 파이썬 bytes 오프젝트입니다.
 
 * MPQAddWave(fname, content)

@@ -14,7 +14,7 @@ from ... import utils as ut
 from ...core.mapdata.chktok import CHK
 from ...eudlib.memiof.mblockio import _repaddsd_epd
 from ...trigtrg import runtrigtrg as rtt
-from ..inlinecode.ilcprocesstrig import GetInlineCodeList
+from ..inlinecode.ilcprocesstrig import _get_inline_code_list
 
 """ Stage 3:
 - Fixes nextptr modification to TRIG triggers by stage 1
@@ -43,7 +43,7 @@ def _DispatchInlineCode(
         ],
     )
 
-    for funcID, func in GetInlineCodeList():
+    for funcID, func in _get_inline_code_list():
         codeStart, codeEnd = func
         cs_a0_epd = ut.EPD(codeStart) + (8 + 320) // 4
 

@@ -19,51 +19,51 @@ from .btInliner import (
     TryToShareTrigger,
     tStartEnd,
 )
-from .ilccompile import CompileInlineCode, ComputeBaseInlineCodeGlobals
+from .ilccompile import _compile_inline_code, ComputeBaseInlineCodeGlobals
 
-_inlineCodes: list[tuple[int, tStartEnd]] = []
-_inliningRate: float = 1.0
-_cutoffRate: list[float] = [1 + (i - 2) / 3 for i in range(9)]
+_inline_codes: list[tuple[int, tStartEnd]] = []
+_inlining_rate: float = 1.0
+_cutoff_rate: list[float] = [1 + (i - 2) / 3 for i in range(9)]
 
 
-def PRT_SetInliningRate(rate: float) -> None:
+def PRT_SetInliningRate(rate: float) -> None:  # noqa: N802
     """Set how much triggers will be inlined into STR section."""
-    global _inliningRate
-    _inliningRate = rate
+    global _inlining_rate
+    _inlining_rate = rate
 
 
-def PreprocessInlineCode(chkt: CHK) -> None:
-    global _inlineCodes
-    trigSection = chkt.getsection("TRIG")
-    _inlineCodes, trigSection = PreprocessTrigSection(trigSection)
-    chkt.setsection("TRIG", trigSection)
+def _preprocess_inline_code(chkt: CHK) -> None:
+    global _inline_codes
+    trig_section = chkt.getsection("TRIG")
+    _inline_codes, trig_section = _preprocess_trig_section(trig_section)
+    chkt.setsection("TRIG", trig_section)
 
 
-def PreprocessTrigSection(
-    trigSection: bytes
+def _preprocess_trig_section(
+    trig_section: bytes
 ) -> tuple[list[tuple[int, tStartEnd]], bytes]:
     """Fetch inline codes & compiles them"""
     ComputeBaseInlineCodeGlobals()
-    if _inliningRate >= 1.0:
-        return ConsecutiveInlineTrigSection(trigSection)
+    if _inlining_rate >= 1.0:
+        return _consecutive_inline_trig_section(trig_section)
 
-    inlineCodes: list[tuple[int, tStartEnd]] = []
-    trigSegments: list[bytes] = []
-    for i in range(0, len(trigSection), 2400):
-        trigSegment = trigSection[i : i + 2400]
-        if len(trigSegment) != 2400:
+    inline_codes: list[tuple[int, tStartEnd]] = []
+    trig_segments: list[bytes] = []
+    for i in range(0, len(trig_section), 2400):
+        trig_segment = trig_section[i : i + 2400]
+        if len(trig_segment) != 2400:
             continue
 
-        propv = ut.b2i4(trigSegment, 320 + 2048)
+        propv = ut.b2i4(trig_segment, 320 + 2048)
 
-        decoded = DispatchInlineCode(inlineCodes, trigSegment)
+        decoded = _dispatch_inline_code(inline_codes, trig_segment)
         if decoded:
-            trigSegment = decoded
+            trig_segment = decoded
 
-        elif propv < 0x80000000 and random() < _inliningRate:
-            trigSegment = InlinifyNormalTrigger(inlineCodes, trigSegment)
+        elif propv < 0x80000000 and random() < _inlining_rate:
+            trig_segment = _inlinify_normal_trigger(inline_codes, trig_segment)
 
-        trigSegments.append(trigSegment)
+        trig_segments.append(trig_segment)
 
     """
     This is rather hard to explain, but we need blank trigger.
@@ -76,144 +76,148 @@ def PreprocessTrigSection(
 
     So we need 'normal' trigger at the last of TRIG triggers for every player.
     """
-    trigSegments.append(tt.Trigger(players=[AllPlayers]))
+    trig_segments.append(tt.Trigger(players=[AllPlayers]))
 
-    trigSection = b"".join(trigSegments)
-    return inlineCodes, trigSection
+    trig_section = b"".join(trig_segments)
+    return inline_codes, trig_section
 
 
-def ConsecutiveInlineTrigSection(
-    trigSection: bytes,
+def _consecutive_inline_trig_section(
+    trig_section: bytes,
 ) -> tuple[list[tuple[int, tStartEnd]], bytes]:
-    inlineCodes: list[tuple[int, tStartEnd]] = []
-    trigSegments: list[bytes] = []
-    pTriggers: list[list[bytes]] = [[] for _ in range(8)]
+    inline_codes: list[tuple[int, tStartEnd]] = []
+    trig_segments: list[bytes] = []
+    ptriggers: list[list[bytes]] = [[] for _ in range(8)]
 
-    def appendPTriggers(p):
-        if pTriggers[p]:
-            func = InlineCodifyMultipleBinaryTriggers(pTriggers[p])
-            trigSegment = CreateInlineCodeDispatcher(inlineCodes, func, 1 << p)
-            trigSegments.append(trigSegment)
-            pTriggers[p].clear()
+    def append_ptriggers(p):
+        if ptriggers[p]:
+            func = InlineCodifyMultipleBinaryTriggers(ptriggers[p])
+            trig_segment = _create_inline_code_dispatcher(
+                inline_codes, func, 1 << p
+            )
+            trig_segments.append(trig_segment)
+            ptriggers[p].clear()
 
-    for i in range(0, len(trigSection), 2400):
-        trigSegment = trigSection[i : i + 2400]
-        if len(trigSegment) != 2400:
+    for i in range(0, len(trig_section), 2400):
+        trig_segment = trig_section[i : i + 2400]
+        if len(trig_segment) != 2400:
             continue
 
-        propv = ut.b2i4(trigSegment, 320 + 2048)
-        playerExecutesTrigger = GetExecutingPlayers(trigSegment)
+        propv = ut.b2i4(trig_segment, 320 + 2048)
+        executing_players = GetExecutingPlayers(trig_segment)
 
-        decoded = DispatchInlineCode(inlineCodes, trigSegment)
+        decoded = _dispatch_inline_code(inline_codes, trig_segment)
         if decoded:
-            trigSegment = decoded
+            trig_segment = decoded
 
         elif propv < 0x80000000:
-            pCount = playerExecutesTrigger.count(True)
-            if pCount >= 2:
-                indexOrTrig = TryToShareTrigger(trigSegment)
-                if isinstance(indexOrTrig, bytes):
-                    size = GetTriggerSize(indexOrTrig)
-                    if size * pCount * _cutoffRate[pCount] > 2400:
+            player_count = executing_players.count(True)
+            if player_count >= 2:
+                index_or_trig = TryToShareTrigger(trig_segment)
+                if isinstance(index_or_trig, bytes):
+                    size = GetTriggerSize(index_or_trig)
+                    if size * player_count * _cutoff_rate[player_count] > 2400:
                         for p in range(8):
-                            if playerExecutesTrigger[p]:
-                                appendPTriggers(p)
-                        trigSegments.append(indexOrTrig)
+                            if executing_players[p]:
+                                append_ptriggers(p)
+                        trig_segments.append(index_or_trig)
                         continue
             for p in range(8):
-                if playerExecutesTrigger[p]:
-                    pTriggers[p].append(trigSegment)
+                if executing_players[p]:
+                    ptriggers[p].append(trig_segment)
             continue
         for p in range(8):
-            if playerExecutesTrigger[p]:
-                appendPTriggers(p)
-        trigSegments.append(trigSegment)
+            if executing_players[p]:
+                append_ptriggers(p)
+        trig_segments.append(trig_segment)
     for p in range(8):
-        appendPTriggers(p)
-    trigSegments.append(tt.Trigger(players=[AllPlayers]))
+        append_ptriggers(p)
+    trig_segments.append(tt.Trigger(players=[AllPlayers]))
 
-    trigSection = b"".join(trigSegments)
-    return inlineCodes, trigSection
+    trig_section = b"".join(trig_segments)
+    return inline_codes, trig_section
 
 
-def GetInlineCodeList() -> list[tuple[int, tStartEnd]]:
+def _get_inline_code_list() -> list[tuple[int, tStartEnd]]:
     """Get list of compiled inline_eudplib code"""
-    return _inlineCodes
+    return _inline_codes
 
 
-def GetInlineCodePlayerList(bTrigger: bytes) -> int | None:
+def _get_inline_code_player_list(btrigger: bytes) -> int | None:
     # Check if effplayer & current_action is empty
     for player in range(28):
-        if bTrigger[320 + 2048 + 4 + player] != 0:
+        if btrigger[320 + 2048 + 4 + player] != 0:
             return None
 
     # trg.cond[0].condtype != 0
-    if bTrigger[15] != 0:
+    if btrigger[15] != 0:
         return None
     # trg.act[0].acttype != 0
-    if bTrigger[346] != 0:
+    if btrigger[346] != 0:
         return None
 
-    return ut.b2i4(bTrigger, 24)
+    return ut.b2i4(btrigger, 24)
 
 
-def DispatchInlineCode(
-    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
+def _dispatch_inline_code(
+    inline_codes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
 ) -> bytearray | None:
     """Check if trigger segment has special data."""
-    magicCode = ut.b2i4(trigger_bytes, 20)
-    if magicCode != 0x10978D4A:
+    magic_code = ut.b2i4(trigger_bytes, 20)
+    if magic_code != 0x10978D4A:
         return None
 
-    playerCode = GetInlineCodePlayerList(trigger_bytes)
-    if not playerCode:
+    player_code = _get_inline_code_player_list(trigger_bytes)
+    if not player_code:
         return None
 
     data = trigger_bytes[20:320] + trigger_bytes[352:2372]
-    codeData = ut.b2u(data[8:]).rstrip("\0")
+    code_data = ut.b2u(data[8:]).rstrip("\0")
 
     # Compile code
-    func = CompileInlineCode(codeData)
-    return CreateInlineCodeDispatcher(inlineCodes, func, playerCode)
+    func = _compile_inline_code(code_data)
+    return _create_inline_code_dispatcher(inline_codes, func, player_code)
 
 
-def InlinifyNormalTrigger(
-    inlineCodes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
+def _inlinify_normal_trigger(
+    inline_codes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
 ) -> bytearray:
     """Inlinify normal binary triggers"""
-    playerCode = 0
+    player_code = 0
     for i in range(27):
         if trigger_bytes[320 + 2048 + 4 + i]:
-            playerCode |= 1 << i
+            player_code |= 1 << i
 
     func = InlineCodifyBinaryTrigger(trigger_bytes)
-    return CreateInlineCodeDispatcher(inlineCodes, func, playerCode)
+    return _create_inline_code_dispatcher(inline_codes, func, player_code)
 
 
-def CreateInlineCodeDispatcher(
-    inlineCodes: list[tuple[int, tStartEnd]], func: tStartEnd, playerCode: int
+def _create_inline_code_dispatcher(
+    inline_codes: list[tuple[int, tStartEnd]],
+    func: tStartEnd,
+    player_code: int,
 ) -> bytearray:
     """Create link from TRIG list to STR trigger."""
-    funcID = len(inlineCodes) + 1024
-    inlineCodes.append((funcID, func))
+    func_id = len(inline_codes) + 1024
+    inline_codes.append((func_id, func))
 
     # Return new trigger
-    newTrigger = bytearray(2400)
+    new_trigger = bytearray(2400)
 
     # Apply effplayer
     for player in range(27):
-        if playerCode & (1 << player):
-            newTrigger[320 + 2048 + 4 + player] = 1
+        if player_code & (1 << player):
+            new_trigger[320 + 2048 + 4 + player] = 1
 
     # Apply 4 SetDeaths
-    SetDeathsTemplate = tt.SetDeaths(0, SetTo, 0, 0)
-    newTrigger[320 + 32 * 0 : 320 + 32 * 1] = SetDeathsTemplate
-    newTrigger[320 + 32 * 1 : 320 + 32 * 2] = SetDeathsTemplate
-    newTrigger[320 + 32 * 2 : 320 + 32 * 3] = SetDeathsTemplate
-    newTrigger[320 + 32 * 3 : 320 + 32 * 4] = SetDeathsTemplate
+    setdeaths_template = tt.SetDeaths(0, SetTo, 0, 0)
+    new_trigger[320 + 32 * 0 : 320 + 32 * 1] = setdeaths_template
+    new_trigger[320 + 32 * 1 : 320 + 32 * 2] = setdeaths_template
+    new_trigger[320 + 32 * 2 : 320 + 32 * 3] = setdeaths_template
+    new_trigger[320 + 32 * 3 : 320 + 32 * 4] = setdeaths_template
 
     # Apply flag
-    newTrigger[0:4] = ut.i2b4(funcID)
-    newTrigger[2368:2372] = b"\0\0\0\x10"
+    new_trigger[0:4] = ut.i2b4(func_id)
+    new_trigger[2368:2372] = b"\0\0\0\x10"
 
-    return newTrigger
+    return new_trigger
