@@ -14,7 +14,7 @@ from ..utils import EPD, EUDCreateBlock, EUDPopBlock, ep_assert
 
 
 @functools.cache
-def EUDQueue(capacity):
+def EUDQueue(capacity):  # noqa: N802
     """A single-ended queue implemented with a fixed-size variable array."""
     ep_assert(isinstance(capacity, int) and capacity > 0)
 
@@ -41,7 +41,9 @@ def EUDQueue(capacity):
             )
             c.RawTrigger(
                 conditions=self._length.AtLeast(1),
-                actions=c.SetMemoryX(iter_start + 2404, c.SetTo, 1 << 24, 255 << 24),
+                actions=c.SetMemoryX(
+                    iter_start + 2404, c.SetTo, 1 << 24, 255 << 24
+                ),
             )
             iter_start << c.RawTrigger(
                 nextptr=0,  # by iter_init
@@ -53,7 +55,9 @@ def EUDQueue(capacity):
             iter_jump << c.RawTrigger(
                 nextptr=0,  # by iter_init, iter_contpoint
                 actions=[
-                    c.SetNextPtr(pop.GetVTable(), 0),  # yield_point by __iter__ call
+                    c.SetNextPtr(
+                        pop.GetVTable(), 0
+                    ),  # yield_point by __iter__ call
                     SetMemory(iter_start + 16, Add, 18),
                     SetMemory(iter_jump + 4, Add, 72),
                     c.SetMemoryX(iter_start + 2376, c.SetTo, 0, 1),
@@ -99,7 +103,11 @@ def EUDQueue(capacity):
             @_EUDPredefineParam((EPD(append_act) + 5,))
             @c.EUDFunc
             def append(value):
-                check_wrap, wrap_tail, wrap_head = c.Forward(), c.Forward(), c.Forward()
+                check_wrap, wrap_tail, wrap_head = (
+                    c.Forward(),
+                    c.Forward(),
+                    c.Forward(),
+                )
                 c.RawTrigger(
                     actions=[
                         append_act,
@@ -131,7 +139,9 @@ def EUDQueue(capacity):
                 )
                 wrap_head << c.RawTrigger(
                     conditions=Memory(
-                        append_act + 16, c.AtLeast, EPD(queue) + 87 + 18 * capacity
+                        append_act + 16,
+                        c.AtLeast,
+                        EPD(queue) + 87 + 18 * capacity,
                     ),
                     actions=SetMemory(append_act + 16, Add, -(18 * capacity)),
                 )
@@ -239,7 +249,7 @@ def EUDQueue(capacity):
 
 
 @functools.cache
-def EUDDeque(capacity):
+def EUDDeque(capacity):  # noqa: N802
     """A double-ended queue implemented with a fixed-size variable array."""
     ep_assert(isinstance(capacity, int) and capacity > 0)
 
@@ -267,7 +277,9 @@ def EUDDeque(capacity):
             )
             c.RawTrigger(
                 conditions=self._length.AtLeast(1),
-                actions=c.SetMemoryX(iter_start + 2404, c.SetTo, 1 << 24, 255 << 24),
+                actions=c.SetMemoryX(
+                    iter_start + 2404, c.SetTo, 1 << 24, 255 << 24
+                ),
             )
             iter_start << c.RawTrigger(
                 nextptr=0,  # by iter_init
@@ -279,7 +291,9 @@ def EUDDeque(capacity):
             iter_jump << c.RawTrigger(
                 nextptr=0,  # by iter_init, iter_contpoint
                 actions=[
-                    c.SetNextPtr(pop.GetVTable(), 0),  # yield_point by __iter__ call
+                    c.SetNextPtr(
+                        pop.GetVTable(), 0
+                    ),  # yield_point by __iter__ call
                     SetMemory(iter_start + 16, Add, 18),
                     SetMemory(iter_jump + 4, Add, 72),
                     c.SetMemoryX(iter_start + 2376, c.SetTo, 0, 1),
@@ -327,7 +341,11 @@ def EUDDeque(capacity):
             def append(value):
                 # deque[head] = value
                 # head %+ 1
-                check_wrap, wrap_tail, wrap_head = c.Forward(), c.Forward(), c.Forward()
+                check_wrap, wrap_tail, wrap_head = (
+                    c.Forward(),
+                    c.Forward(),
+                    c.Forward(),
+                )
                 c.RawTrigger(
                     actions=[
                         append_act,
@@ -362,7 +380,9 @@ def EUDDeque(capacity):
                 )
                 wrap_head << c.RawTrigger(
                     conditions=Memory(
-                        append_act + 16, c.AtLeast, EPD(deque) + 87 + 18 * capacity
+                        append_act + 16,
+                        c.AtLeast,
+                        EPD(deque) + 87 + 18 * capacity,
                     ),
                     actions=[
                         SetMemory(append_act + 16, Add, -(18 * capacity)),
@@ -400,7 +420,11 @@ def EUDDeque(capacity):
             def appendleft(value):
                 # tail %- 1
                 # deque[tail] = value
-                check_wrap, wrap_head, wrap_tail = c.Forward(), c.Forward(), c.Forward()
+                check_wrap, wrap_head, wrap_tail = (
+                    c.Forward(),
+                    c.Forward(),
+                    c.Forward(),
+                )
                 check_wrap << c.RawTrigger(
                     nextptr=wrap_tail,
                     conditions=self._length.AtLeast(capacity),
@@ -419,7 +443,9 @@ def EUDDeque(capacity):
                     ],
                 )
                 wrap_tail << c.RawTrigger(
-                    conditions=Memory(appendleft_act + 16, c.AtMost, EPD(deque) + 87),
+                    conditions=Memory(
+                        appendleft_act + 16, c.AtMost, EPD(deque) + 87
+                    ),
                     actions=[
                         SetMemory(appendleft_act + 16, Add, 18 * capacity),
                         SetMemory(jumpleft + 4, Add, 72 * capacity),
@@ -478,7 +504,9 @@ def EUDDeque(capacity):
                         SetMemory(iter_init + 348, c.SetTo, EPD(deque) + 87),
                         SetMemory(iter_init + 380, c.SetTo, deque - 72),
                         SetMemory(append_act + 16, c.SetTo, EPD(deque) + 87),
-                        SetMemory(appendleft_act + 16, c.SetTo, EPD(deque) + 87),
+                        SetMemory(
+                            appendleft_act + 16, c.SetTo, EPD(deque) + 87
+                        ),
                         self._length.SetNumber(0),
                     ]
                 )

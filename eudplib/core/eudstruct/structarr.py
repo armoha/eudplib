@@ -46,7 +46,7 @@ class _EUDStruct_Metaclass(type):
 
 
 class EUDStructArray(ExprProxy, metaclass=_EUDStruct_Metaclass):
-    dontFlatten = True
+    dont_flatten = True
 
     def __init__(self, initvar=None, *, _from=None, _times, _basetype):
         if _from is None:

@@ -256,8 +256,8 @@ msgstr ""
 #: C:\eudplib\eudplib\core\mapdata\stringmap.py:94
 #: C:\eudplib\eudplib\core\mapdata\stringmap.py:100
 #: C:\eudplib\eudplib\core\mapdata\stringmap.py:106
-#: C:\eudplib\eudplib\maprw\injector\payloadInit.py:36
-#: C:\eudplib\eudplib\maprw\injector\vectorReloc.py:64
+#: C:\eudplib\eudplib\maprw\injector\payload_init.py:36
+#: C:\eudplib\eudplib\maprw\injector\vector_reloc.py:64
 msgid "Must use LoadMap first"
 msgstr ""
 
@@ -602,10 +602,10 @@ msgid "Check out whether Start Locations are placed correctly."
 msgstr ""
 
 #: C:\eudplib\eudplib\maprw\injector\mainloop.py:85
-msgid "_MainStarter has not called"
+msgid "main_starter has not called"
 msgstr ""
 
-#: C:\eudplib\eudplib\maprw\injector\vectorReloc.py:193
+#: C:\eudplib\eudplib\maprw\injector\vector_reloc.py:193
 msgid "MRGN section size bug"
 msgstr ""
 
@@ -776,4 +776,3 @@ msgstr ""
 #: C:\eudplib\eudplib\utils\ubconv.py:47 C:\eudplib\eudplib\utils\ubconv.py:56
 msgid "Invalid type {}"
 msgstr ""
-

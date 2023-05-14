@@ -9,9 +9,9 @@ from .. import core as c
 from .eudarray import EUDArray
 
 
-def EUDStack(basetype=None):
+def EUDStack(basetype=None):  # noqa: N802
     class _EUDStack(c.EUDStruct):
-        _fields_ = [("data", EUDArray), "pos"]
+        _fields_ = (("data", EUDArray), "pos")
 
         def constructor(self, size):
             self.data = EUDArray(size)

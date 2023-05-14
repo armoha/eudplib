@@ -18,7 +18,7 @@ class EUDArrayData(c.EUDObject):
     Structure for storing multiple values.
     """
 
-    dontFlatten = True
+    dont_flatten = True
 
     def __init__(self, arr) -> None:
         super().__init__()
@@ -30,41 +30,43 @@ class EUDArrayData(c.EUDObject):
 
         else:
             for i, item in enumerate(arr):
-                ut.ep_assert(c.IsConstExpr(item), _("Invalid item #{}").format(i))
+                ut.ep_assert(
+                    c.IsConstExpr(item), _("Invalid item #{}").format(i)
+                )
             self._datas = arr
             self._arrlen = len(arr)
 
-    def GetDataSize(self) -> int:
+    def GetDataSize(self) -> int:  # noqa: N802
         return self._arrlen * 4
 
-    def WritePayload(self, buf) -> None:
+    def WritePayload(self, buf) -> None:  # noqa: N802
         for item in self._datas:
             buf.WriteDword(item)
 
     # --------
 
-    def GetArraySize(self) -> int:
+    def GetArraySize(self) -> int:  # noqa: N802
         """Get size of array"""
         return self._arrlen
 
 
 class EUDArray(ut.ExprProxy):
-    dontFlatten = True
+    dont_flatten = True
 
     def __init__(self, initval=None, *, _from=None) -> None:
         self.length: int | None
         if _from is not None:
-            dataObj = _from
+            data_obj = _from
             try:
                 self.length = _from._arrlen
             except AttributeError:
                 self.length = None
 
         else:
-            dataObj = EUDArrayData(initval)
-            self.length = dataObj._arrlen
+            data_obj = EUDArrayData(initval)
+            self.length = data_obj._arrlen
 
-        super().__init__(dataObj)
+        super().__init__(data_obj)
         self._epd = ut.EPD(self)
 
     def fmt(self, formatter):
@@ -81,7 +83,9 @@ class EUDArray(ut.ExprProxy):
         if isinstance(index, int) and isinstance(self.length, int):
             ut.ep_assert(
                 0 <= index < self.length,
-                _("index out of bounds: EUDArray.length is {} but the index is {}").format(
+                _("index out of bounds")
+                + ": "
+                + _("EUDArray.length is {} but the index is {}").format(
                     self.length, index
                 ),
             )
@@ -104,9 +108,9 @@ class EUDArray(ut.ExprProxy):
         raise ut.EPError(_("Can't iterate EUDArray"))
 
     # in-place item operations
-    # Total 6 cases = 3 × 2
-    # [0, 1, 2] of (self._epd, key) are variable
-    #  × val is variable or not
+    # Total 6 cases = 3 x 2
+    # 3 = [0, 1, 2] of (self._epd, key) are variable
+    # 2 = val is variable or not
     def iadditem(self, key, val):
         self._bound_check(key)
         return iset(self._epd, key, c.Add, val)

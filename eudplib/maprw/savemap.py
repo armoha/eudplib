@@ -14,8 +14,8 @@ from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
 from ..core.mapdata import fixmapdata, mapdata, mpqapi
 from ..localize import _
 from ..utils import EPError, ep_assert, ep_eprint
-from .injector.applyInjector import applyInjector
-from .injector.mainloop import _MainStarter
+from .injector.apply_injector import apply_injector
+from .injector.mainloop import main_starter
 from .inlinecode.ilcprocesstrig import _preprocess_inline_code
 from .mpqadd import _update_mpq
 
@@ -51,12 +51,12 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
     _ResetTraceMap()
 
     # Add payload
-    root = _MainStarter(rootf)
+    root = main_starter(rootf)
     _preprocess_inline_code(chkt)
     mapdata.UpdateMapData()
 
     fixmapdata.FixMapData(chkt)
-    applyInjector(chkt, root)
+    apply_injector(chkt, root)
 
     chkt.optimize()
     rawchk = chkt.savechk()

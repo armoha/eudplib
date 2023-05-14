@@ -14,109 +14,109 @@ from ... import ctrlstru as cs
 from ... import utils as ut
 from ...trigtrg.runtrigtrg import _runner_cp
 
-sharedTriggers: list[bytes | c.RawTrigger] = []
-tStartEnd: TypeAlias = tuple[c.ConstExpr, c.RawTrigger]
+_shared_triggers: list[bytes | c.RawTrigger] = []
+t_start_end: TypeAlias = tuple[c.ConstExpr, c.RawTrigger]
 
 
-def GetExecutingPlayers(
-    bTrigger: bytes,
-) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
+def get_executing_players(
+    btrigger: bytes,
+) -> list[bool]:
     # Get executing players of the trigger.
     # If AllPlayers executes it, then pass it
-    if bTrigger[320 + 2048 + 4 + 17] != 0:
+    if btrigger[320 + 2048 + 4 + 17] != 0:
         return (True,) * 8
     # Should check manually, by player and force
-    return tuple(
+    return [
         (
-            bool(bTrigger[320 + 2048 + 4 + player])
+            bool(btrigger[320 + 2048 + 4 + player])
             or bool(
-                bTrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force]
+                btrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force]
             )
         )
         for player in range(8)
-    )  # type: ignore
+    ]
 
 
-def NoWaitAndPreserved(bTrigger: ByteString) -> bool:
-    execOnce = True
+def _preserved_and_has_no_wait(btrigger: ByteString) -> bool:
+    exec_once = True
     for i in range(64):
-        actionflag = bTrigger[320 + 32 * i + 28]
+        actionflag = btrigger[320 + 32 * i + 28]
         if not actionflag & 0b10:  # Enabled Flag
             continue
-        actionbyte = bTrigger[320 + 32 * i + 26]
+        actionbyte = btrigger[320 + 32 * i + 26]
         if actionbyte in (4, 7):  # Wait or Transmission
             return False
         elif actionbyte == 3:  # PreserveTrigger
-            execOnce = False
-    if execOnce and not (bTrigger[320 + 2048] & 4):
+            exec_once = False
+    if exec_once and not (btrigger[320 + 2048] & 4):
         return False
     return True
 
 
-def InlineCodifyBinaryTrigger(bTrigger: bytes) -> tStartEnd:
+def inline_codify_binary_trigger(btrigger: bytes) -> t_start_end:
     """Inline codify raw(binary) trigger data.
 
     For minimal protection, eudplib make some of the trig-triggers to
     eudplib trigger. This function makes eudplib trigger out of raw
     binary trigger stream.
 
-    :param bTrigger: Binary trigger data
-    :returns: (tStart, tEnd) pair, as being used by tEnd
+    :param btrigger: Binary trigger data
+    :returns: (tstart, tend) pair, as being used by tend
     """
 
     # 1. Get executing players of the trigger.
     # If all player executes it, then pass it
-    playerExecutesTrigger = GetExecutingPlayers(bTrigger)
+    executing_players = get_executing_players(btrigger)
 
     # 2. Create function body
 
     if c.PushTriggerScope():
-        tStart = c.RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
+        tstart = c.RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
 
         cp = _runner_cp
-        execP = [p for p, e in enumerate(playerExecutesTrigger) if e]
-        noWaitPreserve = NoWaitAndPreserved(bTrigger)
+        execp = [p for p, e in enumerate(executing_players) if e]
+        no_wait_and_preserved = _preserved_and_has_no_wait(btrigger)
 
-        if noWaitPreserve and len(execP) == 8:
-            tEnd = c.RawTrigger(trigSection=bTrigger)
-        if noWaitPreserve and max(execP) - min(execP) == len(execP) - 1:
-            if cs.EUDIf()([cp >= min(execP), cp <= max(execP)]):
-                c.RawTrigger(trigSection=bTrigger)
+        if no_wait_and_preserved and len(execp) == 8:
+            tend = c.RawTrigger(trigSection=btrigger)
+        if no_wait_and_preserved and max(execp) - min(execp) == len(execp) - 1:
+            if cs.EUDIf()([cp >= min(execp), cp <= max(execp)]):
+                c.RawTrigger(trigSection=btrigger)
             cs.EUDEndIf()
-            tEnd = c.RawTrigger()
+            tend = c.RawTrigger()
         else:
             cs.EUDSwitch(cp)
             for player in ut._rand_lst(range(8)):
-                if playerExecutesTrigger[player]:
+                if executing_players[player]:
                     if cs.EUDSwitchCase()(player):
-                        c.RawTrigger(trigSection=bTrigger)
+                        c.RawTrigger(trigSection=btrigger)
                         cs.EUDBreak()
 
             cs.EUDEndSwitch()
 
-            tEnd = c.RawTrigger()
+            tend = c.RawTrigger()
     c.PopTriggerScope()
 
-    return tStart, tEnd
+    return tstart, tend
 
 
-def CountConditionsAndActions(bTrigger: bytes) -> tuple[int, int]:
+def _count_conditions_and_actions(btrigger: bytes) -> tuple[int, int]:
     cond_count, act_count = 0, 0
     for cond in range(16):
-        if bTrigger[cond * 20 + 15] == 22:  # Always
+        if btrigger[cond * 20 + 15] == 22:  # Always
             continue
-        elif bTrigger[cond * 20 + 15] >= 1:
+        elif btrigger[cond * 20 + 15] >= 1:
             cond_count += 1
     for act in range(64):
-        if bTrigger[320 + act * 32 + 26] in (47,):  # Comment
+        if btrigger[320 + act * 32 + 26] in (47,):  # Comment
             continue
-        elif bTrigger[320 + act * 32 + 26] >= 1:
+        elif btrigger[320 + act * 32 + 26] >= 1:
             act_count += 1
     return cond_count, act_count
 
 
-def GetTriggerSize(bTrigger: bytes) -> int:
-    cond_count, act_count = CountConditionsAndActions(bTrigger)
+def get_trigger_size(btrigger: bytes) -> int:
+    cond_count, act_count = _count_conditions_and_actions(btrigger)
     min_size = 4 + 5 * cond_count + 8 * act_count
     trig = {
         "n": [1],  # nextptr
@@ -147,75 +147,75 @@ def GetTriggerSize(bTrigger: bytes) -> int:
     return 2408
 
 
-def TryToShareTrigger(bTrigger: bytes) -> int | bytes:
-    if NoWaitAndPreserved(bTrigger):
-        sharedTriggers.append(bTrigger)
-        return len(sharedTriggers) - 1
-    return bTrigger
+def try_share_trigger(btrigger: bytes) -> int | bytes:
+    if _preserved_and_has_no_wait(btrigger):
+        _shared_triggers.append(btrigger)
+        return len(_shared_triggers) - 1
+    return btrigger
 
 
-def InlineCodifyMultipleBinaryTriggers(
-    bTriggers: Collection[bytes | int],
-) -> tStartEnd:
+def inline_codify_binary_triggers(
+    btriggers: Collection[bytes | int],
+) -> t_start_end:
     """Inline codify raw(binary) trigger data.
 
     For minimal protection, eudplib make some of the trig-triggers to
     eudplib trigger. This function makes eudplib trigger out of raw
     binary trigger stream.
 
-    :param bTrigger: Binary trigger data
-    :returns: (tStart, tEnd) pair, as being used by tEnd
+    :param btrigger: Binary trigger data
+    :returns: (tstart, tend) pair, as being used by tend
     """
 
     # Create function body
 
-    firstTrigger = None
-    tStartActions = [c.SetDeaths(0, c.SetTo, 0, 0)]
+    first_trigger = None
+    t_startactions = [c.SetDeaths(0, c.SetTo, 0, 0)]
     b2s = False
 
     if c.PushTriggerScope():
-        nextTrigger = c.Forward()
-        for i, bTrigger in enumerate(bTriggers):
-            tEnd: c.RawTrigger
-            if isinstance(bTrigger, bytes):
-                tEnd = c.RawTrigger(trigSection=bTrigger)
-                nextTrigger << tEnd
-                if i < len(bTriggers) - 1:
-                    nextTrigger = c.Forward()
+        next_trigger = c.Forward()
+        for i, btrigger in enumerate(btriggers):
+            tend: c.RawTrigger
+            if isinstance(btrigger, bytes):
+                tend = c.RawTrigger(trigSection=btrigger)
+                next_trigger << tend
+                if i < len(btriggers) - 1:
+                    next_trigger = c.Forward()
                 b2s = True
-            elif isinstance(bTrigger, int):
-                sharedTrigger = sharedTriggers[bTrigger]
-                if isinstance(sharedTrigger, bytes):
-                    tEnd = c.RawTrigger(trigSection=sharedTrigger)
-                    sharedTriggers[bTrigger] = tEnd
-                elif isinstance(sharedTrigger, c.RawTrigger):
-                    tEnd = sharedTrigger
+            elif isinstance(btrigger, int):
+                shared_trigger = _shared_triggers[btrigger]
+                if isinstance(shared_trigger, bytes):
+                    tend = c.RawTrigger(trigSection=shared_trigger)
+                    _shared_triggers[btrigger] = tend
+                elif isinstance(shared_trigger, c.RawTrigger):
+                    tend = shared_trigger
                     if b2s:
-                        c.SetNextTrigger(sharedTrigger)
+                        c.SetNextTrigger(shared_trigger)
                 else:
                     raise TypeError()
-                nextTrigger << tEnd
-                if i < len(bTriggers) - 1:
-                    nextTrigger = c.Forward()
-                    tStartActions.append(c.SetNextPtr(tEnd, nextTrigger))
+                next_trigger << tend
+                if i < len(btriggers) - 1:
+                    next_trigger = c.Forward()
+                    t_startactions.append(c.SetNextPtr(tend, next_trigger))
                 b2s = False
             else:
                 raise TypeError()
-            if firstTrigger is None:
-                firstTrigger = tEnd
+            if first_trigger is None:
+                first_trigger = tend
     c.PopTriggerScope()
 
-    if firstTrigger is None:
+    if first_trigger is None:
         raise TypeError()
 
     if c.PushTriggerScope():
-        tStart = c.Forward()
-        tStart << c.NextTrigger()
+        tstart = c.Forward()
+        tstart << c.NextTrigger()
 
-        cs.DoActions(tStartActions)
+        cs.DoActions(t_startactions)
 
-        c.SetNextTrigger(firstTrigger)
+        c.SetNextTrigger(first_trigger)
 
     c.PopTriggerScope()
 
-    return tStart, tEnd
+    return tstart, tend

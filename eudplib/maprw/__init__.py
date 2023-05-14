@@ -5,7 +5,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from .injector.applyInjector import PRT_SkipPayloadRelocator
+from .injector.apply_injector import PRT_SkipPayloadRelocator
 from .injector.mainloop import EUDDoEvents, EUDOnStart
 from .inlinecode.ilcprocesstrig import PRT_SetInliningRate
 from .loadmap import LoadMap

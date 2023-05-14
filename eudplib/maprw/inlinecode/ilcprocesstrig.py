@@ -11,17 +11,17 @@ from ... import utils as ut
 from ...core.mapdata.chktok import CHK
 from ...core.rawtrigger import AllPlayers, SetTo
 from ...trigtrg import trigtrg as tt
-from .btInliner import (
-    GetExecutingPlayers,
-    GetTriggerSize,
-    InlineCodifyBinaryTrigger,
-    InlineCodifyMultipleBinaryTriggers,
-    TryToShareTrigger,
-    tStartEnd,
+from .btinliner import (
+    get_executing_players,
+    get_trigger_size,
+    inline_codify_binary_trigger,
+    inline_codify_binary_triggers,
+    t_start_end,
+    try_share_trigger,
 )
-from .ilccompile import _compile_inline_code, ComputeBaseInlineCodeGlobals
+from .ilccompile import _compile_inline_code, compute_base_inline_code_globals
 
-_inline_codes: list[tuple[int, tStartEnd]] = []
+_inline_codes: list[tuple[int, t_start_end]] = []
 _inlining_rate: float = 1.0
 _cutoff_rate: list[float] = [1 + (i - 2) / 3 for i in range(9)]
 
@@ -41,13 +41,13 @@ def _preprocess_inline_code(chkt: CHK) -> None:
 
 def _preprocess_trig_section(
     trig_section: bytes
-) -> tuple[list[tuple[int, tStartEnd]], bytes]:
+) -> tuple[list[tuple[int, t_start_end]], bytes]:
     """Fetch inline codes & compiles them"""
-    ComputeBaseInlineCodeGlobals()
+    compute_base_inline_code_globals()
     if _inlining_rate >= 1.0:
         return _consecutive_inline_trig_section(trig_section)
 
-    inline_codes: list[tuple[int, tStartEnd]] = []
+    inline_codes: list[tuple[int, t_start_end]] = []
     trig_segments: list[bytes] = []
     for i in range(0, len(trig_section), 2400):
         trig_segment = trig_section[i : i + 2400]
@@ -84,14 +84,14 @@ def _preprocess_trig_section(
 
 def _consecutive_inline_trig_section(
     trig_section: bytes,
-) -> tuple[list[tuple[int, tStartEnd]], bytes]:
-    inline_codes: list[tuple[int, tStartEnd]] = []
+) -> tuple[list[tuple[int, t_start_end]], bytes]:
+    inline_codes: list[tuple[int, t_start_end]] = []
     trig_segments: list[bytes] = []
     ptriggers: list[list[bytes]] = [[] for _ in range(8)]
 
     def append_ptriggers(p):
         if ptriggers[p]:
-            func = InlineCodifyMultipleBinaryTriggers(ptriggers[p])
+            func = inline_codify_binary_triggers(ptriggers[p])
             trig_segment = _create_inline_code_dispatcher(
                 inline_codes, func, 1 << p
             )
@@ -104,7 +104,7 @@ def _consecutive_inline_trig_section(
             continue
 
         propv = ut.b2i4(trig_segment, 320 + 2048)
-        executing_players = GetExecutingPlayers(trig_segment)
+        executing_players = get_executing_players(trig_segment)
 
         decoded = _dispatch_inline_code(inline_codes, trig_segment)
         if decoded:
@@ -113,9 +113,9 @@ def _consecutive_inline_trig_section(
         elif propv < 0x80000000:
             player_count = executing_players.count(True)
             if player_count >= 2:
-                index_or_trig = TryToShareTrigger(trig_segment)
+                index_or_trig = try_share_trigger(trig_segment)
                 if isinstance(index_or_trig, bytes):
-                    size = GetTriggerSize(index_or_trig)
+                    size = get_trigger_size(index_or_trig)
                     if size * player_count * _cutoff_rate[player_count] > 2400:
                         for p in range(8):
                             if executing_players[p]:
@@ -138,7 +138,7 @@ def _consecutive_inline_trig_section(
     return inline_codes, trig_section
 
 
-def _get_inline_code_list() -> list[tuple[int, tStartEnd]]:
+def _get_inline_code_list() -> list[tuple[int, t_start_end]]:
     """Get list of compiled inline_eudplib code"""
     return _inline_codes
 
@@ -160,7 +160,7 @@ def _get_inline_code_player_list(btrigger: bytes) -> int | None:
 
 
 def _dispatch_inline_code(
-    inline_codes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
+    inline_codes: list[tuple[int, t_start_end]], trigger_bytes: bytes
 ) -> bytearray | None:
     """Check if trigger segment has special data."""
     magic_code = ut.b2i4(trigger_bytes, 20)
@@ -180,7 +180,7 @@ def _dispatch_inline_code(
 
 
 def _inlinify_normal_trigger(
-    inline_codes: list[tuple[int, tStartEnd]], trigger_bytes: bytes
+    inline_codes: list[tuple[int, t_start_end]], trigger_bytes: bytes
 ) -> bytearray:
     """Inlinify normal binary triggers"""
     player_code = 0
@@ -188,13 +188,13 @@ def _inlinify_normal_trigger(
         if trigger_bytes[320 + 2048 + 4 + i]:
             player_code |= 1 << i
 
-    func = InlineCodifyBinaryTrigger(trigger_bytes)
+    func = inline_codify_binary_trigger(trigger_bytes)
     return _create_inline_code_dispatcher(inline_codes, func, player_code)
 
 
 def _create_inline_code_dispatcher(
-    inline_codes: list[tuple[int, tStartEnd]],
-    func: tStartEnd,
+    inline_codes: list[tuple[int, t_start_end]],
+    func: t_start_end,
     player_code: int,
 ) -> bytearray:
     """Create link from TRIG list to STR trigger."""

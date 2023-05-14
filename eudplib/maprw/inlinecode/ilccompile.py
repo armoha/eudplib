@@ -15,20 +15,20 @@ from ... import eudlib as sf
 from ... import trigger as t
 from ... import utils as ut
 from ...core import RawTrigger
-from .btInliner import tStartEnd
+from .btinliner import t_start_end
 
-_inlineGlobals = {}
+_inline_globals = {}
 
 
-def ComputeBaseInlineCodeGlobals() -> None:
+def compute_base_inline_code_globals() -> None:
     """
     Return list of globals inline eudplib code can call.
     """
 
-    global _inlineGlobals
+    global _inline_globals
 
     # Add eudplib functions
-    G = {}
+    g = {}
     modules = [c, cs, sf, ut, t]
     for module in modules:
         for k, v in module.__dict__.items():
@@ -37,31 +37,31 @@ def ComputeBaseInlineCodeGlobals() -> None:
             if k[0] == "_":
                 continue
 
-            G[k] = v
+            g[k] = v
 
-    _inlineGlobals = G
+    _inline_globals = g
 
 
-def GetInlineCodeGlobals() -> dict[str, Any]:
+def get_inline_code_globals() -> dict[str, Any]:
     """
     Return list of globals inline eudplib code can call.
     """
 
-    G = _inlineGlobals.copy()
+    g = _inline_globals.copy()
 
     # Add custom registered functions
     for k, v in c.GetEUDNamespace().items():
-        G[k] = v
+        g[k] = v
 
-    return G
+    return g
 
 
-def _compile_inline_code(code: str) -> tStartEnd:
+def _compile_inline_code(code: str) -> t_start_end:
     _code = compile(code, "<string>", "exec")
 
     if c.PushTriggerScope():
         tstart = RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
-        exec(_code, GetInlineCodeGlobals(), {})
+        exec(_code, get_inline_code_globals(), {})
         tend = RawTrigger()
     c.PopTriggerScope()
 

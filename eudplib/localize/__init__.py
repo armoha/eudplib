@@ -14,16 +14,24 @@ _lang = None if _lc is None else (_lc,)
 _h = sys.excepthook
 _u = sys.unraisablehook
 _locale_path = os.path.dirname(__file__)
-_t = gettext.translation("eudplib", _locale_path, languages=_lang, fallback=True)
+_t = gettext.translation(
+    "eudplib", _locale_path, languages=_lang, fallback=True
+)
 if not isinstance(_t, gettext.GNUTranslations):
-    _locale_path = os.path.dirname(os.path.dirname(os.path.dirname(_locale_path)))
-    _t = gettext.translation("eudplib", _locale_path, languages=_lang, fallback=True)
+    _locale_path = os.path.dirname(
+        os.path.dirname(os.path.dirname(_locale_path))
+    )
+    _t = gettext.translation(
+        "eudplib", _locale_path, languages=_lang, fallback=True
+    )
 _gt = _t.gettext
 _ = _gt
 
 
 def _excepthook(
-    type_: type[BaseException], value: BaseException, traceback: _TracebackType | None
+    type_: type[BaseException],
+    value: BaseException,
+    traceback: _TracebackType | None,
 ) -> Any:
     # print("# FIXME: excepthook")
     v = list(value.args)

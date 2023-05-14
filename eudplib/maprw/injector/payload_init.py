@@ -18,7 +18,7 @@ from ...trigtrg import trigtrg as tt
 trglist: list[bytes] = []
 
 
-def Trigger(
+def _Trigger(  # noqa: N802
     *,
     # FIXME: Cannot determine type of "AllPlayers" [has-type]
     players: list[tt.Player] = [17],
@@ -29,7 +29,7 @@ def Trigger(
     trglist.append(tt.Trigger(players, conditions, actions))
 
 
-def InitializePayload(
+def initialize_payload(
     chkt: CHK, payload: Payload, mrgndata: ByteString | None = None
 ) -> None:
     strmap = GetStringMap()
@@ -81,7 +81,7 @@ def InitializePayload(
     for player in ut._rand_lst(range(8)):
         triggerend = ~(pts + player * 12)
 
-        Trigger(
+        _Trigger(
             players=[player],
             actions=[
                 tt.SetMemory(curpl, tt.SetTo, ut.EPD(pts + 12 * player)),
@@ -91,20 +91,20 @@ def InitializePayload(
 
     # read pts[player].lasttrigger
     for e in ut._rand_lst(range(2, 32)):
-        Trigger(
+        _Trigger(
             conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2**e),
             actions=tt.SetDeaths(11, tt.Add, 2**e, 0),
         )
 
     # apply to curpl
-    Trigger(
+    _Trigger(
         actions=[
             tt.SetDeaths(10, tt.SetTo, ut.EPD(4), 0),
             tt.SetMemory(curpl, tt.SetTo, ut.EPD(4)),
         ]
     )
     for e in ut._rand_lst(range(2, 32)):
-        Trigger(
+        _Trigger(
             conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2**e),
             actions=[
                 # tt.SetDeaths(11, tt.Subtract, 2 ** e, 0),
@@ -116,8 +116,8 @@ def InitializePayload(
 
     # now curpl = EPD(value(ptsprev) + 4)
     # value(EPD(value(ptsprev) + 4)) = strs + payload_offset
-    # CopyDeaths(tt.EPD(strs), tt.CurrentPlayer, False, strsled_offset)
-    Trigger(
+    # copy_deaths(tt.EPD(strs), tt.CurrentPlayer, False, strsled_offset)
+    _Trigger(
         actions=[
             tt.SetDeaths(tt.CurrentPlayer, tt.SetTo, payload_offset, 0),
             tt.SetDeaths(11, tt.SetTo, 0, 0),

@@ -15,7 +15,9 @@ from ..rawtrigger.consttype import ConstType
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
-    def __init__(self, *args, _from=None, _static_initval=None, **kwargs) -> None:
+    def __init__(
+        self, *args, _from=None, _static_initval=None, **kwargs
+    ) -> None:
         fieldcount = len(self._fielddict)
 
         if _from is not None:
@@ -33,15 +35,15 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
     # Due to cyclic dependency we import objpool inside methods
     @classmethod
     def alloc(cls, *args, **kwargs):
-        from ...eudlib.objpool import GetGlobalPool
+        from ...eudlib.objpool import get_global_pool
 
-        return GetGlobalPool().alloc(cls, *args, **kwargs)
+        return get_global_pool().alloc(cls, *args, **kwargs)
 
     @classmethod
     def free(cls, data):
-        from ...eudlib.objpool import GetGlobalPool
+        from ...eudlib.objpool import get_global_pool
 
-        return GetGlobalPool().free(cls, data)
+        return get_global_pool().free(cls, data)
 
     # Constructor & Destructor of classes
     def constructor(self):

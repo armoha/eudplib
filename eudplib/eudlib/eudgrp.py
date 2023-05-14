@@ -23,13 +23,13 @@ class EUDGrp(c.EUDObject):
             content = open(content, "rb").read()
         self._content = content
 
-    def Evaluate(self):
+    def Evaluate(self):  # noqa: N802
         return c.GetObjectAddr(self) + 2
 
-    def GetDataSize(self):
+    def GetDataSize(self):  # noqa: N802
         return len(self._content) + 2
 
-    def WritePayload(self, buf):
+    def WritePayload(self, buf):  # noqa: N802
         buf.WriteBytes(b"\0\0")  # 2byte padding to align dwords at (*)
 
         # fill in grp header
@@ -44,7 +44,9 @@ class EUDGrp(c.EUDObject):
 
         for i in range(fn):
             fhoffset = 6 + 8 * i
-            xoff, yoff, w, h, lto = struct.unpack("<BBBBI", b[fhoffset : fhoffset + 8])
+            xoff, yoff, w, h, lto = struct.unpack(
+                "<BBBBI", b[fhoffset : fhoffset + 8]
+            )
             buf.WriteByte(xoff)
             buf.WriteByte(yoff)
             buf.WriteByte(w)

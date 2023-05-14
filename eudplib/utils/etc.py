@@ -91,7 +91,7 @@ def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
 
 
 def FlattenList(lst: Any) -> list:  # noqa: N802
-    if isinstance(lst, (bytes, str)) or hasattr(lst, "dontFlatten"):
+    if isinstance(lst, (bytes, str)) or hasattr(lst, "dont_flatten"):
         return [lst]
 
     try:
@@ -131,7 +131,7 @@ def Assignable2List(a: Any) -> list:  # noqa: N802
     if a is None:
         return []
 
-    elif isinstance(a, Iterable) and not hasattr(a, "dontFlatten"):
+    elif isinstance(a, Iterable) and not hasattr(a, "dont_flatten"):
         return list(a)
 
     else:

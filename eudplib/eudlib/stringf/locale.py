@@ -10,7 +10,12 @@ from ...core import (
     SetMemory,
     SetTo,
 )
-from ...ctrlstru import EUDEndSwitch, EUDSwitch, EUDSwitchCase, EUDSwitchDefault
+from ...ctrlstru import (
+    EUDEndSwitch,
+    EUDSwitch,
+    EUDSwitchCase,
+    EUDSwitchDefault,
+)
 from ...utils import EPD, ExprProxy, ep_assert
 from .cpprint import f_raise_CCMU
 
@@ -33,7 +38,7 @@ LOCALES = (
 
 
 class _LocalLocale(ExprProxy):
-    dontFlatten = True
+    dont_flatten = True
 
     def __init__(self, initvar) -> None:
         super().__init__(initvar)

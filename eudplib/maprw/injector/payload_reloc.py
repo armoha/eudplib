@@ -17,7 +17,7 @@ from ...core.allocator.pbuffer import Payload
 """
 
 
-def CreatePayloadRelocator(payload: Payload) -> Payload:
+def create_payload_relocator(payload: Payload) -> Payload:
     # We first build code injector.
     prtdb = c.Db(b"".join([ut.i2b4(x // 4) for x in payload.prttable]))
     ortdb = c.Db(b"".join([ut.i2b4(x // 4) for x in payload.orttable]))
@@ -46,7 +46,9 @@ def CreatePayloadRelocator(payload: Payload) -> Payload:
                         epd.SetDest(ut.EPD(dst) + 4),
                     ],
                 )
-                cs.DoActions(dst << c.SetDeaths(0, c.Add, orig_payload // 4, 0))
+                cs.DoActions(
+                    dst << c.SetDeaths(0, c.Add, orig_payload // 4, 0)
+                )
             cs.EUDEndWhile()
 
         # init ort

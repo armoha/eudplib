@@ -23,7 +23,7 @@ class _ObjPoolData(c.ConstExpr):
         self.size = size
         self.max_fieldn = max_fieldn
 
-    def Evaluate(self):
+    def Evaluate(self):  # noqa: N802
         evb = ev.GetCurrentVariableBuffer()
         try:
             return evb._vdict[self].Evaluate()
@@ -90,19 +90,21 @@ class _GlobalObjPool:
     max_object_num: int = 32768
 
 
-globalPool = _GlobalObjPool(pool=None, max_fieldn=8, max_object_num=32768)
+_global_pool = _GlobalObjPool(pool=None, max_fieldn=8, max_object_num=32768)
 
 
-def SetGlobalPoolFieldN(fieldn: int) -> None:
-    global globalPool
-    ut.ep_assert(globalPool.pool is None, "Global object pool is already initialized.")
-    globalPool.max_fieldn = fieldn
-    globalPool.max_object_num = 8 * 32768 // fieldn
+def SetGlobalPoolFieldN(fieldn: int) -> None:  # noqa: N802
+    global _global_pool
+    ut.ep_assert(
+        _global_pool.pool is None, "Global object pool is already initialized."
+    )
+    _global_pool.max_fieldn = fieldn
+    _global_pool.max_object_num = 8 * 32768 // fieldn
 
 
-def GetGlobalPool() -> ObjPool:
-    global globalPool
-    if globalPool.pool is None:
-        size, max_fieldn = globalPool.max_object_num, globalPool.max_fieldn
-        globalPool.pool = ObjPool(size, max_fieldn)
-    return globalPool.pool
+def get_global_pool() -> ObjPool:
+    global _global_pool
+    if _global_pool.pool is None:
+        size, max_fieldn = _global_pool.max_object_num, _global_pool.max_fieldn
+        _global_pool.pool = ObjPool(size, max_fieldn)
+    return _global_pool.pool

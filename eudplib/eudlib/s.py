@@ -51,7 +51,7 @@ def srand() -> Action:
     return Action(_loc, 0, 0, 0, epd, r, u, 45, 7, 20)
 
 
-def SetMemoryS(dest, modtype, value) -> tuple[Action, Action]:
+def SetMemoryS(dest, modtype, value) -> tuple[Action, Action]:  # noqa: N802
     modtype = EncodeModifier(modtype)
     cpo, unit = rand(dest)
     return (
@@ -60,7 +60,7 @@ def SetMemoryS(dest, modtype, value) -> tuple[Action, Action]:
     )
 
 
-def MoveCP(dest) -> Action:
+def MoveCP(dest) -> Action:  # noqa: N802
     try:
         value = dest - _seed
     except (TypeError, AttributeError):
@@ -68,7 +68,7 @@ def MoveCP(dest) -> Action:
     return SetMemoryC(0x6509B0, Add, value)
 
 
-def SetMemoryC(dest, modtype, value) -> Action:
+def SetMemoryC(dest, modtype, value) -> Action:  # noqa: N802
     modtype = EncodeModifier(modtype)
     _loc = random.randint(0, 0xFFFFFFFF)
     u = random.randint(234, 65535)

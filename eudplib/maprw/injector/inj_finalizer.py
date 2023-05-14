@@ -24,11 +24,11 @@ from ..inlinecode.ilcprocesstrig import _get_inline_code_list
 """
 
 
-def _DispatchInlineCode(
+def _dispatch_inline_code(
     nextptr: c.EUDVariable, trigepd: c.EUDVariable, prop: int
 ) -> None:
-    cs0 = c.Forward()  # set cs0+20 to codeStart
-    cs1 = c.Forward()  # set cs1+20 to ut.EPD(codeEnd) + 1
+    cs0 = c.Forward()  # set cs0+20 to code_start
+    cs1 = c.Forward()  # set cs1+20 to ut.EPD(code_end) + 1
     cs2 = c.Forward()  # set cs2+20 to cs_a0_epd + 4
     cs3 = c.Forward()  # set cs3+20 to cs_a0_epd + 5
     resetter = c.Forward()
@@ -43,15 +43,15 @@ def _DispatchInlineCode(
         ],
     )
 
-    for funcID, func in _get_inline_code_list():
-        codeStart, codeEnd = func
-        cs_a0_epd = ut.EPD(codeStart) + (8 + 320) // 4
+    for func_id, func in _get_inline_code_list():
+        code_start, code_end = func
+        cs_a0_epd = ut.EPD(code_start) + (8 + 320) // 4
 
         t = c.Forward()
         nt = c.Forward()
         acts = [
-            c.SetMemory(cs0 + 20, c.SetTo, codeStart),
-            c.SetMemory(cs1 + 20, c.SetTo, ut.EPD(codeEnd + 4)),
+            c.SetMemory(cs0 + 20, c.SetTo, code_start),
+            c.SetMemory(cs1 + 20, c.SetTo, ut.EPD(code_end + 4)),
             c.SetMemory(cs2 + 20, c.SetTo, cs_a0_epd + 4),
             c.SetMemory(cs3 + 20, c.SetTo, cs_a0_epd + 5),
             c.SetMemory(resetter + 16, c.SetTo, ut.EPD(t + 4)),
@@ -59,14 +59,14 @@ def _DispatchInlineCode(
             c.SetNextPtr(t, end),
         ]
         t << c.RawTrigger(
-            conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, funcID, v)],
+            conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, func_id, v)],
             actions=ut._rand_lst(acts),
         )
         nt << c.NextTrigger()
 
     end << c.NextTrigger()
 
-    st1, st2, st3, st4, stf = [c.Forward() for _ in range(5)]
+    st1, st2, st3, st4, stf = (c.Forward() for _ in range(5))
     c.VProc(
         [trigepd, nextptr],
         [
@@ -115,7 +115,7 @@ def _DispatchInlineCode(
     )
 
 
-def _FlipProp(trigepd: c.EUDVariable) -> None:
+def _flip_prop(trigepd: c.EUDVariable) -> None:
     """Iterate through triggers and flip 'Trigger disabled' flag
 
     Also, dispatch inline codes
@@ -150,7 +150,7 @@ def _FlipProp(trigepd: c.EUDVariable) -> None:
         if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 0x10000000, u)):
             # Preserve
             cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 4, u))
-            _DispatchInlineCode(nexttrig, trigepd, prop)
+            _dispatch_inline_code(nexttrig, trigepd, prop)
         cs.EUDEndIf()
 
         trigepd << nexttrigepd
@@ -158,7 +158,7 @@ def _FlipProp(trigepd: c.EUDVariable) -> None:
     cs.EUDEndWhile()
 
 
-def CreateInjectFinalizer(
+def create_inject_finalizer(
     chkt: CHK, root: c.Forward | c.RawTrigger, mrgndata: bytes | None = None
 ) -> c.Forward:
     rtt._alloc_trigtrigger_link()
@@ -200,7 +200,7 @@ def CreateInjectFinalizer(
         i = c.EUDVariable()
         if cs.EUDWhile()(i <= 3 * 7):
             i += ut.EPD(pts + 8)
-            _FlipProp(sf.f_epdread_epd(i))
+            _flip_prop(sf.f_epdread_epd(i))
             i += 3 - ut.EPD(pts + 8)
         cs.EUDEndWhile()
 

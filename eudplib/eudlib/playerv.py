@@ -28,7 +28,8 @@ class PVariable(_EUDVArray8):
         )
         for k in range(3):
             c.RawTrigger(
-                conditions=index.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
+                conditions=index.AtLeastX(1, 2**k),
+                actions=value.AddDest(18 * (2**k)),
             )
         c.SetNextTrigger(value.GetVTable())
         nptr << c.NextTrigger()
@@ -42,7 +43,8 @@ class PVariable(_EUDVArray8):
         )
         for k in range(3):
             c.RawTrigger(
-                conditions=index.AtLeastX(1, 2**k), actions=value.AddDest(18 * (2**k))
+                conditions=index.AtLeastX(1, 2**k),
+                actions=value.AddDest(18 * (2**k)),
             )
         c.SetNextTrigger(value.GetVTable())
         nptr << c.NextTrigger()
@@ -56,7 +58,9 @@ class PVariable(_EUDVArray8):
                 self._pveudset(index, value)
             else:
                 a0 = c.Forward()
-                cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
+                cs.DoActions(
+                    c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4)
+                )
                 for k in range(2, -1, -1):
                     c.RawTrigger(
                         conditions=index.AtLeastX(1, 2**k),
