@@ -23,47 +23,47 @@ def f_getuserplayerid() -> c.EUDVariable:
     return _userp
 
 
-def IsUserCP() -> c.Condition:
+def IsUserCP() -> c.Condition:  # noqa: N802
     """Condition: check if CurrentPlayer equals to user player id (local)"""
     fw = c.Forward()
     ret = c.Memory(0x6509B0, c.Exactly, fw)
-    fw << UserP_FW(ret, 8)
+    fw << _UserPFw(ret, 8)
     return ret
 
 
 def _action_all(action: c.Action) -> tuple[c.Action, c.Action]:
     fw = c.Forward()
     ret = c.SetMemory(0x6509B0, c.SetTo, fw)
-    fw << UserP_FW(ret, 20)
+    fw << _UserPFw(ret, 20)
     return ret, action
 
 
-def DisplayTextAll(text) -> tuple[c.Action, c.Action]:
+def DisplayTextAll(text) -> tuple[c.Action, c.Action]:  # noqa: N802
     """Action: DisplayText for everyone (including observers)"""
     return _action_all(c.DisplayText(text))
 
 
-def PlayWAVAll(soundpath) -> tuple[c.Action, c.Action]:
+def PlayWAVAll(soundpath) -> tuple[c.Action, c.Action]:  # noqa: N802
     """Action: PlayWAV for everyone (including observers)"""
     return _action_all(c.PlayWAV(soundpath))
 
 
-def MinimapPingAll(location) -> tuple[c.Action, c.Action]:
+def MinimapPingAll(location) -> tuple[c.Action, c.Action]:  # noqa: N802
     """Action: MinimapPing for everyone (including observers)"""
     return _action_all(c.MinimapPing(location))
 
 
-def CenterViewAll(location) -> tuple[c.Action, c.Action]:
+def CenterViewAll(location) -> tuple[c.Action, c.Action]:  # noqa: N802
     """Action: CenterView for everyone (including observers)"""
     return _action_all(c.CenterView(location))
 
 
-def SetMissionObjectivesAll(text) -> tuple[c.Action, c.Action]:
+def SetMissionObjectivesAll(text) -> tuple[c.Action, c.Action]:  # noqa: N802
     """Action: SetMissionObjectives for everyone (including observers)"""
     return _action_all(c.SetMissionObjectives(text))
 
 
-def TalkingPortraitAll(unit, time) -> tuple[c.Action, c.Action]:
+def TalkingPortraitAll(unit, time) -> tuple[c.Action, c.Action]:  # noqa: N802
     """Action: TalkingPortrait for everyone (including observers)"""
     return _action_all(c.TalkingPortrait(unit, time))
 
@@ -71,24 +71,24 @@ def TalkingPortraitAll(unit, time) -> tuple[c.Action, c.Action]:
 # NOTE: should we add (Un)MuteUnitSpeechAll?
 
 
-class UserP_FW(c.ConstExpr):
+class _UserPFw(c.ConstExpr):
     def __init__(self, dest, offset):
         super().__init__(self)
         self._initobj = (dest, offset)
 
-    def Evaluate(self):
-        _RegisterUserP(*self._initobj)
+    def Evaluate(self):  # noqa: N802
+        _register_userp(*self._initobj)
         return c.toRlocInt(0)
 
 
-def RCPC_ResetUserP():
+def _rcpc_reset_userp():
     _userp_fws.clear()
 
 
-c.RegisterCreatePayloadCallback(RCPC_ResetUserP)
+c.RegisterCreatePayloadCallback(_rcpc_reset_userp)
 
 
-def _RegisterUserP(dest, offset):
+def _register_userp(dest, offset):
     _userp_fws.add((dest, offset))
 
 
@@ -96,10 +96,10 @@ class UserPBuffer(c.EUDObject):
     def __init__(self):
         super().__init__()
 
-    def GetDataSize(self):
+    def GetDataSize(self):  # noqa: N802
         return (len(_userp_fws) + 1) * 4
 
-    def WritePayload(self, pbuf):
+    def WritePayload(self, pbuf):  # noqa: N802
         for dest, offset in _userp_fws:
             pbuf.WriteDword(ut.EPD(dest + offset))
         pbuf.WriteDword(0xFFFFFFFF)

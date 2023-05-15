@@ -11,7 +11,7 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
 from ...localize import _
-from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl
+from ..memiof import f_getcurpl, f_setcurpl
 
 
 @c.EUDTypedFunc([c.TrgPlayer], [None])
@@ -47,12 +47,12 @@ def f_playerexist(player):
 # --------
 
 
-def EUDLoopPlayer(
+def EUDLoopPlayer(  # noqa: N802
     ptype: str | None = "Human", force=None, race: str | None = None
 ) -> Iterator[c.EUDVariable]:
-    def EncodeForce(f):
+    def encode_force(f):
         force_dict = {c.Force1: 0, c.Force2: 1, c.Force3: 2, c.Force4: 3}
-        if type(f) != int and f in force_dict:
+        if not isinstance(f, int) and f in force_dict:
             return force_dict[f]
         return f
 
@@ -61,7 +61,7 @@ def EUDLoopPlayer(
         pinfo = c.GetPlayerInfo(p)
         if (
             (not ptype or pinfo.typestr == ptype)
-            and (not force or pinfo.force == EncodeForce(force))
+            and (not force or pinfo.force == encode_force(force))
             and (not race or pinfo.racestr == race)
         ):
             plist.append(p)
@@ -97,7 +97,7 @@ def EUDLoopPlayer(
 # -------
 
 
-def EUDPlayerLoop():
+def EUDPlayerLoop():  # noqa: N802
     def _footer():
         block = {"origcp": f_getcurpl(), "playerv": c.EUDVariable()}
         playerv = block["playerv"]
@@ -113,7 +113,7 @@ def EUDPlayerLoop():
     return cs.CtrlStruOpener(_footer)
 
 
-def EUDEndPlayerLoop():
+def EUDEndPlayerLoop():  # noqa: N802
     block = ut.EUDPopBlock("ploopblock")[1]
     playerv = block["playerv"]
     origcp = block["origcp"]

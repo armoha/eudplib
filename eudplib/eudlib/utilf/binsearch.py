@@ -11,7 +11,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 
-def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:
+def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:  # noqa: N802
     """Find maximum x satisfying cond(x) using binary search
 
     :param cond: Test condition
@@ -55,7 +55,7 @@ def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:
     return x
 
 
-def EUDBinaryMin(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:
+def EUDBinaryMin(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:  # noqa: N802
     """Find minimum x satisfying cond(x) using binary search
 
     :param cond: Test condition

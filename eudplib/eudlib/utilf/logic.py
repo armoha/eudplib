@@ -11,7 +11,7 @@ from eudplib.trigger.tpatcher import negate_cond
 from eudplib.utils.eperror import EPError
 
 
-def EUDOr(cond1, *conds) -> c.EUDLightBool:
+def EUDOr(cond1, *conds) -> c.EUDLightBool:  # noqa: N802
     """cond1 || cond2 || ... || condn
 
     .. warning:: Short circuiting is not supported
@@ -31,7 +31,7 @@ def EUDOr(cond1, *conds) -> c.EUDLightBool:
     return v
 
 
-def EUDAnd(cond1, *conds) -> c.EUDLightBool:
+def EUDAnd(cond1, *conds) -> c.EUDLightBool:  # noqa: N802
     """cond1 && cond2 && ... && condn
 
     .. note::
@@ -56,7 +56,7 @@ def EUDAnd(cond1, *conds) -> c.EUDLightBool:
     return v
 
 
-def EUDNot(cond):
+def EUDNot(cond):  # noqa: N802
     """!cond
 
     :param conds: Condition to negate

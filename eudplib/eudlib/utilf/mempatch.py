@@ -11,13 +11,13 @@ from eudplib import trigger as t
 from eudplib import utils as ut
 
 from ..eudarray import EUDArray
-from ..memiof import f_dwread_epd, f_dwwrite_epd, f_repmovsd_epd
+from ..memiof import f_dwread_epd, f_repmovsd_epd
 
-patchMax = 8192
+_patch_max = 8192
 
-patchstack = EUDArray(3 * patchMax)
+patchstack = EUDArray(3 * _patch_max)
 dws_top, ps_top = c.EUDVariable(), c.EUDVariable()
-dwstack = EUDArray(patchMax)
+dwstack = EUDArray(_patch_max)
 
 
 def pushpatchstack(value: c.EUDVariable | int) -> None:

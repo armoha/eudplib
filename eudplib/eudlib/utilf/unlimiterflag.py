@@ -10,11 +10,11 @@ class _UnlimiterBool:
 _unlimiter: _UnlimiterBool = _UnlimiterBool(is_unlimiter_on=False)
 
 
-def _turnUnlimiterOn() -> None:
+def _turnUnlimiterOn() -> None:  # noqa: N802
     global _unlimiter
     _unlimiter.is_unlimiter_on = True
 
 
-def IsUnlimiterOn() -> bool:
+def IsUnlimiterOn() -> bool:  # noqa: N802
     global _unlimiter
-    return _unlimiter.is_unlimiter_on == True
+    return _unlimiter.is_unlimiter_on is True
