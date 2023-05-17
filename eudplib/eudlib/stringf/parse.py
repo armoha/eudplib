@@ -62,7 +62,11 @@ class _EUDParser(EUDByteReader):
         # \s*[+-]?\d+
         jumper, trim = c.Forward(), c.Forward()
         number, digits = self._number, self._digits
-        cs.DoActions(number.SetNumber(0), digits.SetNumber(0), c.SetNextPtr(jumper, trim))
+        cs.DoActions(
+            number.SetNumber(0),
+            digits.SetNumber(0),
+            c.SetNextPtr(jumper, trim),
+        )
         if cs.EUDInfLoop()():
             block = ut.EUDPeekBlock("infloopblock")[1]
 
@@ -102,7 +106,10 @@ class _EUDParser(EUDByteReader):
 
             number *= 10
             # ignore leading zeros
-            c.RawTrigger(conditions=[number == 0], actions=digits.SetNumberX(0, (1 << 30) - 1))
+            c.RawTrigger(
+                conditions=[number == 0],
+                actions=digits.SetNumberX(0, (1 << 30) - 1),
+            )
             c.SeqCompute(
                 [
                     (ut.EPD(is_digit) + 1, c.SetTo, fin),
@@ -116,7 +123,10 @@ class _EUDParser(EUDByteReader):
             )
         cs.EUDEndInfLoop()
 
-        c.RawTrigger(conditions=digits.AtLeastX(1, 1 << 30), actions=number.SetNumber(0x7FFFFFFF))
+        c.RawTrigger(
+            conditions=digits.AtLeastX(1, 1 << 30),
+            actions=number.SetNumber(0x7FFFFFFF),
+        )
         if cs.EUDIf()(digits.AtLeastX(1, 1 << 31)):
             number << -number
         cs.EUDEndIf()
@@ -129,7 +139,11 @@ class _EUDParser(EUDByteReader):
         # \s*[+-]?(0[bB])?[01]+
         jumper, trim = c.Forward(), c.Forward()
         number, digits = self._number, self._digits
-        cs.DoActions(number.SetNumber(0), digits.SetNumber(0), c.SetNextPtr(jumper, trim))
+        cs.DoActions(
+            number.SetNumber(0),
+            digits.SetNumber(0),
+            c.SetNextPtr(jumper, trim),
+        )
         if cs.EUDInfLoop()():
             block = ut.EUDPeekBlock("infloopblock")[1]
 
@@ -142,7 +156,9 @@ class _EUDParser(EUDByteReader):
 
             # (0[bB])?
             is_zero, is_literal = c.Forward(), c.Forward()
-            assume_decimal, cont, is_alphanumeric = [c.Forward() for _ in range(3)]
+            assume_decimal, cont, is_alphanumeric = (
+                c.Forward() for _ in range(3)
+            )
 
             cs.DoActions(
                 c.SetNextPtr(is_zero, assume_decimal),
@@ -171,16 +187,23 @@ class _EUDParser(EUDByteReader):
                         radix.SetNumber(base),
                     ],
                 )
-            assume_decimal << c.RawTrigger(conditions=[radix == 0], actions=radix.SetNumber(10))
+            assume_decimal << c.RawTrigger(
+                conditions=[radix == 0], actions=radix.SetNumber(10)
+            )
             cutoff, cutlim = c.f_div(0xFFFFFFFF, radix)
             cont << c.RawTrigger(
                 nextptr=0,
-                actions=[c.SetNextPtr(jumper, is_alphanumeric), cutlim.AddNumber(1)],
+                actions=[
+                    c.SetNextPtr(jumper, is_alphanumeric),
+                    cutlim.AddNumber(1),
+                ],
             )
 
             # [\da-zA-Z]+
             fin = c.Forward()
-            is_alphanumeric << c.RawTrigger(actions=c.SetNextPtr(fin, block["loopend"]))
+            is_alphanumeric << c.RawTrigger(
+                actions=c.SetNextPtr(fin, block["loopend"])
+            )
             c.RawTrigger(
                 conditions=[b >= ord("0"), b <= ord("9")],
                 actions=[
@@ -208,8 +231,13 @@ class _EUDParser(EUDByteReader):
             cs.EUDBreakIf(b >= radix)
 
             # handle overflow
-            c.RawTrigger(conditions=digits.AtLeastX(1, 1 << 30), actions=digits.AddNumber(-1))
-            if cs.EUDIf()([number == cutoff, digits.AtLeastX(cutlim, (1 << 31) - 1)]):
+            c.RawTrigger(
+                conditions=digits.AtLeastX(1, 1 << 30),
+                actions=digits.AddNumber(-1),
+            )
+            if cs.EUDIf()(
+                [number == cutoff, digits.AtLeastX(cutlim, (1 << 31) - 1)]
+            ):
                 cs.DoActions(digits.SetNumberX(1 << 30, 1 << 30))
             if cs.EUDElse()():
                 cutoff += 1
@@ -221,11 +249,17 @@ class _EUDParser(EUDByteReader):
 
             number *= radix
             # ignore leading zeros
-            c.RawTrigger(conditions=[number == 0], actions=digits.SetNumberX(0, (1 << 30) - 1))
+            c.RawTrigger(
+                conditions=[number == 0],
+                actions=digits.SetNumberX(0, (1 << 30) - 1),
+            )
             c.SeqCompute([(digits, c.Add, 1), (number, c.Add, b)])
         cs.EUDEndInfLoop()
 
-        c.RawTrigger(conditions=digits.AtLeastX(1, 1 << 30), actions=number.SetNumber(0x7FFFFFFF))
+        c.RawTrigger(
+            conditions=digits.AtLeastX(1, 1 << 30),
+            actions=number.SetNumber(0x7FFFFFFF),
+        )
         if cs.EUDIf()(digits.AtLeastX(1, 1 << 31)):
             number << -number
         cs.EUDEndIf()
@@ -234,7 +268,7 @@ class _EUDParser(EUDByteReader):
         c.EUDReturn(number, digits)
 
 
-def _GetGlobalEUDParser():
+def _get_global_eudparser():
     global _global_parser
     if _global_parser is None:
         _global_parser = _EUDParser()
@@ -250,7 +284,7 @@ def f_parse(dst, radix=10):
 
 @c.EUDFunc
 def _parse_dw(dst):
-    global_parser = _GetGlobalEUDParser()
+    global_parser = _get_global_eudparser()
     global_parser.seekoffset(dst)
     number, digits = global_parser._parse_dw()
     c.EUDReturn(number, digits)
@@ -258,7 +292,7 @@ def _parse_dw(dst):
 
 @c.EUDFunc
 def _parse_from_radix(dst, radix):
-    global_parser = _GetGlobalEUDParser()
+    global_parser = _get_global_eudparser()
     global_parser.seekoffset(dst)
     if cs.EUDIf()(radix == 10):
         number, digits = global_parser._parse_dw()

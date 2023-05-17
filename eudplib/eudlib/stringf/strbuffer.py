@@ -10,23 +10,30 @@ from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.mapdata.stringmap import ForceAddString
 from ...localize import _
-from ..eudarray import EUDArray
 from ..memiof import f_getcurpl, f_setcurpl
 from ..utilf import IsUserCP, f_getuserplayerid
 from .cpprint import FixedText, f_cpstr_print, f_gettextptr
 from .cpstr import GetMapStringAddr
 from .fmtprint import _format_args
 from .strfunc import f_strlen_epd
-from .texteffect import TextFX_FadeIn, TextFX_FadeOut, TextFX_Remove, _get_TextFX_timer
+from .texteffect import (
+    TextFX_FadeIn,
+    TextFX_FadeOut,
+    TextFX_Remove,
+    get_textfx_timer,
+)
 
 _display_text = c.DisplayText(0)
 
 
 @c.EUDFullFunc(
-    [(ut.EPD(0x640B58), c.Add, 0, None), (ut.EPD(_display_text) + 1, c.SetTo, 0, None)],
+    [
+        (ut.EPD(0x640B58), c.Add, 0, None),
+        (ut.EPD(_display_text) + 1, c.SetTo, 0, None),
+    ],
     [None, c.TrgString],
 )
-def DisplayTextAt(line, text):
+def DisplayTextAt(line, text):  # noqa: N802
     with FixedText(_display_text):
         c.VProc([line, text], [])
         c.RawTrigger(
@@ -71,12 +78,12 @@ class StringBuffer(c.EUDStruct):
     You can do anything you would do with normal string with StringBuffer.
     """
 
-    _fields_ = [
+    _fields_ = (
         ("StringIndex", c.TrgString),  # static
         "epd",  # static
         "pos",
         "capacity",  # static
-    ]
+    )
 
     _method_template = c.Forward()
     _cpbranch = c.Forward()
@@ -85,8 +92,8 @@ class StringBuffer(c.EUDStruct):
         """Constructor for StringBuffer
 
         :param content: Initial StringBuffer content / capacity. Capacity of
-            StringBuffer is determined by size of this. If content is integer, then
-            initial capacity and content of StringBuffer will be set to
+            StringBuffer is determined by size of this. If content is integer,
+            then initial capacity and content of StringBuffer will be set to
             content(int) and empty string.
 
         :type content: str, bytes, int
@@ -111,21 +118,29 @@ class StringBuffer(c.EUDStruct):
         super().__init__(_from=_from, _static_initval=initval)
 
     def constructor(self, *args, **kwargs):
-        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
+        raise ut.EPError(
+            _("Dynamically allocating StringBuffer is not supported")
+        )
 
     def constructor_static(self, *args, **kwargs):
         pass
 
     @classmethod
     def alloc(cls, *args, **kwargs):
-        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
+        raise ut.EPError(
+            _("Dynamically allocating StringBuffer is not supported")
+        )
 
     @classmethod
     def free(cls, data):
-        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
+        raise ut.EPError(
+            _("Dynamically allocating StringBuffer is not supported")
+        )
 
     def destructor(self):
-        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
+        raise ut.EPError(
+            _("Dynamically allocating StringBuffer is not supported")
+        )
 
     # Initializer
 
@@ -133,7 +148,9 @@ class StringBuffer(c.EUDStruct):
         raise ut.EPError(_("Can't mutate field of StringBuffer except 'pos'"))
 
     def copyto(self, inst):
-        raise ut.EPError(_("Can't clone StringBuffer, which is reference type."))
+        raise ut.EPError(
+            _("Can't clone StringBuffer, which is reference type.")
+        )
 
     # Field setter & getter
 
@@ -144,7 +161,9 @@ class StringBuffer(c.EUDStruct):
         return super().getfield(name)
 
     def setfield(self, name, value):
-        ut.ep_assert(name == "pos", _("Can't mutate field of StringBuffer except 'pos'"))
+        ut.ep_assert(
+            name == "pos", _("Can't mutate field of StringBuffer except 'pos'")
+        )
         super().setfield(name, value)
 
     def iaddattr(self, name, value):
@@ -224,15 +243,15 @@ class StringBuffer(c.EUDStruct):
         c.PopTriggerScope()
 
     @classmethod
-    def CPBranch(cls):
-        if not StringBuffer._method_template.IsSet():
-            StringBuffer._init_template()
+    def _cpblock(cls):
+        if not cls._method_template.IsSet():
+            cls._init_template()
         end, ontrue = c.Forward(), c.Forward()
         c.RawTrigger(
-            nextptr=StringBuffer._method_template,
+            nextptr=cls._method_template,
             actions=[
-                c.SetNextPtr(StringBuffer._cpbranch, end),
-                c.SetMemory(StringBuffer._cpbranch + 348, c.SetTo, ontrue),
+                c.SetNextPtr(cls._cpbranch, end),
+                c.SetMemory(cls._cpbranch + 348, c.SetTo, ontrue),
             ],
         )
         ontrue << c.NextTrigger()
@@ -240,7 +259,7 @@ class StringBuffer(c.EUDStruct):
         end << c.NextTrigger()
 
     def append(self, *args):
-        for _end in StringBuffer.CPBranch():
+        for _end in self._cpblock():
             f_setcurpl(self.pos)
             f_cpstr_print(*args)
             self.pos = f_getcurpl()
@@ -250,7 +269,7 @@ class StringBuffer(c.EUDStruct):
         self.append(*_format_args(format_string, *args))
 
     def insert(self, index, *args):
-        for _end in StringBuffer.CPBranch():
+        for _end in self._cpblock():
             f_setcurpl(self.epd + index)
             f_cpstr_print(*args, EOS=False)
             self.pos = f_getcurpl()
@@ -260,7 +279,7 @@ class StringBuffer(c.EUDStruct):
         self.insert(index, *_format_args(format_string, *args))
 
     def delete(self, start, length=1):
-        for _end in StringBuffer.CPBranch():
+        for _end in self._cpblock():
             pos = self.epd + start
             self.pos = pos
             f_setcurpl(pos)
@@ -273,11 +292,11 @@ class StringBuffer(c.EUDStruct):
             )
             f_setcurpl(f_getuserplayerid())
 
-    def Display(self):
+    def Display(self):  # noqa: N802
         cs.DoActions(c.DisplayText(self.StringIndex))
 
-    def DisplayAt(self, line, _f={}):
-        for _end in StringBuffer.CPBranch():
+    def DisplayAt(self, line, _f={}):  # noqa: N802
+        for _end in self._cpblock():
             with FixedText(c.DisplayText(self.StringIndex)):
                 if c.IsEUDVariable(line):
                     c.VProc(line, line.QueueAddTo(ut.EPD(0x640B58)))
@@ -292,7 +311,7 @@ class StringBuffer(c.EUDStruct):
     def print(self, *args):
         if len(args) == 1 and isinstance(args[0], str):
             return cs.DoActions(c.DisplayText(args[0]))
-        for _end in StringBuffer.CPBranch():
+        for _end in self._cpblock():
             f_setcurpl(self.epd)
             f_cpstr_print(*args, EOS=False)
             cs.DoActions(
@@ -304,10 +323,10 @@ class StringBuffer(c.EUDStruct):
     def printf(self, format_string, *args):
         self.print(*_format_args(format_string, *args))
 
-    def printAt(self, line, *args):
+    def printAt(self, line, *args):  # noqa: N802
         if len(args) == 1 and isinstance(args[0], str):
             return DisplayTextAt(line, args[0])
-        for _end in StringBuffer.CPBranch():
+        for _end in self._cpblock():
             f_setcurpl(self.epd)
             f_cpstr_print(*args, EOS=False)
             cs.DoActions(
@@ -316,7 +335,7 @@ class StringBuffer(c.EUDStruct):
             )
             self.DisplayAt(line)
 
-    def printfAt(self, line, format_string, *args):
+    def printfAt(self, line, format_string, *args):  # noqa: N802
         self.printAt(line, *_format_args(format_string, *args))
 
     def _display_at(self, prevpos, line):
@@ -373,88 +392,116 @@ class StringBuffer(c.EUDStruct):
                 tag = fmtargs[0]
             else:
                 tag = fmtargs
-        if not StringBuffer._method_template.IsSet():
-            StringBuffer._init_template()
+        if not self._method_template.IsSet():
+            self._init_template()
         end, ontrue = c.Forward(), c.Forward()
         ret = c.EUDVariable()
         c.RawTrigger(
-            nextptr=StringBuffer._method_template,
+            nextptr=self._method_template,
             actions=[
-                c.SetNextPtr(StringBuffer._cpbranch, end),
-                c.SetMemory(StringBuffer._cpbranch + 348, c.SetTo, ontrue),
+                c.SetNextPtr(self._cpbranch, end),
+                c.SetMemory(self._cpbranch + 348, c.SetTo, ontrue),
                 ret.SetNumber(-1),
             ],
         )
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
-        _, _, identifier = _get_TextFX_timer(tag)
+        _, _, identifier = get_textfx_timer(tag)
         _tag_print(identifier, *fmtargs)
         self._display_at(prevpos, line)
         end << c.NextTrigger()
 
-    def Play(self):
+    def Play(self):  # noqa: N802
         cs.DoActions(c.PlayWAV(self.StringIndex))
 
-    def fadeIn(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
+    def fadeIn(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):  # noqa: N802
         if tag is None:
             if len(args) == 1:
                 tag = args[0]
             else:
                 tag = args
-        if not StringBuffer._method_template.IsSet():
-            StringBuffer._init_template()
+        if not self._method_template.IsSet():
+            self._init_template()
         end, ontrue = c.Forward(), c.Forward()
         ret = c.EUDVariable()
         c.RawTrigger(
-            nextptr=StringBuffer._method_template,
+            nextptr=self._method_template,
             actions=[
-                c.SetNextPtr(StringBuffer._cpbranch, end),
-                c.SetMemory(StringBuffer._cpbranch + 348, c.SetTo, ontrue),
+                c.SetNextPtr(self._cpbranch, end),
+                c.SetMemory(self._cpbranch + 348, c.SetTo, ontrue),
                 ret.SetNumber(-1),
             ],
         )
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
-        ret << TextFX_FadeIn(*args, color=color, wait=wait, reset=reset, tag=tag)
+        ret << TextFX_FadeIn(
+            *args, color=color, wait=wait, reset=reset, tag=tag
+        )
         self._display_at(prevpos, line)
         end << c.NextTrigger()
         return ret
 
-    def fadeInf(self, format_string, *args, color=None, wait=1, reset=True, line=-1, tag=None):
+    def fadeInf(  # noqa: N802
+        self,
+        format_string,
+        *args,
+        color=None,
+        wait=1,
+        reset=True,
+        line=-1,
+        tag=None,
+    ):
         fmtargs = _format_args(format_string, *args)
-        return self.fadeIn(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
+        return self.fadeIn(
+            *fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag
+        )
 
-    def fadeOut(self, *args, color=None, wait=1, reset=True, line=-1, tag=None):
+    def fadeOut(  # noqa: N802
+        self, *args, color=None, wait=1, reset=True, line=-1, tag=None
+    ):
         if tag is None:
             if len(args) == 1:
                 tag = args[0]
             else:
                 tag = args
-        if not StringBuffer._method_template.IsSet():
-            StringBuffer._init_template()
+        if not self._method_template.IsSet():
+            self._init_template()
         end, ontrue = c.Forward(), c.Forward()
         ret = c.EUDVariable()
         c.RawTrigger(
-            nextptr=StringBuffer._method_template,
+            nextptr=self._method_template,
             actions=[
-                c.SetNextPtr(StringBuffer._cpbranch, end),
-                c.SetMemory(StringBuffer._cpbranch + 348, c.SetTo, ontrue),
+                c.SetNextPtr(self._cpbranch, end),
+                c.SetMemory(self._cpbranch + 348, c.SetTo, ontrue),
                 ret.SetNumber(-1),
             ],
         )
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
-        ret << TextFX_FadeOut(*args, color=color, wait=wait, reset=reset, tag=tag)
+        ret << TextFX_FadeOut(
+            *args, color=color, wait=wait, reset=reset, tag=tag
+        )
         self._display_at(prevpos, line)
         end << c.NextTrigger()
         return ret
 
-    def fadeOutf(self, format_string, *args, color=None, wait=1, reset=True, line=-1, tag=None):
+    def fadeOutf(  # noqa: N802
+        self,
+        format_string,
+        *args,
+        color=None,
+        wait=1,
+        reset=True,
+        line=-1,
+        tag=None,
+    ):
         fmtargs = _format_args(format_string, *args)
-        return self.fadeOut(*fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag)
+        return self.fadeOut(
+            *fmtargs, color=color, wait=wait, reset=reset, line=line, tag=tag
+        )
 
     def length(self):
         return f_strlen_epd(self.epd)
@@ -463,7 +510,7 @@ class StringBuffer(c.EUDStruct):
 _globalsb = None
 
 
-def GetGlobalStringBuffer():
+def GetGlobalStringBuffer():  # noqa: N802
     global _globalsb
     if _globalsb is None:
         _globalsb = StringBuffer(1023)
@@ -492,6 +539,6 @@ def f_println(format_string, *args):
     gsb.printf(format_string, *args)
 
 
-def f_printAt(line, format_string, *args):
+def f_printAt(line, format_string, *args):  # noqa: N802
     gsb = GetGlobalStringBuffer()
     gsb.printfAt(line, format_string, *args)

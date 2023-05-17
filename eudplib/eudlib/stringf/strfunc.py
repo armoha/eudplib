@@ -7,8 +7,8 @@
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ...utils import EPD, EUDPeekBlock
-from ..memiof import f_dwread_epd, f_setcurpl2cpcache
+from ...utils import EPD
+from ..memiof import f_setcurpl2cpcache
 from ..stringf.rwcommon import br1, br2, bs1, bw1
 
 
@@ -78,7 +78,6 @@ def _strlen_epd(epd, subp):
         actions=[jump, epd.SetDest(EPD(0x6509B0)), ret.SetNumber(0)],
     )
     if cs.EUDInfLoop()():
-        loop = EUDPeekBlock("infloopblock")[1]
         b[0] << c.RawTrigger(
             nextptr=loopend,
             conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF),
@@ -123,7 +122,6 @@ def _strlen_epd(epd, subp):
 
 
 def f_strlen(src, /, **kwargs):
-    ret = c.EUDVariable()
     epd, subp = c.f_div(src, 4)
     epd += -0x58A364 // 4
     return f_strlen_epd(epd, subp, **kwargs)
@@ -148,7 +146,10 @@ def f_strnstr(string, substring, count):
         oldoffset, oldsuboffset = c.EUDCreateVariables(2)
         c.VProc(
             [bs1._offset, bs1._suboffset],
-            [bs1._offset.SetDest(oldoffset), bs1._suboffset.SetDest(oldsuboffset)],
+            [
+                bs1._offset.SetDest(oldoffset),
+                bs1._suboffset.SetDest(oldsuboffset),
+            ],
         )
         if cs.EUDInfLoop()():
             d = br2.readbyte()
@@ -159,7 +160,10 @@ def f_strnstr(string, substring, count):
         cs.EUDEndInfLoop()
         c.VProc(
             [oldoffset, oldsuboffset],
-            [oldoffset.SetDest(bs1._offset), oldsuboffset.SetDest(bs1._suboffset)],
+            [
+                oldoffset.SetDest(bs1._offset),
+                oldsuboffset.SetDest(bs1._suboffset),
+            ],
         )
         br2.seekoffset(substring + 1)
     cs.EUDEndWhile()

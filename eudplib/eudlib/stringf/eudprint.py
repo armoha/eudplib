@@ -8,22 +8,21 @@
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
-from eudplib.localize import _
 
 from ..stringf.rwcommon import br1, bw1
 from .dbstr import DBString
 
 _conststr_dict = dict()
-_str_jump, _str_EOS, _str_dst = c.Forward(), c.Forward(), c.Forward()
-_dw_jump, _dw_EOS, _dw_dst = c.Forward(), c.Forward(), c.Forward()
-_ptr_jump, _ptr_EOS, _ptr_dst = c.Forward(), c.Forward(), c.Forward()
+_str_jump, _str_eos, _str_dst = c.Forward(), c.Forward(), c.Forward()
+_dw_jump, _dw_eos, _dw_dst = c.Forward(), c.Forward(), c.Forward()
+_ptr_jump, _ptr_eos, _ptr_dst = c.Forward(), c.Forward(), c.Forward()
 
 
 def _addstr_core(_f=[]):
     if not _str_jump.IsSet():
 
         def f():
-            global _str_jump, _str_EOS, _str_dst
+            global _str_jump, _str_eos, _str_dst
             c.PushTriggerScope()
             strlen = c.EUDVariable()
             init = c.RawTrigger(actions=strlen.SetNumber(0))
@@ -32,14 +31,15 @@ def _addstr_core(_f=[]):
             if cs.EUDInfLoop()():
                 b = br1.readbyte()
                 _str_jump << c.RawTrigger(
-                    conditions=b.Exactly(0), actions=c.SetNextPtr(_str_jump, _str_EOS)
+                    conditions=b.Exactly(0),
+                    actions=c.SetNextPtr(_str_jump, _str_eos),
                 )
                 write << c.NextTrigger()
                 bw1.writebyte(b)
                 strlen += 1
             cs.EUDEndInfLoop()
 
-            _str_EOS << c.NextTrigger()
+            _str_eos << c.NextTrigger()
             bw1.writebyte(0)  # EOS
             _str_dst << c.RawTrigger(actions=c.SetNextPtr(_str_jump, write))
             c.PopTriggerScope()
@@ -104,7 +104,7 @@ def _addstr_epd(epd):
 
 @c.EUDFunc
 def _adddw(number):
-    global _dw_jump, _dw_EOS, _dw_dst
+    global _dw_jump, _dw_eos, _dw_dst
     strlen = c.EUDVariable()
     strlen << 0
 
@@ -127,7 +127,7 @@ def _adddw(number):
             _dw_jump << c.NextTrigger()
         strlen += 1
 
-    _dw_EOS << c.NextTrigger()
+    _dw_eos << c.NextTrigger()
     bw1.writebyte(0)  # EOS
     _dw_dst << c.NextTrigger()
 
@@ -151,7 +151,7 @@ def f_dbstr_adddw(dst, number):
 
 @c.EUDFunc
 def _addptr(number):
-    global _ptr_jump, _ptr_EOS, _ptr_dst
+    global _ptr_jump, _ptr_eos, _ptr_dst
     strlen = c.EUDVariable()
     strlen << 0
     ch = [0] * 8
@@ -171,7 +171,7 @@ def _addptr(number):
             _ptr_jump << c.NextTrigger()
         strlen += 1
 
-    _ptr_EOS << c.NextTrigger()
+    _ptr_eos << c.NextTrigger()
     bw1.writebyte(0)  # EOS
     _ptr_dst << c.NextTrigger()
 
@@ -193,7 +193,7 @@ def f_dbstr_addptr(dst, number):
     return dst
 
 
-def _OmitEOS(*args):
+def _omit_eos(*args):
     dw = any(
         (
             c.IsConstExpr(x)
@@ -211,28 +211,28 @@ def _OmitEOS(*args):
     )
     yield (dw, ptr)
     cs.DoActions(
-        c.SetMemory(_str_jump + 348, c.SetTo, _str_EOS),
-        c.SetNextPtr(_dw_jump, _dw_EOS) if dw else [],
-        c.SetNextPtr(_ptr_jump, _ptr_EOS) if ptr else [],
+        c.SetMemory(_str_jump + 348, c.SetTo, _str_eos),
+        c.SetNextPtr(_dw_jump, _dw_eos) if dw else [],
+        c.SetNextPtr(_ptr_jump, _ptr_eos) if ptr else [],
     )
 
 
-class ptr2s:
+class ptr2s:  # noqa: N801
     def __init__(self, value):
         self._value = value
 
 
-class epd2s:
+class epd2s:  # noqa: N801
     def __init__(self, value):
         self._value = value
 
 
-class hptr:
+class hptr:  # noqa: N801
     def __init__(self, value):
         self._value = value
 
 
-def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
+def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):  # noqa: N803
     """Print multiple string / number to dst.
 
     :param dst: Destination address (Not EPD player)
@@ -296,26 +296,29 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):
         elif ut.isUnproxyInstance(arg, hptr):
             strlen = addf["ptr"](*dstmsg(arg._value))
         else:
-            raise ut.EPError(
-                _("Object with unknown parameter type {} given to f_eudprint.").format(type(arg))
-            )
+            e = _("Object with unknown parameter type {} given to f_eudprint.")
+            raise ut.EPError(e.format(type(arg)))
         strlens.append(strlen)
 
     if EOS:
         if len(args) >= 2:
-            for _ in _OmitEOS(*args):
+            for _ in _omit_eos(*args):
                 for i, arg in enumerate(args[:-1]):
                     proc_arg(i, arg)
             proc_arg(-1, args[-1])
 
-            c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
+            c.SeqCompute(
+                [(strlens[0], c.Add, strlen) for strlen in strlens[1:]]
+            )
         else:
             proc_arg(0, args[0])
     else:
-        for _ in _OmitEOS(*args):
+        for _ in _omit_eos(*args):
             for i, arg in enumerate(args):
                 proc_arg(i, arg)
         if len(args) >= 2:
-            c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
+            c.SeqCompute(
+                [(strlens[0], c.Add, strlen) for strlen in strlens[1:]]
+            )
 
     return strlens[0]

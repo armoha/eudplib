@@ -23,7 +23,7 @@ from ..memiof import (
 )
 from ..playerv import PVariable
 from ..utilf import EUDLoopPlayer, f_getgametick, f_playerexist
-from .cpprint import PName, f_cpstr_print
+from .cpprint import f_cpstr_print
 from .eudprint import epd2s, f_dbstr_print, ptr2s
 from .fmtprint import _format_args
 from .strfunc import f_strlen_epd
@@ -32,7 +32,7 @@ PLVarUnit, PLVarMask = ceil((0x58F500 - 0x58A364) / 48), 0
 # FIXME: PLVarDict = {}
 
 
-def GetPlayerLightVariable() -> tuple[int, int]:
+def _get_player_lightvar() -> tuple[int, int]:
     global PLVarUnit, PLVarMask
     ret = (PLVarUnit, 1 << PLVarMask)
     PLVarMask += 1
@@ -65,12 +65,12 @@ def compare_sequence(src: int, seq: str) -> list[c.Condition]:
     return ret
 
 
-def GetIsPNameCondition(name, _plvars={}):
+def _get_ispname_cond(name, _plvars={}):
     try:
         init, end, params = _plvars[name]
     except KeyError:
         c.PushTriggerScope()
-        unit, mask = GetPlayerLightVariable()
+        unit, mask = _get_player_lightvar()
         init, params = c.NextTrigger(), (c.AtLeast, 1, unit, mask)
         end = c.Forward()
         _plvars[name] = (init, end, params)
@@ -97,7 +97,7 @@ def GetIsPNameCondition(name, _plvars={}):
     return init, end, params
 
 
-def IsPName(player, name):
+def IsPName(player, name):  # noqa: N802
     p = c.EncodePlayer(player)
     if isinstance(p, int):
         if p < 8:
@@ -107,11 +107,11 @@ def IsPName(player, name):
             # fmt: off
             ut.ep_assert(
                 p == c.EncodePlayer(c.CurrentPlayer),
-                _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),
+                _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),  # noqa: E501
             )
             # fmt: on
 
-    init, end, params = GetIsPNameCondition(name)
+    init, end, params = _get_ispname_cond(name)
     if cs.EUDExecuteOnce()():
         # TODO: initialize when game starts
         nptr = c.Forward()
@@ -128,7 +128,10 @@ class _PlayerName:
         self.ptr, self.epd = c.EUDCreateVariables(2)
         self.odds_or_even = c.EUDLightBool()
         self.name_db_list = [c.Db(26) for _ in range(8)]
-        self.basenames, self.baselens = PVariable(self.name_db_list), PVariable()
+        self.basenames, self.baselens = (
+            PVariable(self.name_db_list),
+            PVariable(),
+        )
         self.optimize_start, self.optimize_end = c.Forward(), c.Forward()
         self.odd = [c.Forward() for p in range(8)]
         self.even0 = [c.Forward() for p in range(8)]
@@ -139,12 +142,12 @@ class _PlayerName:
             return
 
         c.PushTriggerScope()
-        prevTxtPtr, _end = c.Forward(), c.Forward()
+        prev_textptr, _end = c.Forward(), c.Forward()
         self.optimize_start << c.NextTrigger()
 
-        oddA = EUDArray([ut.EPD(x) for x in self.odd])
-        even0A = EUDArray([ut.EPD(x) for x in self.even0])
-        even1A = EUDArray([ut.EPD(x) for x in self.even1])
+        odd_arr = EUDArray([ut.EPD(x) for x in self.odd])
+        even0_arr = EUDArray([ut.EPD(x) for x in self.even0])
+        even1_arr = EUDArray([ut.EPD(x) for x in self.even1])
 
         if cs.EUDExecuteOnce()():
             for player in EUDLoopPlayer(None):
@@ -155,21 +158,21 @@ class _PlayerName:
                     playerid_epd.AddNumber(ut.EPD(0x57EEEC)),
                 )
                 idlen = f_strlen_epd(playerid_epd)
-                nameDb = self.basenames[player]
-                f_dbstr_print(nameDb, ptr2s(player_name), ":")
-                val_odd = f_dwread_epd(ut.EPD(nameDb))
+                name_db = self.basenames[player]
+                f_dbstr_print(name_db, ptr2s(player_name), ":")
+                val_odd = f_dwread_epd(ut.EPD(name_db))
                 v0, v1 = f_dwbreak(val_odd)[0:2]
                 val_even0 = v0 * 0x10000
-                val_even1 = v1 + f_wread_epd(ut.EPD(nameDb) + 1, 0) * 0x10000
-                con_odd, con_even = oddA[player], even1A[player]
+                val_even1 = v1 + f_wread_epd(ut.EPD(name_db) + 1, 0) * 0x10000
+                con_odd, con_even = odd_arr[player], even1_arr[player]
                 cs.DoActions(
                     idlen.AddNumber(1),  # fix ":" not recognized
                     player_name.AddNumber(1),
                     c.SetMemoryEPD(con_odd + 2, c.SetTo, val_odd),
-                    c.SetMemoryEPD(even0A[player] + 2, c.SetTo, val_even0),
+                    c.SetMemoryEPD(even0_arr[player] + 2, c.SetTo, val_even0),
                     c.SetMemoryEPD(con_even + 2, c.SetTo, val_even1),
                 )
-                f_dbstr_print(nameDb, ptr2s(player_name), ":")
+                f_dbstr_print(name_db, ptr2s(player_name), ":")
                 self.baselens[player] = idlen
                 if cs.EUDIf()(idlen <= 4):
                     cs.DoActions(
@@ -186,21 +189,23 @@ class _PlayerName:
         cs.EUDEndExecuteOnce()
 
         once = c.Forward()
-        cs.EUDJumpIf([once << c.Memory(0x57F23C, c.Exactly, ~0)], self.optimize_end)
+        cs.EUDJumpIf(
+            [once << c.Memory(0x57F23C, c.Exactly, ~0)], self.optimize_end
+        )
         cs.DoActions(
             self.is_chatptr_unchanged.Clear(),
             c.SetMemory(once + 8, c.SetTo, f_getgametick()),
         )
         c.RawTrigger(
-            conditions=[prevTxtPtr << c.Memory(0x640B58, c.Exactly, 11)],
+            conditions=[prev_textptr << c.Memory(0x640B58, c.Exactly, 11)],
             actions=self.is_chatptr_unchanged.Set(),
         )
         cs.EUDJumpIf(self.is_chatptr_unchanged, _end)
-        cs.DoActions(c.SetMemory(prevTxtPtr + 8, c.SetTo, 0))
+        cs.DoActions(c.SetMemory(prev_textptr + 8, c.SetTo, 0))
         for i in range(3, -1, -1):
             c.RawTrigger(
                 conditions=c.MemoryX(0x640B58, c.AtLeast, 1, 2**i),
-                actions=c.SetMemory(prevTxtPtr + 8, c.Add, 2**i),
+                actions=c.SetMemory(prev_textptr + 8, c.Add, 2**i),
             )
         _end << c.NextTrigger()
         self.optimize_end << c.RawTrigger()
@@ -224,7 +229,8 @@ class _PlayerName:
             if cs.EUDElseIf()(
                 [
                     self.odds_or_even,
-                    self.even0[i] << c.MemoryXEPD(dst, c.Exactly, 0, 0xFFFF0000),
+                    self.even0[i]
+                    << c.MemoryXEPD(dst, c.Exactly, 0, 0xFFFF0000),
                     self.even1[i] << c.MemoryEPD(dst + 1, c.Exactly, 0),
                 ]
             ):
@@ -239,7 +245,10 @@ class _PlayerName:
         self._optimize()
 
         start = c.Forward()
-        c.RawTrigger(nextptr=self.optimize_start, actions=c.SetNextPtr(self.optimize_end, start))
+        c.RawTrigger(
+            nextptr=self.optimize_start,
+            actions=c.SetNextPtr(self.optimize_end, start),
+        )
         start << c.NextTrigger()
 
         _end = c.Forward()
@@ -273,7 +282,9 @@ class _PlayerName:
             c.RawTrigger(
                 conditions=self.odds_or_even.IsSet(),
                 actions=[
-                    c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"\r" * 4), 0),
+                    c.SetDeaths(
+                        c.CurrentPlayer, c.SetTo, ut.b2i4(b"\r" * 4), 0
+                    ),
                     c.AddCurrentPlayer(1),
                 ],
             )
@@ -287,7 +298,10 @@ class _PlayerName:
                 self.epd.AddNumber(54),
                 self.odds_or_even.Toggle(),
             )
-            c.RawTrigger(conditions=self.odds_or_even.IsCleared(), actions=self.epd.AddNumber(1))
+            c.RawTrigger(
+                conditions=self.odds_or_even.IsCleared(),
+                actions=self.epd.AddNumber(1),
+            )
         cs.EUDEndWhile()
         f_setcurpl(origcp)
 
@@ -302,10 +316,10 @@ def f_check_id(player, dst):
     return _global_pname_class.check_id(player, dst)
 
 
-def SetPName(player, *name):
+def SetPName(player, *name):  # noqa: N802
     _global_pname_class.set_pname(player, *name)
 
 
-def SetPNamef(player, format_string, *args):
+def SetPNamef(player, format_string, *args):  # noqa: N802
     fmtargs = _format_args(format_string, *args)
     SetPName(player, *fmtargs)

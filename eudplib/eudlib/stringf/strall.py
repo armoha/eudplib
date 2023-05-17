@@ -1,22 +1,16 @@
 #!/usr/bin/python
 from ... import core as c
-from ... import ctrlstru as cs
 from ... import utils as ut
 from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from ..utilf import (
     DisplayTextAll,
-    PlayWAVAll,
-    SetMissionObjectivesAll,
     f_getuserplayerid,
 )
-from .cpprint import FixedText, f_gettextptr
-from .cpstr import GetMapStringAddr
-from .fmtprint import _format_args
+from .cpprint import FixedText
 from .strbuffer import GetGlobalStringBuffer
-from .strfunc import f_strlen_epd
 
 
-def f_printAll(format_string, *args):
+def f_printAll(format_string, *args):  # noqa: N802
     if not args:
         return f_setcurpl2cpcache([], DisplayTextAll(format_string))
     oldcp = f_getcurpl()
@@ -36,7 +30,7 @@ _display_text_all = DisplayTextAll(0)
     ],
     [None, c.TrgString],
 )
-def DisplayTextAllAt(line, text):
+def DisplayTextAllAt(line, text):  # noqa: N802
     with FixedText(_display_text_all):
         c.VProc([line, text], [])
         c.RawTrigger(
@@ -46,7 +40,7 @@ def DisplayTextAllAt(line, text):
     f_setcurpl2cpcache()
 
 
-def f_printAllAt(line, format_string, *args):
+def f_printAllAt(line, format_string, *args):  # noqa: N802
     if not args:
         DisplayTextAllAt(line, format_string)
     oldcp = f_getcurpl()

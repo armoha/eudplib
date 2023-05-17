@@ -12,7 +12,13 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
 from ..eudarray import EUDArray
-from ..memiof import CPByteWriter, f_bread_epd, f_cunitread_epd, f_getcurpl, f_setcurpl
+from ..memiof import (
+    CPByteWriter,
+    f_bread_epd,
+    f_cunitread_epd,
+    f_getcurpl,
+    f_setcurpl,
+)
 from ..utilf import IsUserCP
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
@@ -24,7 +30,7 @@ prevcp = c.EUDVariable()
 
 
 @c.EUDFunc
-def _PColor(p):
+def _pcolor(p):
     p += ut.EPD(0x581D76)
     pcolor = f_bread_epd(p, 2)
     # fmt: off
@@ -51,16 +57,16 @@ def _PColor(p):
     return pcolor
 
 
-def PColor(i):
+def PColor(i):  # noqa: N802
     if isinstance(i, type(c.P1)):
         if i == c.CurrentPlayer:
             i = prevcp
         else:
             i = c.EncodePlayer(i)
-    return epd2s(_PColor(i * 2))
+    return epd2s(_pcolor(i * 2))
 
 
-def PName(x):
+def PName(x):  # noqa: N802
     if ut.isUnproxyInstance(x, type(c.P1)):
         x = c.EncodePlayer(x)
         if x == c.EncodePlayer(c.CurrentPlayer):
@@ -68,7 +74,7 @@ def PName(x):
     return ptr2s(0x57EEEB + 36 * x)
 
 
-class FixedText(object):
+class FixedText:
     def __init__(self, actions_on_exit=[]):
         self._actions_on_exit = ut.FlattenList([actions_on_exit])
         self._txtptr = c.EUDVariable(ut.EPD(0x640B58), c.SetTo, 0)
@@ -199,11 +205,13 @@ def f_cpstr_addptr(number):
                 )
             cs.DoActions(
                 c.AddCurrentPlayer(1),
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0) if i == 16 else [],
+                c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0)
+                if i == 16
+                else [],
             )
 
 
-def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
+def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
     """Print multiple string / number to CurrentPlayer.
 
     :param args: Things to print
@@ -240,14 +248,15 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):
             f_cpstr_addptr(arg._value)
         else:
             raise ut.EPError(
-                "Object with unknown parameter type %s given to f_cpprint." % type(arg)
+                "Object with unknown parameter type %s given to f_cpprint."
+                % type(arg)
             )
     if EOS:
         cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
 
 
 @c.EUDTypedFunc([c.TrgPlayer])
-def f_raise_CCMU(player):
+def f_raise_CCMU(player):  # noqa: N802
     if cs.EUDIf()(c.Memory(0x628438, c.AtLeast, 0x59CCA8)):
         orignextptr = f_cunitread_epd(ut.EPD(0x628438))
         print_error = c.Forward()
@@ -268,7 +277,7 @@ def f_raise_CCMU(player):
 _eprintln_template = c.Forward()
 _eprintln_desync = c.Forward()
 _eprintln_print = c.Forward()
-_eprintln_EOS = c.Forward()
+_eprintln_eos = c.Forward()
 _eprintln_end = c.Forward()
 
 
@@ -283,14 +292,16 @@ def _eprint_init():
         _eprintln_print << c.RawTrigger(
             nextptr=0, actions=c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))
         )
-        _eprintln_EOS << c.RawTrigger(actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+        _eprintln_eos << c.RawTrigger(
+            actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
+        )
         f_setcurpl(prevcp)
     cs.EUDEndIf()
     _eprintln_end << c.RawTrigger(nextptr=0)
     c.PopTriggerScope()
 
 
-def _eprintAll(*args):
+def eprint_all(*args):
     _eprint_init()
 
     _print, _next = c.Forward(), c.Forward()
@@ -307,7 +318,7 @@ def _eprintAll(*args):
     )
     _print << c.NextTrigger()
     f_cpstr_print(*args, EOS=False, encoding="UTF-8")
-    c.SetNextTrigger(_eprintln_EOS)
+    c.SetNextTrigger(_eprintln_eos)
     _next << c.NextTrigger()
 
 
@@ -318,7 +329,11 @@ def f_eprintln(*args):
     c.RawTrigger(
         nextptr=_eprintln_template,
         actions=[
-            c.SetMemory(_eprintln_template + 380, c.SetTo, c.EncodePlayer(c.CurrentPlayer)),
+            c.SetMemory(
+                _eprintln_template + 380,
+                c.SetTo,
+                c.EncodePlayer(c.CurrentPlayer),
+            ),
             c.SetMemoryX(_eprintln_desync + 12, c.SetTo, 15 << 24, 0xFF000000),
             c.SetNextPtr(_eprintln_print, _print),
             c.SetNextPtr(_eprintln_end, _next),
@@ -326,5 +341,5 @@ def f_eprintln(*args):
     )
     _print << c.NextTrigger()
     f_cpstr_print(*args, EOS=False, encoding="UTF-8")
-    c.SetNextTrigger(_eprintln_EOS)
+    c.SetNextTrigger(_eprintln_eos)
     _next << c.NextTrigger()

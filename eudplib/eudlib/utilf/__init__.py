@@ -40,7 +40,7 @@ from .userpl import (
     f_getuserplayerid,
 )
 
-__all__ = (
+__all__ = [
     "EUDBinaryMax",
     "EUDBinaryMin",
     "f_getgametick",
@@ -78,4 +78,4 @@ __all__ = (
     "SetMissionObjectivesAll",
     "TalkingPortraitAll",
     "f_getuserplayerid",
-)
+]

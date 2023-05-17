@@ -13,31 +13,35 @@ from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import GetStringSectionName
 from eudplib.localize import _
 
-from ..memiof import f_dwepdread_epd, f_dwread_epd, f_wread_epd
+from ..memiof import f_dwread_epd, f_wread_epd
+
+_STR_ADDRESS = 0x191943C8
 
 
 @c.EUDTypedFunc([c.TrgString])
-def _GetMapStringAddr(strId):
-    add_STR_ptr, add_STR_epd = c.Forward(), c.Forward()
+def _get_mapstring_addr(str_id):
+    add_strptr, add_strepd = c.Forward(), c.Forward()
     if cs.EUDExecuteOnce()():
-        STR_ptr, STR_epd = 0x191943C8, ut.EPD(0x191943C8)
+        strptr, strepd = _STR_ADDRESS, ut.EPD(_STR_ADDRESS)
         cs.DoActions(
-            c.SetMemory(add_STR_ptr + 20, c.SetTo, STR_ptr),
-            c.SetMemory(add_STR_epd + 20, c.SetTo, STR_epd),
+            c.SetMemory(add_strptr + 20, c.SetTo, strptr),
+            c.SetMemory(add_strepd + 20, c.SetTo, strepd),
         )
     cs.EUDEndExecuteOnce()
     str_chunk_name = GetStringSectionName()
     if str_chunk_name == "STR":
-        r, m = c.f_div(strId, 2)
+        r, m = c.f_div(str_id, 2)
         c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
-        c.RawTrigger(actions=add_STR_epd << r.AddNumber(0))
+        c.RawTrigger(actions=add_strepd << r.AddNumber(0))
         ret = f_wread_epd(r, m)
     elif str_chunk_name == "STRx":
-        c.RawTrigger(actions=add_STR_epd << strId.AddNumber(0))
-        ret = f_dwread_epd(strId)
+        c.RawTrigger(actions=add_strepd << str_id.AddNumber(0))
+        ret = f_dwread_epd(str_id)
     else:
-        raise ut.EPError(_("Invalid string section name: {}").format(str_chunk_name))
-    c.RawTrigger(actions=add_STR_ptr << ret.AddNumber(0))
+        raise ut.EPError(
+            _("Invalid string section name: {}").format(str_chunk_name)
+        )
+    c.RawTrigger(actions=add_strptr << ret.AddNumber(0))
     c.EUDReturn(ret)
 
 
@@ -49,34 +53,38 @@ def _initialize_queries():
 
     strmap = GetStringMap()
     strmap.Finalize()
-    STR_ADDRESS = 0x191943C8
     non_existing_id = []
-    for strId, offsetQuery in _const_strptr.items():
+    for str_id, offset_query in _const_strptr.items():
         try:
-            offsetQuery._expr = c.ConstExpr(
-                None, STR_ADDRESS + strmap._stroffset[strmap._dataindextb[strId - 1]], 0
+            offset_query._expr = c.ConstExpr(
+                None,
+                _STR_ADDRESS
+                + strmap._stroffset[strmap._dataindextb[str_id - 1]],
+                0,
             )
         except IndexError:
-            non_existing_id.append(strId)
+            non_existing_id.append(str_id)
 
     if non_existing_id:
         raise ut.EPError(
-            _("GetMapStringAddr(strId) for non-existing string ID(s): {}").format(non_existing_id)
+            _(
+                "GetMapStringAddr(str_id) for non-existing string ID(s): {}"
+            ).format(non_existing_id)
         )
 
 
 _RegisterAllocObjectsCallback(_initialize_queries)
 
 
-def GetMapStringAddr(strId):
+def GetMapStringAddr(str_id):  # noqa: N802
     global _const_strptr
-    strId = c.EncodeString(strId)
-    if isinstance(strId, int):
-        if strId not in _const_strptr:
-            _const_strptr[strId] = c.Forward()
-            _const_strptr[strId] << 0
-        return _const_strptr[strId]
-    return _GetMapStringAddr(strId)
+    str_id = c.EncodeString(str_id)
+    if isinstance(str_id, int):
+        if str_id not in _const_strptr:
+            _const_strptr[str_id] = c.Forward()
+            _const_strptr[str_id] << 0
+        return _const_strptr[str_id]
+    return _get_mapstring_addr(str_id)
 
 
 def _s2b(x):
@@ -89,7 +97,10 @@ def _s2b(x):
 
 def _addcpcache(p):
     p = c.EncodePlayer(p)
-    return [_curpl_var.AddNumber(p), c.SetMemory(_curpl_checkcond + 8, c.Add, p)]
+    return [
+        _curpl_var.AddNumber(p),
+        c.SetMemory(_curpl_checkcond + 8, c.Add, p),
+    ]
 
 
 class CPString:
@@ -110,14 +121,21 @@ class CPString:
         elif isinstance(content, str) or isinstance(content, bytes):
             self.content = _s2b(content)
         else:
-            raise ut.EPError(_("Unexpected type for CPString: {}").format(type(content)))
+            raise ut.EPError(
+                _("Unexpected type for CPString: {}").format(type(content))
+            )
 
         self.length = len(self.content) // 4
         self.trigger = list()
         self.valueAddr = [0 for _ in range(self.length)]
         actions = [
             [
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(self.content[i : i + 4]), i // 48)
+                c.SetDeaths(
+                    c.CurrentPlayer,
+                    c.SetTo,
+                    ut.b2i4(self.content[i : i + 4]),
+                    i // 48,
+                )
                 for i in range(4 * mod, len(self.content), 48)
             ]
             for mod in range(12)
@@ -145,12 +163,14 @@ class CPString:
             self.trigger.append(t)
         c.PopTriggerScope()
 
-        self.valueAddr = [self.trigger[v // 64] + 348 + 32 * (v % 64) for v in self.valueAddr]
+        self.valueAddr = [
+            self.trigger[v // 64] + 348 + 32 * (v % 64) for v in self.valueAddr
+        ]
         _nextptr = c.Forward()
         self.trigger[-1]._nextptr = _nextptr
         _nextptr << c.NextTrigger()
 
-    def Display(self, action=[]):
+    def Display(self, action=[]):  # noqa: N802
         _next = c.Forward()
         c.RawTrigger(
             nextptr=self.trigger[0],
@@ -158,5 +178,5 @@ class CPString:
         )
         _next << c.NextTrigger()
 
-    def GetVTable(self):
+    def GetVTable(self):  # noqa: N802
         return self.trigger[0]

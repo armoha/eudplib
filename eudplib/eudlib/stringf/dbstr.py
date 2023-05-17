@@ -6,11 +6,7 @@
 # file that should have been included as part of this package.
 
 from eudplib import core as c
-from eudplib import ctrlstru as cs
 from eudplib import utils as ut
-
-from ..memiof import f_dwread_epd, f_dwwrite_epd
-from .cpstr import GetMapStringAddr
 
 
 class DBString(ut.ExprProxy):
@@ -38,7 +34,7 @@ class DBString(ut.ExprProxy):
         else:
             super().__init__(_from)
 
-    def GetStringMemoryAddr(self):
+    def GetStringMemoryAddr(self):  # noqa: N802
         """Get memory address of DBString content.
 
         :returns: Memory address of DBString content.
@@ -46,18 +42,19 @@ class DBString(ut.ExprProxy):
         return self + 4
 
     @c.EUDMethod
-    def Display(self):
-        from .eudprint import epd2s
+    def Display(self):  # noqa: N802
         from .strbuffer import GetGlobalStringBuffer
 
         gsb = GetGlobalStringBuffer()
-        gsb.print(epd2s(ut.EPD(self) + 1))
+        gsb.printf("{:t}", ut.EPD(self) + 1)
 
     @c.EUDMethod
-    def Play(self):
+    def Play(self):  # noqa: N802
+        from .strbuffer import GetGlobalStringBuffer
+
         gsb = GetGlobalStringBuffer()
         gsb.insert(0)
-        gsb.append(epd2s(ut.EPD(self) + 1))
+        gsb.appendf("{:t}", ut.EPD(self) + 1)
         gsb.Play()
 
 
@@ -80,10 +77,10 @@ class DBStringData(c.EUDObject):
         else:
             self.content = ut.u2utf8(content)
 
-    def GetDataSize(self):
+    def GetDataSize(self):  # noqa: N802
         return len(self.content) + 5
 
-    def WritePayload(self, pbuf):
+    def WritePayload(self, pbuf):  # noqa: N802
         pbuf.WriteBytes(b"\x01\x00\x04\x00")
         pbuf.WriteBytes(self.content)
         pbuf.WriteByte(0)

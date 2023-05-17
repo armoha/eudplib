@@ -71,12 +71,17 @@ def f_cpchar_adddw(number):
         if i != 9:
             skipper[i] << c.NextTrigger()
         cs.DoActions(
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, color_v + ch[i] * 256 + (0x0D0D3000), 0),
+            c.SetDeaths(
+                c.CurrentPlayer,
+                c.SetTo,
+                color_v + ch[i] * 256 + (0x0D0D3000),
+                0,
+            ),
             c.AddCurrentPlayer(1),
         )
 
 
-def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):
+def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
     global color_code
     args = ut.FlattenList(args)
 
@@ -118,13 +123,34 @@ def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):
 
 
 _TextFX_dict = dict()
-id_codes = (
-    "\x18\x02\x03\x04\x06\x07\x08\x0D\x0E\x0F\x10\x11\x15\x16\x17\x19\x1A\x1B\x1C\x1D\x1E\x1F"
-)
+id_codes = [
+    "\x18",
+    "\x02",
+    "\x03",
+    "\x04",
+    "\x06",
+    "\x07",
+    "\x08",
+    "\x0D",
+    "\x0E",
+    "\x0F",
+    "\x10",
+    "\x11",
+    "\x15",
+    "\x16",
+    "\x17",
+    "\x19",
+    "\x1A",
+    "\x1B",
+    "\x1C",
+    "\x1D",
+    "\x1E",
+    "\x1F",
+]
 id_gen = itertools.cycle(itertools.product(id_codes, repeat=6))
 
 
-def _add_TextFX_timer(tag):
+def _add_textfx_timer(tag):
     if tag not in _TextFX_dict:
         _TextFX_dict[tag] = (
             c.EUDVariable(),
@@ -133,29 +159,29 @@ def _add_TextFX_timer(tag):
         )
 
 
-def _get_TextFX_timer(tag):
+def get_textfx_timer(tag):
     return _TextFX_dict[tag]
 
 
-def TextFX_SetTimer(tag, modtype, value):
-    _add_TextFX_timer(tag)
-    timer, _, _ = _get_TextFX_timer(tag)
+def TextFX_SetTimer(tag, modtype, value):  # noqa: N802
+    _add_textfx_timer(tag)
+    timer, _, _ = get_textfx_timer(tag)
     cs.DoActions(c.SetMemory(timer.getValueAddr(), modtype, value))
 
 
 @c.EUDFunc
-def _remove_TextFX(o0, o1, e0, e1):
-    txtPtr = c.EUDVariable()
-    e0t, e1t, e_fail, o0t, o1t, o_fail = [c.Forward() for _ in range(6)]
-    setPtr_o, setPtr_e = c.Forward(), c.Forward()
+def _remove_textfx(o0, o1, e0, e1):
+    textptr = c.EUDVariable()
+    e0t, e1t, e_fail, o0t, o1t, o_fail = (c.Forward() for _ in range(6))
+    setptr_o, setptr_e = c.Forward(), c.Forward()
 
     c.VProc(
         [o0, o1, e0, e1],
         [
-            txtPtr.SetNumber(-1),
+            textptr.SetNumber(-1),
             c.SetMemory(0x6509B0, c.SetTo, ut.EPD(0x640B60 + 218 * 11)),
-            c.SetMemory(setPtr_o + 20, c.SetTo, 10),
-            c.SetMemory(setPtr_e + 20, c.SetTo, 11),
+            c.SetMemory(setptr_o + 20, c.SetTo, 10),
+            c.SetMemory(setptr_e + 20, c.SetTo, 11),
             o0.SetDest(ut.EPD(o0t + 16)),
             o1.SetDest(ut.EPD(o1t + 16)),
             e0.SetDest(ut.EPD(e0t + 16)),
@@ -175,7 +201,7 @@ def _remove_TextFX(o0, o1, e0, e1):
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
                 c.SetMemory(0x6509B0, c.Subtract, 1),
                 c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
-                setPtr_e << txtPtr.SetNumber(0),
+                setptr_e << textptr.SetNumber(0),
                 c.SetNextPtr(e1t, incr_e),
             ],
         )
@@ -185,7 +211,7 @@ def _remove_TextFX(o0, o1, e0, e1):
                 c.SetNextPtr(e0t, incr_e),
                 c.SetNextPtr(e1t, e_fail),
                 c.SetMemory(0x6509B0, c.Subtract, 216 // 4),
-                c.SetMemory(setPtr_e + 20, c.Subtract, 2),
+                c.SetMemory(setptr_e + 20, c.Subtract, 2),
             ]
         )
         o0t << c.RawTrigger(
@@ -199,7 +225,7 @@ def _remove_TextFX(o0, o1, e0, e1):
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
                 c.SetMemory(0x6509B0, c.Subtract, 1),
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                setPtr_o << txtPtr.SetNumber(0),
+                setptr_o << textptr.SetNumber(0),
                 c.SetNextPtr(o1t, incr_o),
             ],
         )
@@ -209,23 +235,23 @@ def _remove_TextFX(o0, o1, e0, e1):
                 c.SetNextPtr(o0t, incr_o),
                 c.SetNextPtr(o1t, o_fail),
                 c.SetMemory(0x6509B0, c.Subtract, 220 // 4),
-                c.SetMemory(setPtr_o + 20, c.Subtract, 2),
+                c.SetMemory(setptr_o + 20, c.Subtract, 2),
             ]
         )
     cs.EUDEndLoopN()
     f_setcurpl2cpcache()
-    return txtPtr
+    return textptr
 
 
-def TextFX_Remove(tag):
+def TextFX_Remove(tag):  # noqa: N802
     ut.ep_assert(tag is not None, "tag should not be None")
-    _add_TextFX_timer(tag)
-    _, _, identifier = _get_TextFX_timer(tag)
+    _add_textfx_timer(tag)
+    _, _, identifier = get_textfx_timer(tag)
     o0 = ut.b2i4(identifier[0:4])
     o1 = ut.b2i2(identifier[4:6])
     e0 = ut.b2i2(identifier[0:2]) * 0x10000
     e1 = ut.b2i4(identifier[2:6])
-    return _remove_TextFX(o0, o1, e0, e1)
+    return _remove_textfx(o0, o1, e0, e1)
 
 
 _check_cp = c.Forward()
@@ -233,7 +259,7 @@ _is_below_start = c.Forward()
 _cpbelowbuffer = c.EUDLightBool()
 
 
-def _is_CP_less_than_start(actions):
+def _is_cp_less_than_start(actions):
     global _is_below_start
     if not _is_below_start.IsSet():
         c.PushTriggerScope()
@@ -243,30 +269,37 @@ def _is_CP_less_than_start(actions):
         )
         c.PopTriggerScope()
     _next = c.Forward()
+    actions = ut.FlattenList(actions)
     c.RawTrigger(
         nextptr=_is_below_start,
-        actions=[actions] + [_cpbelowbuffer.Clear(), c.SetNextPtr(_is_below_start, _next)],
+        actions=[
+            *actions,
+            _cpbelowbuffer.Clear(),
+            c.SetNextPtr(_is_below_start, _next),
+        ],
     )
     _next << c.NextTrigger()
 
 
-def R2L(colors, colors_dict={}):
+def _r2l(colors, colors_dict={}):
     try:
         _f = colors_dict[colors]
     except KeyError:
 
         @c.EUDFunc
         def _f():
-            _jump, _isend, _end = [c.Forward() for _ in range(3)]
+            _jump, _isend, _end = (c.Forward() for _ in range(3))
             ret = c.EUDVariable()
-            _is_CP_less_than_start([ret.SetNumber(1), c.SetNextPtr(_isend, _jump)])
+            _is_cp_less_than_start(
+                [ret.SetNumber(1), c.SetNextPtr(_isend, _jump)]
+            )
             _isend << c.RawTrigger(
                 conditions=_cpbelowbuffer.IsSet(),
                 actions=[ret.SetNumber(0), c.SetNextPtr(_isend, _end)],
             )
             _jump << c.NextTrigger()
             for color in reversed(colors):
-                _is_CP_less_than_start([])
+                _is_cp_less_than_start([])
                 c.RawTrigger(
                     conditions=_cpbelowbuffer.IsCleared(),
                     actions=[
@@ -281,7 +314,7 @@ def R2L(colors, colors_dict={}):
     return _f()
 
 
-def _TextFX_Print(*args, identifier, encoding="UTF-8"):
+def _textfx_print(*args, identifier, encoding="UTF-8"):
     f_cpstr_print(identifier, EOS=False, encoding=encoding)
     global color_code
     color_code = b"\x02"
@@ -293,7 +326,11 @@ def _TextFX_Print(*args, identifier, encoding="UTF-8"):
             line = arg.split("\n")
             for s in line[:-1]:
                 f_cpchar_print(s, EOS=False, encoding=encoding)
-                f_cpstr_print(identifier + b"\n" + identifier, EOS=False, encoding=encoding)
+                f_cpstr_print(
+                    identifier + b"\n" + identifier,
+                    EOS=False,
+                    encoding=encoding,
+                )
             f_cpchar_print(line[-1], EOS=False, encoding=encoding)
         else:
             f_cpchar_print(arg, EOS=False, encoding=encoding)
@@ -301,7 +338,9 @@ def _TextFX_Print(*args, identifier, encoding="UTF-8"):
     cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
 
 
-def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF-8"):
+def TextFX_FadeIn(  # noqa: N802
+    *args, color=None, wait=1, reset=True, tag=None, encoding="UTF-8"
+):
     """Print multiple string / number and apply color from Left To Right
 
     Keyword arguments:
@@ -318,8 +357,8 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
         else:
             tag = args
 
-    _add_TextFX_timer(tag)
-    timer, counter, identifier = _get_TextFX_timer(tag)
+    _add_textfx_timer(tag)
+    timer, counter, identifier = get_textfx_timer(tag)
 
     start = f_getcurpl()
     c.VProc(
@@ -329,8 +368,10 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
             start.SetDest(ut.EPD(_check_cp) + 2),
         ],
     )
-    _TextFX_Print(*args, identifier=identifier, encoding=encoding)
-    f_setcurpl(start, actions=[start.AddNumber(2 - len(color))], set_modifier=False)
+    _textfx_print(*args, identifier=identifier, encoding=encoding)
+    f_setcurpl(
+        start, actions=[start.AddNumber(2 - len(color))], set_modifier=False
+    )
 
     if reset is True:
         check_gametick = c.Forward()
@@ -346,7 +387,7 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
             )
         cs.EUDEndIf()
 
-    _is_finished, _draw_color, _end = [c.Forward() for _ in range(3)]
+    _is_finished, _draw_color, _end = (c.Forward() for _ in range(3))
     ret = c.EUDVariable()
 
     cs.DoActions(
@@ -372,7 +413,7 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
             c.AddCurrentPlayer(len(color) - 1),
         ]
     )
-    R2L(color)
+    _r2l(color)
     c.RawTrigger(
         conditions=counter.AtLeast(max(wait, 1)),
         actions=[counter.SetNumber(0), timer.AddNumber(1)],
@@ -381,7 +422,9 @@ def TextFX_FadeIn(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF
     return ret
 
 
-def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UTF-8"):
+def TextFX_FadeOut(  # noqa: N802
+    *args, color=None, wait=1, reset=True, tag=None, encoding="UTF-8"
+):
     """Print multiple string / number and apply color from Left To Right
 
     Keyword arguments:
@@ -398,8 +441,8 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
         else:
             tag = args
 
-    _add_TextFX_timer(tag)
-    timer, counter, identifier = _get_TextFX_timer(tag)
+    _add_textfx_timer(tag)
+    timer, counter, identifier = get_textfx_timer(tag)
 
     start = f_getcurpl()
     c.VProc(
@@ -409,7 +452,7 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
             start.SetDest(ut.EPD(_check_cp) + 2),
         ],
     )
-    _TextFX_Print(*args, identifier=identifier, encoding=encoding)
+    _textfx_print(*args, identifier=identifier, encoding=encoding)
 
     if reset is True:
         check_gametick = c.Forward()
@@ -431,9 +474,11 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
     cs.DoActions(
         c.SetMemory(check_gametick + 8, c.Add, 1) if reset is True else [],
         c.AddCurrentPlayer((len(color) - 1) - timer),
-        c.SetNextPtr(increment_and_jump, paint_last_color) if does_last_color_overwrite else [],
+        c.SetNextPtr(increment_and_jump, paint_last_color)
+        if does_last_color_overwrite
+        else [],
     )
-    ret = R2L(color)
+    ret = _r2l(color)
     if does_last_color_overwrite:
         skip = c.Forward()
         increment_and_jump << c.RawTrigger(
@@ -450,7 +495,9 @@ def TextFX_FadeOut(*args, color=None, wait=1, reset=True, tag=None, encoding="UT
                 start.SetDest(ut.EPD(0x6509B0)),
             ],
         )
-        f_setcurpl2cpcache([], c.SetDeathsX(c.CurrentPlayer, c.SetTo, color[-1], 0, 0xFF))
+        f_setcurpl2cpcache(
+            [], c.SetDeathsX(c.CurrentPlayer, c.SetTo, color[-1], 0, 0xFF)
+        )
         skip << c.NextTrigger()
     else:
         c.RawTrigger(conditions=ret.Exactly(1), actions=counter.AddNumber(1))

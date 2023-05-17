@@ -5,8 +5,8 @@ from eudplib.epscript.helper import _RELIMP, _IGVA, _CGFW, _ARR, _VARR, _SRET, _
 from eudplib.eudlib.stringf import tblprint
 # (Line 2) const inputData = py_bytes(1000);
 inputData = _CGFW(lambda: [bytes(1000)], 1)[0]
-# (Line 3) tblprint._AddStatText(inputData);
-tblprint._AddStatText(inputData)
+# (Line 3) tblprint._add_stattext(inputData);
+tblprint._add_stattext(inputData)
 # (Line 5) const expected_result = py_str("abcdeArmo\xE2\x80\x89\0");
 expected_result = _CGFW(lambda: [str("abcdeArmo\xE2\x80\x89\0")], 1)[0]
 # (Line 6) function test_stattext() {

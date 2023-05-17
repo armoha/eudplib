@@ -5,15 +5,13 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-import cgi
 import string
 
 from eudplib import core as c
-from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 from eudplib.localize import _
 
-from .cpprint import PColor, PName, _eprintAll, f_cpstr_print, f_eprintln
+from .cpprint import PColor, PName, eprint_all, f_cpstr_print, f_eprintln
 from .dbstr import DBString
 from .eudprint import epd2s, f_dbstr_print, hptr, ptr2s
 
@@ -29,12 +27,20 @@ class _EUDFormatter(string.Formatter):
         return result
 
     def _eudformat(
-        self, format_string, args, kwargs, used_args, recursion_depth, auto_arg_index=0
+        self,
+        format_string,
+        args,
+        kwargs,
+        used_args,
+        recursion_depth,
+        auto_arg_index=0,
     ):
         if recursion_depth < 0:
             raise ValueError(_("Max string recursion exceeded"))
         result = []
-        for literal_text, field_name, format_spec, conversion in self.parse(format_string):
+        for literal_text, field_name, format_spec, conversion in self.parse(
+            format_string
+        ):
             # output the literal text
             if literal_text:
                 result.append(literal_text)
@@ -47,12 +53,12 @@ class _EUDFormatter(string.Formatter):
                 # handle arg indexing when empty field_names are given.
                 if field_name == "":
                     if auto_arg_index is False:
-                        raise ValueError(_("cannot switch from manual field specification to automatic field numbering"))
+                        raise ValueError(_("cannot switch from manual field specification to automatic field numbering"))  # noqa: E501
                     field_name = str(auto_arg_index)
                     auto_arg_index += 1
                 elif field_name.isdigit():
                     if auto_arg_index:
-                        raise ValueError(_("cannot switch from manual field specification to automatic field numbering"))
+                        raise ValueError(_("cannot switch from manual field specification to automatic field numbering"))  # noqa: E501
                     # disable auto arg incrementing, if it gets
                     # used later on, then an exception will be raised
                     auto_arg_index = False
@@ -111,7 +117,7 @@ class _EUDFormatter(string.Formatter):
         if key == "":
             key = self.last_number
             self.last_number += 1
-        return super(_EUDFormatter, self).get_value(key, args, kwargs)
+        return super().get_value(key, args, kwargs)
 
 
 def _format_args(format_string, *args):
@@ -119,12 +125,12 @@ def _format_args(format_string, *args):
     return formatter.format(format_string, *args)
 
 
-def f_sprintf(dst, format_string, *args, EOS=True, encoding="UTF-8"):
+def f_sprintf(dst, format_string, *args, EOS=True, encoding="UTF-8"):  # noqa: N803
     fmtargs = _format_args(format_string, *args)
     return f_dbstr_print(dst, *fmtargs, EOS=EOS, encoding=encoding)
 
 
-def f_sprintf_cp(format_string, *args, EOS=True, encoding="UTF-8"):
+def f_sprintf_cp(format_string, *args, EOS=True, encoding="UTF-8"):  # noqa: N803
     fmtargs = _format_args(format_string, *args)
     f_cpstr_print(*fmtargs, EOS=EOS, encoding=encoding)
 
@@ -134,6 +140,6 @@ def f_eprintf(format_string, *args):
     f_eprintln(*fmtargs)
 
 
-def f_eprintAll(format_string, *args):
+def f_eprintAll(format_string, *args):  # noqa: N802
     fmtargs = _format_args(format_string, *args)
-    _eprintAll(*fmtargs)
+    eprint_all(*fmtargs)
