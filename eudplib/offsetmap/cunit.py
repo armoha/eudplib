@@ -512,8 +512,8 @@ class CUnit(EPDOffsetMap):
 
     @staticmethod
     @c.EUDTypedFunc([None, c.TrgPlayer])
-    def _set_color(unit, color_player):
-        from ..eudlib.memiof import f_bwrite_epd, f_spriteepdread_epd
+    def _set_color(unit, color_player65536):
+        from ..eudlib.memiof import f_maskwrite_epd, f_spriteepdread_epd
 
         color_epd = c.EUDVariable()
         check_sprite = c.MemoryEPD(0, c.Exactly, 0)
@@ -530,11 +530,12 @@ class CUnit(EPDOffsetMap):
             )
         cs.EUDEndIf()
         if cs.EUDIfNot()(color_epd <= 2):
-            f_bwrite_epd(color_epd + 2, 2, color_player)
+            f_maskwrite_epd(color_epd + 2, color_player65536, 0xFF0000)
         cs.EUDEndIf()
 
     def set_color(self, color_player) -> None:
-        CUnit._set_color(self, color_player)
+        color_player = c.EncodePlayer(color_player)
+        CUnit._set_color(self, color_player * 65536)
 
     def check_status_flag(self, value, mask=None) -> c.Condition:
         if mask is None:
@@ -576,31 +577,31 @@ class CUnit(EPDOffsetMap):
             ],
         )
         Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
             ret.SetNumber(1),
         )
         if cs.EUDIfNot()(ret == 1):
             unit65536 = unit_type * 65536  # Does not change CurrentPlayer
             Trigger(
                 c.DeathsX(
-                    c.CurrentPlayer, c.Exactly, unit65536, 0xFFFF0000, 0
+                    c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000
                 ),
                 ret.SetNumber(1),
             )
             c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
             Trigger(
-                c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+                c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
                 ret.SetNumber(1),
             )
             Trigger(
                 c.DeathsX(
-                    c.CurrentPlayer, c.Exactly, unit65536, 0xFFFF0000, 0
+                    c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000
                 ),
                 ret.SetNumber(1),
             )
             c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
             Trigger(
-                c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+                c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
                 ret.SetNumber(1),
             )
         cs.EUDEndIf()
@@ -625,25 +626,25 @@ class CUnit(EPDOffsetMap):
             ],
         )
         Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
             ret.SetNumber(1),
         )
         Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0xFFFF0000, 0),
-            ret.SetNumber(1),
-        )
-        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-        Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
-            ret.SetNumber(1),
-        )
-        Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0xFFFF0000, 0),
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
             ret.SetNumber(1),
         )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
         Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0xFFFF, 0),
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
+            ret.SetNumber(1),
+        )
+        Trigger(
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
+            ret.SetNumber(1),
+        )
+        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
+        Trigger(
+            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
             ret.SetNumber(1),
         )
         f_setcurpl2cpcache()
