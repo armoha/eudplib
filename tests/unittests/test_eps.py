@@ -13,8 +13,17 @@ from .test_eps_array import (
 )
 from .test_eps_compat import f_test_compatibility, stat
 from .test_eps_cunit import f_test_cunit
-from .test_eps_epsfile import f_constv_thing, f_square, f_switch_test, f_test_array
-from .test_eps_object import f_test_nested_object, f_test_object, f_test_selftype_member
+from .test_eps_epsfile import (
+    f_constv_thing,
+    f_square,
+    f_switch_test,
+    f_test_array,
+)
+from .test_eps_object import (
+    f_test_nested_object,
+    f_test_object,
+    f_test_selftype_member,
+)
 
 
 @TestInstance
@@ -41,7 +50,11 @@ def test_epscript():
         [c[0]] * (len(c) - 1),
     )
     test_equality("epScript EUDQueue", f_test_queue(), 31)
-    test_equality("epScript queue wraparound", f_test_queue_wraparound(), [0, 3, 9, 12, 9, 20, 14])
+    test_equality(
+        "epScript queue wraparound",
+        f_test_queue_wraparound(),
+        [0, 3, 9, 12, 9, 20, 14],
+    )
     dq = deque(maxlen=7)
     cases = []
     pushes = 1
@@ -56,14 +69,18 @@ def test_epscript():
         else:
             cases.append(0)
     cases.append(len(dq) + sum(dq))
-    testname = DequeTest + "".join(chr(14 + i % 4) + str(x) for i, x in enumerate(cases))
+    testname = DequeTest + "".join(
+        chr(14 + i % 4) + str(x) for i, x in enumerate(cases)
+    )
     test_equality("epScript EUDDeque %s" % testname, f_test_deque(), cases)
 
     test_equality("epScript object", f_test_object(), 511)
     test_equality("epScript nested object", f_test_nested_object(), 127)
     test_equality("epScript all object array", f_test_selftype_member(), 5)
-    test_equality("epScript EPDCUnitMap", f_test_cunit(), 4095 + 32768)
+    test_equality("epScript EPDCUnitMap", f_test_cunit(), 131071)
     test_equality("epScript compatibility", f_test_compatibility(), 32)
     test_equality(
-        "epScript stat_txt.tbl", stat.f_test_stattext(), [ord(c) for c in stat.expected_result]
+        "epScript stat_txt.tbl",
+        stat.f_test_stattext(),
+        [ord(c) for c in stat.expected_result],
     )
