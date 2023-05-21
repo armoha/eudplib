@@ -379,8 +379,14 @@ method_header(H) ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_
         }
     });
 
+    // Skip decorator header for constructor_static
+    if (name->data == "constructor_static") {
+        if (isTypedFunction) {
+            throw_error(9789, "constructor_static can't be typed method", args->line);
+        }
+    }
     // Add decorator header
-    if (!isTypedFunction) {
+    else if (!isTypedFunction) {
         if(MAP_DEBUG) ps->gen << "@EUDTracedMethod\n";
         else ps->gen << "@EUDMethod\n";
     }
