@@ -14,33 +14,50 @@ from .vararray import EUDVArray
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
-    def __init__(self, *args, _from=None, **kwargs) -> None:
+    def __init__(self, *args, _from=None, _fields_static=None, **kwargs) -> None:
         fielddict = {}
         fieldcount = 0
         for basetype in reversed(type(self).__mro__):
             if not hasattr(basetype, "_fields_"):
                 continue
 
-            for nametype in basetype._fields_:
-                if isinstance(nametype, str):  # "fieldname"
-                    fieldname = nametype
+            for name_type_mut in basetype._fields_:
+                if isinstance(name_type_mut, str):  # "fieldname"
+                    fieldname = name_type_mut
                     fieldtype = None
-                else:  # ("fieldname", fieldtype)
-                    fieldname = nametype[0]
-                    fieldtype = nametype[1]
+                    fieldmutability = "var"
+                elif len(name_type_mut) == 2:  # ("fieldname", fieldtype)
+                    fieldname = name_type_mut[0]
+                    fieldtype = name_type_mut[1]
+                    fieldmutability = "var"
+                else:  # ("fieldname", fieldtype, "const|static")
+                    fieldname = name_type_mut[0]
+                    fieldtype = name_type_mut[1]
+                    fieldmutability = name_type_mut[2]
+
+                if fieldmutability not in ("var", "const", "static"):
+                    raise ut.EPError(
+                        _("Mutability must be one of var, const, and static, not {}").format(
+                            fieldmutability
+                        )
+                    )
 
                 if fieldname in fielddict:
                     raise ut.EPError(_("Duplicated field name: {}").format(fieldname))
-                fielddict[fieldname] = (fieldcount, fieldtype)
+                fielddict[fieldname] = (fieldcount, fieldtype, fieldmutability)
                 fieldcount += 1
 
-        self._fielddict: dict[str, tuple[int, type | None]] = fielddict
+        self._fielddict: dict[str, tuple[int, type | None, str]] = fielddict
 
         if _from is not None:
             super().__init__(EUDVArray(fieldcount).cast(_from))
             self._initialized = True
         else:
-            super().__init__(EUDVArray(fieldcount)([0] * fieldcount))
+            if _fields_static is None:
+                _fields_static = [0] * fieldcount
+            else:
+                _fields_static
+            super().__init__(EUDVArray(fieldcount)(_fields_static))
             self.isPooled = False
             self._initialized = True
             self.constructor_static(*args, **kwargs)
@@ -121,7 +138,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
     # Field setter & getter
 
     def getfield(self, name):
-        attrid, attrtype = self._fielddict[name]
+        attrid, attrtype, attrmut = self._fielddict[name]
         attr = self.get(attrid)
         if attrtype:
             return attrtype.cast(attr)
@@ -131,7 +148,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
     def setfield(self, name, value):
         from ..eudfunc.consttype import createEncoder
 
-        attrid, attrtype = self._fielddict[name]
+        attrid, attrtype, attrmut = self._fielddict[name]
         if isinstance(attrtype, createEncoder):
             value = attrtype.cast(value)
         self.set(attrid, value)
@@ -170,81 +187,107 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
     # Specializations
 
     def iaddattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.iadditem(attrid, value)
 
     # FIXME: add operator for Subtract
     def isubtractattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.isubtractitem(attrid, value)
 
     def isubattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.isubitem(attrid, value)
 
     def imulattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.imulitem(attrid, value)
 
     def ifloordivattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.ifloordivitem(attrid, value)
 
     def imodattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.imoditem(attrid, value)
 
     def ilshiftattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.ilshiftitem(attrid, value)
 
     def irshiftattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.irshiftitem(attrid, value)
 
     def ipowattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.ipowitem(attrid, value)
 
     def iandattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.ianditem(attrid, value)
 
     def iorattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.ioritem(attrid, value)
 
     def ixorattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.ixoritem(attrid, value)
 
     # FIXME: Add operator for x[i] = ~x[i]
     def iinvertattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, attrmut = self._fielddict[name]
+        if attrmut != "var":
+            raise ut.EPError(_("Cannot reassign non-var member: {}").format(name))
         self.iinvertitem(attrid, value)
 
     # Attribute comparisons
 
     def eqattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, _ = self._fielddict[name]
         return self.eqitem(attrid, value)
 
     def neattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, _ = self._fielddict[name]
         return self.neitem(attrid, value)
 
     def leattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, _ = self._fielddict[name]
         return self.leitem(attrid, value)
 
     def geattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, _ = self._fielddict[name]
         return self.geitem(attrid, value)
 
     def ltattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, _ = self._fielddict[name]
         return self.ltitem(attrid, value)
 
     def gtattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        attrid, _, _ = self._fielddict[name]
         return self.gtitem(attrid, value)

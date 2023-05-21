@@ -21,7 +21,10 @@ class _EUDStruct_Metaclass(type):
             for i, member in enumerate(fields):
                 if isinstance(member, str):
                     continue
-                mName, mType = member
+                if len(member) == 2:
+                    mName, mType = member
+                else:
+                    mName, mType, mMut = member
                 if mType is selftype:
                     fields[i] = (mName, cls)
 
