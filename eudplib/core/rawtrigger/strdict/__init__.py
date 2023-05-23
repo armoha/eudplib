@@ -13,7 +13,30 @@ from .portrait import DefPortraitDict
 from .sprite import DefSpriteDict
 from .stattxt import DefStatTextDict
 from .tech import DefTechDict
-from .trg import DefAIScriptDict, DefLocationDict, DefSwitchDict, DefUnitDict
+from .trg import (
+    DefAIScriptDict,
+    DefLocationDict,
+    DefSwitchDict,
+    DefUnitDict,
+)
 from .unitorder import DefUnitOrderDict
 from .upgrade import DefUpgradeDict
 from .weapon import DefWeaponDict
+
+__all__ = [
+    "DefFlingyDict",
+    "DefIconDict",
+    "DefImageDict",
+    "DefIscriptDict",
+    "DefPortraitDict",
+    "DefSpriteDict",
+    "DefStatTextDict",
+    "DefTechDict",
+    "DefAIScriptDict",
+    "DefLocationDict",
+    "DefSwitchDict",
+    "DefUnitDict",
+    "DefUnitOrderDict",
+    "DefUpgradeDict",
+    "DefWeaponDict",
+]

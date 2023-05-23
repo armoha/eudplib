@@ -16,7 +16,7 @@ from ..allocator import IsConstExpr
 from ..eudobj import EUDObject
 from .action import Action
 from .condition import Condition
-from .triggerscope import NextTrigger, _RegisterTrigger
+from .triggerscope import NextTrigger, _register_trigger
 
 if TYPE_CHECKING:
     from ..allocator import ConstExpr
@@ -24,17 +24,17 @@ if TYPE_CHECKING:
 
 # Trigger counter thing
 
-_trgCounter = 0
+_trg_counter = 0
 
 
-def GetTriggerCounter() -> int:
-    return _trgCounter
+def GetTriggerCounter() -> int:  # noqa: N802
+    return _trg_counter
 
 
 # Aux
 
 
-def _bool2Cond(x: bool | Condition) -> Condition:
+def _bool2cond(x: bool | Condition) -> Condition:
     if x is True:
         return Condition(0, 0, 0, 0, 0, 22, 0, 0)  # Always
     elif x is False:
@@ -53,7 +53,7 @@ def Disabled(arg: Action) -> Action:
     ...
 
 
-def Disabled(arg: Condition | Action) -> Condition | Action:
+def Disabled(arg: Condition | Action) -> Condition | Action:  # noqa: N802
     """Disable condition or action"""
     arg.disable()
     return arg
@@ -76,8 +76,8 @@ class RawTrigger(EUDObject):
         actions: _Action | None = None,
         *,
         preserved: bool = True,
-        currentAction: int | None = None,
-        trigSection: None = None,
+        currentAction: int | None = None,  # noqa: N803
+        trigSection: None = None,  # noqa: N803
     ) -> None:
         ...
 
@@ -90,8 +90,8 @@ class RawTrigger(EUDObject):
         actions: None = None,
         *,
         preserved: Literal[True] = True,
-        currentAction: None = None,
-        trigSection: bytes,
+        currentAction: None = None,  # noqa: N803
+        trigSection: bytes,  # noqa: N803
     ) -> None:
         ...
 
@@ -103,15 +103,15 @@ class RawTrigger(EUDObject):
         actions: _Action | None = None,
         *,
         preserved: bool = True,
-        currentAction: int | None = None,
-        trigSection: bytes | None = None,
+        currentAction: int | None = None,  # noqa: N803
+        trigSection: bytes | None = None,  # noqa: N803
     ) -> None:
         super().__init__()
 
         # Register trigger to global table
-        global _trgCounter
-        _trgCounter += 1
-        _RegisterTrigger(self)  # This should be called before (1)
+        global _trg_counter
+        _trg_counter += 1
+        _register_trigger(self)  # This should be called before (1)
 
         # Set linked list pointers
         if prevptr is None:
@@ -132,7 +132,7 @@ class RawTrigger(EUDObject):
             if conditions is None:
                 conditions = []
             conditions = ut.FlattenList(conditions)
-            _conditions: list[Condition] = list(map(_bool2Cond, conditions))
+            _conditions: list[Condition] = list(map(_bool2cond, conditions))
 
             if actions is None:
                 actions = []
@@ -143,12 +143,12 @@ class RawTrigger(EUDObject):
 
             # Register condition/actions to trigger
             for i, cond in enumerate(_conditions):
-                cond.check_args(i)
-                cond.set_parent_trigger(self, i)
+                cond.CheckArgs(i)
+                cond.SetParentTrigger(self, i)
 
             for i, act in enumerate(actions):
-                act.check_args(i)
-                act.set_parent_trigger(self, i)
+                act.CheckArgs(i)
+                act.SetParentTrigger(self, i)
 
             self._conditions = _conditions
             self._actions = actions
@@ -197,10 +197,10 @@ class RawTrigger(EUDObject):
         else:
             self._flags &= ~4
 
-    def GetDataSize(self) -> int:
+    def GetDataSize(self) -> int:  # noqa: N802
         return 2408
 
-    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:
+    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
         pbuffer.WriteDword(self._prevptr)
         pbuffer.WriteDword(self._nextptr)
 
@@ -209,7 +209,7 @@ class RawTrigger(EUDObject):
         for act in self._actions:
             act.CollectDependency(pbuffer)
 
-    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:
+    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
         pbuffer.WriteDword(self._prevptr)
         pbuffer.WriteDword(self._nextptr)
 
@@ -239,7 +239,7 @@ class RawTrigger(EUDObject):
             pbuffer.WriteByte(self._currentAction)
 
 
-def _DoActions(
+def _do_actions(
     actions: _Action | None = None
 ) -> tuple[RawTrigger, RawTrigger]:
     actions = ut.FlattenList(actions)

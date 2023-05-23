@@ -9,11 +9,11 @@ from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, TypeAlias, TypeVar
 
 if TYPE_CHECKING:
+    from ...utils import ExprProxy
     from ..allocator import ConstExpr
     from ..variable import EUDVariable
-    from ...utils import ExprProxy
 
-Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy[int] | ExprProxy[EUDVariable] | ExprProxy[ConstExpr]"
+Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy[int] | ExprProxy[EUDVariable] | ExprProxy[ConstExpr]"  # noqa: E501
 Word: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
 Byte: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
 
@@ -42,9 +42,9 @@ _Byte: TypeAlias = "int | EUDVariable"
 # argument types
 T = TypeVar("T", int, "EUDVariable", "ConstExpr")
 U = TypeVar("U", int, "EUDVariable")
-_ExprProxy: TypeAlias = "ExprProxy[ConstType | int | EUDVariable | ConstExpr | ExprProxy]"
-_Arg: TypeAlias = "ConstType | int | EUDVariable | ConstExpr | ExprProxy[ConstType | int | EUDVariable | ConstExpr | ExprProxy]"
-__ExprProxy: TypeAlias = "ExprProxy[ConstType | int | EUDVariable | ExprProxy]"
-__Arg: TypeAlias = (
-    "ConstType | int | EUDVariable | ExprProxy[ConstType | int | EUDVariable | ExprProxy]"
+_ExprProxy: TypeAlias = (
+    "ExprProxy[ConstType | int | EUDVariable | ConstExpr | ExprProxy]"
 )
+_Arg: TypeAlias = "ConstType | int | EUDVariable | ConstExpr | ExprProxy[ConstType | int | EUDVariable | ConstExpr | ExprProxy]"  # noqa: E501
+__ExprProxy: TypeAlias = "ExprProxy[ConstType | int | EUDVariable | ExprProxy]"
+__Arg: TypeAlias = "ConstType | int | EUDVariable | ExprProxy[ConstType | int | EUDVariable | ExprProxy]"  # noqa: E501

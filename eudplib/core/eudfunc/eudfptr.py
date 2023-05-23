@@ -10,7 +10,7 @@ from ...localize import _
 from .. import allocator as ac
 from .. import rawtrigger as rt
 from ..eudstruct import EUDStruct, EUDVArray
-from ..rawtrigger.rawtriggerdef import _DoActions
+from ..rawtrigger.rawtriggerdef import _do_actions
 from ..variable import EUDVariable, SetVariables, VProc
 from .eudfuncn import EUDFuncN
 from .eudtypedfuncn import applyTypes
@@ -51,7 +51,7 @@ def fillArgumentsAndReturns(f):
     if var:
         VProc(var, actions)
     elif actions:
-        _DoActions(actions)
+        _do_actions(actions)
 
 
 def callFuncBody(fstart, fend):
@@ -95,7 +95,9 @@ def EUDTypedFuncPtr(argtypes, rettypes):
                 # Statically generate with EUDFuncN
                 self.checkValidFunction(_from)
                 f_idcstart, f_idcend = createIndirectCaller(_from)
-                super().__init__(_from=EUDVArray(2)([f_idcstart, ut.EPD(f_idcend + 4)]))
+                super().__init__(
+                    _from=EUDVArray(2)([f_idcstart, ut.EPD(f_idcend + 4)])
+                )
             else:
                 # Cast from EUDVariable or ConstExpr
                 super().__init__(_from=_from)
@@ -105,7 +107,9 @@ def EUDTypedFuncPtr(argtypes, rettypes):
             return cls(_from=_from)
 
         def checkValidFunction(self, f):
-            ut.ep_assert(isinstance(f, EUDFuncN), _("{} is not an EUDFuncN").format(f))
+            ut.ep_assert(
+                isinstance(f, EUDFuncN), _("{} is not an EUDFuncN").format(f)
+            )
             if not f._fstart:
                 f._CreateFuncBody()
 
@@ -113,11 +117,15 @@ def EUDTypedFuncPtr(argtypes, rettypes):
             f_retn = f._retn
             ut.ep_assert(
                 argn == f_argn,
-                _("Function requires {} arguments (Expected {})").format(f_argn, argn),
+                _("Function requires {} arguments (Expected {})").format(
+                    f_argn, argn
+                ),
             )
             ut.ep_assert(
                 retn == f_retn,
-                _("Function returns {} values (Expected {})").format(f_retn, retn),
+                _("Function returns {} values (Expected {})").format(
+                    f_retn, retn
+                ),
             )
 
         def setFunc(self, f):
@@ -150,7 +158,10 @@ def EUDTypedFuncPtr(argtypes, rettypes):
 
             # Call function
             t, a = ac.Forward(), ac.Forward()
-            SetVariables([ut.EPD(t + 4), ut.EPD(a + 16)], [self._fstart, self._fendnext_epd])
+            SetVariables(
+                [ut.EPD(t + 4), ut.EPD(a + 16)],
+                [self._fstart, self._fendnext_epd],
+            )
 
             fcallend = ac.Forward()
             t << rt.RawTrigger(actions=[a << rt.SetNextPtr(0, fcallend)])

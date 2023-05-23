@@ -151,7 +151,7 @@ class Action(ConstExpr):
         actname = _acttypes[acttype] if isinstance(acttype, int) else acttype
         return _("Invalid fields for action{} {}:").format(i, actname)
 
-    def check_args(self, i: int) -> None:
+    def CheckArgs(self, i: int) -> None:  # noqa: N802
         if all(IsConstExpr(field) for field in self.fields[:6]) and all(
             isinstance(field, int) for field in self.fields[6:]
         ):
@@ -219,7 +219,7 @@ class Action(ConstExpr):
 
         raise ut.EPError("\n".join(error))
 
-    def set_parent_trigger(self, trg: "RawTrigger", index: int) -> None:
+    def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:  # noqa: N802
         ut.ep_assert(
             self.parenttrg is None,
             _("Actions cannot be shared by two triggers."),
@@ -231,16 +231,15 @@ class Action(ConstExpr):
         self.parenttrg = trg
         self.actindex = index
 
-    def Evaluate(self) -> "RlocInt_C":
+    def Evaluate(self) -> "RlocInt_C":  # noqa: N802
         if self.parenttrg is None or self.actindex is None:
-            raise ut.EPError(
-                _(
-                    "Orphan action. This often happens when you try to do arithmetics with actions."
-                )
-            )
+            # fmt: off
+            err = _("Orphan action. This often happens when you try to do arithmetics with actions.")  # noqa: E501
+            # fmt: on
+            raise ut.EPError(err)
         return self.parenttrg.Evaluate() + 8 + 320 + 32 * self.actindex
 
-    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:
+    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
         from ..variable import IsEUDVariable
 
         eudvar_field = next(
@@ -262,7 +261,7 @@ class Action(ConstExpr):
         for field in self.fields[:6]:
             pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
-    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:
+    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
         from ..variable import IsEUDVariable
 
         eudvar_field = next(
@@ -283,15 +282,15 @@ class Action(ConstExpr):
 
         pbuffer.WritePack("IIIIIIHBBBBH", self.fields)  # type: ignore[arg-type]
 
-    def getDestAddr(self) -> ConstExpr:
+    def getDestAddr(self) -> ConstExpr:  # noqa: N802
         ut.ep_assert(self.fields[7] == 45)
         return self + 16  # type: ignore[return-value]
 
-    def getValueAddr(self) -> ConstExpr:
+    def getValueAddr(self) -> ConstExpr:  # noqa: N802
         ut.ep_assert(self.fields[7] == 45)
         return self + 20  # type: ignore[return-value]
 
-    def SetDest(self, dest) -> "Action":
+    def SetDest(self, dest) -> "Action":  # noqa: N802
         from ..variable.eudv import _ProcessDest
         from .constenc import SetTo
         from .stockact import SetMemory

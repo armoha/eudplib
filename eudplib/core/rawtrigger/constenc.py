@@ -8,22 +8,22 @@
 from collections.abc import Callable, Mapping
 from typing import TypeAlias, overload
 
+from ...localize import _
+from ...utils import EPError, ExprProxy, unProxy
+from ..mapdata import GetPropertyIndex, UnitProperty
 from .consttype import (
+    Byte,
     ConstType,
     Dword,
-    Byte,
-    _Dword,
-    _Byte,
     T,
     U,
-    _ExprProxy,
-    _Arg,
-    __ExprProxy,
     __Arg,
+    __ExprProxy,
+    _Arg,
+    _Byte,
+    _Dword,
+    _ExprProxy,
 )
-from ...localize import _
-from ...utils import ExprProxy, EPError, unProxy
-from ..mapdata import GetPropertyIndex, UnitProperty
 
 
 class TrgAllyStatus(ConstType):
@@ -270,7 +270,12 @@ Clear = TrgSwitchAction("Clear")
 Random = TrgSwitchAction("Random")
 Cleared = TrgSwitchState("Cleared")
 
-SwitchActionDict: dict[ConstType, int] = {Set: 4, Clear: 5, Toggle: 6, Random: 11}
+SwitchActionDict: dict[ConstType, int] = {
+    Set: 4,
+    Clear: 5,
+    Toggle: 6,
+    Random: 11,
+}
 SwitchStateDict: dict[ConstType, int] = {Set: 2, Cleared: 3}
 
 
@@ -289,7 +294,7 @@ def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _ExprProxy) -> _Dword:
     ...
 
 
-def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _Arg) -> _Dword:
+def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _Arg) -> _Dword:  # noqa: N802
     u = unProxy(s)
     if isinstance(u, ConstType):
         if u in d:
@@ -300,101 +305,101 @@ def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _Arg) -> _Dword:
 
 
 @overload
-def EncodeAllyStatus(s: ConstType, issueError: bool = False) -> int:
+def EncodeAllyStatus(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeAllyStatus(s: U, issueError: bool = False) -> U:
+def EncodeAllyStatus(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeAllyStatus(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeAllyStatus(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeAllyStatus(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeAllyStatus(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2]."""
     return _EncodeConst("AllyStatus", AllyStatusDict, s)  # type: ignore[return-value]
 
 
 @overload
-def EncodeComparison(s: ConstType, issueError: bool = False) -> int:
+def EncodeComparison(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeComparison(s: U, issueError: bool = False) -> U:
+def EncodeComparison(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeComparison(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeComparison(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeComparison(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeComparison(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10]."""
     return _EncodeConst("Comparison", ComparisonDict, s)  # type: ignore[return-value]
 
 
 @overload
-def EncodeModifier(s: ConstType, issueError: bool = False) -> int:
+def EncodeModifier(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeModifier(s: U, issueError: bool = False) -> U:
+def EncodeModifier(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeModifier(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeModifier(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeModifier(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeModifier(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [SetTo, Add, Subtract] to number [7, 8, 9]."""
     return _EncodeConst("Modifier", ModifierDict, s)  # type: ignore[return-value]
 
 
 @overload
-def EncodeOrder(s: ConstType, issueError: bool = False) -> int:
+def EncodeOrder(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeOrder(s: U, issueError: bool = False) -> U:
+def EncodeOrder(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeOrder(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeOrder(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeOrder(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeOrder(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Move, Patrol, Attack] to number [0, 1, 2]."""
     return _EncodeConst("Order", OrderDict, s)  # type: ignore[return-value]
 
 
 @overload
-def EncodePlayer(s: ConstType, issueError: bool = False) -> int:
+def EncodePlayer(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodePlayer(s: T, issueError: bool = False) -> T:
+def EncodePlayer(s: T, issueError: bool = False) -> T:  # noqa: N803
     ...
 
 
 @overload
-def EncodePlayer(s: _ExprProxy, issueError: bool = False) -> _Dword:
+def EncodePlayer(s: _ExprProxy, issueError: bool = False) -> _Dword:  # noqa: N803
     ...
 
 
-def EncodePlayer(s: _Arg, issueError: bool = False) -> _Dword:
+def EncodePlayer(s: _Arg, issueError: bool = False) -> _Dword:  # noqa: N802, N803
     """Convert player identifier to corresponding number.
 
     ======================= ========
@@ -441,61 +446,61 @@ def EncodePlayer(s: _Arg, issueError: bool = False) -> _Dword:
 
 
 @overload
-def EncodePropState(s: ConstType, issueError: bool = False) -> int:
+def EncodePropState(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodePropState(s: U, issueError: bool = False) -> U:
+def EncodePropState(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodePropState(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodePropState(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodePropState(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodePropState(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Enable, Disable, Toogle] to number [4, 5, 6]"""
     return _EncodeConst("PropState", PropStateDict, s)  # type: ignore[return-value]
 
 
 @overload
-def EncodeResource(s: ConstType, issueError: bool = False) -> int:
+def EncodeResource(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeResource(s: U, issueError: bool = False) -> U:
+def EncodeResource(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeResource(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeResource(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeResource(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeResource(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Ore, Gas, OreAndGas] to [0, 1, 2]"""
     return _EncodeConst("Resource", ResourceDict, s)  # type: ignore[return-value]
 
 
 @overload
-def EncodeScore(s: ConstType, issueError: bool = False) -> int:
+def EncodeScore(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeScore(s: U, issueError: bool = False) -> U:
+def EncodeScore(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeScore(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeScore(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeScore(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeScore(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert score type identifier to number.
 
     ================= ========
@@ -516,61 +521,61 @@ def EncodeScore(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeSwitchAction(s: ConstType, issueError: bool = False) -> int:
+def EncodeSwitchAction(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeSwitchAction(s: U, issueError: bool = False) -> U:
+def EncodeSwitchAction(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeSwitchAction(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeSwitchAction(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeSwitchAction(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeSwitchAction(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Set, Clear, Toogle, Random] to [4, 5, 6, 11]."""
     return _EncodeConst("SwitchAction", SwitchActionDict, s)  # type: ignore[return-value]
 
 
 @overload
-def EncodeSwitchState(s: ConstType, issueError: bool = False) -> int:
+def EncodeSwitchState(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeSwitchState(s: U, issueError: bool = False) -> U:
+def EncodeSwitchState(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeSwitchState(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeSwitchState(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeSwitchState(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeSwitchState(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Set, Cleared] to [2, 3]."""
     return _EncodeConst("_SwitchState", SwitchStateDict, s)  # type: ignore[return-value]
 
 
 @overload
-def EncodeCount(s: ConstType, issueError: bool = False) -> int:
+def EncodeCount(s: ConstType, issueError: bool = False) -> int:  # noqa: N803
     ...
 
 
 @overload
-def EncodeCount(s: U, issueError: bool = False) -> U:
+def EncodeCount(s: U, issueError: bool = False) -> U:  # noqa: N803
     ...
 
 
 @overload
-def EncodeCount(s: __ExprProxy, issueError: bool = False) -> _Byte:
+def EncodeCount(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
     ...
 
 
-def EncodeCount(s: __Arg, issueError: bool = False) -> _Byte:
+def EncodeCount(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [All, (other numbers)] to number [0, (as-is)]."""
     t = unProxy(s)
     if t is All:
@@ -584,8 +589,9 @@ def EncodeCount(s: __Arg, issueError: bool = False) -> _Byte:
 # ========================
 
 
-def EncodeProperty(
-    prop: UnitProperty | bytes | ExprProxy[UnitProperty | bytes], issueError: bool = False
+def EncodeProperty(  # noqa: N802
+    prop: UnitProperty | bytes | ExprProxy[UnitProperty | bytes],
+    issueError: bool = False,  # noqa: N803
 ) -> int:
     prop = unProxy(prop)
     return GetPropertyIndex(prop)

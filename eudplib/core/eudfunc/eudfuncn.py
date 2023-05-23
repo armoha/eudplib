@@ -14,7 +14,7 @@ from ...utils.blockstru import BlockStruManager, set_blockstru_manager
 from .. import allocator as ac
 from .. import rawtrigger as bt
 from .. import variable as ev
-from ..rawtrigger.rawtriggerdef import _DoActions
+from ..rawtrigger.rawtriggerdef import _do_actions
 from .trace.tracetool import _EUDTracePop, _EUDTracePush
 
 _currentCompiledFunc = None
@@ -55,7 +55,10 @@ class EUDFuncN:
         if isinstance(argn, int):
             self._argn = argn
             self._arginits = [(0, bt.SetTo, 0, None)] * argn
-        elif all(isinstance(initvals, tuple) and len(initvals) == 4 for initvals in argn):
+        elif all(
+            isinstance(initvals, tuple) and len(initvals) == 4
+            for initvals in argn
+        ):
             self._argn = len(argn)
             self._arginits = argn
         else:
@@ -116,15 +119,20 @@ class EUDFuncN:
                 varfret = filter(ev.IsEUDVariable, self._frets)
                 actfret = itertools.filterfalse(ev.IsEUDVariable, self._frets)
                 fendTrgs = ut.FlattenList(ev.VProc([varfret], [actfret]))
-                self._fend, self._nptr = fendTrgs[0], fendTrgs[-1]._actions[-1] + 20
+                self._fend, self._nptr = (
+                    fendTrgs[0],
+                    fendTrgs[-1]._actions[-1] + 20,
+                )
             else:
-                self._fend = _DoActions(self._frets)[1]
+                self._fend = _do_actions(self._frets)[1]
                 self._nptr = self._fend + 4
 
         bt.PopTriggerScope()
 
         # Finalize
-        ut.ep_assert(f_bsm.empty(), _("Block start/end mismatch inside function"))
+        ut.ep_assert(
+            f_bsm.empty(), _("Block start/end mismatch inside function")
+        )
         set_blockstru_manager(prev_bsm)
 
         # No return -> set return count to 0
@@ -181,7 +189,8 @@ class EUDFuncN:
         ret = ut.FlattenList(ret)
         ut.ep_assert(
             len(ret) == self._retn,
-            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
+            _("Return number mismatch : ")
+            + "len(%s) != %d" % (repr(ret), self._retn),
         )
         nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -190,7 +199,9 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
+                nextPtrAssignment.append(
+                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
+                )
 
         ev.SeqCompute(nextPtrAssignment)
         bt.SetNextTrigger(self._fstart)
@@ -211,7 +222,8 @@ class EUDFuncN:
 
         ut.ep_assert(
             len(args) == self._argn,
-            _("Argument number mismatch : ") + "len(%s) != %d" % (repr(args), self._argn),
+            _("Argument number mismatch : ")
+            + "len(%s) != %d" % (repr(args), self._argn),
         )
 
         fcallend = ac.Forward()
@@ -223,7 +235,8 @@ class EUDFuncN:
         ret = ut.FlattenList(ret)
         ut.ep_assert(
             len(ret) == self._retn,
-            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
+            _("Return number mismatch : ")
+            + "len(%s) != %d" % (repr(ret), self._retn),
         )
         nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -232,7 +245,9 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
+                nextPtrAssignment.append(
+                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
+                )
         varAssigns, constAssigns = list(), list()
         for farg, arg in zip(self._fargs, args):
             if ev.IsEUDVariable(arg):

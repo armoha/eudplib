@@ -110,7 +110,7 @@ class Condition(ConstExpr):
         )
         return _("Invalid fields for condition{} {}:").format(i, condname)
 
-    def check_args(self, i: int) -> None:
+    def CheckArgs(self, i: int) -> None:  # noqa: N802
         if all(IsConstExpr(field) for field in self.fields[:3]) and all(
             isinstance(field, int) for field in self.fields[3:]
         ):
@@ -149,7 +149,7 @@ class Condition(ConstExpr):
 
         raise ut.EPError("\n".join(error))
 
-    def set_parent_trigger(self, trg: "RawTrigger", index: int) -> None:
+    def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:  # noqa: N802
         ut.ep_assert(
             self.parenttrg is None,
             _("Condition cannot be shared by two triggers."),
