@@ -160,7 +160,7 @@ DefFlingyDict: dict[str, int] = {
     "Psionic Storm": 157,
     "Yamato Gun": 158,
     "Phase Disruptor": 159,
-    "STA/STS Cannon Overlay": 160,
+    "STA/STS Photon Cannon Overlay": 160,
     "Sunken Colony Tentacle": 161,
     "Venom": 162,
     "Acid Spore": 163,
