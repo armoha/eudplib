@@ -5,7 +5,9 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-DefLocationDict: dict[str, int] = {"Location %u" % i: i for i in range(1, 256) if i != 64}
+DefLocationDict: dict[str, int] = {
+    "Location %u" % i: i for i in range(1, 256) if i != 64
+}
 DefLocationDict["Anywhere"] = 64
 
 DefSwitchDict: dict[str, int] = {"Switch %d" % (i + 1): i for i in range(256)}
