@@ -91,7 +91,7 @@ def _RELIMP(path, mod_name, _cache={}):  # relative path import
 def _IGVA(varCount, exprListGen):
     try:
         vList = List2Assignable([EUDVariable(x) for x in exprListGen()])
-    except (TriggerScopeError, NameError):
+    except (TriggerScopeError, NameError, AttributeError):
         vList = EUDCreateVariables(varCount)
 
         def _():
@@ -107,7 +107,7 @@ def _CGFW(exprf, retn):
     start = NextTrigger()
     try:
         rets = exprf()
-    except NameError:
+    except (NameError, AttributeError):
         rets = [ExprProxy(None) for _ in range(retn)]
 
         def _():

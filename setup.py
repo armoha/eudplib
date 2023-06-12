@@ -1,4 +1,4 @@
-__version__ = "0.75.0.a1"
+__version__ = "0.75.0.a2"
 
 import os
 import subprocess
