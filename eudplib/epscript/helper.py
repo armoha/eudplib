@@ -21,6 +21,7 @@ from ..core import (
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
 from ..eudlib import EUDArray
 from ..maprw import EUDOnStart
+from ..maprw.injector.mainloop import _EUDOnStart2
 from ..utils import (
     ExprProxy,
     FlattenList,
@@ -91,7 +92,7 @@ def _RELIMP(path, mod_name, _cache={}):  # relative path import
 def _IGVA(varCount, exprListGen):
     try:
         vList = List2Assignable([EUDVariable(x) for x in exprListGen()])
-    except (TriggerScopeError, NameError, AttributeError):
+    except (TriggerScopeError, NameError):
         vList = EUDCreateVariables(varCount)
 
         def _():
@@ -107,7 +108,7 @@ def _CGFW(exprf, retn):
     start = NextTrigger()
     try:
         rets = exprf()
-    except (NameError, AttributeError):
+    except NameError:
         rets = [ExprProxy(None) for _ in range(retn)]
 
         def _():
@@ -115,7 +116,7 @@ def _CGFW(exprf, retn):
             for ret, val in zip(rets, vals):
                 ret._value = val
 
-        EUDOnStart(_)
+        _EUDOnStart2(_)
     end = Forward()
     SetNextTrigger(end)
     PopTriggerScope()
