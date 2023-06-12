@@ -21,7 +21,6 @@ from ..core import (
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
 from ..eudlib import EUDArray
 from ..maprw import EUDOnStart
-from ..maprw.injector.mainloop import _EUDOnStart2
 from ..utils import (
     ExprProxy,
     FlattenList,
@@ -116,7 +115,7 @@ def _CGFW(exprf, retn):
             for ret, val in zip(rets, vals):
                 ret._value = val
 
-        _EUDOnStart2(_)
+        EUDOnStart(_)
     end = Forward()
     SetNextTrigger(end)
     PopTriggerScope()
