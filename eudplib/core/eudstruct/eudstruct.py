@@ -14,52 +14,30 @@ from .vararray import EUDVArray
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
-    def __init__(
-        self, *args, _from=None, _initial_values_static: dict | None = None, **kwargs
-    ) -> None:
+    def __init__(self, *args, _from=None, **kwargs):
+        basetype = type(self)
+        fields = basetype._fields_
+        fieldn = len(fields)
+
+        # Fill fielddict
         fielddict = {}
-        fieldcount = 0
-        for basetype in reversed(type(self).__mro__):
-            if not hasattr(basetype, "_fields_"):
-                continue
-
-            for name_type_mut in basetype._fields_:
-                if isinstance(name_type_mut, str):  # "fieldname"
-                    fieldname = name_type_mut
-                    fieldtype = None
-                    fieldmut = "var"
-                elif len(name_type_mut) == 2:  # ("fieldname", fieldtype)
-                    fieldname = name_type_mut[0]
-                    fieldtype = name_type_mut[1]
-                    fieldmut = "var"
-                else:  # ("fieldname", fieldtype, "var|const|static")
-                    fieldname = name_type_mut[0]
-                    fieldtype = name_type_mut[1]
-                    fieldmut = name_type_mut[2]
-
-                if fieldmut not in ("var", "const", "static"):
-                    raise ut.EPError(
-                        _("Mutability must be one of var, const, and static, not {}").format(
-                            fieldmut
-                        )
-                    )
-
-                if fieldname in fielddict:
-                    raise ut.EPError(_("Duplicated field name: {}").format(fieldname))
-                fielddict[fieldname] = (fieldcount, fieldtype, fieldmut)
-                fieldcount += 1
-
-        self._fielddict: dict[str, tuple[int, type | None, str]] = fielddict
+        for index, nametype in enumerate(fields):
+            if isinstance(nametype, str):
+                fieldname = nametype
+                field_index_type = (index, None)
+            else:
+                fieldname = nametype[0]
+                field_index_type = (index, nametype[1])
+            if fieldname in fielddict:
+                raise ut.EPError(_("Duplicated field name: {}").format(fieldname))
+            fielddict[fieldname] = field_index_type
+        self._fielddict = fielddict
 
         if _from is not None:
-            super().__init__(EUDVArray(fieldcount).cast(_from))
+            super().__init__(EUDVArray(fieldn).cast(_from))
             self._initialized = True
         else:
-            initvals_static = [0] * fieldcount
-            if _initial_values_static is not None:
-                for fieldname, initval in _initial_values_static.items():
-                    initvals_static[fielddict[fieldname][0]] = initval
-            super().__init__(EUDVArray(fieldcount)(initvals_static))
+            super().__init__(EUDVArray(fieldn)([0] * fieldn))
             self.isPooled = False
             self._initialized = True
             self.constructor_static(*args, **kwargs)
