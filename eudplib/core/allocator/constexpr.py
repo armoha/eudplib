@@ -5,7 +5,7 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from typing import TypeAlias, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, overload
 
 from ... import utils as ut
 from ...localize import _
@@ -22,30 +22,15 @@ class ConstExpr:
         offset: int = 0,
         rlocmode: int = 4,
     ) -> None:
-        def int32_keep_sign(x: int) -> int:
-            if x > 2_147_483_647:
-                return x & 0xFFFFFFFF
-            elif x < -2_147_483_648:
-                return -(-x & 0x7FFFFFFF)
-            return x
-
         self.baseobj: "ConstExpr | None" = unProxy(baseobj)
-        self.offset: int = int32_keep_sign(offset)
-        self.rlocmode: int = int32_keep_sign(rlocmode)
+        self.offset: int = offset & 0xFFFFFFFF
+        self.rlocmode: int = rlocmode & 0xFFFFFFFF
 
     def Evaluate(self) -> RlocInt_C:
         if self.rlocmode:
             return self.baseobj.Evaluate() * self.rlocmode // 4 + self.offset  # type: ignore[union-attr]
         else:
             return RlocInt_C(self.offset & 0xFFFFFFFF, 0)
-
-    def __divmod__(self, other: int | ExprProxy[int]) -> tuple["ConstExpr", int]:
-        return self // other, self % other
-
-    def __abs__(self) -> "ConstExpr":
-        if self.rlocmode < 0:
-            return ConstExpr(self.baseobj, -self.offset, -self.rlocmode)
-        return ConstExpr(self.baseobj, self.offset, self.rlocmode)
 
     def __add__(self, other: "ConstExpr | int | ExprProxy[int | ConstExpr]") -> "ConstExpr | int":
         other = ut.unProxy(other)
@@ -89,16 +74,16 @@ class ConstExpr:
                 )
         return NotImplemented
 
-    def __mul__(self, other: int | ExprProxy[int]) -> "ConstExpr | int":
+    def __mul__(self, other: "int | ExprProxy[int]") -> "ConstExpr | int":
         other = ut.unProxy(other)
         if isinstance(other, int):
             return IntOrConstExpr(self.baseobj, self.offset * other, self.rlocmode * other)
         return NotImplemented
 
-    def __rmul__(self, other: int | ExprProxy[int]) -> "ConstExpr | int":
+    def __rmul__(self, other: "int | ExprProxy[int]") -> "ConstExpr | int":
         return self.__mul__(other)
 
-    def __floordiv__(self, other: int | ExprProxy[int]) -> "ConstExpr":
+    def __floordiv__(self, other: "int | ExprProxy[int]") -> "ConstExpr":
         other = ut.unProxy(other)
         if isinstance(other, int):
             ut.ep_assert(
@@ -108,7 +93,7 @@ class ConstExpr:
             return ConstExpr(self.baseobj, self.offset // other, self.rlocmode // other)
         return NotImplemented
 
-    def __mod__(self, other: int | ExprProxy[int]) -> int:
+    def __mod__(self, other: "int | ExprProxy[int]") -> int:
         other = ut.unProxy(other)
         if isinstance(other, int):
             ut.ep_assert(
