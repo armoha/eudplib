@@ -10,19 +10,19 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
-from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...localize import _
 from ..memiof import f_dwread_epd, f_getcurpl, f_setcurpl
 
 
-@_EUDPredefineReturn(2, 3)
 @c.EUDTypedFunc([c.TrgPlayer], [None])
 def f_playerexist(player):
     """Check if player has not left the game.
 
     :returns: 1 if player exists, 0 if not.
     """
-    ret = f_playerexist._frets[0]
+    f_playerexist._frets = [c.SetDeaths(0, c.SetTo, 0, 0)]
+    f_playerexist._retn = 1
+    ret = c.EUDLightVariable(_from=f_playerexist._frets[0])
     pts = 0x51A280
 
     cs.EUDSwitch(player)

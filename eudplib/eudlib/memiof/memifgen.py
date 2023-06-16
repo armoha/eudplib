@@ -5,13 +5,13 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from collections.abc import Callable
 import functools
+from collections.abc import Callable
 
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ...core.eudfunc.eudf import _EUDPredefineParam
 from ...core.eudfunc.eudtypedfuncn import EUDTypedFuncN
 from . import modcurpl as cp
 
@@ -20,11 +20,12 @@ from . import modcurpl as cp
 def _read_epd_func(
     mask: int, initvals: tuple[int, ...], *args: tuple[int, ...], _check_empty: bool = False
 ) -> EUDTypedFuncN:
-    @_EUDPredefineReturn(len(args))
     @_EUDPredefineParam(c.CurrentPlayer)
     @c.EUDFunc
     def readerfunc(targetplayer):
-        ret = readerfunc._frets
+        readerfunc._frets = [c.SetDeaths(0, c.SetTo, 0, 0) for _ in args]
+        readerfunc._retn = len(args)
+        ret = [c.EUDLightVariable(_from=fret) for fret in readerfunc._frets]
         done = c.Forward()
 
         if _check_empty:
@@ -74,10 +75,11 @@ def f_readgen_epd(
 def _read_cp_func(
     mask: int, initvals: tuple[int, ...], *args: tuple[int, ...], _check_empty: bool = False
 ) -> Callable:
-    @_EUDPredefineReturn(len(args))
     @c.EUDFunc
     def reader():
-        ret = reader._frets
+        reader._frets = [c.SetDeaths(0, c.SetTo, 0, 0) for _ in args]
+        reader._retn = len(args)
+        ret = [c.EUDLightVariable(_from=fret) for fret in reader._frets]
         init_actions = [retv.SetNumber(initval) for retv, initval in zip(ret, initvals)]
         if _check_empty:
             check, read_start = c.Forward(), c.Forward()

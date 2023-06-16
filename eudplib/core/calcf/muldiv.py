@@ -5,18 +5,19 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from collections.abc import Callable
-from ..eudfunc.eudtypedfuncn import EUDTypedFuncN
 import math
+from collections.abc import Callable
+
 from eudplib import utils as ut
 
+from ...localize import _
 from .. import allocator as ac
 from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .. import variable as ev
+from ..eudfunc.eudf import _EUDPredefineParam
+from ..eudfunc.eudtypedfuncn import EUDTypedFuncN
 from ..variable.evcommon import _ev
-from ...localize import _
-from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 
 
 def f_mul(a, b, **kwargs):
@@ -189,10 +190,12 @@ def _const_mul(number: int) -> Callable:
     except KeyError:
 
         @_EUDPredefineParam(1)
-        @_EUDPredefineReturn(1, 2)
         @ef.EUDFunc
         def _mulf(a):
-            ret = _mulf._frets[0]
+            _mulf._frets = [rt.SetDeaths(0, rt.SetTo, 0, 0)]
+            _mulf._retn = 1
+            ret = ev.EUDLightVariable(_from=_mulf._frets[0])
+
             ret << 0
             for i in ut.RandList(range(32)):
                 if (2**i * number) & 0xFFFFFFFF == 0:
@@ -231,12 +234,15 @@ def _const_div(number: int) -> EUDTypedFuncN:
     try:
         return divfdict[number]
     except KeyError:
+        quot, rem = rt.SetDeaths(0, rt.SetTo, 0, 0), rt.SetDeaths(0, rt.SetTo, 0, 0)
 
-        @_EUDPredefineReturn(2)
-        @_EUDPredefineParam(1, 2)
+        @_EUDPredefineParam((ut.EPD(rem) + 5,))
         @ef.EUDFunc
         def _divf(a):
-            quotient = _divf._frets[0]
+            _divf._frets = [quot, rem]
+            _divf._retn = 2
+            quotient = ev.EUDLightVariable(_from=quot)
+            remainder = ev.EUDLightVariable(_from=rem)
             quotient << 0
             for i in range(31, -1, -1):
                 # number too big
@@ -245,20 +251,20 @@ def _const_div(number: int) -> EUDTypedFuncN:
 
                 if number & (number - 1) == 0:
                     rt.RawTrigger(
-                        conditions=a.AtLeastX(1, 2**i * number),
+                        conditions=remainder.AtLeastX(1, 2**i * number),
                         actions=quotient.AddNumber(2**i),
                     )
                 else:
                     rt.RawTrigger(
-                        conditions=a.AtLeast(2**i * number),
+                        conditions=remainder.AtLeast(2**i * number),
                         actions=[
-                            a.SubtractNumber(2**i * number),
+                            remainder.SubtractNumber(2**i * number),
                             quotient.AddNumber(2**i),
                         ],
                     )
             if number & (number - 1) == 0:
-                a &= number - 1
-            # return quotient, a
+                remainder &= number - 1
+            # return quotient, remainder
 
         divfdict[number] = _divf
         return _divf
@@ -289,20 +295,25 @@ def _const_quot(number: int) -> Callable:
         return quotfdict[number]
     except KeyError:
         if number & (number - 1) == 0:  # a // powOf2 = a >> log2(powOf2)
+            quot = rt.SetDeaths(0, rt.SetTo, 0, 0)
 
-            @_EUDPredefineReturn(1)
-            @_EUDPredefineParam(1)
+            @_EUDPredefineParam((ut.EPD(quot) + 5,))
             @ef.EUDFunc
             def _quotf(quotient):
-                ev.vbase.VariableBase.__irshift__(quotient, int(math.log2(number)))
+                _quotf._frets = [quot]
+                _quotf._retn = 1
+                quotient = ev.EUDLightVariable(_from=quot)
+                quotient.__irshift__(int(math.log2(number)))
                 # return quotient
 
         else:
 
-            @_EUDPredefineReturn(1)
             @ef.EUDFunc
             def _quotf(a):
-                quotient = _quotf._frets[0]
+                _quotf._frets = [rt.SetDeaths(0, rt.SetTo, 0, 0)]
+                _quotf._retn = 1
+                quotient = ev.EUDLightVariable(_from=_quotf._frets[0])
+
                 quotient << 0
                 for i in range(31, -1, -1):
                     # number too big
@@ -347,28 +358,36 @@ def _const_rem(number: int) -> Callable:
         return remfdict[number]
     except KeyError:
         if number & (number - 1) == 0:
+            rem = rt.SetDeaths(0, rt.SetTo, 0, 0)
 
-            @_EUDPredefineReturn(1)
-            @_EUDPredefineParam(1)
+            @_EUDPredefineParam((ut.EPD(rem) + 5,))
             @ef.EUDFunc
             def _remf(remainder):
+                _remf._frets = [rem]
+                _remf._retn = 1
+                remainder = ev.EUDLightVariable(_from=rem)
+
                 remainder &= number - 1
                 # return remainder
 
         else:
+            rem = rt.SetDeaths(0, rt.SetTo, 0, 0)
 
-            @_EUDPredefineReturn(1)
-            @_EUDPredefineParam(1)
+            @_EUDPredefineParam((ut.EPD(rem) + 5,))
             @ef.EUDFunc
             def _remf(a):
+                _remf._frets = [rem]
+                _remf._retn = 1
+                remainder = ev.EUDLightVariable(_from=rem)
+
                 for i in range(31, -1, -1):
                     # number too big
                     if 2**i * number >= 2**32:
                         continue
 
                     rt.RawTrigger(
-                        conditions=a.AtLeast(2**i * number),
-                        actions=a.SubtractNumber(2**i * number),
+                        conditions=remainder.AtLeast(2**i * number),
+                        actions=remainder.SubtractNumber(2**i * number),
                     )
                 # return remainder
 
@@ -379,10 +398,11 @@ def _const_rem(number: int) -> Callable:
 # -------
 
 
-@_EUDPredefineReturn(1)
 @ef.EUDFunc
 def _eud_mul(a, b):
-    ret = _eud_mul._frets[0]
+    _eud_mul._frets = [rt.SetDeaths(0, rt.SetTo, 0, 0)]
+    _eud_mul._retn = 1
+    ret = ev.EUDLightVariable(_from=_eud_mul._frets[0])
     endmul, reset_nptr = ac.Forward(), ac.Forward()
 
     # Init

@@ -135,33 +135,3 @@ def _EUDPredefineParam(*args):
         return f
 
     return wrapper
-
-
-def _EUDPredefineReturn(*frets):
-    """
-    Use with cautions!
-    1. Always initialize value!
-    2. Reset modifier to `SetTo` when you're done!
-    3. Don't modify Dest in function body!
-    4. No EUDFunc call in function body!
-    """
-    ut.ep_assert(frets)
-    if len(frets) <= 2 and all(isinstance(ret, int) for ret in frets):
-        while len(_ev) < max(frets):
-            _ev.append(EUDVariable())
-        rets = _ev[slice(*frets)]
-
-    elif all(IsEUDVariable(ret) for ret in frets):
-        rets = frets
-
-    else:
-        raise ut.EPError(_("Invalid return variable: {}").format(frets))
-
-    rets = ut.FlattenList(rets)
-
-    def wrapper(f):
-        f._frets = rets
-        f._retn = len(rets)
-        return f
-
-    return wrapper

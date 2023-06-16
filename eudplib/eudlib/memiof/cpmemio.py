@@ -8,15 +8,16 @@
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...core.variable.evcommon import _ev
 from . import dwepdio as dwm
 
 
-@_EUDPredefineReturn(2)
 @c.EUDFunc
 def _reader():
-    ptr, epd = _reader._frets
+    _reader._frets = [c.SetDeaths(0, c.SetTo, 0, 0) for _ in range(2)]
+    _reader._retn = 2
+    ptr, epd = [c.EUDLightVariable(_from=fret) for fret in _reader._frets]
+
     cs.DoActions(ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)))
     for i in ut.RandList(range(32)):
         c.RawTrigger(
@@ -53,10 +54,12 @@ def f_epdread_cp(cpo, **kwargs):
     return f_dwepdread_cp(cpo, **kwargs)[1]
 
 
-@_EUDPredefineReturn(1)
 @c.EUDFunc
 def _wreader(subp):
-    w = _wreader._frets[0]
+    _wreader._frets = [c.SetDeaths(0, c.SetTo, 0, 0)]
+    _wreader._retn = 1
+    w = c.EUDLightVariable(_from=_wreader._frets[0])
+
     w << 0
     cs.EUDSwitch(subp)
     for bits in ut.RandList(range(3)):

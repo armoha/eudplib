@@ -10,7 +10,7 @@ from .. import allocator as ac
 from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .. import variable as ev
-from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ..eudfunc.eudf import _EUDPredefineParam
 from ..variable import SeqCompute
 from ..variable.evcommon import _selfadder, _xv
 from .muldiv import _quot
@@ -79,10 +79,12 @@ def f_bitsplit(a):
 
 
 @_EUDPredefineParam(1)
-@_EUDPredefineReturn(1, 2)
 @ef.EUDFunc
 def _exp2_vv(n):
-    ret = _exp2_vv._frets[0]
+    _exp2_vv._frets = [rt.SetDeaths(0, rt.SetTo, 0, 0)]
+    _exp2_vv._retn = 1
+    ret = ev.EUDLightVariable(_from=_exp2_vv._frets[0])
+
     ret << 0
     for i in RandList(range(32)):
         rt.RawTrigger(conditions=[n == i], actions=ret.SetNumber(2**i))
