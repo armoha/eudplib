@@ -6,6 +6,7 @@
 # Please see the LICENSE file that should have been included as part of this package.
 
 import functools
+import itertools
 
 from ... import utils as ut
 from ...localize import _
@@ -13,6 +14,7 @@ from ...utils.blockstru import BlockStruManager, SetCurrentBlockStruManager
 from .. import allocator as ac
 from .. import rawtrigger as bt
 from .. import variable as ev
+from ..rawtrigger.rawtriggerdef import _DoActions
 from .trace.tracetool import _EUDTracePop, _EUDTracePush
 
 _currentCompiledFunc = None
@@ -109,9 +111,14 @@ class EUDFuncN:
         if self._retn is None or self._retn == 0:
             self._fend = bt.RawTrigger()
             self._nptr = self._fend + 4
-        else:
-            fendTrgs = ut.FlattenList(ev.VProc([self._frets], []))
+        elif any(ev.IsEUDVariable(fret) for fret in self._frets):
+            varfret = filter(ev.IsEUDVariable, self._frets)
+            actfret = itertools.filterfalse(ev.IsEUDVariable, self._frets)
+            fendTrgs = ut.FlattenList(ev.VProc([varfret], [actfret]))
             self._fend, self._nptr = fendTrgs[0], fendTrgs[-1]._actions[-1] + 20
+        else:
+            self._fend = _DoActions(self._frets)[1]
+            self._nptr = self._fend + 4
 
         bt.PopTriggerScope()
 
@@ -137,7 +144,7 @@ class EUDFuncN:
     def _AddReturn(self, retv, needjump):
         retv = ut.FlattenList(retv)
         if self._frets is None:
-            self._frets = [ev.EUDVariable() for _ in retv]
+            self._frets = [bt.SetDeaths(0, bt.SetTo, 0, 0) for _ in retv]
             self._retn = len(retv)
 
         ut.ep_assert(
@@ -160,7 +167,7 @@ class EUDFuncN:
         if needjump:
             bt.SetNextTrigger(self._fend)
 
-    def _CallWithLastArgs(self, ret=None):
+    def _CallWithLastArgs(self, *, ret=None):
         if self._fstart is None:
             self._CreateFuncBody()
 

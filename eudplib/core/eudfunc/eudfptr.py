@@ -10,6 +10,7 @@ from ...localize import _
 from .. import allocator as ac
 from .. import rawtrigger as rt
 from ..eudstruct import EUDStruct, EUDVArray
+from ..rawtrigger.rawtriggerdef import _DoActions
 from ..variable import EUDVariable, SetVariables, VProc
 from .eudfuncn import EUDFuncN
 from .eudtypedfuncn import applyTypes
@@ -33,20 +34,24 @@ def getRetStorage(retn, _retstorage_dict={}):
     return _retstorage_dict[retn]
 
 
-def fillArguments(f):
-    """Copy values from common argument storage to f._args"""
+def fillArgumentsAndReturns(f):
+    """Copy values from common argument storage to f._args,
+    and queue assign from f_rets to common returns storage"""
+    var = []
+    actions = []
     if f._argn:
         argStorage = getArgStorage(f._argn)
         for farg, arg in zip(f._fargs, argStorage):
-            VProc(arg, arg.QueueAssignTo(farg))
-
-
-def fillReturns(f):
-    """Copy values from f_rets to common returns storage"""
+            var.append(arg)
+            actions.append(arg.QueueAssignTo(farg))
     if f._retn:
         retStorage = getRetStorage(f._retn)
         for fret, ret in zip(f._frets, retStorage):
-            VProc(fret, fret.QueueAssignTo(ret))
+            actions.append(fret.SetDest(ret))
+    if var:
+        VProc(var, actions)
+    elif actions:
+        _DoActions(actions)
 
 
 def callFuncBody(fstart, fend):
@@ -65,9 +70,8 @@ def createIndirectCaller(f, _caller_dict={}):
     if f not in _caller_dict:
         rt.PushTriggerScope()
         caller_start = rt.NextTrigger()
-        fillArguments(f)
+        fillArgumentsAndReturns(f)
         callFuncBody(f._fstart, f._fend)
-        fillReturns(f)
         caller_end = rt.RawTrigger()
         rt.PopTriggerScope()
 

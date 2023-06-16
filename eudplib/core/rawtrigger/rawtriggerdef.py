@@ -214,3 +214,9 @@ class RawTrigger(EUDObject):
             pbuffer.WriteByte(0)
         else:
             pbuffer.WriteByte(self._currentAction)
+
+
+def _DoActions(actions: _Action | None = None) -> tuple[RawTrigger, RawTrigger]:
+    actions = ut.FlattenList(actions)
+    trg = [RawTrigger(actions=actions[i : i + 64]) for i in range(0, len(actions), 64)]
+    return trg[0], trg[-1]

@@ -191,6 +191,8 @@ def _testmain():
         _testFailed << 0
         f_simpleprint("\x03[TEST] 테스트를 진행합니다:", testname)
         testfunc()
+        test_equality(f"{testname} 종료", f_dwread_epd(0), 0)
+        f_dwwrite_epd(0, 0)
         Trigger(_testFailed == 1, _failedNum.AddNumber(1))
 
     test_complete()

@@ -12,9 +12,15 @@ from .vbase import VariableBase
 
 
 class EUDLightVariable(VariableBase):
-    def __init__(self, initvalue=0):
+    def __init__(self, initvalue=0, *, _from=None):
         super().__init__()
-        self._memaddr = Db(i2b4(initvalue))
+        if _from is None:
+            self._memaddr = Db(i2b4(initvalue))
+        else:
+            try:
+                self._memaddr = _from.getValueAddr()
+            except AttributeError:
+                self._memaddr = _from
 
     def getValueAddr(self):
         return self._memaddr

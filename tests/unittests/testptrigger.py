@@ -29,13 +29,6 @@ def test_ptrigger():
         )
     EUDEndPlayerLoop()
 
-    test_assert(
-        "PTrigger test",
-        [
-            Deaths(P1, Exactly, 3, "Terran Marine"),
-            Deaths(P7, Exactly, 1, "Terran Marine"),
-            Deaths(P8, Exactly, 0, "Terran Marine"),
-        ],
-    )
+    test_equality("PTrigger test", [f_dwread_epd(0), f_dwread_epd(6), f_dwread_epd(7)], [3, 1, 0])
 
     DoActions(SetDeaths(AllPlayers, SetTo, 0, "Terran Marine"))
