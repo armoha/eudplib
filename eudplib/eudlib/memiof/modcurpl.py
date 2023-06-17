@@ -44,15 +44,21 @@ def f_setcurpl2cpcache(v=[], actions=[]):
 def _f_updatecpcache():
     cpcond = c.curpl.cpcacheMatchCond()
     cpcache = c.curpl.GetCPCache()
-    cpcache << 0
+    c.RawTrigger(
+        actions=[
+            SetMemoryC(cpcache.getValueAddr(), c.SetTo, 0),
+            SetMemoryC(cpcond + 8, c.SetTo, 0),
+        ]
+    )
     for i in ut.RandList(range(32)):
         u = random.randint(234, 65535)
         c.RawTrigger(
             conditions=c.DeathsX(ut.EPD(0x6509B0) - 12 * u, c.AtLeast, 1, u, 2**i),
-            actions=SetMemoryC(cpcache.getValueAddr(), c.Add, 2**i),
+            actions=[
+                SetMemoryC(cpcache.getValueAddr(), c.Add, 2**i),
+                SetMemoryC(cpcond + 8, c.Add, 2**i),
+            ],
         )
-    c.VProc(cpcache, cpcache.SetDest(ut.EPD(cpcond) + 2))
-    f_setcurpl2cpcache()
 
 
 @c.EUDFunc
@@ -65,11 +71,16 @@ def f_getcurpl():
     """
     cpcond = c.curpl.cpcacheMatchCond()
     cpcache = c.curpl.GetCPCache()
+    f_getcurpl._frets = [cpcache]
+    f_getcurpl._retn = 1
+    f_getcurpl._fend << cpcache.GetVTable()
+    f_getcurpl._nptr = cpcache.GetVTable() + 4
     if cs.EUDIfNot()(cpcond):
         _f_updatecpcache()
     cs.EUDEndIf()
 
-    return cpcache  # its dest can vary
+    c.SetNextTrigger(cpcache.GetVTable())
+    # return cpcache  # its dest can vary
 
 
 def f_addcurpl(cp):

@@ -105,20 +105,21 @@ class EUDFuncN:
         if final_rets is not None:
             self._AddReturn(ut.Assignable2List(final_rets), False)
 
-        self._fend << bt.NextTrigger()
-        if self._traced:
-            _EUDTracePop()
-        if self._retn is None or self._retn == 0:
-            self._fend = bt.RawTrigger()
-            self._nptr = self._fend + 4
-        elif any(ev.IsEUDVariable(fret) for fret in self._frets):
-            varfret = filter(ev.IsEUDVariable, self._frets)
-            actfret = itertools.filterfalse(ev.IsEUDVariable, self._frets)
-            fendTrgs = ut.FlattenList(ev.VProc([varfret], [actfret]))
-            self._fend, self._nptr = fendTrgs[0], fendTrgs[-1]._actions[-1] + 20
-        else:
-            self._fend = _DoActions(self._frets)[1]
-            self._nptr = self._fend + 4
+        if not self._fend.IsSet():
+            self._fend << bt.NextTrigger()
+            if self._traced:
+                _EUDTracePop()
+            if self._retn is None or self._retn == 0:
+                self._fend = bt.RawTrigger()
+                self._nptr = self._fend + 4
+            elif any(ev.IsEUDVariable(fret) for fret in self._frets):
+                varfret = filter(ev.IsEUDVariable, self._frets)
+                actfret = itertools.filterfalse(ev.IsEUDVariable, self._frets)
+                fendTrgs = ut.FlattenList(ev.VProc([varfret], [actfret]))
+                self._fend, self._nptr = fendTrgs[0], fendTrgs[-1]._actions[-1] + 20
+            else:
+                self._fend = _DoActions(self._frets)[1]
+                self._nptr = self._fend + 4
 
         bt.PopTriggerScope()
 
