@@ -5,10 +5,10 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 from ...core import Db, SetMemory, SetTo
-from .mempatch import f_dwpatch_epd
-from ..memiof import f_repmovsd_epd, f_epdread_epd
-from ...utils import EPD
 from ...ctrlstru import DoActions
+from ...utils import EPD
+from ..memiof import f_epdread_epd, f_repmovsd_epd
+from .mempatch import f_dwpatch_epd
 
 _data = []
 

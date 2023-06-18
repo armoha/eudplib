@@ -12,21 +12,12 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
 from ..eudarray import EUDArray
-from ..memiof import (
-    CPByteWriter,
-    f_bread_epd,
-    f_cunitread_epd,
-    f_dwepdread_epd,
-    f_dwwrite,
-    f_getcurpl,
-    f_setcurpl,
-    f_wread_epd,
-)
-from ..stringf.rwcommon import br1
+from ..memiof import CPByteWriter, f_bread_epd, f_cunitread_epd, f_getcurpl, f_setcurpl
 from ..utilf import IsUserCP
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
+from .rwcommon import br1
 
 cw = CPByteWriter()
 prevcp = c.EUDVariable()
@@ -112,26 +103,6 @@ def f_getnextchatdst():
             actions=ret.AddNumber(ceil((2**i) * 54.5)),
         )
     return ret
-
-
-@c.EUDTypedFunc([c.StatText], None)
-def GetTBLAddr(tblId):
-    STAT_TEXT_POINTER = ut.EPD(0x6D5A30)
-    add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
-    check_pointer = c.MemoryEPD(STAT_TEXT_POINTER, c.Exactly, 0)
-    if cs.EUDIfNot()(check_pointer):
-        from ...core.variable.evcommon import _ev
-
-        f_dwepdread_epd(STAT_TEXT_POINTER, ret=[_ev[4], ut.EPD(add_TBL_epd) + 5])
-        c.VProc(_ev[4], _ev[4].SetDest(ut.EPD(check_pointer) + 2))
-        c.VProc(_ev[4], _ev[4].SetDest(ut.EPD(add_TBL_ptr) + 5))
-    cs.EUDEndIf()
-    r, m = c.f_div(tblId, 2)
-    c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
-    c.RawTrigger(actions=add_TBL_epd << r.AddNumber(0))
-    ret = f_wread_epd(r, m)
-    c.RawTrigger(actions=add_TBL_ptr << ret.AddNumber(0))
-    c.EUDReturn(ret)
 
 
 @c.EUDFunc
@@ -352,49 +323,4 @@ def f_eprintln(*args):
     _print << c.NextTrigger()
     f_cpstr_print(*args, EOS=False, encoding="UTF-8")
     c.SetNextTrigger(_eprintln_EOS)
-    _next << c.NextTrigger()
-
-
-_eprintln2_template = None
-_eprintln2_print = c.Forward()
-_eprintln2_EOS = c.Forward()
-_eprintln2_end = c.Forward()
-
-
-def f_eprintln2(*args):
-    global _eprintln2_template
-    if _eprintln2_template is None:
-        _eprintln2_template = c.Forward()
-
-        c.PushTriggerScope()
-        _eprintln2_template << c.NextTrigger()
-
-        if cs.EUDExecuteOnce()():
-            # [871] Unit's waypoint list is full.
-            ptr = GetTBLAddr(871)
-            f_dwwrite(ptr, ut.b2i4(b"\r\r\r\r"))
-            epd = ut.EPD(ptr) + 1
-        cs.EUDEndExecuteOnce()
-
-        if cs.EUDIf()(IsUserCP()):
-            prevcp << f_getcurpl()
-            f_setcurpl(epd)
-            _eprintln2_print << c.RawTrigger(nextptr=0)
-            _eprintln2_EOS << c.RawTrigger(actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
-            f_setcurpl(prevcp)
-        cs.EUDEndIf()
-        _eprintln2_end << c.RawTrigger(nextptr=0)
-        c.PopTriggerScope()
-
-    _print, _next = c.Forward(), c.Forward()
-    c.RawTrigger(
-        nextptr=_eprintln2_template,
-        actions=[
-            c.SetNextPtr(_eprintln2_print, _print),
-            c.SetNextPtr(_eprintln2_end, _next),
-        ],
-    )
-    _print << c.NextTrigger()
-    f_cpstr_print(*args, EOS=False, encoding="UTF-8")
-    c.SetNextTrigger(_eprintln2_EOS)
     _next << c.NextTrigger()

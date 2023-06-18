@@ -12,7 +12,6 @@ from .consttype import (
     Iscript,
     Portrait,
     Sprite,
-    StatText,
     Tech,
     TrgAIScript,
     TrgAllyStatus,

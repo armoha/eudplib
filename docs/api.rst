@@ -707,7 +707,7 @@ Trigger Scope
 -   **Iscript**
 -   **MPQAddFile**
 -   **MPQAddWave**
--   **MPQCheckFile** 
+-   **MPQCheckFile**
 -   **MemoryEPD**
 -   **MemoryX**
 -   **MemoryXEPD**

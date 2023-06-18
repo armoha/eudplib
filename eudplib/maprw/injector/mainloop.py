@@ -11,6 +11,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
+from ...eudlib.stringf.tblprint import _f_initstattext
 from ...eudlib.utilf.userpl import _f_initisusercp, _f_inituserplayerid
 from ...localize import _
 from ...utils import EPError, ep_assert
@@ -51,6 +52,7 @@ def _MainStarter(mf: Callable) -> c.Forward:
         _f_inituserplayerid()
         _f_initisusercp()
         _f_initstacktrace()
+        _f_initstattext()
 
         for func in startFunctionList1:
             func()

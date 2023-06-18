@@ -7,14 +7,12 @@
 
 from .cpprint import (
     FixedText,
-    GetTBLAddr,
     PColor,
     PName,
     f_cpstr_adddw,
     f_cpstr_addptr,
     f_cpstr_print,
     f_eprintln,
-    f_eprintln2,
     f_gettextptr,
     f_raise_CCMU,
 )
@@ -44,7 +42,15 @@ from .strbuffer import (
     f_simpleprint,
 )
 from .strfunc import f_strcmp, f_strcpy, f_strlen, f_strlen_epd, f_strnstr
-from .tblprint import f_settbl, f_settbl2, f_settblf, f_settblf2
+from .tblprint import (
+    GetTBLAddr,
+    StatText,
+    f_eprintln2,
+    f_settbl,
+    f_settbl2,
+    f_settblf,
+    f_settblf2,
+)
 from .texteffect import (
     TextFX_FadeIn,
     TextFX_FadeOut,

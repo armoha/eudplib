@@ -1,9 +1,6 @@
-import eudplib.eudlib.utilf.datadumper;
+import eudplib.eudlib.stringf.tblprint;
 const inputData = py_bytes(1000);
-const outOffsets = list(0x6D5A30);
-const flags = py_set();
-flags.add(py_str("copy"));
-datadumper._add_datadumper(inputData, outOffsets, flags);
+tblprint._AddStatText(inputData);
 
 const expected_result = py_str("abcdeArmo\xE2\x80\x89\0");
 function test_stattext() {

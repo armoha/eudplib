@@ -80,7 +80,6 @@ TrgString = createEncoder(EncodeString, "TrgString")
 TrgSwitch = createEncoder(EncodeSwitch, "TrgSwitch")
 TrgUnit = createEncoder(EncodeUnit, "TrgUnit")
 
-StatText = createEncoder(EncodeTBL, "StatText")
 Weapon = createEncoder(EncodeWeapon, "Weapon")
 Flingy = createEncoder(EncodeFlingy, "Flingy")
 Sprite = createEncoder(EncodeSprite, "Sprite")
