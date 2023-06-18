@@ -17,7 +17,6 @@ from .breakcont import (
     EUDSetContinuePoint,
 )
 from .cshelper import CtrlStruOpener
-from .jumptable import GetCurrentJumpBuffer
 from .loopblock import (
     EUDEndInfLoop,
     EUDEndLoopN,

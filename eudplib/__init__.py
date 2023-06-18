@@ -57,8 +57,8 @@ def eudplibVersion():
 _alllist.append("eudplibVersion")
 
 
-from .epscript.epscompile import setEpsGlobals, setPyBuiltins, setPyKeywords
+from .epscript import epscompile
 
-setEpsGlobals(_alllist)
-setPyKeywords(keyword.kwlist)
-setPyBuiltins(dir(builtins))
+epscompile._setEpsGlobals(_alllist)
+epscompile._setPyKeywords(keyword.kwlist)
+epscompile._setPyBuiltins(dir(builtins))

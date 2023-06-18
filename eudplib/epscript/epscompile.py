@@ -29,17 +29,17 @@ libeps.registerPyKeywords.argtypes = [c_char_p]
 libeps.registerPyBuiltins.argtypes = [c_char_p]
 
 
-def setEpsGlobals(globalList):
+def _setEpsGlobals(globalList):
     globalList_C = b"\0".join(u2b(g) for g in globalList) + b"\0"
     libeps.registerPlibConstants(globalList_C)
 
 
-def setPyKeywords(keywordList):
+def _setPyKeywords(keywordList):
     keywordList_C = b"\0".join(u2b(g) for g in keywordList) + b"\0"
     libeps.registerPyKeywords(keywordList_C)
 
 
-def setPyBuiltins(builtinList):
+def _setPyBuiltins(builtinList):
     builtinList_C = b"\0".join(u2b(g) for g in builtinList) + b"\0"
     libeps.registerPyBuiltins(builtinList_C)
 

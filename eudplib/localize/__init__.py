@@ -4,7 +4,7 @@ import gettext
 import locale
 import os
 import sys
-from types import TracebackType
+from types import TracebackType as _TracebackType
 from typing import Any
 
 _lc = os.environ.get("LANG")
@@ -24,7 +24,7 @@ _ = _gt
 
 
 def _excepthook(
-    type_: type[BaseException], value: BaseException, traceback: TracebackType | None
+    type_: type[BaseException], value: BaseException, traceback: _TracebackType | None
 ) -> Any:
     # print("# FIXME: excepthook")
     v = list(value.args)
