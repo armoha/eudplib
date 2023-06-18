@@ -65,6 +65,7 @@ class TBL:
         self,
         content: bytes | None = None,
         init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap] | None" = None,
+        *,
         load_entry: Literal[2, 4] = 2,
         save_entry: Literal[2, 4] = 4,
     ) -> None:
