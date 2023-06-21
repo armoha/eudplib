@@ -14,7 +14,7 @@ from .vararray import EUDVArray
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
-    def __init__(self, *args, _from=None, **kwargs) -> None:
+    def __init__(self, *args, _from=None, _static_initval=None, **kwargs) -> None:
         fielddict = {}
         fieldcount = 0
         for basetype in reversed(type(self).__mro__):
@@ -40,7 +40,9 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
             super().__init__(EUDVArray(fieldcount).cast(_from))
             self._initialized = True
         else:
-            super().__init__(EUDVArray(fieldcount)([0] * fieldcount))
+            if _static_initval is None:  # hacky way...
+                _static_initval = [0] * fieldcount
+            super().__init__(EUDVArray(fieldcount)(_static_initval))
             self.isPooled = False
             self._initialized = True
             self.constructor_static(*args, **kwargs)

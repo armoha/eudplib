@@ -9,6 +9,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.mapdata.stringmap import ForceAddString
+from ...localize import _
 from ..eudarray import EUDArray
 from ..memiof import f_getcurpl, f_setcurpl
 from ..utilf import IsUserCP, f_getuserplayerid
@@ -63,17 +64,24 @@ def _tag_print(identifier, *args, encoding="UTF-8"):
     cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
 
 
-class StringBuffer:
+class StringBuffer(c.EUDStruct):
     """Object for storing single modifiable string.
 
     Manipulating STR section is easy. :)
     You can do anything you would do with normal string with StringBuffer.
     """
 
+    _fields_ = [
+        ("StringIndex", c.TrgString),  # static
+        "epd",  # static
+        "pos",
+        "capacity",  # static
+    ]
+
     _method_template = c.Forward()
     _cpbranch = c.Forward()
 
-    def __init__(self, content=None):
+    def __init__(self, content=None, *, _from=None):
         """Constructor for StringBuffer
 
         :param content: Initial StringBuffer content / capacity. Capacity of
@@ -83,17 +91,126 @@ class StringBuffer:
 
         :type content: str, bytes, int
         """
-        _chkt = c.GetChkTokenized()
-        if content is None:
-            content = "\r" * 218
-        elif isinstance(content, int):
-            content = "\r" * content
-        else:
-            content = ut.u2utf8(content)
-        self.capacity = len(content)
-        self.StringIndex = ForceAddString(content)
-        self.epd = ut.EPD(GetMapStringAddr(self.StringIndex))
-        self.pos = c.EUDVariable()
+        initval = None
+        if _from and isinstance(_from, StringBuffer) and c.IsConstExpr(_from):
+            self._capacity = _from._capacity
+            self._StringIndex = _from._StringIndex
+            self._epd = _from._epd
+        elif _from is None:
+            if content is None:
+                content = "\r" * 218
+            elif isinstance(content, int):
+                content = "\r" * content
+            else:
+                content = ut.u2utf8(content)
+            # static fields
+            self._capacity = len(content)
+            self._StringIndex = ForceAddString(content)
+            self._epd = ut.EPD(GetMapStringAddr(self._StringIndex))
+            initval = [self._StringIndex, self._epd, 0, self._capacity]
+        super().__init__(_from=_from, _static_initval=initval)
+
+    def constructor(self, *args, **kwargs):
+        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
+
+    def constructor_static(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def alloc(cls, *args, **kwargs):
+        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
+
+    @classmethod
+    def free(cls, data):
+        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
+
+    def destructor(self):
+        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
+
+    # Initializer
+
+    def setall(self, values):
+        raise ut.EPError(_("Can't mutate field of StringBuffer except 'pos'"))
+
+    def copyto(self, inst):
+        raise ut.EPError(_("Can't clone StringBuffer, which is reference type."))
+
+    # Field setter & getter
+
+    def getfield(self, name):
+        # get static field
+        if c.IsConstExpr(self) and name != "pos":
+            return getattr(self, f"_{name}")
+        return super().getfield(name)
+
+    def setfield(self, name, value):
+        ut.ep_assert(name == "pos", _("Can't mutate field of StringBuffer except 'pos'"))
+        super().setfield(name, value)
+
+    def iaddattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().iaddattr(name, value)
+
+    def isubtractattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().isubtractattr(name, value)
+
+    def isubattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().isubattr(name, value)
+
+    def imulattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().imulattr(name, value)
+
+    def ifloordivattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().ifloordivattr(name, value)
+
+    def imodattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().imodattr(name, value)
+
+    def ilshiftattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().ilshiftattr(name, value)
+
+    def irshiftattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().irshiftattr(name, value)
+
+    def ipowattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().ipowattr(name, value)
+
+    def iandattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().iandattr(name, value)
+
+    def iorattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().iorattr(name, value)
+
+    def ixorattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().ixorattr(name, value)
+
+    def iinvertattr(self, name, value):
+        if name != "pos":
+            raise AttributeError
+        super().iinvertattr(name, value)
 
     @classmethod
     def _init_template(cls):
@@ -126,7 +243,7 @@ class StringBuffer:
         for _end in StringBuffer.CPBranch():
             f_setcurpl(self.pos)
             f_cpstr_print(*args)
-            f_getcurpl(ret=[self.pos])
+            self.pos = f_getcurpl()
             f_setcurpl(f_getuserplayerid())
 
     def appendf(self, format_string, *args):
@@ -136,7 +253,7 @@ class StringBuffer:
         for _end in StringBuffer.CPBranch():
             f_setcurpl(self.epd + index)
             f_cpstr_print(*args, EOS=False)
-            f_getcurpl(ret=[self.pos])
+            self.pos = f_getcurpl()
             f_setcurpl(f_getuserplayerid())
 
     def insertf(self, index, format_string, *args):
@@ -144,8 +261,9 @@ class StringBuffer:
 
     def delete(self, start, length=1):
         for _end in StringBuffer.CPBranch():
-            self.pos << self.epd + start
-            f_setcurpl(self.pos)
+            pos = self.epd + start
+            self.pos = pos
+            f_setcurpl(pos)
             cs.DoActions(
                 [
                     c.SetDeaths(c.CurrentPlayer, c.SetTo, 0x0D0D0D0D, 0),
