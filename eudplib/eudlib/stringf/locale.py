@@ -7,28 +7,55 @@ from ...core import (
     SetMemory,
     SetTo,
 )
+from ...utils import ExprProxy, ep_assert
 from .cpprint import f_raise_CCMU
 
-LocalLocale = EUDVariable(0)
+LOCALES = (
+    "enUS",  # [1] English
+    "frFR",  # [2] Français
+    "itIT",  # [3] Italiano
+    "deDE",  # [4] Deutsch
+    "esES",  # [5] Español - España
+    "esMX",  # [6] Español - Latino
+    "ptBR",  # [7] Português
+    "zhCN",  # [8] 简体中文
+    "zhTW",  # [9] 繁體中文
+    "jaJP",  # [10] 日本語
+    "koUS",  # [11] 한국어 (음역)
+    "koKR",  # [12] 한국어 (완역)
+    "plPL",  # [13] Polski
+    "ruRU",  # [14] Русский
+)
+
+
+class LocalLocale(ExprProxy):
+    def __init__(self, initvar) -> None:
+        self.dontFlatten = True
+        super().__init__(initvar)
+
+    def __lshift__(self, other):
+        if isinstance(other, str):
+            ep_assert(other in LOCALES)
+            other = 1 + LOCALES.index(other)
+        return super().__lshift__(other)
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            ep_assert(other in LOCALES)
+            other = 1 + LOCALES.index(other)
+        return super().__eq__(other)
+
+    def __ne__(self, other):
+        if isinstance(other, str):
+            ep_assert(other in LOCALES)
+            other = 1 + LOCALES.index(other)
+        return super().__ne__(other)
+
+
+LocalLocale = LocalLocale(EUDVariable(0))
 
 
 def _detect_locale():
-    LOCALES = [
-        "enUS",  # [1] English
-        "frFR",  # [2] Français
-        "itIT",  # [3] Italiano
-        "deDE",  # [4] Deutsch
-        "esES",  # [5] Español - España
-        "esMX",  # [6] Español - Latino
-        "ptBR",  # [7] Português
-        "zhCN",  # [8] 简体中文
-        "zhTW",  # [9] 繁體中文
-        "jaJP",  # [10] 日本語
-        "koUS",  # [11] 한국어 (음역)
-        "koKR",  # [12] 한국어 (완역)
-        "plPL",  # [13] Polski
-        "ruRU",  # [14] Русский
-    ]
     MAGIC_NUMBERS = {
         "enUS": (1650552405, 1948280172, 1919098991),
         "frFR": (1869638985, 1651078003, 1679844716),
@@ -61,4 +88,5 @@ def _detect_locale():
             ],
             actions=LocalLocale.SetNumber(locale_id + 1),
         )
+    # clear error message
     RawTrigger(actions=SetMemory(STATUS_MSG, SetTo, 0))

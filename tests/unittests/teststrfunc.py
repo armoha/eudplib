@@ -3,7 +3,7 @@ from helper import *
 
 @TestInstance
 def test_strbuffer():
-    test_equality("LocalLocale test", LocalLocale, 11)
+    test_assert("LocalLocale test", [LocalLocale == "koUS"])
 
     origcp = f_getcurpl()
 
