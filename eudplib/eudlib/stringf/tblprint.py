@@ -35,9 +35,9 @@ class StatText(createEncoder):
 StatText = StatText()
 
 
-@c.EUDTypedFunc([StatText], None)
+@c.EUDTypedFunc([StatText])
 def GetTBLAddr(tblId):
-    STAT_TEXT_POINTER = ut.EPD(0x6D5A30)
+    STAT_TEXT_POINTER = ut.EPD(0x6D5A30)  # TODO: hardcode 0x19184660 ?
     add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
     check_pointer = c.MemoryEPD(STAT_TEXT_POINTER, c.Exactly, 0)
     if cs.EUDIfNot()(check_pointer):

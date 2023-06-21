@@ -3,6 +3,8 @@ from helper import *
 
 @TestInstance
 def test_strbuffer():
+    test_equality("LocalLocale test", LocalLocale, 11)
+
     origcp = f_getcurpl()
 
     s1 = StringBuffer(1023)

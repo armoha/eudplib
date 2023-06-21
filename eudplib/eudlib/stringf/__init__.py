@@ -30,6 +30,7 @@ from .eudprint import (
     ptr2s,
 )
 from .fmtprint import f_eprintAll, f_eprintf, f_sprintf, f_sprintf_cp
+from .locale import LocalLocale
 from .parse import f_parse
 from .pname import IsPName, SetPName, SetPNamef
 from .strall import DisplayTextAllAt, f_printAll, f_printAllAt

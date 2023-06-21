@@ -249,7 +249,7 @@ def f_raise_CCMU(player):
         print_error = c.Forward()
         c.VProc(player, player.SetDest(ut.EPD(print_error + 16)))
         c.VProc(
-            orignextptr,
+            orignextptr,  # restores 0x628438
             [
                 c.SetMemory(0x628438, c.SetTo, 0),
                 print_error << c.CreateUnit(1, 0, 64, 0),
