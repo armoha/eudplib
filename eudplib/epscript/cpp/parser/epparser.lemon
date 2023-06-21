@@ -1042,6 +1042,9 @@ expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET GT expr(D). [GT] {
 expr(A) ::= expr(B) EQ expr(C).   { A = binopConcat(B, "==", C); }
 expr(A) ::= expr(B) NE expr(C).   { A = negate(binopConcat(B, "==", C)); }
 
+expr(A) ::= expr(B) EQ STRING(C).   { A = binopConcat(B, "==", C); }
+expr(A) ::= expr(B) NE STRING(C).   { A = negate(binopConcat(B, "==", C)); }
+
 expr(A) ::= expr(B) LE expr(C).   { A = binopConcat(B, "<=", C); }
 expr(A) ::= expr(B) GE expr(C).   { A = binopConcat(B, ">=", C); }
 
@@ -1282,6 +1285,12 @@ lvalueList_nonEmpty(A) ::= lvalue(B). { A = B; }
 lvalueList_nonEmpty(A) ::= lvalueList_nonEmpty(B) COMMA lvalue(C). { A = commaConcat(B, C); }
 
 assign_stmt ::= lvalue(A) ASSIGN expr(B). {
+    writeTraceInfo(ps->gen, A);
+    ps->gen << A->data << " << (" << B->data << ")" << std::endl;
+    delete A; delete B;
+}
+
+assign_stmt ::= lvalue(A) ASSIGN STRING(B). {
     writeTraceInfo(ps->gen, A);
     ps->gen << A->data << " << (" << B->data << ")" << std::endl;
     delete A; delete B;
