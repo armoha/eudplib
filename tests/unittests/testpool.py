@@ -10,8 +10,6 @@ class Coord(EUDStruct):
 def test_pool():
     from eudplib.eudlib.objpool import SetGlobalPoolFieldN
 
-    SetGlobalPoolFieldN(16)
-
     # Basic allocation
     a = Coord.alloc()
     a.x = 5

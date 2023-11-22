@@ -5,26 +5,37 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from ...utils import ExprProxy
+from ...utils import ExprProxy, EPError
 from .selftype import selftype
 from .vararray import EUDVArray
+from ...localize import _
 
 
 class _EUDStruct_Metaclass(type):
     def __init__(cls, name, bases, dct) -> None:
         # For field declaration, modify selftype to cls
-        try:
-            fields = dct["_fields_"]
-        except KeyError:
-            pass
-        else:
-            for i, member in enumerate(fields):
-                if isinstance(member, str):
-                    continue
-                mName, mType = member
-                if mType is selftype:
-                    fields[i] = (mName, cls)
+        fielddict = {}
+        fieldcount = 0
+        for basetype in reversed(cls.__mro__):
+            if not hasattr(basetype, "_fields_"):
+                continue
+            for i, nametype in enumerate(basetype._fields_):
+                if isinstance(nametype, str):  # "fieldname"
+                    fieldname = nametype
+                    fieldtype = None
+                else:  # ("fieldname", fieldtype)
+                    fieldname = nametype[0]
+                    fieldtype = nametype[1]
+                if fieldtype is selftype:
+                    fieldtype = cls
+                    basetype._fields_[i] = (fieldname, cls)
 
+                if fieldname in fielddict:
+                    raise EPError(_("Duplicated field name: {}").format(fieldname))
+                fielddict[fieldname] = (fieldcount, fieldtype)
+                fieldcount += 1
+
+        cls._fielddict = fielddict
         super().__init__(name, bases, dct)
 
     def __mul__(self, times: int):

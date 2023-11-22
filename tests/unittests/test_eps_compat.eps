@@ -2,6 +2,17 @@ import .BGM_eps_test;
 import .test_eps_stattext as stat;
 var x = 1 << 4;
 EUDOnStart(function () { x += x; });
+object ParticleBag extends EUDStruct {
+    var a;
+    var b;
+};
+object ObjectWithTooManyFields {
+    var v0, v1, v2, v3, v4, v5, v6, v7, v8, v9;
+};
+object ClassInheritingBigObj extends ObjectWithTooManyFields {
+    var v10;
+};
+
 function test_compatibility() {
     static var ret = 0;
     const empty = Db(i2b4(0));
@@ -66,7 +77,3 @@ with expect_eperror():\n\
     var z = EUDVariable();
     return ret;
 }
-object ParticleBag extends EUDStruct {
-    var a;
-    var b;
-};

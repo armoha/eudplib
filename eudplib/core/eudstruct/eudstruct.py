@@ -15,26 +15,7 @@ from .vararray import EUDVArray
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
     def __init__(self, *args, _from=None, _static_initval=None, **kwargs) -> None:
-        fielddict = {}
-        fieldcount = 0
-        for basetype in reversed(type(self).__mro__):
-            if not hasattr(basetype, "_fields_"):
-                continue
-
-            for nametype in basetype._fields_:
-                if isinstance(nametype, str):  # "fieldname"
-                    fieldname = nametype
-                    fieldtype = None
-                else:  # ("fieldname", fieldtype)
-                    fieldname = nametype[0]
-                    fieldtype = nametype[1]
-
-                if fieldname in fielddict:
-                    raise ut.EPError(_("Duplicated field name: {}").format(fieldname))
-                fielddict[fieldname] = (fieldcount, fieldtype)
-                fieldcount += 1
-
-        self._fielddict: dict[str, tuple[int, type | None]] = fielddict
+        fieldcount = len(self._fielddict)
 
         if _from is not None:
             super().__init__(EUDVArray(fieldcount).cast(_from))
@@ -115,9 +96,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
 
     def copyto(self, inst):
         """Copy struct to other instance"""
-        basetype = type(self)
-        fields = basetype._fields_
-        for i, nametype in enumerate(fields):
+        for i, _nametype in enumerate(self._fielddict):
             inst.set(i, self.get(i))
 
     # Field setter & getter
