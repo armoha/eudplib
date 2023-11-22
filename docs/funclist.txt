@@ -529,7 +529,7 @@ eudplib의 핵심 개념 중 하나가 변수와 함수의 개념입니다.
             (a, SetTo, 1),
             (b, SetTo, 2)
         ])
-    
+
 * VProc(v, actions)  ** 고급 **
     뻘강의 "Full Variable" 단원 참고. QueueAssignTo같은 액션을 실행하는데 쓴다.
 
@@ -579,7 +579,7 @@ eudplib의 핵심 개념 중 하나가 변수와 함수의 개념입니다.
 
 * EUDMethod(method)
 * EUDTypedMethod(argtypes, rettypes)
-    EUDStruct나 EUDObject같이 메서드를 EUDFunc처럼 쓰고 싶을때 쓰면 됩니다.    
+    EUDStruct나 EUDObject같이 메서드를 EUDFunc처럼 쓰고 싶을때 쓰면 됩니다.
 
 
 * EUDReturn()
@@ -645,6 +645,9 @@ eudplib의 핵심 개념 중 하나가 변수와 함수의 개념입니다.
     들어 위 EUDStack이란 구조체에는 EUDArray형의 data와 EUDVariable형의 pos를
     갖고 있습니다.
 
+    모든 EUDStruct는 _fielddict 멤버를 갖고 있습니다. _fielddict는 상속한 클래스의
+    필드까지 포함돼있고, {이름: (필드번호, 타입명)}의 dict 형식입니다.
+
     EUDStruct의 생성자에 list를 넣으면 해당 데이터를 이용해 EUDStruct의 필드를 초기화해
     새로운 EUDStruct를 만들게 되고, ConstExpr나 변수를 넣으면 그 변수에 있는 주소를
     가지고 EUDStruct를 만듭니다. 차이점을 유의해두세요.
@@ -680,7 +683,7 @@ eudplib의 핵심 개념 중 하나가 변수와 함수의 개념입니다.
                 ])
 
             else:
-                super().__init__(size)      
+                super().__init__(size)
 
     처럼 size가 int인지 아닌지에 따라 생성자를 다르게 적용하고 있습니다.
 
@@ -935,7 +938,7 @@ TRIG 트리거 관련
     안되는 트리거도 있을 수 있습니다. EUDLoopTrigger를 포함해서 아래 함수들을
     사용할때는 이런 추가된 트리거들을 조심하세요.
 
-                    
+
 * EUDLoopTrigger(player)
     player의 모든 TRIG Trigger를 돕니다.
 
@@ -1204,4 +1207,3 @@ SaveMap은 3가지 단계로 이루어집니다.
 * EUDByteReader()
 * EUDByteWriter()
     바이트 단위로 읽고 씁니다. f_bread 함수를 참고하세요.
-

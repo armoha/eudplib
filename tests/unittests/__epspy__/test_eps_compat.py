@@ -51,78 +51,81 @@ class ClassInheritingBigObj(ObjectWithTooManyFields):
 
 @EUDFunc
 def f_test_compatibility():
-    # (Line 17) static var ret = 0;
+    # (Line 17) py_exec("from helper import *\n\
+    # (Line 20) ");
+    exec("from helper import *\nwith expect_eperror():\n    ClassInheritingBigObj.alloc()\n")
+    # (Line 21) static var ret = 0;
     ret = EUDVariable(0)
-    # (Line 18) const empty = Db(i2b4(0));
+    # (Line 22) const empty = Db(i2b4(0));
     empty = Db(i2b4(0))
-    # (Line 19) const cond = Forward();
+    # (Line 23) const cond = Forward();
     cond = Forward()
-    # (Line 21) py_exec("from helper import *\n\
-    # (Line 30) ");
+    # (Line 25) py_exec("from helper import *\n\
+    # (Line 34) ");
     exec("from helper import *\nwith expect_eperror():\n    Trigger(cond, ret.AddNumber(1 << 0))\nwith expect_eperror():\n    Trigger(empty, ret.AddNumber(1 << 1))\nwith expect_eperror():\n    Trigger(empty + 1, ret.AddNumber(1 << 2))\nwith expect_eperror():\n    SetVariables(ret, -1, EUDVariable(EncodeModifier(SetTo)))\n")
-    # (Line 31) py_exec("from helper import *\n\
-    # (Line 39) ");
+    # (Line 35) py_exec("from helper import *\n\
+    # (Line 43) ");
     exec("from helper import *\nwith expect_eperror():\n    SetVariables(EUDVariable(), 1)\nwith expect_eperror():\n    SetVariables(f_dwread_epd(0), 1)\npv = PVariable()\nwith expect_eperror():\n    SetVariables(pv[0], 1)\n")
-    # (Line 40) const tc = GetTriggerCounter();
+    # (Line 44) const tc = GetTriggerCounter();
     tc = GetTriggerCounter()
-    # (Line 41) var x0 = EUDVariable(0);
+    # (Line 45) var x0 = EUDVariable(0);
     x0 = _LVAR([EUDVariable(0)])
-    # (Line 42) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+    # (Line 46) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
     ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 44) var x1 = list(EUDVariable(0));
+    # (Line 48) var x1 = list(EUDVariable(0));
     x1 = _LVAR([FlattenList([EUDVariable(0)])])
-    # (Line 45) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+    # (Line 49) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
     ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 47) var x2 = list(list(EUDVariable(0)));
+    # (Line 51) var x2 = list(list(EUDVariable(0)));
     x2 = _LVAR([FlattenList([FlattenList([EUDVariable(0)])])])
-    # (Line 48) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+    # (Line 52) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
     ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 50) var x3 = ExprProxy(EUDVariable(0));
+    # (Line 54) var x3 = ExprProxy(EUDVariable(0));
     x3 = _LVAR([ExprProxy(EUDVariable(0))])
-    # (Line 51) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+    # (Line 55) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
     ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 53) var x4 = ExprProxy(ExprProxy(EUDVariable(0)));
+    # (Line 57) var x4 = ExprProxy(ExprProxy(EUDVariable(0)));
     x4 = _LVAR([ExprProxy(ExprProxy(EUDVariable(0)))])
-    # (Line 54) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+    # (Line 58) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
     ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 56) var x5, y5 = EUDVariable(0), EUDVariable(0);
+    # (Line 60) var x5, y5 = EUDVariable(0), EUDVariable(0);
     x5, y5 = _LVAR([EUDVariable(0), EUDVariable(0)])
-    # (Line 57) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+    # (Line 61) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
     ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 59) var x6, y6 = list(EUDVariable(0), EUDVariable(0));
+    # (Line 63) var x6, y6 = list(EUDVariable(0), EUDVariable(0));
     x6, y6 = _LVAR([FlattenList([EUDVariable(0), EUDVariable(0)])])
-    # (Line 60) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+    # (Line 64) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
     ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 62) var x7, y7, z7 = EUDCreateVariables(3);
+    # (Line 66) var x7, y7, z7 = EUDCreateVariables(3);
     x7, y7, z7 = _LVAR([EUDCreateVariables(3)])
-    # (Line 63) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
+    # (Line 67) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
     ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 65) const vlist = EUDCreateVariables(3);
+    # (Line 69) const vlist = EUDCreateVariables(3);
     vlist = EUDCreateVariables(3)
-    # (Line 66) var x8, y8, z8 = vlist;
+    # (Line 70) var x8, y8, z8 = vlist;
     x8, y8, z8 = _LVAR([vlist])
-    # (Line 67) ep_assert(tc != GetTriggerCounter(), "Wrongly elide var copy");
+    # (Line 71) ep_assert(tc != GetTriggerCounter(), "Wrongly elide var copy");
     ep_assert(EUDNot(tc == GetTriggerCounter()), "Wrongly elide var copy")
-    # (Line 69) const tc2 = GetTriggerCounter();
+    # (Line 73) const tc2 = GetTriggerCounter();
     tc2 = GetTriggerCounter()
-    # (Line 70) var x9, y9, z9 = list(vlist[2], vlist[1], vlist[0]);
+    # (Line 74) var x9, y9, z9 = list(vlist[2], vlist[1], vlist[0]);
     x9, y9, z9 = _LVAR([FlattenList([vlist[2], vlist[1], vlist[0]])])
-    # (Line 71) ep_assert(tc2 != GetTriggerCounter(), "Wrongly elide var copy");
+    # (Line 75) ep_assert(tc2 != GetTriggerCounter(), "Wrongly elide var copy");
     ep_assert(EUDNot(tc2 == GetTriggerCounter()), "Wrongly elide var copy")
-    # (Line 73) cond.__lshift__(Memory(empty, AtLeast, 1));
+    # (Line 77) cond.__lshift__(Memory(empty, AtLeast, 1));
     cond.__lshift__(Memory(empty, AtLeast, 1))
-    # (Line 74) if (cond) { ret += 1 << 3; }
+    # (Line 78) if (cond) { ret += 1 << 3; }
     if EUDIf()(cond):
         ret.__iadd__(_LSH(1,3))
-        # (Line 75) ret += x;
+        # (Line 79) ret += x;
     EUDEndIf()
     ret.__iadd__(x)
-    # (Line 76) if(Is64BitWireframe()) {}
+    # (Line 80) if(Is64BitWireframe()) {}
     if EUDIf()(Is64BitWireframe()):
-        # (Line 77) var z = EUDVariable();
+        # (Line 81) var z = EUDVariable();
         pass
     EUDEndIf()
     z = _LVAR([EUDVariable()])
-    # (Line 78) return ret;
+    # (Line 82) return ret;
     EUDReturn(ret)
-    # (Line 79) }
+    # (Line 83) }
