@@ -14,12 +14,11 @@ from ..memiof import (
     f_dwepdread_epd,
     f_dwwrite,
     f_epdread_epd,
-    f_getcurpl,
     f_repmovsd_epd,
     f_setcurpl,
     f_wread_epd,
 )
-from ..utilf import IsUserCP
+from ..utilf import IsUserCP, f_getuserplayerid
 from .cpprint import f_cpstr_print
 from .eudprint import f_dbstr_print
 from .fmtprint import f_sprintf
@@ -128,11 +127,10 @@ def f_eprintln2(*args) -> None:
         cs.EUDEndExecuteOnce()
 
         if cs.EUDIf()(IsUserCP()):
-            prevcp << f_getcurpl()
             f_setcurpl(epd)
             _eprintln2_print << c.RawTrigger(nextptr=0)
             _eprintln2_EOS << c.RawTrigger(actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
-            f_setcurpl(prevcp)
+            f_setcurpl(f_getuserplayerid())
         cs.EUDEndIf()
         _eprintln2_end << c.RawTrigger(nextptr=0)
         c.PopTriggerScope()
