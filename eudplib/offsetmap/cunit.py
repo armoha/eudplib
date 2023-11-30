@@ -517,7 +517,7 @@ class CUnit(EPDOffsetMap):
     def clear_status_flag(self, mask) -> None:
         self.set_status_flag(0, mask)
 
-    def are_buildq_empty(self) -> [c.Condition]:
+    def are_buildq_empty(self) -> list[c.Condition]:
         return [
             self.eqattr("buildQueue12", 0xE400E4),
             self.eqattr("buildQueue34", 0xE400E4),
