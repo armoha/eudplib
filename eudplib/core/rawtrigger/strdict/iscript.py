@@ -394,7 +394,7 @@ DefIscriptDict: dict[str, int] = {
     "Mind Control Hit": 390,
     "Optical Flare Hit": 391,
     "Feedback": 392,
-    "Maelstorm Overlay": 393,
+    "Maelstrom Overlay": 393,
     "Unknown394": 394,
     "Unknown395": 395,
     "Desert Doodad": 396,
