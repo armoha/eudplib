@@ -32,7 +32,7 @@ LOCALES = (
 )
 
 
-class LocalLocale(ExprProxy):
+class _LocalLocale(ExprProxy):
     dontFlatten = True
 
     def __init__(self, initvar) -> None:
@@ -70,10 +70,10 @@ class LocalLocale(ExprProxy):
     def fmt(self):
         from .eudprint import epd2s
 
-        return epd2s(LocalLocale._fmt(self))
+        return epd2s(_LocalLocale._fmt(self))
 
 
-LocalLocale = LocalLocale(EUDVariable(0))
+LocalLocale = _LocalLocale(EUDVariable(0))
 
 
 def _detect_locale():

@@ -57,11 +57,11 @@ def GetInlineCodeGlobals() -> dict[str, Any]:
 
 
 def CompileInlineCode(code: str) -> tStartEnd:
-    code = compile(code, "<string>", "exec")
+    _code = compile(code, "<string>", "exec")
 
     if c.PushTriggerScope():
         tStart = RawTrigger(actions=c.SetDeaths(0, c.SetTo, 0, 0))
-        exec(code, GetInlineCodeGlobals(), {})
+        exec(_code, GetInlineCodeGlobals(), {})
         tEnd = RawTrigger()
     c.PopTriggerScope()
 
