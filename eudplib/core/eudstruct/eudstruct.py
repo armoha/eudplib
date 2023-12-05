@@ -11,6 +11,7 @@ from ..allocator import IsConstExpr
 from ..variable import EUDVariable
 from .structarr import _EUDStruct_Metaclass
 from .vararray import EUDVArray
+from ..rawtrigger.consttype import ConstType
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
@@ -110,10 +111,8 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
             return attr
 
     def setfield(self, name, value):
-        from ..eudfunc.consttype import createEncoder
-
         attrid, attrtype = self._fielddict[name]
-        if isinstance(attrtype, createEncoder):
+        if isinstance(attrtype, ConstType):
             value = attrtype.cast(value)
         self.set(attrid, value)
 

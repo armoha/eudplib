@@ -6,196 +6,127 @@
 # Please see the LICENSE file that should have been included as part of this package.
 
 from collections.abc import Callable, Mapping
-from typing import TYPE_CHECKING, TypeAlias, TypeVar, overload
+from typing import TYPE_CHECKING, TypeAlias, overload
 
-from ... import utils as ut
+from .consttype import ConstType, Dword, Word, Byte, _Dword, _Byte, T, U, _ExprProxy, _Arg, __ExprProxy, __Arg
 from ...localize import _
-from ...utils import ExprProxy
+from ...utils import ExprProxy, EPError, unProxy
 from ..mapdata import GetPropertyIndex, UnitProperty
 
 if TYPE_CHECKING:
     from ..allocator import ConstExpr
     from ..variable import EUDVariable
 
-Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy[int] | ExprProxy[EUDVariable] | ExprProxy[ConstExpr]"
-Word: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
-Byte: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
+
+class TrgAllyStatus(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeAllyStatus(s)
 
 
-class _Unique:
-    def __init__(self, name: str) -> None:
-        self._name: str = name
+AllyStatus: TypeAlias = "TrgAllyStatus | Byte"
+Enemy = TrgAllyStatus("Enemy")
+Ally = TrgAllyStatus("Ally")
+AlliedVictory = TrgAllyStatus("AlliedVictory")
 
-    def __repr__(self) -> str:
-        return self._name
-
-    def __str__(self) -> str:
-        return repr(self)
+AllyStatusDict: dict[ConstType, int] = {Enemy: 0, Ally: 1, AlliedVictory: 2}
 
 
-class _Player(_Unique):
-    pass
+class TrgComparison(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeComparison(s)
 
 
-Player: TypeAlias = "_Player | Dword"
-P1 = _Player("P1")
-P2 = _Player("P2")
-P3 = _Player("P3")
-P4 = _Player("P4")
-P5 = _Player("P5")
-P6 = _Player("P6")
-P7 = _Player("P7")
-P8 = _Player("P8")
-P9 = _Player("P9")
-P10 = _Player("P10")
-P11 = _Player("P11")
-P12 = _Player("P12")
-Player1 = _Player("Player1")
-Player2 = _Player("Player2")
-Player3 = _Player("Player3")
-Player4 = _Player("Player4")
-Player5 = _Player("Player5")
-Player6 = _Player("Player6")
-Player7 = _Player("Player7")
-Player8 = _Player("Player8")
-Player9 = _Player("Player9")
-Player10 = _Player("Player10")
-Player11 = _Player("Player11")
-Player12 = _Player("Player12")
-CurrentPlayer = _Player("CurrentPlayer")
-Foes = _Player("Foes")
-Allies = _Player("Allies")
-NeutralPlayers = _Player("NeutralPlayers")
-AllPlayers = _Player("AllPlayers")
-Force1 = _Player("Force1")
-Force2 = _Player("Force2")
-Force3 = _Player("Force3")
-Force4 = _Player("Force4")
-NonAlliedVictoryPlayers = _Player("NonAlliedVictoryPlayers")
+Comparison: TypeAlias = "TrgComparison | Byte"
+AtLeast = TrgComparison("AtLeast")
+AtMost = TrgComparison("AtMost")
+Exactly = TrgComparison("Exactly")
+
+ComparisonDict: dict[ConstType, int] = {AtLeast: 0, AtMost: 1, Exactly: 10}
 
 
-class _Score(_Unique):
-    pass
+class TrgCount(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeCount(s)
 
 
-class _KillsSpecialized(_Score):
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
-        self._internalf: Callable
-
-    def __call__(self, a, b, c, d):
-        return self._internalf(a, b, c, d)
+Count: TypeAlias = "TrgCount | Byte"
+All = TrgCount("All")
 
 
-Score: TypeAlias = "_Score | Byte"
-Total = _Score("Total")
-Units = _Score("Units")
-Buildings = _Score("Buildings")
-UnitsAndBuildings = _Score("UnitsAndBuildings")
-# Name 'Kills' is used for both condition type and score type.
-# To resolve conflict, we initialize Kills differently from others.
-Kills = _KillsSpecialized("Kills")
-Razings = _Score("Razings")
-KillsAndRazings = _Score("KillsAndRazings")
-Custom = _Score("Custom")
+class TrgModifier(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeModifier(s)
 
 
-class _Resource(_Unique):
-    pass
+Modifier: TypeAlias = "TrgModifier | Byte"
+SetTo = TrgModifier("SetTo")
+Add = TrgModifier("Add")
+Subtract = TrgModifier("Subtract")
+
+ModifierDict: dict[ConstType, int] = {SetTo: 7, Add: 8, Subtract: 9}
 
 
-Resource: TypeAlias = "_Resource | Byte"
-Ore = _Resource("Ore")
-Gas = _Resource("Gas")
-OreAndGas = _Resource("OreAndGas")
+class TrgOrder(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeOrder(s)
 
 
-class _AllyStatus(_Unique):
-    pass
+Order: TypeAlias = "TrgOrder | Byte"
+Move = TrgOrder("Move")
+Patrol = TrgOrder("Patrol")
+Attack = TrgOrder("Attack")
+
+OrderDict: dict[ConstType, int] = {Move: 0, Patrol: 1, Attack: 2}
 
 
-AllyStatus: TypeAlias = "_AllyStatus | Byte"
-Enemy = _AllyStatus("Enemy")
-Ally = _AllyStatus("Ally")
-AlliedVictory = _AllyStatus("AlliedVictory")
+class TrgPlayer(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodePlayer(s)
 
 
-class _Comparison(_Unique):
-    pass
+Player: TypeAlias = "TrgPlayer | Dword"
+P1 = TrgPlayer("P1")
+P2 = TrgPlayer("P2")
+P3 = TrgPlayer("P3")
+P4 = TrgPlayer("P4")
+P5 = TrgPlayer("P5")
+P6 = TrgPlayer("P6")
+P7 = TrgPlayer("P7")
+P8 = TrgPlayer("P8")
+P9 = TrgPlayer("P9")
+P10 = TrgPlayer("P10")
+P11 = TrgPlayer("P11")
+P12 = TrgPlayer("P12")
+Player1 = TrgPlayer("Player1")
+Player2 = TrgPlayer("Player2")
+Player3 = TrgPlayer("Player3")
+Player4 = TrgPlayer("Player4")
+Player5 = TrgPlayer("Player5")
+Player6 = TrgPlayer("Player6")
+Player7 = TrgPlayer("Player7")
+Player8 = TrgPlayer("Player8")
+Player9 = TrgPlayer("Player9")
+Player10 = TrgPlayer("Player10")
+Player11 = TrgPlayer("Player11")
+Player12 = TrgPlayer("Player12")
+CurrentPlayer = TrgPlayer("CurrentPlayer")
+Foes = TrgPlayer("Foes")
+Allies = TrgPlayer("Allies")
+NeutralPlayers = TrgPlayer("NeutralPlayers")
+AllPlayers = TrgPlayer("AllPlayers")
+Force1 = TrgPlayer("Force1")
+Force2 = TrgPlayer("Force2")
+Force3 = TrgPlayer("Force3")
+Force4 = TrgPlayer("Force4")
+NonAlliedVictoryPlayers = TrgPlayer("NonAlliedVictoryPlayers")
 
-
-Comparison: TypeAlias = "_Comparison | Byte"
-AtLeast = _Comparison("AtLeast")
-AtMost = _Comparison("AtMost")
-Exactly = _Comparison("Exactly")
-
-
-class _Modifier(_Unique):
-    pass
-
-
-Modifier: TypeAlias = "_Modifier | Byte"
-SetTo = _Modifier("SetTo")
-Add = _Modifier("Add")
-Subtract = _Modifier("Subtract")
-
-
-class _SwitchState(_Unique):
-    pass
-
-
-class _SwitchAction(_Unique):
-    pass
-
-
-class _SwitchStateOrAction(_SwitchState, _SwitchAction):
-    pass
-
-
-SwitchState: TypeAlias = "_SwitchState | Byte"
-SwitchAction: TypeAlias = "_SwitchAction | Byte"
-Set = _SwitchStateOrAction("Set")
-Clear = _SwitchAction("Clear")
-Random = _SwitchAction("Random")
-Cleared = _SwitchState("Cleared")
-
-
-class _PropState(_Unique):
-    pass
-
-
-PropState: TypeAlias = "_PropState | Byte"
-Enable = _PropState("Enable")
-Disable = _PropState("Disable")
-Toggle = _PropState("Toggle")
-
-
-class _Count(_Unique):
-    pass
-
-
-Count: TypeAlias = "_Count | Byte"
-All = _Count("All")
-
-
-class _Order(_Unique):
-    pass
-
-
-Order: TypeAlias = "_Order | Byte"
-Move = _Order("Move")
-Patrol = _Order("Patrol")
-Attack = _Order("Attack")
-
-AllyStatusDict: dict[_Unique, int] = {Enemy: 0, Ally: 1, AlliedVictory: 2}
-
-ComparisonDict: dict[_Unique, int] = {AtLeast: 0, AtMost: 1, Exactly: 10}
-
-ModifierDict: dict[_Unique, int] = {SetTo: 7, Add: 8, Subtract: 9}
-
-OrderDict: dict[_Unique, int] = {Move: 0, Patrol: 1, Attack: 2}
-
-PlayerDict: dict[_Unique, int] = {
+PlayerDict: dict[ConstType, int] = {
     P1: 0,
     P2: 1,
     P3: 2,
@@ -232,11 +163,71 @@ PlayerDict: dict[_Unique, int] = {
     NonAlliedVictoryPlayers: 26,
 }
 
-PropStateDict: dict[_Unique, int] = {Enable: 4, Disable: 5, Toggle: 6}
 
-ResourceDict: dict[_Unique, int] = {Ore: 0, Gas: 1, OreAndGas: 2}
+class TrgProperty(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeProperty(s)
 
-ScoreDict: dict[_Unique, int] = {
+
+class TrgPropState(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodePropState(s)
+
+
+PropState: TypeAlias = "TrgPropState | Byte"
+Enable = TrgPropState("Enable")
+Disable = TrgPropState("Disable")
+Toggle = TrgPropState("Toggle")
+
+PropStateDict: dict[ConstType, int] = {Enable: 4, Disable: 5, Toggle: 6}
+
+
+class TrgResource(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeResource(s)
+
+
+Resource: TypeAlias = "TrgResource | Byte"
+Ore = TrgResource("Ore")
+Gas = TrgResource("Gas")
+OreAndGas = TrgResource("OreAndGas")
+
+ResourceDict: dict[ConstType, int] = {Ore: 0, Gas: 1, OreAndGas: 2}
+
+
+class TrgScore(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeScore(s)
+
+
+class _KillsSpecialized(TrgScore):
+    def __init__(self, name: str) -> None:
+        super().__init__(name)
+        self._internalf: Callable
+
+    # Player: Player, Comparison: Comparison, Number: Dword, Unit: Unit
+    # ) -> Condition
+    def __call__(self, a, b, c, d):
+        return self._internalf(a, b, c, d)
+
+
+Score: TypeAlias = "TrgScore | Byte"
+Total = TrgScore("Total")
+Units = TrgScore("Units")
+Buildings = TrgScore("Buildings")
+UnitsAndBuildings = TrgScore("UnitsAndBuildings")
+# Name 'Kills' is used for both condition type and score type.
+# To resolve conflict, we initialize Kills differently from others.
+Kills = _KillsSpecialized("Kills")
+Razings = TrgScore("Razings")
+KillsAndRazings = TrgScore("KillsAndRazings")
+Custom = TrgScore("Custom")
+
+ScoreDict: dict[ConstType, int] = {
     Total: 0,
     Units: 1,
     Buildings: 2,
@@ -247,52 +238,61 @@ ScoreDict: dict[_Unique, int] = {
     Custom: 7,
 }
 
-SwitchActionDict: dict[_Unique, int] = {Set: 4, Clear: 5, Toggle: 6, Random: 11}
 
-SwitchStateDict: dict[_Unique, int] = {Set: 2, Cleared: 3}
+class TrgSwitchAction(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeSwitchAction(s)
 
-# return types
-_Dword: TypeAlias = "int | EUDVariable | ConstExpr"
-_Word: TypeAlias = "int | EUDVariable"
-_Byte: TypeAlias = "int | EUDVariable"
-# argument types
-T = TypeVar("T", int, "EUDVariable", "ConstExpr")
-U = TypeVar("U", int, "EUDVariable")
-_ExprProxy: TypeAlias = "ExprProxy[_Unique | int | EUDVariable | ConstExpr | ExprProxy]"
-_Arg: TypeAlias = "_Unique | int | EUDVariable | ConstExpr | ExprProxy[_Unique | int | EUDVariable | ConstExpr | ExprProxy]"
-__ExprProxy: TypeAlias = "ExprProxy[_Unique | int | EUDVariable | ExprProxy]"
-__Arg: TypeAlias = (
-    "_Unique | int | EUDVariable | ExprProxy[_Unique | int | EUDVariable | ExprProxy]"
-)
+
+class TrgSwitchState(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeSwitchState(s)
+
+
+class TrgSwitchStateOrAction(TrgSwitchState, TrgSwitchAction):
+    pass
+
+
+SwitchState: TypeAlias = "TrgSwitchState | Byte"
+SwitchAction: TypeAlias = "TrgSwitchAction | Byte"
+Set = TrgSwitchStateOrAction("Set")
+Clear = TrgSwitchAction("Clear")
+Random = TrgSwitchAction("Random")
+Cleared = TrgSwitchState("Cleared")
+
+SwitchActionDict: dict[ConstType, int] = {Set: 4, Clear: 5, Toggle: 6, Random: 11}
+SwitchStateDict: dict[ConstType, int] = {Set: 2, Cleared: 3}
 
 
 @overload
-def _EncodeConst(t: str, d: Mapping[_Unique, int], s: _Unique) -> int:
+def _EncodeConst(t: str, d: Mapping[ConstType, int], s: ConstType) -> int:
     ...
 
 
 @overload
-def _EncodeConst(t: str, d: Mapping[_Unique, int], s: T) -> T:
+def _EncodeConst(t: str, d: Mapping[ConstType, int], s: T) -> T:
     ...
 
 
 @overload
-def _EncodeConst(t: str, d: Mapping[_Unique, int], s: _ExprProxy) -> _Dword:
+def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _ExprProxy) -> _Dword:
     ...
 
 
-def _EncodeConst(t: str, d: Mapping[_Unique, int], s: _Arg) -> _Dword:
-    u = ut.unProxy(s)
-    if isinstance(u, _Unique):
+def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _Arg) -> _Dword:
+    u = unProxy(s)
+    if isinstance(u, ConstType):
         if u in d:
             return d[u]
-        raise ut.EPError(_('[Warning] "{}" is not a {}').format(u, t))
+        raise EPError(_('[Warning] "{}" is not a {}').format(u, t))
     assert not isinstance(u, ExprProxy), "unreachable"
     return u
 
 
 @overload
-def EncodeAllyStatus(s: _Unique, issueError: bool = False) -> int:
+def EncodeAllyStatus(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -312,7 +312,7 @@ def EncodeAllyStatus(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeComparison(s: _Unique, issueError: bool = False) -> int:
+def EncodeComparison(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -332,7 +332,7 @@ def EncodeComparison(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeModifier(s: _Unique, issueError: bool = False) -> int:
+def EncodeModifier(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -352,7 +352,7 @@ def EncodeModifier(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeOrder(s: _Unique, issueError: bool = False) -> int:
+def EncodeOrder(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -372,7 +372,7 @@ def EncodeOrder(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodePlayer(s: _Unique, issueError: bool = False) -> int:
+def EncodePlayer(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -433,7 +433,7 @@ def EncodePlayer(s: _Arg, issueError: bool = False) -> _Dword:
 
 
 @overload
-def EncodePropState(s: _Unique, issueError: bool = False) -> int:
+def EncodePropState(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -453,7 +453,7 @@ def EncodePropState(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeResource(s: _Unique, issueError: bool = False) -> int:
+def EncodeResource(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -473,7 +473,7 @@ def EncodeResource(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeScore(s: _Unique, issueError: bool = False) -> int:
+def EncodeScore(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -508,7 +508,7 @@ def EncodeScore(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeSwitchAction(s: _Unique, issueError: bool = False) -> int:
+def EncodeSwitchAction(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -528,7 +528,7 @@ def EncodeSwitchAction(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeSwitchState(s: _Unique, issueError: bool = False) -> int:
+def EncodeSwitchState(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -548,7 +548,7 @@ def EncodeSwitchState(s: __Arg, issueError: bool = False) -> _Byte:
 
 
 @overload
-def EncodeCount(s: _Unique, issueError: bool = False) -> int:
+def EncodeCount(s: ConstType, issueError: bool = False) -> int:
     ...
 
 
@@ -564,11 +564,11 @@ def EncodeCount(s: __ExprProxy, issueError: bool = False) -> _Byte:
 
 def EncodeCount(s: __Arg, issueError: bool = False) -> _Byte:
     """Convert [All, (other numbers)] to number [0, (as-is)]."""
-    t = ut.unProxy(s)
+    t = unProxy(s)
     if t is All:
         return 0
-    if isinstance(t, _Unique):
-        raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, "count"))
+    if isinstance(t, ConstType):
+        raise EPError(_('[Warning] "{}" is not a {}').format(s, "count"))
     assert not isinstance(t, ExprProxy), "unreachable"
     return t
 
@@ -579,5 +579,5 @@ def EncodeCount(s: __Arg, issueError: bool = False) -> _Byte:
 def EncodeProperty(
     prop: UnitProperty | bytes | ExprProxy[UnitProperty | bytes], issueError: bool = False
 ) -> int:
-    prop = ut.unProxy(prop)
+    prop = unProxy(prop)
     return GetPropertyIndex(prop)

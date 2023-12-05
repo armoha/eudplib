@@ -29,7 +29,7 @@ from .vbase import VariableBase
 from .vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
 
 if TYPE_CHECKING:
-    from ..rawtrigger.constenc import Dword, _Modifier, _Player
+    from ..rawtrigger.constenc import Dword, TrgModifier, TrgPlayer
 
 
 isRValueStrict = False
@@ -52,7 +52,7 @@ def _ProcessDest(dest: "VariableBase | ExprProxy[VariableBase]") -> ConstExpr:
 
 
 @overload
-def _ProcessDest(dest: "_Player") -> int:
+def _ProcessDest(dest: "TrgPlayer") -> int:
     ...
 
 
@@ -135,7 +135,7 @@ class EUDVariable(VariableBase):
     def __init__(
         self,
         initval_or_epd: int | ConstExpr,
-        modifier: "_Modifier",
+        modifier: "TrgModifier",
         initval: int | ConstExpr,
         /,
         *,

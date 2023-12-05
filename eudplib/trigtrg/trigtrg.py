@@ -86,16 +86,19 @@ from ..core.rawtrigger.constenc import (
     Total,
     Units,
     UnitsAndBuildings,
-    _AllyStatus,
-    _Comparison,
-    _Count,
+    TrgAllyStatus,
+    TrgComparison,
+    TrgCount,
     _KillsSpecialized,
-    _Modifier,
+    TrgModifier,
+    TrgPlayer,
+    TrgPropState,
+    TrgResource,
+    TrgOrder,
+    TrgScore,
+    TrgSwitchAction,
+    TrgSwitchState,
 )
-from ..core.rawtrigger.constenc import _Order as OrderType
-from ..core.rawtrigger.constenc import _Player, _PropState, _Resource
-from ..core.rawtrigger.constenc import _Score as ScoreType
-from ..core.rawtrigger.constenc import _SwitchAction, _SwitchState
 from ..core.rawtrigger.strenc import (
     EncodeAIScript,
     EncodeLocation,
@@ -118,17 +121,17 @@ condition / actions.
    3. Make your action as mentioned here.
      ex) CreateUnit(30, 'Terran Marine', 'Anywhere', Player1)
 """
-AllyStatus: TypeAlias = _AllyStatus | int
-Comparison: TypeAlias = _Comparison | int
-Count: TypeAlias = _Count | int
-Modifier: TypeAlias = _Modifier | int
-_Order: TypeAlias = OrderType | int
-Player: TypeAlias = _Player | int
-PropState: TypeAlias = _PropState | int
-Resource: TypeAlias = _Resource | int
-_Score: TypeAlias = ScoreType | int
-SwitchAction: TypeAlias = _SwitchAction | int
-SwitchState: TypeAlias = _SwitchState | int
+AllyStatus: TypeAlias = TrgAllyStatus | int
+Comparison: TypeAlias = TrgComparison | int
+Count: TypeAlias = TrgCount | int
+Modifier: TypeAlias = TrgModifier | int
+_Order: TypeAlias = TrgOrder | int
+Player: TypeAlias = TrgPlayer | int
+PropState: TypeAlias = TrgPropState | int
+Resource: TypeAlias = TrgResource | int
+_Score: TypeAlias = TrgScore | int
+SwitchAction: TypeAlias = TrgSwitchAction | int
+SwitchState: TypeAlias = TrgSwitchState | int
 
 Unit: TypeAlias = str | int | bytes
 Location: TypeAlias = str | int | bytes
@@ -300,9 +303,9 @@ def MostKills(Unit: Unit) -> bytes:
     return Condition(0, 0, 0, Unit, 0, 8, 0, 0)
 
 
-def HighestScore(ScoreType: _Score) -> bytes:
-    ScoreType = EncodeScore(ScoreType)
-    return Condition(0, 0, 0, 0, 0, 9, ScoreType, 0)
+def HighestScore(TrgScore: _Score) -> bytes:
+    TrgScore = EncodeScore(TrgScore)
+    return Condition(0, 0, 0, 0, 0, 9, TrgScore, 0)
 
 
 def MostResources(ResourceType: Resource) -> bytes:
@@ -354,9 +357,9 @@ def LeastKills(Unit: Unit) -> bytes:
     return Condition(0, 0, 0, Unit, 0, 18, 0, 0)
 
 
-def LowestScore(ScoreType: _Score) -> bytes:
-    ScoreType = EncodeScore(ScoreType)
-    return Condition(0, 0, 0, 0, 0, 19, ScoreType, 0)
+def LowestScore(TrgScore: _Score) -> bytes:
+    TrgScore = EncodeScore(TrgScore)
+    return Condition(0, 0, 0, 0, 0, 19, TrgScore, 0)
 
 
 def LeastResources(ResourceType: Resource) -> bytes:
@@ -364,11 +367,11 @@ def LeastResources(ResourceType: Resource) -> bytes:
     return Condition(0, 0, 0, 0, 0, 20, ResourceType, 0)
 
 
-def Score(Player: Player, ScoreType: _Score, Comparison: Comparison, Number: int) -> bytes:
+def Score(Player: Player, TrgScore: _Score, Comparison: Comparison, Number: int) -> bytes:
     Player = EncodePlayer(Player)
-    ScoreType = EncodeScore(ScoreType)
+    TrgScore = EncodeScore(TrgScore)
     Comparison = EncodeComparison(Comparison)
-    return Condition(0, Player, Number, 0, Comparison, 21, ScoreType, 0)
+    return Condition(0, Player, Number, 0, Comparison, 21, TrgScore, 0)
 
 
 def Always() -> bytes:
@@ -502,10 +505,10 @@ def LeaderBoardKills(Unit: Unit, Label: String) -> bytes:
     return Action(0, Label, 0, 0, 0, 0, Unit, 20, 0, 20)
 
 
-def LeaderBoardScore(ScoreType: _Score, Label: String) -> bytes:
-    ScoreType = EncodeScore(ScoreType)
+def LeaderBoardScore(TrgScore: _Score, Label: String) -> bytes:
+    TrgScore = EncodeScore(TrgScore)
     Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, 0, ScoreType, 21, 0, 4)
+    return Action(0, Label, 0, 0, 0, 0, TrgScore, 21, 0, 4)
 
 
 def KillUnit(Unit: Unit, Player: Player) -> bytes:
@@ -543,11 +546,11 @@ def SetResources(Player: Player, Modifier: Modifier, Amount: int, ResourceType: 
     return Action(0, 0, 0, 0, Player, Amount, ResourceType, 26, Modifier, 4)
 
 
-def SetScore(Player: Player, Modifier: Modifier, Amount: int, ScoreType: _Score) -> bytes:
+def SetScore(Player: Player, Modifier: Modifier, Amount: int, TrgScore: _Score) -> bytes:
     Player = EncodePlayer(Player)
     Modifier = EncodeModifier(Modifier)
-    ScoreType = EncodeScore(ScoreType)
-    return Action(0, 0, 0, 0, Player, Amount, ScoreType, 27, Modifier, 4)
+    TrgScore = EncodeScore(TrgScore)
+    return Action(0, 0, 0, 0, Player, Amount, TrgScore, 27, Modifier, 4)
 
 
 def MinimapPing(Where: Location) -> bytes:
@@ -598,10 +601,10 @@ def LeaderBoardGoalKills(Goal: int, Unit: Unit, Label: String) -> bytes:
     return Action(0, Label, 0, 0, 0, Goal, Unit, 36, 0, 20)
 
 
-def LeaderBoardGoalScore(Goal: int, ScoreType: _Score, Label: String) -> bytes:
-    ScoreType = EncodeScore(ScoreType)
+def LeaderBoardGoalScore(Goal: int, TrgScore: _Score, Label: String) -> bytes:
+    TrgScore = EncodeScore(TrgScore)
     Label = EncodeString(Label)
-    return Action(0, Label, 0, 0, 0, Goal, ScoreType, 37, 0, 4)
+    return Action(0, Label, 0, 0, 0, Goal, TrgScore, 37, 0, 4)
 
 
 def MoveLocation(Location: Location, OnUnit: Unit, Owner: Player, DestLocation: Location) -> bytes:
@@ -663,14 +666,14 @@ def SetDeaths(Player: Player, Modifier: Modifier, Number: int, Unit: Unit) -> by
 
 
 def Order(
-    Unit: Unit, Owner: Player, StartLocation: Location, OrderType: _Order, DestLocation: Location
+    Unit: Unit, Owner: Player, StartLocation: Location, TrgOrder: _Order, DestLocation: Location
 ) -> bytes:
     Unit = EncodeUnit(Unit)
     Owner = EncodePlayer(Owner)
     StartLocation = EncodeLocation(StartLocation)
-    OrderType = EncodeOrder(OrderType)
+    TrgOrder = EncodeOrder(TrgOrder)
     DestLocation = EncodeLocation(DestLocation)
-    return Action(StartLocation, 0, 0, 0, Owner, DestLocation, Unit, 46, OrderType, 20)
+    return Action(StartLocation, 0, 0, 0, Owner, DestLocation, Unit, 46, TrgOrder, 20)
 
 
 def Comment(Text: String) -> bytes:

@@ -14,7 +14,7 @@ from eudplib.localize import _
 
 from ...utils import ExprProxy
 from ..mapdata import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
-from .constenc import Byte, Dword, T, U, _Dword, _Word, _Byte, Word, _Unique
+from .consttype import Byte, Dword, T, U, _Dword, _Word, _Byte, Word, ConstType
 from .strdict import (
     DefAIScriptDict,
     DefFlingyDict,
@@ -37,23 +37,123 @@ if TYPE_CHECKING:
     from ..allocator import ConstExpr
     from ..variable import EUDVariable
 
+
+class TrgAIScript(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeAIScript(s)
+
+
+class TrgLocation(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeLocation(s)
+
+
+class TrgString(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeString(s)
+
+
+class TrgSwitch(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeSwitch(s)
+
+
+class TrgUnit(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeUnit(s)
+
+
+class Weapon(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeWeapon(s)
+
+
+class Flingy(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeFlingy(s)
+
+
+class Sprite(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeSprite(s)
+
+
+class Image(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeImage(s)
+
+
+class Iscript(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeIscript(s)
+
+
+class Upgrade(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeUpgrade(s)
+
+
+class StatText(ConstType):
+    _encoding = "UTF-8"
+    _data = b""
+
+    @classmethod
+    def cast(cls, s):
+        return EncodeTBL(s)
+
+
+class Tech(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeTech(s)
+
+
+class UnitOrder(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeUnitOrder(s)
+
+
+class Icon(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodeIcon(s)
+
+
+class Portrait(ConstType):
+    @classmethod
+    def cast(cls, s):
+        return EncodePortrait(s)
+
+
 Unit: TypeAlias = "str | Word | bytes"
 Location: TypeAlias = "str | Dword | bytes"
 String: TypeAlias = "str | Dword | bytes"
 AIScript: TypeAlias = "str | Dword | bytes"
 Switch: TypeAlias = "str | Byte | bytes"  # Byte in Condition, Dword in Action
 
-StatText: TypeAlias = "str | Dword | bytes"
-Flingy: TypeAlias = "str | Word | bytes"
-Icon: TypeAlias = "str | Word | bytes"
-Image: TypeAlias = "str | Word | bytes"
-Iscript: TypeAlias = "str | Word | bytes"
-Portrait: TypeAlias = "str | Word | bytes"
-Sprite: TypeAlias = "str | Word | bytes"
-Tech: TypeAlias = "str | Byte | bytes"
-UnitOrder: TypeAlias = "str | Byte | bytes"
-Upgrade: TypeAlias = "str | Byte | bytes"
-Weapon: TypeAlias = "str | Byte | bytes"
+_StatText: TypeAlias = "str | Dword | bytes"
+_Flingy: TypeAlias = "str | Word | bytes"
+_Icon: TypeAlias = "str | Word | bytes"
+_Image: TypeAlias = "str | Word | bytes"
+_Iscript: TypeAlias = "str | Word | bytes"
+_Portrait: TypeAlias = "str | Word | bytes"
+_Sprite: TypeAlias = "str | Word | bytes"
+_Tech: TypeAlias = "str | Byte | bytes"
+_UnitOrder: TypeAlias = "str | Byte | bytes"
+_Upgrade: TypeAlias = "str | Byte | bytes"
+_Weapon: TypeAlias = "str | Byte | bytes"
 
 # argument types
 _ExprProxy: TypeAlias = "ExprProxy[str | bytes | int | EUDVariable | ConstExpr | ExprProxy]"
@@ -103,7 +203,7 @@ def EncodeAIScript(ais: _Arg, issueError: bool = False) -> _Dword:
                 sl += "\n" + _(" - Suggestion: {}").format(match)
         raise ut.EPError(sl)
 
-    if isinstance(ai, _Unique):
+    if isinstance(ai, ConstType):
         raise ut.EPError(_('[Warning] "{}" is not a {}').format(ais, "AIScript"))
     assert not isinstance(ai, ExprProxy), "unreachable"
     return ai
@@ -140,7 +240,7 @@ def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: _Arg) -> _Dword:
                 raise ut.EPError(sl)
             raise ut.EPError(_('[Warning] "{}" is not a {}').format(u, t))
 
-    elif isinstance(u, _Unique):
+    elif isinstance(u, ConstType):
         raise ut.EPError(_('[Warning] "{}" is not a {}').format(u, t))
     assert not isinstance(u, ExprProxy), "unreachable"
     return u

@@ -15,7 +15,7 @@ from ..localize import _
 from ..utils import EPError, ExprProxy, unProxy
 
 if TYPE_CHECKING:
-    from ..core.rawtrigger.constenc import Player, _Player
+    from ..core.rawtrigger.constenc import Player, TrgPlayer
     from ..eudlib import EUDArray
 
 _runner_start: list[c.Forward] = [c.Forward() for _ in range(8)]
@@ -88,7 +88,7 @@ def TrigTriggerBegin(player: "Player") -> EUDVariable:
 
 
 @overload
-def TrigTriggerEnd(player: "int | _Player | ExprProxy[int | _Player]") -> c.Forward:
+def TrigTriggerEnd(player: "int | TrgPlayer | ExprProxy[int | TrgPlayer]") -> c.Forward:
     ...
 
 

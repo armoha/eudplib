@@ -11,7 +11,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..allocator import ConstExpr, IsConstExpr
-from .constenc import Byte, Dword, Word
+from .consttype import Byte, Dword, Word
 
 if TYPE_CHECKING:
     from ..allocator.payload import RlocInt_C, _PayloadBuffer
@@ -259,11 +259,11 @@ class Action(ConstExpr):
 
     def getDestAddr(self) -> ConstExpr:
         ut.ep_assert(self.fields[7] == 45)
-        return self + 16
+        return self + 16   # type: ignore[return-value]
 
     def getValueAddr(self) -> ConstExpr:
         ut.ep_assert(self.fields[7] == 45)
-        return self + 20
+        return self + 20  # type: ignore[return-value]
 
     def SetDest(self, dest) -> "Action":
         from ..variable.eudv import _ProcessDest

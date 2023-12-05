@@ -611,7 +611,7 @@ class CUnit(EPDOffsetMap):
         f_setcurpl2cpcache()
         # return False
 
-    def check_buildq(self, unit: c.TrgUnit) -> c.Condition:
+    def check_buildq(self, unit) -> c.Condition:
         unit_type = c.EncodeUnit(unit)
         if isinstance(unit_type, int):
             return CUnit._check_buildq_const(self, unit_type, unit_type * 65536)

@@ -45,7 +45,6 @@ from .strbuffer import (
 from .strfunc import f_strcmp, f_strcpy, f_strlen, f_strlen_epd, f_strnstr
 from .tblprint import (
     GetTBLAddr,
-    StatText,
     f_eprintln2,
     f_settbl,
     f_settbl2,

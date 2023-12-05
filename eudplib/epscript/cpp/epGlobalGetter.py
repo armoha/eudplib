@@ -24,13 +24,13 @@ if mode == 1:
 elif mode == 2:
     allowed_type = [
         int,
-        eudplib.core.rawtrigger.constenc._Unique,
+        eudplib.core.rawtrigger.consttype.ConstType,
         eudplib.core.rawtrigger.constenc._KillsSpecialized,
     ]
 else:
     allowed_type = eudftypes + [
         int,
-        eudplib.core.rawtrigger.constenc._Unique,
+        eudplib.core.rawtrigger.consttype.ConstType,
         type,
         types.FunctionType,
         eudplib.core.rawtrigger.constenc._KillsSpecialized,

@@ -11,7 +11,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from ..allocator import ConstExpr, IsConstExpr
-from .constenc import Byte, Dword, Word
+from .consttype import Byte, Dword, Word
 
 if TYPE_CHECKING:
     from ...utils import ExprProxy

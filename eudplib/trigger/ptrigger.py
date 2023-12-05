@@ -12,13 +12,13 @@ from eudplib import utils as ut
 
 from .. import core as c
 from ..core.mapdata.playerinfo import PlayerInfo
-from ..core.rawtrigger.constenc import _Player
+from ..core.rawtrigger.constenc import TrgPlayer
 from .triggerdef import Actions, Conditions, Trigger
 
 _pinfos: list[PlayerInfo] = []
 _pdbtable: dict[bytes, c.Db] = {}
 
-Players: TypeAlias = _Player | int | Iterable[_Player | int | Iterable]
+Players: TypeAlias = TrgPlayer | int | Iterable[TrgPlayer | int | Iterable]
 
 
 def InitPTrigger() -> None:

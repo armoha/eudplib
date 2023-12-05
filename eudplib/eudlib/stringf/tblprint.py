@@ -8,7 +8,6 @@
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ...core.eudfunc.consttype import createEncoder
 from ...localize import _
 from ..memiof import (
     f_dwepdread_epd,
@@ -24,17 +23,7 @@ from .eudprint import f_dbstr_print
 from .fmtprint import f_sprintf
 
 
-class StatText(createEncoder):
-    def __init__(self):
-        self._encoding = "UTF-8"
-        self._data = b""
-        super().__init__(c.EncodeTBL, "StatText")
-
-
-StatText = StatText()
-
-
-@c.EUDTypedFunc([StatText])
+@c.EUDTypedFunc([c.StatText])
 def GetTBLAddr(tblId):
     STAT_TEXT_POINTER = ut.EPD(0x6D5A30)  # TODO: hardcode 0x19184660 ?
     add_TBL_ptr, add_TBL_epd = c.Forward(), c.Forward()
@@ -60,7 +49,7 @@ def f_settbl(tblID, offset, *args, encoding=None):
     dst += offset
 
     if encoding is None:
-        encoding = StatText._encoding
+        encoding = c.StatText._encoding
 
     if encoding.casefold() == "UTF-8".casefold():
         if isinstance(args[-1], str):
@@ -77,7 +66,7 @@ def f_settbl2(tblID, offset, *args, encoding=None):
     dst += offset
 
     if encoding is None:
-        encoding = StatText._encoding
+        encoding = c.StatText._encoding
 
     return f_dbstr_print(dst, *args, EOS=False, encoding=encoding)
 
@@ -87,7 +76,7 @@ def f_settblf(tblID, offset, format_string, *args, encoding=None):
     dst += offset
 
     if encoding is None:
-        encoding = StatText._encoding
+        encoding = c.StatText._encoding
 
     if encoding.casefold() == "UTF-8".casefold() and format_string[-1] != "\u2009":
         format_string += "\u2009"
@@ -100,7 +89,7 @@ def f_settblf2(tblID, offset, format_string, *args, encoding=None):
     dst += offset
 
     if encoding is None:
-        encoding = StatText._encoding
+        encoding = c.StatText._encoding
 
     return f_sprintf(dst, format_string, *args, EOS=False, encoding=encoding)
 
@@ -150,18 +139,17 @@ def f_eprintln2(*args) -> None:
 
 
 def _f_initstattext() -> None:
-    if not StatText._data:
+    if not c.StatText._data:
         return
 
-    statText_db = c.Db(StatText._data)
-    inputDwordN = (len(StatText._data) + 3) // 4
+    statText_db = c.Db(c.StatText._data)
+    inputDwordN = (len(c.StatText._data) + 3) // 4
 
     addrEPD = f_epdread_epd(ut.EPD(0x6D5A30))
     f_repmovsd_epd(addrEPD, ut.EPD(statText_db), inputDwordN)
 
 
 def _AddStatText(tbl: bytes) -> None:
-    global StatText
     tblCount = ut.b2i2(tbl)
     newTbl = ut.i2b2(tblCount)
     tblOffset = 2 * (tblCount + 1)
@@ -200,6 +188,6 @@ def _AddStatText(tbl: bytes) -> None:
         newTbl += tblContent
 
     if utf8DecodableCount < cp949DecodableCount:
-        StatText._encoding = "CP949"
+        c.StatText._encoding = "CP949"
 
-    StatText._data = newTbl
+    c.StatText._data = newTbl

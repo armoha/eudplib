@@ -5,35 +5,6 @@
 # This file is part of EUD python library (eudplib), and is released under "MIT License Agreement".
 # Please see the LICENSE file that should have been included as part of this package.
 
-from .consttype import (
-    Flingy,
-    Icon,
-    Image,
-    Iscript,
-    Portrait,
-    Sprite,
-    Tech,
-    TrgAIScript,
-    TrgAllyStatus,
-    TrgComparison,
-    TrgCount,
-    TrgLocation,
-    TrgModifier,
-    TrgOrder,
-    TrgPlayer,
-    TrgProperty,
-    TrgPropState,
-    TrgResource,
-    TrgScore,
-    TrgString,
-    TrgSwitch,
-    TrgSwitchAction,
-    TrgSwitchState,
-    TrgUnit,
-    UnitOrder,
-    Upgrade,
-    Weapon,
-)
 from .eudf import (
     EUDFullFunc,
     EUDFunc,
