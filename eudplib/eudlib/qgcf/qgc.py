@@ -7,7 +7,7 @@
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
-from eudplib import utils as ut
+from eudplib.utils import EPD, ep_assert
 
 from ..memiof import (
     EUDByteWriter,
@@ -25,8 +25,8 @@ _len_cache = c.Memory(_CMDQLEN, c.Exactly, 0)
 @c.EUDFunc
 def _update_cmdqlen():
     if cs.EUDIfNot()(_len_cache):
-        f_dwread_epd(ut.EPD(0x654AA0), ret=[_cmdqlen])
-        c.VProc(_cmdqlen, _cmdqlen.QueueAssignTo(ut.EPD(_len_cache) + 2))
+        f_dwread_epd(EPD(0x654AA0), ret=[_cmdqlen])
+        c.VProc(_cmdqlen, _cmdqlen.QueueAssignTo(EPD(_len_cache) + 2))
     cs.EUDEndIf()
 
 
@@ -36,15 +36,15 @@ def _get_cmdqlen():
 
 
 def _set_cmdqlen(new_len):
-    ut.ep_assert(c.IsEUDVariable(new_len))
+    ep_assert(c.IsEUDVariable(new_len))
     c.VProc(
         [new_len, _cmdqlen],
         [
             new_len.QueueAssignTo(_cmdqlen),
-            _cmdqlen.QueueAssignTo(ut.EPD(_CMDQLEN)),
+            _cmdqlen.QueueAssignTo(EPD(_CMDQLEN)),
         ],
     )
-    c.VProc(_cmdqlen, _cmdqlen.SetDest(ut.EPD(_len_cache) + 2))
+    c.VProc(_cmdqlen, _cmdqlen.SetDest(EPD(_len_cache) + 2))
 
 
 class QueueGameCommandHelper:
@@ -90,29 +90,26 @@ bw = EUDByteWriter()
 
 
 @c.EUDFunc
-def QueueGameCommand_Select(n, ptr_arr):  # noqa: N802
+def _qgc_alphaids(packet_id, n, arr_epd):
     """
+    == 0x0B - Select Delta Del ==
+    == 0x0A - Select Delta Add ==
     == 0x09 - Select Units ==
-    {{{
-        BYTE bCount;
-        WORD unitID[bCount];
-    }}}
     """
     with QueueGameCommandHelper(2 + 2 * n) as qgc:
-        epd = ut.EPD(ptr_arr)
         bw.seekoffset(0x654880 + qgc.cmdqlen)
-        bw.writebyte(9)
+        bw.writebyte(packet_id)
         bw.writebyte(n)
 
         cp2arr = c.SetMemory(0x6509B0, c.SetTo, 0)
-        cp2arr_quantity = ut.EPD(cp2arr) + 5
-        c.SetVariables(cp2arr_quantity, epd)
+        cp2arr_quantity = EPD(cp2arr) + 5
+        c.SetVariables(cp2arr_quantity, arr_epd)
         if cs.EUDWhileNot()(n.Exactly(0)):
             b0, b1 = c.EUDCreateVariables(2)
             restore_arr = c.SetDeaths(c.CurrentPlayer, c.Add, 0, 0)
             cp2uniqueness_identifier = c.SetMemory(0x6509B0, c.SetTo, 0)
-            cp2ui_quantity = ut.EPD(cp2uniqueness_identifier) + 5
-            cunit_initval = ut.EPD(0x59CCA8) + 0xA5 // 4
+            cp2ui_quantity = EPD(cp2uniqueness_identifier) + 5
+            cunit_initval = EPD(0x59CCA8) + 0xA5 // 4
             c.RawTrigger(
                 actions=[
                     cp2arr,
@@ -156,6 +153,54 @@ def QueueGameCommand_Select(n, ptr_arr):  # noqa: N802
         f_setcurpl2cpcache()
 
 
+def QueueGameCommand_Select(n, ptr_arr):  # noqa: N802
+    """
+    == 0x09 - Select Units ==
+    {{{
+        BYTE bCount;
+        WORD unitID[bCount];
+    }}}
+    """
+    if isinstance(ptr_arr, int) or c.IsEUDVariable(ptr_arr):
+        _qgc_alphaids(0x09, n, EPD(ptr_arr))
+    elif c.IsConstExpr(ptr_arr) and ptr_arr.rlocmode == 1:
+        _qgc_alphaids(0x09, n, ptr_arr)
+    else:
+        _qgc_alphaids(0x09, n, EPD(ptr_arr))
+
+
+def QueueGameCommand_AddSelect(n, ptr_arr):  # noqa: N802
+    """
+    == 0x0A - Select Delta Add ==
+    {{{
+        BYTE bCount;
+        WORD unitID[bCount];
+    }}}
+    """
+    if isinstance(ptr_arr, int) or c.IsEUDVariable(ptr_arr):
+        _qgc_alphaids(0x0A, n, EPD(ptr_arr))
+    elif c.IsConstExpr(ptr_arr) and ptr_arr.rlocmode == 1:
+        _qgc_alphaids(0x0A, n, ptr_arr)
+    else:
+        _qgc_alphaids(0x0A, n, EPD(ptr_arr))
+
+
+def QueueGameCommand_RemoveSelect(n, ptr_arr):  # noqa: N802
+    """
+    == 0x0B - Select Delta Del ==
+    {{{
+        BYTE bCount;
+        WORD unitID[bCount];
+    }}}
+    """
+    if isinstance(ptr_arr, int) or c.IsEUDVariable(ptr_arr):
+        _qgc_alphaids(0x0B, n, EPD(ptr_arr))
+    elif c.IsConstExpr(ptr_arr) and ptr_arr.rlocmode == 1:
+        _qgc_alphaids(0x0B, n, ptr_arr)
+    else:
+        _qgc_alphaids(0x0B, n, EPD(ptr_arr))
+
+
 @c.EUDFunc
 def QueueGameCommand_RightClick(xy):  # noqa: N802
     """Queue right click action.
@@ -163,7 +208,7 @@ def QueueGameCommand_RightClick(xy):  # noqa: N802
     :param xy: (y * 65536) + x, where (x, y) is coordinate for right click.
     """
     right_click_command = c.Db(b"...\x14XXYY\0\0\xE4\0\x00")
-    c.SetVariables(ut.EPD(right_click_command + 4), xy)
+    c.SetVariables(EPD(right_click_command + 4), xy)
     QueueGameCommand(right_click_command + 3, 10)
 
 
@@ -174,7 +219,7 @@ def QueueGameCommand_QueuedRightClick(xy):  # noqa: N802
     :param xy: (y * 65536) + x, where (x, y) is coordinate for right click.
     """
     queued_right_click_command = c.Db(b"...\x14XXYY\0\0\xE4\0\x01")
-    c.SetVariables(ut.EPD(queued_right_click_command + 4), xy)
+    c.SetVariables(EPD(queued_right_click_command + 4), xy)
     QueueGameCommand(queued_right_click_command + 3, 10)
 
 
@@ -185,14 +230,14 @@ def QueueGameCommand_MinimapPing(xy):  # noqa: N802
     :param xy: (y * 65536) + x, where (x, y) is coordinate for minimap ping.
     """
     minimap_ping_command = c.Db(b"...\x58XXYY")
-    c.SetVariables(ut.EPD(minimap_ping_command + 4), xy)
+    c.SetVariables(EPD(minimap_ping_command + 4), xy)
     QueueGameCommand(minimap_ping_command + 3, 5)
 
 
 @c.EUDTypedFunc([c.TrgUnit])
 def QueueGameCommand_TrainUnit(unit):  # noqa: N802
     train_unit_command = c.Db(b"...\x1FUU..")
-    c.SetVariables(ut.EPD(train_unit_command + 4), unit)
+    c.SetVariables(EPD(train_unit_command + 4), unit)
     QueueGameCommand(train_unit_command + 3, 3)
 
 
@@ -229,5 +274,5 @@ def QueueGameCommand_MergeArchon():  # noqa: N802
 @c.EUDFunc
 def QueueGameCommand_UseCheat(flags):  # noqa: N802
     use_cheat_command = c.Db(b"...\x12CCCC")
-    c.SetVariables(ut.EPD(use_cheat_command + 4), flags)
+    c.SetVariables(EPD(use_cheat_command + 4), flags)
     QueueGameCommand(use_cheat_command + 3, 5)
