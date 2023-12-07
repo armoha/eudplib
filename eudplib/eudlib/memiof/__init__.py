@@ -70,7 +70,7 @@ from .modcurpl import f_addcurpl, f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from .ptrmemio import f_bread, f_bwrite, f_dwread, f_dwwrite, f_wread, f_wwrite
 from .varrayreader import EUDVArrayReader
 
-__all__ = (
+__all__ = [
     "f_badd_epd",
     "f_bread_epd",
     "f_bsubtract_epd",
@@ -139,4 +139,4 @@ __all__ = (
     "f_wread",
     "f_wwrite",
     "EUDVArrayReader",
-)
+]
