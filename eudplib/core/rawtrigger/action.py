@@ -136,6 +136,9 @@ class Action(ConstExpr):
         self.parenttrg: "RawTrigger | None" = None
         self.actindex: int | None = None
 
+    def __copy__(self) -> "Action":
+        return self.__class__(*self.fields[:10], eudx=self.self.fields[11])
+
     def disable(self) -> None:
         if isinstance(self.fields[9], ConstExpr):
             raise ut.EPError(_("Can't disable non-const Action flags"))

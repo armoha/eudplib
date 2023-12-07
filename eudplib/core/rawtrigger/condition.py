@@ -93,6 +93,9 @@ class Condition(ConstExpr):
         self.parenttrg: "RawTrigger | None" = None
         self.condindex: int | None = None
 
+    def __copy__(self) -> "Condition":
+        return self.__class__(*self.fields[:8], eudx=self.self.fields[8])
+
     def disable(self) -> None:
         if isinstance(self.fields[7], ConstExpr):
             raise ut.EPError(_("Can't disable non-const Condition flags"))
@@ -106,9 +109,6 @@ class Condition(ConstExpr):
             _condtypes[condtype] if isinstance(condtype, int) else condtype
         )
         return _("Invalid fields for condition{} {}:").format(i, condname)
-
-    def __deepcopy__(self, memo={}) -> "Condition":
-        pass
 
     def check_args(self, i: int) -> None:
         if all(IsConstExpr(field) for field in self.fields[:3]) and all(
