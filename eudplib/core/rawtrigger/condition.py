@@ -14,9 +14,7 @@ from ..allocator import ConstExpr, IsConstExpr
 from .consttype import Byte, Dword, Word
 
 if TYPE_CHECKING:
-    from ...utils import ExprProxy
     from ..allocator.payload import RlocInt_C, _PayloadBuffer
-    from ..variable import EUDVariable
     from .rawtriggerdef import RawTrigger
 
 _condtypes: dict[int, str] = {
@@ -95,7 +93,7 @@ class Condition(ConstExpr):
         self.parenttrg: "RawTrigger | None" = None
         self.condindex: int | None = None
 
-    def Disabled(self) -> None:
+    def disable(self) -> None:
         if isinstance(self.fields[7], ConstExpr):
             raise ut.EPError(_("Can't disable non-const Condition flags"))
         self.fields[7] |= 2
@@ -104,10 +102,15 @@ class Condition(ConstExpr):
 
     def _invalid_condition(self, i: int) -> str:
         condtype = self.fields[5]
-        condname = _condtypes[condtype] if isinstance(condtype, int) else condtype
+        condname = (
+            _condtypes[condtype] if isinstance(condtype, int) else condtype
+        )
         return _("Invalid fields for condition{} {}:").format(i, condname)
 
-    def CheckArgs(self, i: int) -> None:
+    def __deepcopy__(self, memo={}) -> "Condition":
+        pass
+
+    def check_args(self, i: int) -> None:
         if all(IsConstExpr(field) for field in self.fields[:3]) and all(
             isinstance(field, int) for field in self.fields[3:]
         ):
@@ -136,13 +139,21 @@ class Condition(ConstExpr):
                 fieldname[6] = "scoretype"
 
         for i, field in enumerate(self.fields):
-            if (i < 3 and not IsConstExpr(field)) or (i >= 3 and not isinstance(field, int)):
-                error.append("\t" + _("invalid {}: {}").format(fieldname[i], repr(field)))
+            if (i < 3 and not IsConstExpr(field)) or (
+                i >= 3 and not isinstance(field, int)
+            ):
+                error.append(
+                    "\t"
+                    + _("invalid {}: {}").format(fieldname[i], repr(field))
+                )
 
         raise ut.EPError("\n".join(error))
 
-    def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:
-        ut.ep_assert(self.parenttrg is None, _("Condition cannot be shared by two triggers."))
+    def set_parent_trigger(self, trg: "RawTrigger", index: int) -> None:
+        ut.ep_assert(
+            self.parenttrg is None,
+            _("Condition cannot be shared by two triggers."),
+        )
 
         ut.ep_assert(trg is not None, _("Trigger should not be null."))
         ut.ep_assert(0 <= index < 16, _("Condition index should be 0 to 15"))
@@ -150,48 +161,62 @@ class Condition(ConstExpr):
         self.parenttrg = trg
         self.condindex = index
 
-    def Evaluate(self) -> "RlocInt_C":
+    def Evaluate(self) -> "RlocInt_C":  # noqa: N802
         if self.parenttrg is None or self.condindex is None:
             # fmt: off
-            raise ut.EPError(
-                _("Orphan condition. This often happens when you try to do arithmetics with conditions.")
-            )
+            raise ut.EPError(_("Orphan condition. This often happens when you try to do arithmetics with conditions."))  # noqa: E501
             # fmt: on
         return self.parenttrg.Evaluate() + 8 + self.condindex * 20
 
-    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:
+    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
         from ..variable import IsEUDVariable
 
         eudvar_field = next(
-            ((i, field) for i, field in enumerate(self.fields) if IsEUDVariable(field)), None
+            (
+                (i, field)
+                for i, field in enumerate(self.fields)
+                if IsEUDVariable(field)
+            ),
+            None,
         )
         if eudvar_field is not None:
             raise ut.EPError(
                 self._invalid_condition(eudvar_field[0])
-                + _("Found EUDVariable {} in field {}").format(eudvar_field[1], eudvar_field[0])
+                + _("Found EUDVariable {} in field {}").format(
+                    eudvar_field[1], eudvar_field[0]
+                )
             )
 
         for field in self.fields[:3]:
             pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
-    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:
+    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
         from ..variable import IsEUDVariable
 
         eudvar_field = next(
-            ((i, field) for i, field in enumerate(self.fields) if IsEUDVariable(field)), None
+            (
+                (i, field)
+                for i, field in enumerate(self.fields)
+                if IsEUDVariable(field)
+            ),
+            None,
         )
         if eudvar_field is not None:
             raise ut.EPError(
                 self._invalid_condition(eudvar_field[0])
-                + _("Found EUDVariable {} in field {}").format(eudvar_field[1], eudvar_field[0])
+                + _("Found EUDVariable {} in field {}").format(
+                    eudvar_field[1], eudvar_field[0]
+                )
             )
 
         pbuffer.WritePack("IIIHBBBBH", self.fields)  # type: ignore[arg-type]
 
     def __bool__(self) -> NoReturn:
-        raise RuntimeError(_("To prevent error, Condition can't be put into if."))
+        raise RuntimeError(
+            _("To prevent error, Condition can't be put into if.")
+        )
 
-    def Negate(self) -> None:
+    def negate(self) -> None:
         condtype = self.fields[5]
         ut.ep_assert(isinstance(condtype, int))
         comparison_set = (1, 2, 3, 4, 5, 12, 14, 15, 21)
@@ -207,7 +232,9 @@ class Condition(ConstExpr):
             bring_or_command = (2, 3)
             comparison = self.fields[4]
             amount = self.fields[2]
-            ut.ep_assert(isinstance(comparison, int) and isinstance(amount, int))
+            ut.ep_assert(
+                isinstance(comparison, int) and isinstance(amount, int)
+            )
             amount &= 0xFFFFFFFF  # type: ignore[operator]
             if comparison == 10 and amount == 0:
                 self.fields[4] = 0
@@ -217,19 +244,23 @@ class Condition(ConstExpr):
                 self.fields[2] = 0
             elif comparison == 0 and amount == 0:
                 self.fields[5] = 23
+            # AtMost and Exactly/AtLeast behaves differently in Bring/Command
+            # (AtMost counts buildings on construction and does not count Egg)
+            # So only exchanging (Exactly, 0) <-> (AtLeast, 1) is sound.
+            #
+            # See: https://cafe.naver.com/edac/book5095361/96809
             elif condtype in bring_or_command:
-                # AtMost and Exactly/AtLeast behaves differently in Bring or Command.
-                # (ex. AtMost counts buildings on construction and does not count Egg/Cocoon)
-                # So only exchanging (Exactly, 0) <-> (AtLeast, 1) is sound.
-                #
-                # See: https://cafe.naver.com/edac/book5095361/96809
-                raise ut.EPError(_("Bring and Command can't exchange AtMost and Exactly/AtLeast"))
+                # fmt: off
+                raise ut.EPError(_("Bring and Command can't exchange AtMost and Exactly/AtLeast"))  # noqa: E501
+                # fmt: on
             elif comparison in (0, 1):
                 self.fields[4] ^= 1  # type: ignore[operator]
                 self.fields[2] += -((-1) ** comparison)  # type: ignore[operator]
             elif comparison != 10:
                 raise ut.EPError(
-                    _('Invalid comparison "{}" in trigger index {}').format(comparison, 0)
+                    _('Invalid comparison "{}" in trigger index {}').format(
+                        comparison, 0
+                    )
                 )
             elif condtype == 15 and self.fields[8] == ut.b2i2(ut.u2b("SC")):
                 mask = self.fields[0] & 0xFFFFFFFF  # type: ignore[operator]

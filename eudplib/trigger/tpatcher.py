@@ -258,7 +258,7 @@ def negate_cond(cond: _Condition) -> Condition:
         return c.Never() if condition else c.Always()
 
     if isinstance(condition, Condition):
-        condition.Negate()
+        condition.negate()
         return condition
     if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
         ep_warn(_("Condition is always False"))

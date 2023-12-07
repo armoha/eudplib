@@ -136,7 +136,7 @@ class Action(ConstExpr):
         self.parenttrg: "RawTrigger | None" = None
         self.actindex: int | None = None
 
-    def Disabled(self) -> None:
+    def disable(self) -> None:
         if isinstance(self.fields[9], ConstExpr):
             raise ut.EPError(_("Can't disable non-const Action flags"))
         self.fields[9] |= 2
@@ -148,7 +148,7 @@ class Action(ConstExpr):
         actname = _acttypes[acttype] if isinstance(acttype, int) else acttype
         return _("Invalid fields for action{} {}:").format(i, actname)
 
-    def CheckArgs(self, i: int) -> None:
+    def check_args(self, i: int) -> None:
         if all(IsConstExpr(field) for field in self.fields[:6]) and all(
             isinstance(field, int) for field in self.fields[6:]
         ):
@@ -206,13 +206,21 @@ class Action(ConstExpr):
                 fieldname[8] = "unit_order"
 
         for i, field in enumerate(self.fields):
-            if (i < 6 and not IsConstExpr(field)) or (i >= 6 and not isinstance(field, int)):
-                error.append("\t" + _("invalid {}: {}").format(fieldname[i], repr(field)))
+            if (i < 6 and not IsConstExpr(field)) or (
+                i >= 6 and not isinstance(field, int)
+            ):
+                error.append(
+                    "\t"
+                    + _("invalid {}: {}").format(fieldname[i], repr(field))
+                )
 
         raise ut.EPError("\n".join(error))
 
-    def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:
-        ut.ep_assert(self.parenttrg is None, _("Actions cannot be shared by two triggers."))
+    def set_parent_trigger(self, trg: "RawTrigger", index: int) -> None:
+        ut.ep_assert(
+            self.parenttrg is None,
+            _("Actions cannot be shared by two triggers."),
+        )
 
         ut.ep_assert(trg is not None, _("Trigger should not be null."))
         ut.ep_assert(0 <= index < 64, _("Triggers out of range"))
@@ -223,7 +231,9 @@ class Action(ConstExpr):
     def Evaluate(self) -> "RlocInt_C":
         if self.parenttrg is None or self.actindex is None:
             raise ut.EPError(
-                _("Orphan action. This often happens when you try to do arithmetics with actions.")
+                _(
+                    "Orphan action. This often happens when you try to do arithmetics with actions."
+                )
             )
         return self.parenttrg.Evaluate() + 8 + 320 + 32 * self.actindex
 
@@ -231,12 +241,19 @@ class Action(ConstExpr):
         from ..variable import IsEUDVariable
 
         eudvar_field = next(
-            ((i, field) for i, field in enumerate(self.fields) if IsEUDVariable(field)), None
+            (
+                (i, field)
+                for i, field in enumerate(self.fields)
+                if IsEUDVariable(field)
+            ),
+            None,
         )
         if eudvar_field is not None:
             raise ut.EPError(
                 self._invalid_action(eudvar_field[0])
-                + _("Found EUDVariable {} in field {}").format(eudvar_field[1], eudvar_field[0])
+                + _("Found EUDVariable {} in field {}").format(
+                    eudvar_field[1], eudvar_field[0]
+                )
             )
 
         for field in self.fields[:6]:
@@ -246,12 +263,19 @@ class Action(ConstExpr):
         from ..variable import IsEUDVariable
 
         eudvar_field = next(
-            ((i, field) for i, field in enumerate(self.fields) if IsEUDVariable(field)), None
+            (
+                (i, field)
+                for i, field in enumerate(self.fields)
+                if IsEUDVariable(field)
+            ),
+            None,
         )
         if eudvar_field is not None:
             raise ut.EPError(
                 self._invalid_action(eudvar_field[0])
-                + _("Found EUDVariable {} in field {}").format(eudvar_field[1], eudvar_field[0])
+                + _("Found EUDVariable {} in field {}").format(
+                    eudvar_field[1], eudvar_field[0]
+                )
             )
 
         pbuffer.WritePack("IIIIIIHBBBBH", self.fields)  # type: ignore[arg-type]

@@ -55,12 +55,14 @@ def Disabled(arg: Action) -> Action:
 
 def Disabled(arg: Condition | Action) -> Condition | Action:
     """Disable condition or action"""
-    arg.Disabled()
+    arg.disable()
     return arg
 
 
 Trigger: TypeAlias = "ConstExpr | int | None"
-_Condition: TypeAlias = Condition | bool | Iterable[Condition | bool | Iterable]
+_Condition: TypeAlias = (
+    Condition | bool | Iterable[Condition | bool | Iterable]
+)
 _Action: TypeAlias = Action | Iterable[Action | Iterable]
 
 
@@ -75,7 +77,7 @@ class RawTrigger(EUDObject):
         *,
         preserved: bool = True,
         currentAction: int | None = None,
-        trigSection: None = None
+        trigSection: None = None,
     ) -> None:
         ...
 
@@ -89,7 +91,7 @@ class RawTrigger(EUDObject):
         *,
         preserved: Literal[True] = True,
         currentAction: None = None,
-        trigSection: bytes
+        trigSection: bytes,
     ) -> None:
         ...
 
@@ -102,7 +104,7 @@ class RawTrigger(EUDObject):
         *,
         preserved: bool = True,
         currentAction: int | None = None,
-        trigSection: bytes | None = None
+        trigSection: bytes | None = None,
     ) -> None:
         super().__init__()
 
@@ -117,7 +119,9 @@ class RawTrigger(EUDObject):
         if nextptr is None:
             nextptr = NextTrigger()  # (1)
         else:
-            ut.ep_assert(IsConstExpr(nextptr), _("nextptr should be ConstExpr"))
+            ut.ep_assert(
+                IsConstExpr(nextptr), _("nextptr should be ConstExpr")
+            )
 
         self._prevptr = prevptr
         self._nextptr = nextptr
@@ -139,12 +143,12 @@ class RawTrigger(EUDObject):
 
             # Register condition/actions to trigger
             for i, cond in enumerate(_conditions):
-                cond.CheckArgs(i)
-                cond.SetParentTrigger(self, i)
+                cond.check_args(i)
+                cond.set_parent_trigger(self, i)
 
             for i, act in enumerate(actions):
-                act.CheckArgs(i)
-                act.SetParentTrigger(self, i)
+                act.check_args(i)
+                act.set_parent_trigger(self, i)
 
             self._conditions = _conditions
             self._actions = actions
@@ -162,17 +166,25 @@ class RawTrigger(EUDObject):
                 if condtype == 22:
                     continue  # ignore Always, no worry disable/enable
                 elif condtype >= 1:
-                    condition = struct.unpack_from("<IIIHBBBBH", trigSection, i * 20)
-                    self._conditions.append(Condition(*condition[:8], eudx=condition[8]))
+                    condition = struct.unpack_from(
+                        "<IIIHBBBBH", trigSection, i * 20
+                    )
+                    self._conditions.append(
+                        Condition(*condition[:8], eudx=condition[8])
+                    )
             self._flags = trigSection[320 + 2048] & 5
             for i in range(64):
                 acttype = trigSection[320 + i * 32 + 26]
                 if acttype == 47:  # Comment
                     continue
                 elif acttype >= 1:
-                    action = struct.unpack_from("<IIIIIIHBBBBH", trigSection, 320 + i * 32)
+                    action = struct.unpack_from(
+                        "<IIIIIIHBBBBH", trigSection, 320 + i * 32
+                    )
                     self._actions.append(Action(*action[:10], eudx=action[11]))
-            self._currentAction = None if not (self._flags & 1) else trigSection[2399]
+            self._currentAction = (
+                None if not (self._flags & 1) else trigSection[2399]
+            )
 
     @property
     def preserved(self) -> bool:
@@ -227,7 +239,12 @@ class RawTrigger(EUDObject):
             pbuffer.WriteByte(self._currentAction)
 
 
-def _DoActions(actions: _Action | None = None) -> tuple[RawTrigger, RawTrigger]:
+def _DoActions(
+    actions: _Action | None = None
+) -> tuple[RawTrigger, RawTrigger]:
     actions = ut.FlattenList(actions)
-    trg = [RawTrigger(actions=actions[i : i + 64]) for i in range(0, len(actions), 64)]
+    trg = [
+        RawTrigger(actions=actions[i : i + 64])
+        for i in range(0, len(actions), 64)
+    ]
     return trg[0], trg[-1]
