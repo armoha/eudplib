@@ -9,8 +9,60 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
-from ..eudarray import EUDArray
-from ..memiof import EUDByteWriter, f_bread, f_dwbreak, f_dwread_epd, f_memcpy
+from ..memiof import (
+    EUDByteWriter,
+    f_dwread_epd,
+    f_memcpy,
+    f_setcurpl2cpcache,
+)
+
+_PROV_MAXBUFFER = 0x57F0D8
+_cmdqlen = c.EUDVariable()
+_CMDQLEN = 0x654AA0
+_len_cache = c.Memory(_CMDQLEN, c.Exactly, 0)
+
+
+@c.EUDFunc
+def _update_cmdqlen():
+    if cs.EUDIfNot()(_len_cache):
+        f_dwread_epd(ut.EPD(0x654AA0), ret=[_cmdqlen])
+        c.VProc(_cmdqlen, _cmdqlen.QueueAssignTo(ut.EPD(_len_cache) + 2))
+    cs.EUDEndIf()
+
+
+def _get_cmdqlen():
+    _update_cmdqlen()
+    return _cmdqlen
+
+
+def _set_cmdqlen(new_len):
+    ut.ep_assert(c.IsEUDVariable(new_len))
+    c.VProc(
+        [new_len, _cmdqlen],
+        [
+            new_len.QueueAssignTo(_cmdqlen),
+            _cmdqlen.QueueAssignTo(ut.EPD(_CMDQLEN)),
+        ],
+    )
+    c.VProc(_cmdqlen, _cmdqlen.SetDest(ut.EPD(_len_cache) + 2))
+
+
+class QueueGameCommandHelper:
+    def __init__(self, size):
+        self.size = size
+
+    def __enter__(self):
+        self.cmdqlen = _get_cmdqlen()
+        self.new_len = _cmdqlen + self.size
+        if cs.EUDIfNot()(
+            c.Memory(_PROV_MAXBUFFER, c.AtMost, self.new_len + 1)
+        ):
+            return self
+
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        if exception_type is None:
+            _set_cmdqlen(self.new_len)
+            cs.EUDEndIf()
 
 
 @c.EUDFunc
@@ -30,12 +82,8 @@ def QueueGameCommand(data, size):  # noqa: N802
         common situations. So **Don't use this function too much in a frame.**
 
     """
-    prov_maxbuffer = f_dwread_epd(ut.EPD(0x57F0D8))
-    cmdqlen = f_dwread_epd(ut.EPD(0x654AA0))
-    if cs.EUDIfNot()(cmdqlen + size + 1 >= prov_maxbuffer):
-        f_memcpy(0x654880 + cmdqlen, data, size)
-        c.SetVariables(ut.EPD(0x654AA0), cmdqlen + size)
-    cs.EUDEndIf()
+    with QueueGameCommandHelper(size) as qgc:
+        f_memcpy(0x654880 + qgc.cmdqlen, data, qgc.size)
 
 
 bw = EUDByteWriter()
@@ -43,23 +91,69 @@ bw = EUDByteWriter()
 
 @c.EUDFunc
 def QueueGameCommand_Select(n, ptr_arr):  # noqa: N802
-    ptr_arr = EUDArray.cast(ptr_arr)
-    buf = c.Db(b"\x090123456789012345678901234")
-    bw.seekoffset(buf + 1)
-    bw.writebyte(n)
-    i = c.EUDVariable()
-    i << 0
-    if cs.EUDWhile()(i < n):
-        unitptr = ptr_arr[i]
-        unit_index = (unitptr - 0x59CCA8) // 336 + 1
-        uniqueness_identifier = f_bread(unitptr + 0xA5)
-        target_id = unit_index | c.f_bitlshift(uniqueness_identifier, 11)
-        b0, b1 = f_dwbreak(target_id)[2:4]
-        bw.writebyte(b0)
-        bw.writebyte(b1)
-        i += 1
-    cs.EUDEndWhile()
-    QueueGameCommand(buf, 2 * (n + 1))
+    """
+    == 0x09 - Select Units ==
+    {{{
+        BYTE bCount;
+        WORD unitID[bCount];
+    }}}
+    """
+    with QueueGameCommandHelper(2 + 2 * n) as qgc:
+        epd = ut.EPD(ptr_arr)
+        bw.seekoffset(0x654880 + qgc.cmdqlen)
+        bw.writebyte(9)
+        bw.writebyte(n)
+
+        cp2arr = c.SetMemory(0x6509B0, c.SetTo, 0)
+        cp2arr_quantity = ut.EPD(cp2arr) + 5
+        c.SetVariables(cp2arr_quantity, epd)
+        if cs.EUDWhileNot()(n.Exactly(0)):
+            b0, b1 = c.EUDCreateVariables(2)
+            restore_arr = c.SetDeaths(c.CurrentPlayer, c.Add, 0, 0)
+            cp2uniqueness_identifier = c.SetMemory(0x6509B0, c.SetTo, 0)
+            cp2ui_quantity = ut.EPD(cp2uniqueness_identifier) + 5
+            cunit_initval = ut.EPD(0x59CCA8) + 0xA5 // 4
+            c.RawTrigger(
+                actions=[
+                    cp2arr,
+                    b0.SetNumber(1),
+                    b1.SetNumber(0),
+                    c.SetMemory(restore_arr + 20, c.SetTo, 0),
+                    c.SetMemoryEPD(cp2ui_quantity, c.SetTo, cunit_initval),
+                ]
+            )
+            for i in range(10, -1, -1):
+                ptr = 0x59CCA8 + (336 << i)
+                c.RawTrigger(
+                    conditions=c.Deaths(c.CurrentPlayer, c.AtLeast, ptr, 0),
+                    actions=[
+                        c.SetDeaths(c.CurrentPlayer, c.Subtract, 336 << i, 0),
+                        c.SetMemory(restore_arr + 20, c.Add, 336 << i),
+                        c.SetMemoryEPD(cp2ui_quantity, c.Add, 84 << i),
+                        b0.AddNumber(1 << i)
+                        if i < 8
+                        else b1.AddNumber(1 << (i - 8)),
+                    ],
+                )
+            c.RawTrigger(
+                conditions=b0.AtLeast(256),
+                actions=[
+                    b0.SubtractNumber(256),
+                    b1.AddNumber(1),
+                ],
+            )
+            c.RawTrigger(actions=[restore_arr, cp2uniqueness_identifier])
+            for i in range(8):
+                m = 1 << (i + 8)
+                c.RawTrigger(
+                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, m),
+                    actions=b1.AddNumber(1 << (i + 3)),
+                )
+            bw.writebyte(b0)
+            bw.writebyte(b1)
+            c.SetVariables([cp2arr_quantity, n], [1, 1], [c.Add, c.Subtract])
+        cs.EUDEndWhile()
+        f_setcurpl2cpcache()
 
 
 @c.EUDFunc
