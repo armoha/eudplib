@@ -340,21 +340,21 @@ def f_test_deque():
     ret = list()
     # (Line 176) var pushes = 1;
     pushes = _LVAR([1])
-    # (Line 177) const a = function () { dq.append(pushes); pushes++; };
+    # (Line 178) const a = function () { dq.append(pushes); pushes++; };
     @EUDFunc
     def _lambda1():
         dq.append(pushes)
         pushes.__iadd__(1)
 
     a = _lambda1
-    # (Line 178) const aL = function () { dq.appendleft(pushes); pushes++; };
+    # (Line 179) const aL = function () { dq.appendleft(pushes); pushes++; };
     @EUDFunc
     def _lambda2():
         dq.appendleft(pushes)
         pushes.__iadd__(1)
 
     aL = _lambda2
-    # (Line 179) const _p = function() { if (dq.empty()) return 0; else return dq.pop(); };
+    # (Line 180) const _p = function() { if (dq.empty()) return 0; else return dq.pop(); };
     @EUDFunc
     def _lambda3():
         if EUDIf()(dq.empty()):
@@ -364,7 +364,7 @@ def f_test_deque():
         EUDEndIf()
 
     _p = _lambda3
-    # (Line 180) const _pL = function() { if (dq.empty()) return 0; else return dq.popleft(); };
+    # (Line 181) const _pL = function() { if (dq.empty()) return 0; else return dq.popleft(); };
     @EUDFunc
     def _lambda4():
         if EUDIf()(dq.empty()):
@@ -374,25 +374,25 @@ def f_test_deque():
         EUDEndIf()
 
     _pL = _lambda4
-    # (Line 181) const p = py_eval('lambda s=ret, f=_p: s.append(f())');
+    # (Line 182) const p = py_eval('lambda s=ret, f=_p: s.append(f())');
     p = eval('lambda s=ret, f=_p: s.append(f())')
-    # (Line 182) const pL = py_eval('lambda s=ret, f=_pL: s.append(f())');
+    # (Line 183) const pL = py_eval('lambda s=ret, f=_pL: s.append(f())');
     pL = eval('lambda s=ret, f=_pL: s.append(f())')
-    # (Line 183) const methodMap = py_eval('{\
-    # (Line 186) }');
+    # (Line 184) const methodMap = py_eval('{\
+    # (Line 187) }');
     methodMap = eval('{        "append":     a,    "pop":     p,        "appendleft": aL,   "popleft": pL,    }')
-    # (Line 187) foreach(method : DequeCases) { methodMap[method](); }
+    # (Line 188) foreach(method : DequeCases) { methodMap[method](); }
     for method in DequeCases:
         methodMap[method]()
-        # (Line 188) var sum = dq.length;
+        # (Line 189) var sum = dq.length;
 
     sum = _LVAR([dq.length])
-    # (Line 189) foreach(element: dq) { sum += element; }
+    # (Line 190) foreach(element: dq) { sum += element; }
     for element in dq:
         sum.__iadd__(element)
-        # (Line 190) ret.append(sum);
+        # (Line 191) ret.append(sum);
 
     ret.append(sum)
-    # (Line 191) return List2Assignable(ret);
+    # (Line 192) return List2Assignable(ret);
     EUDReturn(List2Assignable(ret))
-    # (Line 192) }
+    # (Line 193) }
