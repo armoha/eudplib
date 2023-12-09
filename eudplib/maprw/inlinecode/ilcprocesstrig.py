@@ -143,7 +143,7 @@ def _get_inline_code_list() -> list[tuple[int, t_start_end]]:
     return _inline_codes
 
 
-def _get_inline_code_player_list(btrigger: bytes) -> int | None:
+def GetInlineCodePlayerList(btrigger: bytes) -> int | None:  # noqa: N802
     # Check if effplayer & current_action is empty
     for player in range(28):
         if btrigger[320 + 2048 + 4 + player] != 0:
@@ -167,7 +167,7 @@ def _dispatch_inline_code(
     if magic_code != 0x10978D4A:
         return None
 
-    player_code = _get_inline_code_player_list(trigger_bytes)
+    player_code = GetInlineCodePlayerList(trigger_bytes)
     if not player_code:
         return None
 
