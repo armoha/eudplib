@@ -88,9 +88,10 @@ def gen_new_opcode(
     Returns:
         types.CodeType: The new code object.
     """
+    ep_firstlineno = ep_lineno_map(code_options["co_firstlineno"])
     linetable = assemble(
         get_instructions(code_object),
-        code_options["co_firstlineno"],
+        ep_firstlineno,
         ep_lineno_map,
     )
     if sys.version_info >= (3, 10):
@@ -99,14 +100,15 @@ def gen_new_opcode(
         code_options["co_linetable"] = linetable
     else:
         code_options["co_lnotab"] = linetable
-    if sys.version_info >= (3, 11):
-        # TODO: generate 3.11 exception table
-        # code_options["co_exceptiontable"] = bytes([])
-        pass
+    code_options["co_firstlineno"] = ep_firstlineno
+    code_options["co_nlocals"] = len(code_options["co_varnames"])
+    # TODO: should we generate or empty 3.11 exception table?
+    # if sys.version_info >= (3, 11):
+    #     code_options["co_exceptiontable"] = bytes([])
     for key, val in code_options.items():
         if isinstance(val, list):
             code_options[key] = tuple(val)
-    # code_options is a dict, use keys to makesure the input order
+    # code_options is a dict, use keys to make sure the input order
     return types.CodeType(*[code_options[k] for k in keys])
 
 
@@ -124,11 +126,11 @@ def assemble(
         ep_lineno_map (Callable[[int], int]): The line number converting function from py to eps.
 
     Returns:
-        bytes: lnotab.
+        bytes: The assembled lnotab.
     """
     code = []
     linetable = []
-    ep_firstlineno = ep_lineno_map(firstlineno)
+    ep_firstlineno = firstlineno
 
     calc_linetable, update_cursor = create_linetable_calculator(ep_firstlineno)
 

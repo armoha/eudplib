@@ -49,6 +49,7 @@ def _modify_code_linetable(codeobj: types.CodeType, ep_lineno_map):
     )
 
 
+# TODO: refactor code or remove as duplicate
 def _modify_code_lnotab(codeobj: types.CodeType, ep_lineno_map):
     # See: https://peps.python.org/pep-0626/#backwards-compatibility
     # https://github.com/python/cpython/blob/main/Objects/lnotab_notes.txt
@@ -153,11 +154,10 @@ class EPSLoader(SourceFileLoader):
         def line_mapper(line):
             if line is None:
                 return None
-            return ep_lineno_map[bisect_right(code_line, line) - 1]
-
-        if "test_eps_epsfile" in path:
-            print("code_line=", code_line)
-            print("ep_lineno_map=", ep_lineno_map)
+            lineno = ep_lineno_map[bisect_right(code_line, line) - 1]
+            if line != 0 and lineno == 0:
+                lineno = 1
+            return lineno
 
         if sys.version_info >= (3, 11):
             codeobj = _modify_code_linetable(codeobj, line_mapper)
