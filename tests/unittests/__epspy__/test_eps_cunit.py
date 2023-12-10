@@ -66,11 +66,11 @@ def f_test_cunit():
     EUDEndIf()
     if EUDIf()(u.are_buildq_empty(), neg=True):
         ret.__iadd__(1024)
-        # (Line 31) if (u.check_buildq(EUDVariable(0x11))) ret += 2048;/**??**/
+        # (Line 31) if (u.check_buildq(EUDVariable(0x11))) ret += 2048;
     EUDEndIf()
     if EUDIf()(u.check_buildq(EUDVariable(0x11))):
         ret.__iadd__(2048)
-        # (Line 33) if (u.check_buildq("Terran Medic")) ret += 4096;/**??**/
+        # (Line 33) if (u.check_buildq("Terran Medic")) ret += 4096;
     EUDEndIf()
     if EUDIf()(u.check_buildq("Terran Medic")):
         ret.__iadd__(4096)
