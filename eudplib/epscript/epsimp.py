@@ -16,8 +16,11 @@ from eudplib.localize import _
 from eudplib.utils import EPError
 
 from .epscompile import epsCompile
-from .linetable import parse_linetable
-from .linetable_calculator import create_linetable_calculator
+from .linetable_calculator import (
+    PYCODE_ATTRIBUTES,
+    gen_code_options,
+    gen_new_opcode,
+)
 
 lineno_regex = re.compile(b" *# \\(Line (\\d+)\\) (.+)")
 is_scdb_map = False
@@ -27,67 +30,26 @@ def IsSCDBMap():  # noqa: N802
     return is_scdb_map
 
 
-def _modify_code_linetable(codeobj: types.CodeType, code_map):
+def _modify_code_linetable(codeobj: types.CodeType, ep_lineno_map):
     # See: https://github.com/python/cpython/blob/main/Objects/locations.md
     # https://github.com/python/cpython/blob/c1652d6d6201e5407b94afc297115a584b5a0955/Python/assemble.c#L231-L242
-    firstlineno = codeobj.co_firstlineno
-    newfirstlineno = code_map(firstlineno)[0]
-    startline = newfirstlineno
-    codelen = 0
-    linetable = []
-    # Reconstruct co_linetable
-    calc_linetable, update_cursor = create_linetable_calculator(newfirstlineno)
-    for length, line, end_line, col, end_col in parse_linetable(
-        codeobj.co_linetable
-    ):
-        if line is not None:
-            startline = code_map(line)[0]
-        if sys.version_info >= (3, 11):
-            linetable.extend(calc_linetable(startline, codelen))
-            update_cursor(startline, codelen)
-
-        codelen += length
-
-    if sys.version_info >= (3, 11):
-        # End hook for Python 3.11
-        linetable.extend(calc_linetable(None, codelen))
-    elif sys.version_info >= (3, 10):
-        # End hook for Python 3.10
-        linetable.extend(calc_linetable(0, codelen))
+    code_options = gen_code_options(codeobj)
 
     # For code objects
     new_co_consts = []
-    for c in codeobj.co_consts:
+    for c in code_options["co_consts"]:
         if isinstance(c, types.CodeType):
-            c = _modify_code_linetable(c, code_map)
+            c = _modify_code_linetable(c, ep_lineno_map)
         new_co_consts.append(c)
 
-    # Python 3.11 change: Added co_qualname, co_exceptiontable
-    codeobj = types.CodeType(
-        codeobj.co_argcount,
-        codeobj.co_posonlyargcount,  # python 3.8 support (See PEP 570)
-        codeobj.co_kwonlyargcount,
-        codeobj.co_nlocals,
-        codeobj.co_stacksize,
-        codeobj.co_flags,
-        codeobj.co_code,
-        tuple(new_co_consts),
-        codeobj.co_names,
-        codeobj.co_varnames,
-        codeobj.co_filename,
-        codeobj.co_name,
-        codeobj.co_qualname,
-        newfirstlineno,  # codeobj.co_firstlineno,
-        bytes(linetable),  # codeobj.co_linetable,
-        codeobj.co_exceptiontable,
-        codeobj.co_freevars,
-        codeobj.co_cellvars,
+    code_options["co_consts"] = new_co_consts
+
+    return gen_new_opcode(
+        codeobj, code_options, PYCODE_ATTRIBUTES, ep_lineno_map
     )
 
-    return codeobj
 
-
-def _modify_code_lnotab(codeobj: types.CodeType, code_map):
+def _modify_code_lnotab(codeobj: types.CodeType, ep_lineno_map):
     # See: https://peps.python.org/pep-0626/#backwards-compatibility
     # https://github.com/python/cpython/blob/main/Objects/lnotab_notes.txt
     co_lnotab = codeobj.co_lnotab
@@ -96,11 +58,11 @@ def _modify_code_lnotab(codeobj: types.CodeType, code_map):
     # Reconstruct co_lnotab
     new_lnotab = []
     current_line = co_firstlineno
-    current_mapped_line = code_map(current_line)[0]
+    current_mapped_line = ep_lineno_map(current_line)
     for i in range(0, len(co_lnotab), 2):
         bytecode_len, line_advance = co_lnotab[i : i + 2]
         next_line = current_line + line_advance
-        next_mapped_line = code_map(next_line)[0]
+        next_mapped_line = ep_lineno_map(next_line)
         new_line_advance = next_mapped_line - current_mapped_line
         while new_line_advance >= 0xFF:
             new_lnotab.append(bytes([0, 0xFF]))
@@ -113,7 +75,7 @@ def _modify_code_lnotab(codeobj: types.CodeType, code_map):
     new_co_consts = []
     for c in codeobj.co_consts:
         if isinstance(c, types.CodeType):
-            c = _modify_code_lnotab(c, code_map)
+            c = _modify_code_lnotab(c, ep_lineno_map)
         new_co_consts.append(c)
 
     # Python 3.7~3.10
@@ -130,7 +92,7 @@ def _modify_code_lnotab(codeobj: types.CodeType, code_map):
         codeobj.co_varnames,
         codeobj.co_filename,
         codeobj.co_name,
-        code_map(co_firstlineno)[0],  # codeobj.co_firstlineno,
+        ep_lineno_map(co_firstlineno),  # codeobj.co_firstlineno,
         b"".join(new_lnotab),  # type: ignore
         codeobj.co_freevars,  # type: ignore
         codeobj.co_cellvars,  # type: ignore
@@ -179,20 +141,23 @@ class EPSLoader(SourceFileLoader):
 
         # Read lines from code data
         code_line = [0]
-        code_map = [
-            [0, 0],
-        ]
+        ep_lineno_map = [0]
         data = data.replace(b"\r\n", b"\n")
         for lineno, line in enumerate(data.split(b"\n")):
             match = lineno_regex.match(line)
             if match:
                 code_line.append(lineno + 1)
-                lineno_and_column = [int(match.group(1)), len(match.group(2))]
-                code_map.append(lineno_and_column)
+                ep_lineno_map.append(int(match.group(1)))
 
         # Reconstruct code data
         def line_mapper(line):
-            return code_map[bisect_right(code_line, line) - 1]
+            if line is None:
+                return None
+            return ep_lineno_map[bisect_right(code_line, line) - 1]
+
+        if "test_eps_epsfile" in path:
+            print("code_line=", code_line)
+            print("ep_lineno_map=", ep_lineno_map)
 
         if sys.version_info >= (3, 11):
             codeobj = _modify_code_linetable(codeobj, line_mapper)

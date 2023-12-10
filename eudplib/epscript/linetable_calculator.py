@@ -1,6 +1,159 @@
 # Source: https://github.com/PaddlePaddle/PaddleSOT/blob/7a2a7f4bdb998ccbec6a386ed69be54d996e923e/sot/opcode_translator/executor/pycode_generator.py#L149-L332
 
 import sys
+import types
+from dis import Instruction, get_instructions
+from typing import Any, Callable, Iterator
+
+
+def get_pycode_attributes() -> list[str]:
+    """
+    Returns a list of attribute names for PyCodeObject.
+    NOTE(SigureMo): The order should consistent with signature specified in code_doc
+    3.8: https://github.com/python/cpython/blob/3.8/Objects/codeobject.c#L416-L421
+    3.10: https://github.com/python/cpython/blob/3.10/Objects/codeobject.c#L523-L543
+    3.11: https://github.com/python/cpython/blob/3.11/Objects/codeobject.c#L1494-L1516
+
+    Returns:
+        list[str]: The attribute names for PyCodeObject.
+    """
+    pycode_attributes = [
+        "co_argcount",
+        "co_posonlyargcount",
+        "co_kwonlyargcount",
+        "co_nlocals",
+        "co_stacksize",
+        "co_flags",
+        "co_code",
+        "co_consts",
+        "co_names",
+        "co_varnames",
+        "co_filename",
+        "co_name",
+    ]
+    if sys.version_info >= (3, 11):
+        pycode_attributes.append("co_qualname")
+    pycode_attributes.append("co_firstlineno")
+    if sys.version_info >= (3, 10):
+        pycode_attributes.append("co_linetable")
+    else:
+        pycode_attributes.append("co_lnotab")
+    if sys.version_info >= (3, 11):
+        pycode_attributes.append("co_exceptiontable")
+    pycode_attributes += [
+        "co_freevars",
+        "co_cellvars",
+    ]
+    return pycode_attributes
+
+
+PYCODE_ATTRIBUTES = get_pycode_attributes()
+
+
+def gen_code_options(code: types.CodeType) -> dict[str, Any]:
+    """
+    Generates a dictionary of code options for the given code object.
+
+    Args:
+        code (types.CodeType): The code object.
+
+    Returns:
+        dict[str, any]: The code options.
+    """
+    code_options = {}
+    for k in PYCODE_ATTRIBUTES:
+        val = getattr(code, k)
+        if isinstance(val, tuple):
+            val = list(val)
+        code_options[k] = val
+
+    return code_options
+
+
+def gen_new_opcode(
+    code_object: types.CodeType,
+    code_options: dict[str, Any],
+    keys: list[str],
+    ep_lineno_map: Callable[[int], int],
+) -> types.CodeType:
+    """
+    Generates a new code object with the given instructions, code options, and keys.
+
+    Args:
+        code_object (types.CodeType): The original CodeType for instructions.
+        code_options (dict[str, any]): The code options for the new code object.
+        keys (list[str]): The keys to specify the order of code options.
+        ep_lineno_map (Callable[[int], int]): The line number converting function from py to eps.
+
+    Returns:
+        types.CodeType: The new code object.
+    """
+    linetable = assemble(
+        get_instructions(code_object),
+        code_options["co_firstlineno"],
+        ep_lineno_map,
+    )
+    if sys.version_info >= (3, 10):
+        # Python deprecated co_lnotab in 3.10, use co_linetable instead
+        # https://peps.python.org/pep-0626/
+        code_options["co_linetable"] = linetable
+    else:
+        code_options["co_lnotab"] = linetable
+    if sys.version_info >= (3, 11):
+        # TODO: generate 3.11 exception table
+        # code_options["co_exceptiontable"] = bytes([])
+        pass
+    for key, val in code_options.items():
+        if isinstance(val, list):
+            code_options[key] = tuple(val)
+    # code_options is a dict, use keys to makesure the input order
+    return types.CodeType(*[code_options[k] for k in keys])
+
+
+def assemble(
+    instructions: Iterator[Instruction],
+    firstlineno: int,
+    ep_lineno_map: Callable[[int], int],
+) -> bytes:
+    """
+    Assembles a list of instructions into lnotab.
+
+    Args:
+        instructions (Iterator[Instruction]): The list of instructions.
+        firstlineno (int): The starting line number.
+        ep_lineno_map (Callable[[int], int]): The line number converting function from py to eps.
+
+    Returns:
+        bytes: lnotab.
+    """
+    code = []
+    linetable = []
+    ep_firstlineno = ep_lineno_map(firstlineno)
+
+    calc_linetable, update_cursor = create_linetable_calculator(ep_firstlineno)
+
+    for instr in instructions:
+        # set linetable, Python 3.11 need to set linetable for each instruction
+        if instr.starts_line is not None or sys.version_info >= (3, 11):
+            ep_lineno = ep_lineno_map(instr.starts_line)
+            linetable.extend(calc_linetable(ep_lineno, len(code)))
+            update_cursor(ep_lineno, len(code))
+
+        # get bytecode
+        arg = instr.arg or 0
+        code.extend((instr.opcode, arg & 0xFF))
+        # fill CACHE
+        for _ in range(get_instruction_size(instr) // 2 - 1):
+            code.extend((0, 0))
+
+    if sys.version_info >= (3, 11):
+        # End hook for Python 3.11
+        linetable.extend(calc_linetable(None, len(code)))
+    elif sys.version_info >= (3, 10):
+        # End hook for Python 3.10
+        linetable.extend(calc_linetable(0, len(code)))
+
+    return bytes(linetable)
 
 
 def to_byte(num):
