@@ -37,50 +37,6 @@ class ExprProxy(Generic[T_co]):
     def __hash__(self) -> int:
         return id(self)
 
-    # Forbid in-place operators
-
-    def __iadd__(self, k):
-        raise AttributeError
-
-    def __iand__(self, k):
-        raise AttributeError
-
-    def __iconcat__(self, k):
-        raise AttributeError
-
-    def __ifloordiv__(self, k):
-        raise AttributeError
-
-    def __ilshift__(self, k):
-        raise AttributeError
-
-    def __imod__(self, k):
-        raise AttributeError
-
-    def __imul__(self, k):
-        raise AttributeError
-
-    def __imatmul__(self, k):
-        raise AttributeError
-
-    def __ior__(self, k):
-        raise AttributeError
-
-    def __ipow__(self, k):
-        raise AttributeError
-
-    def __irshift__(self, k):
-        raise AttributeError
-
-    def __isub__(self, k):
-        raise AttributeError
-
-    def __itruediv__(self, k):
-        raise AttributeError
-
-    def __ixor__(self, k):
-        raise AttributeError
-
     # Proxy arithmetic operators
 
     def __lshift__(self, k):
@@ -216,7 +172,17 @@ def unProxy(x: T) -> T:
 
 
 def unProxy(x):  # noqa: N802
+    objlist = []
     while isinstance(x, ExprProxy):
+        if x in objlist:
+            objlist.append(x)
+            err = _("ExprProxy {} has cyclic references: ")
+
+            raise RecursionError(
+                err.format(objlist[0].__qualname__),
+                ", ".join(obj.__qualname__ for obj in objlist),
+            )
+        objlist.append(x)
         x = x.get_value()
     return x
 
