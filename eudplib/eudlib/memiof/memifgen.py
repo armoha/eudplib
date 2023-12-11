@@ -11,32 +11,37 @@ from collections.abc import Callable
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ...core.eudfunc.eudf import _EUDPredefineParam
+from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ...core.eudfunc.eudtypedfuncn import EUDTypedFuncN
 from . import modcurpl as cp
 
 
 @functools.cache
 def _read_epd_func(
-    mask: int, initvals: tuple[int, ...], *args: tuple[int, ...], _check_empty: bool = False
+    mask: int,
+    initvals: tuple[int, ...],
+    *args: tuple[int, ...],
+    _check_empty: bool = False,
 ) -> EUDTypedFuncN:
+    @_EUDPredefineReturn(len(args))
     @_EUDPredefineParam(c.CurrentPlayer)
     @c.EUDFunc
     def readerfunc(targetplayer):
-        readerfunc._frets = [c.SetDeaths(0, c.SetTo, 0, 0) for _ in args]
-        readerfunc._retn = len(args)
-        ret = [c.EUDLightVariable(_from=fret) for fret in readerfunc._frets]
+        ret = readerfunc._frets
         done = c.Forward()
 
         if _check_empty:
             check = c.Forward()
             check << c.RawTrigger(
                 conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
-                actions=[retv.SetNumber(0) for retv in ret] + [c.SetNextPtr(check, done)],
+                actions=[retv.SetNumber(0) for retv in ret]
+                + [c.SetNextPtr(check, done)],
             )
             init = c.NextTrigger()
 
-        cs.DoActions([retv.SetNumber(initval) for retv, initval in zip(ret, initvals)])
+        cs.DoActions(
+            [retv.SetNumber(initval) for retv, initval in zip(ret, initvals)]
+        )
 
         for nth, i in enumerate(ut.bits(mask)):
             if all(arg[nth] == 0 for arg in args):
@@ -44,12 +49,16 @@ def _read_epd_func(
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i),
                 actions=[
-                    retv.AddNumber(arg[nth]) for retv, arg in zip(ret, args) if arg[nth] != 0
+                    retv.AddNumber(arg[nth])
+                    for retv, arg in zip(ret, args)
+                    if arg[nth] != 0
                 ],
             )
 
         done << c.NextTrigger()
-        cp.f_setcurpl2cpcache(actions=c.SetNextPtr(check, init) if _check_empty else [])
+        cp.f_setcurpl2cpcache(
+            actions=c.SetNextPtr(check, init) if _check_empty else []
+        )
         # return ut.List2Assignable(ret)
 
     return readerfunc
@@ -59,13 +68,15 @@ def f_readgen_epd(
     mask: int,
     *args: tuple[int, Callable[[int], int]],
     docstring: str | None = None,
-    _check_empty: bool = False
+    _check_empty: bool = False,
 ) -> EUDTypedFuncN:
     mask = mask & 0xFFFFFFFF
     initvals = tuple(arg[0] for arg in args)
     vals = tuple(tuple(arg[1](i) for i in ut.bits(mask)) for arg in args)
 
-    readerfunc = _read_epd_func(mask, initvals, *vals, _check_empty=_check_empty)
+    readerfunc = _read_epd_func(
+        mask, initvals, *vals, _check_empty=_check_empty
+    )
     if docstring:
         readerfunc.__doc__ = docstring
     return readerfunc
@@ -73,14 +84,18 @@ def f_readgen_epd(
 
 @functools.cache
 def _read_cp_func(
-    mask: int, initvals: tuple[int, ...], *args: tuple[int, ...], _check_empty: bool = False
+    mask: int,
+    initvals: tuple[int, ...],
+    *args: tuple[int, ...],
+    _check_empty: bool = False,
 ) -> Callable:
+    @_EUDPredefineReturn(len(args))
     @c.EUDFunc
     def reader():
-        reader._frets = [c.SetDeaths(0, c.SetTo, 0, 0) for _ in args]
-        reader._retn = len(args)
-        ret = [c.EUDLightVariable(_from=fret) for fret in reader._frets]
-        init_actions = [retv.SetNumber(initval) for retv, initval in zip(ret, initvals)]
+        ret = reader._frets
+        init_actions = [
+            retv.SetNumber(initval) for retv, initval in zip(ret, initvals)
+        ]
         if _check_empty:
             check, read_start = c.Forward(), c.Forward()
             init_actions.append(c.SetNextPtr(check, read_start))
@@ -90,7 +105,11 @@ def _read_cp_func(
             done = c.Forward()
             check << c.RawTrigger(
                 conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
-                actions=[retv.SetNumber(0) for retv, initval in zip(ret, initvals) if initval != 0]
+                actions=[
+                    retv.SetNumber(0)
+                    for retv, initval in zip(ret, initvals)
+                    if initval != 0
+                ]
                 + [c.SetNextPtr(check, done)],
             )
             read_start << c.NextTrigger()
@@ -101,7 +120,9 @@ def _read_cp_func(
             c.RawTrigger(
                 conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i),
                 actions=[
-                    retv.AddNumber(arg[nth]) for retv, arg in zip(ret, args) if arg[nth] != 0
+                    retv.AddNumber(arg[nth])
+                    for retv, arg in zip(ret, args)
+                    if arg[nth] != 0
                 ],
             )
 
@@ -124,13 +145,15 @@ def f_readgen_cp(
     mask: int,
     *args: tuple[int, Callable[[int], int]],
     docstring: str | None = None,
-    _check_empty: bool = False
+    _check_empty: bool = False,
 ) -> Callable:
     mask = mask & 0xFFFFFFFF
     initvals = tuple(arg[0] for arg in args)
     vals = tuple(tuple(arg[1](i) for i in ut.bits(mask)) for arg in args)
 
-    readerfunc = _read_cp_func(mask, initvals, *vals, _check_empty=_check_empty)
+    readerfunc = _read_cp_func(
+        mask, initvals, *vals, _check_empty=_check_empty
+    )
     if docstring:
         readerfunc.__doc__ = docstring
     return readerfunc
@@ -148,8 +171,12 @@ def _mapXYmask():
     return x, y
 
 
-f_cunitread_epd = f_readgen_epd(0x3FFFF0, (0x400008, lambda x: x), _check_empty=True)
-f_cunitread_cp = f_readgen_cp(0x3FFFF0, (0x400008, lambda x: x), _check_empty=True)
+f_cunitread_epd = f_readgen_epd(
+    0x3FFFF0, (0x400008, lambda x: x), _check_empty=True
+)
+f_cunitread_cp = f_readgen_cp(
+    0x3FFFF0, (0x400008, lambda x: x), _check_empty=True
+)
 f_cunitepdread_epd = f_readgen_epd(
     0x3FFFF0,
     (0x400008, lambda x: x),
@@ -190,8 +217,12 @@ f_spriteepdread_cp = f_readgen_cp(
     (0x188000 - 0x58A364 // 4, lambda y: y // 4),
     _check_empty=True,
 )
-f_spriteread_epd = f_readgen_epd(0x1FFFC, (0x620000, lambda x: x), _check_empty=True)
-f_spriteread_cp = f_readgen_cp(0x1FFFC, (0x620000, lambda x: x), _check_empty=True)
+f_spriteread_epd = f_readgen_epd(
+    0x1FFFC, (0x620000, lambda x: x), _check_empty=True
+)
+f_spriteread_cp = f_readgen_cp(
+    0x1FFFC, (0x620000, lambda x: x), _check_empty=True
+)
 
 
 def _posread_epd():

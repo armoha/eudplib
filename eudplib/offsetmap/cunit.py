@@ -10,6 +10,7 @@ from typing import TypeVar, cast
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
+from ..core.eudfunc.eudf import _EUDPredefineReturn
 from ..localize import _
 from .csprite import int_or_var
 from .epdoffsetmap import EPDOffsetMap, epd_cache, ptr_cache
@@ -560,14 +561,13 @@ class CUnit(EPDOffsetMap):
         ]
 
     @staticmethod
+    @_EUDPredefineReturn(2, 3)
     @c.EUDTypedFunc([None, c.TrgUnit])
     def _check_buildq(unit, unit_type):
         from ..eudlib import f_setcurpl2cpcache
         from ..trigger import Trigger
 
-        CUnit._check_buildq._frets = [c.SetDeaths(0, c.SetTo, 0, 0)]
-        CUnit._check_buildq._retn = 1
-        ret = c.EUDLightVariable(_from=CUnit._check_buildq._frets[0])
+        ret = CUnit._check_buildq._frets[0]
         c.VProc(
             unit,
             [
@@ -609,14 +609,13 @@ class CUnit(EPDOffsetMap):
         # return False
 
     @staticmethod
+    @_EUDPredefineReturn(1, 2)
     @c.EUDTypedFunc([None, c.TrgUnit, None])
     def _check_buildq_const(unit, unit_type, unit65536):
         from ..eudlib import f_setcurpl2cpcache
         from ..trigger import Trigger
 
-        CUnit._check_buildq_const._frets = [c.SetDeaths(0, c.SetTo, 0, 0)]
-        CUnit._check_buildq_const._retn = 1
-        ret = c.EUDLightVariable(_from=CUnit._check_buildq_const._frets[0])
+        ret = CUnit._check_buildq_const._frets[0]
         c.VProc(
             unit,
             [

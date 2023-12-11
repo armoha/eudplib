@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -6,7 +7,6 @@
 # file that should have been included as part of this package.
 
 import functools
-import itertools
 
 from ... import utils as ut
 from ...localize import _
@@ -14,7 +14,6 @@ from ...utils.blockstru import BlockStruManager, set_blockstru_manager
 from .. import allocator as ac
 from .. import rawtrigger as bt
 from .. import variable as ev
-from ..rawtrigger.rawtriggerdef import _do_actions
 from .trace.tracetool import _EUDTracePop, _EUDTracePush
 
 _currentCompiledFunc = None
@@ -114,18 +113,8 @@ class EUDFuncN:
         if self._retn is None or self._retn == 0:
             self._fend = bt.RawTrigger(actions=trace)
             self._nptr = self._fend + 4
-        elif all(isinstance(fret, bt.Action) for fret in self._frets):
-            fend = _do_actions([trace, self._frets])
-            self._fend = fend[0]
-            self._nptr = fend[-1] + 4
         else:
-
-            def is_action(x) -> bool:
-                return isinstance(x, bt.Action)
-
-            actfret = list(filter(is_action, self._frets))
-            varfret = list(itertools.filterfalse(is_action, self._frets))
-            fendTrgs = ut.FlattenList(ev.VProc(varfret, [trace, actfret]))
+            fendTrgs = ut.FlattenList(ev.VProc([self._frets], [trace]))
             self._fend = fendTrgs[0]
             self._nptr = fendTrgs[-1]._actions[-1] + 20
 
@@ -156,8 +145,6 @@ class EUDFuncN:
         retv = ut.FlattenList(retv)
         if self._frets is None:
             self._frets = [ev.EUDVariable() for _ in retv]
-            # FIXME: Not compatible with EUDFuncPtr
-            # self._frets = [bt.SetDeaths(0, bt.SetTo, 0, 0) for _ in retv]
             self._retn = len(retv)
 
         ut.ep_assert(

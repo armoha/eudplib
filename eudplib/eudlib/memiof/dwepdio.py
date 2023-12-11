@@ -11,20 +11,16 @@ import warnings
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ...core.eudfunc.eudf import _EUDPredefineParam
+from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ...localize import _
 from .modcurpl import f_setcurpl2cpcache
 
 
+@_EUDPredefineReturn(2)
 @_EUDPredefineParam(c.CurrentPlayer)
 @c.EUDFunc
 def f_dwepdread_epd(targetplayer):
-    f_dwepdread_epd._frets = [c.SetDeaths(0, c.SetTo, 0, 0) for _ in range(2)]
-    f_dwepdread_epd._retn = 2
-    ptr, epd = [
-        c.EUDLightVariable(_from=fret) for fret in f_dwepdread_epd._frets
-    ]
-
+    ptr, epd = f_dwepdread_epd._frets
     u = random.randint(234, 65535)
     acts = [
         ptr.SetNumber(0),
@@ -43,18 +39,16 @@ def f_dwepdread_epd(targetplayer):
             actions=ut._rand_lst(acts),
         )
 
-    f_setcurpl2cpcache()  # FIXME: integrate with function return
+    f_setcurpl2cpcache()
 
     # return ptr, epd
 
 
+@_EUDPredefineReturn(1)
 @_EUDPredefineParam(c.CurrentPlayer)
 @c.EUDFunc
 def f_dwread_epd(targetplayer):
-    f_dwread_epd._frets = [c.SetDeaths(0, c.SetTo, 0, 0)]
-    f_dwread_epd._retn = 1
-    ptr = c.EUDLightVariable(_from=f_dwread_epd._frets[0])
-
+    ptr = f_dwread_epd._frets[0]
     u = random.randint(234, 65535)
     acts = [
         ptr.SetNumber(0),
@@ -67,18 +61,16 @@ def f_dwread_epd(targetplayer):
             actions=ptr.AddNumber(2**i),
         )
 
-    f_setcurpl2cpcache()  # FIXME: integrate with function return
+    f_setcurpl2cpcache()
 
     # return ptr
 
 
+@_EUDPredefineReturn(1)
 @_EUDPredefineParam(c.CurrentPlayer)
 @c.EUDFunc
 def f_epdread_epd(targetplayer):
-    f_epdread_epd._frets = [c.SetDeaths(0, c.SetTo, 0, 0)]
-    f_epdread_epd._retn = 1
-    ptr = c.EUDLightVariable(_from=f_epdread_epd._frets[0])
-
+    ptr = f_epdread_epd._frets[0]
     u = random.randint(234, 65535)
     acts = [
         ptr.SetNumber(ut.EPD(0)),
@@ -91,7 +83,7 @@ def f_epdread_epd(targetplayer):
             actions=ptr.AddNumber(2 ** (i - 2)),
         )
 
-    f_setcurpl2cpcache()  # FIXME: integrate with function return
+    f_setcurpl2cpcache()
 
     # return ptr
 

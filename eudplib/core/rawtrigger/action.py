@@ -281,20 +281,3 @@ class Action(ConstExpr):
             )
 
         pbuffer.WritePack("IIIIIIHBBBBH", self.fields)  # type: ignore[arg-type]
-
-    def getDestAddr(self) -> ConstExpr:  # noqa: N802
-        ut.ep_assert(self.fields[7] == 45)
-        return self + 16  # type: ignore[return-value]
-
-    def getValueAddr(self) -> ConstExpr:  # noqa: N802
-        ut.ep_assert(self.fields[7] == 45)
-        return self + 20  # type: ignore[return-value]
-
-    def SetDest(self, dest) -> "Action":  # noqa: N802
-        from ..variable.eudv import _ProcessDest
-        from .constenc import SetTo
-        from .stockact import SetMemory
-
-        ut.ep_assert(self.fields[7] == 45)
-        dest = _ProcessDest(dest)
-        return SetMemory(self.getDestAddr(), SetTo, dest)
