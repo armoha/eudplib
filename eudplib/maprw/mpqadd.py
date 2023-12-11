@@ -11,13 +11,13 @@ from .. import utils as ut
 from ..core.mapdata.mpqapi import MPQ
 from ..localize import _
 
-_added_files: dict[bytes, tuple[str, bytes | None, bool]] = {}
+_addedFiles: dict[bytes, tuple[str, bytes | None, bool]] = {}  # noqa: N816
 
 
 def update_filelist_by_listfile(mpqr: MPQ) -> None:
     """Use listfile to get list of already existing files."""
 
-    _added_files.clear()
+    _addedFiles.clear()
 
     flist = mpqr.EnumFiles()
 
@@ -41,7 +41,7 @@ def MPQCheckFile(fname: str) -> bytes:  # noqa: N802
     fname_key = ut.u2b(normpath(normcase(fname)))
 
     ut.ep_assert(
-        fname_key not in _added_files,
+        fname_key not in _addedFiles,
         _('MPQ filename duplicate : "{}"').format(fname),
     )
 
@@ -74,7 +74,7 @@ def MPQAddFile(  # noqa: N802
     # make fname case_insensitive
     fname_key = MPQCheckFile(fname)
 
-    _added_files[fname_key] = (fname, content, is_wav)
+    _addedFiles[fname_key] = (fname, content, is_wav)
 
 
 def MPQAddWave(fname: str, content: bytes | None) -> None:  # noqa: N802
@@ -95,13 +95,13 @@ def _update_mpq(mpqw: MPQ) -> None:
     """
 
     count = mpqw.GetMaxFileCount()
-    if count < len(_added_files):  # need to increase max file count
-        max_count = max(1024, 1 << (len(_added_files)).bit_length())
+    if count < len(_addedFiles):  # need to increase max file count
+        max_count = max(1024, 1 << (len(_addedFiles)).bit_length())
         is_increased = mpqw.SetMaxFileCount(max_count)
         if not is_increased:
             raise ctypes.WinError(ctypes.get_last_error())
 
-    for fname, content, is_wav in _added_files.values():
+    for fname, content, is_wav in _addedFiles.values():
         if content is not None:
             ret: int | None
             if is_wav:
@@ -117,8 +117,8 @@ def _update_mpq(mpqw: MPQ) -> None:
                 raise ctypes.WinError(ctypes.get_last_error())
 
 
-def _get_added_files() -> set[str]:
-    ret = set(fname for fname, content, is_wav in _added_files.values())
+def _get_addedFiles() -> set[str]:
+    ret = set(fname for fname, content, is_wav in _addedFiles.values())
     ret.add("staredit\\scenario.chk")
     ret.add("(listfile)")
     return ret
