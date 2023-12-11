@@ -741,7 +741,7 @@ class CUnit(EPDOffsetMap):
         return self.check_status_flag(0x00000010)
 
     def setloc(self, location) -> None:
-        from ..eudlib.locf import f_setloc_epd
+        from ..eudlib import f_setloc_epd
 
         f_setloc_epd(location, self._epd + 0x28 // 4)
 
