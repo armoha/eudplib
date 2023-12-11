@@ -6,7 +6,6 @@
 # file that should have been included as part of this package.
 
 import functools
-import itertools
 
 from ... import utils as ut
 from ...localize import _
@@ -115,10 +114,12 @@ class EUDFuncN:
             if self._retn is None or self._retn == 0:
                 self._fend = bt.RawTrigger()
                 self._nptr = self._fend + 4
-            elif any(ev.IsEUDVariable(fret) for fret in self._frets):
-                varfret = filter(ev.IsEUDVariable, self._frets)
-                actfret = itertools.filterfalse(ev.IsEUDVariable, self._frets)
-                fendTrgs = ut.FlattenList(ev.VProc([varfret], [actfret]))
+            elif all(
+                not isinstance(fret, ut.ExprProxy)
+                and not isinstance(fret, ev.EUDVariable)
+                for fret in self._frets
+            ):
+                fendTrgs = ut.FlattenList(ev.VProc([self._frets], []))
                 self._fend, self._nptr = (
                     fendTrgs[0],
                     fendTrgs[-1]._actions[-1] + 20,
@@ -153,7 +154,7 @@ class EUDFuncN:
     def _AddReturn(self, retv, needjump):
         retv = ut.FlattenList(retv)
         if self._frets is None:
-            self._frets = [bt.SetDeaths(0, bt.SetTo, 0, 0) for _ in retv]
+            self._frets = [ev.EUDVariable() for _ in retv]
             self._retn = len(retv)
 
         ut.ep_assert(
