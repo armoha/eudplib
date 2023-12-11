@@ -228,3 +228,40 @@ def f_test_selftype_member():
     EUDEndWhile()
     EUDReturn(i)
     # (Line 104) }
+    # (Line 106) object RandomData {
+
+# (Line 107) var arr: EUDArray;
+class RandomData(EUDStruct):
+    # (Line 108) var count;
+    # (Line 110) function constructor(arr, count) {
+    @EUDMethod
+    def constructor(this, arr, count):
+        # (Line 111) EUDOnStart(function () { this.EUDConstructor(arr, count); });
+        @EUDFunc
+        def _lambda1():
+            this.EUDConstructor(arr, count)
+
+        EUDOnStart(_lambda1)
+        # (Line 112) }
+        # (Line 114) function EUDConstructor(arr, count) {
+
+    @EUDMethod
+    def EUDConstructor(this, arr, count):
+        # (Line 115) this.arr = arr;
+        _ATTW(this, 'arr') << (arr)
+        # (Line 116) this.count = count;
+        _ATTW(this, 'count') << (count)
+        # (Line 117) }
+        # (Line 118) };
+
+    # (Line 119) function test_eudmethods() {
+    _fields_ = [
+        ('arr', EUDArray),
+        'count',
+    ]
+
+@EUDFunc
+def f_test_eudmethods():
+    # (Line 120) const dat = RandomData(EUDArray(4), 4);
+    dat = RandomData(EUDArray(4), 4)
+    # (Line 121) }

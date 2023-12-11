@@ -6,6 +6,7 @@
 # file that should have been included as part of this package.
 
 import functools
+import itertools
 
 from ... import utils as ut
 from ...localize import _
@@ -109,24 +110,24 @@ class EUDFuncN:
 
         if not self._fend.IsSet():
             self._fend << bt.NextTrigger()
-            if self._traced:
-                _EUDTracePop()
-            if self._retn is None or self._retn == 0:
-                self._fend = bt.RawTrigger()
-                self._nptr = self._fend + 4
-            elif all(
-                not isinstance(fret, ut.ExprProxy)
-                and not isinstance(fret, ev.EUDVariable)
-                for fret in self._frets
-            ):
-                fendTrgs = ut.FlattenList(ev.VProc([self._frets], []))
-                self._fend, self._nptr = (
-                    fendTrgs[0],
-                    fendTrgs[-1]._actions[-1] + 20,
-                )
-            else:
-                self._fend = _do_actions(self._frets)[1]
-                self._nptr = self._fend + 4
+        trace = _EUDTracePop() if self._traced else []
+        if self._retn is None or self._retn == 0:
+            self._fend = bt.RawTrigger(actions=trace)
+            self._nptr = self._fend + 4
+        elif all(isinstance(fret, bt.Action) for fret in self._frets):
+            fend = _do_actions([trace, self._frets])
+            self._fend = fend[0]
+            self._nptr = fend[-1] + 4
+        else:
+
+            def is_action(x) -> bool:
+                return isinstance(x, bt.Action)
+
+            actfret = list(filter(is_action, self._frets))
+            varfret = list(itertools.filterfalse(is_action, self._frets))
+            fendTrgs = ut.FlattenList(ev.VProc(varfret, [trace, actfret]))
+            self._fend = fendTrgs[0]
+            self._nptr = fendTrgs[-1]._actions[-1] + 20
 
         bt.PopTriggerScope()
 
@@ -155,6 +156,8 @@ class EUDFuncN:
         retv = ut.FlattenList(retv)
         if self._frets is None:
             self._frets = [ev.EUDVariable() for _ in retv]
+            # FIXME: Not compatible with EUDFuncPtr
+            # self._frets = [bt.SetDeaths(0, bt.SetTo, 0, 0) for _ in retv]
             self._retn = len(retv)
 
         ut.ep_assert(

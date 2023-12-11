@@ -13,6 +13,7 @@ from ....localize import _
 from ...allocator import Forward
 from ...eudobj import Db
 from ...rawtrigger import (
+    Action,
     Add,
     AtLeast,
     MemoryX,
@@ -70,9 +71,9 @@ def _EUDTracePush() -> None:
     RawTrigger(actions=SetMemory(recordTraceAct + 16, Add, 1))
 
 
-def _EUDTracePop() -> None:
+def _EUDTracePop() -> Action:
     EUDTraceLogRaw(0)
-    RawTrigger(actions=SetMemory(recordTraceAct + 16, Subtract, 1))
+    return SetMemory(recordTraceAct + 16, Subtract, 1)
 
 
 nextTraceId = 0

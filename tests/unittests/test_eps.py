@@ -23,6 +23,7 @@ from .test_eps_object import (
     f_test_nested_object,
     f_test_object,
     f_test_selftype_member,
+    f_test_eudmethods,
 )
 
 
@@ -77,6 +78,7 @@ def test_epscript():
     test_equality("epScript object", f_test_object(), 511)
     test_equality("epScript nested object", f_test_nested_object(), 127)
     test_equality("epScript all object array", f_test_selftype_member(), 5)
+    f_test_eudmethods()
     test_equality("epScript EPDCUnitMap", f_test_cunit(), 131071)
     test_equality("epScript compatibility", f_test_compatibility(), 32)
     test_equality(

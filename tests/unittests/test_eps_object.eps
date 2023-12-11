@@ -102,3 +102,20 @@ function test_selftype_member() {
     for (i = 0 ; arr[i] != -1 ; i++) {}
     return i;
 }
+
+object RandomData {
+    var arr: EUDArray;
+    var count;
+
+    function constructor(arr, count) {
+        EUDOnStart(function () { this.EUDConstructor(arr, count); });
+    }
+
+    function EUDConstructor(arr, count) {
+        this.arr = arr;
+        this.count = count;
+    }
+};
+function test_eudmethods() {
+    const dat = RandomData(EUDArray(4), 4);
+}
