@@ -152,10 +152,8 @@ class EPSLoader(SourceFileLoader):
 
         # Reconstruct code data
         def line_mapper(line):
-            if line is None:
-                return None
-            # FIXME: subtract 1 only in euddraft
-            lineno = ep_lineno_map[bisect_right(code_line, line) - 1] - 1
+            # FIXME: sometimes return lineno off-by-one
+            lineno = ep_lineno_map[bisect_right(code_line, line) - 1]
             if line != 0:
                 lineno = max(0, lineno)
             return lineno

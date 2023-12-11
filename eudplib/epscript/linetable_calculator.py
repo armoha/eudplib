@@ -128,7 +128,7 @@ def assemble(
     Returns:
         bytes: The assembled lnotab.
     """
-    code = []
+    code: list[int] = []
     linetable = []
     ep_firstlineno = firstlineno
 
@@ -137,7 +137,11 @@ def assemble(
     for instr in instructions:
         # set linetable, Python 3.11 need to set linetable for each instruction
         if instr.starts_line is not None or sys.version_info >= (3, 11):
-            ep_lineno = ep_lineno_map(instr.starts_line)
+            ep_lineno: int | None
+            if instr.starts_line is not None:
+                ep_lineno = ep_lineno_map(instr.starts_line)
+            else:
+                ep_lineno = None
             linetable.extend(calc_linetable(ep_lineno, len(code)))
             update_cursor(ep_lineno, len(code))
 
@@ -232,7 +236,7 @@ def create_linetable_calculator(firstlineno: int):
         nonlocal cur_lineno, cur_bytecode
         line_offset = starts_line - cur_lineno
         byte_offset = code_length - cur_bytecode
-        result = []
+        result: list[int] = []
 
         while line_offset or byte_offset:
             line_offset_step = min(max(line_offset, -128), 127)
@@ -256,7 +260,7 @@ def create_linetable_calculator(firstlineno: int):
         """
         nonlocal cur_lineno, cur_bytecode, line_offset
         byte_offset = code_length - cur_bytecode
-        result = []
+        result: list[int] = []
         while line_offset or byte_offset:
             line_offset_step = min(max(line_offset, -127), 127)
             byte_offset_step = min(max(byte_offset, 0), 254)
