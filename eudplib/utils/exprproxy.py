@@ -173,14 +173,15 @@ def unProxy(x: T) -> T:
 
 def unProxy(x):  # noqa: N802
     objlist = []
+    objlist.clear()
     while isinstance(x, ExprProxy):
-        if x in objlist:
+        if any(x is e for e in objlist):
             objlist.append(x)
             err = _("ExprProxy {} has cyclic references: ")
 
             raise RecursionError(
-                err.format(objlist[0].__qualname__),
-                ", ".join(obj.__qualname__ for obj in objlist),
+                err.format(objlist[0]),
+                objlist,
             )
         objlist.append(x)
         x = x.get_value()
