@@ -24,7 +24,7 @@ def get_executing_players(
     # Get executing players of the trigger.
     # If AllPlayers executes it, then pass it
     if btrigger[320 + 2048 + 4 + 17] != 0:
-        return (True,) * 8
+        return [True] * 8
     # Should check manually, by player and force
     return [
         (
