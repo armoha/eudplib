@@ -9,7 +9,7 @@ import builtins
 import keyword
 import types
 
-__version__ = "0.76.5"
+__version__ = "0.76.6"
 
 oldGlobals = set(globals().keys())
 
