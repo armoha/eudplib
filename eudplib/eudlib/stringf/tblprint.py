@@ -156,7 +156,7 @@ def _f_initstattext() -> None:
     f_repmovsd_epd(addr_epd, ut.EPD(stattext_db), inputdword_n)
 
 
-def _add_stattext(tbl: bytes) -> None:
+def _AddStatText(tbl: bytes) -> None:  # noqa: N802
     tbl_count = ut.b2i2(tbl)
     new_tbl = ut.i2b2(tbl_count)
     tbl_offset = 2 * (tbl_count + 1)
