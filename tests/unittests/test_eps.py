@@ -12,7 +12,7 @@ from .test_eps_array import (
     f_test_write,
 )
 from .test_eps_compat import f_test_compatibility, stat
-from .test_eps_cunit import f_test_cunit
+from .test_eps_cunit import f_test_cunit1, f_test_cunit2
 from .test_eps_epsfile import (
     f_constv_thing,
     f_square,
@@ -20,10 +20,10 @@ from .test_eps_epsfile import (
     f_test_array,
 )
 from .test_eps_object import (
+    f_test_eudmethods,
     f_test_nested_object,
     f_test_object,
     f_test_selftype_member,
-    f_test_eudmethods,
 )
 
 
@@ -78,8 +78,9 @@ def test_epscript():
     test_equality("epScript object", f_test_object(), 511)
     test_equality("epScript nested object", f_test_nested_object(), 127)
     test_equality("epScript all object array", f_test_selftype_member(), 5)
-    f_test_eudmethods()
-    test_equality("epScript EPDCUnitMap", f_test_cunit(), 131071)
+    test_equality("epScript EUDMethod", f_test_eudmethods(), 7)
+    test_equality("epScript EPDCUnitMap", f_test_cunit1(), 131071)
+    test_equality("epScript CUnit", f_test_cunit2(), 4095)
     test_equality("epScript compatibility", f_test_compatibility(), 32)
     test_equality(
         "epScript stat_txt.tbl",
