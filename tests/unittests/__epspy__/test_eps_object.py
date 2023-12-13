@@ -236,32 +236,21 @@ class RandomData(EUDStruct):
     # (Line 110) function constructor(arr, count) {
     @EUDMethod
     def constructor(this, arr, count):
-        # (Line 111) EUDOnStart(function () { this.EUDConstructor(arr, count); });
-        @EUDFunc
-        def _lambda1():
-            this.EUDConstructor(arr, count)
-
-        EUDOnStart(_lambda1)
-        # (Line 112) }
-        # (Line 114) function EUDConstructor(arr, count) {
-
-    @EUDMethod
-    def EUDConstructor(this, arr, count):
-        # (Line 115) this.arr = arr;
+        # (Line 111) this.arr = arr;
         _ATTW(this, 'arr') << (arr)
-        # (Line 116) this.count = count;
+        # (Line 112) this.count = count;
         _ATTW(this, 'count') << (count)
-        # (Line 117) }
-        # (Line 118) function get_value() {
+        # (Line 113) }
+        # (Line 115) function get_value() {
 
     @EUDMethod
     def get_value(this):
-        # (Line 134) return this.arr[dwrand() % this.count];
+        # (Line 116) return this.arr[dwrand() % this.count];
         EUDReturn(this.arr[f_dwrand() % this.count])
-        # (Line 135) }
-        # (Line 136) };
+        # (Line 117) }
+        # (Line 118) };
 
-    # (Line 137) function test_eudmethods() {
+    # (Line 119) function test_eudmethods() {
     _fields_ = [
         ('arr', EUDArray),
         'count',
@@ -269,20 +258,20 @@ class RandomData(EUDStruct):
 
 @EUDFunc
 def f_test_eudmethods():
-    # (Line 138) const rd = RandomData(EUDArray(list(1,2,3,4,5,6,7)), 7);
+    # (Line 120) const rd = RandomData(EUDArray(list(1,2,3,4,5,6,7)), 7);
     rd = RandomData(EUDArray(FlattenList([1, 2, 3, 4, 5, 6, 7])), 7)
-    # (Line 139) var ret = 0;
+    # (Line 121) var ret = 0;
     ret = _LVAR([0])
-    # (Line 140) foreach(n : py_range(7)) {
+    # (Line 122) foreach(n : py_range(7)) {
     for n in range(7):
-        # (Line 141) const v = rd.get_value();
+        # (Line 123) const v = rd.get_value();
         v = rd.get_value()
-        # (Line 142) if (1 <= v && v <= 7) ret += 1;
+        # (Line 124) if (1 <= v && v <= 7) ret += 1;
         if EUDIf()(EUDSCAnd()(1 <= v)(v <= 7)()):
             ret.__iadd__(1)
-            # (Line 143) }
+            # (Line 125) }
         EUDEndIf()
-        # (Line 144) return ret;
+        # (Line 126) return ret;
 
     EUDReturn(ret)
-    # (Line 145) }
+    # (Line 127) }
