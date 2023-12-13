@@ -60,9 +60,7 @@ def Disabled(arg: Condition | Action) -> Condition | Action:  # noqa: N802
 
 
 Trigger: TypeAlias = "ConstExpr | int | None"
-_Condition: TypeAlias = (
-    Condition | bool | Iterable[Condition | bool | Iterable]
-)
+_Condition: TypeAlias = Condition | bool | Iterable[Condition | bool | Iterable]
 _Action: TypeAlias = Action | Iterable[Action | Iterable]
 
 
@@ -119,9 +117,7 @@ class RawTrigger(EUDObject):
         if nextptr is None:
             nextptr = NextTrigger()  # (1)
         else:
-            ut.ep_assert(
-                IsConstExpr(nextptr), _("nextptr should be ConstExpr")
-            )
+            ut.ep_assert(IsConstExpr(nextptr), _("nextptr should be ConstExpr"))
 
         self._prevptr = prevptr
         self._nextptr = nextptr

@@ -18,7 +18,10 @@ class EUDVArrayReader:
         c.PushTriggerScope()
         self._trg << c.RawTrigger(
             nextptr=0,
-            actions=[c.SetDeaths(0, c.SetTo, 0, 0), c.SetNextPtr(0, self._fin)],
+            actions=[
+                c.SetDeaths(0, c.SetTo, 0, 0),
+                c.SetNextPtr(0, self._fin),
+            ],
         )
         self._fin << c.RawTrigger(
             nextptr=0,
@@ -41,19 +44,27 @@ class EUDVArrayReader:
                     varr_ptr.QueueAssignTo(ut.EPD(self._trg) + 1),
                     varr_epd.AddNumber(1),
                     varr_epd.QueueAssignTo(ut.EPD(self._trg) + 360 // 4 + 4),
-                    c.SetMemory(self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())),
+                    c.SetMemory(
+                        self._trg + 328 + 20,
+                        c.SetTo,
+                        ut.EPD(eudv.getValueAddr()),
+                    ),
                 ],
             )
             trg = c.VProc(
                 varr_epd,
-                [acts] + [varr_epd.AddNumber(328 // 4 + 3), varr_epd.AddDest(-8)],
+                [acts, varr_epd.AddNumber(328 // 4 + 3), varr_epd.AddDest(-8)],
             )
             return trg
         else:
             return [
                 c.SetNextPtr(self._trg, varr_ptr),
-                c.SetMemory(self._trg + 328 + 16, c.SetTo, varr_epd + 328 // 4 + 4),
-                c.SetMemory(self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())),
+                c.SetMemory(
+                    self._trg + 328 + 16, c.SetTo, varr_epd + 328 // 4 + 4
+                ),
+                c.SetMemory(
+                    self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())
+                ),
                 c.SetMemory(self._trg + 360 + 16, c.SetTo, varr_epd + 1),
             ]
 
@@ -61,6 +72,8 @@ class EUDVArrayReader:
         if not self._trg.IsSet():
             self._maketrg()
         nptr = c.Forward()
-        trg = c.RawTrigger(nextptr=self._trg, actions=[acts] + [c.SetNextPtr(self._fin, nptr)])
+        trg = c.RawTrigger(
+            nextptr=self._trg, actions=[acts, c.SetNextPtr(self._fin, nptr)]
+        )
         nptr << c.NextTrigger()
         return trg

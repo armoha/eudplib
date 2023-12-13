@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -55,13 +54,12 @@ class EUDFuncN:
             self._argn = argn
             self._arginits = [(0, bt.SetTo, 0, None)] * argn
         elif all(
-            isinstance(initvals, tuple) and len(initvals) == 4
-            for initvals in argn
+            isinstance(initvals, tuple) and len(initvals) == 4 for initvals in argn
         ):
             self._argn = len(argn)
             self._arginits = argn
         else:
-            raise ut.EPError("Invalid argn: {}".format(argn))
+            raise ut.EPError(f"Invalid argn: {argn}")
         self._retn = None
         self._callerfunc = callerfunc
         self._bodyfunc = bodyfunc
@@ -121,9 +119,7 @@ class EUDFuncN:
         bt.PopTriggerScope()
 
         # Finalize
-        ut.ep_assert(
-            f_bsm.empty(), _("Block start/end mismatch inside function")
-        )
+        ut.ep_assert(f_bsm.empty(), _("Block start/end mismatch inside function"))
         set_blockstru_manager(prev_bsm)
 
         # No return -> set return count to 0

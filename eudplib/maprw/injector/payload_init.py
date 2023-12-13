@@ -6,7 +6,7 @@ from eudplib import utils as ut
 
 from ...core.allocator.pbuffer import Payload
 from ...core.mapdata.chktok import CHK
-from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
+from ...core.mapdata.stringmap import get_string_map, get_string_section_name
 from ...localize import _
 from ...trigtrg import trigtrg as tt
 
@@ -32,10 +32,10 @@ def _Trigger(  # noqa: N802
 def initialize_payload(
     chkt: CHK, payload: Payload, mrgndata: ByteString | None = None
 ) -> None:
-    strmap = GetStringMap()
+    strmap = get_string_map()
     if strmap is None:
         raise ut.EPError(_("Must use LoadMap first"))
-    str_section = strmap.SaveTBL()
+    str_section = strmap.save_tbl()
     str_padding = -len(str_section) & 3
     payload_offset = 0x191943C8 + len(str_section) + str_padding
 
@@ -52,7 +52,7 @@ def initialize_payload(
         new_payload[ort : ort + 4] = ut.i2b4(v)
 
     str_section = str_section + bytes(str_padding) + new_payload
-    chkt.setsection(GetStringSectionName(), str_section)
+    chkt.setsection(get_string_section_name(), str_section)
 
     if mrgndata is not None:
         orig_mrgn = chkt.getsection("MRGN")
@@ -134,9 +134,7 @@ def initialize_payload(
     # Previous rawtrigger datas
 
     oldtrigraw = chkt.getsection("TRIG")
-    oldtrigs = [
-        oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)
-    ]
+    oldtrigs = [oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)]
     proc_trigs = []
 
     # Collect only enabled triggers

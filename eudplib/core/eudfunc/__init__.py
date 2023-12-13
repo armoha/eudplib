@@ -13,7 +13,12 @@ from .eudf import (
     EUDTypedFunc,
     EUDXTypedFunc,
 )
-from .eudfmethod import EUDMethod, EUDTracedMethod, EUDTracedTypedMethod, EUDTypedMethod
+from .eudfmethod import (
+    EUDMethod,
+    EUDTracedMethod,
+    EUDTracedTypedMethod,
+    EUDTypedMethod,
+)
 from .eudfptr import EUDFuncPtr, EUDTypedFuncPtr
 from .eudfuncn import EUDFuncN, EUDReturn
 from .trace import *

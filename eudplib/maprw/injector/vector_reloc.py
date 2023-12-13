@@ -9,7 +9,7 @@ from eudplib import utils as ut
 
 from ...core.allocator.pbuffer import Payload
 from ...core.mapdata.chktok import CHK
-from ...core.mapdata.stringmap import GetStringMap, GetStringSectionName
+from ...core.mapdata.stringmap import get_string_map, get_string_section_name
 from ...localize import _
 from ...trigtrg import trigtrg as tt
 
@@ -62,10 +62,10 @@ def copy_deaths(
 def create_vector_relocator(chkt: CHK, payload: Payload) -> None:
     global trglist
 
-    strmap = GetStringMap()
+    strmap = get_string_map()
     if strmap is None:
         raise ut.EPError(_("Must use LoadMap first"))
-    str_section = strmap.SaveTBL()
+    str_section = strmap.save_tbl()
 
     """
     Algorithm credit to klassical_31@naver.com
@@ -167,7 +167,7 @@ def create_vector_relocator(chkt: CHK, payload: Payload) -> None:
         + bytes(4)
         + payload.data
     )
-    chkt.setsection(GetStringSectionName(), str_section)
+    chkt.setsection(get_string_section_name(), str_section)
 
     ##############
     # MRGN SECTION
@@ -274,9 +274,7 @@ def create_vector_relocator(chkt: CHK, payload: Payload) -> None:
     # Previous rawtrigger datas
 
     oldtrigraw = chkt.getsection("TRIG")
-    oldtrigs = [
-        oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)
-    ]
+    oldtrigs = [oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)]
     proc_trigs = []
 
     # Collect only enabled triggers

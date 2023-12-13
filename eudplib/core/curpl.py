@@ -6,7 +6,6 @@
 # file that should have been included as part of this package.
 
 
-from ..utils import EPD
 from .allocator import Forward
 from .rawtrigger import Add, EncodePlayer, Exactly, Memory, SetMemory, SetTo
 from .variable import EUDVariable
@@ -15,13 +14,13 @@ _curpl_var = EUDVariable()
 _curpl_checkcond = Forward()
 
 
-def cpcacheMatchCond():
+def cpcache_match_cond():
     if not _curpl_checkcond.IsSet():
         _curpl_checkcond << Memory(0x6509B0, Exactly, 0)
     return _curpl_checkcond
 
 
-def SetCurrentPlayer(p):
+def SetCurrentPlayer(p):  # noqa: N802
     p = EncodePlayer(p)
     return [
         _curpl_var.SetNumber(p),
@@ -30,7 +29,7 @@ def SetCurrentPlayer(p):
     ]
 
 
-def AddCurrentPlayer(p):
+def AddCurrentPlayer(p):  # noqa: N802
     p = EncodePlayer(p)
     return [
         _curpl_var.AddNumber(p),
@@ -39,5 +38,5 @@ def AddCurrentPlayer(p):
     ]
 
 
-def GetCPCache():
+def GetCPCache():  # noqa: N802
     return _curpl_var

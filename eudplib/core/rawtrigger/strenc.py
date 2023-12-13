@@ -165,9 +165,7 @@ _ExprProxy: TypeAlias = (
     "ExprProxy[str | bytes | int | EUDVariable | ConstExpr | ExprProxy]"
 )
 _Arg: TypeAlias = "str | bytes | int | EUDVariable | ConstExpr | ExprProxy[str | bytes | int | EUDVariable | ConstExpr | ExprProxy]"  # noqa: E501
-__ExprProxy: TypeAlias = (
-    "ExprProxy[str | bytes | int | EUDVariable | ExprProxy]"
-)
+__ExprProxy: TypeAlias = "ExprProxy[str | bytes | int | EUDVariable | ExprProxy]"
 __Arg: TypeAlias = "str | bytes | int | EUDVariable | ExprProxy[str | bytes | int | EUDVariable | ExprProxy]"  # noqa: E501
 
 
@@ -206,24 +204,18 @@ def EncodeAIScript(ais: _Arg, issueError: bool = False) -> _Dword:  # noqa: N803
             if ai in DefAIScriptDict.values():
                 return ut.b2i4(ai)
             sl = _("Cannot encode string {} as {}.").format(ai, "AIScript")
-            for match in difflib.get_close_matches(
-                ai, DefAIScriptDict.values()
-            ):
+            for match in difflib.get_close_matches(ai, DefAIScriptDict.values()):
                 sl += "\n" + _(" - Suggestion: {}").format(match)
         raise ut.EPError(sl)
 
     if isinstance(ai, ConstType):
-        raise ut.EPError(
-            _('[Warning] "{}" is not a {}').format(ais, "AIScript")
-        )
+        raise ut.EPError(_('[Warning] "{}" is not a {}').format(ais, "AIScript"))
     assert not isinstance(ai, ExprProxy), "unreachable"
     return ai
 
 
 @overload
-def _EncodeAny(
-    t: str, f: Callable, dl: Mapping[str, int], s: str | bytes
-) -> int:
+def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: str | bytes) -> int:
     ...
 
 
@@ -233,9 +225,7 @@ def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: T) -> T:
 
 
 @overload
-def _EncodeAny(
-    t: str, f: Callable, dl: Mapping[str, int], s: _ExprProxy
-) -> _Dword:
+def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: _ExprProxy) -> _Dword:
     ...
 
 

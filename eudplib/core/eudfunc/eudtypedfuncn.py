@@ -78,8 +78,12 @@ class EUDXTypedFuncN(EUDTypedFuncN):
     EUDFuncN specialization for EUDX.
     """
 
-    def __init__(self, argn, callerfunc, bodyfunc, argtypes, rettypes, argmasks, *, traced):
-        super().__init__(argn, callerfunc, bodyfunc, argtypes, rettypes, traced=traced)
+    def __init__(
+        self, argn, callerfunc, bodyfunc, argtypes, rettypes, argmasks, *, traced
+    ):
+        super().__init__(
+            argn, callerfunc, bodyfunc, argtypes, rettypes, traced=traced
+        )
         self._argmasks = argmasks
 
     def _CreateFuncArgs(self):
@@ -92,7 +96,9 @@ class EUDXTypedFuncN(EUDTypedFuncN):
 
 
 class EUDFullFuncN(EUDFuncN):
-    def __init__(self, argn, arginitvals, callerfunc, bodyfunc, argtypes, rettypes, *, traced):
+    def __init__(
+        self, argn, arginitvals, callerfunc, bodyfunc, argtypes, rettypes, *, traced
+    ):
         arginitvals = list(arginitvals)
         while len(arginitvals) < argn:
             arginitvals.append((0, bt.SetTo, 0, None))

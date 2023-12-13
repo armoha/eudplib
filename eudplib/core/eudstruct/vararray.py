@@ -23,10 +23,10 @@ from ..variable import (
     SeqCompute,
     VProc,
 )
-from ..variable.eudv import _ProcessDest
+from ..variable.eudv import process_dest
 from ..variable.vbuf import (
-    GetCurrentCustomVariableBuffer,
-    GetCurrentVariableBuffer,
+    get_current_custom_varbuffer,
+    get_current_varbuffer,
 )
 
 
@@ -42,17 +42,13 @@ def EUDVArrayData(size):
                 _("{} items expected, got {}").format(size, len(initvars)),
             )
             for i, item in enumerate(initvars):
-                ep_assert(
-                    IsConstExpr(item), _("Invalid item #{}").format(repr(i))
-                )
+                ep_assert(IsConstExpr(item), _("Invalid item #{}").format(repr(i)))
             if not all(isinstance(x, int) and x == 0 for x in (dest, nextptr)):
-                ep_assert(
-                    IsConstExpr(nextptr), _("nextptr should be ConstExpr")
-                )
+                ep_assert(IsConstExpr(nextptr), _("nextptr should be ConstExpr"))
                 initvars = [
                     (
                         0xFFFFFFFF,
-                        _ProcessDest(dest),
+                        process_dest(dest),
                         initvar,
                         0x072D0000,
                         nextptr,
@@ -63,11 +59,11 @@ def EUDVArrayData(size):
 
         def Evaluate(self):
             if all(isinstance(var, tuple) for var in self._initvars):
-                evb = GetCurrentCustomVariableBuffer()
+                evb = get_current_custom_varbuffer()
             else:
-                evb = GetCurrentVariableBuffer()
+                evb = get_current_varbuffer()
             if self not in evb._vdict:
-                evb.CreateMultipleVarTriggers(self, self._initvars)
+                evb.create_vartriggers(self, self._initvars)
 
             return evb._vdict[self].Evaluate()
 
@@ -101,7 +97,7 @@ class BitsTrg:
 
 
 @functools.cache
-def EUDVArray(size: int, basetype: type | None = None):
+def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
     ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
     def _bound_check(index: object) -> None:
@@ -111,14 +107,12 @@ def EUDVArray(size: int, basetype: type | None = None):
                 _(
                     "index out of bounds: the length of EUDVArray is {} but the index is {}"
                 ).format(size, index)
-            )  # noqa: E501
+            )
 
     class _EUDVArray(ExprProxy):
         dont_flatten = True
 
-        def __init__(
-            self, initvars=None, *, dest=0, nextptr=0, _from=None
-        ) -> None:
+        def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None) -> None:
             # Initialization from value
             if _from is not None:
                 if IsConstExpr(_from):
@@ -135,9 +129,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                     initvars = [0] * size
 
                 # For python iterables
-                baseobj = EUDVArrayData(size)(
-                    initvars, dest=dest, nextptr=nextptr
-                )
+                baseobj = EUDVArrayData(size)(initvars, dest=dest, nextptr=nextptr)
 
             super().__init__(baseobj)
             self._epd = EPD(self)
@@ -187,13 +179,9 @@ def EUDVArray(size: int, basetype: type | None = None):
                     nextptr=i.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["end"] + 4, bt.SetTo, self),
-                        bt.SetMemory(
-                            bitstrg["ret"] + 16, bt.SetTo, self._epd + 86
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 86),
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, dst),
-                        bt.SetMemory(
-                            bitstrg["ret"] + 48, bt.SetTo, self._epd + 1
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 48, bt.SetTo, self._epd + 1),
                         bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, nptr),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
@@ -286,9 +274,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 for t in range(27, -1, -1):
                     trg[t] << bt.RawTrigger(
                         conditions=_index.AtLeastX(1, 2**t),
-                        actions=bt.SetMemory(
-                            trg["ret"] + 16, bt.Add, 18 * (2**t)
-                        ),
+                        actions=bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
                     )
                 trg["end"] << bt.RawTrigger(
                     nextptr=0,
@@ -334,9 +320,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 bt.RawTrigger(
                     nextptr=val.GetVTable(),
                     actions=[
-                        bt.SetMemory(
-                            bitstrg["ret"] + 16, bt.SetTo, self._epd + 87
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
                         bt.SetMemoryX(
@@ -351,9 +335,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 bt.RawTrigger(
                     nextptr=i.GetVTable(),
                     actions=[
-                        bt.SetMemory(
-                            bitstrg["ret"] + 16, bt.SetTo, self._epd + 87
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
                         bt.SetMemoryX(
                             bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
@@ -409,9 +391,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 for t in range(27, -1, -1):
                     trg[t] << bt.RawTrigger(
                         conditions=_index.AtLeastX(1, 2**t),
-                        actions=bt.SetMemory(
-                            trg["ret"] + 16, bt.Add, 18 * (2**t)
-                        ),
+                        actions=bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
                     )
                 trg["end"] << bt.RawTrigger(
                     nextptr=0,
@@ -443,9 +423,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 bt.RawTrigger(
                     nextptr=val.GetVTable(),
                     actions=[
-                        bt.SetMemory(
-                            bitstrg["ret"] + 16, bt.SetTo, self._epd + 87
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
                         i.QueueAssignTo(_index),
@@ -596,9 +574,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                         bt.SetMemoryXEPD(cp, bt.SetTo, 0, mask >> 1),
                         GetCPCache().SetDest(EPD(0x6509B0)),
                     ]
-                    + [
-                        sub((mask >> 1) << k, mask << k) for k in range(32 - n)
-                    ],
+                    + [sub((mask >> 1) << k, mask << k) for k in range(32 - n)],
                 )
 
             bits = max((size - 1).bit_length() - 1, 0)
@@ -644,9 +620,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 for t in range(27, -1, -1):
                     trg[t] << bt.RawTrigger(
                         conditions=_index.AtLeastX(1, 2**t),
-                        actions=bt.SetMemory(
-                            trg["ret"] + 16, bt.Add, 18 * (2**t)
-                        ),
+                        actions=bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
                     )
                 trg["end"] << bt.RawTrigger(
                     nextptr=0,
@@ -690,9 +664,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 bt.RawTrigger(
                     nextptr=val.GetVTable(),
                     actions=[
-                        bt.SetMemory(
-                            bitstrg["ret"] + 16, bt.SetTo, self._epd + 87
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         val.QueueAssignTo(EPD(bitstrg["ret"])),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
                         i.QueueAssignTo(_index),
@@ -704,9 +676,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 bt.RawTrigger(
                     nextptr=i.GetVTable(),
                     actions=[
-                        bt.SetMemory(
-                            bitstrg["ret"] + 16, bt.SetTo, self._epd + 87
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
@@ -726,15 +696,11 @@ def EUDVArray(size: int, basetype: type | None = None):
                 for t in range(27, -1, -1):
                     trg[t] << bt.RawTrigger(
                         conditions=_index.AtLeastX(1, 2**t),
-                        actions=bt.SetMemory(
-                            trg["ret"] + 16, bt.Add, 18 * (2**t)
-                        ),
+                        actions=bt.SetMemory(trg["ret"] + 16, bt.Add, 18 * (2**t)),
                     )
                 trg["end"] << bt.RawTrigger(
                     nextptr=0,
-                    actions=[
-                        trg["ret"] << bt.SetMemoryXEPD(0, bt.SetTo, ~0, 0)
-                    ],
+                    actions=[trg["ret"] << bt.SetMemoryXEPD(0, bt.SetTo, ~0, 0)],
                 )
 
             bits = max((size - 1).bit_length() - 1, 0)
@@ -770,9 +736,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 bt.RawTrigger(
                     nextptr=val.GetVTable(),
                     actions=[
-                        bt.SetMemory(
-                            bitstrg["ret"] + 16, bt.SetTo, self._epd + 87
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         val.QueueAssignTo(EPD(bitstrg["ret"])),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
                         i.QueueAssignTo(_index),
@@ -784,9 +748,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                 bt.RawTrigger(
                     nextptr=i.GetVTable(),
                     actions=[
-                        bt.SetMemory(
-                            bitstrg["ret"] + 16, bt.SetTo, self._epd + 87
-                        ),
+                        bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
                         i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
@@ -815,9 +777,7 @@ def EUDVArray(size: int, basetype: type | None = None):
                         << bt.SetDeathsX(
                             bt.CurrentPlayer, bt.Add, 0, 0, 0x55555555
                         ),
-                        bt.SetDeathsX(
-                            bt.CurrentPlayer, bt.Add, 0, 0, 0xAAAAAAAA
-                        ),
+                        bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0xAAAAAAAA),
                         GetCPCache().SetDest(EPD(0x6509B0)),
                     ],
                 )

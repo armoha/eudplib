@@ -51,18 +51,10 @@ def _f_initstacktrace() -> None:
         raise ut.EPError(_("Must call SaveMap first"))
     RawTrigger(
         actions=[
-            SetMemoryEPD(
-                traceToolDataEPD + 0, SetTo, ut.b2i4(trace_header, 0x0)
-            ),
-            SetMemoryEPD(
-                traceToolDataEPD + 1, SetTo, ut.b2i4(trace_header, 0x4)
-            ),
-            SetMemoryEPD(
-                traceToolDataEPD + 2, SetTo, ut.b2i4(trace_header, 0x8)
-            ),
-            SetMemoryEPD(
-                traceToolDataEPD + 3, SetTo, ut.b2i4(trace_header, 0xC)
-            ),
+            SetMemoryEPD(traceToolDataEPD + 0, SetTo, ut.b2i4(trace_header, 0x0)),
+            SetMemoryEPD(traceToolDataEPD + 1, SetTo, ut.b2i4(trace_header, 0x4)),
+            SetMemoryEPD(traceToolDataEPD + 2, SetTo, ut.b2i4(trace_header, 0x8)),
+            SetMemoryEPD(traceToolDataEPD + 3, SetTo, ut.b2i4(trace_header, 0xC)),
         ],
     )
 

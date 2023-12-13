@@ -91,7 +91,7 @@ def parse_setuppy_commands():
         bad_commands[command] = "`setup.py %s` is not supported" % command
     # fmt: on
 
-    for command in bad_commands.keys():
+    for command in bad_commands:
         if command in args:
             print(
                 textwrap.dedent(bad_commands[command])

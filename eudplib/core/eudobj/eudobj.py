@@ -7,8 +7,6 @@
 
 from abc import ABCMeta, abstractmethod
 
-from eudplib import utils as ut
-
 from ..allocator import ConstExpr, RlocInt_C
 from ..allocator.payload import GetObjectAddr, _PayloadBuffer
 
@@ -33,7 +31,7 @@ class EUDObject(ConstExpr, metaclass=ABCMeta):
     def __init__(self) -> None:
         super().__init__(self)
 
-    def DynamicConstructed(self) -> bool:
+    def DynamicConstructed(self) -> bool:  # noqa: N802
         """Whether function is constructed dynamically.
 
         Dynamically constructed EUDObject may have their dependency list
@@ -42,7 +40,7 @@ class EUDObject(ConstExpr, metaclass=ABCMeta):
         """
         return False
 
-    def Evaluate(self) -> RlocInt_C:
+    def Evaluate(self) -> RlocInt_C:  # noqa: N802
         """
         What this object should be evaluated to when used in eudplib program.
 
@@ -55,14 +53,14 @@ class EUDObject(ConstExpr, metaclass=ABCMeta):
         return GetObjectAddr(self)
 
     @abstractmethod
-    def GetDataSize(self) -> int:
+    def GetDataSize(self) -> int:  # noqa: N802
         """Memory size of object."""
         raise NotImplementedError()
 
-    def CollectDependency(self, pbuffer: _PayloadBuffer) -> None:
+    def CollectDependency(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802
         self.WritePayload(pbuffer)
 
     @abstractmethod
-    def WritePayload(self, pbuffer: _PayloadBuffer) -> None:
+    def WritePayload(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802
         """Write object"""
         raise NotImplementedError()

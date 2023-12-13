@@ -278,7 +278,10 @@ def ilshift(a, b, n):
         return
     mask = (1 << (n + 1)) - 1
     dst, trg = cpset(a, b)
-    itemw = lambda mod, value, mask: SetMemoryXEPD(dst, mod, value, mask)
+
+    def itemw(mod, value, mask):
+        return SetMemoryXEPD(dst, mod, value, mask)
+
     return trg(
         actions=[
             [
@@ -297,7 +300,10 @@ def irshift(a, b, n):
         return
     mask = (1 << (n + 1)) - 1
     dst, trg = cpset(a, b)
-    sub = lambda value, mask: SetMemoryXEPD(dst, Subtract, value, mask)
+
+    def sub(value, mask):
+        return SetMemoryXEPD(dst, Subtract, value, mask)
+
     return trg(
         actions=[SetMemoryXEPD(dst, SetTo, 0, mask >> 1)]  # lowest n bits
         + [sub((mask >> 1) << n, mask << n) for n in range(32 - n)]

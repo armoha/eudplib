@@ -10,14 +10,14 @@ from ...utils import b2i2, ep_warn
 from .chktok import CHK
 
 
-def FixMapData(chkt: CHK) -> None:
-    FixUnitMap(chkt)
-    FixSettings(chkt)
-    ApplyRemasteredChk(chkt)
-    FixMTXM0_0Null(chkt)
+def _fix_map_data(chkt: CHK) -> None:
+    _fix_unit_map(chkt)
+    _fix_stats_and_settings(chkt)
+    _apply_remastered_chk(chkt)
+    _fix_mtxm_0_0_null(chkt)
 
 
-def FixUnitMap(chkt: CHK) -> None:
+def _fix_unit_map(chkt: CHK) -> None:
     unit = bytearray(chkt.getsection("UNIT"))
 
     for i in range(0, len(unit), 36):
@@ -52,7 +52,7 @@ def FixUnitMap(chkt: CHK) -> None:
     chkt.setsection("UNIT", unit)
 
 
-def FixSettings(chkt: CHK) -> None:
+def _fix_stats_and_settings(chkt: CHK) -> None:
     sections = (
         ("UNIx", 228, (4, 2, 1, 2, 2, 2, 2)),
         ("UPGx", 61, (2, 2, 2, 2, 2, 2)),
@@ -75,11 +75,11 @@ def FixSettings(chkt: CHK) -> None:
         chkt.setsection(name, data)
 
 
-def ApplyRemasteredChk(chkt: CHK) -> None:
+def _apply_remastered_chk(chkt: CHK) -> None:
     chkt.setsection("VER ", b"\xCE\0")
 
 
-def FixMTXM0_0Null(chkt: CHK) -> None:
+def _fix_mtxm_0_0_null(chkt: CHK) -> None:
     mtxm = bytearray(chkt.getsection("MTXM"))
 
     null_tiles = []
@@ -92,7 +92,10 @@ def FixMTXM0_0Null(chkt: CHK) -> None:
         dim = chkt.getsection("DIM")
         width = b2i2(dim, 0)
 
-        print("Null tiles at:", ", ".join(map(lambda x: str(divmod(x, width)[::-1]), null_tiles)))
+        print(
+            "Null tiles at:",
+            ", ".join(map(lambda x: str(divmod(x, width)[::-1]), null_tiles)),
+        )
         ep_warn(
             _("[Warning] Input map has 0000.00 null tiles")
             + "\n"

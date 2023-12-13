@@ -5,10 +5,10 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ...utils import ExprProxy, EPError
+from ...localize import _
+from ...utils import EPError, ExprProxy
 from .selftype import selftype
 from .vararray import EUDVArray
-from ...localize import _
 
 
 class _EUDStruct_Metaclass(type):

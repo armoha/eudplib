@@ -695,9 +695,7 @@ def Order(  # noqa: N802
     start_loc = EncodeLocation(start_location)
     order_type = EncodeOrder(order_type)
     dest_loc = EncodeLocation(dest_location)
-    return Action(
-        start_loc, 0, 0, 0, owner, dest_loc, unit, 46, order_type, 20
-    )
+    return Action(start_loc, 0, 0, 0, owner, dest_loc, unit, 46, order_type, 20)
 
 
 def Comment(text: String) -> Action:  # noqa: N802

@@ -10,7 +10,6 @@ from ... import ctrlstru as cs
 from ...core.variable.evcommon import _ev
 from ...localize import _
 from ...utils import EPD, EPError, _rand_lst
-from . import dwepdio as dwm
 from . import modcurpl as cp
 
 

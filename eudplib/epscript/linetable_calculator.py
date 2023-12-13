@@ -83,7 +83,7 @@ def gen_new_opcode(
         code_object (types.CodeType): The original CodeType for instructions.
         code_options (dict[str, any]): The code options for the new code object.
         keys (list[str]): The keys to specify the order of code options.
-        ep_lineno_map (Callable[[int], int]): The line number converting function from py to eps.
+        ep_lineno_map (Callable[[int], int]): The function to convert line number.
 
     Returns:
         types.CodeType: The new code object.
@@ -123,7 +123,7 @@ def assemble(
     Args:
         instructions (Iterator[Instruction]): The list of instructions.
         firstlineno (int): The starting line number.
-        ep_lineno_map (Callable[[int], int]): The line number converting function from py to eps.
+        ep_lineno_map (Callable[[int], int]): The function to convert line number.
 
     Returns:
         bytes: The assembled lnotab.
@@ -312,9 +312,7 @@ def create_linetable_calculator(firstlineno: int):
             list[int]: The linetable.
         """
         nonlocal cur_lineno, cur_bytecode
-        line_offset = (
-            starts_line - cur_lineno if starts_line is not None else 0
-        )
+        line_offset = starts_line - cur_lineno if starts_line is not None else 0
         byte_offset = (code_length - cur_bytecode) // 2
         return _encode_bytecode_to_entries_py311(line_offset, byte_offset)
 

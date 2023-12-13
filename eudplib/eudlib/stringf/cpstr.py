@@ -10,7 +10,7 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 from eudplib.core.allocator.payload import _RegisterAllocObjectsCallback
 from eudplib.core.curpl import _curpl_checkcond, _curpl_var
-from eudplib.core.mapdata.stringmap import GetStringSectionName
+from eudplib.core.mapdata.stringmap import get_string_section_name
 from eudplib.localize import _
 
 from ..memiof import f_dwread_epd, f_wread_epd
@@ -28,7 +28,7 @@ def _get_mapstring_addr(str_id):
             c.SetMemory(add_strepd + 20, c.SetTo, strepd),
         )
     cs.EUDEndExecuteOnce()
-    str_chunk_name = GetStringSectionName()
+    str_chunk_name = get_string_section_name()
     if str_chunk_name == "STR":
         r, m = c.f_div(str_id, 2)
         c.RawTrigger(conditions=m.Exactly(1), actions=m.SetNumber(2))
@@ -38,9 +38,7 @@ def _get_mapstring_addr(str_id):
         c.RawTrigger(actions=add_strepd << str_id.AddNumber(0))
         ret = f_dwread_epd(str_id)
     else:
-        raise ut.EPError(
-            _("Invalid string section name: {}").format(str_chunk_name)
-        )
+        raise ut.EPError(_("Invalid string section name: {}").format(str_chunk_name))
     c.RawTrigger(actions=add_strptr << ret.AddNumber(0))
     c.EUDReturn(ret)
 
@@ -49,17 +47,16 @@ _const_strptr: dict[int, c.Forward] = {}
 
 
 def _initialize_queries():
-    from ...core.mapdata.stringmap import GetStringMap
+    from ...core.mapdata.stringmap import get_string_map
 
-    strmap = GetStringMap()
-    strmap.Finalize()
+    strmap = get_string_map()
+    strmap.finalize()
     non_existing_id = []
     for str_id, offset_query in _const_strptr.items():
         try:
             offset_query._expr = c.ConstExpr(
                 None,
-                _STR_ADDRESS
-                + strmap._stroffset[strmap._dataindextb[str_id - 1]],
+                _STR_ADDRESS + strmap._stroffset[strmap._dataindextb[str_id - 1]],
                 0,
             )
         except IndexError:
@@ -67,9 +64,9 @@ def _initialize_queries():
 
     if non_existing_id:
         raise ut.EPError(
-            _(
-                "GetMapStringAddr(str_id) for non-existing string ID(s): {}"
-            ).format(non_existing_id)
+            _("GetMapStringAddr(str_id) for non-existing string ID(s): {}").format(
+                non_existing_id
+            )
         )
 
 
@@ -174,7 +171,7 @@ class CPString:
         _next = c.Forward()
         c.RawTrigger(
             nextptr=self.trigger[0],
-            actions=[action] + [c.SetNextPtr(self.trigger[-1], _next)],
+            actions=[action, c.SetNextPtr(self.trigger[-1], _next)],
         )
         _next << c.NextTrigger()
 

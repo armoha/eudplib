@@ -41,7 +41,7 @@ def LoadMap(fname: str) -> None:  # noqa: N802
     if not b:
         raise EPError(_("Fail to extract scenario.chk, maybe invalid scx"))
     chkt.loadchk(b)
-    mapdata.InitMapData(chkt, rawfile)
+    mapdata.init_map_data(chkt, rawfile)
     update_filelist_by_listfile(mpqr)
     for f in mpqr.EnumFiles():
         if f and f not in ("staredit\\scenario.chk", "(listfile)"):

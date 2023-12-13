@@ -90,7 +90,7 @@ class MemberKind(enum.Enum):
             f_readgen_epd,
             f_wread_epd,
         )
-        from ..eudlib.memiof.memifgen import _mapXYmask
+        from ..eudlib.memiof.memifgen import _map_xy_mask
 
         match self:
             case MemberKind.BOOL:
@@ -105,18 +105,18 @@ class MemberKind(enum.Enum):
                 return f_bread_epd(epd, subp)
             case MemberKind.POSITION:
                 return f_maskread_epd(
-                    epd, (lambda x, y: x + 65536 * y)(*_mapXYmask())
+                    epd, (lambda x, y: x + 65536 * y)(*_map_xy_mask())
                 )
             case MemberKind.POSITION_X:
                 shift = 8 * subp
                 f_xread_epd = f_readgen_epd(
-                    _mapXYmask()[0] << shift, (0, lambda x: x >> shift)
+                    _map_xy_mask()[0] << shift, (0, lambda x: x >> shift)
                 )
                 return f_xread_epd(epd)
             case MemberKind.POSITION_Y:
                 shift = 8 * subp
                 f_yread_epd = f_readgen_epd(
-                    _mapXYmask()[1] << shift, (0, lambda x: x >> shift)
+                    _map_xy_mask()[1] << shift, (0, lambda x: x >> shift)
                 )
                 return f_yread_epd(epd)
             case _:

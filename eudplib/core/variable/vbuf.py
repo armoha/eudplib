@@ -9,7 +9,6 @@ from collections import deque
 from typing import TYPE_CHECKING, Literal
 
 from ... import utils as ut
-from .. import rawtrigger as bt
 from ..allocator import RegisterCreatePayloadCallback
 from ..eudobj import EUDObject
 
@@ -30,30 +29,30 @@ class EUDVarBuffer(EUDObject):
         self._vdict: "dict[VariableTriggerForward, int]" = {}
         self._initvals: "list[int | ConstExpr]" = []
 
-    def DynamicConstructed(self) -> Literal[True]:
+    def DynamicConstructed(self) -> Literal[True]:  # noqa: N802
         return True
 
-    def CreateVarTrigger(self, v, initval):
+    def create_vartrigger(self, v, initval):
         ret = self + (72 * len(self._initvals))
         self._initvals.append(initval)
         self._vdict[v] = ret
         return ret
 
-    def CreateMultipleVarTriggers(self, v, initvals):
+    def create_vartriggers(self, v, initvals):
         ret = self + (72 * len(self._initvals))
         self._initvals.extend(initvals)
         self._vdict[v] = ret
         return ret
 
-    def GetDataSize(self) -> int:
+    def GetDataSize(self) -> int:  # noqa: N802
         return 2408 + 72 * (len(self._initvals) - 1)
 
-    def CollectDependency(self, emitbuffer) -> None:
+    def CollectDependency(self, emitbuffer) -> None:  # noqa: N802
         for initval in self._initvals:
-            if type(initval) is not int:
+            if not isinstance(initval, int):
                 emitbuffer.WriteDword(initval)
 
-    def WritePayload(self, emitbuffer) -> None:
+    def WritePayload(self, emitbuffer) -> None:  # noqa: N802
         emitbuffer.WriteSpace(4)
 
         for _ in range(4):
@@ -105,16 +104,16 @@ class EUDVarBuffer(EUDObject):
 _evb = None
 
 
-def RegisterNewVariableBuffer() -> None:
+def _register_new_varbuffer() -> None:
     global _evb
     _evb = EUDVarBuffer()
 
 
-def GetCurrentVariableBuffer():
+def get_current_varbuffer():
     return _evb
 
 
-RegisterCreatePayloadCallback(RegisterNewVariableBuffer)
+RegisterCreatePayloadCallback(_register_new_varbuffer)
 
 
 class EUDCustomVarBuffer(EUDObject):
@@ -131,10 +130,10 @@ class EUDCustomVarBuffer(EUDObject):
         self._actnptr_pairs = []
         self._5acts = deque([], maxlen=5)
 
-    def DynamicConstructed(self):
+    def DynamicConstructed(self):  # noqa: N802
         return True
 
-    def CreateVarTrigger(self, v, initval):
+    def create_vartrigger(self, v, initval):
         # bitmask, player, #, modifier, nptr
         ret = self + 72 * (len(self._actnptr_pairs) + len(self._5acts))
         if len(self._5acts) == 5:
@@ -148,30 +147,30 @@ class EUDCustomVarBuffer(EUDObject):
             self._vdict[v] = ret
         return ret
 
-    def CreateMultipleVarTriggers(self, v, initvals):
+    def create_vartriggers(self, v, initvals):
         ret = self + 72 * (len(self._actnptr_pairs) + len(self._5acts))
         for initval in initvals:
-            self.CreateVarTrigger(None, initval)
+            self.create_vartrigger(None, initval)
         self._vdict[v] = ret
         return ret
 
-    def GetDataSize(self):
+    def GetDataSize(self):  # noqa: N802
         return 2408 + 72 * (len(self._actnptr_pairs) + len(self._5acts) - 1)
 
-    def CollectDependency(self, emitbuffer):
+    def CollectDependency(self, emitbuffer):  # noqa: N802
         for initval in self._5nptrs:
-            if type(initval) is not int:
+            if not isinstance(initval, int):
                 emitbuffer.WriteDword(initval)
         for initvals in self._actnptr_pairs:
             for initval in initvals:
-                if type(initval) is not int:
+                if not isinstance(initval, int):
                     emitbuffer.WriteDword(initval)
         for initvals in self._5acts:
             for initval in initvals:
-                if type(initval) is not int:
+                if not isinstance(initval, int):
                     emitbuffer.WriteDword(initval)
 
-    def WritePayload(self, emitbuffer):
+    def WritePayload(self, emitbuffer):  # noqa: N802
         output = bytearray(72 * (len(self._actnptr_pairs) + len(self._5acts)))
 
         emitbuffer.WriteSpace(4)
@@ -231,13 +230,13 @@ class EUDCustomVarBuffer(EUDObject):
 _ecvb = None
 
 
-def RegisterNewCustomVariableBuffer():
+def _register_new_custom_varbuffer():
     global _ecvb
     _ecvb = EUDCustomVarBuffer()
 
 
-def GetCurrentCustomVariableBuffer():
+def get_current_custom_varbuffer():
     return _ecvb
 
 
-RegisterCreatePayloadCallback(RegisterNewCustomVariableBuffer)
+RegisterCreatePayloadCallback(_register_new_custom_varbuffer)

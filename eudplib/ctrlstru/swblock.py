@@ -173,9 +173,7 @@ def EUDEndSwitch():  # noqa: N802
         branch, nextbranch = c.Forward(), c.Forward()
         restore = c.SetMemory(branch + 4, c.SetTo, nextbranch)
         c.RawTrigger(
-            actions=[restore, block["_actions"]]
-            if "_actions" in block
-            else restore
+            actions=[restore, block["_actions"]] if "_actions" in block else restore
         )
         for case in casekeylist:
             branch << c.RawTrigger(
@@ -280,21 +278,15 @@ def EUDEndSwitch():  # noqa: N802
                     c.RawTrigger(actions=_reset())
                 c.RawTrigger(
                     nextptr=cpcache.GetVTable(),
-                    conditions=c.MemoryXEPD(
-                        cmpplayer, c.Exactly, keys[0], bitmask
-                    ),
-                    actions=c.SetNextPtr(
-                        cpcache.GetVTable(), casebrlist[keys[0]]
-                    ),
+                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
+                    actions=c.SetNextPtr(cpcache.GetVTable(), casebrlist[keys[0]]),
                 )
 
             elif len(keys) == 2:
                 br1, jump1, br2 = c.Forward(), c.Forward(), c.Forward()
                 br1 << c.RawTrigger(
                     nextptr=br2,
-                    conditions=c.MemoryXEPD(
-                        cmpplayer, c.Exactly, keys[0], bitmask
-                    ),
+                    conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
                     actions=[c.SetNextPtr(br1, jump1), _reset()],
                 )
                 jump1 << c.RawTrigger(
@@ -381,9 +373,7 @@ def EUDEndSwitch():  # noqa: N802
                 midpos = len(keys) // 2
                 branch << c.RawTrigger(
                     nextptr=br1,
-                    conditions=c.MemoryXEPD(
-                        epd, c.AtLeast, keys[midpos], bitmask
-                    ),
+                    conditions=c.MemoryXEPD(epd, c.AtLeast, keys[midpos], bitmask),
                     actions=[
                         c.SetNextPtr(branch, br2),
                         _reset(),

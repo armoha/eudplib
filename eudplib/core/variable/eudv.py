@@ -26,37 +26,37 @@ from ...utils import (
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, Forward, IsConstExpr
 from .vbase import VariableBase
-from .vbuf import GetCurrentCustomVariableBuffer, GetCurrentVariableBuffer
+from .vbuf import get_current_custom_varbuffer, get_current_varbuffer
 
 if TYPE_CHECKING:
     from ..rawtrigger.constenc import Dword, TrgModifier, TrgPlayer
 
 
-isRValueStrict = False
+_is_rvalue_strict = False
 T = TypeVar("T", int, ConstExpr, ExprProxy[int] | ExprProxy[ConstExpr])
 
 
-def EP_SetRValueStrictMode(mode: bool) -> None:
-    global isRValueStrict
-    isRValueStrict = mode
+def EP_SetRValueStrictMode(mode: bool) -> None:  # noqa: N802
+    global _is_rvalue_strict
+    _is_rvalue_strict = mode
 
 
 @overload
-def _ProcessDest(dest: T) -> T:
+def process_dest(dest: T) -> T:
     ...
 
 
 @overload
-def _ProcessDest(dest: "VariableBase | ExprProxy[VariableBase]") -> ConstExpr:
+def process_dest(dest: "VariableBase | ExprProxy[VariableBase]") -> ConstExpr:
     ...
 
 
 @overload
-def _ProcessDest(dest: "TrgPlayer") -> int:
+def process_dest(dest: "TrgPlayer") -> int:
     ...
 
 
-def _ProcessDest(dest):
+def process_dest(dest):
     epd = unProxy(dest)
     if isinstance(epd, VariableBase):
         epd.checkNonRValue()
@@ -104,15 +104,15 @@ class VariableTriggerForward(ConstExpr):
         super().__init__(self)
         self._initval = initval
 
-    def Evaluate(self):
+    def Evaluate(self):  # noqa: N802
         if isinstance(self._initval, tuple):
-            evb = GetCurrentCustomVariableBuffer()
+            evb = get_current_custom_varbuffer()
         else:
-            evb = GetCurrentVariableBuffer()
+            evb = get_current_varbuffer()
         try:
             return evb._vdict[self].Evaluate()
         except KeyError:
-            vt = evb.CreateVarTrigger(self, self._initval)
+            vt = evb.create_vartrigger(self, self._initval)
             return vt.Evaluate()
 
 
@@ -155,7 +155,7 @@ class EUDVariable(VariableBase):
             # bitmask, player, #, modifier, nextptr
             initial_pair = (
                 0xFFFFFFFF,
-                _ProcessDest(initval_or_epd),
+                process_dest(initval_or_epd),
                 initval,
                 ((bt.EncodeModifier(modifier) & 0xFF) << 24) | 0x2D0000,
                 nextptr,
@@ -164,113 +164,111 @@ class EUDVariable(VariableBase):
         self._varact: ConstExpr = self._vartrigger + (8 + 320)  # type: ignore[assignment]
         self._rvalue = False
 
-    def GetVTable(self) -> ConstExpr:
+    def GetVTable(self) -> ConstExpr:  # noqa: N802
         return self._vartrigger
 
-    def getMaskAddr(self) -> ConstExpr:
+    def getMaskAddr(self) -> ConstExpr:  # noqa: N802
         return self._varact
 
-    def getDestAddr(self) -> ConstExpr:
+    def getDestAddr(self) -> ConstExpr:  # noqa: N802
         return self._varact + 16  # type: ignore[return-value]
 
-    def getValueAddr(self) -> ConstExpr:
+    def getValueAddr(self) -> ConstExpr:  # noqa: N802
         return self._varact + 20  # type: ignore[return-value]
 
     def __hash__(self) -> int:
         return id(self)
 
     # -------
-    def makeL(self) -> "EUDVariable":
+    def makeL(self) -> "EUDVariable":  # noqa: N802
         self._rvalue = False
         return self
 
-    def makeR(self) -> "EUDVariable":
+    def makeR(self) -> "EUDVariable":  # noqa: N802
         self._rvalue = True
         return self
 
-    def checkNonRValue(self) -> None:
-        if isRValueStrict and self._rvalue:
+    def checkNonRValue(self) -> None:  # noqa: N802
+        if _is_rvalue_strict and self._rvalue:
             raise EPError(_("Trying to modify value of r-value variable"))
 
     # -------
 
-    def SetMask(self, value: "Dword") -> bt.Action:
+    def SetMask(self, value: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getMaskAddr(), bt.SetTo, value)
 
-    def AddMask(self, value: "Dword") -> bt.Action:
+    def AddMask(self, value: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getMaskAddr(), bt.Add, value)
 
-    def SubtractMask(self, value: "Dword") -> bt.Action:
+    def SubtractMask(self, value: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getMaskAddr(), bt.Subtract, value)
 
     # -------
 
-    def SetMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:
+    def SetMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getMaskAddr(), bt.SetTo, value, mask)
 
-    def AddMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:
+    def AddMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getMaskAddr(), bt.Add, value, mask)
 
-    def SubtractMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:
+    def SubtractMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getMaskAddr(), bt.Subtract, value, mask)
 
     # -------
 
-    def MaskAtLeast(self, value: "Dword") -> bt.Condition:
+    def MaskAtLeast(self, value: "Dword") -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getMaskAddr(), bt.AtLeast, value)
 
-    def MaskAtMost(self, value: "Dword") -> bt.Condition:
+    def MaskAtMost(self, value: "Dword") -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getMaskAddr(), bt.AtMost, value)
 
-    def MaskExactly(self, value: "Dword") -> bt.Condition:
+    def MaskExactly(self, value: "Dword") -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getMaskAddr(), bt.Exactly, value)
 
     # -------
 
-    def MaskAtLeastX(self, value: "Dword", mask: "Dword") -> bt.Condition:
+    def MaskAtLeastX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getMaskAddr(), bt.AtLeast, value, mask)
 
-    def MaskAtMostX(self, value: "Dword", mask: "Dword") -> bt.Condition:
+    def MaskAtMostX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getMaskAddr(), bt.AtMost, value, mask)
 
-    def MaskExactlyX(self, value: "Dword", mask: "Dword") -> bt.Condition:
+    def MaskExactlyX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getMaskAddr(), bt.Exactly, value, mask)
 
     # -------
 
-    def SetDest(self, dest) -> bt.Action:
-        dest = _ProcessDest(dest)
+    def SetDest(self, dest) -> bt.Action:  # noqa: N802
+        dest = process_dest(dest)
         return bt.SetMemory(self.getDestAddr(), bt.SetTo, dest)
 
-    def AddDest(self, dest) -> bt.Action:
-        dest = _ProcessDest(dest)
+    def AddDest(self, dest) -> bt.Action:  # noqa: N802
+        dest = process_dest(dest)
         return bt.SetMemory(self.getDestAddr(), bt.Add, dest)
 
-    def SubtractDest(self, dest) -> bt.Action:
-        dest = _ProcessDest(dest)
+    def SubtractDest(self, dest) -> bt.Action:  # noqa: N802
+        dest = process_dest(dest)
         return bt.SetMemory(self.getDestAddr(), bt.Subtract, dest)
 
     # -------
 
-    def SetDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:
-        dest = _ProcessDest(dest)
+    def SetDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+        dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.SetTo, dest, mask)
 
-    def AddDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:
-        dest = _ProcessDest(dest)
+    def AddDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+        dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.Add, dest, mask)
 
-    def SubtractDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:
-        dest = _ProcessDest(dest)
+    def SubtractDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+        dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.Subtract, dest, mask)
 
     # -------
 
-    def SetModifier(self, modifier) -> bt.Action:
+    def SetModifier(self, modifier) -> bt.Action:  # noqa: N802
         ep_assert(
-            modifier is bt.SetTo
-            or modifier is bt.Add
-            or modifier is bt.Subtract,
+            modifier is bt.SetTo or modifier is bt.Add or modifier is bt.Subtract,
             _("Unexpected modifier {}").format(modifier),
         )
         modifier = bt.EncodeModifier(modifier) << 24
@@ -280,18 +278,18 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def QueueAssignTo(self, dest) -> list[bt.Action]:
+    def QueueAssignTo(self, dest) -> list[bt.Action]:  # noqa: N802
         return [self.SetDest(dest), self.SetModifier(bt.SetTo)]
 
-    def QueueAddTo(self, dest) -> list[bt.Action]:
+    def QueueAddTo(self, dest) -> list[bt.Action]:  # noqa: N802
         return [self.SetDest(dest), self.SetModifier(bt.Add)]
 
-    def QueueSubtractTo(self, dest) -> list[bt.Action]:
+    def QueueSubtractTo(self, dest) -> list[bt.Action]:  # noqa: N802
         return [self.SetDest(dest), self.SetModifier(bt.Subtract)]
 
     # -------
 
-    def Assign(self, other):
+    def Assign(self, other):  # noqa: N802
         self.checkNonRValue()
         SeqCompute(((self, bt.SetTo, other),))
 
@@ -633,9 +631,7 @@ class EUDVariable(VariableBase):
 
     def __gt__(self, other):
         if isinstance(other, int) and other >= 0xFFFFFFFF:
-            ep_warn(
-                _("No unsigned number can be greater than {}").format(other)
-            )
+            ep_warn(_("No unsigned number can be greater than {}").format(other))
             traceback.print_stack()
             return [bt.Never()]  # No unsigned number is less than 0
 
@@ -684,7 +680,7 @@ class EUDVariable(VariableBase):
         raise NotImplementedError
 
 
-def IsEUDVariable(x: object) -> bool:
+def IsEUDVariable(x: object) -> bool:  # noqa: N802
     return isUnproxyInstance(x, EUDVariable)
 
 
@@ -703,7 +699,7 @@ def VProc(
     ...
 
 
-def VProc(v, actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
+def VProc(v, actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:  # noqa: N802
     v = FlattenList(v)
     actions = FlattenList(actions)
     end = Forward()
@@ -723,21 +719,21 @@ def VProc(v, actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
 
 
 # From vbuffer.py
-def EUDCreateVariables(varn: int):
+def EUDCreateVariables(varn: int):  # noqa: N802
     return List2Assignable([EUDVariable() for _ in range(varn)])
 
 
 # -------
 
 
-def _GetComputeDest(dst):
+def _get_computedest(dst):
     try:
         return EPD(dst.getValueAddr())
     except AttributeError:
         return dst
 
 
-def _SeqComputeSub(assignpairs, _srcdict={}):
+def _seqcompute_sub(assignpairs, _srcdict={}):
     """
     Subset of SeqCompute with following restrictions
 
@@ -757,7 +753,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
             break
 
     for dst, mdt, src in assignpairs[0:const_assigning_index]:
-        dst = _GetComputeDest(dst)
+        dst = _get_computedest(dst)
         actionlist.append(bt.SetDeaths(dst, mdt, src, 0))
 
     # Only constant-assigning function : skip
@@ -771,9 +767,9 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
     nextptr = None  # nextptr for this rawtrigger
     vt_nextptr = None  # what to set for nextptr of current vtable
     last_pairs = None
-    nonConstActions = list()
+    non_const_actions = list()
 
-    def _RemoveDuplicateActions() -> None:
+    def remove_duplicate_actions() -> None:
         if last_pairs is None:
             return
         last_src, last_dst, last_mdt = last_pairs
@@ -782,7 +778,7 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
         except KeyError:
             pass
         else:
-            lastact = nonConstActions[-1]
+            lastact = non_const_actions[-1]
             queueact, setnptr = lastact
             setdst, setmdt = queueact
             if last_dst is prev_dst:
@@ -794,40 +790,40 @@ def _SeqComputeSub(assignpairs, _srcdict={}):
         _srcdict[last_src] = (last_dst, last_mdt, vt_nextptr)
 
     for dst, mdt, src in assignpairs[const_assigning_index:]:
-        dst = _GetComputeDest(dst)
+        dst = _get_computedest(dst)
 
         if nextptr is None:
             nextptr = src.GetVTable()
         else:
             vt_nextptr << src.GetVTable()
 
-        _RemoveDuplicateActions()
+        remove_duplicate_actions()
 
         vt_nextptr = Forward()
-        nonConstAction = []
+        nonconst_action = []
         if dst is None:
-            nonConstAction.append([])
+            nonconst_action.append([])
         else:
-            nonConstAction.append(src.SetDest(dst))
+            nonconst_action.append(src.SetDest(dst))
         if mdt is None:
-            nonConstAction.append([])
+            nonconst_action.append([])
         else:
-            nonConstAction.append(src.SetModifier(mdt))
+            nonconst_action.append(src.SetModifier(mdt))
 
-        nonConstActions.append(
-            [nonConstAction, bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
+        non_const_actions.append(
+            [nonconst_action, bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
         )
         last_pairs = src, dst, mdt
 
-    _RemoveDuplicateActions()
+    remove_duplicate_actions()
     bt.RawTrigger(
-        nextptr=nextptr, actions=[actionlist, _rand_lst(nonConstActions)]
+        nextptr=nextptr, actions=[actionlist, _rand_lst(non_const_actions)]
     )
 
     vt_nextptr << bt.NextTrigger()
 
 
-def SeqCompute(assignpairs):
+def SeqCompute(assignpairs):  # noqa: N802
     # We need dependency map while writing assignment pairs
     dstvarset = set()
     srcvarset = set()
@@ -835,12 +831,10 @@ def SeqCompute(assignpairs):
     # Record previous dst, mdt for src to optimize duplicate actions
     import inspect
 
-    srcdictsub = (
-        inspect.signature(_SeqComputeSub).parameters["_srcdict"].default
-    )
+    srcdictsub = inspect.signature(_seqcompute_sub).parameters["_srcdict"].default
     srcdict = {}
 
-    # Sublist of assignments to put in _SeqComputeSub
+    # Sublist of assignments to put in _seqcompute_sub
     subassignpairs = []
 
     # Is we collecting constant-assigning pairs?
@@ -849,13 +843,13 @@ def SeqCompute(assignpairs):
     # Number of expected actions.
     actioncount = 0
 
-    def FlushPairs():
+    def flush_pairs():
         nonlocal constcollecting, actioncount
 
         if actioncount == 0:  # Already flushed before
             return
 
-        _SeqComputeSub(subassignpairs)
+        _seqcompute_sub(subassignpairs)
 
         dstvarset.clear()
         srcvarset.clear()
@@ -871,11 +865,11 @@ def SeqCompute(assignpairs):
         # Flush action set before proceeding
         if IsEUDVariable(src):
             if src in dstvarset:
-                FlushPairs()
+                flush_pairs()
             elif src in srcvarset:
-                FlushPairs()
+                flush_pairs()
             elif actioncount >= 64 - 3:
-                FlushPairs()
+                flush_pairs()
 
             srcvarset.add(src)
             constcollecting = False
@@ -894,9 +888,9 @@ def SeqCompute(assignpairs):
 
         else:
             if not constcollecting:
-                FlushPairs()
+                flush_pairs()
             elif actioncount >= 64 - 3:
-                FlushPairs()
+                flush_pairs()
 
             actioncount += 1
 
@@ -904,11 +898,11 @@ def SeqCompute(assignpairs):
         if IsEUDVariable(dst):
             dstvarset.add(dst)
 
-    FlushPairs()
+    flush_pairs()
     srcdictsub.clear()
 
 
-def NonSeqCompute(assignpairs):
+def NonSeqCompute(assignpairs):  # noqa: N802
     import itertools
 
     dstvarset = set()
@@ -932,9 +926,7 @@ def NonSeqCompute(assignpairs):
     if len(assignpairs) == len(constpairs):
         SeqCompute(assignpairs)
         return
-    ep_assert(
-        dstvarset.isdisjoint(srcvarset), _("dst and src have intersection")
-    )
+    ep_assert(dstvarset.isdisjoint(srcvarset), _("dst and src have intersection"))
 
     varpairlists = list()
     for pairlist in varassigndict.values():
@@ -951,7 +943,7 @@ def NonSeqCompute(assignpairs):
     SeqCompute(constpairs + varassignpairs)
 
 
-def SetVariables(srclist, dstlist, mdtlist=None) -> None:
+def SetVariables(srclist, dstlist, mdtlist=None) -> None:  # noqa: N802
     if sys.version_info >= (3, 11):
         srclist_refcount = 2
         refcount = 3
@@ -963,9 +955,7 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:
         nth = 0
         for src, is_rvalue in _yield_and_check_rvalue(srclist, refcount):
             if isinstance(src, EUDVariable) and is_rvalue:
-                errlist.append(
-                    EPError(_("src{} is RValue variable").format(nth))
-                )
+                errlist.append(EPError(_("src{} is RValue variable").format(nth)))
             nth += 1
     srclist = FlattenList(srclist)
     dstlist = FlattenList(dstlist)
@@ -979,9 +969,7 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:
                 _("Multiple error occurred on SetVariables:"), errlist
             )
         else:
-            raise EPError(
-                _("Multiple error occurred on SetVariables:"), errlist
-            )
+            raise EPError(_("Multiple error occurred on SetVariables:"), errlist)
 
     if mdtlist is None:
         mdtlist = [bt.SetTo] * len(srclist)

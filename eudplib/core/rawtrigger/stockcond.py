@@ -341,9 +341,7 @@ def DeathsX(  # noqa: N802
     player = EncodePlayer(player)
     comparison = EncodeComparison(comparison)
     unit = EncodeUnit(unit)
-    return Condition(
-        mask, player, number, unit, comparison, 15, 0, 0, eudx=0x4353
-    )
+    return Condition(mask, player, number, unit, comparison, 15, 0, 0, eudx=0x4353)
 
 
 def MemoryX(  # noqa: N802

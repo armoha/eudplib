@@ -105,9 +105,7 @@ class Condition(ConstExpr):
 
     def _invalid_condition(self, i: int) -> str:
         condtype = self.fields[5]
-        condname = (
-            _condtypes[condtype] if isinstance(condtype, int) else condtype
-        )
+        condname = _condtypes[condtype] if isinstance(condtype, int) else condtype
         return _("Invalid fields for condition{} {}:").format(i, condname)
 
     def CheckArgs(self, i: int) -> None:  # noqa: N802
@@ -143,8 +141,7 @@ class Condition(ConstExpr):
                 i >= 3 and not isinstance(field, int)
             ):
                 error.append(
-                    "\t"
-                    + _("invalid {}: {}").format(fieldname[i], repr(field))
+                    "\t" + _("invalid {}: {}").format(fieldname[i], repr(field))
                 )
 
         raise ut.EPError("\n".join(error))
@@ -212,9 +209,7 @@ class Condition(ConstExpr):
         pbuffer.WritePack("IIIHBBBBH", self.fields)  # type: ignore[arg-type]
 
     def __bool__(self) -> NoReturn:
-        raise RuntimeError(
-            _("To prevent error, Condition can't be put into if.")
-        )
+        raise RuntimeError(_("To prevent error, Condition can't be put into if."))
 
     def negate(self) -> None:
         condtype = self.fields[5]
@@ -232,9 +227,7 @@ class Condition(ConstExpr):
             bring_or_command = (2, 3)
             comparison = self.fields[4]
             amount = self.fields[2]
-            ut.ep_assert(
-                isinstance(comparison, int) and isinstance(amount, int)
-            )
+            ut.ep_assert(isinstance(comparison, int) and isinstance(amount, int))
             amount &= 0xFFFFFFFF  # type: ignore[operator]
             if comparison == 10 and amount == 0:
                 self.fields[4] = 0

@@ -32,7 +32,7 @@ MPQ_FILE_REPLACEEXISTING = 0x80000000
 MPQ_COMP_ZLIB = 0x00000002
 
 if sys.platform.startswith("win32"):  # windows
-    from ctypes import WinDLL as DLL
+    from ctypes import WinDLL as DLL  # noqa: N814
 else:  # elif sys.platform.startswith("darwin")  # mac
     from ctypes import CDLL as DLL
 
@@ -40,7 +40,7 @@ libstorm: DLL | None = None
 
 
 class CreateInfo(Structure):
-    _fields_ = [
+    _fields_ = [  # noqa: RUF012
         ("cbSize", c_int),
         ("dwMpqVersion", c_int),
         ("pvUserData", c_void_p),
@@ -56,7 +56,7 @@ class CreateInfo(Structure):
     ]
 
 
-def InitMpqLibrary() -> None:
+def _init_mpq_library() -> None:
     global libstorm
 
     try:
@@ -151,7 +151,7 @@ class MPQ:
     def __del__(self) -> None:
         self.Close()
 
-    def Open(self, fname: str) -> bool:
+    def Open(self, fname: str) -> bool:  # noqa: N802
         if self.mpqh is not None:
             raise RuntimeError(_("Duplicate opening"))
 
@@ -164,8 +164,8 @@ class MPQ:
         self.mpqh = h
         return True
 
-    def Create(
-        self, fname: str, *, sector_size: int = 3, fileCount: int = 1024
+    def Create(  # noqa: N802
+        self, fname: str, *, sector_size: int = 3, file_count: int = 1024
     ) -> bool:
         if self.mpqh is not None:
             raise RuntimeError(_("Duplicate opening"))
@@ -179,7 +179,7 @@ class MPQ:
         cinfo.dwFileFlags3 = 0
         cinfo.dwAttrFlags = 0
         cinfo.dwSectorSize = 2 ** (9 + sector_size)
-        cinfo.dwMaxFileCount = fileCount
+        cinfo.dwMaxFileCount = file_count
         h = c_void_p()
         ret = self.libstorm.SFileCreateArchive2(fname, byref(cinfo), byref(h))
         if not ret:
@@ -189,14 +189,14 @@ class MPQ:
         self.mpqh = h
         return True
 
-    def Close(self) -> None:
+    def Close(self) -> None:  # noqa: N802
         if self.mpqh is None:
             return
 
         self.libstorm.SFileCloseArchive(self.mpqh)
         self.mpqh = None
 
-    def EnumFiles(self) -> list[str]:
+    def EnumFiles(self) -> list[str]:  # noqa: N802
         # using listfile.
         lst = self.Extract("(listfile)")
         if lst is None:
@@ -211,7 +211,7 @@ class MPQ:
                 return []
 
     # Extract
-    def Extract(self, fname: str) -> bytes | None:
+    def Extract(self, fname: str) -> bytes | None:  # noqa: N802
         if self.libstorm is None:
             return None
         elif not self.mpqh:
@@ -221,9 +221,7 @@ class MPQ:
 
         # Open file
         fileh = c_void_p()
-        ret = self.libstorm.SFileOpenFileEx(
-            self.mpqh, u2b(fname), 0, byref(fileh)
-        )
+        ret = self.libstorm.SFileOpenFileEx(self.mpqh, u2b(fname), 0, byref(fileh))
         if not ret:
             ret = self.libstorm.SFileOpenFileEx(
                 self.mpqh, u2utf8(fname), 0, byref(fileh)
@@ -250,7 +248,7 @@ class MPQ:
 
     # Writer
 
-    def PutFile(
+    def PutFile(  # noqa: N802
         self,
         fname: str,
         buffer: bytes,
@@ -281,16 +279,14 @@ class MPQ:
                 self.mpqh,
                 tmpfname,
                 u2utf8(fname),
-                MPQ_FILE_COMPRESS
-                | MPQ_FILE_ENCRYPTED
-                | MPQ_FILE_REPLACEEXISTING,
+                MPQ_FILE_COMPRESS | MPQ_FILE_ENCRYPTED | MPQ_FILE_REPLACEEXISTING,
                 cmp1,
                 cmp2,
             )
         os.unlink(tmpfname)
         return ret
 
-    def PutWave(
+    def PutWave(  # noqa: N802
         self,
         fname: str,
         buffer: bytes,
@@ -328,17 +324,17 @@ class MPQ:
         os.unlink(tmpfname)
         return ret
 
-    def GetMaxFileCount(self) -> int:
+    def GetMaxFileCount(self) -> int:  # noqa: N802
         return self.libstorm.SFileGetMaxFileCount(self.mpqh)
 
-    def SetMaxFileCount(self, count: int) -> int:
+    def SetMaxFileCount(self, count: int) -> int:  # noqa: N802
         return self.libstorm.SFileSetMaxFileCount(self.mpqh, count)
 
-    def Compact(self) -> int:
+    def Compact(self) -> int:  # noqa: N802
         return self.libstorm.SFileCompactArchive(self.mpqh, None, 0)
 
 
-InitMpqLibrary()
+_init_mpq_library()
 
 if __name__ == "__main__":
     mr = MPQ()
@@ -346,9 +342,7 @@ if __name__ == "__main__":
     a = mr.Extract("staredit\\scenario.chk")
     mr.Close()
     if a is None:
-        raise EPError(
-            "failed to extract staredit\\scenario.chk of basemap.scx"
-        )
+        raise EPError("failed to extract staredit\\scenario.chk of basemap.scx")
     print(len(a))
 
     if os.path.exists("test.scx"):

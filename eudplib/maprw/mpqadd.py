@@ -117,7 +117,7 @@ def _update_mpq(mpqw: MPQ) -> None:
                 raise ctypes.WinError(ctypes.get_last_error())
 
 
-def _get_addedFiles() -> set[str]:
+def _get_addedFiles() -> set[str]:  # noqa: N802
     ret = set(fname for fname, content, is_wav in _addedFiles.values())
     ret.add("staredit\\scenario.chk")
     ret.add("(listfile)")

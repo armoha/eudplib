@@ -8,7 +8,6 @@
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from . import byterw as brw
 from . import cpmemio as cpm
 from . import dwepdio as dwm
 from . import modcurpl as cp

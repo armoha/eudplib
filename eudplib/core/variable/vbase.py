@@ -6,10 +6,7 @@
 # file that should have been included as part of this package.
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Literal, overload, TypeVar
-
-from eudplib import utils as ut
-from eudplib.localize import _
+from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, IsConstExpr
@@ -26,56 +23,56 @@ class VariableBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def getValueAddr(self) -> ConstExpr:
+    def getValueAddr(self) -> ConstExpr:  # noqa: N802
         raise NotImplementedError()
 
     # -------
 
-    def AtLeast(self, value: "Dword") -> bt.Condition:
+    def AtLeast(self, value: "Dword") -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getValueAddr(), bt.AtLeast, value)
 
-    def AtMost(self, value: "Dword") -> bt.Condition:
+    def AtMost(self, value: "Dword") -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getValueAddr(), bt.AtMost, value)
 
-    def Exactly(self, value: "Dword") -> bt.Condition:
+    def Exactly(self, value: "Dword") -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getValueAddr(), bt.Exactly, value)
 
     # -------
 
-    def SetNumber(self, value: "Dword") -> bt.Action:
+    def SetNumber(self, value: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getValueAddr(), bt.SetTo, value)
 
-    def AddNumber(self, value: "Dword") -> bt.Action:
+    def AddNumber(self, value: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getValueAddr(), bt.Add, value)
 
-    def SubtractNumber(self, value: "Dword") -> bt.Action:
+    def SubtractNumber(self, value: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getValueAddr(), bt.Subtract, value)
 
     # -------
 
-    def AtLeastX(self, value: "Dword", mask: "Dword") -> bt.Condition:
+    def AtLeastX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getValueAddr(), bt.AtLeast, value, mask)
 
-    def AtMostX(self, value: "Dword", mask: "Dword") -> bt.Condition:
+    def AtMostX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getValueAddr(), bt.AtMost, value, mask)
 
-    def ExactlyX(self, value: "Dword", mask: "Dword") -> bt.Condition:
+    def ExactlyX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getValueAddr(), bt.Exactly, value, mask)
 
     # -------
 
-    def SetNumberX(self, value: "Dword", mask: "Dword") -> bt.Action:
+    def SetNumberX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, value, mask)
 
-    def AddNumberX(self, value: "Dword", mask: "Dword") -> bt.Action:
+    def AddNumberX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getValueAddr(), bt.Add, value, mask)
 
-    def SubtractNumberX(self, value: "Dword", mask: "Dword") -> bt.Action:
+    def SubtractNumberX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getValueAddr(), bt.Subtract, value, mask)
 
     # -------
 
-    def Assign(self, value: "Dword") -> None:
+    def Assign(self, value: "Dword") -> None:  # noqa: N802
         bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.SetTo, value))
 
     def __lshift__(self, value: "Dword") -> None:
@@ -160,7 +157,10 @@ class VariableBase(metaclass=ABCMeta):
         mask = (1 << (n + 1)) - 1
         bt.RawTrigger(
             actions=[self.SetNumberX(0, mask >> 1)]  # lowest n bits
-            + [self.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(32 - n)]
+            + [
+                self.SubtractNumberX((mask >> 1) << t, mask << t)
+                for t in range(32 - n)
+            ]
         )
         return self
 

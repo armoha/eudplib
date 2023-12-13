@@ -19,7 +19,7 @@ class EUDSCAnd:
         self.side_effect = c.NextTrigger()
         self.scope = ut.EUDGetLastBlock()
 
-    def Patch(self):
+    def patch(self):
         self.const = False
         self.jb = c.Forward()
         try:
@@ -33,9 +33,7 @@ class EUDSCAnd:
             c.RawTrigger(actions=self.v.Set())
         else:
             self.v = c.EUDVariable()
-            self.fb = c.RawTrigger(
-                nextptr=self.jb, actions=self.v.SetNumber(0)
-            )
+            self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.SetNumber(0))
             c.PopTriggerScope()
             self.v << True
 
@@ -61,7 +59,7 @@ class EUDSCAnd:
                 # has side-effect
                 ifcond = c.Forward()
                 c.SetNextTrigger(ifcond)
-                self.Patch()
+                self.patch()
                 if self.cond:
                     EUDJumpIfNot(self.cond, self.fb)
                     self.cond.clear()
@@ -77,7 +75,7 @@ class EUDSCAnd:
                         cond = tg.tpatcher.negate_cond(cond)
                         self.cond.append(cond)
                     else:
-                        self.Patch()
+                        self.patch()
                         if self.cond:
                             EUDJumpIfNot(self.cond, self.fb)
                             self.cond.clear()
@@ -85,7 +83,7 @@ class EUDSCAnd:
                 else:
                     self.cond.append(cond)
             else:
-                self.Patch()
+                self.patch()
                 # TODO: handle mixing of non/side-effect conditions
                 if self.cond:
                     EUDJumpIfNot(self.cond, self.fb)

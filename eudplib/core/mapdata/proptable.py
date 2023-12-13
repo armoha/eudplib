@@ -10,13 +10,13 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from .chktok import CHK
-from .unitprp import PropertyKey, UnitProperty
+from .unitprp import UnitProperty, property_key
 
 _uprpdict: dict[bytes, int] = {}
 _uprptable: list[bytes] = []
 
 
-def InitPropertyMap(chkt: "CHK") -> None:
+def init_property_map(chkt: "CHK") -> None:
     global _prptable, _uprpdict
     _uprpdict.clear()
     _uprptable.clear()
@@ -31,36 +31,36 @@ def InitPropertyMap(chkt: "CHK") -> None:
 
     for i in range(64):
         if upus[i]:
-            uprpdata = PropertyKey(uprp, 20 * i)
+            uprpdata = property_key(uprp, 20 * i)
             # FIXME: merge duplicates and fix existing CUWPs
             _uprpdict[uprpdata] = i
             _uprptable[i] = uprpdata
 
 
-def GetPropertyIndex(prop: UnitProperty | bytes) -> int:
+def GetPropertyIndex(prop: UnitProperty | bytes) -> int:  # noqa: N802
     ut.ep_assert(
         isinstance(prop, UnitProperty) or isinstance(prop, bytes),
         _("Invalid property type"),
     )
 
-    prop = PropertyKey(bytes(prop))
+    prop = property_key(bytes(prop))
     try:
         return _uprpdict[prop] + 1  # SC counts unit properties from 1.
 
     except KeyError:
-        indexNotFound = False
+        index_found = False
         for uprpindex in range(64):
             if not _uprptable[uprpindex]:
-                indexFound = True
+                index_found = True
                 break
 
-        ut.ep_assert(indexFound, _("Unit property table overflow"))
+        ut.ep_assert(index_found, _("Unit property table overflow"))
 
         _uprptable[uprpindex] = prop
         _uprpdict[prop] = uprpindex
         return uprpindex + 1  # SC counts unit properties from 1.
 
 
-def ApplyPropertyMap(chkt: "CHK") -> None:
+def apply_property_map(chkt: "CHK") -> None:
     uprpdata = b"".join([uprpdata or bytes(20) for uprpdata in _uprptable])
     chkt.setsection("UPRP", uprpdata)

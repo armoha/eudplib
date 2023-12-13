@@ -16,10 +16,10 @@ class EUDLightVariable(VariableBase):
         super().__init__()
         self._memaddr = Db(i2b4(initvalue))
 
-    def getValueAddr(self):
+    def getValueAddr(self):  # noqa: N802
         return self._memaddr
 
-    def checkNonRValue(self):
+    def checkNonRValue(self):  # noqa: N802
         pass
 
     def __hash__(self):
@@ -43,20 +43,20 @@ class EUDLightBool:
             EUDLightBool._bit = 1
         self._memaddr = self._basev._memaddr
 
-    def getValueAddr(self):
+    def getValueAddr(self):  # noqa: N802
         return self._memaddr
 
-    def Set(self):
+    def Set(self):  # noqa: N802
         return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, self._mask, self._mask)
 
-    def Clear(self):
+    def Clear(self):  # noqa: N802
         return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, 0, self._mask)
 
-    def Toggle(self):
+    def Toggle(self):  # noqa: N802
         return bt.SetMemoryX(self.getValueAddr(), bt.Add, self._mask, self._mask)
 
-    def IsSet(self):
+    def IsSet(self):  # noqa: N802
         return bt.MemoryX(self.getValueAddr(), bt.AtLeast, 1, self._mask)
 
-    def IsCleared(self):
+    def IsCleared(self):  # noqa: N802
         return bt.MemoryX(self.getValueAddr(), bt.Exactly, 0, self._mask)

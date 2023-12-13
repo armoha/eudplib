@@ -53,9 +53,9 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
     # Add payload
     root = main_starter(rootf)
     _preprocess_inline_code(chkt)
-    mapdata.UpdateMapData()
+    mapdata.update_map_data()
 
-    fixmapdata.FixMapData(chkt)
+    fixmapdata._fix_map_data(chkt)
     apply_injector(chkt, root)
 
     chkt.optimize()
@@ -76,9 +76,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
                 )
                 raise
         if not mw.Create(fname, sector_size=sector_size):
-            raise EPError(
-                _("Fail to access output map ({})").format(GetLastError())
-            )
+            raise EPError(_("Fail to access output map ({})").format(GetLastError()))
         for n, f in mapdata.IterListFiles():
             if f:
                 ep_assert(
@@ -97,9 +95,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
             )
             raise
         if not mw.Open(fname):
-            raise EPError(
-                _("Fail to access output map ({})").format(GetLastError())
-            )
+            raise EPError(_("Fail to access output map ({})").format(GetLastError()))
 
     if not mw.PutFile("staredit\\scenario.chk", rawchk):
         raise EPError(_("Fail to add scenario.chk"))
@@ -113,11 +109,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
         if trace_header is None:
             raise EPError(_("Unreachable callback error"))
         with open(trace_fname, "w", encoding="utf-8") as wf:
-            wf.write(
-                "H0: %s\n" % binascii.hexlify(trace_header[0]).decode("ascii")
-            )
-            wf.write(
-                "H1: %s\n" % binascii.hexlify(trace_header[1]).decode("ascii")
-            )
+            wf.write("H0: %s\n" % binascii.hexlify(trace_header[0]).decode("ascii"))
+            wf.write("H1: %s\n" % binascii.hexlify(trace_header[1]).decode("ascii"))
             for k, v in trace_map:
                 wf.write(f" - {k:08}%08X : {v}\n")

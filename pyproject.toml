@@ -1,6 +1,6 @@
 [tool.ruff]
 select = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
-line-length = 79
+line-length = 85
 
 [tool.ruff.isort]
 known-first-party = ["eudplib", "tests"]

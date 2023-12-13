@@ -20,7 +20,10 @@ def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
     def _EUDTypedFunc(fdecl_func):
         argspec = inspect.getfullargspec(fdecl_func)
         argn = len(argspec[0])
-        ut.ep_assert(argspec[1] is None, _("No variadic arguments (*args) allowed for EUDFunc."))
+        ut.ep_assert(
+            argspec[1] is None,
+            _("No variadic arguments (*args) allowed for EUDFunc."),
+        )
         ut.ep_assert(
             argspec[2] is None,
             _("No variadic keyword arguments (**kwargs) allowed for EUDFunc."),
@@ -31,7 +34,9 @@ def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
             args = applyTypes(argtypes, args)
             return fdecl_func(*args)
 
-        ret = EUDTypedFuncN(argn, caller, fdecl_func, argtypes, rettypes, traced=traced)
+        ret = EUDTypedFuncN(
+            argn, caller, fdecl_func, argtypes, rettypes, traced=traced
+        )
         functools.update_wrapper(ret, fdecl_func)
         return ret
 
@@ -54,7 +59,10 @@ def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):
     def _EUDXTypedFunc(fdecl_func):
         argspec = inspect.getfullargspec(fdecl_func)
         argn = len(argspec[0])
-        ut.ep_assert(argspec[1] is None, _("No variadic arguments (*args) allowed for EUDFunc."))
+        ut.ep_assert(
+            argspec[1] is None,
+            _("No variadic arguments (*args) allowed for EUDFunc."),
+        )
         ut.ep_assert(
             argspec[2] is None,
             _("No variadic keyword arguments (**kwargs) allowed for EUDFunc."),
@@ -65,7 +73,9 @@ def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):
             args = applyTypes(argtypes, args)
             return fdecl_func(*args)
 
-        ret = EUDXTypedFuncN(argn, caller, fdecl_func, argtypes, rettypes, argmasks, traced=traced)
+        ret = EUDXTypedFuncN(
+            argn, caller, fdecl_func, argtypes, rettypes, argmasks, traced=traced
+        )
         functools.update_wrapper(ret, fdecl_func)
         return ret
 
@@ -82,7 +92,10 @@ def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):
                 argn, len(arginitvals)
             ),
         )
-        ut.ep_assert(argspec[1] is None, _("No variadic arguments (*args) allowed for EUDFunc."))
+        ut.ep_assert(
+            argspec[1] is None,
+            _("No variadic arguments (*args) allowed for EUDFunc."),
+        )
         ut.ep_assert(
             argspec[2] is None,
             _("No variadic keyword arguments (**kwargs) allowed for EUDFunc."),

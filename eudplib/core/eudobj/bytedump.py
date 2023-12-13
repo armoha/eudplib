@@ -5,8 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from .eudobj import EUDObject
 from ..allocator.payload import _PayloadBuffer
+from .eudobj import EUDObject
 
 
 class Db(EUDObject):
@@ -18,8 +18,8 @@ class Db(EUDObject):
             b = b.encode("UTF-8") + b"\0"
         self.content: bytes = bytes(b)
 
-    def GetDataSize(self) -> int:
+    def GetDataSize(self) -> int:  # noqa: N802
         return len(self.content)
 
-    def WritePayload(self, pbuffer: _PayloadBuffer) -> None:
+    def WritePayload(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802
         pbuffer.WriteBytes(self.content)

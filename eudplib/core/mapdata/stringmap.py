@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 from ...localize import _
-from ...utils import EPError, b2i2, b2i4, ep_assert, u2b, u2utf8, unProxy
+from ...utils import EPError, u2b, u2utf8, unProxy
 from .chktok import CHK
 from .tblformat import TBL
 
@@ -15,14 +15,14 @@ class StringIdMap:
     def __init__(self) -> None:
         self._s2id: dict[bytes, int | None] = {}
 
-    def AddItem(self, string: str | bytes, strid: int) -> None:
+    def add_item(self, string: str | bytes, strid: int) -> None:
         byte = u2b(unProxy(string))
         if byte in self._s2id:  # ambiguous string
             self._s2id[byte] = None
         else:
             self._s2id[byte] = strid
 
-    def GetStringIndex(self, string: str | bytes) -> int:
+    def GetStringIndex(self, string: str | bytes) -> int:  # noqa: N802
         byte = u2utf8(unProxy(string))
         if byte not in self._s2id:
             byte = u2b(unProxy(string))
@@ -31,7 +31,9 @@ class StringIdMap:
         retid = self._s2id.get(byte)
         if retid is None:
             raise KeyError(
-                _("Ambiguous string; multiple entries have duplicated contents: {}").format(string)
+                _(
+                    "Ambiguous string; multiple entries have duplicated contents: {}"
+                ).format(string)
             )
         return retid
 
@@ -43,7 +45,7 @@ locmap: StringIdMap | None = None
 swmap: StringIdMap | None = None
 
 
-def InitStringMap(chkt: CHK) -> None:
+def init_stringmaps(chkt: CHK) -> None:
     global strmap, strsection, unitmap, locmap, swmap
 
     unitmap = StringIdMap()
@@ -63,49 +65,49 @@ def InitStringMap(chkt: CHK) -> None:
     strmap = TBL(chkt.getsection("STR"), init_chkt, save_entry=4)
 
 
-def GetLocationIndex(l: str | bytes) -> int:
+def GetLocationIndex(loc: str | bytes) -> int:  # noqa: N802
     if locmap is None:
         raise EPError(_("Must use LoadMap first"))
-    return locmap.GetStringIndex(l) + 1
+    return locmap.GetStringIndex(loc) + 1
 
 
-def GetStringIndex(s: str | bytes) -> int:
+def GetStringIndex(s: str | bytes) -> int:  # noqa: N802
     if strmap is None:
         raise EPError(_("Must use LoadMap first"))
     return strmap.GetStringIndex(s)
 
 
-def GetSwitchIndex(s: str | bytes) -> int:
+def GetSwitchIndex(s: str | bytes) -> int:  # noqa: N802
     if swmap is None:
         raise EPError(_("Must use LoadMap first"))
     return swmap.GetStringIndex(s)
 
 
-def GetUnitIndex(u: str | bytes) -> int:
+def GetUnitIndex(u: str | bytes) -> int:  # noqa: N802
     if unitmap is None:
         raise EPError(_("Must use LoadMap first"))
     return unitmap.GetStringIndex(u)
 
 
-def ApplyStringMap(chkt: CHK) -> None:
+def apply_string_map(chkt: CHK) -> None:
     if strsection is None or strmap is None:
         raise EPError(_("Must use LoadMap first"))
-    chkt.setsection(strsection, strmap.SaveTBL())
+    chkt.setsection(strsection, strmap.save_tbl())
 
 
-def ForceAddString(s: str | bytes) -> int:
+def ForceAddString(s: str | bytes) -> int:  # noqa: N802
     if strmap is None:
         raise EPError(_("Must use LoadMap first"))
     return strmap.ForceAddString(s) + 1
 
 
-def GetStringMap() -> TBL:
+def get_string_map() -> TBL:
     if strmap is None:
         raise EPError(_("Must use LoadMap first"))
     return strmap
 
 
-def GetStringSectionName() -> str:
+def get_string_section_name() -> str:
     if strsection is None:
         raise EPError(_("Must use LoadMap first"))
     return strsection

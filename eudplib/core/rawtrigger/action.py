@@ -213,8 +213,7 @@ class Action(ConstExpr):
                 i >= 6 and not isinstance(field, int)
             ):
                 error.append(
-                    "\t"
-                    + _("invalid {}: {}").format(fieldname[i], repr(field))
+                    "\t" + _("invalid {}: {}").format(fieldname[i], repr(field))
                 )
 
         raise ut.EPError("\n".join(error))

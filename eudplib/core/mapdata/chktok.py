@@ -81,7 +81,9 @@ class CHK:
         import random
 
         fake_name = random.sample(fake_section, 1)
-        blist.append(fake_name[0] + ut.i2b4(random.randint(0, 0xFFFFFFFF) | 0x80000000))
+        blist.append(
+            fake_name[0] + ut.i2b4(random.randint(0, 0xFFFFFFFF) | 0x80000000)
+        )
         return b"".join(blist)
 
     def enumsection(self) -> list[bytes]:
@@ -110,18 +112,19 @@ class CHK:
         ]
         # fmt: on
 
-        unused_section = [sn for sn in self.sections.keys() if sn not in used_section]
+        unused_section = [sn for sn in self.sections if sn not in used_section]
         for sn in unused_section:
             del self.sections[sn]
 
+        # Omit MASK and MTXM optimization.
+        # Game desync is reported if MTXM has shorter size.
+        """
         # Terrain optimization
         dim = self.getsection(b"DIM ")
         mapw = ut.b2i2(dim, 0)
         maph = ut.b2i2(dim, 2)
         terrainsize = mapw * maph
 
-        # Omit MASK and MTXM optimization. Game desync is reported if MTXM has shorter size.
-        """
         # MASK optimization : cancel 0xFFs.
         mask = self.getsection(b"MASK")
         if mask:

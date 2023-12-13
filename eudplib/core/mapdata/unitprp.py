@@ -5,7 +5,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ctypes import LittleEndianStructure, c_ushort, c_byte, c_uint
+from ctypes import LittleEndianStructure, c_byte, c_uint, c_ushort
 from struct import pack, unpack_from
 
 from eudplib import utils as ut
@@ -17,7 +17,7 @@ class UnitProperty(LittleEndianStructure):
     UnitProperty class. Used in 'Create Unit with Properties' action.
     """
 
-    _fields_ = [
+    _fields_ = [  # noqa: RUF012
         ("sprpvalid", c_ushort),
         ("prpvalid", c_ushort),
         ("player", c_byte),
@@ -65,12 +65,19 @@ class UnitProperty(LittleEndianStructure):
         ut.ep_assert(
             hitpoint is None or (isinstance(hitpoint, int) and 0 <= hitpoint <= 100)
         )
-        ut.ep_assert(shield is None or (isinstance(shield, int) and 0 <= shield <= 100))
-        ut.ep_assert(energy is None or (isinstance(energy, int) and 0 <= energy <= 100))
         ut.ep_assert(
-            resource is None or (isinstance(resource, int) and 0 <= resource <= 65535)
+            shield is None or (isinstance(shield, int) and 0 <= shield <= 100)
         )
-        ut.ep_assert(hanger is None or (isinstance(hanger, int) and 0 <= hanger <= 255))
+        ut.ep_assert(
+            energy is None or (isinstance(energy, int) and 0 <= energy <= 100)
+        )
+        ut.ep_assert(
+            resource is None
+            or (isinstance(resource, int) and 0 <= resource <= 65535)
+        )
+        ut.ep_assert(
+            hanger is None or (isinstance(hanger, int) and 0 <= hanger <= 255)
+        )
 
         ut.ep_assert(cloaked in [None, True, False])
         ut.ep_assert(burrowed in [None, True, False])
@@ -131,7 +138,7 @@ class UnitProperty(LittleEndianStructure):
         )
 
 
-def PropertyKey(b: bytes, index: int = 0) -> bytes:
+def property_key(b: bytes, index: int = 0) -> bytes:
     x = list(unpack_from("<HHBBBBIHHI", b, index))
 
     x[0] &= 0b11111  # remove unused flags
@@ -146,7 +153,8 @@ def PropertyKey(b: bytes, index: int = 0) -> bytes:
     if x[4] == 100:  # 100% Shields is equals to not using Shields%
         x[1] &= ~0b100
     # Can't apply to Energy: Default energy differs between max energy (200 and 250)
-    # Can't apply to Resource amount: Default amount differs between Mineral Fields and Vespene Geyser
+    # Can't apply to Resource amount: Default amount differs
+    # between Mineral Fields and Vespene Geyser
     if x[7] == 0:  # 0 in hanger is equals to not using hanger amount
         x[1] &= ~0b100000
 

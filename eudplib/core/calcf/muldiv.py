@@ -419,7 +419,7 @@ def _eud_mul(a, b):
     # Run multiplication chain
     for i in range(32):
         remaining_bits -= 1 << i
-        p1, p2, p3, p4 = [ac.Forward() for _ in range(4)]
+        p1, p2, p3, p4 = (ac.Forward() for _ in range(4))
         p1 << rt.RawTrigger(
             nextptr=p2,
             conditions=a.AtLeastX(1, 2**i),

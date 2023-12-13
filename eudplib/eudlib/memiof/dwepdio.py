@@ -169,7 +169,7 @@ def f_dwsubtract_epd(targetplayer, value):
 def f_dwbreak(number):
     """Get hiword/loword/4byte of dword"""
     word = [c.EUDXVariable(0, 0xFFFF), c.EUDVariable()]
-    byte = [c.EUDXVariable(0, 0xFF)] + c.EUDCreateVariables(3)
+    byte = [c.EUDXVariable(0, 0xFF), *c.EUDCreateVariables(3)]
 
     # Clear byte[], word[]
     c.VProc(
@@ -234,33 +234,19 @@ def f_dwbreak2(number):
 
 
 # backward compatibility functions
+E = _("safe read functions are deprecated in 0.61 and will be removed in 0.63")
 
 
 def f_dwepdread_epd_safe(*args, **kwargs):
-    warnings.warn(
-        _(
-            "safe read functions are deprecated in 0.61 and will be removed in 0.63"
-        ),
-        DeprecationWarning,
-    )
+    warnings.warn(E, DeprecationWarning)
     return f_dwepdread_epd(*args, **kwargs)
 
 
 def f_dwread_epd_safe(*args, **kwargs):
-    warnings.warn(
-        _(
-            "safe read functions are deprecated in 0.61 and will be removed in 0.63"
-        ),
-        DeprecationWarning,
-    )
+    warnings.warn(E, DeprecationWarning)
     return f_dwread_epd(*args, **kwargs)
 
 
 def f_epdread_epd_safe(*args, **kwargs):
-    warnings.warn(
-        _(
-            "safe read functions are deprecated in 0.61 and will be removed in 0.63"
-        ),
-        DeprecationWarning,
-    )
+    warnings.warn(E, DeprecationWarning)
     return f_epdread_epd(*args, **kwargs)

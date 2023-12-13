@@ -119,9 +119,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):
             )
             ut.ep_assert(
                 retn == f_retn,
-                _("Function returns {} values (Expected {})").format(
-                    f_retn, retn
-                ),
+                _("Function returns {} values (Expected {})").format(f_retn, retn),
             )
 
         def setFunc(self, f):

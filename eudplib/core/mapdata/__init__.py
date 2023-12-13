@@ -11,3 +11,16 @@ from .proptable import GetPropertyIndex
 from .stringmap import GetLocationIndex, GetStringIndex, GetSwitchIndex, GetUnitIndex
 from .tblformat import TBL
 from .unitprp import UnitProperty
+
+__all__ = [
+    "GetChkTokenized",
+    "IsMapdataInitialized",
+    "GetPlayerInfo",
+    "GetPropertyIndex",
+    "GetLocationIndex",
+    "GetStringIndex",
+    "GetSwitchIndex",
+    "GetUnitIndex",
+    "TBL",
+    "UnitProperty",
+]

@@ -159,7 +159,7 @@ def f_readgen_cp(
     return readerfunc
 
 
-def _mapXYmask():
+def _map_xy_mask():
     from ...core.mapdata import GetChkTokenized
 
     chkt = GetChkTokenized()
@@ -229,7 +229,7 @@ def _posread_epd():
     f = getattr(_posread_epd, "f", None)
     if f is None:
         f = f_readgen_epd(
-            (lambda x, y: x + 65536 * y)(*_mapXYmask()),
+            (lambda x, y: x + 65536 * y)(*_map_xy_mask()),
             (0, lambda x: x if x <= 0xFFFF else 0),
             (0, lambda y: y >> 16),
         )
@@ -245,7 +245,7 @@ def f_posread_cp(cpoffset, **kwargs):
     _rf = getattr(f_posread_cp, "_rf", None)
     if _rf is None:
         _rf = f_readgen_cp(
-            (lambda x, y: x + 65536 * y)(*_mapXYmask()),
+            (lambda x, y: x + 65536 * y)(*_map_xy_mask()),
             (0, lambda x: x if x <= 0xFFFF else 0),
             (0, lambda y: y >> 16),
         )

@@ -9,7 +9,6 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from . import bwepdio as bwm
-from . import byterw as brw
 from . import cpmemio as cpm
 from . import dwepdio as dwm
 from . import modcurpl as cp
@@ -25,11 +24,11 @@ def _ptr2epd(ptr):
 
 
 def f_dwwrite(ptr, dw):
-    if type(ptr) == int and ptr % 4 == 0:
+    if isinstance(ptr, int) and ptr % 4 == 0:
         dwm.f_dwwrite_epd(ut.EPD(ptr), dw)
     else:
         chars = dwm.f_dwbreak(dw)[2:]
-        from ..stringf.rwcommon import br1, bw1
+        from ..stringf.rwcommon import bw1
 
         _bw = bw1
         _bw.seekoffset(ptr)

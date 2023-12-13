@@ -4,16 +4,18 @@
 # This file is part of EUD python library (eudplib),
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import utils as ut
 import functools
+
+from ... import core as c
 
 _signflag = c.EUDLightVariable()
 
 
-def f_div_towards_zero(a, b, **kwargs) -> tuple[c.EUDVariable, c.EUDVariable] | tuple[int, int]:
-    """Calculates the quotient and remainder of (a ÷ b), rounding the quotient towards zero.
+def f_div_towards_zero(
+    a, b, **kwargs
+) -> tuple[c.EUDVariable, c.EUDVariable] | tuple[int, int]:
+    """Calculates the quotient and remainder of (a ÷ b),
+    rounding the quotient towards zero.
 
     Calculate signed division, unlike unsigned division `f_div(a, b)`.
     Consistent with C-like languages including JavaScript.
@@ -82,8 +84,11 @@ def _div_towards_zero(a, b):
     return quotient, modulo
 
 
-def f_div_floor(a, b, **kwargs) -> tuple[c.EUDVariable, c.EUDVariable] | tuple[int, int]:
-    """Calculates the quotient and remainder of (a ÷ b), rounding the quotient towards negative infinity.
+def f_div_floor(
+    a, b, **kwargs
+) -> tuple[c.EUDVariable, c.EUDVariable] | tuple[int, int]:
+    """Calculates the quotient and remainder of (a ÷ b),
+    rounding the quotient towards negative infinity.
 
     Calculate signed division, unlike unsigned division `f_div(a, b)`.
     Consistent with mathematical modulo.
@@ -138,7 +143,7 @@ def _div_floor(a, b):
 
     quotient, modulo = c.f_div(a, b)
 
-    check, ontrue, onfalse = [c.Forward() for _ in range(3)]
+    check, ontrue, onfalse = (c.Forward() for _ in range(3))
     if c.IsEUDVariable(b):
         check << c.RawTrigger(  # modulo << -modulo + b
             nextptr=onfalse,
@@ -178,14 +183,19 @@ def _div_floor(a, b):
     return quotient, modulo
 
 
-def f_div_euclid(a, b, **kwargs) -> tuple[c.EUDVariable, c.EUDVariable] | tuple[int, int]:
+def f_div_euclid(
+    a, b, **kwargs
+) -> tuple[c.EUDVariable, c.EUDVariable] | tuple[int, int]:
     """Calculates the quotient and remainder of Euclidean division of a by b.
 
     Calculate signed division, unlike unsigned division `f_div(a, b)`.
-    This computes the quotient such that `a = quotient * b + remainder`, and `0 <= r < abs(b)`.
+    This computes the quotient such that `a = quotient * b + remainder`,
+    and `0 <= r < abs(b)`.
 
-    In other words, the result is a ÷ b rounded to the quotient such that `a >= quotient * b`.
-    If `a > 0`, this is equal to round towards zero; if `a < 0`, this is equal to round towards +/- infinity (away from zero).
+    In other words, the result is a ÷ b rounded to the quotient
+    such that `a >= quotient * b`.
+    If `a > 0`, this is equal to round towards zero; if `a < 0`,
+    this is equal to round towards +/- infinity (away from zero).
     """
     if c.IsEUDVariable(b):
         if not hasattr(f_div_euclid, "_eudf"):
@@ -239,7 +249,7 @@ def _div_euclid(a, b):
 
     quotient, modulo = c.f_div(a, b)
 
-    check, ontrue, onfalse = [c.Forward() for _ in range(3)]
+    check, ontrue, onfalse = (c.Forward() for _ in range(3))
     if c.IsEUDVariable(b):
         check << c.RawTrigger(  # modulo << -modulo + b
             nextptr=onfalse,

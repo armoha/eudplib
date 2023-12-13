@@ -21,13 +21,13 @@ if TYPE_CHECKING:
 unit_name_encoding: str | None = None
 
 
-def DecodeUnitNameAs(e: str) -> None:
+def _decode_unit_name_as(e: str) -> None:
     global unit_name_encoding
     "".encode(e)  # check if e is valid encoding
     unit_name_encoding = e
 
 
-def IgnoreColor(s: bytes) -> bytes | None:
+def _ignore_color(s: bytes) -> bytes | None:
     has_color = False
     ret = []
     for x in s:
@@ -41,22 +41,17 @@ def IgnoreColor(s: bytes) -> bytes | None:
         return None
 
 
-def b2in(n: int) -> Callable[[Sequence[int], int], int]:
+def _b2in(n: int) -> Callable[[Sequence[int], int], int]:
     b2in_map = {2: ut.b2i2, 4: ut.b2i4}
     return b2in_map[n]
 
 
-def i2bn(n: int) -> Callable[[int], bytes]:
+def _i2bn(n: int) -> Callable[[int], bytes]:
     i2bn_map = {2: ut.i2b2, 4: ut.i2b4}
     return i2bn_map[n]
 
 
-def u2bn(n: int) -> Callable[[str | bytes], bytes]:
-    u2bn_map = {2: ut.u2b, 4: ut.u2utf8}
-    return u2bn_map[n]
-
-
-def roundup_by_4(num: int) -> int:
+def _roundup_by_4(num: int) -> int:
     return -((-num) // 4) * 4
 
 
@@ -89,11 +84,11 @@ class TBL:
 
         if content is not None:
             if init_chkt:
-                self.LoadTBLWithChk(content, init_chkt)
+                self.load_tbl_with_chk(content, init_chkt)
             else:
-                self.LoadTBL(content)
+                self.load_tbl(content)
 
-    def LoadTBL(self, content: bytes) -> None:
+    def load_tbl(self, content: bytes) -> None:
         # ut.ep_assert(not self._loaded, "String data are already loaded")
         self._datatb.clear()
         self._stringmap.clear()
@@ -103,7 +98,7 @@ class TBL:
         self._capacity = self._saveentry
 
         size = self._loadentry
-        b2i = b2in(size)
+        b2i = _b2in(size)
         stringcount = b2i(content, 0)
 
         for i in range(stringcount):
@@ -131,7 +126,7 @@ class TBL:
             self.AddString(string)
         self._loaded = True
 
-    def LoadTBLWithChk(
+    def load_tbl_with_chk(
         self,
         content: bytes,
         init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap]",
@@ -200,7 +195,7 @@ class TBL:
                     reserved_str.add(forcstrid)
 
         size = self._loadentry
-        b2i = b2in(size)
+        b2i = _b2in(size)
         removed_str = set(locdict.keys()).union(swnmdict.keys()) - reserved_str
         stringcount = b2i(content, 0)
 
@@ -214,11 +209,9 @@ class TBL:
             except IndexError:
                 if stringoffset == send:
                     # invalid string offset
-                    # print("String[{}] has invalid string offset: {:X}".format(i, stringoffset))
                     continue
                 else:
                     # no null terminator
-                    # print("String[{}] has no null terminator: {}".format(i, content[stringoffset:send].decode("CP949")))
                     pass
 
             string = content[stringoffset:send]
@@ -250,17 +243,19 @@ class TBL:
                 if i in unitdict:
                     if unit_name_encoding:
                         try:
-                            string = (string.decode(unit_name_encoding)).encode("utf-8")
+                            string = (string.decode(unit_name_encoding)).encode(
+                                "utf-8"
+                            )
                         except UnicodeDecodeError:
                             pass
-                    unitmap.AddItem(string, unitdict[i])
-                    color_erased = IgnoreColor(string)
+                    unitmap.add_item(string, unitdict[i])
+                    color_erased = _ignore_color(string)
                     if color_erased:
-                        unitmap.AddItem(color_erased, unitdict[i])
+                        unitmap.add_item(color_erased, unitdict[i])
                 if i in locdict:
-                    locmap.AddItem(string, locdict[i])
+                    locmap.add_item(string, locdict[i])
                 if i in swnmdict:
-                    swmap.AddItem(string, swnmdict[i])
+                    swmap.add_item(string, swnmdict[i])
 
             if i in removed_str:
                 string = b""
@@ -268,8 +263,10 @@ class TBL:
             self.AddString(string)
         self._loaded = True
 
-    def AddString(self, string: str | bytes) -> int:
-        ut.ep_assert(not self._finalized, _("Can't add new string after finalization"))
+    def AddString(self, string: str | bytes) -> int:  # noqa: N802
+        ut.ep_assert(
+            not self._finalized, _("Can't add new string after finalization")
+        )
         # Starcraft: Remastered uses both utf-8 and multibyte encoding.
         if isinstance(string, str):
             try:
@@ -304,7 +301,7 @@ class TBL:
                         self._dataindextb[i] += 1
                 self._dataindextb[stringindex] = dataindex
                 # string + b'\0'
-                self._capacity += roundup_by_4(len(string) + 1)
+                self._capacity += _roundup_by_4(len(string) + 1)
             else:
                 if self._first_extended_string is None:
                     self._first_extended_string = string
@@ -312,16 +309,17 @@ class TBL:
                 self._datatb.append(string)
                 self._dataindextb.append(dataindex)
                 # string + b'\0' + string offset
-                self._capacity += roundup_by_4(len(string) + 1) + self._saveentry
+                self._capacity += _roundup_by_4(len(string) + 1) + self._saveentry
             self._stringmap[string] = stringindex
 
         ut.ep_assert(
-            self._capacity < (1 << (8 * self._saveentry)), _("String table overflow")
+            self._capacity < (1 << (8 * self._saveentry)),
+            _("String table overflow"),
         )
 
         return stringindex
 
-    def GetString(self, index: int) -> bytes | None:
+    def GetString(self, index: int) -> bytes | None:  # noqa: N802
         if index == 0:
             return None
         else:
@@ -331,7 +329,7 @@ class TBL:
             except IndexError:
                 return None
 
-    def GetStringIndex(self, string: str | bytes) -> int:
+    def GetStringIndex(self, string: str | bytes) -> int:  # noqa: N802
         try:
             return self._stringmap[ut.u2b(string)] + 1
         except KeyError:
@@ -340,7 +338,7 @@ class TBL:
             except KeyError:
                 return self.AddString(string) + 1
 
-    def SaveTBL(self) -> bytes:
+    def save_tbl(self) -> bytes:
         if self._finalized:
             return self._tbldata
 
@@ -348,12 +346,12 @@ class TBL:
         outbytes = []
         self._stroffset.clear()
         size = self._saveentry
-        outindex = roundup_by_4(size * len(self._dataindextb) + size)
+        outindex = _roundup_by_4(size * len(self._dataindextb) + size)
 
         for s in self._datatb:
             self._stroffset.append(outindex)
-            outindex += roundup_by_4(len(s) + 1)
-        i2b = i2bn(size)
+            outindex += _roundup_by_4(len(s) + 1)
+        i2b = _i2bn(size)
 
         # String count
         outbytes.append(i2b(len(self._dataindextb)))
@@ -363,25 +361,27 @@ class TBL:
             outbytes.append(i2b(self._stroffset[dataidx]))
 
         tablesize = size * (len(self._dataindextb) + 1)
-        for _n in range(roundup_by_4(tablesize) - tablesize):
+        for _n in range(_roundup_by_4(tablesize) - tablesize):
             outbytes.append(b"\0")
 
         # String data
         for s in self._datatb:
             outbytes.append(s)
-            for _n in range(roundup_by_4(len(s) + 1) - len(s)):
+            for _n in range(_roundup_by_4(len(s) + 1) - len(s)):
                 outbytes.append(b"\0")
 
         self._tbldata = b"".join(outbytes)
         return self._tbldata
 
-    def Finalize(self) -> tuple[bytes, list[int]]:
-        self.SaveTBL()
+    def finalize(self) -> tuple[bytes, list[int]]:
+        self.save_tbl()
         self._finalized = True
         return self._tbldata, self._stroffset
 
-    def ForceAddString(self, string: str | bytes) -> int:
-        ut.ep_assert(not self._finalized, _("Can't add new string after finalization"))
+    def ForceAddString(self, string: str | bytes) -> int:  # noqa: N802
+        ut.ep_assert(
+            not self._finalized, _("Can't add new string after finalization")
+        )
         string = ut.u2b(string)  # Starcraft uses multibyte encoding.
         if not isinstance(string, bytes):
             raise ut.EPError(_("Invalid type for string"))
@@ -394,10 +394,11 @@ class TBL:
         self._datatb.append(string)
         self._dataindextb.append(dataindex)
         # string + b'\0' + string offset
-        self._capacity += roundup_by_4(len(string) + 1) + self._saveentry
+        self._capacity += _roundup_by_4(len(string) + 1) + self._saveentry
 
         ut.ep_assert(
-            self._capacity < (1 << (8 * self._saveentry)), _("String table overflow")
+            self._capacity < (1 << (8 * self._saveentry)),
+            _("String table overflow"),
         )
 
         return stringindex

@@ -24,13 +24,11 @@ class _ObjPoolData(c.ConstExpr):
         self.max_fieldn = max_fieldn
 
     def Evaluate(self):  # noqa: N802
-        evb = ev.GetCurrentVariableBuffer()
+        evb = ev.get_current_varbuffer()
         try:
             return evb._vdict[self].Evaluate()
         except KeyError:
-            ret = evb.CreateMultipleVarTriggers(
-                self, [0] * (self.max_fieldn * self.size)
-            )
+            ret = evb.create_vartriggers(self, [0] * (self.max_fieldn * self.size))
             return ret.Evaluate()
 
 

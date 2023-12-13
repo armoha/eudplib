@@ -10,14 +10,14 @@ from ctypes import CDLL, c_char_p, c_int, c_void_p
 
 from eudplib.utils import find_data_file, u2b
 
-libFile = {
+_libfile = {
     "Linux": "libepScriptLib.so",  # Linux
     "Windows": "libepScriptLib.dll",  # Windows
     "Darwin": "libepScriptLib.dylib",  # Mac
 }[platform.system()]
 
 
-libeps = CDLL(find_data_file(libFile, __file__))
+libeps = CDLL(find_data_file(_libfile, __file__))
 libeps.compileString.argtypes = [c_char_p, c_char_p]
 libeps.compileString.restype = c_void_p
 libeps.freeCompiledResult.argtypes = [c_void_p]
@@ -29,30 +29,30 @@ libeps.registerPyKeywords.argtypes = [c_char_p]
 libeps.registerPyBuiltins.argtypes = [c_char_p]
 
 
-def _setEpsGlobals(globalList):
-    globalList_C = b"\0".join(u2b(g) for g in globalList) + b"\0"
-    libeps.registerPlibConstants(globalList_C)
+def _set_eps_globals(global_list):
+    global_list_c = b"\0".join(u2b(g) for g in global_list) + b"\0"
+    libeps.registerPlibConstants(global_list_c)
 
 
-def _setPyKeywords(keywordList):
-    keywordList_C = b"\0".join(u2b(g) for g in keywordList) + b"\0"
-    libeps.registerPyKeywords(keywordList_C)
+def _set_py_keywords(keyword_list):
+    keyword_list_c = b"\0".join(u2b(g) for g in keyword_list) + b"\0"
+    libeps.registerPyKeywords(keyword_list_c)
 
 
-def _setPyBuiltins(builtinList):
-    builtinList_C = b"\0".join(u2b(g) for g in builtinList) + b"\0"
-    libeps.registerPyBuiltins(builtinList_C)
+def _set_py_builtins(builtin_list):
+    builtin_list_c = b"\0".join(u2b(g) for g in builtin_list) + b"\0"
+    libeps.registerPyBuiltins(builtin_list_c)
 
 
-def epsCompile(filename, bCode):
+def epsCompile(filename, b_code):  # noqa: N802
     filename = u2b(filename)
-    output = libeps.compileString(filename, bCode)
+    output = libeps.compileString(filename, b_code)
     if not output or libeps.getErrorCount():
         return None
-    outputStr = c_char_p(output).value
+    output_str = c_char_p(output).value
     libeps.freeCompiledResult(output)
-    return outputStr
+    return output_str
 
 
-def EPS_SetDebug(b):
+def EPS_SetDebug(b):  # noqa: N802
     libeps.setDebugMode(b)

@@ -7,7 +7,6 @@
 
 from eudplib import core as c
 from eudplib import ctrlstru as cs
-from eudplib import utils as ut
 
 
 @c.EUDFunc

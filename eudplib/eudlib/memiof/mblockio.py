@@ -8,8 +8,6 @@
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ...core.eudfunc.eudf import _EUDPredefineParam
-from . import byterw as bm
 from . import cpmemio as cm
 from . import modcurpl as cp
 
@@ -56,7 +54,9 @@ def _repaddsd_epd(dstepdp, srcepdp, copydwn):
         [
             c.SetMemory(_cpadda, c.SetTo, -1),
             # TODO: set Add modifier in compile-time
-            c.SetMemoryX(_cpadda + 8, c.SetTo, c.EncodeModifier(c.Add) << 24, 0xFF000000),
+            c.SetMemoryX(
+                _cpadda + 8, c.SetTo, c.EncodeModifier(c.Add) << 24, 0xFF000000
+            ),
         ],
     )
 
@@ -93,7 +93,12 @@ def _memcpy(dst, src, copylen):
 
 
 def f_memcpy(dst, src, copylen, **kwargs):
-    if type(dst) == type(src) == type(copylen) == int and dst % 4 == src % 4 == copylen % 4 == 0:
+    if (
+        isinstance(dst, int)
+        and isinstance(src, int)
+        and isinstance(copylen, int)
+        and dst % 4 == src % 4 == copylen % 4 == 0
+    ):
         return f_repmovsd_epd(ut.EPD(dst), ut.EPD(src), copylen // 4, **kwargs)
     return _memcpy(dst, src, copylen, **kwargs)
 

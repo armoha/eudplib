@@ -30,7 +30,7 @@ from ..utils import (
 )
 
 
-def _RELIMP(path, mod_name, _cache={}):  # relative path import
+def _RELIMP(path, mod_name, _cache={}):  # relative path import  # noqa: N802
     import importlib.util
     import inspect
     import pathlib
@@ -52,7 +52,9 @@ def _RELIMP(path, mod_name, _cache={}):  # relative path import
         return _cache[abs_path]
 
     def py_module(mod_name, p):
-        spec = importlib.util.spec_from_file_location(mod_name, p / (mod_name + ".py"))
+        spec = importlib.util.spec_from_file_location(
+            mod_name, p / (mod_name + ".py")
+        )
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return module
@@ -87,21 +89,21 @@ def _RELIMP(path, mod_name, _cache={}):  # relative path import
     return module
 
 
-def _IGVA(varCount, exprListGen):
+def _IGVA(var_count, expr_list_gen):  # noqa: N802
     try:
-        vList = List2Assignable([EUDVariable(x) for x in exprListGen()])
+        var_list = List2Assignable([EUDVariable(x) for x in expr_list_gen()])
     except (TriggerScopeError, NameError):
-        vList = EUDCreateVariables(varCount)
+        var_list = EUDCreateVariables(var_count)
 
         def _():
-            exprList = exprListGen()
-            SetVariables(vList, exprList)
+            expr_list = expr_list_gen()
+            SetVariables(var_list, expr_list)
 
         EUDOnStart(_)
-    return vList
+    return var_list
 
 
-def _CGFW(exprf, retn):
+def _CGFW(exprf, retn):  # noqa: N802
     PushTriggerScope()
     start = NextTrigger()
     try:
@@ -128,139 +130,139 @@ def _CGFW(exprf, retn):
     return rets
 
 
-def _ARR(items):  # EUDArray initialization
+def _ARR(items):  # EUDArray initialization  # noqa: N802
     k = EUDArray(len(items))
     for i, item in enumerate(items):
         k[i] = item
     return k
 
 
-def _VARR(items):  # EUDVArray initialization
+def _VARR(items):  # EUDVArray initialization  # noqa: N802
     k = EUDVArray(len(items))()
     for i, item in enumerate(items):
         k[i] = item
     return k
 
 
-def _SRET(v, klist):
+def _SRET(v, klist):  # noqa: N802
     return List2Assignable([v[k] for k in klist])
 
 
-def _SV(dL, sL):
-    [d << s for d, s in zip(FlattenList(dL), FlattenList(sL))]
+def _SV(d_list, s_list):  # noqa: N802
+    [d << s for d, s in zip(FlattenList(d_list), FlattenList(s_list))]
 
 
 class _ATTW:  # attribute write
-    def __init__(self, obj, attrName):
+    def __init__(self, obj, attr_name):
         self.obj = obj
-        self.attrName = attrName
+        self.attr_name = attr_name
 
     def __lshift__(self, r):
         if isinstance(self.obj, ModuleType):
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             if IsEUDVariable(ov):
                 ov << r
                 return
             ep_warn("Try to shadow module variable")
-        setattr(self.obj, self.attrName, r)
+        setattr(self.obj, self.attr_name, r)
 
     def __iadd__(self, v):
         try:
-            self.obj.iaddattr(self.attrName, v)
+            self.obj.iaddattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov += v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __isub__(self, v):
         try:
-            self.obj.isubattr(self.attrName, v)
+            self.obj.isubattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov -= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __imul__(self, v):
         try:
-            self.obj.imulattr(self.attrName, v)
+            self.obj.imulattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov *= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __ifloordiv__(self, v):
         try:
-            self.obj.ifloordivattr(self.attrName, v)
+            self.obj.ifloordivattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov //= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __imod__(self, v):
         try:
-            self.obj.imodattr(self.attrName, v)
+            self.obj.imodattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov %= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __ilshift__(self, v):
         try:
-            self.obj.ilshiftattr(self.attrName, v)
+            self.obj.ilshiftattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov <<= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __irshift__(self, v):
         try:
-            self.obj.irshiftattr(self.attrName, v)
+            self.obj.irshiftattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov >>= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __ipow__(self, v):
         try:
-            self.obj.ipowattr(self.attrName, v)
+            self.obj.ipowattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov **= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __iand__(self, v):
         try:
-            self.obj.iandattr(self.attrName, v)
+            self.obj.iandattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov &= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __ior__(self, v):
         try:
-            self.obj.iorattr(self.attrName, v)
+            self.obj.iorattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov |= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
     def __ixor__(self, v):
         try:
-            self.obj.ixorattr(self.attrName, v)
+            self.obj.ixorattr(self.attr_name, v)
         except AttributeError:
-            ov = getattr(self.obj, self.attrName)
+            ov = getattr(self.obj, self.attr_name)
             ov ^= v
-            setattr(self.obj, self.attrName, ov)
+            setattr(self.obj, self.attr_name, ov)
         return self
 
 
@@ -271,7 +273,9 @@ class _ARRW:  # array write
 
     def __lshift__(self, r):
         isUnproxyInstance
-        if not IsEUDVariable(self.obj) and not isUnproxyInstance(self.obj, ConstExpr):
+        if not IsEUDVariable(self.obj) and not isUnproxyInstance(
+            self.obj, ConstExpr
+        ):
             # maybe Python collections
             ov = self.obj[self.index]
             if IsEUDVariable(ov):
@@ -380,45 +384,45 @@ class _ARRW:  # array write
 
 
 class _ATTC:  # attribute comparison
-    def __init__(self, obj, attrName):
+    def __init__(self, obj, attr_name):
         self.obj = obj
-        self.attrName = attrName
+        self.attr_name = attr_name
 
     def __eq__(self, k):
         try:
-            return self.obj.eqattr(self.attrName, k)
+            return self.obj.eqattr(self.attr_name, k)
         except AttributeError:
-            return getattr(self.obj, self.attrName) == k
+            return getattr(self.obj, self.attr_name) == k
 
     def __ne__(self, k):
         try:
-            return self.obj.neattr(self.attrName, k)
+            return self.obj.neattr(self.attr_name, k)
         except AttributeError:
-            return getattr(self.obj, self.attrName) != k
+            return getattr(self.obj, self.attr_name) != k
 
     def __le__(self, k):
         try:
-            return self.obj.leattr(self.attrName, k)
+            return self.obj.leattr(self.attr_name, k)
         except AttributeError:
-            return getattr(self.obj, self.attrName) <= k
+            return getattr(self.obj, self.attr_name) <= k
 
     def __lt__(self, k):
         try:
-            return self.obj.ltattr(self.attrName, k)
+            return self.obj.ltattr(self.attr_name, k)
         except AttributeError:
-            return getattr(self.obj, self.attrName) < k
+            return getattr(self.obj, self.attr_name) < k
 
     def __ge__(self, k):
         try:
-            return self.obj.geattr(self.attrName, k)
+            return self.obj.geattr(self.attr_name, k)
         except AttributeError:
-            return getattr(self.obj, self.attrName) >= k
+            return getattr(self.obj, self.attr_name) >= k
 
     def __gt__(self, k):
         try:
-            return self.obj.gtattr(self.attrName, k)
+            return self.obj.gtattr(self.attr_name, k)
         except AttributeError:
-            return getattr(self.obj, self.attrName) > k
+            return getattr(self.obj, self.attr_name) > k
 
 
 class _ARRC:  # array comparison
@@ -463,9 +467,9 @@ class _ARRC:  # array comparison
             return self.obj[self.index] > k
 
 
-def _L2V(l):  # logic to value
+def _L2V(logic):  # noqa: N802, logic to value
     ret = EUDVariable()
-    if EUDIf()(l):
+    if EUDIf()(logic):
         ret << 1
     if EUDElse()():
         ret << 0
@@ -473,7 +477,7 @@ def _L2V(l):  # logic to value
     return ret
 
 
-def _LVAR(vs):
+def _LVAR(vs):  # noqa: N802
     import sys
 
     from ..core.variable.eudv import _yield_and_check_rvalue
@@ -495,8 +499,8 @@ def _LVAR(vs):
     return List2Assignable(ret)
 
 
-def _LSH(l, r):
-    if IsEUDVariable(l):
-        return f_bitlshift(l, r)
+def _LSH(lhs, r):  # noqa: N802
+    if IsEUDVariable(lhs):
+        return f_bitlshift(lhs, r)
     else:
-        return l << r
+        return lhs << r
