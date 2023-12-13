@@ -54,7 +54,9 @@ def test_dwmemio():
 
     # Flag reading!
     f1, f2, f3, f4 = f_flagread_epd(EPD(a), 0x1000, 0x0100, ~0x0010, 0x0004)
-    test_equality("f_flagread_epd", [f1, f2, f3, f4], [0x1000, 0x0000, 0x1224, 0x0004])
+    test_equality(
+        "f_flagread_epd", [f1, f2, f3, f4], [0x1000, 0x0000, 0x1224, 0x0004]
+    )
 
     # dwwrite
     f_dwwrite_epd(EPD(a), 1234)
@@ -66,11 +68,11 @@ def test_dwmemio():
     f_setcurpl(Player1)
     test_assert("f_dwwrite works", Memory(a, Exactly, 1222))
 
-    f_randomize()
-    f_rand()
     EP_SetRValueStrictMode(False)
-    f_dwrand()
+    f_randomize()
     EP_SetRValueStrictMode(True)
+    f_rand()
+    f_dwrand()
 
     # Fixes https://cafe.naver.com/edac/81090
     SetKills(CurrentPlayer, SetTo, 0, 0)

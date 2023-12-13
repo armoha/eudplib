@@ -256,12 +256,12 @@ class RandomData(EUDStruct):
 
     @EUDMethod
     def get_value(this):
-        # (Line 119) return this.arr[dwrand() % this.count];
+        # (Line 134) return this.arr[dwrand() % this.count];
         EUDReturn(this.arr[f_dwrand() % this.count])
-        # (Line 120) }
-        # (Line 121) };
+        # (Line 135) }
+        # (Line 136) };
 
-    # (Line 122) function test_eudmethods() {
+    # (Line 137) function test_eudmethods() {
     _fields_ = [
         ('arr', EUDArray),
         'count',
@@ -269,20 +269,20 @@ class RandomData(EUDStruct):
 
 @EUDFunc
 def f_test_eudmethods():
-    # (Line 123) const rd = RandomData(EUDArray(list(1,2,3,4,5,6,7)), 7);
+    # (Line 138) const rd = RandomData(EUDArray(list(1,2,3,4,5,6,7)), 7);
     rd = RandomData(EUDArray(FlattenList([1, 2, 3, 4, 5, 6, 7])), 7)
-    # (Line 124) var ret = 0;
+    # (Line 139) var ret = 0;
     ret = _LVAR([0])
-    # (Line 125) foreach(n : py_range(7)) {
+    # (Line 140) foreach(n : py_range(7)) {
     for n in range(7):
-        # (Line 126) const v = rd.get_value();
+        # (Line 141) const v = rd.get_value();
         v = rd.get_value()
-        # (Line 127) if (1 <= v && v <= 7) ret += 1;
+        # (Line 142) if (1 <= v && v <= 7) ret += 1;
         if EUDIf()(EUDSCAnd()(1 <= v)(v <= 7)()):
             ret.__iadd__(1)
-            # (Line 128) }
+            # (Line 143) }
         EUDEndIf()
-        # (Line 129) return ret;
+        # (Line 144) return ret;
 
     EUDReturn(ret)
-    # (Line 130) }
+    # (Line 145) }
