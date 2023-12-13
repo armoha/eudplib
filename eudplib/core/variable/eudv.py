@@ -69,7 +69,7 @@ def _ProcessDest(dest):
 def _is_rvalue(obj: object, refcount: int = 3) -> bool:
     if isinstance(obj, EUDVariable) and sys.getrefcount(obj) != refcount:
         return False
-    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.get_value(), 4):
+    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.getValue(), 4):
         return False
     return True
 
@@ -85,7 +85,7 @@ def _yield_and_check_rvalue(
 ) -> Iterator[tuple[Any, bool]]:
     is_rvalue &= sys.getrefcount(obj) == refcount
     if isinstance(obj, ExprProxy):
-        yield from _yield_and_check_rvalue(obj.get_value(), 3, is_rvalue)
+        yield from _yield_and_check_rvalue(obj.getValue(), 3, is_rvalue)
     elif isinstance(obj, EUDVariable):
         yield obj, is_rvalue
     elif isinstance(obj, (bytes, str)) or hasattr(obj, "dont_flatten"):

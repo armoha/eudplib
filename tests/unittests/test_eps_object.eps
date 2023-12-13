@@ -115,7 +115,31 @@ object RandomData {
         this.arr = arr;
         this.count = count;
     }
+    function get_value() {
+/*
+  File "C:\dev\eudplib\eudplib\eudlib\utilf\random.py", line 39, in f_randomize
+    _seed.QueueAddTo(_seed),
+    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\dev\eudplib\eudplib\core\variable\eudv.py", line 287, in QueueAddTo
+    return [self.SetDest(dest), self.SetModifier(bt.Add)]
+            ^^^^^^^^^^^^^^^^^^
+  File "C:\dev\eudplib\eudplib\core\variable\eudv.py", line 242, in SetDest
+    dest = _ProcessDest(dest)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\dev\eudplib\eudplib\core\variable\eudv.py", line 62, in _ProcessDest
+    epd.checkNonRValue()
+  File "C:\dev\eudplib\eudplib\core\variable\eudv.py", line 193, in checkNonRValue
+    raise EPError(_("Trying to modify value of r-value variable"))
+ */
+        return this.arr[dwrand() % this.count];
+    }
 };
 function test_eudmethods() {
-    const dat = RandomData(EUDArray(4), 4);
+    const rd = RandomData(EUDArray(list(1,2,3,4,5,6,7)), 7);
+    var ret = 0;
+    foreach(n : py_range(7)) {
+        const v = rd.get_value();
+        if (1 <= v && v <= 7) ret += 1;
+    }
+    return ret;
 }

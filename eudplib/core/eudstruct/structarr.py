@@ -74,10 +74,10 @@ class EUDStructArray(ExprProxy, metaclass=_EUDStruct_Metaclass):
             inst[i] = self[i]
 
     def __getitem__(self, index):
-        return self.get_value()[index]
+        return self.getValue()[index]
 
     def __setitem__(self, index, newval):
-        self.get_value()[index] = newval
+        self.getValue()[index] = newval
 
     def __getattr__(self, name):
         return super().__getattr__(name)
