@@ -93,10 +93,11 @@ void funcNamePreprocess(std::string& s) {
     else s = "f_" + s;
 }
 
-void impPathProcess(const std::string& s, std::string& impPath, std::string& impModname) {
+bool impPathProcess(const std::string& s, std::string& impPath, std::string& impModname) {
     // Preprocess python module.
     auto lastDot = s.find_last_of('.');
     std::string path, modname;
+    bool isPy;
     if(lastDot == std::string::npos) {
         modname = s;
     }
@@ -108,11 +109,14 @@ void impPathProcess(const std::string& s, std::string& impPath, std::string& imp
     if(strncmp(modname.c_str(), "py_", 3) == 0) {
         impPath = path;
         impModname = modname.substr(3);
+        isPy = true;
     }
     else {
         impPath = path;
         impModname = modname;
+        isPy = false;
     }
+    return isPy;
 }
 
 ////

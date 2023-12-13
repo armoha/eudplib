@@ -24,6 +24,7 @@ public:
     bool defVariable(std::string& name);
     bool defConstant(std::string& name);
     bool defModule(std::string& name);
+    bool defPyModule(std::string& name);
 
     // These function returns possibility. For example, Kills can be both
     // constant and function, so both function will return true to "Kills".
@@ -32,6 +33,7 @@ public:
     bool getConstant(std::string& name) const;
     bool getVariable(std::string& name) const;
     bool isModule(std::string& name) const;
+    bool isPyModule(std::string& name) const;
 
 private:
     ClosureManagerImpl* impl;

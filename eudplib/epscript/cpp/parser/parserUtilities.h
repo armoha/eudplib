@@ -48,7 +48,7 @@ void writeCsOpener(std::ostream &os, const Token *csOpener, const Token *lexpr);
 std::string trim(std::string s);
 std::string iwCollapse(const std::string &in);
 void funcNamePreprocess(std::string &s);
-void impPathProcess(const std::string &s, std::string &impPath, std::string &impModname);
+bool impPathProcess(const std::string &s, std::string &impPath, std::string &impModname);
 std::string impPathGetModule(const std::string &s);
 std::string addStubCode(const std::string &s);
 bool checkPyBuiltinForEpsGlobalConst(std::string& name);

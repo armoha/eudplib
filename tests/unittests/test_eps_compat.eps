@@ -1,5 +1,6 @@
 import .BGM_eps_test;
 import .test_eps_stattext as stat;
+import py_math;
 var x = 1 << 4;
 EUDOnStart(function () { x += x; });
 object ParticleBag extends EUDStruct {
@@ -79,5 +80,6 @@ with expect_eperror():\n\
     ret += x;
     if(Is64BitWireframe()) {}
     var z = EUDVariable();
+    math.cos(1);
     return ret;
 }

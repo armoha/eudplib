@@ -111,7 +111,7 @@ relimp_path(A) ::= relimp_path(B) PERIOD NAME(C). {
 }
 relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
     std::string impPath, impModname;
-    impPathProcess(A->data, impPath, impModname);
+    bool isPy = impPathProcess(A->data, impPath, impModname);
     if(isBuiltinConst(B->data)) {
         throw_error(6755, "Name collision with eudplib global " + B->data, B->line);
     }
@@ -121,7 +121,9 @@ relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
     if(isPyBuiltin(B->data)) {
         throw_error(6757, "Name collision with Python builtin " + B->data, B->line);
     }
-    if(!ps->closure.defModule(B->data)) {
+    if (isPy && !ps->closure.defPyModule(B->data)) {
+        throw_error(6754, "Importing already-declared module " + B->data, B->line);
+    } else if (!isPy && !ps->closure.defModule(B->data)) {
         throw_error(6754, "Importing already-declared module " + B->data, B->line);
     }
 
@@ -130,7 +132,7 @@ relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
 }
 relimp_chunk ::= relimp_path(A) SEMICOLON. {
     std::string impPath, impModname;
-    impPathProcess(A->data, impPath, impModname);
+    bool isPy = impPathProcess(A->data, impPath, impModname);
 
     if(isBuiltinConst(impModname)) {
         throw_error(6755, "Name collision with eudplib global " + impModname, A->line);
@@ -141,7 +143,9 @@ relimp_chunk ::= relimp_path(A) SEMICOLON. {
     if(isPyBuiltin(impModname)) {
         throw_error(6757, "Name collision with Python builtin " + impModname, A->line);
     }
-    if(!ps->closure.defModule(impModname)) {
+    if (isPy && !ps->closure.defPyModule(impModname)) {
+        throw_error(6754, "Importing already-declared module " + impModname, A->line);
+    } else if (!isPy && !ps->closure.defModule(impModname)) {
         throw_error(6754, "Importing already-declared module " + impModname, A->line);
     }
 
@@ -158,7 +162,7 @@ dottedName(A) ::= dottedName(B) PERIOD NAME(C). {
 
 import_chunk ::= IMPORT dottedName(A) AS NAME(B). {
     std::string impPath, impModname;
-    impPathProcess(A->data, impPath, impModname);
+    bool isPy = impPathProcess(A->data, impPath, impModname);
 
     if(isBuiltinConst(B->data)) {
         throw_error(6755, "Name collision with eudplib global " + B->data, B->line);
@@ -169,7 +173,9 @@ import_chunk ::= IMPORT dottedName(A) AS NAME(B). {
     if(isPyBuiltin(B->data)) {
         throw_error(6757, "Name collision with Python builtin " + B->data, B->line);
     }
-    if(!ps->closure.defModule(B->data)) {
+    if (isPy && !ps->closure.defPyModule(B->data)) {
+        throw_error(6754, "Importing already-declared module " + B->data, B->line);
+    } else if (!isPy && !ps->closure.defModule(B->data)) {
         throw_error(6754, "Importing already-declared module " + B->data, B->line);
     }
 
@@ -180,7 +186,7 @@ import_chunk ::= IMPORT dottedName(A) AS NAME(B). {
 
 import_chunk ::= IMPORT dottedName(A). {
     std::string impPath, impModname;
-    impPathProcess(A->data, impPath, impModname);
+    bool isPy = impPathProcess(A->data, impPath, impModname);
 
     if(isBuiltinConst(impModname)) {
         throw_error(6755, "Name collision with eudplib global " + impModname, A->line);
@@ -191,7 +197,9 @@ import_chunk ::= IMPORT dottedName(A). {
     if(isPyBuiltin(impModname)) {
         throw_error(6757, "Name collision with Python builtin " + impModname, A->line);
     }
-    if(!ps->closure.defModule(impModname)) {
+    if (isPy && !ps->closure.defPyModule(impModname)) {
+        throw_error(6754, "Importing already-declared module " + impModname, A->line);
+    } else if (!isPy && !ps->closure.defModule(impModname)) {
         throw_error(6754, "Importing already-declared module " + impModname, A->line);
     }
 
@@ -720,8 +728,10 @@ funcexpr(out) ::= expr(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
         size_t p = nameStr.find('.');
         std::string moduleName = nameStr.substr(0, p);
         std::string funcName = nameStr.substr(p + 1);
-        if (closure->isModule(moduleName) && std::regex_match(funcName, prefixedFuncNameRegex)) {
-            funcNamePreprocess(funcName);
+        if (closure->isModule(moduleName)) {
+            if (!closure->isPyModule(moduleName) && std::regex_match(funcName, prefixedFuncNameRegex)) {
+                funcNamePreprocess(funcName);
+            }
             name->data = moduleName + '.' + funcName;
         }
     }
@@ -747,8 +757,10 @@ funccall_global_stmt ::= expr(name) LPAREN fArgs(exprs) RPAREN.  [FUNCCALL] {
         size_t p = nameStr.find('.');
         std::string moduleName = nameStr.substr(0, p);
         std::string funcName = nameStr.substr(p + 1);
-        if (closure->isModule(moduleName) && std::regex_match(funcName, prefixedFuncNameRegex)) {
-            funcNamePreprocess(funcName);
+        if (closure->isModule(moduleName)) {
+            if (!closure->isPyModule(moduleName) && std::regex_match(funcName, prefixedFuncNameRegex)) {
+                funcNamePreprocess(funcName);
+            }
             name->data = moduleName + '.' + funcName;
         }
     }
@@ -1315,7 +1327,7 @@ case_chunk ::= case_clause bodyStmtList. {
     ps->gen.unindent(false);
 }
 
-case_chunks ::= case_chunks case_chunk. 
+case_chunks ::= case_chunks case_chunk.
 
 case_chunks ::= case_chunk.
 

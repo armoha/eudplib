@@ -13,7 +13,8 @@ enum {
     TABLE_VAR = 2,
     TABLE_CONST = 4,
     TABLE_MODULE = 8,
-    TABLE_DECLONLY = 0x10
+    TABLE_DECLONLY = 0x10,
+    TABLE_PYMODULE = 0x20
 };
 
 struct ClosureEntry {
@@ -41,6 +42,7 @@ public:
     bool defVariable(std::string& name);
     bool defConstant(std::string& name);
     bool defModule(std::string& name);
+    bool defPyModule(std::string& name);
 
     // These function returns possibility. For example, Kills can be both
     // constant and function, so both function will return true to "Kills".
@@ -48,6 +50,7 @@ public:
     bool getConstant(std::string& name) const;
     bool getVariable(std::string& name) const;
     bool isModule(std::string& name) const;
+    bool isPyModule(std::string& name) const;
 
 private:
     Closure& lastClosure() { return closures[closures.size() - 1]; }
@@ -72,11 +75,14 @@ bool ClosureManager::defFunction(std::string& name) { return impl->defFunction(n
 bool ClosureManager::defVariable(std::string& name) { return impl->defVariable(name); }
 bool ClosureManager::defConstant(std::string& name) { return impl->defConstant(name); }
 bool ClosureManager::defModule(std::string& name) { return impl->defModule(name); }
+bool ClosureManager::defPyModule(std::string& name) { return impl->defPyModule(name); }
+
 
 bool ClosureManager::getFunction(std::string& name) const { return impl->getFunction(name); }
 bool ClosureManager::getConstant(std::string& name) const { return impl->getConstant(name); }
 bool ClosureManager::getVariable(std::string& name) const { return impl->getVariable(name); }
 bool ClosureManager::isModule(std::string &name) const { return impl->isModule(name); }
+bool ClosureManager::isPyModule(std::string &name) const { return impl->isPyModule(name); }
 
 ///////
 
@@ -106,6 +112,10 @@ bool ClosureManagerImpl::defModule(std::string &name) {
     return defTableValue(name, TABLE_MODULE | TABLE_CONST);
 }
 
+bool ClosureManagerImpl::defPyModule(std::string &name) {
+    return defTableValue(name, TABLE_MODULE | TABLE_PYMODULE | TABLE_CONST);
+}
+
 bool ClosureManagerImpl::getFunction(std::string& name) const {
     if (isBuiltinConst(name)) return true;
     return getTableValue(name, TABLE_FUNC | TABLE_CONST, [&](std::string& name1) {
@@ -129,6 +139,10 @@ bool ClosureManagerImpl::getVariable(std::string& name) const {
 
 bool ClosureManagerImpl::isModule(std::string& name) const {
     return getTableValue(name, TABLE_MODULE, [](std::string&) { return false; });
+}
+
+bool ClosureManagerImpl::isPyModule(std::string& name) const {
+    return getTableValue(name, TABLE_PYMODULE, [](std::string&) { return false; });
 }
 
 ///////
