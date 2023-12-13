@@ -608,6 +608,12 @@ expr(A)::= expr(B) LSQBRACKET expr(C) RSQBRACKET. [SUBSCRIPT] {
     A = mkTokenTemp(B);
 }
 
+expr(A)::= expr(B) LSQBRACKET STRING(C) RSQBRACKET. [SUBSCRIPT] {
+    B->data = B->data + "[" + C->data + "]";
+    delete C;
+    A = mkTokenTemp(B);
+}
+
 // Lambda calls
 lambdaExprStart(A) ::= FUNCTION LPAREN typedNameList(args) RPAREN fdef_rettypes(rets). {
     std::string funcname = "_lambda" + std::to_string(++lambdaIndex);
@@ -1156,6 +1162,12 @@ lvalue(A) ::= NAME(B). {
 }
 
 lvalue(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET. [SUBSCRIPT] {
+    C->data = "_ARRW(" + B->data + ", " + C->data + ")";
+    A = mkTokenTemp(C);
+    delete B;
+}
+
+lvalue(A) ::= expr(B) LSQBRACKET STRING(C) RSQBRACKET. [SUBSCRIPT] {
     C->data = "_ARRW(" + B->data + ", " + C->data + ")";
     A = mkTokenTemp(C);
     delete B;
