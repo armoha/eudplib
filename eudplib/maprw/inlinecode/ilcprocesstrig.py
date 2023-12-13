@@ -11,7 +11,7 @@ from ... import utils as ut
 from ...core.mapdata.chktok import CHK
 from ...core.rawtrigger import AllPlayers, SetTo
 from ...trigtrg import trigtrg as tt
-from .btinliner import (
+from .btInliner import (
     get_executing_players,
     get_trigger_size,
     inline_codify_binary_trigger,

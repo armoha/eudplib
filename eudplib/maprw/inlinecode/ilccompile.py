@@ -15,7 +15,7 @@ from ... import eudlib as sf
 from ... import trigger as t
 from ... import utils as ut
 from ...core import RawTrigger
-from .btinliner import t_start_end
+from .btInliner import t_start_end
 
 _inline_globals = {}
 
