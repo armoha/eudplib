@@ -36,6 +36,7 @@ def f_setcurpl(cp, *, actions=[], set_modifier=True):
 
 def f_setcurpl2cpcache(v=[], actions=[]):
     cpcache = c.curpl.GetCPCache()
+    v = ut.FlattenList(v)
     if v:
         trg = c.VProc([*v, cpcache], [actions, cpcache.SetDest(ut.EPD(0x6509B0))])
     else:
