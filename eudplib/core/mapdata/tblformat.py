@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 unit_name_encoding: str | None = None
 
 
-def _decode_unit_name_as(e: str) -> None:
+def DecodeUnitNameAs(e: str) -> None:  # noqa: N802
     global unit_name_encoding
     "".encode(e)  # check if e is valid encoding
     unit_name_encoding = e
