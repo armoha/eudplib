@@ -6,10 +6,11 @@
 # file that should have been included as part of this package.
 
 from .epscompile import EPS_SetDebug, epsCompile
-from .epsimp import IsSCDBMap
+from .epsimp import EPSLoader, IsSCDBMap
 
 __all__ = [
     "EPS_SetDebug",
+    "EPSLoader",
     "epsCompile",
     "IsSCDBMap",
 ]

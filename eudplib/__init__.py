@@ -9,13 +9,18 @@ import builtins
 import keyword
 import types
 
-__version__ = "0.76.13a4"
+__version__ = "0.76.13a6"
 
 oldGlobals = set(globals().keys())
 
 from .core import *
 from .ctrlstru import *
-from .epscript import *
+from .epscript import (
+    EPS_SetDebug,
+    EPSLoader,
+    epsCompile,
+    IsSCDBMap,
+)
 from .eudlib import *
 from .maprw import *
 from .offsetmap import CSprite, CUnit, EPDCUnitMap
