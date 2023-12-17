@@ -22,7 +22,6 @@ if TYPE_CHECKING:
     from ..eudobj import EUDObject
 
 _found_objects: "list[EUDObject]" = []
-_rootobj: "EUDObject | None" = None
 _found_objects_set: "set[EUDObject]" = set()
 _untraversed_objects: "list[EUDObject]" = []
 _dynamic_objects_set: "set[EUDObject]" = set()
@@ -117,9 +116,7 @@ class ObjCollector:
             if isinstance(arg, (ConstExpr, ExprProxy, RlocInt_C)):
                 Evaluate(arg)
                 continue
-            raise EPError(
-                _("Collected unexpected object: {}").format(repr(arg))
-            )
+            raise EPError(_("Collected unexpected object: {}").format(repr(arg)))
 
     def WriteBytes(self, b: bytes) -> None:
         pass
@@ -130,7 +127,6 @@ class ObjCollector:
 
 def CollectObjects(root: "EUDObject | Forward") -> None:
     global phase
-    global _rootobj
     global _found_objects
     global _found_objects_set
     global _dynamic_objects_set
@@ -141,7 +137,6 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
     phase = PHASE.COLLECTING
 
     objc = ObjCollector()
-    _rootobj = None
     _found_objects_set = set()
     _dynamic_objects_set = set()
     _untraversed_objects = []
@@ -176,9 +171,10 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
 
     if _payload_shuffle:
         # Shuffle objects -> Randomize(?) addresses
-        if _rootobj:
-            _found_objects_set.remove(_rootobj)
-        _found_objects = [_rootobj] + _rand_lst(_found_objects_set)
+        _rootobj = _found_objects[0]
+        _found_objects_set.remove(_rootobj)
+        _found_objects = _rand_lst(_found_objects_set)
+        _found_objects.insert(0, _rootobj)
 
     # cleanup
     _found_objects_set.clear()
@@ -305,9 +301,7 @@ def AllocObjects() -> None:
             lprint(_(" - Allocated {} / {} objects").format(i + 1, objn))
         _payload_size = lallocaddr
 
-        lprint(
-            _(" - Allocated {} / {} objects").format(objn, objn), flush=True
-        )
+        lprint(_(" - Allocated {} / {} objects").format(objn, objn), flush=True)
         phase = None
         return
 
@@ -363,9 +357,9 @@ def ConstructPayload() -> Payload:
         written_bytes = pbuf.EndWrite()
         ep_assert(
             written_bytes == objsize,
-            _(
-                "obj.GetDataSize()({}) != Real payload size({}) for object {}"
-            ).format(objsize, written_bytes, obj),
+            _("obj.GetDataSize()({}) != Real payload size({}) for object {}").format(
+                objsize, written_bytes, obj
+            ),
         )
 
         lprint(_(" - Written {} / {} objects").format(i + 1, objn))
@@ -408,7 +402,6 @@ def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
     global _found_objects_set
     global _untraversed_objects
     global _dynamic_objects_set
-    global _rootobj
 
     if phase is PHASE.COLLECTING:
         if obj not in _found_objects_set:
@@ -417,8 +410,6 @@ def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
             _found_objects_set.add(obj)
             if obj.DynamicConstructed():
                 _dynamic_objects_set.add(obj)
-            if not _rootobj:
-                _rootobj = obj
 
         return defri
 
