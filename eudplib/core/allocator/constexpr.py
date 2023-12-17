@@ -31,6 +31,13 @@ class ConstExpr:
         else:
             return RlocInt_C(self.offset, 0)
 
+    def __int__(self) -> int:
+        if self.baseobj is not None:
+            raise ut.EPError(
+                _("int(ConstExpr) failed because ConstExpr has baseobj")
+            )
+        return self.offset
+
     def __add__(self, other: "int | ConstExpr") -> "ConstExpr":
         if isinstance(other, int):
             return ConstExpr(self.baseobj, self.offset + other, self.rlocmode)
