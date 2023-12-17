@@ -18,7 +18,7 @@ class Payload:
         self.orttable = orttable
 
 
-_packerData: dict[str, list[int]] = {}
+_packer_data: dict[str, list[int]] = {}
 
 
 class PayloadBuffer:
@@ -53,7 +53,8 @@ class PayloadBuffer:
 
         if number.rlocmode:
             ut.ep_assert(
-                self._datacur % 4 == 0, _("Non-const dwords must be aligned to 4byte")
+                self._datacur % 4 == 0,
+                _("Non-const dwords must be aligned to 4byte"),
             )
             if number.rlocmode == 1:
                 self._prttable.append(self._datacur)
@@ -81,10 +82,10 @@ class PayloadBuffer:
         """
 
         try:
-            _StructPacker(_packerData[structformat], self, arglist)
+            _StructPacker(_packer_data[structformat], self, arglist)
         except KeyError:
-            _packerData[structformat] = CreateStructPackerData(structformat)
-            _StructPacker(_packerData[structformat], self, arglist)
+            _packer_data[structformat] = CreateStructPackerData(structformat)
+            _StructPacker(_packer_data[structformat], self, arglist)
 
     def WriteBytes(self, b: bytes) -> None:
         """
