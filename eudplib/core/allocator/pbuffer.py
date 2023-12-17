@@ -4,6 +4,7 @@
 # This file is part of EUD python library (eudplib),
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
+from collections.abc import Iterable
 
 from eudplib import utils as ut
 from eudplib.localize import _
@@ -43,12 +44,12 @@ class PayloadBuffer:
         self._data[self._datacur] = number & 0xFF
         self._datacur += 1
 
-    def WriteWord(self, number: int) -> None:
+    def WriteWord(self, number: int) -> None:  # noqa: N802
         self._data[self._datacur + 0] = number & 0xFF
         self._data[self._datacur + 1] = (number >> 8) & 0xFF
         self._datacur += 2
 
-    def WriteDword(self, obj: Evaluable) -> None:
+    def WriteDword(self, obj: Evaluable) -> None:  # noqa: N802
         number = Evaluate(obj)
 
         if number.rlocmode:
@@ -70,7 +71,7 @@ class PayloadBuffer:
         self._data[self._datacur + 3] = (offset >> 24) & 0xFF
         self._datacur += 4
 
-    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
+    def WritePack(self, structformat: str, arglist: Iterable[Evaluable]) -> None:  # noqa: N802
         """
         ======= =======
           Char   Type
@@ -82,12 +83,12 @@ class PayloadBuffer:
         """
 
         try:
-            _StructPacker(_packer_data[structformat], self, arglist)
+            _struct_packer(_packer_data[structformat], self, arglist)
         except KeyError:
-            _packer_data[structformat] = CreateStructPackerData(structformat)
-            _StructPacker(_packer_data[structformat], self, arglist)
+            _packer_data[structformat] = _create_struct_packer_data(structformat)
+            _struct_packer(_packer_data[structformat], self, arglist)
 
-    def WriteBytes(self, b: bytes) -> None:
+    def WriteBytes(self, b: bytes) -> None:  # noqa: N802
         """
         Write bytes object to buffer.
 
@@ -96,31 +97,30 @@ class PayloadBuffer:
         self._data[self._datacur : self._datacur + len(b)] = b
         self._datacur += len(b)
 
-    def WriteSpace(self, spacesize: int) -> None:
+    def WriteSpace(self, spacesize: int) -> None:  # noqa: N802
         self._datacur += spacesize
 
     # Internally used
-    def CreatePayload(self) -> Payload:
+    def CreatePayload(self) -> Payload:  # noqa: N802
         return Payload(self._data, self._prttable, self._orttable)
 
 
-def CreateStructPackerData(structformat: str) -> list[int]:
+def _create_struct_packer_data(structformat: str) -> list[int]:
     sizedict = {"B": 1, "H": 2, "I": 4}
     return [sizedict[s] for s in structformat]
 
 
-def _StructPacker(
-    sizelist: list[int],
+def _struct_packer(
+    sizelist: Iterable[int],
     buf: PayloadBuffer,
-    arglist: list[Evaluable],
+    arglist: Iterable[Evaluable],
 ) -> None:
     dpos = buf._datacur
     data = buf._data
     prttb = buf._prttable
     orttb = buf._orttable
 
-    for i, arg in enumerate(arglist):
-        argsize = sizelist[i]
+    for argsize, arg in zip(sizelist, arglist):
         ri = Evaluate(arg)
 
         if not (ri.rlocmode == 0 or (argsize == 4 and dpos % 4 == 0)):
