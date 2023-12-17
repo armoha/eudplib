@@ -120,9 +120,7 @@ class ConstExpr:
     def __neg__(self) -> "ConstExpr":
         return self.__mul__(-1)
 
-    def __eq__(self, other: "int | ConstExpr") -> bool:
-        if isinstance(other, int) and self.rlocmode == 0:
-            return self.offset == other
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, ConstExpr) and self.baseobj is other.baseobj:
             return (self.offset == other.offset) and (
                 self.rlocmode == other.rlocmode
@@ -132,9 +130,7 @@ class ConstExpr:
     def __hash__(self) -> int:
         return hash((id(self.baseobj), self.offset, self.rlocmode))
 
-    def __ne__(self, other: "int | ConstExpr") -> bool:
-        if isinstance(other, int) and self.rlocmode == 0:
-            return self.offset != other
+    def __ne__(self, other: object) -> bool:
         if isinstance(other, ConstExpr) and self.baseobj is other.baseobj:
             return (self.offset != other.offset) or (self.rlocmode != other.rlocmode)
         return NotImplemented
