@@ -166,46 +166,10 @@ class Condition(ConstExpr):
         return self.parenttrg.Evaluate() + 8 + self.condindex * 20
 
     def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
-        from ..variable import IsEUDVariable
-
-        eudvar_field = next(
-            (
-                (i, field)
-                for i, field in enumerate(self.fields)
-                if IsEUDVariable(field)
-            ),
-            None,
-        )
-        if eudvar_field is not None:
-            raise ut.EPError(
-                self._invalid_condition(eudvar_field[0])
-                + _("Found EUDVariable {} in field {}").format(
-                    eudvar_field[1], eudvar_field[0]
-                )
-            )
-
         for field in self.fields[:3]:
             pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
     def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
-        from ..variable import IsEUDVariable
-
-        eudvar_field = next(
-            (
-                (i, field)
-                for i, field in enumerate(self.fields)
-                if IsEUDVariable(field)
-            ),
-            None,
-        )
-        if eudvar_field is not None:
-            raise ut.EPError(
-                self._invalid_condition(eudvar_field[0])
-                + _("Found EUDVariable {} in field {}").format(
-                    eudvar_field[1], eudvar_field[0]
-                )
-            )
-
         pbuffer.WritePack("IIIHBBBBH", self.fields)  # type: ignore[arg-type]
 
     def __bool__(self) -> NoReturn:

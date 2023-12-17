@@ -239,44 +239,8 @@ class Action(ConstExpr):
         return self.parenttrg.Evaluate() + 8 + 320 + 32 * self.actindex
 
     def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
-        from ..variable import IsEUDVariable
-
-        eudvar_field = next(
-            (
-                (i, field)
-                for i, field in enumerate(self.fields)
-                if IsEUDVariable(field)
-            ),
-            None,
-        )
-        if eudvar_field is not None:
-            raise ut.EPError(
-                self._invalid_action(eudvar_field[0])
-                + _("Found EUDVariable {} in field {}").format(
-                    eudvar_field[1], eudvar_field[0]
-                )
-            )
-
         for field in self.fields[:6]:
             pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
     def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
-        from ..variable import IsEUDVariable
-
-        eudvar_field = next(
-            (
-                (i, field)
-                for i, field in enumerate(self.fields)
-                if IsEUDVariable(field)
-            ),
-            None,
-        )
-        if eudvar_field is not None:
-            raise ut.EPError(
-                self._invalid_action(eudvar_field[0])
-                + _("Found EUDVariable {} in field {}").format(
-                    eudvar_field[1], eudvar_field[0]
-                )
-            )
-
         pbuffer.WritePack("IIIIIIHBBBBH", self.fields)  # type: ignore[arg-type]
