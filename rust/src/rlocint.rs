@@ -18,10 +18,6 @@ impl RlocInt {
             rlocmode,
         }
     }
-
-    fn __add__(&self, rhs: &Self) -> Self {
-        a
-    }
 }
 
 impl fmt::Display for RlocInt {

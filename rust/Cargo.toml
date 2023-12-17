@@ -1,0 +1,21 @@
+[package]
+name = "eudplib-rust"
+version = "0.1.0"
+authors = ["Armoha <kein0011@naver.com>"]
+edition = "2021"
+publish = false
+
+[dependencies]
+pyo3 = { version = "0.20.0" }
+
+[features]
+# See https://github.com/PyO3/pyo3/issues/340
+extension-module = ["pyo3/extension-module"]
+default = ["extension-module"]
+
+[lib]
+name = "eudplib_rust"
+crate-type = ["cdylib"]
+
+[profile.release]
+overflow-checks = true
