@@ -1,4 +1,4 @@
-use crate::rlocint::RlocInt;
+use crate::allocator::rlocint::RlocInt;
 use pyo3::create_exception;
 use pyo3::prelude::*;
 use std::sync::Arc;

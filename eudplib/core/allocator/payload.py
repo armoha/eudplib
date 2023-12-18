@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, TypeAlias
 
 from eudplib.localize import _
 from eudplib.utils import EPError, _rand_lst, ep_assert
-from eudplib.bindings._rust import stack_objects
+from eudplib.bindings._rust import allocator
 
 from .constexpr import ConstExpr, Evaluable, Evaluate, Forward
 from .pbuffer import Payload, PayloadBuffer
@@ -174,9 +174,7 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
         rootobj = next(iterobj)
         found_objects = _rand_lst(iterobj)
         found_objects.append(rootobj)
-        _found_objects_dict = {
-            obj: i for i, obj in enumerate(reversed(found_objects))
-        }
+        _found_objects_dict = {obj: i for i, obj in enumerate(reversed(found_objects))}
 
     # cleanup
     phase = None
@@ -317,9 +315,7 @@ def AllocObjects() -> None:
         dwoccupmap = obja.EndWrite()
         dwoccupmap_list.append(dwoccupmap)
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
-            e = _(
-                "Occupation map length ({}) & Object size mismatch for object ({})"
-            )  # noqa: E501
+            e = _("Occupation map length ({}) & Object size mismatch for object ({})")  # noqa: E501
             e = e.format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
             raise EPError(e)
         lprint(_(" - Preprocessed {} / {} objects").format(i + 1, objn))
@@ -327,12 +323,11 @@ def AllocObjects() -> None:
     lprint(_(" - Preprocessed {} / {} objects").format(objn, objn), flush=True)
 
     lprint(_(" - Allocating objects.."), flush=True)
-    _alloctable = stack_objects(dwoccupmap_list)
+    _alloctable = allocator.stack_objects(dwoccupmap_list)
 
     # Get payload length
     _payload_size = max(
-        _alloctable[i] + obj.GetDataSize()
-        for i, obj in enumerate(_found_objects_dict)
+        _alloctable[i] + obj.GetDataSize() for i, obj in enumerate(_found_objects_dict)
     )
 
     phase = None
