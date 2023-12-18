@@ -94,7 +94,7 @@ class Condition(ConstExpr):
         self.condindex: int | None = None
 
     def __copy__(self) -> "Condition":
-        return self.__class__(*self.fields[:8], eudx=self.fields[8])
+        return self.__class__(*self.fields[:8], eudx=self.fields[8])  # type: ignore[arg-type]
 
     def disable(self) -> None:
         if isinstance(self.fields[7], ConstExpr):

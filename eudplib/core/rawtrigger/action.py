@@ -137,7 +137,7 @@ class Action(ConstExpr):
         self.actindex: int | None = None
 
     def __copy__(self) -> "Action":
-        return self.__class__(*self.fields[:10], eudx=self.fields[11])
+        return self.__class__(*self.fields[:10], eudx=self.fields[11])  # type: ignore[arg-type]
 
     def disable(self) -> None:
         if isinstance(self.fields[9], ConstExpr):

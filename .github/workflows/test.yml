@@ -72,9 +72,9 @@ jobs:
       - name: Install mypy
         run: pip install mypy
       - name: Run mypy for Python 3.11
-        run: mypy eudplib --python-version 3.11 --allow-redefinition
+        run: mypy eudplib --python-version 3.11
       - name: Run mypy for Python 3.10
-        run: mypy eudplib --python-version 3.10 --allow-redefinition
+        run: mypy eudplib --python-version 3.10
 
   autoformat:
     name: Autoformat
@@ -92,7 +92,7 @@ jobs:
       run: |
         printenv | grep GITHUB
         git config --global user.name 'armoha'
-        git config --global user.email 'kein0011@naver.com'          
+        git config --global user.email 'kein0011@naver.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
         git remote -v
         git branch
