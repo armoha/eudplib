@@ -12,7 +12,9 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<bool>>) -> (Vec<u32>, usize) {
     let mut alloctable = Vec::with_capacity(dwoccupmap_max_size);
     for py_dwoccupmap in dwoccupmap_list {
 
-        // preprocess dwoccupmap
+        // preprocess dwoccupmap (example)
+        // py_dwoccupmap = [T,  F, T, T,  F,  F, T, T, T]
+        //   dwoccupmap  = [0, -1, 2, 2, -1, -1, 6, 6, 6]
         let mut dwoccupmap = Vec::new();
         dwoccupmap.push(if py_dwoccupmap[0] {
             0

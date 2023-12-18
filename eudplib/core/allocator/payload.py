@@ -305,8 +305,7 @@ def AllocObjects() -> None:
         dwoccupmap_list.append(dwoccupmap)
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
             e = _("Occupation map length ({}) & Object size mismatch for object ({})")  # noqa: E501
-            e = e.format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2)
-            raise EPError(e)
+            raise EPError(e.format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2))
         lprint(_(" - Preprocessed {} / {} objects").format(i + 1, objn))
 
     lprint(_(" - Preprocessed {} / {} objects").format(objn, objn), flush=True)
