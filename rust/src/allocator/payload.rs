@@ -5,6 +5,8 @@ use pyo3::create_exception;
 
 create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 
+/// Object having PayloadBuffer-like interfaces. Collects all objects by
+/// calling RegisterObject() for every related objects.
 #[pyclass]
 pub struct ObjAllocator {
     suboccupmap: bool,
