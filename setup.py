@@ -1,4 +1,4 @@
-__version__ = "0.76.13a7"
+__version__ = "0.76.13a8"
 
 import os
 import sys
@@ -132,6 +132,8 @@ if __name__ == "__main__":
             package_data={
                 "": [
                     "*.c",
+                    "*.pyd",
+                    "*.pyi",
                     "*.pyx",
                     "*.dll",
                     "*.dylib",
