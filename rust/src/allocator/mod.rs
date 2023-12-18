@@ -4,28 +4,30 @@ mod rlocint;
 mod constexpr;
 
 #[pyfunction]
-fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> Vec<u32> {
+fn stack_objects(dwoccupmap_list: Vec<Vec<bool>>) -> (Vec<u32>, usize) {
     let dwoccupmap_max_size = dwoccupmap_list.iter().fold(0, |acc, x| acc + x.len());
     let mut dwoccupmap_sum  = vec![-1; dwoccupmap_max_size];
     let mut lallocaddr = 0;
+    let mut payload_size = 0;
     let mut alloctable = Vec::with_capacity(dwoccupmap_max_size);
     for py_dwoccupmap in dwoccupmap_list {
 
         // preprocess dwoccupmap
         let mut dwoccupmap = Vec::new();
-        dwoccupmap.push(if py_dwoccupmap[0] == 0 {
-            -1
-        } else {
+        dwoccupmap.push(if py_dwoccupmap[0] {
             0
+        } else {
+            -1
         });
         for (i, (a, b)) in py_dwoccupmap.iter().zip(py_dwoccupmap.iter().skip(1)).enumerate() {
             dwoccupmap.push(
-                if *b == 0 {
+                if *b == false {
                     -1
-                } else if *a == -1 {
+                } else if *a == false {
                     1 + i as i32
                 } else {
-                    *a
+                    // Safety: dwoccupmap can't be empty
+                    unsafe { *dwoccupmap.last().unwrap_unchecked() }
                 }
             );
         }
@@ -54,8 +56,11 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> Vec<u32> {
             }
         }
         alloctable.push(lallocaddr as u32 * 4);
+        if (lallocaddr + py_dwoccupmap.len()) * 4 > payload_size {
+            payload_size = (lallocaddr + py_dwoccupmap.len()) * 4
+        }
     }
-    alloctable
+    (alloctable, payload_size)
 }
 
 pub(crate) fn create_submodule(py: Python<'_>) -> PyResult<&PyModule> {

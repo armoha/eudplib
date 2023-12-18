@@ -14,12 +14,11 @@ from eudplib.localize import _
 from eudplib.utils import EPError, _rand_lst, ep_assert
 from eudplib.bindings._rust import allocator
 
-from .constexpr import ConstExpr, Evaluable, Evaluate, Forward
+from .constexpr import Evaluable, Evaluate, Forward
 from .pbuffer import Payload, PayloadBuffer
 from .rlocint import RlocInt, RlocInt_C
 
 if TYPE_CHECKING:
-    from ...utils import ExprProxy
     from ..eudobj import EUDObject
 
 _found_objects_dict: "dict[EUDObject, int]" = {}
@@ -100,23 +99,13 @@ class ObjCollector:
         pass
 
     def WriteDword(self, obj: Evaluable) -> None:
-        from ...utils import ExprProxy
-
-        if isinstance(obj, int):
-            return
-        if isinstance(obj, (ConstExpr, ExprProxy, RlocInt_C)):
+        if not isinstance(obj, int):
             Evaluate(obj)
-            return
-        raise EPError(_("Collected unexpected object: {}").format(repr(obj)))
 
     def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
         for arg in arglist:
-            if isinstance(arg, int):
-                continue
-            if isinstance(arg, (ConstExpr, ExprProxy, RlocInt_C)):
+            if not isinstance(arg, int):
                 Evaluate(arg)
-                continue
-            raise EPError(_("Collected unexpected object: {}").format(repr(arg)))
 
     def WriteBytes(self, b: bytes) -> None:
         pass
@@ -203,26 +192,26 @@ class ObjAllocator:
         self._sizes: dict[str, int] = {}
 
     def StartWrite(self) -> None:
-        self._suboccupmap: int = 0
+        self._suboccupmap: bool = False
         self._suboccupidx: int = 0
-        self._occupmap: list[int] = []
+        self._occupmap: list[bool] = []
 
     def _Occup0(self) -> None:
         self._suboccupidx += 1
         if self._suboccupidx == 4:
             self._occupmap.append(self._suboccupmap)
             self._suboccupidx = 0
-            self._suboccupmap = 0
+            self._suboccupmap = False
 
     def _Occup1(self) -> None:
-        self._suboccupmap = 1
+        self._suboccupmap = True
         self._suboccupidx += 1
         if self._suboccupidx == 4:
             self._occupmap.append(self._suboccupmap)
             self._suboccupidx = 0
-            self._suboccupmap = 0
+            self._suboccupmap = False
 
-    def EndWrite(self) -> list[int]:
+    def EndWrite(self) -> list[bool]:
         if self._suboccupidx:
             self._occupmap.append(self._suboccupmap)
             self._suboccupidx = 0
@@ -243,7 +232,7 @@ class ObjAllocator:
             self._Occup1()
 
     def WriteDword(self, obj: Evaluable) -> None:
-        self._occupmap.append(1)
+        self._occupmap.append(True)
 
     def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
         if structformat not in self._sizes:
@@ -256,14 +245,14 @@ class ObjAllocator:
         ssize = self._sizes[structformat]
 
         # Add occupation index
-        self._occupmap.extend([1] * (ssize >> 2))
+        self._occupmap.extend([True] * (ssize >> 2))
         ssize &= 3
         for i in range(ssize):
             self._Occup1()
 
     def WriteBytes(self, b: bytes) -> None:
         ssize = len(b)
-        self._occupmap.extend([1] * (ssize >> 2))
+        self._occupmap.extend([True] * (ssize >> 2))
         for i in range(ssize & 3):
             self._Occup1()
 
@@ -273,9 +262,9 @@ class ObjAllocator:
             self._occupmap.append(self._suboccupmap)
             self._suboccupidx -= 4
             remaining0 = self._suboccupidx // 4
-            self._occupmap.extend([0] * remaining0)
+            self._occupmap.extend([False] * remaining0)
             self._suboccupidx %= 4
-            self._suboccupmap = 0
+            self._suboccupmap = False
 
 
 def AllocObjects() -> None:
@@ -306,7 +295,7 @@ def AllocObjects() -> None:
     obja = ObjAllocator()
 
     _alloctable = []
-    dwoccupmap_list: list[list[int]] = []
+    dwoccupmap_list: list[list[bool]] = []
 
     # Get occupation map for all objects
     for i, obj in enumerate(_found_objects_dict):
@@ -323,12 +312,7 @@ def AllocObjects() -> None:
     lprint(_(" - Preprocessed {} / {} objects").format(objn, objn), flush=True)
 
     lprint(_(" - Allocating objects.."), flush=True)
-    _alloctable = allocator.stack_objects(dwoccupmap_list)
-
-    # Get payload length
-    _payload_size = max(
-        _alloctable[i] + obj.GetDataSize() for i, obj in enumerate(_found_objects_dict)
-    )
+    _alloctable, _payload_size = allocator.stack_objects(dwoccupmap_list)
 
     phase = None
 
