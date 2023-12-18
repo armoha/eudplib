@@ -4,11 +4,11 @@ mod rlocint;
 mod constexpr;
 
 #[pyfunction]
-fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> Vec<usize> {
+fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> Vec<u32> {
     let dwoccupmap_max_size = dwoccupmap_list.iter().fold(0, |acc, x| acc + x.len());
     let mut dwoccupmap_sum  = vec![-1; dwoccupmap_max_size];
     let mut lallocaddr = 0;
-    let mut alloctable = Vec::new();
+    let mut alloctable = Vec::with_capacity(dwoccupmap_max_size);
     for py_dwoccupmap in dwoccupmap_list {
 
         // preprocess dwoccupmap
@@ -53,7 +53,7 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> Vec<usize> {
                 };
             }
         }
-        alloctable.push(lallocaddr * 4);
+        alloctable.push(lallocaddr as u32 * 4);
     }
     alloctable
 }

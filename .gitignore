@@ -10,7 +10,8 @@ htmlcov/
 *.egg-info/
 *.egg
 .eggs/
-*.py[cdo]
+# TODO: Add pyd?
+*.py[co]
 .hypothesis/
 target/
 .rust-cov/
