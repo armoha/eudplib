@@ -182,91 +182,6 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
 # -------
 
 
-class ObjAllocator:
-    """
-    Object having PayloadBuffer-like interfaces. Collects all objects by
-    calling RegisterObject() for every related objects.
-    """
-
-    def __init__(self) -> None:
-        self._sizes: dict[str, int] = {}
-
-    def StartWrite(self) -> None:
-        self._suboccupmap: bool = False
-        self._suboccupidx: int = 0
-        self._occupmap: list[bool] = []
-
-    def _Occup0(self) -> None:
-        self._suboccupidx += 1
-        if self._suboccupidx == 4:
-            self._occupmap.append(self._suboccupmap)
-            self._suboccupidx = 0
-            self._suboccupmap = False
-
-    def _Occup1(self) -> None:
-        self._suboccupmap = True
-        self._suboccupidx += 1
-        if self._suboccupidx == 4:
-            self._occupmap.append(self._suboccupmap)
-            self._suboccupidx = 0
-            self._suboccupmap = False
-
-    def EndWrite(self) -> list[bool]:
-        if self._suboccupidx:
-            self._occupmap.append(self._suboccupmap)
-            self._suboccupidx = 0
-        return self._occupmap
-
-    def WriteByte(self, number: int) -> None:
-        if number is None:
-            self._Occup0()
-        else:
-            self._Occup1()
-
-    def WriteWord(self, number: int) -> None:
-        if number is None:
-            self._Occup0()
-            self._Occup0()
-        else:
-            self._Occup1()
-            self._Occup1()
-
-    def WriteDword(self, obj: Evaluable) -> None:
-        self._occupmap.append(True)
-
-    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
-        if structformat not in self._sizes:
-            ssize = 0
-            sizedict = {"B": 1, "H": 2, "I": 4}
-            for b in structformat:
-                ssize += sizedict[b]
-            self._sizes[structformat] = ssize
-
-        ssize = self._sizes[structformat]
-
-        # Add occupation index
-        self._occupmap.extend([True] * (ssize >> 2))
-        ssize &= 3
-        for i in range(ssize):
-            self._Occup1()
-
-    def WriteBytes(self, b: bytes) -> None:
-        ssize = len(b)
-        self._occupmap.extend([True] * (ssize >> 2))
-        for i in range(ssize & 3):
-            self._Occup1()
-
-    def WriteSpace(self, ssize: int) -> None:
-        self._suboccupidx += ssize
-        if self._suboccupidx >= 4:
-            self._occupmap.append(self._suboccupmap)
-            self._suboccupidx -= 4
-            remaining0 = self._suboccupidx // 4
-            self._occupmap.extend([False] * remaining0)
-            self._suboccupidx %= 4
-            self._suboccupmap = False
-
-
 def AllocObjects() -> None:
     global phase
     global _alloctable
@@ -352,7 +267,7 @@ def CreatePayload(root: "EUDObject | Forward") -> Payload:
     return ConstructPayload()
 
 
-_PayloadBuffer: TypeAlias = ObjCollector | ObjAllocator | PayloadBuffer
+_PayloadBuffer: TypeAlias = ObjCollector | allocator.ObjAllocator | PayloadBuffer
 defri: RlocInt_C = RlocInt(0, 4)
 
 
