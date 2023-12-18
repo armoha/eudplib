@@ -6,7 +6,8 @@ edition = "2021"
 publish = false
 
 [dependencies]
-pyo3 = { version = "0.20.0" }
+pyo3 = "0.20.0"
+indicatif = "0.17.7"
 
 [features]
 # See https://github.com/PyO3/pyo3/issues/340

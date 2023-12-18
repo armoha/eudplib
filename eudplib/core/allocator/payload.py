@@ -292,26 +292,7 @@ def AllocObjects() -> None:
         phase = None
         return
 
-    obja = ObjAllocator()
-
-    _alloctable = []
-    dwoccupmap_list: list[list[bool]] = []
-
-    # Get occupation map for all objects
-    for i, obj in enumerate(_found_objects_dict):
-        obja.StartWrite()
-        obj.WritePayload(obja)
-        dwoccupmap = obja.EndWrite()
-        dwoccupmap_list.append(dwoccupmap)
-        if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
-            e = _("Occupation map length ({}) & Object size mismatch for object ({})")  # noqa: E501
-            raise EPError(e.format(len(dwoccupmap), (obj.GetDataSize() + 3) >> 2))
-        lprint(_(" - Preprocessed {} / {} objects").format(i + 1, objn))
-
-    lprint(_(" - Preprocessed {} / {} objects").format(objn, objn), flush=True)
-
-    lprint(_(" - Allocating objects.."), flush=True)
-    _alloctable, _payload_size = allocator.stack_objects(dwoccupmap_list)
+    _alloctable, _payload_size = allocator.alloc_objects(_found_objects_dict)
 
     phase = None
 

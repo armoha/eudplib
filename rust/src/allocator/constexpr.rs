@@ -1,9 +1,7 @@
 use crate::allocator::rlocint::RlocInt;
-use pyo3::create_exception;
 use pyo3::prelude::*;
 use std::sync::Arc;
 
-create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 // use crate::rlocint::RlocInt;
 
 // div_floor is not stabilized yet
