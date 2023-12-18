@@ -46,22 +46,3 @@ impl ConstExpr {
     //     }
     // }
 }
-
-#[pyclass(extends=ConstExpr)]
-struct ConstExprInt {}
-
-#[pymethods]
-impl ConstExprInt {
-    #[new]
-    fn new(value: i32) -> (Self, ConstExpr) {
-        (Self {}, ConstExpr::new(None, value, 0))
-    }
-
-    fn Evaluate(self_: PyRef<'_, Self>) -> RlocInt {
-        let super_ = self_.as_ref(); // Get &BaseClass
-        RlocInt(super_.offset, 0)
-    }
-}
-
-#[pyclass(extends=ConstExpr)]
-struct Forward {}

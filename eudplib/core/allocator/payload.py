@@ -11,7 +11,8 @@ from enum import Enum
 from typing import TYPE_CHECKING, TypeAlias
 
 from eudplib.localize import _
-from eudplib.utils import _rand_lst, EPError, ep_assert, stackobjs
+from eudplib.utils import EPError, _rand_lst, ep_assert
+from eudplib.bindings._rust import stack_objects
 
 from .constexpr import ConstExpr, Evaluable, Evaluate, Forward
 from .pbuffer import Payload, PayloadBuffer
@@ -21,11 +22,10 @@ if TYPE_CHECKING:
     from ...utils import ExprProxy
     from ..eudobj import EUDObject
 
-_found_objects: "list[EUDObject]" = []
-_found_objects_set: "set[EUDObject]" = set()
+_found_objects_dict: "dict[EUDObject, int]" = {}
 _untraversed_objects: "list[EUDObject]" = []
 _dynamic_objects_set: "set[EUDObject]" = set()
-_alloctable: "dict[EUDObject, int]" = {}
+_alloctable: "list[int]" = []
 _payload_size: int = 0
 
 PHASE = Enum("PHASE", ["COLLECTING", "ALLOCATING", "WRITING"])
@@ -127,8 +127,7 @@ class ObjCollector:
 
 def CollectObjects(root: "EUDObject | Forward") -> None:
     global phase
-    global _found_objects
-    global _found_objects_set
+    global _found_objects_dict
     global _dynamic_objects_set
     global _untraversed_objects
 
@@ -137,7 +136,7 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
     phase = PHASE.COLLECTING
 
     objc = ObjCollector()
-    _found_objects_set = set()
+    _found_objects_dict = {}
     _dynamic_objects_set = set()
     _untraversed_objects = []
 
@@ -149,8 +148,8 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
         while _untraversed_objects:
             lprint(
                 _(" - Collected {} / {} objects").format(
-                    len(_found_objects_set),
-                    len(_found_objects_set) + len(_untraversed_objects),
+                    len(_found_objects_dict),
+                    len(_found_objects_dict) + len(_untraversed_objects),
                 )
             )
 
@@ -166,24 +165,26 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
             obj.CollectDependency(objc)
             objc.EndWrite()
 
-    if len(_found_objects_set) == 0:
+    if len(_found_objects_dict) == 0:
         raise EPError(_("No object collected"))
 
     if _payload_shuffle:
         # Shuffle objects -> Randomize(?) addresses
-        _rootobj = _found_objects[0]
-        _found_objects_set.remove(_rootobj)
-        _found_objects = _rand_lst(_found_objects_set)
-        _found_objects.insert(0, _rootobj)
+        iterobj = iter(_found_objects_dict)
+        rootobj = next(iterobj)
+        found_objects = _rand_lst(iterobj)
+        found_objects.append(rootobj)
+        _found_objects_dict = {
+            obj: i for i, obj in enumerate(reversed(found_objects))
+        }
 
     # cleanup
-    _found_objects_set.clear()
     phase = None
 
     # Final
     lprint(
         _(" - Collected {} / {} objects").format(
-            len(_found_objects), len(_found_objects)
+            len(_found_objects_dict), len(_found_objects_dict)
         ),
         flush=True,
     )
@@ -285,17 +286,16 @@ def AllocObjects() -> None:
     global _payload_size
 
     phase = PHASE.ALLOCATING
-    objn = len(_found_objects)
+    objn = len(_found_objects_dict)
 
     lprint(_("[Stage 2/3] AllocObjects"), flush=True)
 
     # Quick and less space-efficient approach
     if not _payload_compress:
         lallocaddr = 0
-        for i, obj in enumerate(_found_objects):
+        for i, obj in enumerate(_found_objects_dict):
             objsize = obj.GetDataSize()
             allocsize = (objsize + 3) & ~3
-            _alloctable[obj] = lallocaddr
             lallocaddr += allocsize
 
             lprint(_(" - Allocated {} / {} objects").format(i + 1, objn))
@@ -307,15 +307,15 @@ def AllocObjects() -> None:
 
     obja = ObjAllocator()
 
-    _alloctable = {}
-    dwoccupmap_dict = {}
+    _alloctable = []
+    dwoccupmap_list: list[list[int]] = []
 
     # Get occupation map for all objects
-    for i, obj in enumerate(_found_objects):
+    for i, obj in enumerate(_found_objects_dict):
         obja.StartWrite()
         obj.WritePayload(obja)
         dwoccupmap = obja.EndWrite()
-        dwoccupmap_dict[obj] = dwoccupmap
+        dwoccupmap_list.append(dwoccupmap)
         if len(dwoccupmap) != (obj.GetDataSize() + 3) >> 2:
             e = _(
                 "Occupation map length ({}) & Object size mismatch for object ({})"
@@ -327,11 +327,12 @@ def AllocObjects() -> None:
     lprint(_(" - Preprocessed {} / {} objects").format(objn, objn), flush=True)
 
     lprint(_(" - Allocating objects.."), flush=True)
-    stackobjs.stack_objects(_found_objects, dwoccupmap_dict, _alloctable)
+    _alloctable = stack_objects(dwoccupmap_list)
 
     # Get payload length
     _payload_size = max(
-        map(lambda obj: _alloctable[obj] + obj.GetDataSize(), _found_objects)
+        _alloctable[i] + obj.GetDataSize()
+        for i, obj in enumerate(_found_objects_dict)
     )
 
     phase = None
@@ -345,12 +346,12 @@ def ConstructPayload() -> Payload:
 
     phase = PHASE.WRITING
     lprint(_("[Stage 3/3] ConstructPayload"), flush=True)
-    objn = len(_found_objects)
+    objn = len(_found_objects_dict)
 
     pbuf = PayloadBuffer(_payload_size)
 
-    for i, obj in enumerate(_found_objects):
-        objaddr, objsize = _alloctable[obj], obj.GetDataSize()
+    for i, obj in enumerate(_found_objects_dict):
+        objaddr, objsize = _alloctable[i], obj.GetDataSize()
 
         pbuf.StartWrite(objaddr)
         obj.WritePayload(pbuf)
@@ -398,16 +399,14 @@ defri: RlocInt_C = RlocInt(0, 4)
 
 def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
     global _alloctable
-    global _found_objects
-    global _found_objects_set
+    global _found_objects_dict
     global _untraversed_objects
     global _dynamic_objects_set
 
     if phase is PHASE.COLLECTING:
-        if obj not in _found_objects_set:
+        if obj not in _found_objects_dict:
             _untraversed_objects.append(obj)
-            _found_objects.append(obj)
-            _found_objects_set.add(obj)
+            _found_objects_dict[obj] = len(_found_objects_dict)
             if obj.DynamicConstructed():
                 _dynamic_objects_set.add(obj)
 
@@ -418,7 +417,7 @@ def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
 
     elif phase is PHASE.WRITING:
         # ep_assert(_alloctable[obj] & 3 == 0)
-        return RlocInt_C(_alloctable[obj], 4)
+        return RlocInt_C(_alloctable[_found_objects_dict[obj]], 4)
 
     else:
         raise EPError(_("Can't calculate object address now"))

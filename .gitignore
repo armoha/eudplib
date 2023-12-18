@@ -20,3 +20,4 @@ target/
 tests/outputmap/
 tests/output.png
 tests/output.pstats
+*.svg
