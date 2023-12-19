@@ -83,11 +83,11 @@ class EUDVarBuffer(EUDObject):
             elif isinstance(initval, int):
                 output[heade : heade + 4] = ut.i2b4(initval)
                 continue
-            emitbuffer.WriteBytes(output[heads:heade])
+            emitbuffer.WriteBytes(bytes(output[heads:heade]))
             emitbuffer.WriteDword(initval)
             heads = 72 * i + 24
 
-        emitbuffer.WriteBytes(output[heads:])
+        emitbuffer.WriteBytes(bytes(output[heads:]))
 
         emitbuffer.WriteSpace(32)
         emitbuffer.WriteDword(4)  # flags
@@ -209,11 +209,11 @@ class EUDCustomVarBuffer(EUDObject):
                 elif isinstance(initval, int):
                     output[heade : heade + 4] = ut.i2b4(initval)
                     continue
-                emitbuffer.WriteBytes(output[heads:heade])
+                emitbuffer.WriteBytes(bytes(output[heads:heade]))
                 emitbuffer.WriteDword(initval)
                 heads = 72 * i + offset + 4
 
-        emitbuffer.WriteBytes(output[heads:])
+        emitbuffer.WriteBytes(bytes(output[heads:]))
 
         emitbuffer.WriteSpace(32)
         emitbuffer.WriteDword(4)  # flags

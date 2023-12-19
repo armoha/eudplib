@@ -733,7 +733,7 @@ def _get_computedest(dst):
         return dst
 
 
-def _seqcompute_sub(assignpairs, _srcdict={}):
+def _seqcompute_sub(assignpairs, _srcdict):
     """
     Subset of SeqCompute with following restrictions
 
@@ -829,9 +829,7 @@ def SeqCompute(assignpairs):  # noqa: N802
     srcvarset = set()
 
     # Record previous dst, mdt for src to optimize duplicate actions
-    import inspect
-
-    srcdictsub = inspect.signature(_seqcompute_sub).parameters["_srcdict"].default
+    srcdictsub = {}
     srcdict = {}
 
     # Sublist of assignments to put in _seqcompute_sub
@@ -849,7 +847,7 @@ def SeqCompute(assignpairs):  # noqa: N802
         if actioncount == 0:  # Already flushed before
             return
 
-        _seqcompute_sub(subassignpairs)
+        _seqcompute_sub(subassignpairs, srcdictsub)
 
         dstvarset.clear()
         srcvarset.clear()
@@ -899,7 +897,6 @@ def SeqCompute(assignpairs):  # noqa: N802
             dstvarset.add(dst)
 
     flush_pairs()
-    srcdictsub.clear()
 
 
 def NonSeqCompute(assignpairs):  # noqa: N802

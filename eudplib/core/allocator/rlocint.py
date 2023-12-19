@@ -12,7 +12,7 @@ from eudplib.localize import _
 _RlocInt: TypeAlias = "int | RlocInt_C"
 
 
-class RlocInt_C:
+class RlocInt_C:  # noqa: N801
 
     """Relocatable int"""
 
@@ -20,38 +20,35 @@ class RlocInt_C:
         self.offset: int = offset
         self.rlocmode: int = rlocmode
 
-    # http://stackoverflow.com/questions/18794169/pythons-radd-doesnt-work-for-c-defined-types
-    # Some obscure type can fludge into 'self' slot, so I called it 'lhs'
-    # rather than self.
-    def __add__(lhs, rhs: _RlocInt) -> "RlocInt_C":
-        if isinstance(lhs, RlocInt_C):  # Call from radd
-            if isinstance(rhs, RlocInt_C):
-                return RlocInt_C(lhs.offset + rhs.offset, lhs.rlocmode + rhs.rlocmode)
-            else:
-                return RlocInt_C((lhs.offset + rhs) & 0xFFFFFFFF, lhs.rlocmode)
+    def __add__(self, rhs: _RlocInt) -> "RlocInt_C":
+        if isinstance(rhs, RlocInt_C):
+            return RlocInt_C(self.offset + rhs.offset, self.rlocmode + rhs.rlocmode)
         else:
-            return RlocInt_C((rhs.offset + lhs) & 0xFFFFFFFF, rhs.rlocmode)
+            return RlocInt_C(self.offset + rhs, self.rlocmode)
 
-    def __sub__(lhs, rhs: _RlocInt) -> "RlocInt_C":
-        lhs = toRlocInt(lhs)
+    def __sub__(self, rhs: _RlocInt) -> "RlocInt_C":
         if isinstance(rhs, RlocInt_C):
             return RlocInt_C(
-                (lhs.offset - rhs.offset) & 0xFFFFFFFF,
-                (lhs.rlocmode - rhs.rlocmode) & 0xFFFFFFFF,
+                self.offset - rhs.offset,
+                self.rlocmode - rhs.rlocmode,
             )
         else:
-            return RlocInt_C((lhs.offset - rhs) & 0xFFFFFFFF, lhs.rlocmode)
+            return RlocInt_C(self.offset - rhs, self.rlocmode)
 
     def __mul__(self, other: _RlocInt) -> "RlocInt_C":
         if isinstance(other, RlocInt_C):
-            ut.ep_assert(other.rlocmode == 0, _("Cannot divide RlocInt with non-const"))
+            ut.ep_assert(
+                other.rlocmode == 0, _("Cannot divide RlocInt with non-const")
+            )
             other = other.offset
 
-        return RlocInt_C((self.offset * other) & 0xFFFFFFFF, self.rlocmode * other)
+        return RlocInt_C(self.offset * other, self.rlocmode * other)
 
     def __floordiv__(self, other: _RlocInt) -> "RlocInt_C":
         if isinstance(other, RlocInt_C):
-            ut.ep_assert(other.rlocmode == 0, _("Cannot divide RlocInt with non-const"))
+            ut.ep_assert(
+                other.rlocmode == 0, _("Cannot divide RlocInt with non-const")
+            )
             other = other.offset
         ut.ep_assert(other != 0, _("Divide by zero"))
         ut.ep_assert(
@@ -59,7 +56,7 @@ class RlocInt_C:
             or (self.rlocmode % other == 0 and self.offset % other == 0),
             _("RlocInt not divisible by {}").format(other),
         )
-        return RlocInt_C((self.offset // other) & 0xFFFFFFFF, self.rlocmode // other)
+        return RlocInt_C(self.offset // other, self.rlocmode // other)
 
     def __str__(self) -> str:
         return "RlocInt(0x%08X, %d)" % (self.offset, self.rlocmode)
@@ -68,15 +65,15 @@ class RlocInt_C:
         return str(self)
 
 
-def RlocInt(offset: int, rlocmode: int) -> RlocInt_C:
-    return RlocInt_C(offset & 0xFFFFFFFF, rlocmode & 0xFFFFFFFF)
+def RlocInt(offset: int, rlocmode: int) -> RlocInt_C:  # noqa: N802
+    return RlocInt_C(offset, rlocmode)
 
 
-def toRlocInt(x: _RlocInt) -> RlocInt_C:
+def toRlocInt(x: _RlocInt) -> RlocInt_C:  # noqa: N802
     """Convert int/RlocInt to rlocint"""
 
     if isinstance(x, RlocInt_C):
         return x
 
     else:
-        return RlocInt_C(x & 0xFFFFFFFF, 0)
+        return RlocInt_C(x, 0)

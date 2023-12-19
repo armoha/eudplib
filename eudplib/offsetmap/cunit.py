@@ -58,15 +58,11 @@ class StatusFlags(EnumMember):
     NoBrkCodeStart = Flag(0x00002000)  # Unbreakable code section in iscript
     UNKNOWN2 = Flag(0x00004000)
     CanNotAttack = Flag(0x00008000)
-    CanTurnAroundToAttack = Flag(
-        0x00010000
-    )  # canAttack? named IsAUnit in BWAPI
+    CanTurnAroundToAttack = Flag(0x00010000)  # canAttack? named IsAUnit in BWAPI
     IsBuilding = Flag(0x00020000)
     IgnoreTileCollision = Flag(0x00040000)
     Unmovable = Flag(0x00080000)
-    IsNormal = Flag(
-        0x00100000
-    )  # 1 for "normal" units, 0 for hallucinated units
+    IsNormal = Flag(0x00100000)  # 1 for "normal" units, 0 for hallucinated units
     # if set, other units wont collide with the unit (like burrowed units)
     NoCollide = Flag(0x00200000)
     UNKNOWN5 = Flag(0x00400000)
@@ -75,14 +71,10 @@ class StatusFlags(EnumMember):
     UNKNOWN6 = Flag(0x01000000)
     UNKNOWN7 = Flag(0x02000000)  # Turret related
     Invincible = Flag(0x04000000)
-    HoldingPosition = Flag(
-        0x08000000
-    )  # Set if the unit is currently holding position
+    HoldingPosition = Flag(0x08000000)  # Set if the unit is currently holding position
     SpeedUpgrade = Flag(0x10000000)
     CooldownUpgrade = Flag(0x20000000)
-    IsHallucination = Flag(
-        0x40000000
-    )  # 1 for hallucinated units, 0 for "normal" units
+    IsHallucination = Flag(0x40000000)  # 1 for hallucinated units, 0 for "normal" units
     # Set for when the unit is self-destructing
     # (scarab, scourge, infested terran)
     IsSelfDestructing = Flag(0x80000000)
@@ -391,9 +383,7 @@ class CUnit(EPDOffsetMap):
     driftX = Member(0x14E, MemberKind.BYTE)
     driftY = Member(0x14F, MemberKind.BYTE)
 
-    def __init__(
-        self, epd: int_or_var, *, ptr: int_or_var | None = None
-    ) -> None:
+    def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
         """EPD Constructor of CUnit. Use CUnit.from_ptr(ptr) for ptr value"""
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
@@ -404,16 +394,12 @@ class CUnit(EPDOffsetMap):
             u, p = epd._epd, epd._ptr
         if isinstance(u, int):
             if p is not None and not isinstance(p, int):
-                raise ut.EPError(
-                    _("Invalid input for CUnit: {}").format((epd, ptr))
-                )
+                raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
             q, r = divmod(u - ut.EPD(0x59CCA8), 84)  # check epd
             if r == 0 and 0 <= q < 1700:
                 _epd, self._ptr = u, 0x59CCA8 + 336 * q
             else:
-                raise ut.EPError(
-                    _("Invalid input for CUnit: {}").format((epd, ptr))
-                )
+                raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
         elif isinstance(u, c.EUDVariable):
             if p is not None:
                 if not isinstance(p, c.EUDVariable):
@@ -427,9 +413,7 @@ class CUnit(EPDOffsetMap):
                 _epd = c.EUDVariable()
                 _epd << u
         else:
-            raise ut.EPError(
-                _("Invalid input for CUnit: {}").format((epd, ptr))
-            )
+            raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
 
         super().__init__(_epd)
 
@@ -526,9 +510,7 @@ class CUnit(EPDOffsetMap):
             ],
         )
         if cs.EUDIfNot()(check_sprite):
-            f_spriteepdread_epd(
-                unit, ret=[ut.EPD(check_sprite) + 2, color_epd]
-            )
+            f_spriteepdread_epd(unit, ret=[ut.EPD(check_sprite) + 2, color_epd])
         cs.EUDEndIf()
         if cs.EUDIfNot()(color_epd <= 2):
             f_maskwrite_epd(color_epd + 2, color_player65536, 0xFF0000)
@@ -583,9 +565,7 @@ class CUnit(EPDOffsetMap):
         if cs.EUDIfNot()(ret == 1):
             unit65536 = unit_type * 65536  # Does not change CurrentPlayer
             Trigger(
-                c.DeathsX(
-                    c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000
-                ),
+                c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
                 ret.SetNumber(1),
             )
             c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
@@ -594,9 +574,7 @@ class CUnit(EPDOffsetMap):
                 ret.SetNumber(1),
             )
             Trigger(
-                c.DeathsX(
-                    c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000
-                ),
+                c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
                 ret.SetNumber(1),
             )
             c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
@@ -712,9 +690,7 @@ class CUnit(EPDOffsetMap):
     def is_dying(self) -> tuple[c.Condition, c.Condition]:
         from ..eudlib.utilf.unlimiterflag import IsUnlimiterOn
 
-        ut.ep_assert(
-            not IsUnlimiterOn(), "Can't detect unit dying with [unlimiter]"
-        )
+        ut.ep_assert(not IsUnlimiterOn(), "Can't detect unit dying with [unlimiter]")
         # return (self.order == 0, self.sprite >= 1)
         return (
             c.MemoryXEPD(self._epd + 0x4D // 4, c.Exactly, 0, 0xFF00),
@@ -743,6 +719,10 @@ class CUnit(EPDOffsetMap):
         from ..eudlib import f_setloc_epd
 
         f_setloc_epd(location, self._epd + 0x28 // 4)
+
+    def remove(self) -> None:
+        self.userActionFlags = 4
+        self.order = 0
 
 
 EPDCUnitMap = CUnit
