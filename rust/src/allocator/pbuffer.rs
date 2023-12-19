@@ -5,6 +5,7 @@ use pyo3::intern;
 use pyo3::prelude::*;
 use pyo3::types::{PyList, PyTuple};
 
+/// Buffer where EUDObject should write to.
 #[pyclass]
 pub struct PayloadBuffer {
     datastart: usize,
@@ -14,11 +15,8 @@ pub struct PayloadBuffer {
     orttable: Vec<usize>,
 }
 
-/// Buffer where EUDObject should write to.
-#[pymethods]
 impl PayloadBuffer {
-    #[new]
-    fn new(totlen: usize) -> Self {
+    pub(crate) fn new(totlen: usize) -> Self {
         Self {
             datastart: 0,
             datacur: 0,
@@ -28,25 +26,39 @@ impl PayloadBuffer {
         }
     }
 
-    fn StartWrite(&mut self, writeaddr: usize) {
+    pub(crate) fn start_write(&mut self, writeaddr: usize) {
         self.datastart = writeaddr;
         self.datacur = writeaddr;
     }
 
-    fn EndWrite(&self) -> usize {
+    pub(crate) fn end_write(&self) -> usize {
         self.datacur - self.datastart
     }
 
-    fn WriteByte(&mut self, number: i64) {
+    pub(crate) fn create_payload(&mut self) -> (Vec<u8>, Vec<usize>, Vec<usize>) {
+        (
+            std::mem::take(&mut self.data),
+            std::mem::take(&mut self.prttable),
+            std::mem::take(&mut self.orttable),
+        )
+    }
+}
+
+#[pymethods]
+impl PayloadBuffer {
+    #[allow(non_snake_case)]
+    fn WriteByte(&mut self, number: i32) {
         self.data[self.datacur] = number.to_le_bytes()[0];
         self.datacur += 1;
     }
 
-    fn WriteWord(&mut self, number: i64) {
+    #[allow(non_snake_case)]
+    fn WriteWord(&mut self, number: i32) {
         self.data[self.datacur..self.datacur + 2].copy_from_slice(&number.to_le_bytes()[0..2]);
         self.datacur += 2;
     }
 
+    #[allow(non_snake_case)]
     fn WriteDword(&mut self, number: &PyAny) -> PyResult<()> {
         let evaluate: Py<PyAny> =
             PyModule::import(number.py(), "eudplib.core.allocator.constexpr")?
@@ -82,6 +94,7 @@ impl PayloadBuffer {
         Ok(())
     }
 
+    #[allow(non_snake_case)]
     fn WritePack(&mut self, structformat: &str, arglist: &PyList) -> PyResult<()> {
         let evaluate: Py<PyAny> =
             PyModule::import(arglist.py(), "eudplib.core.allocator.constexpr")?
@@ -124,27 +137,22 @@ impl PayloadBuffer {
                     .copy_from_slice(&offset.to_le_bytes()[0..2]);
                 self.datacur += 2;
             } else {
-                self.data[self.datacur..self.datacur + 4].copy_from_slice(&offset.to_le_bytes()[0..4]);
+                self.data[self.datacur..self.datacur + 4]
+                    .copy_from_slice(&offset.to_le_bytes()[0..4]);
                 self.datacur += 4;
             }
         }
         Ok(())
     }
 
+    #[allow(non_snake_case)]
     fn WriteBytes(&mut self, b: &[u8]) {
         self.data[self.datacur..self.datacur + b.len()].copy_from_slice(b);
         self.datacur += b.len();
     }
 
+    #[allow(non_snake_case)]
     fn WriteSpace(&mut self, spacesize: usize) {
         self.datacur += spacesize;
-    }
-
-    fn CreatePayload(&mut self, py: Python) -> (Vec<u8>, Vec<usize>, Vec<usize>) {
-        (
-            std::mem::take(&mut self.data),
-            std::mem::take(&mut self.prttable),
-            std::mem::take(&mut self.orttable),
-        )
     }
 }

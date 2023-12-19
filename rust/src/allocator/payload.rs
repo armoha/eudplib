@@ -2,6 +2,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use pyo3::create_exception;
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyDict, PyList, PyTuple};
+use crate::allocator::pbuffer::PayloadBuffer;
 
 create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 
@@ -173,38 +174,92 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
     (alloctable, payload_size)
 }
 
-#[pyfunction]
-pub fn alloc_objects(py: Python, found_objects: &PyDict) -> PyResult<(Vec<u32>, usize)> {
-    let obja = PyCell::new(py, ObjAllocator::new())?;
-    let mut dwoccupmap_list = Vec::with_capacity(found_objects.len());
-    let bar = ProgressBar::new(found_objects.len() as u64);
-    bar.println(" - Preprocessing objects..");
-    bar.set_style(
-        ProgressStyle::with_template("[{elapsed}] {bar:40.cyan/blue} {pos} / {len} objects")
-            .unwrap()
-            .progress_chars("##-"),
-    );
-    for (obj, _v) in found_objects.iter() {
-        {
-            let mut obja = obja.borrow_mut();
-            obja.start_write();
+#[pyclass]
+pub struct PayloadBuilder {
+    alloctable: Vec<u32>,
+    payload_size: usize,
+}
+
+#[pymethods]
+impl PayloadBuilder {
+    #[new]
+    fn new() -> Self {
+        Self {
+            alloctable: Vec::new(),
+            payload_size: 0,
         }
-        let arg: &PyTuple = PyTuple::new(py, &[obja]);
-        obj.call_method1("WritePayload", arg)?;
-        let dwoccupmap = {
-            let mut obja = obja.borrow_mut();
-            obja.end_write()
-        };
-        let datasize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
-        if dwoccupmap.len() != (datasize + 3) >> 2 {
-            let dwoccupmap_len = dwoccupmap.len();
-            let datasize = (datasize + 3) >> 2;
-            return Err(AllocError::new_err(format!("Occupation map length ({dwoccupmap_len}) & Object size ({datasize}) mismatch for {obj}")));
-        }
-        dwoccupmap_list.push(dwoccupmap);
-        bar.inc(1);
     }
-    bar.finish();
-    println!(" - Allocating objects..");
-    Ok(stack_objects(dwoccupmap_list))
+
+    fn offset(&self, index: usize) -> u32 {
+        self.alloctable[index]
+    }
+
+    fn alloc_objects(&mut self, py: Python, found_objects: &PyDict) -> PyResult<()> {
+        let obja = PyCell::new(py, ObjAllocator::new())?;
+        let mut dwoccupmap_list = Vec::with_capacity(found_objects.len());
+        let bar = ProgressBar::new(found_objects.len() as u64);
+        bar.println(" - Preprocessing objects..");
+        bar.set_style(
+            ProgressStyle::with_template("[{elapsed}] {bar:40.cyan/blue} {pos} / {len} objects")
+                .unwrap()
+                .progress_chars("##-"),
+        );
+        for (obj, _v) in found_objects.iter() {
+            {
+                let mut obja = obja.borrow_mut();
+                obja.start_write();
+            }
+            let arg: &PyTuple = PyTuple::new(py, &[obja]);
+            obj.call_method1("WritePayload", arg)?;
+            let dwoccupmap = {
+                let mut obja = obja.borrow_mut();
+                obja.end_write()
+            };
+            let datasize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
+            if dwoccupmap.len() != (datasize + 3) >> 2 {
+                let dwoccupmap_len = dwoccupmap.len();
+                let datasize = (datasize + 3) >> 2;
+                return Err(AllocError::new_err(format!("Occupation map length ({dwoccupmap_len}) & Object size ({datasize}) mismatch for {obj}")));
+            }
+            dwoccupmap_list.push(dwoccupmap);
+            bar.inc(1);
+        }
+        bar.finish();
+        println!(" - Allocating objects..");
+        (self.alloctable, self.payload_size) = stack_objects(dwoccupmap_list);
+        Ok(())
+    }
+
+    fn contruct_payload(&self, py: Python, found_objects: &PyDict) -> PyResult<(Vec<u8>, Vec<usize>, Vec<usize>)> {
+        let pbuf = PyCell::new(py, PayloadBuffer::new(self.payload_size))?;
+        let bar = ProgressBar::new(found_objects.len() as u64);
+        bar.println(" - Writing objects..");
+        bar.set_style(
+            ProgressStyle::with_template("[{elapsed}] {bar:40.cyan/blue} {pos} / {len} objects")
+                .unwrap()
+                .progress_chars("##-"),
+        );
+        for (i, (obj, _v)) in found_objects.iter().enumerate() {
+            {
+                let mut pbuf = pbuf.borrow_mut();
+                pbuf.start_write(self.alloctable[i] as usize);
+            }
+            let arg: &PyTuple = PyTuple::new(py, &[pbuf]);
+            obj.call_method1("WritePayload", arg)?;
+            let written_bytes = {
+                let mut pbuf = pbuf.borrow_mut();
+                pbuf.end_write()
+            };
+            let objsize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
+            if written_bytes != objsize {
+                return Err(AllocError::new_err(format!("obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj}")));
+            }
+            bar.inc(1);
+        }
+        bar.finish();
+        Ok({
+            let mut pbuf = pbuf.borrow_mut();
+            pbuf.create_payload()
+        })
+    }
 }

@@ -7,7 +7,6 @@
 
 import time
 from collections.abc import Callable
-from enum import Enum
 from typing import TYPE_CHECKING, TypeAlias
 
 from eudplib.localize import _
@@ -24,11 +23,12 @@ if TYPE_CHECKING:
 _found_objects_dict: "dict[EUDObject, int]" = {}
 _untraversed_objects: "list[EUDObject]" = []
 _dynamic_objects_set: "set[EUDObject]" = set()
-_alloctable: "list[int]" = []
-_payload_size: int = 0
+_payload_builder: allocator.PayloadBuilder | None = None
 
-PHASE = Enum("PHASE", ["COLLECTING", "ALLOCATING", "WRITING"])
-phase: PHASE | None = None
+PHASE_COLLECTING = 1
+PHASE_ALLOCATING = 2
+PHASE_WRITING = 3
+phase: int = 0
 
 _payload_compress: bool = False
 _payload_shuffle: bool = True
@@ -122,7 +122,7 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
 
     lprint(_("[Stage 1/3] CollectObjects"), flush=True)
 
-    phase = PHASE.COLLECTING
+    phase = PHASE_COLLECTING
 
     objc = ObjCollector()
     _found_objects_dict = {}
@@ -166,7 +166,7 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
         _found_objects_dict = {obj: i for i, obj in enumerate(reversed(found_objects))}
 
     # cleanup
-    phase = None
+    phase = 0
 
     # Final
     lprint(
@@ -184,64 +184,30 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
 
 def AllocObjects() -> None:
     global phase
-    global _alloctable
-    global _payload_size
+    global _payload_builder
 
-    phase = PHASE.ALLOCATING
-    objn = len(_found_objects_dict)
-
+    phase = PHASE_ALLOCATING
     lprint(_("[Stage 2/3] AllocObjects"), flush=True)
 
-    # Quick and less space-efficient approach
     if not _payload_compress:
-        lallocaddr = 0
-        for i, obj in enumerate(_found_objects_dict):
-            objsize = obj.GetDataSize()
-            allocsize = (objsize + 3) & ~3
-            lallocaddr += allocsize
+        raise EPError("CompressPayload(False) is currently not supported")
 
-            lprint(_(" - Allocated {} / {} objects").format(i + 1, objn))
-        _payload_size = lallocaddr
-
-        lprint(_(" - Allocated {} / {} objects").format(objn, objn), flush=True)
-        phase = None
-        return
-
-    _alloctable, _payload_size = allocator.alloc_objects(_found_objects_dict)
+    _payload_builder = allocator.PayloadBuilder()
+    _payload_builder.alloc_objects(_found_objects_dict)
 
     phase = None
-
-
-# -------
 
 
 def ConstructPayload() -> Payload:
     global phase
+    global _payload_builder
 
-    phase = PHASE.WRITING
+    phase = PHASE_WRITING
     lprint(_("[Stage 3/3] ConstructPayload"), flush=True)
-    objn = len(_found_objects_dict)
 
-    pbuf = allocator.PayloadBuffer(_payload_size)
-
-    for i, obj in enumerate(_found_objects_dict):
-        objaddr, objsize = _alloctable[i], obj.GetDataSize()
-
-        pbuf.StartWrite(objaddr)
-        obj.WritePayload(pbuf)
-        written_bytes = pbuf.EndWrite()
-        ep_assert(
-            written_bytes == objsize,
-            _("obj.GetDataSize()({}) != Real payload size({}) for object {}").format(
-                objsize, written_bytes, obj
-            ),
-        )
-
-        lprint(_(" - Written {} / {} objects").format(i + 1, objn))
-
-    lprint(_(" - Written {} / {} objects").format(objn, objn), flush=True)
-    phase = None
-    return Payload(*pbuf.CreatePayload())
+    payload = _payload_builder.contruct_payload(_found_objects_dict)
+    phase = 0
+    return Payload(*payload)
 
 
 _on_create_payload_callbacks: list[Callable] = []
@@ -274,12 +240,12 @@ defri: RlocInt_C = RlocInt(0, 4)
 
 
 def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
-    global _alloctable
+    global _payload_builder
     global _found_objects_dict
     global _untraversed_objects
     global _dynamic_objects_set
 
-    if phase is PHASE.COLLECTING:
+    if phase == PHASE_COLLECTING:
         if obj not in _found_objects_dict:
             _untraversed_objects.append(obj)
             _found_objects_dict[obj] = len(_found_objects_dict)
@@ -288,12 +254,12 @@ def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
 
         return defri
 
-    elif phase is PHASE.ALLOCATING:
+    elif phase == PHASE_ALLOCATING:
         return defri
 
-    elif phase is PHASE.WRITING:
-        # ep_assert(_alloctable[obj] & 3 == 0)
-        return RlocInt_C(_alloctable[_found_objects_dict[obj]], 4)
+    elif phase == PHASE_WRITING:
+        # ep_assert(_payload_builder.offset(_found_objects_dict[obj]) & 3 == 0)
+        return RlocInt_C(_payload_builder.offset(_found_objects_dict[obj]), 4)
 
     else:
         raise EPError(_("Can't calculate object address now"))
