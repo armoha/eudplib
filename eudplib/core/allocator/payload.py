@@ -15,7 +15,7 @@ from eudplib.utils import EPError, _rand_lst, ep_assert
 from eudplib.bindings._rust import allocator
 
 from .constexpr import Evaluable, Evaluate, Forward
-from .pbuffer import Payload, PayloadBuffer
+from .pbuffer import Payload
 from .rlocint import RlocInt, RlocInt_C
 
 if TYPE_CHECKING:
@@ -222,7 +222,7 @@ def ConstructPayload() -> Payload:
     lprint(_("[Stage 3/3] ConstructPayload"), flush=True)
     objn = len(_found_objects_dict)
 
-    pbuf = PayloadBuffer(_payload_size)
+    pbuf = allocator.PayloadBuffer(_payload_size)
 
     for i, obj in enumerate(_found_objects_dict):
         objaddr, objsize = _alloctable[i], obj.GetDataSize()
@@ -241,7 +241,7 @@ def ConstructPayload() -> Payload:
 
     lprint(_(" - Written {} / {} objects").format(objn, objn), flush=True)
     phase = None
-    return pbuf.CreatePayload()
+    return Payload(*pbuf.CreatePayload())
 
 
 _on_create_payload_callbacks: list[Callable] = []
@@ -267,7 +267,9 @@ def CreatePayload(root: "EUDObject | Forward") -> Payload:
     return ConstructPayload()
 
 
-_PayloadBuffer: TypeAlias = ObjCollector | allocator.ObjAllocator | PayloadBuffer
+_PayloadBuffer: TypeAlias = (
+    ObjCollector | allocator.ObjAllocator | allocator.PayloadBuffer
+)
 defri: RlocInt_C = RlocInt(0, 4)
 
 
