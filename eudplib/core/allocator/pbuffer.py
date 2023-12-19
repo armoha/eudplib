@@ -13,9 +13,7 @@ from .constexpr import Evaluable, Evaluate
 
 
 class Payload:
-    def __init__(
-        self, data: bytearray, prttable: list[int], orttable: list[int]
-    ) -> None:
+    def __init__(self, data: bytes, prttable: list[int], orttable: list[int]) -> None:
         self.data = data
         self.prttable = prttable
         self.orttable = orttable

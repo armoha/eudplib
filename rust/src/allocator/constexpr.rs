@@ -37,10 +37,4 @@ impl ConstExpr {
             rlocmode,
         }
     }
-
-    // fn Evaluate(&self) {
-    //     if let Some(expr) = self.baseobj {
-    //         expr.Evaluate()
-    //     }
-    // }
 }

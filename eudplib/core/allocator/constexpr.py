@@ -33,9 +33,7 @@ class ConstExpr:
 
     def __int__(self) -> int:
         if self.baseobj is not None:
-            raise ut.EPError(
-                _("int(ConstExpr) failed because ConstExpr has baseobj")
-            )
+            raise ut.EPError(_("int(ConstExpr) failed because ConstExpr has baseobj"))
         return self.offset
 
     def __add__(self, other: "int | ConstExpr") -> "ConstExpr":
@@ -85,9 +83,7 @@ class ConstExpr:
 
     def __mul__(self, other: int) -> "ConstExpr":
         if isinstance(other, int):
-            return ConstExpr(
-                self.baseobj, self.offset * other, self.rlocmode * other
-            )
+            return ConstExpr(self.baseobj, self.offset * other, self.rlocmode * other)
         return NotImplemented
 
     def __rmul__(self, other: "int") -> "ConstExpr":
@@ -101,9 +97,7 @@ class ConstExpr:
                     other, self.rlocmode
                 ),
             )
-            return ConstExpr(
-                self.baseobj, self.offset // other, self.rlocmode // other
-            )
+            return ConstExpr(self.baseobj, self.offset // other, self.rlocmode // other)
         return NotImplemented
 
     def __mod__(self, other: "int") -> int:
@@ -122,9 +116,7 @@ class ConstExpr:
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, ConstExpr) and self.baseobj is other.baseobj:
-            return (self.offset == other.offset) and (
-                self.rlocmode == other.rlocmode
-            )
+            return (self.offset == other.offset) and (self.rlocmode == other.rlocmode)
         return NotImplemented
 
     def __hash__(self) -> int:
