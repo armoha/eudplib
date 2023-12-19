@@ -1,7 +1,7 @@
 use indicatif::{ProgressBar, ProgressStyle};
-use pyo3::prelude::*;
-use pyo3::types::{PyList, PyBytes, PyDict, PyTuple};
 use pyo3::create_exception;
+use pyo3::prelude::*;
+use pyo3::types::{PyBytes, PyDict, PyList, PyTuple};
 
 create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 
@@ -48,6 +48,7 @@ impl ObjAllocator {
         });
     }
 
+    #[allow(dead_code)]
     fn occup0(&mut self) {
         self.suboccupidx += 1;
         if self.suboccupidx == 4 {
@@ -88,12 +89,15 @@ impl ObjAllocator {
 
     #[allow(non_snake_case)]
     fn WritePack(&mut self, structformat: &str, _arglist: &PyList) {
-        let ssize: u32 = structformat.bytes().map(|x| match x {
-           66 => 1,  // 'B'
-           72 => 2,  // 'H'
-           73 => 4,  // 'I'
-           x => panic!("Unknown struct format: {x}")
-        }).sum();
+        let ssize: u32 = structformat
+            .bytes()
+            .map(|x| match x {
+                66 => 1, // 'B'
+                72 => 2, // 'H'
+                73 => 4, // 'I'
+                _ => panic!("Unknown struct format: {x}"),
+            })
+            .sum();
 
         for _ in 0..(ssize >> 2) {
             self.push(true);
@@ -133,7 +137,7 @@ impl ObjAllocator {
 
 fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
     let dwoccupmap_max_size = dwoccupmap_list.iter().fold(0, |acc, x| acc + x.len());
-    let mut dwoccupmap_sum  = vec![-1; dwoccupmap_max_size];
+    let mut dwoccupmap_sum = vec![-1; dwoccupmap_max_size];
     let mut lallocaddr = 0;
     let mut payload_size = 0;
     let mut alloctable = Vec::with_capacity(dwoccupmap_max_size);
@@ -174,14 +178,18 @@ pub fn alloc_objects(py: Python, found_objects: &PyDict) -> PyResult<(Vec<u32>, 
     let obja = PyCell::new(py, ObjAllocator::new())?;
     let mut dwoccupmap_list = Vec::with_capacity(found_objects.len());
     let bar = ProgressBar::new(found_objects.len() as u64);
-    bar.set_style(ProgressStyle::with_template(" - Preprocessed {pos:>5} / {len:5} objects")
-    .unwrap());
+    bar.println(" - Preprocessing objects..");
+    bar.set_style(
+        ProgressStyle::with_template("[{elapsed}] {bar:40.cyan/blue} {pos} / {len} objects")
+            .unwrap()
+            .progress_chars("##-"),
+    );
     for (obj, _v) in found_objects.iter() {
         {
             let mut obja = obja.borrow_mut();
             obja.start_write();
         }
-        let arg: &PyTuple = PyTuple::new(py, &[obja,]);
+        let arg: &PyTuple = PyTuple::new(py, &[obja]);
         obj.call_method1("WritePayload", arg)?;
         let dwoccupmap = {
             let mut obja = obja.borrow_mut();
