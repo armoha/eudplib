@@ -195,7 +195,7 @@ def AllocObjects() -> None:
     _payload_builder = allocator.PayloadBuilder()
     _payload_builder.alloc_objects(_found_objects_dict)
 
-    phase = None
+    phase = 0
 
 
 def ConstructPayload() -> Payload:
@@ -204,6 +204,8 @@ def ConstructPayload() -> Payload:
 
     phase = PHASE_WRITING
     lprint(_("[Stage 3/3] ConstructPayload"), flush=True)
+    if _payload_builder is None:
+        raise EPError(_("PayloadBuilder is not instantiated"))
 
     payload = _payload_builder.contruct_payload(_found_objects_dict)
     phase = 0
@@ -259,7 +261,7 @@ def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
 
     elif phase == PHASE_WRITING:
         # ep_assert(_payload_builder.offset(_found_objects_dict[obj]) & 3 == 0)
-        return RlocInt_C(_payload_builder.offset(_found_objects_dict[obj]), 4)
+        return RlocInt_C(_payload_builder.offset(_found_objects_dict[obj]), 4)  # type: ignore[union-attr]
 
     else:
         raise EPError(_("Can't calculate object address now"))
