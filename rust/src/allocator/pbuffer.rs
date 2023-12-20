@@ -48,13 +48,13 @@ impl PayloadBuffer {
 impl PayloadBuffer {
     #[allow(non_snake_case)]
     fn WriteByte(&mut self, number: i32) {
-        self.data[self.datacur] = number.to_le_bytes()[0];
+        self.data[self.datacur] = number as u8;
         self.datacur += 1;
     }
 
     #[allow(non_snake_case)]
     fn WriteWord(&mut self, number: i32) {
-        self.data[self.datacur..self.datacur + 2].copy_from_slice(&number.to_le_bytes()[0..2]);
+        self.data[self.datacur..self.datacur + 2].copy_from_slice(&number.to_le_bytes()[..2]);
         self.datacur += 2;
     }
 

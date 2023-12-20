@@ -207,7 +207,7 @@ def ConstructPayload() -> Payload:
     if _payload_builder is None:
         raise EPError(_("PayloadBuilder is not instantiated"))
 
-    payload = _payload_builder.contruct_payload(_found_objects_dict)
+    payload = _payload_builder.construct_payload(_found_objects_dict)
     phase = 0
     return Payload(*payload)
 

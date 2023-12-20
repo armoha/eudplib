@@ -1,8 +1,8 @@
+use crate::allocator::pbuffer::PayloadBuffer;
 use indicatif::{ProgressBar, ProgressStyle};
 use pyo3::create_exception;
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyDict, PyList, PyTuple};
-use crate::allocator::pbuffer::PayloadBuffer;
 
 create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 
@@ -137,11 +137,11 @@ impl ObjAllocator {
 }
 
 fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
-    let dwoccupmap_max_size = dwoccupmap_list.iter().fold(0, |acc, x| acc + x.len());
-    let mut dwoccupmap_sum = vec![-1; dwoccupmap_max_size];
+    let mut dwoccupmap_sum = vec![-1; dwoccupmap_list.iter().map(Vec::len).sum()];
+    let mut alloctable = Vec::with_capacity(dwoccupmap_sum.len());
     let mut lallocaddr = 0;
     let mut payload_size = 0;
-    let mut alloctable = Vec::with_capacity(dwoccupmap_max_size);
+
     for dwoccupmap in dwoccupmap_list {
         // Find appropriate position to allocate object
         let mut i = 0;
@@ -156,9 +156,9 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
         }
 
         // Apply occupation map
-        for i in (0..dwoccupmap.len()).rev() {
+        for (i, &occup) in dwoccupmap.iter().enumerate().rev() {
             let curoff = lallocaddr + i;
-            if dwoccupmap[i] != -1 || dwoccupmap_sum[curoff] != -1 {
+            if occup != -1 || dwoccupmap_sum[curoff] != -1 {
                 dwoccupmap_sum[curoff] = if dwoccupmap_sum[curoff + 1] == -1 {
                     curoff as i32 + 1
                 } else {
@@ -166,11 +166,15 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
                 };
             }
         }
-        alloctable.push(lallocaddr as u32 * 4);
-        if (lallocaddr + dwoccupmap.len()) * 4 > payload_size {
-            payload_size = (lallocaddr + dwoccupmap.len()) * 4
+        alloctable.push((lallocaddr * 4) as u32);
+
+        let obj_size = lallocaddr + dwoccupmap.len();
+        let obj_payload_size = obj_size * 4;
+        if obj_payload_size > payload_size {
+            payload_size = obj_payload_size;
         }
     }
+
     (alloctable, payload_size)
 }
 
@@ -230,7 +234,11 @@ impl PayloadBuilder {
         Ok(())
     }
 
-    fn contruct_payload(&self, py: Python, found_objects: &PyDict) -> PyResult<(Vec<u8>, Vec<usize>, Vec<usize>)> {
+    fn construct_payload(
+        &self,
+        py: Python,
+        found_objects: &PyDict,
+    ) -> PyResult<(Vec<u8>, Vec<usize>, Vec<usize>)> {
         let pbuf = PyCell::new(py, PayloadBuffer::new(self.payload_size))?;
         let bar = ProgressBar::new(found_objects.len() as u64);
         bar.println(" - Writing objects..");
@@ -252,7 +260,9 @@ impl PayloadBuilder {
             };
             let objsize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
             if written_bytes != objsize {
-                return Err(AllocError::new_err(format!("obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj}")));
+                return Err(AllocError::new_err(format!(
+                    "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj}"
+                )));
             }
             bar.inc(1);
         }
