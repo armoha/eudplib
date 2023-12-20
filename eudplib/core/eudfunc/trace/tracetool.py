@@ -63,9 +63,9 @@ def _EUDTracePush() -> None:
     RawTrigger(actions=SetMemory(recordTraceAct + 16, Add, 1))
 
 
-def _EUDTracePop() -> Action:
+def _EUDTracePop() -> None:
     EUDTraceLogRaw(0)
-    return SetMemory(recordTraceAct + 16, Subtract, 1)
+    RawTrigger(actions=SetMemory(recordTraceAct + 16, Subtract, 1))
 
 
 nextTraceId = 0

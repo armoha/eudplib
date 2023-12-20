@@ -107,12 +107,13 @@ class EUDFuncN:
 
         if not self._fend.IsSet():
             self._fend << bt.NextTrigger()
-        trace = _EUDTracePop() if self._traced else []
+        if self._traced:
+            _EUDTracePop()
         if self._retn is None or self._retn == 0:
-            self._fend = bt.RawTrigger(actions=trace)
+            self._fend = bt.RawTrigger()
             self._nptr = self._fend + 4
         else:
-            fendTrgs = ut.FlattenList(ev.VProc([self._frets], [trace]))
+            fendTrgs = ut.FlattenList(ev.VProc([self._frets], []))
             self._fend = fendTrgs[0]
             self._nptr = fendTrgs[-1]._actions[-1] + 20
 
@@ -176,8 +177,7 @@ class EUDFuncN:
         ret = ut.FlattenList(ret)
         ut.ep_assert(
             len(ret) == self._retn,
-            _("Return number mismatch : ")
-            + "len(%s) != %d" % (repr(ret), self._retn),
+            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
         )
         nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -186,9 +186,7 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append(
-                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
-                )
+                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
 
         ev.SeqCompute(nextPtrAssignment)
         bt.SetNextTrigger(self._fstart)
@@ -222,8 +220,7 @@ class EUDFuncN:
         ret = ut.FlattenList(ret)
         ut.ep_assert(
             len(ret) == self._retn,
-            _("Return number mismatch : ")
-            + "len(%s) != %d" % (repr(ret), self._retn),
+            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
         )
         nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -232,9 +229,7 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append(
-                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
-                )
+                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
         varAssigns, constAssigns = list(), list()
         for farg, arg in zip(self._fargs, args):
             if ev.IsEUDVariable(arg):
