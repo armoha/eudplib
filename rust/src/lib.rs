@@ -1,6 +1,7 @@
 use pyo3::prelude::*;
 
 mod allocator;
+mod types;
 
 #[pymodule]
 fn _rust(py: Python<'_>, m: &PyModule) -> PyResult<()> {

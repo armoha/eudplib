@@ -4,6 +4,7 @@ use pyo3::exceptions::PyValueError;
 use pyo3::intern;
 use pyo3::prelude::*;
 use pyo3::types::{PyList, PyTuple};
+use crate::types::EVALUATE;
 
 /// Buffer where EUDObject should write to.
 #[pyclass]
@@ -60,18 +61,15 @@ impl PayloadBuffer {
 
     #[allow(non_snake_case)]
     fn WriteDword(&mut self, number: &PyAny) -> PyResult<()> {
-        let evaluate: Py<PyAny> =
-            PyModule::import(number.py(), "eudplib.core.allocator.constexpr")?
-                .getattr("Evaluate")?
-                .into();
+        let evaluate = EVALUATE.get(number.py())?;
         let arg = PyTuple::new(number.py(), &[number]);
-        let rlocint = evaluate.call1(number.py(), arg)?;
+        let rlocint = evaluate.call1(arg)?;
         let rlocmode = rlocint
-            .getattr(number.py(), intern!(number.py(), "rlocmode"))?
-            .extract::<i64>(number.py())?;
+            .getattr(intern!(number.py(), "rlocmode"))?
+            .extract::<i64>()?;
         let offset = rlocint
-            .getattr(number.py(), intern!(number.py(), "offset"))?
-            .extract::<i64>(number.py())?;
+            .getattr(intern!(number.py(), "offset"))?
+            .extract::<i64>()?;
 
         if rlocmode != 0 {
             assert!(
@@ -96,10 +94,7 @@ impl PayloadBuffer {
 
     #[allow(non_snake_case)]
     fn WritePack(&mut self, structformat: &str, arglist: &PyList) -> PyResult<()> {
-        let evaluate: Py<PyAny> =
-            PyModule::import(arglist.py(), "eudplib.core.allocator.constexpr")?
-                .getattr("Evaluate")?
-                .into();
+        let evaluate = EVALUATE.get(arglist.py())?;
 
         for (b, number) in structformat.bytes().zip(arglist.iter()) {
             let argsize = match b {
@@ -109,13 +104,13 @@ impl PayloadBuffer {
                 _ => panic!("Unknown struct format: {b}"),
             };
             let arg = PyTuple::new(number.py(), &[number]);
-            let rlocint = evaluate.call1(arglist.py(), arg)?;
+            let rlocint = evaluate.call1(arg)?;
             let rlocmode = rlocint
-                .getattr(arglist.py(), intern!(arglist.py(), "rlocmode"))?
-                .extract::<i64>(arglist.py())?;
+                .getattr(intern!(arglist.py(), "rlocmode"))?
+                .extract::<i64>()?;
             let offset = rlocint
-                .getattr(arglist.py(), intern!(arglist.py(), "offset"))?
-                .extract::<i64>(arglist.py())?;
+                .getattr(intern!(arglist.py(), "offset"))?
+                .extract::<i64>()?;
 
             if !(rlocmode == 0 || (argsize == 4 && self.datacur % 4 == 0)) {
                 return Err(PyValueError::new_err(
