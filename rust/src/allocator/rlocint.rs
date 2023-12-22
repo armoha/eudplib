@@ -1,23 +1,34 @@
+use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
 use std::fmt;
 use std::ops::{Add, Div, Mul, Rem, Sub};
 
-/// Relocatable int
-#[pyclass(frozen)]
-pub struct RlocInt_C {
+#[derive(Clone)]
+pub(crate) struct RlocInt {
     offset: i32,
     rlocmode: i32,
 }
 
-#[pymethods]
-impl RlocInt_C {
-    #[new]
-    fn new(offset: i32, rlocmode: i32) -> Self {
+impl RlocInt {
+    pub(crate) fn new(offset: i32, rlocmode: i32) -> Self {
         Self { offset, rlocmode }
     }
 }
 
-impl fmt::Display for RlocInt_C {
+/// Relocatable int
+#[derive(Clone)]
+#[pyclass(frozen, name = "RlocInt_C")]
+pub struct PyRlocInt(RlocInt);
+
+#[pymethods]
+impl PyRlocInt {
+    #[new]
+    fn new(offset: i32, rlocmode: i32) -> Self {
+        Self(RlocInt::new(offset, rlocmode))
+    }
+}
+
+impl fmt::Display for RlocInt {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // Write strictly the first element into the supplied output
         // stream: `f`. Returns `fmt::Result` which indicates whether the
@@ -27,7 +38,7 @@ impl fmt::Display for RlocInt_C {
     }
 }
 
-impl Add<RlocInt_C> for RlocInt_C {
+impl Add<RlocInt> for RlocInt {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
@@ -38,7 +49,7 @@ impl Add<RlocInt_C> for RlocInt_C {
     }
 }
 
-impl Add<i32> for RlocInt_C {
+impl Add<i32> for RlocInt {
     type Output = Self;
 
     fn add(self, other: i32) -> Self {
@@ -49,18 +60,18 @@ impl Add<i32> for RlocInt_C {
     }
 }
 
-impl Add<RlocInt_C> for i32 {
-    type Output = RlocInt_C;
+impl Add<RlocInt> for i32 {
+    type Output = RlocInt;
 
-    fn add(self, other: RlocInt_C) -> RlocInt_C {
-        RlocInt_C {
+    fn add(self, other: RlocInt) -> RlocInt {
+        RlocInt {
             offset: self.wrapping_add(other.offset),
             rlocmode: other.rlocmode,
         }
     }
 }
 
-impl Sub<RlocInt_C> for RlocInt_C {
+impl Sub<RlocInt> for RlocInt {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
@@ -71,7 +82,7 @@ impl Sub<RlocInt_C> for RlocInt_C {
     }
 }
 
-impl Sub<i32> for RlocInt_C {
+impl Sub<i32> for RlocInt {
     type Output = Self;
 
     fn sub(self, other: i32) -> Self {
@@ -82,18 +93,18 @@ impl Sub<i32> for RlocInt_C {
     }
 }
 
-impl Sub<RlocInt_C> for i32 {
-    type Output = RlocInt_C;
+impl Sub<RlocInt> for i32 {
+    type Output = RlocInt;
 
-    fn sub(self, other: RlocInt_C) -> RlocInt_C {
-        RlocInt_C {
+    fn sub(self, other: RlocInt) -> RlocInt {
+        RlocInt {
             offset: self.wrapping_sub(other.offset),
             rlocmode: -other.rlocmode,
         }
     }
 }
 
-impl Mul<RlocInt_C> for RlocInt_C {
+impl Mul<RlocInt> for RlocInt {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
@@ -108,7 +119,7 @@ impl Mul<RlocInt_C> for RlocInt_C {
     }
 }
 
-impl Mul<i32> for RlocInt_C {
+impl Mul<i32> for RlocInt {
     type Output = Self;
 
     fn mul(self, other: i32) -> Self {
@@ -119,18 +130,18 @@ impl Mul<i32> for RlocInt_C {
     }
 }
 
-impl Mul<RlocInt_C> for i32 {
-    type Output = RlocInt_C;
+impl Mul<RlocInt> for i32 {
+    type Output = RlocInt;
 
-    fn mul(self, other: RlocInt_C) -> RlocInt_C {
-        RlocInt_C {
+    fn mul(self, other: RlocInt) -> RlocInt {
+        RlocInt {
             offset: self.wrapping_mul(other.offset),
             rlocmode: self.wrapping_mul(other.rlocmode),
         }
     }
 }
 
-impl Div<RlocInt_C> for RlocInt_C {
+impl Div<RlocInt> for RlocInt {
     type Output = Self;
 
     fn div(self, other: Self) -> Self {
@@ -148,7 +159,7 @@ impl Div<RlocInt_C> for RlocInt_C {
     }
 }
 
-impl Div<i32> for RlocInt_C {
+impl Div<i32> for RlocInt {
     type Output = Self;
 
     fn div(self, other: i32) -> Self {
@@ -164,10 +175,10 @@ impl Div<i32> for RlocInt_C {
     }
 }
 
-impl Div<RlocInt_C> for i32 {
+impl Div<RlocInt> for i32 {
     type Output = i32;
 
-    fn div(self, other: RlocInt_C) -> i32 {
+    fn div(self, other: RlocInt) -> i32 {
         assert!(other.rlocmode == 0, "Cannot divide RlocInt with non-const");
         assert!(other.offset != 0, "Divide by zero");
         assert!(
@@ -178,7 +189,7 @@ impl Div<RlocInt_C> for i32 {
     }
 }
 
-impl Rem<RlocInt_C> for RlocInt_C {
+impl Rem<RlocInt> for RlocInt {
     type Output = Self;
 
     fn rem(self, other: Self) -> Self {
@@ -196,7 +207,7 @@ impl Rem<RlocInt_C> for RlocInt_C {
     }
 }
 
-impl Rem<i32> for RlocInt_C {
+impl Rem<i32> for RlocInt {
     type Output = Self;
 
     fn rem(self, other: i32) -> Self {
@@ -212,10 +223,10 @@ impl Rem<i32> for RlocInt_C {
     }
 }
 
-impl Rem<RlocInt_C> for i32 {
+impl Rem<RlocInt> for i32 {
     type Output = i32;
 
-    fn rem(self, other: RlocInt_C) -> i32 {
+    fn rem(self, other: RlocInt) -> i32 {
         assert!(other.rlocmode == 0, "Cannot divide RlocInt with non-const");
         assert!(other.offset != 0, "Divide by zero");
         assert!(
@@ -227,6 +238,23 @@ impl Rem<RlocInt_C> for i32 {
 }
 
 #[pyfunction]
-pub fn RlocInt(offset: i32, rlocmode: i32) -> RlocInt_C {
-    RlocInt_C::new(offset, rlocmode)
+#[pyo3(name = "RlocInt")]
+pub fn py_rlocint(offset: i32, rlocmode: i32) -> PyRlocInt {
+    PyRlocInt::new(offset, rlocmode)
+}
+
+#[pyfunction]
+#[pyo3(name = "toRlocInt")]
+pub fn to_rlocint(x: &PyAny) -> PyResult<PyRlocInt> {
+    let expr = if let Ok(expr) = x.extract::<PyRlocInt>() {
+        expr.0
+    } else if let Ok(expr) = x.extract::<i32>() {
+        RlocInt {
+            offset: expr,
+            rlocmode: 0,
+        }
+    } else {
+        return Err(PyTypeError::new_err(format!("Unsupported type: {x}")));
+    };
+    Ok(PyRlocInt(expr))
 }

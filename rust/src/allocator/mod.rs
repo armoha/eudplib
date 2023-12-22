@@ -11,10 +11,12 @@ pub(crate) fn create_submodule(py: Python<'_>) -> PyResult<&PyModule> {
     submod.add_class::<payload::PayloadBuilder>()?;
     submod.add_class::<pbuffer::PayloadBuffer>()?;
 
-    submod.add_function(wrap_pyfunction!(rlocint::RlocInt, submod)?)?;
-    submod.add_class::<rlocint::RlocInt_C>()?;
+    submod.add_function(wrap_pyfunction!(rlocint::py_rlocint, submod)?)?;
+    submod.add_function(wrap_pyfunction!(rlocint::to_rlocint, submod)?)?;
+    submod.add_class::<rlocint::PyRlocInt>()?;
 
-    submod.add_class::<constexpr::ConstExpr>()?;
+    submod.add_class::<constexpr::PyConstExpr>()?;
+    submod.add_class::<constexpr::Forward>()?;
 
     Ok(submod)
 }
