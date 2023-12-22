@@ -255,7 +255,7 @@ impl PayloadBuilder {
             let arg: &PyTuple = PyTuple::new(py, &[pbuf]);
             obj.call_method1("WritePayload", arg)?;
             let written_bytes = {
-                let mut pbuf = pbuf.borrow_mut();
+                let pbuf = pbuf.borrow();
                 pbuf.end_write()
             };
             let objsize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
