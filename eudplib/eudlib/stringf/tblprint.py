@@ -31,9 +31,7 @@ def GetTBLAddr(tbl_id):  # noqa: N802
     if cs.EUDIfNot()(check_pointer):
         from ...core.variable.evcommon import _ev
 
-        f_dwepdread_epd(
-            _STAT_TEXT_POINTER, ret=[_ev[4], ut.EPD(add_tblepd) + 5]
-        )
+        f_dwepdread_epd(_STAT_TEXT_POINTER, ret=[_ev[4], ut.EPD(add_tblepd) + 5])
         c.VProc(_ev[4], _ev[4].SetDest(ut.EPD(check_pointer) + 2))
         c.VProc(_ev[4], _ev[4].SetDest(ut.EPD(add_tblptr) + 5))
     cs.EUDEndIf()
@@ -80,10 +78,7 @@ def f_settblf(tbl_id, offset, format_string, *args, encoding=None):
     if encoding is None:
         encoding = c.StatText._encoding
 
-    if (
-        encoding.casefold() == "UTF-8".casefold()
-        and format_string[-1] != "\u2009"
-    ):
+    if encoding.casefold() == "UTF-8".casefold() and format_string[-1] != "\u2009":
         format_string += "\u2009"
 
     return f_sprintf(dst, format_string, *args, encoding=encoding)
@@ -158,11 +153,6 @@ def _f_initstattext() -> None:
 
 def _AddStatText(tbl: bytes) -> None:  # noqa: N802
     tbl_count = ut.b2i2(tbl)
-    new_tbl = ut.i2b2(tbl_count)
-    tbl_offset = 2 * (tbl_count + 1)
-    if tbl_count % 2 == 0:
-        tbl_offset += 2
-    tbl_contents = []
     utf8_decodable_count = tbl_count
     cp949_decodable_count = tbl_count
 
@@ -172,12 +162,7 @@ def _AddStatText(tbl: bytes) -> None:  # noqa: N802
         tbl_end = ut.b2i2(tbl, k + 2)
         if i == tbl_count - 1:
             tbl_end = len(tbl)
-        tbl_content = tbl[tbl_start:tbl_end] + b"\0\0\0"
-        while len(tbl_content) % 4 >= 1:
-            tbl_content += b"\0"
-        new_tbl += ut.i2b2(tbl_offset)
-        tbl_contents.append(tbl_content)
-        tbl_offset += len(tbl_content)
+        tbl_content = tbl[tbl_start:tbl_end]
 
         try:
             tbl_content.decode("utf-8")
@@ -188,13 +173,7 @@ def _AddStatText(tbl: bytes) -> None:  # noqa: N802
         except UnicodeDecodeError:
             cp949_decodable_count -= 1
 
-    if tbl_count % 2 == 0:
-        new_tbl += b"\0\0"
-
-    for tbl_content in tbl_contents:
-        new_tbl += tbl_content
-
     if utf8_decodable_count < cp949_decodable_count:
         c.StatText._encoding = "CP949"
 
-    c.StatText._data = new_tbl
+    c.StatText._data = tbl
