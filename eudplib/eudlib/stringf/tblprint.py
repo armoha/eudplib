@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+import itertools
+
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
@@ -153,6 +155,11 @@ def _f_initstattext() -> None:
 
 def _AddStatText(tbl: bytes) -> None:  # noqa: N802
     tbl_count = ut.b2i2(tbl)
+    new_tbl = [ut.i2b2(tbl_count)]
+    tbl_offset = 2 * (tbl_count + 1)
+    if tbl_count % 2 == 0:
+        tbl_offset += 2
+    tbl_contents = []
     utf8_decodable_count = tbl_count
     cp949_decodable_count = tbl_count
 
@@ -173,7 +180,19 @@ def _AddStatText(tbl: bytes) -> None:  # noqa: N802
         except UnicodeDecodeError:
             cp949_decodable_count -= 1
 
-    if utf8_decodable_count < cp949_decodable_count:
-        c.StatText._encoding = "CP949"
+        assert tbl_offset % 4 == 0
+        new_tbl.append(ut.i2b2(tbl_offset))
+        new_tbl_len = -(-(len(tbl_content) + 3) // 4) * 4
+        tbl_offset += new_tbl_len
+        tbl_contents.append(tbl_content)
+        tbl_contents.append(b"\0" * (new_tbl_len - len(tbl_content)))
 
-    c.StatText._data = tbl
+    if tbl_count % 2 == 0:
+        new_tbl.append(b"\0\0")
+
+    if utf8_decodable_count <= cp949_decodable_count:
+        c.StatText._encoding = "CP949"
+    else:
+        c.StatText._encoding = "UTF-8"
+
+    c.StatText._data = b"".join(itertools.chain(new_tbl, tbl_contents))
