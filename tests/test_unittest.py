@@ -71,6 +71,12 @@ def f():
     helper.test_runall("unittest")
 
 
+from eudplib.eudlib.stringf.tblprint import _AddStatText
+
+
+_AddStatText(open("unittests/custom_txt.tbl", "rb").read())
+
+
 # profile_tool.profile(f, "profile.json")
 f()
 print("--- %s seconds ---" % (time.time() - start_time))
