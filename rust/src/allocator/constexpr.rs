@@ -30,7 +30,7 @@ impl DivFloor for i32 {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct ConstExpr {
     baseobj: PyObject,
     offset: i32,
@@ -62,7 +62,12 @@ impl ConstExpr {
 }
 
 #[derive(Clone)]
-#[pyclass(frozen, subclass, name = "ConstExpr")]
+#[pyclass(
+    frozen,
+    subclass,
+    name = "ConstExpr",
+    module = "eudplib.core.allocator"
+)]
 pub struct PyConstExpr(ConstExpr);
 
 #[pymethods]
@@ -71,6 +76,24 @@ impl PyConstExpr {
     #[pyo3(signature = (baseobj, offset=0, rlocmode=4))]
     fn new(baseobj: PyObject, offset: i32, rlocmode: i32) -> PyResult<Self> {
         Ok(Self(ConstExpr::new(baseobj, offset, rlocmode)))
+    }
+
+    fn __repr__(&self) -> String {
+        format!("{:?}", self.0)
+    }
+
+    fn __str__(&self) -> String {
+        self.__repr__()
+    }
+
+    fn __int__(&self, py: Python) -> PyResult<i32> {
+        if self.0.rlocmode == 0 && self.0.baseobj.is_none(py) {
+            Ok(self.0.offset)
+        } else {
+            Err(PyValueError::new_err(
+                "int(ConstExpr) failed because ConstExpr has baseobj",
+            ))
+        }
     }
 
     fn __add__(slf: PyRef<Self>, py: Python, rhs: i32) -> Self {
@@ -184,7 +207,7 @@ impl PyConstExpr {
     }
 }
 
-#[pyclass(extends = PyConstExpr)]
+#[pyclass(extends = PyConstExpr, module = "eudplib.core.allocator")]
 pub struct Forward {
     expr: Option<PyConstExpr>,
 }
