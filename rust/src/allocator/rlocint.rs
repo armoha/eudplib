@@ -18,7 +18,7 @@ impl RlocInt {
 /// Relocatable int
 #[derive(Clone)]
 #[pyclass(frozen, name = "RlocInt_C")]
-pub struct PyRlocInt(RlocInt);
+pub struct PyRlocInt(pub RlocInt);
 
 #[pymethods]
 impl PyRlocInt {
