@@ -17,7 +17,7 @@ impl RlocInt {
 
 /// Relocatable int
 #[derive(Clone)]
-#[pyclass(frozen, name = "RlocInt_C")]
+#[pyclass(frozen, name = "RlocInt_C", module = "eudplib.core.allocator")]
 pub struct PyRlocInt(pub RlocInt);
 
 #[pymethods]

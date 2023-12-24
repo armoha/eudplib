@@ -8,7 +8,7 @@ create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 
 /// Object having PayloadBuffer-like interfaces. Collects all objects by
 /// calling RegisterObject() for every related objects.
-#[pyclass]
+#[pyclass(module = "eudplib.core.allocator")]
 pub struct ObjAllocator {
     suboccupmap: bool,
     suboccupidx: u32,
@@ -178,7 +178,7 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
     (alloctable, payload_size)
 }
 
-#[pyclass]
+#[pyclass(module = "eudplib.core.allocator")]
 pub struct PayloadBuilder {
     alloctable: Vec<u32>,
     payload_size: usize,

@@ -7,7 +7,7 @@ use pyo3::types::{PyList, PyTuple};
 use crate::types::EVALUATE;
 
 /// Buffer where EUDObject should write to.
-#[pyclass]
+#[pyclass(module = "eudplib.core.allocator")]
 pub struct PayloadBuffer {
     datastart: usize,
     datacur: usize,
