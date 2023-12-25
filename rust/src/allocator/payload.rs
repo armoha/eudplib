@@ -3,9 +3,35 @@ use indicatif::{ProgressBar, ProgressStyle};
 use pyo3::create_exception;
 use pyo3::intern;
 use pyo3::prelude::*;
-use pyo3::types::{PyBytes, PyDict, PyList, PyTuple};
+use pyo3::types::{PyBytes, PyDict, PyList, PySet, PyTuple};
+use std::cell::Cell;
 
 create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
+
+/// Object having PayloadBuffer-like interfaces. Collects all objects by
+/// calling object.CollectDependency() for every related objects.
+#[pyclass(frozen, module = "eudplib.core.allocator")]
+pub struct ObjCollector;
+
+#[pymethods]
+impl ObjCollector {
+    #[allow(non_snake_case)]
+    fn WriteByte(&self, _number: &PyAny) {
+    }
+
+    #[allow(non_snake_case)]
+    fn WriteDword(&self, obj: &PyAny) {
+        let _ = obj.call_method0(intern!(obj.py(), "Evaluate"));
+    }
+
+    #[allow(non_snake_case)]
+    fn WriteBytes(&self, _b: &PyAny) {
+    }
+
+    #[allow(non_snake_case)]
+    fn WriteSpace(&self, _ssize: &PyAny) {
+    }
+}
 
 /// Object having PayloadBuffer-like interfaces. Collects all objects by
 /// calling object.WritePayload() for every related objects.
@@ -179,10 +205,23 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
     (alloctable, payload_size)
 }
 
+#[derive(PartialEq, Debug, Clone, Copy)]
+enum Phase {
+    None,
+    Collecting,
+    Allocating,
+    Writing,
+}
+
 #[pyclass(module = "eudplib.core.allocator")]
 pub struct PayloadBuilder {
+    phase: Cell<Phase>,
     callbacks_on_create_payload: Vec<PyObject>,
     callbacks_after_collecting: Vec<PyObject>,
+    // Collecting phase
+    found_objects: Py<PyDict>,
+    dynamic_objects: Py<PySet>,
+    untraversed_objects: Py<PyList>, // TODO: Use RefCell<Vec<PyObject>>?
     // Allocating & Writing phase
     alloctable: Vec<u32>,
     payload_size: usize,
@@ -191,20 +230,34 @@ pub struct PayloadBuilder {
 #[pymethods]
 impl PayloadBuilder {
     #[new]
-    fn new() -> Self {
+    fn new(py: Python) -> Self {
         Self {
+            phase: Cell::new(Phase::None),
             callbacks_on_create_payload: Vec::new(),
             callbacks_after_collecting: Vec::new(),
+            found_objects: PyDict::new(py).into_py(py),
+            dynamic_objects: PySet::empty(py).unwrap().into_py(py),
+            untraversed_objects: PyList::empty(py).into_py(py),
             alloctable: Vec::new(),
             payload_size: 0,
         }
     }
 
     fn register_create_payload_callback(&mut self, callable: PyObject) {
+        assert!(
+            self.phase.get() == Phase::None,
+            "Can't register callback during {:?}",
+            self.phase
+        );
         self.callbacks_on_create_payload.push(callable);
     }
 
     fn register_after_collecting_callback(&mut self, callable: PyObject) {
+        assert!(
+            self.phase.get() == Phase::None,
+            "Can't register callback during {:?}",
+            self.phase
+        );
         self.callbacks_after_collecting.push(callable);
     }
 
@@ -220,11 +273,74 @@ impl PayloadBuilder {
         }
     }
 
-    fn offset(&self, index: usize) -> u32 {
-        self.alloctable[index]
+    fn collect_object(&self, py: Python, obj: &PyAny) -> PyResult<()> {
+        assert!(
+            self.phase.get() == Phase::Collecting,
+            "{:?}",
+            self.phase.get()
+        );
+        let found_objects = self.found_objects.as_ref(py);
+        if !found_objects.contains(obj)? {
+            found_objects.set_item(obj, found_objects.len())?;
+            self.untraversed_objects.as_ref(py).append(obj.into_py(py))?;
+            if obj
+                .call_method0(intern!(py, "DynamicConstructed"))?
+                .extract::<bool>()?
+            {
+                self.dynamic_objects.as_ref(py).add(obj)?;
+            }
+        }
+        Ok(())
     }
 
-    fn alloc_objects(&mut self, py: Python, found_objects: &PyDict) -> PyResult<()> {
+    fn collect_objects(&self, root: &PyAny) -> PyResult<()> {
+        self.phase.set(Phase::Collecting);
+        {
+            self.found_objects.as_ref(root.py()).clear();
+            // self.untraversed_objects.as_ref(root.py()).clear();
+            self.dynamic_objects.as_ref(root.py()).clear();
+        }
+
+        let bar = ProgressBar::new(0);
+        bar.println(" - Collecting objects..");
+        bar.set_style(
+            ProgressStyle::with_template("[{elapsed}] {bar:40.cyan/blue} {pos} / {len} objects")
+                .unwrap()
+                .progress_chars("##-"),
+        );
+
+        root.call_method0(intern!(root.py(), "Evaluate"))?;
+        let arg: &PyTuple = PyTuple::new(root.py(), &[ObjCollector {}.into_py(root.py())]);
+        let untraversed_objects = self.untraversed_objects.as_ref(root.py());
+
+        while !untraversed_objects.is_empty() {
+            while !untraversed_objects.is_empty() {
+                let found_count = self.found_objects.as_ref(root.py()).len() as u64;
+                bar.set_position(found_count);
+                bar.set_length(found_count + untraversed_objects.len() as u64);
+                // Safety: !is_empty has been checked above.
+                let index = untraversed_objects.len() - 1;
+                let obj = unsafe {
+                    untraversed_objects.get_item_unchecked(index)
+                };
+                untraversed_objects.del_item(index)?;
+                // let _ = obj.call_method0(root.py(), intern!(root.py(), "Evaluate"));
+                obj.call_method1(intern!(root.py(), "CollectDependency"), arg)?;
+            }
+            for obj in self.dynamic_objects.as_ref(root.py()).iter() {
+                // let _ = obj.call_method0(intern!(root.py(), "Evaluate"));
+                obj.call_method1(intern!(root.py(), "CollectDependency"), arg)?;
+            }
+        }
+        bar.finish();
+        self.phase.set(Phase::None);
+        Ok(())
+    }
+
+    fn alloc_objects(&mut self, py: Python) -> PyResult<()> {
+        self.phase.set(Phase::Allocating);
+
+        let found_objects = self.found_objects.as_ref(py);
         let obja = PyCell::new(py, ObjAllocator::new())?;
         let mut dwoccupmap_list = Vec::with_capacity(found_objects.len());
         let bar = ProgressBar::new(found_objects.len() as u64);
@@ -234,18 +350,20 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
+        let arg: &PyTuple = PyTuple::new(py, &[obja]);
         for (obj, _v) in found_objects.iter() {
             {
                 let mut obja = obja.borrow_mut();
                 obja.start_write();
             }
-            let arg: &PyTuple = PyTuple::new(py, &[obja]);
             obj.call_method1(intern!(py, "WritePayload"), arg)?;
             let dwoccupmap = {
                 let mut obja = obja.borrow_mut();
                 obja.end_write()
             };
-            let datasize = obj.call_method0(intern!(py, "GetDataSize"))?.extract::<usize>()?;
+            let datasize = obj
+                .call_method0(intern!(py, "GetDataSize"))?
+                .extract::<usize>()?;
             if dwoccupmap.len() != (datasize + 3) >> 2 {
                 let dwoccupmap_len = dwoccupmap.len();
                 let datasize = (datasize + 3) >> 2;
@@ -257,15 +375,14 @@ impl PayloadBuilder {
         bar.finish();
         println!(" - Allocating objects..");
         (self.alloctable, self.payload_size) = stack_objects(dwoccupmap_list);
+        self.phase.set(Phase::None);
         Ok(())
     }
 
-    fn construct_payload(
-        &self,
-        py: Python,
-        found_objects: &PyDict,
-    ) -> PyResult<(Vec<u8>, Vec<usize>, Vec<usize>)> {
+    fn construct_payload(&self, py: Python) -> PyResult<(Vec<u8>, Vec<usize>, Vec<usize>)> {
+        self.phase.set(Phase::Writing);
         let pbuf = PyCell::new(py, PayloadBuffer::new(self.payload_size))?;
+        let found_objects = self.found_objects.as_ref(py);
         let bar = ProgressBar::new(found_objects.len() as u64);
         bar.println(" - Writing objects..");
         bar.set_style(
@@ -273,18 +390,20 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
+        let arg: &PyTuple = PyTuple::new(py, &[pbuf]);
         for (i, (obj, _v)) in found_objects.iter().enumerate() {
             {
                 let mut pbuf = pbuf.borrow_mut();
                 pbuf.start_write(self.alloctable[i] as usize);
             }
-            let arg: &PyTuple = PyTuple::new(py, &[pbuf]);
             obj.call_method1(intern!(py, "WritePayload"), arg)?;
             let written_bytes = {
                 let pbuf = pbuf.borrow();
                 pbuf.end_write()
             };
-            let objsize = obj.call_method0(intern!(py, "GetDataSize"))?.extract::<usize>()?;
+            let objsize = obj
+                .call_method0(intern!(py, "GetDataSize"))?
+                .extract::<usize>()?;
             if written_bytes != objsize {
                 return Err(AllocError::new_err(format!(
                     "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj}"
@@ -293,9 +412,16 @@ impl PayloadBuilder {
             bar.inc(1);
         }
         bar.finish();
+        self.phase.set(Phase::None);
         Ok({
             let mut pbuf = pbuf.borrow_mut();
             pbuf.create_payload()
         })
+    }
+
+    fn offset(&self, obj: &PyAny) -> PyResult<u32> {
+        let found_objects = self.found_objects.as_ref(obj.py());
+        let index = PyAny::get_item(found_objects, obj)?.extract::<usize>()?;
+        Ok(self.alloctable[index])
     }
 }
