@@ -73,12 +73,12 @@ impl DivFloor for i64 {
 
 #[derive(Clone, Debug)]
 pub(crate) struct RlocInt {
-    pub(crate) offset: i64,
-    pub(crate) rlocmode: i64,
+    pub(crate) offset: i32,
+    pub(crate) rlocmode: i32,
 }
 
 impl RlocInt {
-    pub(crate) fn new(offset: i64, rlocmode: i64) -> Self {
+    pub(crate) fn new(offset: i32, rlocmode: i32) -> Self {
         Self { offset, rlocmode }
     }
 }
@@ -91,7 +91,7 @@ pub struct PyRlocInt(pub(crate) RlocInt);
 #[pymethods]
 impl PyRlocInt {
     #[new]
-    fn new(offset: i64, rlocmode: i64) -> Self {
+    fn new(offset: i32, rlocmode: i32) -> Self {
         Self(RlocInt::new(offset, rlocmode))
     }
 
@@ -119,7 +119,7 @@ impl PyRlocInt {
                 self.0.offset + rhs.0.offset,
                 self.0.rlocmode + rhs.0.rlocmode,
             )
-        } else if let Ok(rhs) = rhs.extract::<i64>() {
+        } else if let Ok(rhs) = rhs.extract::<i32>() {
             RlocInt::new(self.0.offset + rhs, self.0.rlocmode)
         } else {
             return Err(PyTypeError::new_err(format!(
@@ -139,7 +139,7 @@ impl PyRlocInt {
                 self.0.offset - rhs.0.offset,
                 self.0.rlocmode - rhs.0.rlocmode,
             )
-        } else if let Ok(rhs) = rhs.extract::<i64>() {
+        } else if let Ok(rhs) = rhs.extract::<i32>() {
             RlocInt::new(self.0.offset - rhs, self.0.rlocmode)
         } else {
             return Err(PyTypeError::new_err(format!(
@@ -155,7 +155,7 @@ impl PyRlocInt {
                 rhs.0.offset - self.0.offset,
                 rhs.0.rlocmode - self.0.rlocmode,
             )
-        } else if let Ok(rhs) = rhs.extract::<i64>() {
+        } else if let Ok(rhs) = rhs.extract::<i32>() {
             RlocInt::new(rhs - self.0.offset, -self.0.rlocmode)
         } else {
             return Err(PyTypeError::new_err(format!(
@@ -173,7 +173,7 @@ impl PyRlocInt {
                 ));
             }
             rhs.0.offset
-        } else if let Ok(rhs) = rhs.extract::<i64>() {
+        } else if let Ok(rhs) = rhs.extract::<i32>() {
             rhs
         } else {
             return Err(PyTypeError::new_err(format!(
@@ -198,7 +198,7 @@ impl PyRlocInt {
                 ));
             }
             rhs.0.offset
-        } else if let Ok(rhs) = rhs.extract::<i64>() {
+        } else if let Ok(rhs) = rhs.extract::<i32>() {
             rhs
         } else {
             return Err(PyTypeError::new_err(format!(
@@ -245,10 +245,10 @@ impl Add<RlocInt> for RlocInt {
     }
 }
 
-impl Add<i64> for RlocInt {
+impl Add<i32> for RlocInt {
     type Output = Self;
 
-    fn add(self, other: i64) -> Self {
+    fn add(self, other: i32) -> Self {
         Self {
             offset: self.offset.wrapping_add(other),
             rlocmode: self.rlocmode,
@@ -256,7 +256,7 @@ impl Add<i64> for RlocInt {
     }
 }
 
-impl Add<RlocInt> for i64 {
+impl Add<RlocInt> for i32 {
     type Output = RlocInt;
 
     fn add(self, other: RlocInt) -> RlocInt {
@@ -278,10 +278,10 @@ impl Sub<RlocInt> for RlocInt {
     }
 }
 
-impl Sub<i64> for RlocInt {
+impl Sub<i32> for RlocInt {
     type Output = Self;
 
-    fn sub(self, other: i64) -> Self {
+    fn sub(self, other: i32) -> Self {
         Self {
             offset: self.offset.wrapping_sub(other),
             rlocmode: self.rlocmode,
@@ -289,7 +289,7 @@ impl Sub<i64> for RlocInt {
     }
 }
 
-impl Sub<RlocInt> for i64 {
+impl Sub<RlocInt> for i32 {
     type Output = RlocInt;
 
     fn sub(self, other: RlocInt) -> RlocInt {
@@ -315,10 +315,10 @@ impl Mul<RlocInt> for RlocInt {
     }
 }
 
-impl Mul<i64> for RlocInt {
+impl Mul<i32> for RlocInt {
     type Output = Self;
 
-    fn mul(self, other: i64) -> Self {
+    fn mul(self, other: i32) -> Self {
         Self {
             offset: self.offset.wrapping_mul(other),
             rlocmode: self.rlocmode.wrapping_mul(other),
@@ -326,7 +326,7 @@ impl Mul<i64> for RlocInt {
     }
 }
 
-impl Mul<RlocInt> for i64 {
+impl Mul<RlocInt> for i32 {
     type Output = RlocInt;
 
     fn mul(self, other: RlocInt) -> RlocInt {
@@ -355,10 +355,10 @@ impl Div<RlocInt> for RlocInt {
     }
 }
 
-impl Div<i64> for RlocInt {
+impl Div<i32> for RlocInt {
     type Output = Self;
 
-    fn div(self, other: i64) -> Self {
+    fn div(self, other: i32) -> Self {
         assert!(other != 0, "Divide by zero");
         assert!(
             self.rlocmode == 0 || (self.offset % other == 0 && self.rlocmode % other == 0),
@@ -371,10 +371,10 @@ impl Div<i64> for RlocInt {
     }
 }
 
-impl Div<RlocInt> for i64 {
-    type Output = i64;
+impl Div<RlocInt> for i32 {
+    type Output = i32;
 
-    fn div(self, other: RlocInt) -> i64 {
+    fn div(self, other: RlocInt) -> i32 {
         assert!(other.rlocmode == 0, "Cannot divide RlocInt with non-const");
         assert!(other.offset != 0, "Divide by zero");
         assert!(
@@ -403,10 +403,10 @@ impl Rem<RlocInt> for RlocInt {
     }
 }
 
-impl Rem<i64> for RlocInt {
+impl Rem<i32> for RlocInt {
     type Output = Self;
 
-    fn rem(self, other: i64) -> Self {
+    fn rem(self, other: i32) -> Self {
         assert!(other != 0, "Divide by zero");
         assert!(
             self.rlocmode == 0 || (self.offset % other == 0 && self.rlocmode % other == 0),
@@ -419,10 +419,10 @@ impl Rem<i64> for RlocInt {
     }
 }
 
-impl Rem<RlocInt> for i64 {
-    type Output = i64;
+impl Rem<RlocInt> for i32 {
+    type Output = i32;
 
-    fn rem(self, other: RlocInt) -> i64 {
+    fn rem(self, other: RlocInt) -> i32 {
         assert!(other.rlocmode == 0, "Cannot divide RlocInt with non-const");
         assert!(other.offset != 0, "Divide by zero");
         assert!(
@@ -435,8 +435,8 @@ impl Rem<RlocInt> for i64 {
 
 #[pyfunction]
 #[pyo3(name = "RlocInt")]
-pub fn py_rlocint(offset: i64, rlocmode: i64) -> PyRlocInt {
-    PyRlocInt::new(offset, rlocmode)
+pub fn py_rlocint(offset: i64, rlocmode: i32) -> PyRlocInt {
+    PyRlocInt::new(offset as i32, rlocmode)
 }
 
 /// Convert int/RlocInt to rlocint
@@ -447,7 +447,7 @@ pub fn to_rlocint(x: &PyAny) -> PyResult<PyRlocInt> {
         expr.0
     } else if let Ok(expr) = x.extract::<i64>() {
         RlocInt {
-            offset: expr,
+            offset: expr as i32,
             rlocmode: 0,
         }
     } else {

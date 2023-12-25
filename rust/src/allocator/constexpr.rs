@@ -8,12 +8,12 @@ use pyo3::types::{PyDict, PyInt, PyNone, PyString, PyTuple};
 #[derive(Clone, Debug)]
 pub(crate) struct ConstExpr {
     baseobj: PyObject,
-    offset: i64,
-    rlocmode: i64,
+    offset: i32,
+    rlocmode: i32,
 }
 
 impl ConstExpr {
-    pub(crate) fn new(baseobj: PyObject, offset: i64, rlocmode: i64) -> Self {
+    pub(crate) fn new(baseobj: PyObject, offset: i32, rlocmode: i32) -> Self {
         Self {
             baseobj,
             offset,
@@ -36,7 +36,7 @@ pub struct PyConstExpr(pub(crate) ConstExpr);
 impl PyConstExpr {
     #[new]
     #[pyo3(signature = (baseobj, offset=0, rlocmode=4))]
-    fn new(baseobj: PyObject, offset: i64, rlocmode: i64) -> PyResult<Self> {
+    fn new(baseobj: PyObject, offset: i32, rlocmode: i32) -> PyResult<Self> {
         Ok(Self(ConstExpr::new(baseobj, offset, rlocmode)))
     }
 
@@ -65,7 +65,7 @@ impl PyConstExpr {
         self.__repr__()
     }
 
-    fn __int__(&self, py: Python) -> PyResult<i64> {
+    fn __int__(&self, py: Python) -> PyResult<i32> {
         if self.0.rlocmode == 0 && self.0.baseobj.is_none(py) {
             Ok(self.0.offset)
         } else {
@@ -76,7 +76,7 @@ impl PyConstExpr {
     }
 
     fn __add__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
-        let offset = slf.0.offset + rhs;
+        let offset = slf.0.offset + rhs as i32;
         let rlocmode = slf.0.rlocmode;
         Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
@@ -94,7 +94,7 @@ impl PyConstExpr {
     }
 
     fn __sub__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
-        let offset = slf.0.offset - rhs;
+        let offset = slf.0.offset - rhs as i32;
         let rlocmode = slf.0.rlocmode;
         Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
@@ -108,7 +108,7 @@ impl PyConstExpr {
     }
 
     fn __rsub__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
-        let offset = rhs - slf.0.offset;
+        let offset = rhs as i32 - slf.0.offset;
         let rlocmode = -slf.0.rlocmode;
         Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
@@ -121,7 +121,7 @@ impl PyConstExpr {
         })
     }
 
-    fn __mul__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
+    fn __mul__(slf: PyRef<Self>, py: Python, rhs: i32) -> Self {
         let offset = slf.0.offset * rhs;
         let rlocmode = slf.0.rlocmode * rhs;
         Self(ConstExpr {
@@ -137,11 +137,11 @@ impl PyConstExpr {
         })
     }
 
-    fn __rmul__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
+    fn __rmul__(slf: PyRef<Self>, py: Python, rhs: i32) -> Self {
         Self::__mul__(slf, py, rhs)
     }
 
-    fn __floordiv__(slf: PyRef<Self>, py: Python, rhs: i64) -> PyResult<Self> {
+    fn __floordiv__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<Self> {
         if slf.0.rlocmode != 0 && slf.0.rlocmode % rhs != 0 {
             return Err(PyValueError::new_err("Address not divisible"));
         }
@@ -158,14 +158,14 @@ impl PyConstExpr {
         }))
     }
 
-    fn __mod__(&self, rhs: i64) -> PyResult<i64> {
+    fn __mod__(&self, rhs: i32) -> PyResult<i32> {
         if self.0.rlocmode != 4 || 4 % rhs != 0 {
             return Err(PyValueError::new_err("Address not divisible"));
         }
         Ok(DivFloor::rem_floor(&self.0.offset, rhs))
     }
 
-    fn __divmod__(slf: PyRef<Self>, py: Python, rhs: i64) -> PyResult<(Self, i64)> {
+    fn __divmod__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<(Self, i32)> {
         if slf.0.rlocmode != 4 || 4 % rhs != 0 {
             return Err(PyValueError::new_err("Address not divisible"));
         }
@@ -240,7 +240,7 @@ impl Forward {
         while expr.is_instance(exprproxy)? {
             expr = expr.getattr(intern!(py, "_value"))?;
         }
-        let expr: Py<PyAny> = if let Ok(offset) = expr.extract::<i64>() {
+        let expr: Py<PyAny> = if let Ok(offset) = expr.extract::<i32>() {
             PyConstExpr(ConstExpr::new(PyNone::get(py).into(), offset, 0)).into_py(py)
         } else {
             expr.into_py(py)
@@ -301,7 +301,7 @@ pub fn evaluate(x: &PyAny) -> PyResult<PyRlocInt> {
     } else if let Ok(expr) = x.extract::<PyRlocInt>() {
         Ok(PyRlocInt(expr.0))
     } else if let Ok(expr) = x.extract::<i64>() {
-        Ok(PyRlocInt(RlocInt::new(expr, 0)))
+        Ok(PyRlocInt(RlocInt::new(expr as i32, 0)))
     } else {
         let wtf1 = x.call_method0(intern!(x.py(), "Evaluate"));
         let wtf2 = x.extract::<i64>();
