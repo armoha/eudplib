@@ -1,10 +1,7 @@
-use std::collections::btree_map::Values;
-
 use pyo3::exceptions::PyValueError;
-use pyo3::intern;
 use pyo3::prelude::*;
-use pyo3::types::{PyList, PyTuple};
-use crate::types::EVALUATE;
+use pyo3::types::PyList;
+use crate::allocator::constexpr::evaluate;
 
 /// Buffer where EUDObject should write to.
 #[pyclass(module = "eudplib.core.allocator")]
@@ -61,15 +58,9 @@ impl PayloadBuffer {
 
     #[allow(non_snake_case)]
     fn WriteDword(&mut self, number: &PyAny) -> PyResult<()> {
-        let evaluate = EVALUATE.get(number.py())?;
-        let arg = PyTuple::new(number.py(), &[number]);
-        let rlocint = evaluate.call1(arg)?;
-        let rlocmode = rlocint
-            .getattr(intern!(number.py(), "rlocmode"))?
-            .extract::<i64>()?;
-        let offset = rlocint
-            .getattr(intern!(number.py(), "offset"))?
-            .extract::<i64>()?;
+        let rlocint = evaluate(number)?;
+        let rlocmode = rlocint.0.rlocmode;
+        let offset = rlocint.0.offset;
 
         if rlocmode != 0 {
             assert!(
@@ -94,8 +85,6 @@ impl PayloadBuffer {
 
     #[allow(non_snake_case)]
     fn WritePack(&mut self, structformat: &str, arglist: &PyList) -> PyResult<()> {
-        let evaluate = EVALUATE.get(arglist.py())?;
-
         for (b, number) in structformat.bytes().zip(arglist.iter()) {
             let argsize = match b {
                 66 => 1, // 'B'
@@ -103,14 +92,9 @@ impl PayloadBuffer {
                 73 => 4, // 'I'
                 _ => panic!("Unknown struct format: {b}"),
             };
-            let arg = PyTuple::new(number.py(), &[number]);
-            let rlocint = evaluate.call1(arg)?;
-            let rlocmode = rlocint
-                .getattr(intern!(arglist.py(), "rlocmode"))?
-                .extract::<i64>()?;
-            let offset = rlocint
-                .getattr(intern!(arglist.py(), "offset"))?
-                .extract::<i64>()?;
+            let rlocint = evaluate(number)?;
+            let rlocmode = rlocint.0.rlocmode;
+            let offset = rlocint.0.offset;
 
             if !(rlocmode == 0 || (argsize == 4 && self.datacur % 4 == 0)) {
                 return Err(PyValueError::new_err(

@@ -17,6 +17,8 @@ pub(crate) fn create_submodule(py: Python<'_>) -> PyResult<&PyModule> {
 
     submod.add_class::<constexpr::PyConstExpr>()?;
     submod.add_class::<constexpr::Forward>()?;
+    submod.add_function(wrap_pyfunction!(constexpr::evaluate, submod)?)?;
+    submod.add_function(wrap_pyfunction!(constexpr::is_constexpr, submod)?)?;
 
     Ok(submod)
 }

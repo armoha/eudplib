@@ -54,9 +54,7 @@ class QueueGameCommandHelper:
     def __enter__(self):
         self.cmdqlen = _get_cmdqlen()
         self.new_len = _cmdqlen + self.size
-        if cs.EUDIfNot()(
-            c.Memory(_PROV_MAXBUFFER, c.AtMost, self.new_len + 1)
-        ):
+        if cs.EUDIfNot()(c.Memory(_PROV_MAXBUFFER, c.AtMost, self.new_len + 1)):
             return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
@@ -163,7 +161,7 @@ def QueueGameCommand_Select(n, ptr_arr):  # noqa: N802
     """
     if isinstance(ptr_arr, int) or c.IsEUDVariable(ptr_arr):
         _qgc_alphaids(0x09, n, EPD(ptr_arr))
-    elif c.IsConstExpr(ptr_arr) and ptr_arr.rlocmode == 1:
+    elif c.IsConstExpr(ptr_arr) and ptr_arr._is_epd():
         _qgc_alphaids(0x09, n, ptr_arr)
     else:
         _qgc_alphaids(0x09, n, EPD(ptr_arr))
@@ -179,7 +177,7 @@ def QueueGameCommand_AddSelect(n, ptr_arr):  # noqa: N802
     """
     if isinstance(ptr_arr, int) or c.IsEUDVariable(ptr_arr):
         _qgc_alphaids(0x0A, n, EPD(ptr_arr))
-    elif c.IsConstExpr(ptr_arr) and ptr_arr.rlocmode == 1:
+    elif c.IsConstExpr(ptr_arr) and ptr_arr._is_epd():
         _qgc_alphaids(0x0A, n, ptr_arr)
     else:
         _qgc_alphaids(0x0A, n, EPD(ptr_arr))
@@ -195,7 +193,7 @@ def QueueGameCommand_RemoveSelect(n, ptr_arr):  # noqa: N802
     """
     if isinstance(ptr_arr, int) or c.IsEUDVariable(ptr_arr):
         _qgc_alphaids(0x0B, n, EPD(ptr_arr))
-    elif c.IsConstExpr(ptr_arr) and ptr_arr.rlocmode == 1:
+    elif c.IsConstExpr(ptr_arr) and ptr_arr._is_epd():
         _qgc_alphaids(0x0B, n, ptr_arr)
     else:
         _qgc_alphaids(0x0B, n, EPD(ptr_arr))

@@ -26,4 +26,4 @@ impl LazyPyImport {
     }
 }
 
-pub(crate) static EVALUATE: LazyPyImport = LazyPyImport::new("eudplib.core.allocator.constexpr", &["Evaluate"]);
+pub(crate) static EXPRPROXY: LazyPyImport = LazyPyImport::new("eudplib.utils", &["ExprProxy"]);

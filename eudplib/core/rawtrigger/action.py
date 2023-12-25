@@ -102,6 +102,9 @@ class Action(ConstExpr):
      ======  ============= ========  ==========
     """
 
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, None)
+
     def __init__(
         self,
         locid1: Dword,
@@ -118,7 +121,7 @@ class Action(ConstExpr):
         eudx: Word = 0,
     ) -> None:
         """See :mod:`eudplib.base.stocktrg` for stock actions list."""
-        super().__init__(self)
+        super().__init__()
         self.fields: list[Dword] = [
             locid1,
             strid,

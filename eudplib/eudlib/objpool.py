@@ -17,8 +17,11 @@ from .eudarray import EUDArray
 
 
 class _ObjPoolData(c.ConstExpr):
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, None)
+
     def __init__(self, size: int, max_fieldn: int = 8) -> None:
-        super().__init__(self)
+        super().__init__()
         self._vdict: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
         self.size = size
         self.max_fieldn = max_fieldn

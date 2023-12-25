@@ -5,15 +5,15 @@ import time
 _currentProfileTree = None
 
 
-_lastTime = time.process_time()
+_last_time = time.process_time()
 
 
 def _profiler(frame, event, arg):
-    global _lastTime
+    global _last_time
     global _currentProfileTree
 
     currentTime = time.process_time()
-    elapsedTime = currentTime - _lastTime
+    elapsedTime = currentTime - _last_time
 
     if not _currentProfileTree:
         return
@@ -38,7 +38,7 @@ def _profiler(frame, event, arg):
         _currentProfileTree["_cumtime2"] += elapsedTime
         _currentProfileTree = newTree
 
-        _lastTime = time.process_time()
+        _last_time = time.process_time()
 
     elif event == "return":
         _currentProfileTree["_time"] += elapsedTime
@@ -53,11 +53,11 @@ def _profiler(frame, event, arg):
         else:
             _currentProfileTree = None
 
-        _lastTime = time.process_time()
+        _last_time = time.process_time()
 
 
 def profile(f, ofname):
-    global _currentProfileTree, _lastTime
+    global _currentProfileTree, _last_time
     _currentProfileTree = {
         "_code": None,
         "_parent": None,
@@ -66,7 +66,7 @@ def profile(f, ofname):
         "_cumtime2": 0,
     }
     rootTree = _currentProfileTree
-    _lastTime = time.process_time()
+    _last_time = time.process_time()
     sys.setprofile(_profiler)
     f()
     sys.setprofile(None)

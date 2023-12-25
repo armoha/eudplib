@@ -1,6 +1,7 @@
 use crate::allocator::pbuffer::PayloadBuffer;
 use indicatif::{ProgressBar, ProgressStyle};
 use pyo3::create_exception;
+use pyo3::intern;
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyDict, PyList, PyTuple};
 
@@ -214,12 +215,12 @@ impl PayloadBuilder {
                 obja.start_write();
             }
             let arg: &PyTuple = PyTuple::new(py, &[obja]);
-            obj.call_method1("WritePayload", arg)?;
+            obj.call_method1(intern!(py, "WritePayload"), arg)?;
             let dwoccupmap = {
                 let mut obja = obja.borrow_mut();
                 obja.end_write()
             };
-            let datasize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
+            let datasize = obj.call_method0(intern!(py, "GetDataSize"))?.extract::<usize>()?;
             if dwoccupmap.len() != (datasize + 3) >> 2 {
                 let dwoccupmap_len = dwoccupmap.len();
                 let datasize = (datasize + 3) >> 2;
@@ -253,12 +254,12 @@ impl PayloadBuilder {
                 pbuf.start_write(self.alloctable[i] as usize);
             }
             let arg: &PyTuple = PyTuple::new(py, &[pbuf]);
-            obj.call_method1("WritePayload", arg)?;
+            obj.call_method1(intern!(py, "WritePayload"), arg)?;
             let written_bytes = {
                 let pbuf = pbuf.borrow();
                 pbuf.end_write()
             };
-            let objsize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
+            let objsize = obj.call_method0(intern!(py, "GetDataSize"))?.extract::<usize>()?;
             if written_bytes != objsize {
                 return Err(AllocError::new_err(format!(
                     "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj}"

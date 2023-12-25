@@ -18,8 +18,7 @@ def _ptr2epd(ptr):
     if c.IsEUDVariable(ptr):
         epd, subp = c.f_div(ptr + (-0x58A364), 4)
     else:
-        dst = ptr + (-0x58A364)
-        epd, subp = dst // 4, dst % 4
+        epd, subp = divmod(ptr + (-0x58A364), 4)
     return epd, subp
 
 
@@ -93,8 +92,7 @@ def f_dwread(ptr, **kwargs):
     if (isinstance(ptr, int) and ptr % 4 == 0) or (
         not c.IsEUDVariable(ptr)
         and isinstance(ptr, (c.RlocInt_C, c.ConstExpr))
-        and ptr.rlocmode == 4
-        and ptr.offset % 4 == 0
+        and ptr._is_aligned_ptr()
     ):
         return dwm.f_dwread_epd(ut.EPD(ptr), **kwargs)
     else:

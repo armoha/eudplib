@@ -100,8 +100,11 @@ def _yield_and_check_rvalue(
 
 # Unused variable don't need to be allocated.
 class VariableTriggerForward(ConstExpr):
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, None)
+
     def __init__(self, initval):
-        super().__init__(self)
+        super().__init__()
         self._initval = initval
 
     def Evaluate(self):  # noqa: N802
@@ -785,7 +788,7 @@ def _seqcompute_sub(assignpairs, _srcdict):
                 queueact.remove(setdst)
             if last_mdt is prev_mdt:
                 queueact.remove(setmdt)
-            if vt_nextptr._expr is prev_nptr._expr:
+            if vt_nextptr.expr is prev_nptr.expr:
                 lastact.remove(setnptr)
         _srcdict[last_src] = (last_dst, last_mdt, vt_nextptr)
 

@@ -64,6 +64,9 @@ class Condition(ConstExpr):
      ======  =============  ========  ===========
     """
 
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, None)
+
     def __init__(
         self,
         locid: Dword,
@@ -78,7 +81,7 @@ class Condition(ConstExpr):
         eudx: Word = 0,
     ) -> None:
         """See :mod:`eudplib.base.stockcond` for stock conditions list."""
-        super().__init__(self)
+        super().__init__()
         self.fields: list[Dword] = [
             locid,
             player,

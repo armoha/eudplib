@@ -8,7 +8,7 @@
 from os import urandom
 
 from ... import core as c
-from ...core.allocator.payload import setPayloadLoggerMode
+from ...core.allocator.payload import _set_payload_logger_mode
 from ...core.mapdata.chktok import CHK
 from ...utils.blockstru import BlockStruManager, set_blockstru_manager
 from .inj_finalizer import create_inject_finalizer
@@ -35,9 +35,9 @@ def apply_injector(chkt: CHK, root: c.Forward | c.RawTrigger) -> None:
 
     root = create_inject_finalizer(chkt, root, mrgndata)
 
-    setPayloadLoggerMode(True)
+    _set_payload_logger_mode(True)
     payload = c.CreatePayload(root)
-    setPayloadLoggerMode(False)
+    _set_payload_logger_mode(False)
 
     if skip_payload_relocator:
         payload = create_payload_relocator(payload)

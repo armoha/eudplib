@@ -54,7 +54,8 @@ def _initialize_queries():
     non_existing_id = []
     for str_id, offset_query in _const_strptr.items():
         try:
-            offset_query._expr = c.ConstExpr(
+            offset_query.Reset()
+            offset_query << c.ConstExpr(
                 None,
                 _STR_ADDRESS + strmap._stroffset[strmap._dataindextb[str_id - 1]],
                 0,

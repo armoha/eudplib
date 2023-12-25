@@ -30,9 +30,7 @@ from .filler import (
 )
 
 
-def apply_patch_table(
-    initepd, obj, patch_table: list[list[int | None]]
-) -> None:
+def apply_patch_table(initepd, obj, patch_table: list[list[int | None]]) -> None:
     field_name = 0
     for i, patch_entry in enumerate(patch_table):
         patch_fields = patch_entry
@@ -92,13 +90,11 @@ def patch_condition(cond: _Condition) -> Condition:
     castable = is_castable(cond)
     condition = unProxy(cond)
     if isinstance(condition, Forward):
-        if condition._expr is None:
+        if not condition.IsSet():
             raise EPError(_("Forward not initialized"))
-        condition = condition._expr
+        condition = condition.expr
     if isinstance(condition, EUDLightBool):
-        return c.MemoryX(
-            condition.getValueAddr(), c.AtLeast, 1, condition._mask
-        )
+        return c.MemoryX(condition.getValueAddr(), c.AtLeast, 1, condition._mask)
     if isinstance(condition, (EUDVariable, EUDLightVariable)):
         return c.Memory(condition.getValueAddr(), c.AtLeast, 1)
 
@@ -114,9 +110,7 @@ def patch_condition(cond: _Condition) -> Condition:
     raise EPError(_("Invalid input for condition: {}").format(cond))
 
 
-def patch_action(
-    act: Action | Forward | ExprProxy[Action | Forward]
-) -> Action:
+def patch_action(act: Action | Forward | ExprProxy[Action | Forward]) -> Action:
     action = unProxy(act)
     if isinstance(action, Forward):
         if action._expr is None:
@@ -145,9 +139,7 @@ def is_const_cond(cond) -> bool:
         if cond._expr is None:
             return False
         cond = cond._expr
-    if isinstance(
-        cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)
-    ):
+    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):
         return True
 
     if isinstance(cond, Condition):
@@ -182,9 +174,7 @@ def is_nagatable_cond(cond) -> bool:
         if cond._expr is None:
             return False
         cond = cond._expr
-    if isinstance(
-        cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)
-    ):
+    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):
         return True
 
     if isinstance(cond, Condition):

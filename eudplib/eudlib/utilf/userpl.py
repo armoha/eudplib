@@ -72,8 +72,11 @@ def TalkingPortraitAll(unit, time) -> tuple[c.Action, c.Action]:  # noqa: N802
 
 
 class _UserPFw(c.ConstExpr):
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, None)
+
     def __init__(self, dest, offset):
-        super().__init__(self)
+        super().__init__()
         self._initobj = (dest, offset)
 
     def Evaluate(self):  # noqa: N802

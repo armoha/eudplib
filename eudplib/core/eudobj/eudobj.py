@@ -28,8 +28,11 @@ class EUDObject(ConstExpr, metaclass=ABCMeta):
         - Writing phase : Object is written into payload.
     """
 
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, None)
+
     def __init__(self) -> None:
-        super().__init__(self)
+        super().__init__()
 
     def DynamicConstructed(self) -> bool:  # noqa: N802
         """Whether function is constructed dynamically.
