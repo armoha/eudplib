@@ -8,7 +8,7 @@
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
-from eudplib.core.allocator.payload import _RegisterAllocObjectsCallback
+from eudplib.core.allocator.payload import _register_after_collecting_callback
 from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import get_string_section_name
 from eudplib.localize import _
@@ -71,7 +71,7 @@ def _initialize_queries():
         )
 
 
-_RegisterAllocObjectsCallback(_initialize_queries)
+_register_after_collecting_callback(_initialize_queries)
 
 
 def GetMapStringAddr(str_id):  # noqa: N802

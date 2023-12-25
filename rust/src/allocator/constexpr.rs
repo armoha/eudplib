@@ -13,7 +13,7 @@ pub(crate) struct ConstExpr {
 }
 
 impl ConstExpr {
-    fn new(baseobj: PyObject, offset: i64, rlocmode: i64) -> Self {
+    pub(crate) fn new(baseobj: PyObject, offset: i64, rlocmode: i64) -> Self {
         Self {
             baseobj,
             offset,
@@ -30,7 +30,7 @@ impl ConstExpr {
     name = "ConstExpr",
     module = "eudplib.core.allocator"
 )]
-pub struct PyConstExpr(ConstExpr);
+pub struct PyConstExpr(pub(crate) ConstExpr);
 
 #[pymethods]
 impl PyConstExpr {
@@ -303,8 +303,10 @@ pub fn evaluate(x: &PyAny) -> PyResult<PyRlocInt> {
     } else if let Ok(expr) = x.extract::<i64>() {
         Ok(PyRlocInt(RlocInt::new(expr, 0)))
     } else {
+        let wtf1 = x.call_method0(intern!(x.py(), "Evaluate"));
+        let wtf2 = x.extract::<i64>();
         Err(PyValueError::new_err(format!(
-            "Only ConstExpr can be Evaluated, not {x}"
+            "Only ConstExpr can be Evaluated, not {x}\n{wtf1:?}\n{wtf2:?}"
         )))
     }
 }

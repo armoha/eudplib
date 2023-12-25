@@ -1,9 +1,9 @@
 use pyo3::prelude::*;
 
-mod constexpr;
+pub(crate) mod rlocint;
+pub(crate) mod constexpr;
 mod payload;
 mod pbuffer;
-mod rlocint;
 
 pub(crate) fn create_submodule(py: Python<'_>) -> PyResult<&PyModule> {
     let submod = PyModule::new(py, "allocator")?;

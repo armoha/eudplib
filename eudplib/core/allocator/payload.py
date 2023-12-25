@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 _found_objects_dict: "dict[EUDObject, int]" = {}
 _untraversed_objects: "list[EUDObject]" = []
 _dynamic_objects_set: "set[EUDObject]" = set()
-_payload_builder: allocator.PayloadBuilder | None = None
+_payload_builder = allocator.PayloadBuilder()
 
 PHASE_COLLECTING = 1
 PHASE_ALLOCATING = 2
@@ -194,7 +194,6 @@ def _allocate_objects() -> None:
     if not _payload_compress:
         raise EPError("CompressPayload(False) is currently not supported")
 
-    _payload_builder = allocator.PayloadBuilder()
     _payload_builder.alloc_objects(_found_objects_dict)
 
     phase = 0
@@ -219,20 +218,18 @@ _on_alloc_objects_callbacks: list[Callable] = []
 
 
 def RegisterCreatePayloadCallback(f: Callable) -> None:  # noqa: N802
-    _on_create_payload_callbacks.append(f)
+    _payload_builder.register_create_payload_callback(f)
 
 
-def _RegisterAllocObjectsCallback(f: Callable) -> None:  # noqa: N802
-    _on_alloc_objects_callbacks.append(f)
+def _register_after_collecting_callback(f: Callable) -> None:
+    _payload_builder.register_after_collecting_callback(f)
 
 
 def CreatePayload(root: "EUDObject | Forward") -> Payload:  # noqa: N802
     # Call callbacks
-    for f in _on_create_payload_callbacks:
-        f()
+    _payload_builder.call_callbacks_on_create_payload()
     _collect_objects(root)
-    for f in _on_alloc_objects_callbacks:
-        f()
+    _payload_builder.call_callbacks_after_collecting()
     _allocate_objects()
     return _construct_payload()
 

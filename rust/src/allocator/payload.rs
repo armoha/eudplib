@@ -181,6 +181,9 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
 
 #[pyclass(module = "eudplib.core.allocator")]
 pub struct PayloadBuilder {
+    callbacks_on_create_payload: Vec<PyObject>,
+    callbacks_after_collecting: Vec<PyObject>,
+    // Allocating & Writing phase
     alloctable: Vec<u32>,
     payload_size: usize,
 }
@@ -190,8 +193,30 @@ impl PayloadBuilder {
     #[new]
     fn new() -> Self {
         Self {
+            callbacks_on_create_payload: Vec::new(),
+            callbacks_after_collecting: Vec::new(),
             alloctable: Vec::new(),
             payload_size: 0,
+        }
+    }
+
+    fn register_create_payload_callback(&mut self, callable: PyObject) {
+        self.callbacks_on_create_payload.push(callable);
+    }
+
+    fn register_after_collecting_callback(&mut self, callable: PyObject) {
+        self.callbacks_after_collecting.push(callable);
+    }
+
+    fn call_callbacks_on_create_payload(&mut self, py: Python) {
+        for callable in self.callbacks_on_create_payload.drain(..) {
+            let _ = callable.call0(py);
+        }
+    }
+
+    fn call_callbacks_after_collecting(&mut self, py: Python) {
+        for callable in self.callbacks_after_collecting.drain(..) {
+            let _ = callable.call0(py);
         }
     }
 

@@ -95,6 +95,16 @@ impl PyRlocInt {
         Self(RlocInt::new(offset, rlocmode))
     }
 
+    #[getter]
+    fn offset(&self) -> i32 {
+        self.0.offset as i32
+    }
+
+    #[getter]
+    fn rlocmode(&self) -> i32 {
+        self.0.rlocmode as i32
+    }
+
     fn __repr__(&self) -> String {
         format!("{:?}", self.0)
     }
@@ -203,6 +213,10 @@ impl PyRlocInt {
 
     fn _is_aligned_ptr(&self) -> bool {
         self.0.rlocmode == 4 && self.0.offset % 4 == 0
+    }
+
+    fn _is_ptr(&self) -> bool {
+        self.0.rlocmode == 4
     }
 
     fn _is_epd(&self) -> bool {
