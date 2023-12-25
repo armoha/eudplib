@@ -5,7 +5,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from typing import Any
+from typing import Any, Callable
 
 class ObjAllocator:
     def WriteByte(self, number: int) -> None: ...  # noqa: N802
@@ -30,6 +30,10 @@ class PayloadBuilder:
     def construct_payload(
         self, found_objects: dict
     ) -> tuple[bytes, list[int], list[int]]: ...
+    def register_create_payload_callback(self, f: Callable[[], Any]) -> None: ...
+    def register_after_collecting_callback(self, f: Callable[[], Any]) -> None: ...
+    def call_callbacks_on_create_payload(self) -> None: ...
+    def call_callbacks_after_collecting(self) -> None: ...
 
 class RlocInt_C:  # noqa: N801
     def __init__(self, offset: int, rlocmode: int) -> None: ...

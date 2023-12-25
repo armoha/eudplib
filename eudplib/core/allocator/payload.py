@@ -163,9 +163,7 @@ def _collect_objects(root: "EUDObject | Forward") -> None:
         rootobj = next(iterobj)
         found_objects = _rand_lst(iterobj)
         found_objects.append(rootobj)
-        _found_objects_dict = {
-            obj: i for i, obj in enumerate(reversed(found_objects))
-        }
+        _found_objects_dict = {obj: i for i, obj in enumerate(reversed(found_objects))}
 
     # cleanup
     phase = 0
@@ -213,16 +211,10 @@ def _construct_payload() -> Payload:
     return Payload(*payload)
 
 
-_on_create_payload_callbacks: list[Callable] = []
-_on_alloc_objects_callbacks: list[Callable] = []
-
-
-def RegisterCreatePayloadCallback(f: Callable) -> None:  # noqa: N802
-    _payload_builder.register_create_payload_callback(f)
-
-
-def _register_after_collecting_callback(f: Callable) -> None:
-    _payload_builder.register_after_collecting_callback(f)
+RegisterCreatePayloadCallback = _payload_builder.register_create_payload_callback
+_register_after_collecting_callback = (
+    _payload_builder.register_after_collecting_callback
+)
 
 
 def CreatePayload(root: "EUDObject | Forward") -> Payload:  # noqa: N802
