@@ -65,6 +65,9 @@ _Action: TypeAlias = Action | Iterable[Action | Iterable]
 
 
 class RawTrigger(EUDObject):
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls)
+
     @overload
     def __init__(
         self,
@@ -162,9 +165,7 @@ class RawTrigger(EUDObject):
                 if condtype == 22:
                     continue  # ignore Always, no worry disable/enable
                 elif condtype >= 1:
-                    condition = struct.unpack_from(
-                        "<IIIHBBBBH", trigSection, i * 20
-                    )
+                    condition = struct.unpack_from("<IIIHBBBBH", trigSection, i * 20)
                     self._conditions.append(
                         Condition(*condition[:8], eudx=condition[8])
                     )
@@ -178,9 +179,7 @@ class RawTrigger(EUDObject):
                         "<IIIIIIHBBBBH", trigSection, 320 + i * 32
                     )
                     self._actions.append(Action(*action[:10], eudx=action[11]))
-            self._currentAction = (
-                None if not (self._flags & 1) else trigSection[2399]
-            )
+            self._currentAction = None if not (self._flags & 1) else trigSection[2399]
 
     @property
     def preserved(self) -> bool:

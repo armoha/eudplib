@@ -20,6 +20,9 @@ class EUDArrayData(c.EUDObject):
 
     dont_flatten = True
 
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls)
+
     def __init__(self, arr) -> None:
         super().__init__()
 

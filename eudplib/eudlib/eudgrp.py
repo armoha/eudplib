@@ -17,6 +17,9 @@ class EUDGrp(c.EUDObject):
     emulates that modification so that SC recognizes GRP correctly.
     """
 
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls)
+
     def __init__(self, content):
         super().__init__()
         if isinstance(content, str):
@@ -44,9 +47,7 @@ class EUDGrp(c.EUDObject):
 
         for i in range(fn):
             fhoffset = 6 + 8 * i
-            xoff, yoff, w, h, lto = struct.unpack(
-                "<BBBBI", b[fhoffset : fhoffset + 8]
-            )
+            xoff, yoff, w, h, lto = struct.unpack("<BBBBI", b[fhoffset : fhoffset + 8])
             buf.WriteByte(xoff)
             buf.WriteByte(yoff)
             buf.WriteByte(w)

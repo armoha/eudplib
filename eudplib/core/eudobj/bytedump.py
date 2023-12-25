@@ -12,6 +12,9 @@ from .eudobj import EUDObject
 class Db(EUDObject):
     """Class for raw data object"""
 
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls)
+
     def __init__(self, b: bytes | int | str) -> None:
         super().__init__()
         if isinstance(b, str):

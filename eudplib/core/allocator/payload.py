@@ -6,7 +6,6 @@
 # file that should have been included as part of this package.
 
 import time
-from collections.abc import Callable
 from typing import TYPE_CHECKING, TypeAlias
 
 from eudplib.bindings._rust import allocator
