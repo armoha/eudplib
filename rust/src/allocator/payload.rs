@@ -8,7 +8,7 @@ use pyo3::types::{PyBytes, PyDict, PyList, PyTuple};
 create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 
 /// Object having PayloadBuffer-like interfaces. Collects all objects by
-/// calling RegisterObject() for every related objects.
+/// calling object.WritePayload() for every related objects.
 #[pyclass(module = "eudplib.core.allocator")]
 pub struct ObjAllocator {
     suboccupmap: bool,

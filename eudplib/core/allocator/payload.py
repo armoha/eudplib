@@ -80,7 +80,7 @@ def ShufflePayload(mode: bool) -> None:  # noqa: N802
 class ObjCollector:
     """
     Object having PayloadBuffer-like interfaces. Collects all objects by
-    calling RegisterObject() for every related objects.
+    calling object.CollectDependency() for every related objects.
     """
 
     def __init__(self) -> None:

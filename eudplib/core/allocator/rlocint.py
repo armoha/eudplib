@@ -4,11 +4,8 @@
 # This file is part of EUD python library (eudplib),
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
-from typing import TypeAlias
-
 from eudplib.bindings._rust import allocator as al
 
 RlocInt_C = al.RlocInt_C
-_RlocInt: TypeAlias = int | RlocInt_C
 RlocInt = al.RlocInt
-toRlocInt = al.toRlocInt
+toRlocInt = al.toRlocInt  # noqa: N816
