@@ -34,24 +34,16 @@ from .calcf.bitwise import (
 )
 from .calcf.muldiv import f_div, f_mul
 from .curpl import AddCurrentPlayer, SetCurrentPlayer
-from .eudfunc import (
-    EUDFullFunc,
+from .eudfunc.eudf import (
     EUDFunc,
-    EUDFuncN,
-    EUDFuncPtr,
-    EUDMethod,
-    EUDReturn,
-    EUDTracedFunc,
-    EUDTracedMethod,
-    EUDTracedTypedFunc,
-    EUDTracedTypedMethod,
-    EUDTraceLog,
     EUDTypedFunc,
-    EUDTypedFuncPtr,
-    EUDTypedMethod,
-    EUDXTypedFunc,
-    GetTraceStackDepth,
 )
+from .eudfunc.eudfmethod import (
+    EUDMethod,
+    EUDTypedMethod,
+)
+from .eudfunc.eudfptr import EUDFuncPtr, EUDTypedFuncPtr
+from .eudfunc.eudfuncn import EUDReturn
 from .eudobj import Db, EUDObject
 from .eudstruct import (
     EUDStruct,
@@ -339,22 +331,13 @@ __all__ = [
     "f_mul",
     "AddCurrentPlayer",
     "SetCurrentPlayer",
-    "EUDFullFunc",
     "EUDFunc",
-    "EUDFuncN",
     "EUDFuncPtr",
     "EUDMethod",
     "EUDReturn",
-    "EUDTracedFunc",
-    "EUDTracedMethod",
-    "EUDTracedTypedFunc",
-    "EUDTracedTypedMethod",
-    "EUDTraceLog",
     "EUDTypedFunc",
     "EUDTypedFuncPtr",
     "EUDTypedMethod",
-    "EUDXTypedFunc",
-    "GetTraceStackDepth",
     "Db",
     "EUDObject",
     "EUDStruct",

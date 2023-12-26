@@ -12,10 +12,9 @@ from eudplib import utils as ut
 
 from ...localize import _
 from .. import allocator as ac
-from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .. import variable as ev
-from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ..eudfunc.eudf import EUDFunc, _EUDPredefineParam, _EUDPredefineReturn
 from ..eudfunc.eudtypedfuncn import EUDTypedFuncN
 from ..variable.evcommon import _ev
 
@@ -45,18 +44,14 @@ def f_div(a, b, **kwargs):
     For signed division, uses `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."""
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(
-                a
-            ),
+            _("Can't use negative dividend for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
             ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(
-                a
-            ),
+            _("Can't use negative divider for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
             ),
@@ -84,18 +79,14 @@ def _quot(a, b, **kwargs):
     """Calculate (a//b)"""
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(
-                a
-            ),
+            _("Can't use negative dividend for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
             ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(
-                a
-            ),
+            _("Can't use negative divider for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
             ),
@@ -123,18 +114,14 @@ def _rem(a, b, **kwargs):
     """Calculate (a%b)"""
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(
-                a
-            ),
+            _("Can't use negative dividend for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
             ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(
-                a
-            ),
+            _("Can't use negative divider for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
             ),
@@ -172,15 +159,15 @@ def _const_mul(number: int) -> Callable:
     if not hasattr(_const_mul, "mulfdict"):
         from .bitwise import f_bitlshift
 
-        @ef.EUDFunc
+        @EUDFunc
         def _mul_1(x):
             return -x
 
-        @ef.EUDFunc
+        @EUDFunc
         def _mul0(x):
             return 0
 
-        @ef.EUDFunc
+        @EUDFunc
         def _mul1(x):
             return x
 
@@ -215,7 +202,7 @@ def _const_mul(number: int) -> Callable:
 
         @_EUDPredefineParam(1)
         @_EUDPredefineReturn(1, 2)
-        @ef.EUDFunc
+        @EUDFunc
         def _mulf(a):
             ret = _mulf._frets[0]
             ret << 0
@@ -241,11 +228,11 @@ def _const_div(number: int) -> EUDTypedFuncN:
     """
     if not hasattr(_const_div, "divfdict"):
 
-        @ef.EUDFunc
+        @EUDFunc
         def _div0(x):
             return -1, x
 
-        @ef.EUDFunc
+        @EUDFunc
         def _div1(x):
             return x, 0
 
@@ -259,7 +246,7 @@ def _const_div(number: int) -> EUDTypedFuncN:
 
         @_EUDPredefineReturn(2)
         @_EUDPredefineParam(1, 2)
-        @ef.EUDFunc
+        @EUDFunc
         def _divf(a):
             quotient = _divf._frets[0]
             quotient << 0
@@ -298,11 +285,11 @@ def _const_quot(number: int) -> Callable:
     """
     if not hasattr(_const_quot, "quotfdict"):
 
-        @ef.EUDFunc
+        @EUDFunc
         def _quot0(x):
             return -1
 
-        @ef.EUDFunc
+        @EUDFunc
         def _quot1(x):
             return x
 
@@ -317,17 +304,15 @@ def _const_quot(number: int) -> Callable:
 
             @_EUDPredefineReturn(1)
             @_EUDPredefineParam(1)
-            @ef.EUDFunc
+            @EUDFunc
             def _quotf(quotient):
-                ev.vbase.VariableBase.__irshift__(
-                    quotient, int(math.log2(number))
-                )
+                ev.vbase.VariableBase.__irshift__(quotient, int(math.log2(number)))
                 # return quotient
 
         else:
 
             @_EUDPredefineReturn(1)
-            @ef.EUDFunc
+            @EUDFunc
             def _quotf(a):
                 quotient = _quotf._frets[0]
                 quotient << 0
@@ -358,11 +343,11 @@ def _const_rem(number: int) -> Callable:
     """
     if not hasattr(_const_rem, "remfdict"):
 
-        @ef.EUDFunc
+        @EUDFunc
         def _rem0(x):
             return x
 
-        @ef.EUDFunc
+        @EUDFunc
         def _rem1(x):
             return 0
 
@@ -377,7 +362,7 @@ def _const_rem(number: int) -> Callable:
 
             @_EUDPredefineReturn(1)
             @_EUDPredefineParam(1)
-            @ef.EUDFunc
+            @EUDFunc
             def _remf(remainder):
                 remainder &= number - 1
                 # return remainder
@@ -386,7 +371,7 @@ def _const_rem(number: int) -> Callable:
 
             @_EUDPredefineReturn(1)
             @_EUDPredefineParam(1)
-            @ef.EUDFunc
+            @EUDFunc
             def _remf(a):
                 for i in range(31, -1, -1):
                     # number too big
@@ -407,7 +392,7 @@ def _const_rem(number: int) -> Callable:
 
 
 @_EUDPredefineReturn(1)
-@ef.EUDFunc
+@EUDFunc
 def _eud_mul(a, b):
     ret = _eud_mul._frets[0]
     endmul, reset_nptr = ac.Forward(), ac.Forward()
@@ -444,7 +429,7 @@ def _eud_mul(a, b):
     # return ret
 
 
-@ef.EUDFunc
+@EUDFunc
 def _eud_div(a, b):
     ret, x = ev.EUDCreateVariables(2)
 

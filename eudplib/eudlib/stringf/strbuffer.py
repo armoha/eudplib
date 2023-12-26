@@ -8,6 +8,7 @@
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
+from ...core.eudfunc import EUDFullFunc
 from ...core.mapdata.stringmap import ForceAddString
 from ...localize import _
 from ..memiof import f_getcurpl, f_setcurpl
@@ -26,7 +27,7 @@ from .texteffect import (
 _display_text = c.DisplayText(0)
 
 
-@c.EUDFullFunc(
+@EUDFullFunc(
     [
         (ut.EPD(0x640B58), c.Add, 0, None),
         (ut.EPD(_display_text) + 1, c.SetTo, 0, None),
@@ -118,29 +119,21 @@ class StringBuffer(c.EUDStruct):
         super().__init__(_from=_from, _static_initval=initval)
 
     def constructor(self, *args, **kwargs):
-        raise ut.EPError(
-            _("Dynamically allocating StringBuffer is not supported")
-        )
+        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
 
     def constructor_static(self, *args, **kwargs):
         pass
 
     @classmethod
     def alloc(cls, *args, **kwargs):
-        raise ut.EPError(
-            _("Dynamically allocating StringBuffer is not supported")
-        )
+        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
 
     @classmethod
     def free(cls, data):
-        raise ut.EPError(
-            _("Dynamically allocating StringBuffer is not supported")
-        )
+        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
 
     def destructor(self):
-        raise ut.EPError(
-            _("Dynamically allocating StringBuffer is not supported")
-        )
+        raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
 
     # Initializer
 
@@ -148,9 +141,7 @@ class StringBuffer(c.EUDStruct):
         raise ut.EPError(_("Can't mutate field of StringBuffer except 'pos'"))
 
     def copyto(self, inst):
-        raise ut.EPError(
-            _("Can't clone StringBuffer, which is reference type.")
-        )
+        raise ut.EPError(_("Can't clone StringBuffer, which is reference type."))
 
     # Field setter & getter
 
@@ -436,9 +427,7 @@ class StringBuffer(c.EUDStruct):
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
-        ret << TextFX_FadeIn(
-            *args, color=color, wait=wait, reset=reset, tag=tag
-        )
+        ret << TextFX_FadeIn(*args, color=color, wait=wait, reset=reset, tag=tag)
         self._display_at(prevpos, line)
         end << c.NextTrigger()
         return ret
@@ -481,9 +470,7 @@ class StringBuffer(c.EUDStruct):
         ontrue << c.NextTrigger()
         prevpos = TextFX_Remove(tag)
         f_setcurpl(self.epd)
-        ret << TextFX_FadeOut(
-            *args, color=color, wait=wait, reset=reset, tag=tag
-        )
+        ret << TextFX_FadeOut(*args, color=color, wait=wait, reset=reset, tag=tag)
         self._display_at(prevpos, line)
         end << c.NextTrigger()
         return ret
