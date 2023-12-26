@@ -647,6 +647,9 @@ class CUnit(EPDOffsetMap):
     def remove_collision(self) -> None:
         self.set_status_flag(0x00A00000)
 
+    def set_collision(self) -> None:
+        self.clear_status_flag(0x00A00000)
+
     def set_invincible(self) -> None:
         self.set_status_flag(0x04000000)
 
