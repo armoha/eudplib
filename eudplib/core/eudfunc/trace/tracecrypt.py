@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 
-def T(x: int) -> int:
+def T(x: int) -> int:  # noqa: N802
     x &= 0xFFFFFFFF
     for i in range(4):
         xsq = x * x

@@ -8,3 +8,9 @@
 from .eudstruct import EUDStruct
 from .selftype import selftype
 from .vararray import EUDVArray
+
+__all__ = [
+    "EUDStruct",
+    "selftype",
+    "EUDVArray",
+]

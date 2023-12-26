@@ -21,4 +21,23 @@ from .eudfmethod import (
 )
 from .eudfptr import EUDFuncPtr, EUDTypedFuncPtr
 from .eudfuncn import EUDFuncN, EUDReturn
-from .trace import *
+from .trace.tracetool import EUDTraceLog, GetTraceStackDepth
+
+__all__ = [
+    "EUDFullFunc",
+    "EUDFunc",
+    "EUDTracedFunc",
+    "EUDTracedTypedFunc",
+    "EUDTypedFunc",
+    "EUDXTypedFunc",
+    "EUDMethod",
+    "EUDTracedMethod",
+    "EUDTracedTypedMethod",
+    "EUDTypedMethod",
+    "EUDFuncPtr",
+    "EUDTypedFuncPtr",
+    "EUDFuncN",
+    "EUDReturn",
+    "EUDTraceLog",
+    "GetTraceStackDepth",
+]

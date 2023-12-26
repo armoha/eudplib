@@ -71,10 +71,12 @@ class StatusFlags(EnumMember):
     UNKNOWN6 = Flag(0x01000000)
     UNKNOWN7 = Flag(0x02000000)  # Turret related
     Invincible = Flag(0x04000000)
-    HoldingPosition = Flag(0x08000000)  # Set if the unit is currently holding position
+    # Set if the unit is currently holding position
+    HoldingPosition = Flag(0x08000000)
     SpeedUpgrade = Flag(0x10000000)
     CooldownUpgrade = Flag(0x20000000)
-    IsHallucination = Flag(0x40000000)  # 1 for hallucinated units, 0 for "normal" units
+    # 1 for hallucinated units, 0 for "normal" units
+    IsHallucination = Flag(0x40000000)
     # Set for when the unit is self-destructing
     # (scarab, scourge, infested terran)
     IsSelfDestructing = Flag(0x80000000)

@@ -13,7 +13,7 @@ from ...utils.blockstru import BlockStruManager, set_blockstru_manager
 from .. import allocator as ac
 from .. import rawtrigger as bt
 from .. import variable as ev
-from .trace.tracetool import _EUDTracePop, _EUDTracePush
+from .trace.tracetool import _eud_trace_pop, _eud_trace_push
 
 _currentCompiledFunc = None
 _currentTriggerCount = 0
@@ -99,7 +99,7 @@ class EUDFuncN:
         self._fstart = fstart
 
         if self._traced:
-            _EUDTracePush()
+            _eud_trace_push()
 
         final_rets = self._callerfunc(*self._fargs)
         if final_rets is not None:
@@ -108,7 +108,7 @@ class EUDFuncN:
         if not self._fend.IsSet():
             self._fend << bt.NextTrigger()
         if self._traced:
-            _EUDTracePop()
+            _eud_trace_pop()
         if self._retn is None or self._retn == 0:
             self._fend = bt.RawTrigger()
             self._nptr = self._fend + 4
@@ -177,7 +177,8 @@ class EUDFuncN:
         ret = ut.FlattenList(ret)
         ut.ep_assert(
             len(ret) == self._retn,
-            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
+            _("Return number mismatch : ")
+            + "len(%s) != %d" % (repr(ret), self._retn),
         )
         nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -186,7 +187,9 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
+                nextPtrAssignment.append(
+                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
+                )
 
         ev.SeqCompute(nextPtrAssignment)
         bt.SetNextTrigger(self._fstart)
@@ -220,7 +223,8 @@ class EUDFuncN:
         ret = ut.FlattenList(ret)
         ut.ep_assert(
             len(ret) == self._retn,
-            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
+            _("Return number mismatch : ")
+            + "len(%s) != %d" % (repr(ret), self._retn),
         )
         nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -229,7 +233,9 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
+                nextPtrAssignment.append(
+                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
+                )
         varAssigns, constAssigns = list(), list()
         for farg, arg in zip(self._fargs, args):
             if ev.IsEUDVariable(arg):

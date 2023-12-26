@@ -7,5 +7,4 @@
 
 from eudplib.bindings._rust import eudobj
 
-
 EUDObject = eudobj.EUDObject

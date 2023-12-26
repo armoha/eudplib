@@ -13,7 +13,6 @@ from ....localize import _
 from ...allocator import Forward
 from ...eudobj import Db
 from ...rawtrigger import (
-    Action,
     Add,
     AtLeast,
     MemoryX,
@@ -30,12 +29,12 @@ from ...rawtrigger import (
 from ...variable import EUDVariable, SeqCompute
 from . import tracecrypt
 
-iHeader: bytes = os.urandom(16)
-traceToolDataEPD = ut.EPD(Db(iHeader + bytes(4 * 2048)))
-recordTraceAct = Forward()
+i_header: bytes = os.urandom(16)
+_tracetool_data_epd = ut.EPD(Db(i_header + bytes(4 * 2048)))
+_record_trace_act = Forward()
 PushTriggerScope()
-recordTraceTrigger = RawTrigger(
-    actions=[recordTraceAct << SetMemoryEPD(traceToolDataEPD + 4, SetTo, 0)]
+_record_trace_trigger = RawTrigger(
+    actions=[_record_trace_act << SetMemoryEPD(_tracetool_data_epd + 4, SetTo, 0)]
 )
 PopTriggerScope()
 
@@ -51,53 +50,53 @@ def _f_initstacktrace() -> None:
         raise ut.EPError(_("Must call SaveMap first"))
     RawTrigger(
         actions=[
-            SetMemoryEPD(traceToolDataEPD + 0, SetTo, ut.b2i4(trace_header, 0x0)),
-            SetMemoryEPD(traceToolDataEPD + 1, SetTo, ut.b2i4(trace_header, 0x4)),
-            SetMemoryEPD(traceToolDataEPD + 2, SetTo, ut.b2i4(trace_header, 0x8)),
-            SetMemoryEPD(traceToolDataEPD + 3, SetTo, ut.b2i4(trace_header, 0xC)),
+            SetMemoryEPD(_tracetool_data_epd + 0, SetTo, ut.b2i4(trace_header, 0x0)),
+            SetMemoryEPD(_tracetool_data_epd + 1, SetTo, ut.b2i4(trace_header, 0x4)),
+            SetMemoryEPD(_tracetool_data_epd + 2, SetTo, ut.b2i4(trace_header, 0x8)),
+            SetMemoryEPD(_tracetool_data_epd + 3, SetTo, ut.b2i4(trace_header, 0xC)),
         ],
     )
 
 
-def _EUDTracePush() -> None:
-    RawTrigger(actions=SetMemory(recordTraceAct + 16, Add, 1))
+def _eud_trace_push() -> None:
+    RawTrigger(actions=SetMemory(_record_trace_act + 16, Add, 1))
 
 
-def _EUDTracePop() -> None:
-    EUDTraceLogRaw(0)
-    RawTrigger(actions=SetMemory(recordTraceAct + 16, Subtract, 1))
+def _eud_trace_pop() -> None:
+    _eud_trace_log_raw(0)
+    RawTrigger(actions=SetMemory(_record_trace_act + 16, Subtract, 1))
 
 
-nextTraceId = 0
+_next_trace_id = 0
 trace_map: list[tuple[int, str]] = []
-traceKey = 0
+_trace_key = 0
 trace_header: bytes = b""
 
 
-def GetTraceStackDepth() -> EUDVariable:
+def GetTraceStackDepth() -> EUDVariable:  # noqa: N802
     v = EUDVariable()
     v << 0
     for i in range(31, -1, -1):
         RawTrigger(
-            conditions=MemoryX(recordTraceAct + 16, AtLeast, 1, 2**i),
+            conditions=MemoryX(_record_trace_act + 16, AtLeast, 1, 2**i),
             actions=v.AddNumber(2**i),
         )
-    SeqCompute([(v, Subtract, traceToolDataEPD + 4)])
+    SeqCompute([(v, Subtract, _tracetool_data_epd + 4)])
     return v
 
 
-def _ResetTraceMap() -> None:
+def _reset_trace_map() -> None:
     """This function gets called by savemap.py::SaveMap to clear trace data."""
-    global nextTraceId, traceKey, trace_header
-    nextTraceId = 0
-    traceKey = ut.b2i4(os.urandom(4))
+    global _next_trace_id, _trace_key, trace_header
+    _next_trace_id = 0
+    _trace_key = ut.b2i4(os.urandom(4))
     trace_map.clear()
     trace_header = os.urandom(16)
 
 
-def EUDTraceLog(lineno: int | None = None) -> None:
+def EUDTraceLog(lineno: int | None = None) -> None:  # noqa: N802
     """Log trace."""
-    global nextTraceId
+    global _next_trace_id
 
     # Construct trace message from cpython stack
     # Note: we need to get the caller's filename, function name, and line no.
@@ -108,37 +107,33 @@ def EUDTraceLog(lineno: int | None = None) -> None:
     try:
         if lineno is None:
             lineno = frame.f_lineno
-        msg = "%s|%s|%s" % (
-            frame.f_code.co_filename,
-            frame.f_code.co_name,
-            lineno,
-        )
+        msg = f"{frame.f_code.co_filename}|{frame.f_code.co_name}|{lineno}"
     finally:
         # frame object should be dereferenced as quickly as possible.
         # https://docs.python.org/3/library/inspect.html#the-interpreter-stack
         del frame
 
-    v = tracecrypt.mix(traceKey, nextTraceId)
-    nextTraceId += 1
+    v = tracecrypt.mix(_trace_key, _next_trace_id)
+    _next_trace_id += 1
     if v == 0:  # We don't allow logging 0.
-        v = tracecrypt.mix(traceKey, nextTraceId)
-        nextTraceId += 1
+        v = tracecrypt.mix(_trace_key, _next_trace_id)
+        _next_trace_id += 1
     trace_map.append((v, str(msg)))
 
-    EUDTraceLogRaw(v)
+    _eud_trace_log_raw(v)
 
 
-def EUDTraceLogRaw(v: int) -> None:
+def _eud_trace_log_raw(v: int) -> None:
     nt = Forward()
     RawTrigger(
-        nextptr=recordTraceTrigger,
+        nextptr=_record_trace_trigger,
         actions=[
-            SetNextPtr(recordTraceTrigger, nt),
-            SetMemory(recordTraceAct + 20, SetTo, v),
+            SetNextPtr(_record_trace_trigger, nt),
+            SetMemory(_record_trace_act + 20, SetTo, v),
         ],
     )
     nt << NextTrigger()
 
 
-def _GetTraceMap() -> tuple[tuple[bytes, bytes], list[tuple[int, str]]]:
-    return (iHeader, trace_header), trace_map
+def _get_trace_map() -> tuple[tuple[bytes, bytes], list[tuple[int, str]]]:
+    return (i_header, trace_header), trace_map
