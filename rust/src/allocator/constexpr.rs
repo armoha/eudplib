@@ -296,18 +296,13 @@ impl Forward {
 #[pyfunction]
 #[pyo3(name = "Evaluate")]
 pub fn evaluate(x: &PyAny) -> PyResult<PyRlocInt> {
-    if let Ok(expr) = x.call_method0(intern!(x.py(), "Evaluate")) {
-        expr.extract::<PyRlocInt>()
-    } else if let Ok(expr) = x.extract::<PyRlocInt>() {
+    if let Ok(expr) = x.extract::<PyRlocInt>() {
         Ok(PyRlocInt(expr.0))
     } else if let Ok(expr) = x.extract::<i64>() {
         Ok(PyRlocInt(RlocInt::new(expr as i32, 0)))
     } else {
-        let wtf1 = x.call_method0(intern!(x.py(), "Evaluate"));
-        let wtf2 = x.extract::<i64>();
-        Err(PyValueError::new_err(format!(
-            "Only ConstExpr can be Evaluated, not {x}\n{wtf1:?}\n{wtf2:?}"
-        )))
+        let expr = x.call_method0(intern!(x.py(), "Evaluate"))?;
+        expr.extract::<PyRlocInt>()
     }
 }
 
