@@ -10,14 +10,12 @@ from ...localize import _
 from ..allocator import IsConstExpr
 from ..rawtrigger.consttype import ConstType
 from ..variable import EUDVariable
-from .structarr import _EUDStruct_Metaclass
+from .structarr import _EUDStructMetaclass
 from .vararray import EUDVArray
 
 
-class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
-    def __init__(
-        self, *args, _from=None, _static_initval=None, **kwargs
-    ) -> None:
+class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
+    def __init__(self, *args, _from=None, _static_initval=None, **kwargs) -> None:
         fieldcount = len(self._fielddict)
 
         if _from is not None:

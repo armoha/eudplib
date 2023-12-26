@@ -36,7 +36,9 @@ class EUDArrayData(c.EUDObject):
         else:
             if any(not c.IsConstExpr(item) for item in arr):
                 err = [_("Invalid item(s) for {}:").format(self.__class__)]
-                for i, item in enumerate(filter(lambda x: not c.IsConstExpr(x), arr)):
+                for i, item in enumerate(
+                    filter(lambda x: not c.IsConstExpr(x), arr)
+                ):
                     err.append(f"\t#{i}: {item}")
                 raise ut.EPError("\n".join(err))
             self._datas = arr

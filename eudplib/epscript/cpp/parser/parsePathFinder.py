@@ -12,33 +12,33 @@ lines = open("epparser.out").readlines()
 
 # Get graph
 graph: dict[int, list[tuple[str, int]]] = {}
-currentState: int = 0
+_current_state: int = 0
 for line in lines:
     r_st = re_state.match(line)
     if r_st:
-        currentState = int(r_st.group(1))
-        graph[currentState] = []
+        _current_state = int(r_st.group(1))
+        graph[_current_state] = []
     else:
         r_sh = re_shift.match(line)
         if r_sh:
             token = r_sh.group(1)
-            stateTo = int(r_sh.group(2))
-            graph[currentState].append((token, stateTo))
+            _state_to = int(r_sh.group(2))
+            graph[_current_state].append((token, _state_to))
 
 # Find path
-pathMap = {}
+_path_map = {}
 q = [("", 0)]
 
 while q:
-    prevPath, currentState = q.pop()
-    for token, nextState in graph[currentState]:
-        if nextState in pathMap:
+    _prev_path, _current_state = q.pop()
+    for token, _next_state in graph[_current_state]:
+        if _next_state in _path_map:
             continue
-        path = f"{prevPath} {token}"
-        pathMap[nextState] = path
-        q.append((path, nextState))
+        path = f"{_prev_path} {token}"
+        _path_map[_next_state] = path
+        q.append((path, _next_state))
 
-keys = list(pathMap.keys())
+keys = list(_path_map.keys())
 keys.sort()
 for k in keys:
-    print("%5d :%s" % (k, pathMap[k]))
+    print("%5d :%s" % (k, _path_map[k]))

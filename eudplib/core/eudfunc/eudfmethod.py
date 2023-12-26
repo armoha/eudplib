@@ -12,14 +12,14 @@ from collections.abc import Callable
 from ... import utils as ut
 from ...localize import _
 from .. import variable as ev
-from ..eudstruct.selftype import SetSelfType, selftype
-from .eudtypedfuncn import EUDTypedFuncN, applyTypes
+from ..eudstruct.selftype import _set_selftype, selftype
+from .eudtypedfuncn import EUDTypedFuncN, _apply_types
 
 _mth_classtype: dict[Callable, type] = {}
 
 
-def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):
-    def _EUDTypedMethod(method):
+def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):  # noqa: N802
+    def _eud_typed_method(method):
         # Get argument number of fdecl_func
         argspec = inspect.getfullargspec(method)
         ut.ep_assert(
@@ -37,15 +37,15 @@ def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):
         constexpr_callmap = {}
 
         # Generic caller
-        def genericCaller(self, *args):
-            SetSelfType(_mth_classtype[method])
+        def generic_caller(self, *args):
+            _set_selftype(_mth_classtype[method])
             self = selftype.cast(self)
-            args = applyTypes(argtypes, args)
-            SetSelfType(None)
+            args = _apply_types(argtypes, args)
+            _set_selftype(None)
             return method(self, *args)
 
-        genericCaller = EUDTypedFuncN(
-            argn + 1, genericCaller, method, argtypes, rettypes, traced=traced
+        generic_caller = EUDTypedFuncN(
+            argn + 1, generic_caller, method, argtypes, rettypes, traced=traced
         )
 
         # Return function
@@ -56,9 +56,9 @@ def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):
                 if method not in _mth_classtype:
                     _mth_classtype[method] = selftype
 
-                SetSelfType(selftype)
-                rets = genericCaller(self, *args)  # FIXME: euddraft#34
-                SetSelfType(None)
+                _set_selftype(selftype)
+                rets = generic_caller(self, *args)  # FIXME: euddraft#34
+                _set_selftype(None)
                 return rets
 
             # Const expression. Can use optimizations
@@ -66,31 +66,31 @@ def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):
                 if self not in constexpr_callmap:
 
                     def caller(*args):
-                        args = applyTypes(argtypes, args)
+                        args = _apply_types(argtypes, args)
                         return method(self, *args)
 
                     constexpr_callmap[self] = EUDTypedFuncN(
                         argn, caller, method, argtypes, rettypes, traced=traced
                     )
 
-                SetSelfType(type(self))
+                _set_selftype(type(self))
                 rets = constexpr_callmap[self](*args)
-                SetSelfType(None)
+                _set_selftype(None)
                 return rets
 
         functools.update_wrapper(call, method)
         return call
 
-    return _EUDTypedMethod
+    return _eud_typed_method
 
 
-def EUDTracedTypedMethod(argtypes, rettypes=None):
+def EUDTracedTypedMethod(argtypes, rettypes=None):  # noqa: N802
     return EUDTypedMethod(argtypes, rettypes, traced=True)
 
 
-def EUDMethod(method):
+def EUDMethod(method):  # noqa: N802
     return EUDTypedMethod(None, None, traced=False)(method)
 
 
-def EUDTracedMethod(method):
+def EUDTracedMethod(method):  # noqa: N802
     return EUDTypedMethod(None, None, traced=True)(method)

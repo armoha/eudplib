@@ -15,27 +15,27 @@ from .. import rawtrigger as bt
 from .. import variable as ev
 from .trace.tracetool import _eud_trace_pop, _eud_trace_push
 
-_currentCompiledFunc = None
-_currentTriggerCount = 0
+_current_compiled_func = None
+_current_trigger_count = 0
 
 
-def _updateFuncTriggerCount():
-    global _currentTriggerCount
-    currentCounter = bt.GetTriggerCounter()
-    addedTriggerCount = currentCounter - _currentTriggerCount
+def _update_func_trigger_count():
+    global _current_trigger_count
+    current_counter = bt.GetTriggerCounter()
+    added_trigger_count = current_counter - _current_trigger_count
 
-    if _currentCompiledFunc:
-        _currentCompiledFunc._triggerCount += addedTriggerCount
-    _currentTriggerCount = currentCounter
+    if _current_compiled_func:
+        _current_compiled_func._triggerCount += added_trigger_count
+    _current_trigger_count = current_counter
 
 
-def _setCurrentCompiledFunc(func):
-    global _currentCompiledFunc
+def _set_current_compiled_func(func):
+    global _current_compiled_func
 
-    lastCompiledFunc = _currentCompiledFunc
-    _updateFuncTriggerCount()
-    _currentCompiledFunc = func
-    return lastCompiledFunc
+    last_compiled_func = _current_compiled_func
+    _update_func_trigger_count()
+    _current_compiled_func = func
+    return last_compiled_func
 
 
 class EUDFuncN:
@@ -74,13 +74,13 @@ class EUDFuncN:
 
     def size(self):
         if not self._fstart:
-            self._CreateFuncBody()
+            self._create_func_body()
 
         return self._triggerCount
 
-    def _CreateFuncBody(self):
+    def _create_func_body(self):
         self._triggerCount = 0
-        lastCompiledFunc = _setCurrentCompiledFunc(self)
+        last_compiled_func = _set_current_compiled_func(self)
 
         # Add return point
         self._fend = ac.Forward()
@@ -93,7 +93,7 @@ class EUDFuncN:
         prev_bsm = set_blockstru_manager(f_bsm)
         bt.PushTriggerScope()
 
-        self._CreateFuncArgs()
+        self._create_func_args()
 
         fstart = bt.NextTrigger()
         self._fstart = fstart
@@ -103,7 +103,7 @@ class EUDFuncN:
 
         final_rets = self._callerfunc(*self._fargs)
         if final_rets is not None:
-            self._AddReturn(ut.Assignable2List(final_rets), False)
+            self._add_return(ut.Assignable2List(final_rets), False)
 
         if not self._fend.IsSet():
             self._fend << bt.NextTrigger()
@@ -113,9 +113,9 @@ class EUDFuncN:
             self._fend = bt.RawTrigger()
             self._nptr = self._fend + 4
         else:
-            fendTrgs = ut.FlattenList(ev.VProc([self._frets], []))
-            self._fend = fendTrgs[0]
-            self._nptr = fendTrgs[-1]._actions[-1] + 20
+            fend_trgs = ut.FlattenList(ev.VProc([self._frets], []))
+            self._fend = fend_trgs[0]
+            self._nptr = fend_trgs[-1]._actions[-1] + 20
 
         bt.PopTriggerScope()
 
@@ -126,9 +126,9 @@ class EUDFuncN:
         # No return -> set return count to 0
         if self._retn is None:
             self._retn = 0
-        _setCurrentCompiledFunc(lastCompiledFunc)
+        _set_current_compiled_func(last_compiled_func)
 
-    def _CreateFuncArgs(self):
+    def _create_func_args(self):
         if self._fargs is None:
             self._fargs = []
             for initvals in self._arginits:
@@ -138,7 +138,7 @@ class EUDFuncN:
                     argv = ev.EUDXVariable(*initvals)
                 self._fargs.append(argv)
 
-    def _AddReturn(self, retv, needjump):
+    def _add_return(self, retv, needjump):
         retv = ut.FlattenList(retv)
         if self._frets is None:
             self._frets = [ev.EUDVariable() for _ in retv]
@@ -150,23 +150,23 @@ class EUDFuncN:
             + _(" (From function %s)").format(self._bodyfunc.__name__),
         )
 
-        varAssigns, constAssigns = list(), list()
+        var_assigns, const_assigns = list(), list()
         for fret, ret in zip(self._frets, retv):
             if ev.IsEUDVariable(ret):
-                varAssigns.append((fret, bt.SetTo, ret))
+                var_assigns.append((fret, bt.SetTo, ret))
             else:
-                constAssigns.append((fret, bt.SetTo, ret))
-        if len(varAssigns) <= 2:
-            ev.SeqCompute(constAssigns + varAssigns)
+                const_assigns.append((fret, bt.SetTo, ret))
+        if len(var_assigns) <= 2:
+            ev.SeqCompute(const_assigns + var_assigns)
         else:
-            ev.NonSeqCompute(constAssigns + varAssigns)
+            ev.NonSeqCompute(const_assigns + var_assigns)
 
         if needjump:
             bt.SetNextTrigger(self._fend)
 
-    def _CallWithLastArgs(self, *, ret=None):
+    def _call_with_last_args(self, *, ret=None):
         if self._fstart is None:
-            self._CreateFuncBody()
+            self._create_func_body()
 
         fcallend = ac.Forward()
 
@@ -180,18 +180,18 @@ class EUDFuncN:
             _("Return number mismatch : ")
             + "len(%s) != %d" % (repr(ret), self._retn),
         )
-        nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
+        next_ptr_assignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
             for fret, retv in zip(self._frets, ret):
                 try:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append(
+                next_ptr_assignment.append(
                     (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
                 )
 
-        ev.SeqCompute(nextPtrAssignment)
+        ev.SeqCompute(next_ptr_assignment)
         bt.SetNextTrigger(self._fstart)
 
         fcallend << bt.NextTrigger()
@@ -206,7 +206,7 @@ class EUDFuncN:
 
     def __call__(self, *args, ret=None):
         if self._fstart is None:
-            self._CreateFuncBody()
+            self._create_func_body()
 
         ut.ep_assert(
             len(args) == self._argn,
@@ -226,26 +226,26 @@ class EUDFuncN:
             _("Return number mismatch : ")
             + "len(%s) != %d" % (repr(ret), self._retn),
         )
-        nextPtrAssignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
+        next_ptr_assignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
             for fret, retv in zip(self._frets, ret):
                 try:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                nextPtrAssignment.append(
+                next_ptr_assignment.append(
                     (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
                 )
-        varAssigns, constAssigns = list(), list()
+        var_assigns, const_assigns = list(), list()
         for farg, arg in zip(self._fargs, args):
             if ev.IsEUDVariable(arg):
-                varAssigns.append((farg, bt.SetTo, arg))
+                var_assigns.append((farg, bt.SetTo, arg))
             else:
-                constAssigns.append((farg, bt.SetTo, arg))
-        if len(varAssigns) <= 2:
-            ev.SeqCompute(nextPtrAssignment + constAssigns + varAssigns)
+                const_assigns.append((farg, bt.SetTo, arg))
+        if len(var_assigns) <= 2:
+            ev.SeqCompute(next_ptr_assignment + const_assigns + var_assigns)
         else:
-            ev.NonSeqCompute(nextPtrAssignment + constAssigns + varAssigns)
+            ev.NonSeqCompute(next_ptr_assignment + const_assigns + var_assigns)
         bt.SetNextTrigger(self._fstart)
 
         fcallend << bt.NextTrigger()
@@ -259,5 +259,5 @@ class EUDFuncN:
             return ut.List2Assignable(ret)
 
 
-def EUDReturn(*args):
-    _currentCompiledFunc._AddReturn(args, True)
+def EUDReturn(*args):  # noqa: N802
+    _current_compiled_func._add_return(args, True)

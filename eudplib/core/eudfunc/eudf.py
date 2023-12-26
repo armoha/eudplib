@@ -13,11 +13,11 @@ from ...localize import _
 from ..rawtrigger import CurrentPlayer
 from ..variable import EUDVariable, IsEUDVariable
 from ..variable.evcommon import _ev
-from .eudtypedfuncn import EUDFullFuncN, EUDTypedFuncN, EUDXTypedFuncN, applyTypes
+from .eudtypedfuncn import EUDFullFuncN, EUDTypedFuncN, EUDXTypedFuncN, _apply_types
 
 
-def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
-    def _EUDTypedFunc(fdecl_func):
+def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):  # noqa: N802
+    def _eud_typed_func(fdecl_func):
         argspec = inspect.getfullargspec(fdecl_func)
         argn = len(argspec[0])
         ut.ep_assert(
@@ -31,7 +31,7 @@ def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
 
         def caller(*args):
             # Cast arguments to argtypes before callee code.
-            args = applyTypes(argtypes, args)
+            args = _apply_types(argtypes, args)
             return fdecl_func(*args)
 
         ret = EUDTypedFuncN(
@@ -40,23 +40,23 @@ def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):
         functools.update_wrapper(ret, fdecl_func)
         return ret
 
-    return _EUDTypedFunc
+    return _eud_typed_func
 
 
-def EUDTracedTypedFunc(argtypes, rettypes=None):
+def EUDTracedTypedFunc(argtypes, rettypes=None):  # noqa: N802
     return EUDTypedFunc(argtypes, rettypes, traced=True)
 
 
-def EUDFunc(fdecl_func):
+def EUDFunc(fdecl_func):  # noqa: N802
     return EUDTypedFunc(None, None, traced=False)(fdecl_func)
 
 
-def EUDTracedFunc(fdecl_func):
+def EUDTracedFunc(fdecl_func):  # noqa: N802
     return EUDTypedFunc(None, None, traced=True)(fdecl_func)
 
 
-def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):
-    def _EUDXTypedFunc(fdecl_func):
+def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):  # noqa: N802
+    def _eudx_typed_func(fdecl_func):
         argspec = inspect.getfullargspec(fdecl_func)
         argn = len(argspec[0])
         ut.ep_assert(
@@ -70,7 +70,7 @@ def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):
 
         def caller(*args):
             # Cast arguments to argtypes before callee code.
-            args = applyTypes(argtypes, args)
+            args = _apply_types(argtypes, args)
             return fdecl_func(*args)
 
         ret = EUDXTypedFuncN(
@@ -79,11 +79,11 @@ def EUDXTypedFunc(argmasks, argtypes, rettypes=None, *, traced=False):
         functools.update_wrapper(ret, fdecl_func)
         return ret
 
-    return _EUDXTypedFunc
+    return _eudx_typed_func
 
 
-def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):
-    def _EUDFullFunc(fdecl_func):
+def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):  # noqa: N802
+    def _eud_full_func(fdecl_func):
         argspec = inspect.getfullargspec(fdecl_func)
         argn = len(argspec[0])
         ut.ep_assert(
@@ -103,7 +103,7 @@ def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):
 
         def caller(*args):
             # Cast arguments to argtypes before callee code.
-            args = applyTypes(argtypes, args)
+            args = _apply_types(argtypes, args)
             return fdecl_func(*args)
 
         ret = EUDFullFuncN(
@@ -112,7 +112,7 @@ def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):
         functools.update_wrapper(ret, fdecl_func)
         return ret
 
-    return _EUDFullFunc
+    return _eud_full_func
 
 
 def _EUDPredefineParam(*args):

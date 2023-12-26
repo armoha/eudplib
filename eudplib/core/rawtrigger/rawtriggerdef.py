@@ -181,7 +181,9 @@ class RawTrigger(EUDObject):
                         "<IIIIIIHBBBBH", trigSection, 320 + i * 32
                     )
                     self._actions.append(Action(*action[:10], eudx=action[11]))
-            self._currentAction = None if not (self._flags & 1) else trigSection[2399]
+            self._currentAction = (
+                None if not (self._flags & 1) else trigSection[2399]
+            )
 
     @property
     def preserved(self) -> bool:
