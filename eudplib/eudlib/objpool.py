@@ -8,6 +8,8 @@
 import weakref
 from dataclasses import dataclass
 
+from typing_extensions import Self
+
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
@@ -17,7 +19,7 @@ from .eudarray import EUDArray
 
 
 class _ObjPoolData(c.ConstExpr):
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs) -> Self:
         return super().__new__(cls, None)
 
     def __init__(self, size: int, max_fieldn: int = 8) -> None:

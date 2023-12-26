@@ -9,6 +9,8 @@ import struct
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, Literal, TypeAlias, overload
 
+from typing_extensions import Self
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
@@ -65,7 +67,7 @@ _Action: TypeAlias = Action | Iterable[Action | Iterable]
 
 
 class RawTrigger(EUDObject):
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs) -> Self:
         return super().__new__(cls)
 
     @overload

@@ -142,6 +142,9 @@ if __name__ == "__main__":
                     "eudplib/py.typed",
                 ]
             },
+            install_requires=[
+                "typing_extensions",
+            ],
             include_package_data=True,
             python_requires=">=3.10, <3.12",
             # metadata for upload to PyPI

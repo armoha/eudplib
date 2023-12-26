@@ -3,7 +3,8 @@ requires = [
     # First version of setuptools to support pyproject.toml configuration
     "setuptools>=61.0.0",
     "wheel",
-    "setuptools-rust"
+    "setuptools-rust",
+    "typing_extensions"
 ]
 
 

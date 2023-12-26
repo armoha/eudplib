@@ -7,6 +7,8 @@
 
 import struct
 
+from typing_extensions import Self
+
 from .. import core as c
 
 
@@ -17,10 +19,10 @@ class EUDGrp(c.EUDObject):
     emulates that modification so that SC recognizes GRP correctly.
     """
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs) -> Self:
         return super().__new__(cls)
 
-    def __init__(self, content):
+    def __init__(self, content) -> None:
         super().__init__()
         if isinstance(content, str):
             content = open(content, "rb").read()

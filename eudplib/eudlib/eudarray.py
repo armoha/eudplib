@@ -6,6 +6,8 @@
 # file that should have been included as part of this package.
 from math import log2
 
+from typing_extensions import Self
+
 from .. import core as c
 from .. import utils as ut
 from ..core.inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
@@ -20,7 +22,7 @@ class EUDArrayData(c.EUDObject):
 
     dont_flatten = True
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs) -> Self:
         return super().__new__(cls)
 
     def __init__(self, arr) -> None:

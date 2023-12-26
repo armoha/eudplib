@@ -7,6 +7,8 @@
 
 from typing import TYPE_CHECKING
 
+from typing_extensions import Self
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
@@ -102,7 +104,7 @@ class Action(ConstExpr):
      ======  ============= ========  ==========
     """
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs) -> Self:
         return super().__new__(cls, None)
 
     def __init__(
