@@ -16,6 +16,7 @@ class ObjAllocator:
     def WritePack(self, structformat: str, _arglist: list) -> None: ...  # noqa: N802
     def WriteBytes(self, b: bytes) -> None: ...  # noqa: N802
     def WriteSpace(self, ssize: int) -> None: ...  # noqa: N802
+    def _write_trigger(self, conditions: int, actions: int) -> None: ...
 
 class PayloadBuffer:
     def WriteByte(self, number: int) -> None: ...  # noqa: N802
@@ -24,6 +25,9 @@ class PayloadBuffer:
     def WritePack(self, structformat: str, _arglist: list) -> None: ...  # noqa: N802
     def WriteBytes(self, b: bytes) -> None: ...  # noqa: N802
     def WriteSpace(self, ssize: int) -> None: ...  # noqa: N802
+    def _write_trigger(
+        self, prevptr, nextptr, conditions: list, actions: list, flags
+    ) -> None: ...
 
 class PayloadBuilder:
     def __new__(cls) -> Self: ...

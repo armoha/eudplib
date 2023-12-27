@@ -7,21 +7,20 @@
 
 import struct
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Literal, TypeAlias, overload
+from typing import Literal, TypeAlias, overload
 
 from typing_extensions import Self
 
 from eudplib import utils as ut
 from eudplib.localize import _
 
+from ...bindings._rust import allocator as alc
 from ..allocator import IsConstExpr, ConstExpr
+from ..allocator.payload import ObjCollector
 from ..eudobj import EUDObject
 from .action import Action
 from .condition import Condition
 from .triggerscope import NextTrigger, _register_trigger
-
-if TYPE_CHECKING:
-    from ..allocator.payload import _PayloadBuffer, ObjCollector
 
 # Trigger counter thing
 
@@ -189,7 +188,7 @@ class RawTrigger(EUDObject):
     def GetDataSize(self) -> int:  # noqa: N802
         return 2408
 
-    def CollectDependency(self, pbuffer: "ObjCollector") -> None:  # noqa: N802
+    def CollectDependency(self, pbuffer: ObjCollector) -> None:  # noqa: N802
         pbuffer.WriteDword(self._prevptr)
         pbuffer.WriteDword(self._nextptr)
 
@@ -198,28 +197,17 @@ class RawTrigger(EUDObject):
         for act in self._actions:
             act.CollectDependency(pbuffer)
 
-    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
-        pbuffer.WriteDword(self._prevptr)
-        pbuffer.WriteDword(self._nextptr)
+    # RawTrigger.WritePayload is overridden in Allocating and Writing phase
+    # (See eudplib.core.allocator.payload.CreatePayload)
+    def _allocate_trigger(self, pbuffer: alc.ObjAllocator) -> None:
+        pbuffer._write_trigger(len(self._conditions), len(self._actions))
 
-        # Conditions
-        for cond in self._conditions:
-            cond.WritePayload(pbuffer)
-
-        if len(self._conditions) != 16:
-            pbuffer.WriteBytes(bytes(20))
-            pbuffer.WriteSpace(20 * (15 - len(self._conditions)))
-
-        # Actions
-        for act in self._actions:
-            act.WritePayload(pbuffer)
-
-        if len(self._actions) != 64:
-            pbuffer.WriteBytes(bytes(32))
-            pbuffer.WriteSpace(32 * (63 - len(self._actions)))
-
-        # Preserved flag
-        pbuffer.WriteDword(self._flags)
-
-        pbuffer.WriteSpace(27)
-        pbuffer.WriteByte(0)
+    def _write_trigger(self, pbuffer: alc.PayloadBuffer) -> None:
+        pbuffer._write_trigger(
+            self._prevptr,
+            self._nextptr,
+            # FIXME: Change Condition and Action to #[pyclass]
+            [cond.fields for cond in self._conditions],
+            [act.fields for act in self._actions],
+            self._flags,
+        )

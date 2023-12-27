@@ -1,7 +1,6 @@
+use crate::allocator::constexpr::evaluate;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use pyo3::types::PyList;
-use crate::allocator::constexpr::evaluate;
 
 /// Buffer where EUDObject should write to.
 #[pyclass(module = "eudplib.core.allocator")]
@@ -84,7 +83,7 @@ impl PayloadBuffer {
     }
 
     #[allow(non_snake_case)]
-    fn WritePack(&mut self, structformat: &str, arglist: &PyList) -> PyResult<()> {
+    fn WritePack(&mut self, structformat: &str, arglist: Vec<&PyAny>) -> PyResult<()> {
         for (b, number) in structformat.bytes().zip(arglist.iter()) {
             let argsize = match b {
                 66 => 1, // 'B'
@@ -133,5 +132,44 @@ impl PayloadBuffer {
     #[allow(non_snake_case)]
     fn WriteSpace(&mut self, spacesize: usize) {
         self.datacur += spacesize;
+    }
+
+    fn _write_trigger(
+        &mut self,
+        prevptr: &PyAny,
+        nextptr: &PyAny,
+        conditions: Vec<Vec<&PyAny>>,
+        actions: Vec<Vec<&PyAny>>,
+        flags: &PyAny,
+    ) -> PyResult<()> {
+        self.WriteDword(prevptr)?;
+        self.WriteDword(nextptr)?;
+
+        // Conditions
+        let condition_count = conditions.len();
+        for condition in conditions {
+            self.WritePack("IIIHBBBBH", condition)?;
+        }
+        if condition_count < 16 {
+            self.WriteBytes(&[0; 20]);
+            self.WriteSpace(20 * (15 - condition_count));
+        }
+
+        // Actions
+        let action_count = actions.len();
+        for action in actions {
+            self.WritePack("IIIIIIHBBBBH", action)?;
+        }
+        if action_count < 64 {
+            self.WriteBytes(&[0; 32]);
+            self.WriteSpace(32 * (63 - action_count));
+        }
+
+        // Preserved flag
+        self.WriteDword(flags)?;
+
+        self.WriteSpace(27);
+        self.WriteByte(0);
+        Ok(())
     }
 }

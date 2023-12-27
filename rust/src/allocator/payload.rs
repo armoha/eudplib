@@ -135,6 +135,39 @@ impl ObjAllocator {
             self.suboccupmap = false;
         }
     }
+
+    fn _write_trigger(&mut self, conditions: u32, actions: u32) {
+        self.push(true);  // prevptr
+        self.push(true);  // nextptr
+
+        // Conditions
+        for _ in 0..(conditions * 5) {
+            self.push(true);
+        }
+        if conditions < 16 {
+            for _ in 0..5 {
+                self.push(true);
+            }
+            self.WriteSpace(20 * (15 - conditions));
+        }
+
+        // Actions
+        for _ in 0..(actions * 8) {
+            self.push(true);
+        }
+        if actions < 64 {
+            for _ in 0..8 {
+                self.push(true);
+            }
+            self.WriteSpace(32 * (63 - actions));
+        }
+
+        // Preserved flag
+        self.push(true);
+
+        self.WriteSpace(27);
+        self.occup1();
+    }
 }
 
 fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
@@ -241,12 +274,12 @@ impl PayloadBuilder {
                 let mut obja = obja.borrow_mut();
                 obja.end_write()
             };
+            let dwoccupmap_len = dwoccupmap.len();
             let datasize = obj
                 .call_method0(intern!(py, "GetDataSize"))?
                 .extract::<usize>()?;
-            if dwoccupmap.len() != (datasize + 3) >> 2 {
-                let dwoccupmap_len = dwoccupmap.len();
-                let datasize = (datasize + 3) >> 2;
+            let datasize = (datasize + 3) >> 2;
+            if dwoccupmap_len != datasize {
                 return Err(AllocError::new_err(format!("Occupation map length ({dwoccupmap_len}) & Object size ({datasize}) mismatch for {obj}")));
             }
             dwoccupmap_list.push(dwoccupmap);
@@ -287,7 +320,7 @@ impl PayloadBuilder {
                 .extract::<usize>()?;
             if written_bytes != objsize {
                 return Err(AllocError::new_err(format!(
-                    "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj}"
+                    "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj:?}"
                 )));
             }
             bar.inc(1);
