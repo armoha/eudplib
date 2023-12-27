@@ -207,7 +207,7 @@ class RawTrigger(EUDObject):
             self._prevptr,
             self._nextptr,
             # FIXME: Change Condition and Action to #[pyclass]
-            [cond.fields for cond in self._conditions],
-            [act.fields for act in self._actions],
+            (cond.fields for cond in self._conditions),
+            (act.fields for act in self._actions),
             self._flags,
         )
