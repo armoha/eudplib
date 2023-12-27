@@ -227,9 +227,7 @@ def CreatePayload(root: "EUDObject | Forward") -> Payload:  # noqa: N802
     return _construct_payload()
 
 
-_PayloadBuffer: TypeAlias = (
-    ObjCollector | allocator.ObjAllocator | allocator.PayloadBuffer
-)
+_PayloadBuffer: TypeAlias = allocator.ObjAllocator | allocator.PayloadBuffer
 defri: RlocInt_C = RlocInt(0, 4)
 
 

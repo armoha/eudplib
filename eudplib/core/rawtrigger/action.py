@@ -16,7 +16,7 @@ from ..allocator import ConstExpr, IsConstExpr
 from .consttype import Byte, Dword, Word
 
 if TYPE_CHECKING:
-    from ..allocator.payload import RlocInt_C, _PayloadBuffer
+    from ..allocator.payload import RlocInt_C, _PayloadBuffer, ObjCollector
     from .rawtriggerdef import RawTrigger
 
 _acttypes: dict[int, str] = {
@@ -243,7 +243,7 @@ class Action(ConstExpr):
             raise ut.EPError(err)
         return self.parenttrg.Evaluate() + 8 + 320 + 32 * self.actindex
 
-    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
+    def CollectDependency(self, pbuffer: "ObjCollector") -> None:  # noqa: N802
         for field in self.fields[:6]:
             if not isinstance(field, int):
                 pbuffer.WriteDword(field)  # type: ignore[arg-type]

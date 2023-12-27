@@ -7,12 +7,14 @@
 
 from typing_extensions import Self
 
-from .allocator import ConstExpr, RlocInt_C
+from eudplib.core.allocator.payload import ObjCollector
+
+from .allocator import ConstExpr, ObjAllocator, PayloadBuffer, RlocInt_C
 
 class EUDObject(ConstExpr):
     def __new__(cls) -> Self: ...
     def DynamicConstructed(self) -> bool: ...  # noqa: N802
     def Evaluate(self) -> RlocInt_C: ...  # noqa: N802
     def GetDataSize(self) -> int: ...  # noqa: N802
-    def CollectDependency(self, pbuf) -> None: ...  # noqa: N802
-    def WritePayload(self, pbuf) -> None: ...  # noqa: N802
+    def CollectDependency(self, pbuf: ObjCollector) -> None: ...  # noqa: N802
+    def WritePayload(self, pbuf: ObjAllocator | PayloadBuffer) -> None: ...  # noqa: N802

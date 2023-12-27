@@ -14,15 +14,14 @@ from typing_extensions import Self
 from eudplib import utils as ut
 from eudplib.localize import _
 
-from ..allocator import IsConstExpr
+from ..allocator import IsConstExpr, ConstExpr
 from ..eudobj import EUDObject
 from .action import Action
 from .condition import Condition
 from .triggerscope import NextTrigger, _register_trigger
 
 if TYPE_CHECKING:
-    from ..allocator import ConstExpr
-    from ..allocator.payload import _PayloadBuffer
+    from ..allocator.payload import _PayloadBuffer, ObjCollector
 
 # Trigger counter thing
 
@@ -61,7 +60,7 @@ def Disabled(arg: Condition | Action) -> Condition | Action:  # noqa: N802
     return arg
 
 
-Trigger: TypeAlias = "ConstExpr | int | None"
+Trigger: TypeAlias = ConstExpr | int | None
 _Condition: TypeAlias = Condition | bool | Iterable[Condition | bool | Iterable]
 _Action: TypeAlias = Action | Iterable[Action | Iterable]
 
@@ -79,7 +78,6 @@ class RawTrigger(EUDObject):
         actions: _Action | None = None,
         *,
         preserved: bool = True,
-        currentAction: int | None = None,  # noqa: N803
         trigSection: None = None,  # noqa: N803
     ) -> None:
         ...
@@ -93,7 +91,6 @@ class RawTrigger(EUDObject):
         actions: None = None,
         *,
         preserved: Literal[True] = True,
-        currentAction: None = None,  # noqa: N803
         trigSection: bytes,  # noqa: N803
     ) -> None:
         ...
@@ -106,7 +103,6 @@ class RawTrigger(EUDObject):
         actions: _Action | None = None,
         *,
         preserved: bool = True,
-        currentAction: int | None = None,  # noqa: N803
         trigSection: bytes | None = None,  # noqa: N803
     ) -> None:
         super().__init__()
@@ -154,9 +150,6 @@ class RawTrigger(EUDObject):
             self._conditions = _conditions
             self._actions = actions
             self._flags = 4 if preserved else 0
-            self._currentAction = currentAction
-            if currentAction is not None:
-                self._flags |= 1
 
         # Uses trigger segment for initialization
         # NOTE : player information is lost inside eudplib.
@@ -181,9 +174,6 @@ class RawTrigger(EUDObject):
                         "<IIIIIIHBBBBH", trigSection, 320 + i * 32
                     )
                     self._actions.append(Action(*action[:10], eudx=action[11]))
-            self._currentAction = (
-                None if not (self._flags & 1) else trigSection[2399]
-            )
 
     @property
     def preserved(self) -> bool:
@@ -199,7 +189,7 @@ class RawTrigger(EUDObject):
     def GetDataSize(self) -> int:  # noqa: N802
         return 2408
 
-    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
+    def CollectDependency(self, pbuffer: "ObjCollector") -> None:  # noqa: N802
         pbuffer.WriteDword(self._prevptr)
         pbuffer.WriteDword(self._nextptr)
 
@@ -232,7 +222,4 @@ class RawTrigger(EUDObject):
         pbuffer.WriteDword(self._flags)
 
         pbuffer.WriteSpace(27)
-        if self._currentAction is None:
-            pbuffer.WriteByte(0)
-        else:
-            pbuffer.WriteByte(self._currentAction)
+        pbuffer.WriteByte(0)
