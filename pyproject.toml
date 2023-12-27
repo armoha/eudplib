@@ -10,7 +10,7 @@ requires = [
 
 [project]
 name = "eudplib"
-version = "0.76.13a10"
+version = "0.76.13"
 authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},

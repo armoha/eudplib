@@ -9,7 +9,7 @@ import builtins
 import keyword
 import types
 
-__version__ = "0.76.13a10"
+__version__ = "0.76.13"
 
 from .core import (
     P1,
