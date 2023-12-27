@@ -16,7 +16,7 @@ from ..allocator import ConstExpr, IsConstExpr
 from .consttype import Byte, Dword, Word
 
 if TYPE_CHECKING:
-    from ..allocator.payload import RlocInt_C, _PayloadBuffer, ObjCollector
+    from ..allocator.payload import ObjCollector, RlocInt_C, _PayloadBuffer
     from .rawtriggerdef import RawTrigger
 
 _acttypes: dict[int, str] = {

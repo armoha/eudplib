@@ -33,7 +33,7 @@ from ..variable.vbuf import (
 
 
 @functools.cache
-def EUDVArrayData(size):
+def eudvarray_data(size):
     ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
     class _EUDVArrayData(ConstExpr):
@@ -62,7 +62,7 @@ def EUDVArrayData(size):
                 ]
             self._initvars = initvars
 
-        def Evaluate(self):
+        def Evaluate(self):  # noqa: N802
             if all(isinstance(var, tuple) for var in self._initvars):
                 evb = get_current_custom_varbuffer()
             else:
@@ -107,12 +107,12 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
 
     def _bound_check(index: object) -> None:
         index = unProxy(unProxy)
-        if isinstance(index, int) and not (0 <= index < size):
-            raise EPError(
-                _(
-                    "index out of bounds: the length of EUDVArray is {} but the index is {}"
-                ).format(size, index)
-            )
+        if not isinstance(index, int) or 0 <= index < size:
+            return
+        e = _(
+            "index out of bounds: the length of EUDVArray is {} but the index is {}"
+        )  # noqa: E501
+        raise EPError(e.format(size, index))
 
     class _EUDVArray(ExprProxy):
         dont_flatten = True
@@ -134,7 +134,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     initvars = [0] * size
 
                 # For python iterables
-                baseobj = EUDVArrayData(size)(initvars, dest=dest, nextptr=nextptr)
+                baseobj = eudvarray_data(size)(initvars, dest=dest, nextptr=nextptr)
 
             super().__init__(baseobj)
             self._epd = EPD(self)

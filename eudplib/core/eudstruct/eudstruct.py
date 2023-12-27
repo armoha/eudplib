@@ -7,9 +7,7 @@
 
 from ... import utils as ut
 from ...localize import _
-from ..allocator import IsConstExpr
 from ..rawtrigger.consttype import ConstType
-from ..variable import EUDVariable
 from .structarr import _EUDStructMetaclass
 from .vararray import EUDVArray
 
@@ -135,14 +133,6 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
             self.__dict__[name] = value
 
     # Utilities
-
-    def asVariable(self):  # FIXME: has no usage
-        if IsConstExpr(self):
-            var = EUDVariable(self)
-        else:
-            var = EUDVariable()
-            var << self
-        return type(self)(var)
 
     def __lshift__(self, rhs):
         raise ut.EPError(_("Cannot reassign another value to eudstruct."))

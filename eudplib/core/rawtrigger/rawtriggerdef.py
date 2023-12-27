@@ -15,7 +15,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from ...bindings._rust import allocator as alc
-from ..allocator import IsConstExpr, ConstExpr
+from ..allocator import ConstExpr, IsConstExpr
 from ..allocator.payload import ObjCollector
 from ..eudobj import EUDObject
 from .action import Action

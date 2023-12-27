@@ -9,7 +9,7 @@ from collections import deque
 from typing import TYPE_CHECKING, Literal
 
 from ... import utils as ut
-from ..allocator import RegisterCreatePayloadCallback, ConstExpr
+from ..allocator import ConstExpr, RegisterCreatePayloadCallback
 from ..eudobj import EUDObject
 
 if TYPE_CHECKING:

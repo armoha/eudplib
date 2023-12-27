@@ -986,7 +986,7 @@ DefStatTextDict: dict[str, int] = {
     "Not enough energy. (3)": 866,
     "Nothing to harvest. Find a Mine or a Vespene Geyser.": 867,
     "Nothing to harvest. Find a Mine, or build a Refinery at a Vespene Geyser.": 868,
-    "Nothing to harvest. Find a Mine, or build an Assimilator at a Vespene Geyser.": 869,
+    "Nothing to harvest. Find a Mine, or build an Assimilator at a Vespene Geyser.": 869,  # noqa: E501
     "Must target severely damaged Terran Command Center.": 870,
     "Unit's waypoint list is full.": 871,
     "Unable to add order.": 872,

@@ -115,7 +115,7 @@ def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):  # noqa:
     return _eud_full_func
 
 
-def _EUDPredefineParam(*args):
+def _EUDPredefineParam(*args):  # noqa: N802
     """
     Use with cautions!
     1. Don't initialize value!
@@ -150,7 +150,7 @@ def _EUDPredefineParam(*args):
     return wrapper
 
 
-def _EUDPredefineReturn(*frets):
+def _EUDPredefineReturn(*frets):  # noqa: N802
     """
     Use with cautions!
     1. Always initialize value!

@@ -1,15 +1,18 @@
 #!/usr/bin/python
 DefUnitOrderDict: dict[str, int] = {
-    "Die": 0,  # Causes the unit to die. Normal units run the death iscript animation,
+    # Causes the unit to die. Normal units run the death iscript animation.
+    "Die": 0,
     # while hallucinated units have the sound/sprite spawned and then are removed.
-    "Stop": 1,  # Normal unit stop command. Stops current order chain, and then goes to idle.
+    # Normal unit stop command. Stops current order chain, and then goes to idle.
+    "Stop": 1,
     "Guard": 2,  # Generic Guard order. Determines what guard command a unit uses.
     "Guard (Normal)": 2,
     "Player Guard": 3,  # Attacking Mobile unit guard order.
     "Guard (Player)": 3,
     "Turret Guard": 4,  # Attacking unit turret guard.
     "Guard (Subunit)": 4,
-    "Bunker Guard": 5,  # Transport building guard. Set when a building picks up a unit.
+    # Transport building guard. Set when a building picks up a unit.
+    "Bunker Guard": 5,
     "Guard (Bunker)": 5,
     "Move": 6,  # Unit move. Ignores enemies on way to destination.
     "Ignore (Normal)": 6,
@@ -45,7 +48,8 @@ DefUnitOrderDict: dict[str, int] = {
     "Attack (Subunit)": 22,
     "Nothing 2": 23,  # Do nothing, next order.
     "Nothing 2 (Normal)": 23,
-    "Nothing 3": 24,  # Unknown, used when a unit is changing state between siege <-> normal.
+    # Unknown, used when a unit is changing state between siege <-> normal.
+    "Nothing 3": 24,
     "Nothing 3 (Unused)": 24,
     "Drone Start Build": 25,  # Move to target position and run drone build.
     "Drone Start Mutate": 25,
@@ -55,7 +59,8 @@ DefUnitOrderDict: dict[str, int] = {
     "Cast Spell (Infest 1)": 27,
     "Infest Mine 3": 28,  # Move to Infest shrouded unit
     "Cast Spell (Infest 2)": 28,
-    "Infest Mine 4": 29,  # Infest Unit. Hides unit, runs infest 1 on target, then reshows unit.
+    # Infest Unit. Hides unit, runs infest 1 on target, then reshows unit.
+    "Infest Mine 4": 29,
     "Infest (Queen)": 29,
     "Build Terran": 30,  # Move/Start Terran Building.
     "Build (SCV)": 30,
@@ -73,7 +78,8 @@ DefUnitOrderDict: dict[str, int] = {
     "Build Add-On": 37,  # Building Addon.
     "Train": 38,  # Training Unit.
     "Train (Normal)": 38,
-    "Rally Point 1": 39,  # Rally to Visible Unit. Causes units to follow the selected unit.
+    # Rally to Visible Unit. Causes units to follow the selected unit.
+    "Rally Point 1": 39,
     "Rally to Visible Unit": 39,
     "Rally Point 2": 40,  # Rally to tile.
     "Rally to Ground Tile": 40,
@@ -91,7 +97,8 @@ DefUnitOrderDict: dict[str, int] = {
     "Enter (Nydus Canal)": 47,
     "Build Self 2": 48,  # Protoss Building being built order.
     "Building Is Constructed (Protoss)": 48,
-    "Follow": 49,  # Move to/with unit or building. Causes units to load into transports
+    # Move to/with unit or building. Causes units to load into transports
+    "Follow": 49,
     # or enter nydus canal or recharge shields.
     "Carrier": 50,  # Idle command for the carrier.
     "Idle (Carrier)": 50,
@@ -129,7 +136,8 @@ DefUnitOrderDict: dict[str, int] = {
     "Move&Attack (Scarab)": 65,
     "Recharge Shields 1": 66,  # Unit recharge shields.
     "Recharge Shields (Unit)": 66,
-    "Recharge Shields 2": 67,  # Shield Battery, recharge shield cast on unit or ground.
+    # Shield Battery, recharge shield cast on unit or ground.
+    "Recharge Shields 2": 67,
     # Unit runs recharge shields 1, shield battery runs shield battery.
     # If cast on ground, recharges all units within rechargeable radius.
     "Recharge Shields (Global)": 67,
@@ -199,7 +207,8 @@ DefUnitOrderDict: dict[str, int] = {
     "Watch Target": 100,  # Immobile Unit base, watch the target.
     "Initing Creep Growth": 101,  # Start Spreading Creep.
     "Script (Starting Creep Growth)": 101,
-    "Spread Creep": 102,  # Spreads creep. If it is a larva producer, runs that order also.
+    # Spreads creep. If it is a larva producer, runs that order also.
+    "Spread Creep": 102,
     "Script (Spread Creep&Spawn Larva)": 102,
     "Stopping Creep Growth": 103,  # Stops creep growth.
     "Script (Stopping Creep Growth)": 103,
@@ -307,10 +316,12 @@ DefUnitOrderDict: dict[str, int] = {
     "Atk Move EP": 157,  # AI Attack Move?
     "Attack Move (Computer)": 157,
     "Harass Move": 158,  # Aggressive Attack Move? Units won't give up on a target.
-    # If they see it, they will attack it, even worse than attack move. Might be a computer attack move?
+    # If they see it, they will attack it, even worse than attack move.
+    # Might be a computer attack move?
     "Move (Harass)": 158,
-    "AI Patrol": 159,  # Moves units to the center of the current area that they are at?
-    # Not sure if the spacing is meant to allow for detectors to cover an area or not.
+    # Moves units to the center of the current area that they are at?
+    "AI Patrol": 159,
+    # Not sure if the spacing is meant to allow for detectors to cover an area or not.  # noqa: E501
     "Patrol (Computer)": 159,
     "Guard Post": 160,  # Immobile Unit Guard.
     "Guard (Computer)": 160,
@@ -319,9 +330,10 @@ DefUnitOrderDict: dict[str, int] = {
     "Neutral": 162,  # Neutral Unit idle.
     "Idle (Neutral)": 162,
     "Computer Return": 163,  # Return computer units to defensive position?
-    # Was seen returning units that had followed a unit outside of a base and killed it.
+    # Was seen returning units that had followed a unit outside of a base and killed it.  # noqa: E501
     "Return To Base (Computer)": 163,
-    "Initing Psi Provider": 164,  # Init Psi Provider. Adds to some kind of linked list.
+    # Init Psi Provider. Adds to some kind of linked list.
+    "Initing Psi Provider": 164,
     "Script (PSI Provider)": 164,
     "Self Destrucing": 165,  # Remove unit.
     "Fatal (Scarab)": 165,
@@ -337,7 +349,8 @@ DefUnitOrderDict: dict[str, int] = {
     "Attack (Trap)": 171,
     "Enable Doodad": 172,  # Enable Doodad State.
     "Disable Doodad": 173,  # Disable Doodad State.
-    "Warp In": 174,  # Unused. Left over from unit warp in which now exists in Starcraft 2.
+    # Unused. Left over from unit warp in which now exists in Starcraft 2.
+    "Warp In": 174,
     "Warp In (Unused)": 174,
     "Medic": 175,  # Idle command for the Terran Medic.
     "Idle (Medic)": 175,
@@ -345,7 +358,8 @@ DefUnitOrderDict: dict[str, int] = {
     "Cast Spell (Heal)": 176,
     "Heal Move": 177,  # Attack move command for the Terran Medic.
     "Move (Medic)": 177,
-    "Medic Hold Position": 178,  # Holds Position for Terran Medics, heals units within range.
+    # Holds Position for Terran Medics, heals units within range.
+    "Medic Hold Position": 178,
     "Hold Position&Heal (Medic)": 178,
     "Medic Heal 2": 179,  # Return to idle after heal.
     "Return To Idle After Heal": 179,
