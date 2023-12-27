@@ -8,6 +8,7 @@
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
+from ...core.eudfunc import EUDFullFunc
 from . import cpmemio as cm
 from . import modcurpl as cp
 
@@ -15,7 +16,7 @@ _cpmoda = c.Forward()
 _cpadda = c.Forward()
 
 
-@c.EUDFullFunc(
+@EUDFullFunc(
     [(ut.EPD(_cpmoda), c.Add, 0, None), (ut.EPD(0x6509B0), c.SetTo, 0, None)],
     [None, None, None],
 )
@@ -42,7 +43,7 @@ def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
     cp.f_setcurpl2cpcache()
 
 
-@c.EUDFullFunc(
+@EUDFullFunc(
     [(ut.EPD(_cpadda), c.Add, 0, None), (ut.EPD(0x6509B0), c.SetTo, 0, None)],
     [None, None, None],
 )

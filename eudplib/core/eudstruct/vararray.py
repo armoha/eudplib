@@ -10,6 +10,8 @@ from collections.abc import Iterator
 from math import log2
 from typing import NoReturn
 
+from typing_extensions import Self
+
 from ...localize import _
 from ...utils import EPD, EPError, ExprProxy, ep_assert, unProxy
 from .. import rawtrigger as bt
@@ -35,8 +37,11 @@ def EUDVArrayData(size):
     ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
     class _EUDVArrayData(ConstExpr):
-        def __init__(self, initvars, *, dest=0, nextptr=0):
-            super().__init__(self)
+        def __new__(cls, *args, **kwargs) -> Self:
+            return super().__new__(cls, None)
+
+        def __init__(self, initvars, *, dest=0, nextptr=0) -> None:
+            super().__init__()
             ep_assert(
                 len(initvars) == size,
                 _("{} items expected, got {}").format(size, len(initvars)),
@@ -774,9 +779,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=GetCPCache().GetVTable(),
                     actions=[
                         trg["ret"]
-                        << bt.SetDeathsX(
-                            bt.CurrentPlayer, bt.Add, 0, 0, 0x55555555
-                        ),
+                        << bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0x55555555),
                         bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0xAAAAAAAA),
                         GetCPCache().SetDest(EPD(0x6509B0)),
                     ],

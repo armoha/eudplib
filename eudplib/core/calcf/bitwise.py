@@ -7,10 +7,9 @@
 
 from ...utils import EPD, _rand_lst
 from .. import allocator as ac
-from .. import eudfunc as ef
 from .. import rawtrigger as rt
 from .. import variable as ev
-from ..eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ..eudfunc.eudf import EUDFunc, _EUDPredefineParam, _EUDPredefineReturn
 from ..variable import SeqCompute
 from ..variable.evcommon import _selfadder, _xv
 from .muldiv import _quot
@@ -62,7 +61,7 @@ def f_bitnot(a):
 # -------
 
 
-@ef.EUDFunc
+@EUDFunc
 def f_bitsplit(a):
     """Splits bit of given number
 
@@ -80,7 +79,7 @@ def f_bitsplit(a):
 
 @_EUDPredefineParam(1)
 @_EUDPredefineReturn(1, 2)
-@ef.EUDFunc
+@EUDFunc
 def _exp2_vv(n):
     ret = _exp2_vv._frets[0]
     ret << 0
@@ -98,7 +97,7 @@ def _exp2(n):
     return _exp2_vv(n)
 
 
-@ef.EUDFunc
+@EUDFunc
 def _f_bitrshift(a, b):
     ret = ev.EUDVariable()
 
@@ -121,7 +120,7 @@ def _f_bitrshift(a, b):
     return ret
 
 
-@ef.EUDFunc
+@EUDFunc
 def _f_bitlshift(a, b):
     loopstart = ac.Forward()
     loopend = ac.Forward()
@@ -163,7 +162,7 @@ def f_bitlshift(a, b, _fdict={}, **kwargs):
                 set_ret = _selfadder.SetDest(0)
 
                 @_EUDPredefineParam((EPD(set_ret) + 5, _selfadder))
-                @ef.EUDFunc
+                @EUDFunc
                 def f(ret, adder):
                     for i in range(b):
                         ev.VProc(adder, [])

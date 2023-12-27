@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 
-import re
 import types
 
 import eudplib
@@ -15,7 +14,8 @@ module_to_doc = eudplib
 exclude_types = [dict, str, types.ModuleType]
 eudftypes = [eudplib.core.eudfunc.eudfuncn.EUDFuncN]
 if mode == 1:
-    allowed_type = eudftypes + [
+    allowed_type = [
+        *eudftypes,
         type,
         types.FunctionType,
         eudplib.core.rawtrigger.constenc._KillsSpecialized,
@@ -27,7 +27,8 @@ elif mode == 2:
         eudplib.core.rawtrigger.constenc._KillsSpecialized,
     ]
 else:
-    allowed_type = eudftypes + [
+    allowed_type = [
+        *eudftypes,
         int,
         eudplib.core.rawtrigger.consttype.ConstType,
         type,
@@ -53,7 +54,9 @@ for name, value in module_to_doc.__dict__.items():
     nlist.append(name)
 
 if mode != 2:
-    nlist.extend(["beforeTriggerExec", "afterTriggerExec", "onPluginStart", "settings"])
+    nlist.extend(
+        ["beforeTriggerExec", "afterTriggerExec", "onPluginStart", "settings"]
+    )
 print("\n==================================\n")
 nlist.sort()
 nlist = ['"%s", ' % name for name in nlist]

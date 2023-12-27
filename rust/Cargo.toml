@@ -19,4 +19,4 @@ name = "eudplib_rust"
 crate-type = ["cdylib"]
 
 [profile.release]
-overflow-checks = true
+overflow-checks = false

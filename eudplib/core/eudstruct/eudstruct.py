@@ -8,16 +8,14 @@
 from ... import utils as ut
 from ...localize import _
 from ..allocator import IsConstExpr
-from ..variable import EUDVariable
-from .structarr import _EUDStruct_Metaclass
-from .vararray import EUDVArray
 from ..rawtrigger.consttype import ConstType
+from ..variable import EUDVariable
+from .structarr import _EUDStructMetaclass
+from .vararray import EUDVArray
 
 
-class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
-    def __init__(
-        self, *args, _from=None, _static_initval=None, **kwargs
-    ) -> None:
+class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
+    def __init__(self, *args, _from=None, _static_initval=None, **kwargs) -> None:
         fieldcount = len(self._fielddict)
 
         if _from is not None:
@@ -131,7 +129,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStruct_Metaclass):
         if "_initialized" in self.__dict__:
             try:
                 self.setfield(name, value)
-            except KeyError as e:
+            except KeyError:
                 raise ut.EPError(_("Unknown field name {}").format(name))
         else:
             self.__dict__[name] = value

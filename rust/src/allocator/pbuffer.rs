@@ -1,13 +1,10 @@
-use std::collections::btree_map::Values;
-
+use crate::allocator::constexpr::evaluate;
 use pyo3::exceptions::PyValueError;
-use pyo3::intern;
 use pyo3::prelude::*;
-use pyo3::types::{PyList, PyTuple};
-use crate::types::EVALUATE;
+use pyo3::types::{PyIterator, PyList};
 
 /// Buffer where EUDObject should write to.
-#[pyclass]
+#[pyclass(module = "eudplib.core.allocator")]
 pub struct PayloadBuffer {
     datastart: usize,
     datacur: usize,
@@ -61,15 +58,9 @@ impl PayloadBuffer {
 
     #[allow(non_snake_case)]
     fn WriteDword(&mut self, number: &PyAny) -> PyResult<()> {
-        let evaluate = EVALUATE.get(number.py())?;
-        let arg = PyTuple::new(number.py(), &[number]);
-        let rlocint = evaluate.call1(arg)?;
-        let rlocmode = rlocint
-            .getattr(intern!(number.py(), "rlocmode"))?
-            .extract::<i64>()?;
-        let offset = rlocint
-            .getattr(intern!(number.py(), "offset"))?
-            .extract::<i64>()?;
+        let rlocint = evaluate(number)?;
+        let rlocmode = rlocint.0.rlocmode;
+        let offset = rlocint.0.offset;
 
         if rlocmode != 0 {
             assert!(
@@ -94,8 +85,6 @@ impl PayloadBuffer {
 
     #[allow(non_snake_case)]
     fn WritePack(&mut self, structformat: &str, arglist: &PyList) -> PyResult<()> {
-        let evaluate = EVALUATE.get(arglist.py())?;
-
         for (b, number) in structformat.bytes().zip(arglist.iter()) {
             let argsize = match b {
                 66 => 1, // 'B'
@@ -103,14 +92,9 @@ impl PayloadBuffer {
                 73 => 4, // 'I'
                 _ => panic!("Unknown struct format: {b}"),
             };
-            let arg = PyTuple::new(number.py(), &[number]);
-            let rlocint = evaluate.call1(arg)?;
-            let rlocmode = rlocint
-                .getattr(intern!(arglist.py(), "rlocmode"))?
-                .extract::<i64>()?;
-            let offset = rlocint
-                .getattr(intern!(arglist.py(), "offset"))?
-                .extract::<i64>()?;
+            let rlocint = evaluate(number)?;
+            let rlocmode = rlocint.0.rlocmode;
+            let offset = rlocint.0.offset;
 
             if !(rlocmode == 0 || (argsize == 4 && self.datacur % 4 == 0)) {
                 return Err(PyValueError::new_err(
@@ -149,5 +133,46 @@ impl PayloadBuffer {
     #[allow(non_snake_case)]
     fn WriteSpace(&mut self, spacesize: usize) {
         self.datacur += spacesize;
+    }
+
+    fn _write_trigger(
+        &mut self,
+        prevptr: &PyAny,
+        nextptr: &PyAny,
+        conditions: &PyIterator,
+        actions: &PyIterator,
+        flags: &PyAny,
+    ) -> PyResult<()> {
+        self.WriteDword(prevptr)?;
+        self.WriteDword(nextptr)?;
+
+        // Conditions
+        let mut condition_count = 0;
+        for condition in conditions {
+            self.WritePack("IIIHBBBBH", condition?.downcast()?)?;
+            condition_count += 1;
+        }
+        if condition_count < 16 {
+            self.WriteBytes(&[0; 20]);
+            self.WriteSpace(20 * (15 - condition_count));
+        }
+
+        // Actions
+        let mut action_count = 0;
+        for action in actions {
+            self.WritePack("IIIIIIHBBBBH", action?.downcast()?)?;
+            action_count += 1;
+        }
+        if action_count < 64 {
+            self.WriteBytes(&[0; 32]);
+            self.WriteSpace(32 * (63 - action_count));
+        }
+
+        // Preserved flag
+        self.WriteDword(flags)?;
+
+        self.WriteSpace(27);
+        self.WriteByte(0);
+        Ok(())
     }
 }

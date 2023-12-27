@@ -6,12 +6,11 @@
 # file that should have been included as part of this package.
 
 import time
-from collections.abc import Callable
 from typing import TYPE_CHECKING, TypeAlias
 
+from eudplib.bindings._rust import allocator
 from eudplib.localize import _
 from eudplib.utils import EPError, _rand_lst, ep_assert
-from eudplib.bindings._rust import allocator
 
 from .constexpr import Evaluable, Evaluate, Forward
 from .pbuffer import Payload
@@ -23,7 +22,7 @@ if TYPE_CHECKING:
 _found_objects_dict: "dict[EUDObject, int]" = {}
 _untraversed_objects: "list[EUDObject]" = []
 _dynamic_objects_set: "set[EUDObject]" = set()
-_payload_builder: allocator.PayloadBuilder | None = None
+_payload_builder = allocator.PayloadBuilder()
 
 PHASE_COLLECTING = 1
 PHASE_ALLOCATING = 2
@@ -35,27 +34,27 @@ _payload_shuffle: bool = True
 
 # -------
 
-_lastTime: float = 0.0
-_doLog: bool = False
+_last_time: float = 0.0
+_is_logging_enabled: bool = False
 
 
-def setPayloadLoggerMode(mode: bool) -> None:
-    global _doLog
-    _doLog = mode
+def _set_payload_logger_mode(mode: bool) -> None:
+    global _is_logging_enabled
+    _is_logging_enabled = mode
 
 
 def lprint(text: str, flush: bool = False):
-    global _lastTime, _doLog
-    if not _doLog:
+    global _last_time, _is_logging_enabled
+    if not _is_logging_enabled:
         return
 
-    currentTime = time.time()
-    if flush or (currentTime - _lastTime) >= 0.5:
-        _lastTime = currentTime
+    current_time = time.time()
+    if flush or (current_time - _last_time) >= 0.5:
+        _last_time = current_time
         print(text, end="\n" if flush else "\r")
 
 
-def CompressPayload(mode: bool) -> None:
+def CompressPayload(mode: bool) -> None:  # noqa: N802
     """Set payload compression mode.
 
     :param mode: If true, enable object stacking (compression). If false,
@@ -66,7 +65,7 @@ def CompressPayload(mode: bool) -> None:
     _payload_compress = True if mode else False
 
 
-def ShufflePayload(mode: bool) -> None:
+def ShufflePayload(mode: bool) -> None:  # noqa: N802
     """Set payload shuffle mode.
 
     :param mode: If true, enable object shuffling (compression). If false,
@@ -80,41 +79,41 @@ def ShufflePayload(mode: bool) -> None:
 class ObjCollector:
     """
     Object having PayloadBuffer-like interfaces. Collects all objects by
-    calling RegisterObject() for every related objects.
+    calling object.CollectDependency() for every related objects.
     """
 
     def __init__(self) -> None:
         pass
 
-    def StartWrite(self) -> None:
+    def StartWrite(self) -> None:  # noqa: N802
         pass
 
-    def EndWrite(self) -> None:
+    def EndWrite(self) -> None:  # noqa: N802
         pass
 
-    def WriteByte(self, number: int) -> None:
+    def WriteByte(self, number: int) -> None:  # noqa: N802
         pass
 
-    def WriteWord(self, number: int) -> None:
+    def WriteWord(self, number: int) -> None:  # noqa: N802
         pass
 
-    def WriteDword(self, obj: Evaluable) -> None:
+    def WriteDword(self, obj: Evaluable) -> None:  # noqa: N802
         if not isinstance(obj, int):
             Evaluate(obj)
 
-    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:
+    def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:  # noqa: N802
         for arg in arglist:
             if not isinstance(arg, int):
                 Evaluate(arg)
 
-    def WriteBytes(self, b: bytes) -> None:
+    def WriteBytes(self, b: bytes) -> None:  # noqa: N802
         pass
 
-    def WriteSpace(self, spacesize: int) -> None:
+    def WriteSpace(self, spacesize: int) -> None:  # noqa: N802
         pass
 
 
-def CollectObjects(root: "EUDObject | Forward") -> None:
+def _collect_objects(root: "EUDObject | Forward") -> None:
     global phase
     global _found_objects_dict
     global _dynamic_objects_set
@@ -182,7 +181,7 @@ def CollectObjects(root: "EUDObject | Forward") -> None:
 # -------
 
 
-def AllocObjects() -> None:
+def _allocate_objects() -> None:
     global phase
     global _payload_builder
 
@@ -192,13 +191,12 @@ def AllocObjects() -> None:
     if not _payload_compress:
         raise EPError("CompressPayload(False) is currently not supported")
 
-    _payload_builder = allocator.PayloadBuilder()
     _payload_builder.alloc_objects(_found_objects_dict)
 
     phase = 0
 
 
-def ConstructPayload() -> Payload:
+def _construct_payload() -> Payload:
     global phase
     global _payload_builder
 
@@ -212,36 +210,30 @@ def ConstructPayload() -> Payload:
     return Payload(*payload)
 
 
-_on_create_payload_callbacks: list[Callable] = []
-_on_alloc_objects_callbacks: list[Callable] = []
-
-
-def RegisterCreatePayloadCallback(f: Callable) -> None:
-    _on_create_payload_callbacks.append(f)
-
-
-def _RegisterAllocObjectsCallback(f: Callable) -> None:
-    _on_alloc_objects_callbacks.append(f)
-
-
-def CreatePayload(root: "EUDObject | Forward") -> Payload:
-    # Call callbacks
-    for f in _on_create_payload_callbacks:
-        f()
-    CollectObjects(root)
-    for f in _on_alloc_objects_callbacks:
-        f()
-    AllocObjects()
-    return ConstructPayload()
-
-
-_PayloadBuffer: TypeAlias = (
-    ObjCollector | allocator.ObjAllocator | allocator.PayloadBuffer
+RegisterCreatePayloadCallback = _payload_builder.register_create_payload_callback
+_register_after_collecting_callback = (
+    _payload_builder.register_after_collecting_callback
 )
+
+
+def CreatePayload(root: "EUDObject | Forward") -> Payload:  # noqa: N802
+    from ..rawtrigger.rawtriggerdef import RawTrigger
+
+    # Call callbacks
+    _payload_builder.call_callbacks_on_create_payload()
+    _collect_objects(root)
+    _payload_builder.call_callbacks_after_collecting()
+    setattr(RawTrigger, "WritePayload", RawTrigger._allocate_trigger)
+    _allocate_objects()
+    setattr(RawTrigger, "WritePayload", RawTrigger._write_trigger)
+    return _construct_payload()
+
+
+_PayloadBuffer: TypeAlias = allocator.ObjAllocator | allocator.PayloadBuffer
 defri: RlocInt_C = RlocInt(0, 4)
 
 
-def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:
+def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:  # noqa: N802
     global _payload_builder
     global _found_objects_dict
     global _untraversed_objects

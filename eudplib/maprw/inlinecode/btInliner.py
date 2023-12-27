@@ -29,9 +29,7 @@ def get_executing_players(
     return [
         (
             bool(btrigger[320 + 2048 + 4 + player])
-            or bool(
-                btrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force]
-            )
+            or bool(btrigger[320 + 2048 + 4 + 18 + c.GetPlayerInfo(player).force])
         )
         for player in range(8)
     ]

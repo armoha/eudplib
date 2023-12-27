@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from ... import core as c
 from ... import utils as ut
+from ...core.eudfunc import EUDFullFunc
 from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from ..utilf import (
     DisplayTextAll,
@@ -23,7 +24,7 @@ def f_printAll(format_string, *args):  # noqa: N802
 _display_text_all = DisplayTextAll(0)
 
 
-@c.EUDFullFunc(
+@EUDFullFunc(
     [
         (ut.EPD(0x640B58), c.Add, 0, None),
         (ut.EPD(_display_text_all[1]) + 1, c.SetTo, 0, None),

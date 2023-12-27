@@ -6,17 +6,4 @@
 # file that should have been included as part of this package.
 
 # Just run _eudvsupport. This won't be visible in user side.
-from . import _eudvsupport
-from .bitwise import (
-    f_bitand,
-    f_bitlshift,
-    f_bitnand,
-    f_bitnor,
-    f_bitnot,
-    f_bitnxor,
-    f_bitor,
-    f_bitrshift,
-    f_bitsplit,
-    f_bitxor,
-)
-from .muldiv import f_div, f_mul
+from . import _eudvsupport  # FIXME: remove hacky way

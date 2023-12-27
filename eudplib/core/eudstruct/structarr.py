@@ -11,7 +11,7 @@ from .selftype import selftype
 from .vararray import EUDVArray
 
 
-class _EUDStruct_Metaclass(type):
+class _EUDStructMetaclass(type):
     def __init__(cls, name, bases, dct) -> None:
         # For field declaration, modify selftype to cls
         fielddict = {}
@@ -31,21 +31,19 @@ class _EUDStruct_Metaclass(type):
                     basetype._fields_[i] = (fieldname, cls)
 
                 if fieldname in fielddict:
-                    raise EPError(
-                        _("Duplicated field name: {}").format(fieldname)
-                    )
+                    raise EPError(_("Duplicated field name: {}").format(fieldname))
                 fielddict[fieldname] = (fieldcount, fieldtype)
                 fieldcount += 1
 
         cls._fielddict = fielddict
         super().__init__(name, bases, dct)
 
-    def __mul__(self, times: int):
-        basetype = self
+    def __mul__(cls, times: int):
+        basetype = cls
         return _EUDStructArray(times, basetype)
 
 
-class EUDStructArray(ExprProxy, metaclass=_EUDStruct_Metaclass):
+class EUDStructArray(ExprProxy, metaclass=_EUDStructMetaclass):
     dont_flatten = True
 
     def __init__(self, initvar=None, *, _from=None, _times, _basetype):
@@ -65,10 +63,10 @@ class EUDStructArray(ExprProxy, metaclass=_EUDStruct_Metaclass):
         """Create a shallow copy"""
         arraytype = type(self)
         inst = arraytype()
-        self.copyTo(inst)
+        self.copyto(inst)
         return inst
 
-    def copyTo(self, inst):
+    def copyto(self, inst):
         """Copy struct to other instance"""
         for i in range(self._times):
             inst[i] = self[i]

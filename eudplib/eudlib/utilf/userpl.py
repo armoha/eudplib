@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from typing_extensions import Self
+
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
@@ -72,8 +74,11 @@ def TalkingPortraitAll(unit, time) -> tuple[c.Action, c.Action]:  # noqa: N802
 
 
 class _UserPFw(c.ConstExpr):
-    def __init__(self, dest, offset):
-        super().__init__(self)
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls, None)
+
+    def __init__(self, dest, offset) -> None:
+        super().__init__()
         self._initobj = (dest, offset)
 
     def Evaluate(self):  # noqa: N802

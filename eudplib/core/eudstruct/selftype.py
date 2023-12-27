@@ -8,7 +8,7 @@
 _selftype = None
 
 
-class selftype:
+class selftype:  # noqa: N801
     """When used in EUDFuncMethod's type declaration, This is interpreted
     as the owning class itself
     """
@@ -18,6 +18,6 @@ class selftype:
         return _selftype.cast(_from)
 
 
-def SetSelfType(t):
+def _set_selftype(t):
     global _selftype
     _selftype = t

@@ -1,14 +1,15 @@
 use crate::allocator::pbuffer::PayloadBuffer;
 use indicatif::{ProgressBar, ProgressStyle};
 use pyo3::create_exception;
+use pyo3::intern;
 use pyo3::prelude::*;
-use pyo3::types::{PyBytes, PyDict, PyList, PyTuple};
+use pyo3::types::{PyBytes, PyDict, PyTuple};
 
 create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 
 /// Object having PayloadBuffer-like interfaces. Collects all objects by
-/// calling RegisterObject() for every related objects.
-#[pyclass]
+/// calling object.WritePayload() for every related objects.
+#[pyclass(module = "eudplib.core.allocator")]
 pub struct ObjAllocator {
     suboccupmap: bool,
     suboccupidx: u32,
@@ -89,7 +90,7 @@ impl ObjAllocator {
     }
 
     #[allow(non_snake_case)]
-    fn WritePack(&mut self, structformat: &str, _arglist: &PyList) {
+    fn WritePack(&mut self, structformat: &str, _arglist: &PyAny) {
         let ssize: u32 = structformat
             .bytes()
             .map(|x| match x {
@@ -133,6 +134,39 @@ impl ObjAllocator {
             self.suboccupidx %= 4;
             self.suboccupmap = false;
         }
+    }
+
+    fn _write_trigger(&mut self, conditions: u32, actions: u32) {
+        self.push(true);  // prevptr
+        self.push(true);  // nextptr
+
+        // Conditions
+        for _ in 0..(conditions * 5) {
+            self.push(true);
+        }
+        if conditions < 16 {
+            for _ in 0..5 {
+                self.push(true);
+            }
+            self.WriteSpace(20 * (15 - conditions));
+        }
+
+        // Actions
+        for _ in 0..(actions * 8) {
+            self.push(true);
+        }
+        if actions < 64 {
+            for _ in 0..8 {
+                self.push(true);
+            }
+            self.WriteSpace(32 * (63 - actions));
+        }
+
+        // Preserved flag
+        self.push(true);
+
+        self.WriteSpace(27);
+        self.occup1();
     }
 }
 
@@ -178,8 +212,11 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
     (alloctable, payload_size)
 }
 
-#[pyclass]
+#[pyclass(module = "eudplib.core.allocator")]
 pub struct PayloadBuilder {
+    callbacks_on_create_payload: Vec<PyObject>,
+    callbacks_after_collecting: Vec<PyObject>,
+    // Allocating & Writing phase
     alloctable: Vec<u32>,
     payload_size: usize,
 }
@@ -189,13 +226,31 @@ impl PayloadBuilder {
     #[new]
     fn new() -> Self {
         Self {
+            callbacks_on_create_payload: Vec::new(),
+            callbacks_after_collecting: Vec::new(),
             alloctable: Vec::new(),
             payload_size: 0,
         }
     }
 
-    fn offset(&self, index: usize) -> u32 {
-        self.alloctable[index]
+    fn register_create_payload_callback(&mut self, callable: PyObject) {
+        self.callbacks_on_create_payload.push(callable);
+    }
+
+    fn register_after_collecting_callback(&mut self, callable: PyObject) {
+        self.callbacks_after_collecting.push(callable);
+    }
+
+    fn call_callbacks_on_create_payload(&mut self, py: Python) {
+        for callable in self.callbacks_on_create_payload.drain(..) {
+            let _ = callable.call0(py);
+        }
+    }
+
+    fn call_callbacks_after_collecting(&mut self, py: Python) {
+        for callable in self.callbacks_after_collecting.drain(..) {
+            let _ = callable.call0(py);
+        }
     }
 
     fn alloc_objects(&mut self, py: Python, found_objects: &PyDict) -> PyResult<()> {
@@ -208,21 +263,23 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
+        let arg: &PyTuple = PyTuple::new(py, &[obja]);
         for (obj, _v) in found_objects.iter() {
             {
                 let mut obja = obja.borrow_mut();
                 obja.start_write();
             }
-            let arg: &PyTuple = PyTuple::new(py, &[obja]);
-            obj.call_method1("WritePayload", arg)?;
+            obj.call_method1(intern!(py, "WritePayload"), arg)?;
             let dwoccupmap = {
                 let mut obja = obja.borrow_mut();
                 obja.end_write()
             };
-            let datasize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
-            if dwoccupmap.len() != (datasize + 3) >> 2 {
-                let dwoccupmap_len = dwoccupmap.len();
-                let datasize = (datasize + 3) >> 2;
+            let dwoccupmap_len = dwoccupmap.len();
+            let datasize = obj
+                .call_method0(intern!(py, "GetDataSize"))?
+                .extract::<usize>()?;
+            let datasize = (datasize + 3) >> 2;
+            if dwoccupmap_len != datasize {
                 return Err(AllocError::new_err(format!("Occupation map length ({dwoccupmap_len}) & Object size ({datasize}) mismatch for {obj}")));
             }
             dwoccupmap_list.push(dwoccupmap);
@@ -247,21 +304,23 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
+        let arg: &PyTuple = PyTuple::new(py, &[pbuf]);
         for (i, (obj, _v)) in found_objects.iter().enumerate() {
             {
                 let mut pbuf = pbuf.borrow_mut();
                 pbuf.start_write(self.alloctable[i] as usize);
             }
-            let arg: &PyTuple = PyTuple::new(py, &[pbuf]);
-            obj.call_method1("WritePayload", arg)?;
+            obj.call_method1(intern!(py, "WritePayload"), arg)?;
             let written_bytes = {
-                let mut pbuf = pbuf.borrow_mut();
+                let pbuf = pbuf.borrow();
                 pbuf.end_write()
             };
-            let objsize = obj.call_method0("GetDataSize")?.extract::<usize>()?;
+            let objsize = obj
+                .call_method0(intern!(py, "GetDataSize"))?
+                .extract::<usize>()?;
             if written_bytes != objsize {
                 return Err(AllocError::new_err(format!(
-                    "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj}"
+                    "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj:?}"
                 )));
             }
             bar.inc(1);
@@ -271,5 +330,9 @@ impl PayloadBuilder {
             let mut pbuf = pbuf.borrow_mut();
             pbuf.create_payload()
         })
+    }
+
+    fn offset(&self, index: usize) -> u32 {
+        self.alloctable[index]
     }
 }

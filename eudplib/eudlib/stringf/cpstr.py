@@ -8,7 +8,7 @@
 from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
-from eudplib.core.allocator.payload import _RegisterAllocObjectsCallback
+from eudplib.core.allocator.payload import _register_after_collecting_callback
 from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import get_string_section_name
 from eudplib.localize import _
@@ -54,7 +54,8 @@ def _initialize_queries():
     non_existing_id = []
     for str_id, offset_query in _const_strptr.items():
         try:
-            offset_query._expr = c.ConstExpr(
+            offset_query.Reset()
+            offset_query << c.ConstExpr(
                 None,
                 _STR_ADDRESS + strmap._stroffset[strmap._dataindextb[str_id - 1]],
                 0,
@@ -70,7 +71,7 @@ def _initialize_queries():
         )
 
 
-_RegisterAllocObjectsCallback(_initialize_queries)
+_register_after_collecting_callback(_initialize_queries)
 
 
 def GetMapStringAddr(str_id):  # noqa: N802

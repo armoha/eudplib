@@ -7,6 +7,8 @@
 
 from typing import TYPE_CHECKING
 
+from typing_extensions import Self
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
@@ -14,7 +16,7 @@ from ..allocator import ConstExpr, IsConstExpr
 from .consttype import Byte, Dword, Word
 
 if TYPE_CHECKING:
-    from ..allocator.payload import RlocInt_C, _PayloadBuffer
+    from ..allocator.payload import RlocInt_C, _PayloadBuffer, ObjCollector
     from .rawtriggerdef import RawTrigger
 
 _acttypes: dict[int, str] = {
@@ -102,6 +104,9 @@ class Action(ConstExpr):
      ======  ============= ========  ==========
     """
 
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls, None)
+
     def __init__(
         self,
         locid1: Dword,
@@ -118,7 +123,7 @@ class Action(ConstExpr):
         eudx: Word = 0,
     ) -> None:
         """See :mod:`eudplib.base.stocktrg` for stock actions list."""
-        super().__init__(self)
+        super().__init__()
         self.fields: list[Dword] = [
             locid1,
             strid,
@@ -238,9 +243,10 @@ class Action(ConstExpr):
             raise ut.EPError(err)
         return self.parenttrg.Evaluate() + 8 + 320 + 32 * self.actindex
 
-    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
+    def CollectDependency(self, pbuffer: "ObjCollector") -> None:  # noqa: N802
         for field in self.fields[:6]:
-            pbuffer.WriteDword(field)  # type: ignore[arg-type]
+            if not isinstance(field, int):
+                pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
     def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
         pbuffer.WritePack("IIIIIIHBBBBH", self.fields)  # type: ignore[arg-type]

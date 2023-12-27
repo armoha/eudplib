@@ -5,12 +5,17 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from typing_extensions import Self
+
 from ..allocator.payload import _PayloadBuffer
 from .eudobj import EUDObject
 
 
 class Db(EUDObject):
     """Class for raw data object"""
+
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls)
 
     def __init__(self, b: bytes | int | str) -> None:
         super().__init__()

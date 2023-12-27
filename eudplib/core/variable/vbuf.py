@@ -9,11 +9,11 @@ from collections import deque
 from typing import TYPE_CHECKING, Literal
 
 from ... import utils as ut
-from ..allocator import RegisterCreatePayloadCallback
+from ..allocator import RegisterCreatePayloadCallback, ConstExpr
 from ..eudobj import EUDObject
 
 if TYPE_CHECKING:
-    from ..allocator import ConstExpr
+    from ..allocator.payload import ObjCollector
     from .eudv import VariableTriggerForward
 
 
@@ -27,7 +27,7 @@ class EUDVarBuffer(EUDObject):
         super().__init__()
 
         self._vdict: "dict[VariableTriggerForward, int]" = {}
-        self._initvals: "list[int | ConstExpr]" = []
+        self._initvals: list[int | ConstExpr] = []
 
     def DynamicConstructed(self) -> Literal[True]:  # noqa: N802
         return True
@@ -47,7 +47,7 @@ class EUDVarBuffer(EUDObject):
     def GetDataSize(self) -> int:  # noqa: N802
         return 2408 + 72 * (len(self._initvals) - 1)
 
-    def CollectDependency(self, emitbuffer) -> None:  # noqa: N802
+    def CollectDependency(self, emitbuffer: "ObjCollector") -> None:  # noqa: N802
         for initval in self._initvals:
             if not isinstance(initval, int):
                 emitbuffer.WriteDword(initval)
@@ -157,7 +157,7 @@ class EUDCustomVarBuffer(EUDObject):
     def GetDataSize(self):  # noqa: N802
         return 2408 + 72 * (len(self._actnptr_pairs) + len(self._5acts) - 1)
 
-    def CollectDependency(self, emitbuffer):  # noqa: N802
+    def CollectDependency(self, emitbuffer: "ObjCollector"):  # noqa: N802
         for initval in self._5nptrs:
             if not isinstance(initval, int):
                 emitbuffer.WriteDword(initval)

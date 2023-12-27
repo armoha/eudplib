@@ -7,6 +7,8 @@
 
 from typing import TYPE_CHECKING, NoReturn
 
+from typing_extensions import Self
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
@@ -14,7 +16,7 @@ from ..allocator import ConstExpr, IsConstExpr
 from .consttype import Byte, Dword, Word
 
 if TYPE_CHECKING:
-    from ..allocator.payload import RlocInt_C, _PayloadBuffer
+    from ..allocator.payload import RlocInt_C, _PayloadBuffer, ObjCollector
     from .rawtriggerdef import RawTrigger
 
 _condtypes: dict[int, str] = {
@@ -64,6 +66,9 @@ class Condition(ConstExpr):
      ======  =============  ========  ===========
     """
 
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls, None)
+
     def __init__(
         self,
         locid: Dword,
@@ -78,7 +83,7 @@ class Condition(ConstExpr):
         eudx: Word = 0,
     ) -> None:
         """See :mod:`eudplib.base.stockcond` for stock conditions list."""
-        super().__init__(self)
+        super().__init__()
         self.fields: list[Dword] = [
             locid,
             player,
@@ -165,7 +170,7 @@ class Condition(ConstExpr):
             # fmt: on
         return self.parenttrg.Evaluate() + 8 + self.condindex * 20
 
-    def CollectDependency(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
+    def CollectDependency(self, pbuffer: "ObjCollector") -> None:  # noqa: N802
         for field in self.fields[:3]:
             pbuffer.WriteDword(field)  # type: ignore[arg-type]
 

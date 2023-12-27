@@ -10,6 +10,8 @@ import traceback
 from collections.abc import Iterator, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
+from typing_extensions import Self
+
 from ...localize import _
 from ...utils import (
     EPD,
@@ -100,8 +102,11 @@ def _yield_and_check_rvalue(
 
 # Unused variable don't need to be allocated.
 class VariableTriggerForward(ConstExpr):
-    def __init__(self, initval):
-        super().__init__(self)
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls, None)
+
+    def __init__(self, initval) -> None:
+        super().__init__()
         self._initval = initval
 
     def Evaluate(self):  # noqa: N802
@@ -272,9 +277,7 @@ class EUDVariable(VariableBase):
             _("Unexpected modifier {}").format(modifier),
         )
         modifier = bt.EncodeModifier(modifier) << 24
-        return bt.SetDeathsX(
-            EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000
-        )
+        return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000)
 
     # -------
 
@@ -624,9 +627,7 @@ class EUDVariable(VariableBase):
             ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             t = EUDVariable()
-            SeqCompute(
-                ((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other))
-            )
+            SeqCompute(((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other)))
             return t.Exactly(0)
 
     def __gt__(self, other):
@@ -693,9 +694,7 @@ def VProc(v: EUDVariable, actions) -> bt.RawTrigger:
 
 
 @overload
-def VProc(
-    v: Sequence[EUDVariable], actions
-) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
+def VProc(v: Sequence[EUDVariable], actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
     ...
 
 
@@ -710,9 +709,8 @@ def VProc(v, actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:  # noqa: N802
     actions.append(bt.SetNextPtr(v[-1].GetVTable(), end))
 
     for i in range(0, len(actions), 64):
-        trg = bt.RawTrigger(actions=actions[i : i + 64])
-        triggers.append(trg)
-    triggers[-1]._nextptr = v[0].GetVTable()
+        triggers.append(bt.RawTrigger(actions=actions[i : i + 64]))
+    bt.SetNextTrigger(v[0].GetVTable())
     end << bt.NextTrigger()
 
     return List2Assignable(triggers)
@@ -785,7 +783,7 @@ def _seqcompute_sub(assignpairs, _srcdict):
                 queueact.remove(setdst)
             if last_mdt is prev_mdt:
                 queueact.remove(setmdt)
-            if vt_nextptr._expr is prev_nptr._expr:
+            if vt_nextptr.expr is prev_nptr.expr:
                 lastact.remove(setnptr)
         _srcdict[last_src] = (last_dst, last_mdt, vt_nextptr)
 
@@ -816,9 +814,7 @@ def _seqcompute_sub(assignpairs, _srcdict):
         last_pairs = src, dst, mdt
 
     remove_duplicate_actions()
-    bt.RawTrigger(
-        nextptr=nextptr, actions=[actionlist, _rand_lst(non_const_actions)]
-    )
+    bt.RawTrigger(nextptr=nextptr, actions=[actionlist, _rand_lst(non_const_actions)])
 
     vt_nextptr << bt.NextTrigger()
 
@@ -947,7 +943,7 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:  # noqa: N802
     else:
         srclist_refcount = 3
         refcount = 4
-    errlist = []  # FIXME: replace to ExceptionGroup
+    errlist = []
     if sys.getrefcount(srclist) == srclist_refcount:
         nth = 0
         for src, is_rvalue in _yield_and_check_rvalue(srclist, refcount):
@@ -962,9 +958,7 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:  # noqa: N802
         raise errlist[0]
     elif errlist:
         if sys.version_info >= (3, 11):
-            raise ExceptionGroup(
-                _("Multiple error occurred on SetVariables:"), errlist
-            )
+            raise ExceptionGroup(_("Multiple error occurred on SetVariables:"), errlist)
         else:
             raise EPError(_("Multiple error occurred on SetVariables:"), errlist)
 

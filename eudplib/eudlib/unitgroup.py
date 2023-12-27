@@ -168,9 +168,7 @@ class _CPLoop:
             )
             nextptr << NextTrigger()
 
-        if _unsafe_whilenot()(
-            Memory(loopstart, AtLeast, varray + 72 * capacity)
-        ):
+        if _unsafe_whilenot()(Memory(loopstart, AtLeast, varray + 72 * capacity)):
             block = EUDPeekBlock("whileblock")[1]
             PushTriggerScope()  # remove entry
             remove_end = Forward()
@@ -271,20 +269,8 @@ class _CpHelper:
         except TypeError as e:
             if isinstance(offset, ConstExpr) and isinstance(self.offset, int):
                 mod, val = Add, offset - self.offset
-            elif isinstance(offset, int) and isinstance(
-                self.offset, ConstExpr
-            ):
+            elif isinstance(offset, int) and isinstance(self.offset, ConstExpr):
                 mod, val = Subtract, self.offset - offset
-            elif (
-                isinstance(offset, ConstExpr)
-                and isinstance(self.offset, ConstExpr)
-                and offset.baseobj is self.offset.baseobj
-                and offset.rlocmode == self.offset.rlocmode
-            ):
-                if offset.offset > self.offset.offset:
-                    mod, val = Add, offset.offset - self.offset.offset
-                elif offset.offset < self.offset.offset:
-                    mod, val = Subtract, self.offset.offset - offset.offset
             else:
                 raise e
         self.offset = offset

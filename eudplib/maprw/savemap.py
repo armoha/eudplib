@@ -10,7 +10,7 @@ import os
 from collections.abc import Callable
 
 from ..core import RegisterCreatePayloadCallback
-from ..core.eudfunc.trace.tracetool import _GetTraceMap, _ResetTraceMap
+from ..core.eudfunc.trace.tracetool import _get_trace_map, _reset_trace_map
 from ..core.mapdata import fixmapdata, mapdata, mpqapi
 from ..localize import _
 from ..utils import EPError, ep_assert, ep_eprint
@@ -25,13 +25,13 @@ trace_map = []
 
 def get_trace_map() -> None:
     global trace_map, trace_header
-    new_trace_header, new_trace_map = _GetTraceMap()
+    new_trace_header, new_trace_map = _get_trace_map()
     if not new_trace_header[1]:
         raise EPError(_("Empty trace header"))
     if new_trace_map:
         trace_header = new_trace_header
         trace_map = list(new_trace_map)
-    _ResetTraceMap()
+    _reset_trace_map()
 
 
 RegisterCreatePayloadCallback(get_trace_map)
@@ -48,7 +48,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
     print(_("Saving to {}...").format(fname))
     chkt = mapdata.GetChkTokenized()
 
-    _ResetTraceMap()
+    _reset_trace_map()
 
     # Add payload
     root = main_starter(rootf)

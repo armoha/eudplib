@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from typing_extensions import Self
+
 from .. import core as c
 
 
@@ -84,8 +86,11 @@ c.RegisterCreatePayloadCallback(register_new_jumpbuffer)
 
 # Unused jump table don't need to be allocated.
 class JumpTriggerForward(c.ConstExpr):
-    def __init__(self, nextptrs):
-        super().__init__(self)
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls, None)
+
+    def __init__(self, nextptrs) -> None:
+        super().__init__()
         self._nextptrs = nextptrs
 
     def Evaluate(self):  # noqa: N802

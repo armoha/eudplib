@@ -12,7 +12,7 @@ from .. import variable as ev
 from .eudfuncn import EUDFuncN
 
 
-def applyTypes(typesdecl, varlist):
+def _apply_types(typesdecl, varlist):
     """
     EUD-Typecast each variable to declared types.
 
@@ -63,12 +63,12 @@ class EUDTypedFuncN(EUDFuncN):
     def __call__(self, *args, ret=None):
         # This layer is necessary for function to accept non-EUDVariable object
         # as argument. For instance, EUDFuncN.
-        args = applyTypes(self._argtypes, args)
+        args = _apply_types(self._argtypes, args)
         rets = super().__call__(*args, ret=ret)
 
         # Cast returns to rettypes before caller code.
         rets = ut.Assignable2List(rets)
-        rets = applyTypes(self._rettypes, rets)
+        rets = _apply_types(self._rettypes, rets)
         return ut.List2Assignable(rets)
 
 
@@ -86,7 +86,7 @@ class EUDXTypedFuncN(EUDTypedFuncN):
         )
         self._argmasks = argmasks
 
-    def _CreateFuncArgs(self):
+    def _create_func_args(self):
         ut.ep_assert(
             self._argn == len(self._argmasks),
             _("Different number of arguments({}) from mask declarations({})."),
@@ -109,10 +109,10 @@ class EUDFullFuncN(EUDFuncN):
     def __call__(self, *args, ret=None):
         # This layer is necessary for function to accept non-EUDVariable object
         # as argument. For instance, EUDFuncN.
-        args = applyTypes(self._argtypes, args)
+        args = _apply_types(self._argtypes, args)
         rets = super().__call__(*args, ret=ret)
 
         # Cast returns to rettypes before caller code.
         rets = ut.Assignable2List(rets)
-        rets = applyTypes(self._rettypes, rets)
+        rets = _apply_types(self._rettypes, rets)
         return ut.List2Assignable(rets)

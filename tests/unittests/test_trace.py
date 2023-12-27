@@ -1,4 +1,5 @@
 from helper import *
+from eudplib.core.eudfunc import *
 
 
 @EUDTracedFunc
@@ -28,10 +29,14 @@ def test_trace():
     t2 = GetTraceStackDepth()
     c = _t1(2)
     t3 = GetTraceStackDepth()
-    test_equality("EUDTracedFunc works well", [a, b, c, t1, t2, t3], [11, 12, 13, 0, 0, 0])
+    test_equality(
+        "EUDTracedFunc works well", [a, b, c, t1, t2, t3], [11, 12, 13, 0, 0, 0]
+    )
 
     _t2()
-    test_equality("EUDTraceFunc for function with no returns", GetTraceStackDepth(), 0)
+    test_equality(
+        "EUDTraceFunc for function with no returns", GetTraceStackDepth(), 0
+    )
 
 
 # phu54321/euddraft#3
