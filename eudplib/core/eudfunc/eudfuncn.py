@@ -113,14 +113,18 @@ class EUDFuncN:
             self._fend = bt.RawTrigger()
             self._nptr = self._fend + 4
         else:
-            fend_trgs = ut.FlattenList(ev.VProc([self._frets], []))
+            fend_trgs = ut.FlattenList(ev.VProc(self._frets, []))
             self._fend = fend_trgs[0]
             self._nptr = fend_trgs[-1]._actions[-1] + 20
 
         bt.PopTriggerScope()
 
         # Finalize
-        ut.ep_assert(f_bsm.empty(), _("Block start/end mismatch inside function"))
+        if not f_bsm.empty():
+            raise ut.EPError(
+                _("Block start/end mismatch inside function")
+                + f": {', '.join(name for name, _data in f_bsm._blockstru)}"
+            )
         set_blockstru_manager(prev_bsm)
 
         # No return -> set return count to 0
