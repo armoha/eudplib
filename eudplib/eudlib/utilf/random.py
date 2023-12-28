@@ -56,8 +56,7 @@ def f_randomize():
             ],
         )
         c.RawTrigger(
-            conditions=c.Switch("Switch 1", c.Set),
-            actions=_seed.AddNumber(1),
+            conditions=c.Switch("Switch 1", c.Set), actions=_seed.AddNumber(1)
         )
     cs.EUDEndWhile()
 

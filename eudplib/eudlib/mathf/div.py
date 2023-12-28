@@ -77,8 +77,7 @@ def _div_towards_zero(a, b):
     )
     # when dividend is negative, modulo is negative
     c.RawTrigger(
-        conditions=_signflag.ExactlyX(1, 1),
-        actions=modulo.ineg(action=True),
+        conditions=_signflag.ExactlyX(1, 1), actions=modulo.ineg(action=True)
     )
 
     return quotient, modulo
@@ -176,8 +175,7 @@ def _div_floor(a, b):
     )
     # when divider is negative, remainder is negative
     c.RawTrigger(
-        conditions=_signflag.ExactlyX(2, 2),
-        actions=modulo.ineg(action=True),
+        conditions=_signflag.ExactlyX(2, 2), actions=modulo.ineg(action=True)
     )
 
     return quotient, modulo

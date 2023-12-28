@@ -290,9 +290,7 @@ def _r2l(colors, colors_dict={}):
         def _f():
             _jump, _isend, _end = (c.Forward() for _ in range(3))
             ret = c.EUDVariable()
-            _is_cp_less_than_start(
-                [ret.SetNumber(1), c.SetNextPtr(_isend, _jump)]
-            )
+            _is_cp_less_than_start([ret.SetNumber(1), c.SetNextPtr(_isend, _jump)])
             _isend << c.RawTrigger(
                 conditions=_cpbelowbuffer.IsSet(),
                 actions=[ret.SetNumber(0), c.SetNextPtr(_isend, _end)],
@@ -369,9 +367,7 @@ def TextFX_FadeIn(  # noqa: N802
         ],
     )
     _textfx_print(*args, identifier=identifier, encoding=encoding)
-    f_setcurpl(
-        start, actions=[start.AddNumber(2 - len(color))], set_modifier=False
-    )
+    f_setcurpl(start, actions=[start.AddNumber(2 - len(color))], set_modifier=False)
 
     if reset is True:
         check_gametick = c.Forward()

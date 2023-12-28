@@ -169,7 +169,9 @@ def _wwriter(subp, w):
     for i in ut._rand_lst(range(3)):
         if cs.EUDSwitchCase()(i):
             c.RawTrigger(
-                actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i))
+                actions=c.SetDeathsX(
+                    c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i)
+                )
             )
             c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256**i))])
             cs.EUDBreak()

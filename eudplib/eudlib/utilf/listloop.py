@@ -157,8 +157,7 @@ def EUDLoopUnit2() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N8
         )
         c.PopTriggerScope()
         continue_if << c.RawTrigger(
-            conditions=is_dead,
-            actions=c.SetNextPtr(continue_if, continue_jump),
+            conditions=is_dead, actions=c.SetNextPtr(continue_if, continue_jump)
         )
         continue_okay << c.NextTrigger()
         yield ptr, epd
@@ -212,10 +211,7 @@ def EUDLoopPlayerUnit(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]: 
         nextptr << c.NextTrigger()
         yield ptr, epd
         cs.EUDSetContinuePoint()
-        cs.DoActions(
-            next_unit << ptr.SetNumber(0),
-            epd.SetNumber(0),
-        )
+        cs.DoActions(next_unit << ptr.SetNumber(0), epd.SetNumber(0))
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("playerunitloop")

@@ -228,8 +228,7 @@ class StringBuffer(c.EUDStruct):
         cls._method_template << c.NextTrigger()
         _localcp = f_getuserplayerid()
         cls._cpbranch << c.RawTrigger(
-            conditions=IsUserCP(),
-            actions=c.SetNextPtr(cls._cpbranch, 0),
+            conditions=IsUserCP(), actions=c.SetNextPtr(cls._cpbranch, 0)
         )
         c.PopTriggerScope()
 

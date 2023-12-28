@@ -348,7 +348,7 @@ del _k
 del _v
 
 
-def eudplibVersion():
+def eudplibVersion():  # noqa: N802
     return __version__
 
 

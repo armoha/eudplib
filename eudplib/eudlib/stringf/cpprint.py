@@ -209,9 +209,7 @@ def f_cpstr_addptr(number):
                     c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
                 )
             else:
-                cs.DoActions(
-                    *c.AddCurrentPlayer(1),
-                )
+                cs.DoActions(*c.AddCurrentPlayer(1))
 
 
 def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
