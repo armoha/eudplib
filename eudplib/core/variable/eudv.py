@@ -277,9 +277,7 @@ class EUDVariable(VariableBase):
             _("Unexpected modifier {}").format(modifier),
         )
         modifier = bt.EncodeModifier(modifier) << 24
-        return bt.SetDeathsX(
-            EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000
-        )
+        return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000)
 
     # -------
 
@@ -521,7 +519,7 @@ class EUDVariable(VariableBase):
                 other,
                 [
                     other.SetMask(0x55555555),
-                    other.QueueAddTo(self),
+                    *other.QueueAddTo(self),
                 ],
             )
             VProc(other, other.SetMask(0xAAAAAAAA))  # 3T 8A
@@ -629,9 +627,7 @@ class EUDVariable(VariableBase):
             ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             t = EUDVariable()
-            SeqCompute(
-                ((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other))
-            )
+            SeqCompute(((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other)))
             return t.Exactly(0)
 
     def __gt__(self, other):
@@ -698,9 +694,7 @@ def VProc(v: EUDVariable, actions) -> bt.RawTrigger:
 
 
 @overload
-def VProc(
-    v: Sequence[EUDVariable], actions
-) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
+def VProc(v: Sequence[EUDVariable], actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
     ...
 
 
@@ -771,27 +765,26 @@ def _seqcompute_sub(assignpairs, _srcdict):
     nextptr = None  # nextptr for this rawtrigger
     vt_nextptr = None  # what to set for nextptr of current vtable
     last_pairs = None
-    non_const_actions = list()
+    non_const_actions = []
 
     def remove_duplicate_actions() -> None:
         if last_pairs is None:
             return
-        last_src, last_dst, last_mdt = last_pairs
+        src, dst, mdt = last_pairs
+
         try:
-            prev_dst, prev_mdt, prev_nptr = _srcdict[last_src]
+            prev_dst, prev_mdt, prev_nptr = _srcdict[src]
         except KeyError:
-            pass
-        else:
-            lastact = non_const_actions[-1]
-            queueact, setnptr = lastact
-            setdst, setmdt = queueact
-            if last_dst is prev_dst:
-                queueact.remove(setdst)
-            if last_mdt is prev_mdt:
-                queueact.remove(setmdt)
-            if vt_nextptr.expr is prev_nptr.expr:
-                lastact.remove(setnptr)
-        _srcdict[last_src] = (last_dst, last_mdt, vt_nextptr)
+            prev_dst, prev_mdt, prev_nptr = None, None, None
+
+        if (dst is not prev_dst) and dst:
+            non_const_actions.append(src.SetDest(dst))
+        if (mdt is not prev_mdt) and mdt:
+            non_const_actions.append(src.SetModifier(mdt))
+        if prev_nptr is None or vt_nextptr.expr is not prev_nptr.expr:
+            non_const_actions.append(bt.SetNextPtr(src.GetVTable(), vt_nextptr))
+
+        _srcdict[src] = (dst if dst else prev_dst, mdt if mdt else prev_mdt, vt_nextptr)
 
     for dst, mdt, src in assignpairs[const_assigning_index:]:
         dst = _get_computedest(dst)
@@ -804,25 +797,11 @@ def _seqcompute_sub(assignpairs, _srcdict):
         remove_duplicate_actions()
 
         vt_nextptr = Forward()
-        nonconst_action = []
-        if dst is None:
-            nonconst_action.append([])
-        else:
-            nonconst_action.append(src.SetDest(dst))
-        if mdt is None:
-            nonconst_action.append([])
-        else:
-            nonconst_action.append(src.SetModifier(mdt))
-
-        non_const_actions.append(
-            [nonconst_action, bt.SetNextPtr(src.GetVTable(), vt_nextptr)]
-        )
         last_pairs = src, dst, mdt
 
     remove_duplicate_actions()
-    bt.RawTrigger(
-        nextptr=nextptr, actions=[actionlist, _rand_lst(non_const_actions)]
-    )
+    actionlist.extend(_rand_lst(non_const_actions))
+    bt.RawTrigger(nextptr=nextptr, actions=actionlist)
 
     vt_nextptr << bt.NextTrigger()
 
@@ -966,9 +945,7 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:  # noqa: N802
         raise errlist[0]
     elif errlist:
         if sys.version_info >= (3, 11):
-            raise ExceptionGroup(
-                _("Multiple error occurred on SetVariables:"), errlist
-            )
+            raise ExceptionGroup(_("Multiple error occurred on SetVariables:"), errlist)
         else:
             raise EPError(_("Multiple error occurred on SetVariables:"), errlist)
 

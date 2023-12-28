@@ -30,6 +30,7 @@ def EPDSwitch(epd, mask=0xFFFFFFFF):  # noqa: N802
         "casebrlist": {},
         "defaultbr": c.Forward(),
         "swend": c.Forward(),
+        "_actions": [],
     }
 
     c.PushTriggerScope()
@@ -46,6 +47,7 @@ def EUDSwitch(var, mask=0xFFFFFFFF):  # noqa: N802
         "casebrlist": {},
         "defaultbr": c.Forward(),
         "swend": c.Forward(),
+        "_actions": [],
     }
 
     c.PushTriggerScope()
@@ -172,9 +174,7 @@ def EUDEndSwitch():  # noqa: N802
         # use simple comparisons
         branch, nextbranch = c.Forward(), c.Forward()
         restore = c.SetMemory(branch + 4, c.SetTo, nextbranch)
-        c.RawTrigger(
-            actions=[restore, block["_actions"]] if "_actions" in block else restore
-        )
+        c.RawTrigger(actions=[restore, *block["_actions"]])
         for case in casekeylist:
             branch << c.RawTrigger(
                 conditions=c.MemoryXEPD(epd, c.Exactly, case, bitmask),
@@ -209,9 +209,7 @@ def EUDEndSwitch():  # noqa: N802
         def powerset(iterable):
             "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
             s = list(iterable)
-            return chain.from_iterable(
-                combinations(s, r) for r in range(len(s) + 1)
-            )
+            return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
         keylist = sorted(map(sum, powerset(keybits)))
         jump_table = JumpTriggerForward(
@@ -227,18 +225,14 @@ def EUDEndSwitch():  # noqa: N802
                 epd,
                 [
                     cpcache.SetDest(ut.EPD(0x6509B0)),
-                    epd.QueueAssignTo(ut.EPD(0x6509B0)),
+                    *epd.QueueAssignTo(ut.EPD(0x6509B0)),
                     c.SetNextPtr(jumper, jump_table),
-                    block["_actions"] if "_actions" in block else [],
+                    *block["_actions"],
                 ],
             )
         else:
             restore = c.SetNextPtr(jumper, jump_table)
-            lastbit = c.RawTrigger(
-                actions=[restore, block["_actions"]]
-                if "_actions" in block
-                else restore
-            )
+            lastbit = c.RawTrigger(actions=[restore, *block["_actions"]])
 
         for i, bit in enumerate(keybits):
             lastbit = c.RawTrigger(
@@ -259,9 +253,9 @@ def EUDEndSwitch():  # noqa: N802
             epd,
             [
                 cpcache.SetDest(ut.EPD(0x6509B0)),
-                epd.QueueAssignTo(ut.EPD(0x6509B0)),
+                *epd.QueueAssignTo(ut.EPD(0x6509B0)),
                 c.SetNextPtr(cpcache.GetVTable(), defbranch),
-                block["_actions"] if "_actions" in block else [],
+                *block["_actions"],
             ],
         )
         reset = []
@@ -287,7 +281,7 @@ def EUDEndSwitch():  # noqa: N802
                 br1 << c.RawTrigger(
                     nextptr=br2,
                     conditions=c.MemoryXEPD(cmpplayer, c.Exactly, keys[0], bitmask),
-                    actions=[c.SetNextPtr(br1, jump1), _reset()],
+                    actions=[c.SetNextPtr(br1, jump1), *_reset()],
                 )
                 jump1 << c.RawTrigger(
                     nextptr=cpcache.GetVTable(),
@@ -308,7 +302,7 @@ def EUDEndSwitch():  # noqa: N802
                     ),
                     actions=[
                         c.SetNextPtr(branch, br2),
-                        _reset(),
+                        *_reset(),
                     ],
                 )
                 br1 << _key_selector(keys[:midpos])
@@ -341,7 +335,7 @@ def EUDEndSwitch():  # noqa: N802
                 branch << c.RawTrigger(
                     nextptr=goto_defbranch,
                     conditions=c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
-                    actions=[c.SetNextPtr(branch, jump), _reset()],
+                    actions=[c.SetNextPtr(branch, jump), *_reset()],
                 )
                 jump << c.RawTrigger(
                     nextptr=casebrlist[keys[0]],
@@ -360,7 +354,7 @@ def EUDEndSwitch():  # noqa: N802
                 br1 << c.RawTrigger(
                     nextptr=br2,
                     conditions=c.MemoryXEPD(epd, c.Exactly, keys[0], bitmask),
-                    actions=[c.SetNextPtr(br1, jump1), _reset()],
+                    actions=[c.SetNextPtr(br1, jump1), *_reset()],
                 )
                 jump1 << c.RawTrigger(
                     nextptr=casebrlist[keys[0]],
@@ -376,7 +370,7 @@ def EUDEndSwitch():  # noqa: N802
                     conditions=c.MemoryXEPD(epd, c.AtLeast, keys[midpos], bitmask),
                     actions=[
                         c.SetNextPtr(branch, br2),
-                        _reset(),
+                        *_reset(),
                     ],
                 )
                 br1 << _key_selector(keys[:midpos])

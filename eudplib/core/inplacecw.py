@@ -29,8 +29,8 @@ def cpset(a, b):
         VProc(
             [a, b],
             [
-                a.QueueAssignTo(EPD(0x6509B0)),
-                b.QueueAddTo(EPD(0x6509B0)),
+                *a.QueueAssignTo(EPD(0x6509B0)),
+                *b.QueueAddTo(EPD(0x6509B0)),
             ],
         )
     else:
@@ -40,7 +40,7 @@ def cpset(a, b):
             a,
             [
                 SetMemory(0x6509B0, SetTo, b),
-                a.QueueAddTo(EPD(0x6509B0)),
+                *a.QueueAddTo(EPD(0x6509B0)),
             ],
         )
     from ..eudlib.memiof.modcurpl import f_setcurpl2cpcache
@@ -59,8 +59,8 @@ def iset(a, b, modifier, v):
             return VProc(
                 [a, b, v],
                 [
-                    a.QueueAssignTo(EPD(v.getDestAddr())),
-                    b.QueueAddTo(EPD(v.getDestAddr())),
+                    *a.QueueAssignTo(EPD(v.getDestAddr())),
+                    *b.QueueAddTo(EPD(v.getDestAddr())),
                     v.SetModifier(modifier),
                 ],
             )
@@ -70,7 +70,7 @@ def iset(a, b, modifier, v):
             [a, v],
             [
                 v.SetDest(b),
-                a.QueueAddTo(EPD(v.getDestAddr())),
+                *a.QueueAddTo(EPD(v.getDestAddr())),
                 v.SetModifier(modifier),
             ],
         )
@@ -79,8 +79,8 @@ def iset(a, b, modifier, v):
         VProc(
             [a, b],
             [
-                a.QueueAssignTo(EPD(set_v) + 4),
-                b.QueueAddTo(EPD(set_v) + 4),
+                *a.QueueAssignTo(EPD(set_v) + 4),
+                *b.QueueAddTo(EPD(set_v) + 4),
             ],
         )
     else:
@@ -90,7 +90,7 @@ def iset(a, b, modifier, v):
             a,
             [
                 SetMemory(set_v + 16, SetTo, b),
-                a.QueueAddTo(EPD(set_v) + 4),
+                *a.QueueAddTo(EPD(set_v) + 4),
             ],
         )
     return RawTrigger(actions=set_v)
@@ -106,7 +106,7 @@ def isub(a, b, v):
             SetMemoryXEPD(dst, Add, -1, 0x55555555),
             SetMemoryXEPD(dst, Add, -1, 0xAAAAAAAA),
             SetMemoryEPD(dst, Add, 1),
-            v.QueueAddTo(dst),
+            *v.QueueAddTo(dst),
         ],
     )
     return trg(
@@ -128,8 +128,8 @@ def iand(a, b, v):
             VProc(
                 [a, b],
                 [
-                    a.QueueAssignTo(EPD(write) + 4),
-                    b.QueueAddTo(EPD(write) + 4),
+                    *a.QueueAssignTo(EPD(write) + 4),
+                    *b.QueueAddTo(EPD(write) + 4),
                 ],
             )
         else:
@@ -139,7 +139,7 @@ def iand(a, b, v):
                 a,
                 [
                     SetMemory(write + 16, SetTo, b),
-                    a.QueueAddTo(EPD(write) + 4),
+                    *a.QueueAddTo(EPD(write) + 4),
                 ],
             )
         return RawTrigger(actions=write)
@@ -152,9 +152,9 @@ def iand(a, b, v):
         VProc(
             [a, b, v],
             [
-                a.QueueAssignTo(EPD(write) + 4),
-                b.QueueAddTo(EPD(write) + 4),
-                v.QueueAssignTo(EPD(write)),
+                *a.QueueAssignTo(EPD(write) + 4),
+                *b.QueueAddTo(EPD(write) + 4),
+                *v.QueueAssignTo(EPD(write)),
             ],
         )
     else:
@@ -165,8 +165,8 @@ def iand(a, b, v):
             [a, v],
             [
                 SetMemory(write + 16, SetTo, b),
-                a.QueueAddTo(EPD(write) + 4),
-                v.QueueAssignTo(EPD(write)),
+                *a.QueueAddTo(EPD(write) + 4),
+                *v.QueueAssignTo(EPD(write)),
             ],
         )
     return RawTrigger(
@@ -188,8 +188,8 @@ def ior(a, b, v):
             VProc(
                 [a, b],
                 [
-                    a.QueueAssignTo(EPD(write) + 4),
-                    b.QueueAddTo(EPD(write) + 4),
+                    *a.QueueAssignTo(EPD(write) + 4),
+                    *b.QueueAddTo(EPD(write) + 4),
                 ],
             )
         else:
@@ -199,7 +199,7 @@ def ior(a, b, v):
                 a,
                 [
                     SetMemory(write + 16, SetTo, b),
-                    a.QueueAddTo(EPD(write) + 4),
+                    *a.QueueAddTo(EPD(write) + 4),
                 ],
             )
         return RawTrigger(actions=write)
@@ -214,9 +214,9 @@ def ior(a, b, v):
         VProc(
             [a, b, v],
             [
-                a.QueueAssignTo(EPD(write) + 4),
-                b.QueueAddTo(EPD(write) + 4),
-                v.QueueAssignTo(EPD(write)),
+                *a.QueueAssignTo(EPD(write) + 4),
+                *b.QueueAddTo(EPD(write) + 4),
+                *v.QueueAssignTo(EPD(write)),
             ],
         )
     else:
@@ -226,8 +226,8 @@ def ior(a, b, v):
             [a, v],
             [
                 SetMemory(write + 16, SetTo, b),
-                a.QueueAddTo(EPD(write) + 4),
-                v.QueueAssignTo(EPD(write)),
+                *a.QueueAddTo(EPD(write) + 4),
+                *v.QueueAssignTo(EPD(write)),
             ],
         )
     return RawTrigger(actions=write)
@@ -245,13 +245,13 @@ def ixor(a, b, v):
 
     dst = EPD(v.getDestAddr())
     if not (IsEUDVariable(a) or IsEUDVariable(b)):
-        VProc(v, [v.QueueAddTo(a + b), v.SetMask(0x55555555)])
+        VProc(v, [*v.QueueAddTo(a + b), v.SetMask(0x55555555)])
     elif IsEUDVariable(a) and IsEUDVariable(b):
         VProc(
             [a, b, v],
             [
-                a.QueueAssignTo(dst),
-                b.QueueAddTo(dst),
+                *a.QueueAssignTo(dst),
+                *b.QueueAddTo(dst),
                 v.SetMask(0x55555555),
                 v.SetModifier(Add),
             ],
@@ -262,8 +262,8 @@ def ixor(a, b, v):
         VProc(
             [a, v],
             [
-                a.QueueAddTo(dst),
-                v.QueueAddTo(b),
+                *a.QueueAddTo(dst),
+                *v.QueueAddTo(b),
                 v.SetMask(0x55555555),
             ],
         )

@@ -21,7 +21,7 @@ class PVariable(_EUDVArray8):
             self._epd,
             [
                 value.SetDest(348 // 4),
-                self._epd.QueueAddTo(ut.EPD(value.getDestAddr())),
+                *self._epd.QueueAddTo(ut.EPD(value.getDestAddr())),
                 c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
                 c.SetNextPtr(value.GetVTable(), nptr),
             ],
@@ -58,9 +58,7 @@ class PVariable(_EUDVArray8):
                 self._pveudset(index, value)
             else:
                 a0 = c.Forward()
-                cs.DoActions(
-                    c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4)
-                )
+                cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
                 for k in range(2, -1, -1):
                     c.RawTrigger(
                         conditions=index.AtLeastX(1, 2**k),
@@ -75,7 +73,7 @@ class PVariable(_EUDVArray8):
                 self._epd,
                 [
                     c.SetMemory(a0 + 16, c.SetTo, 348 // 4),
-                    self._epd.QueueAddTo(ut.EPD(a0 + 16)),
+                    *self._epd.QueueAddTo(ut.EPD(a0 + 16)),
                 ],
             )
             for k in range(3):

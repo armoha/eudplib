@@ -307,7 +307,7 @@ class StringBuffer(c.EUDStruct):
             f_cpstr_print(*args, EOS=False)
             cs.DoActions(
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                c.SetCurrentPlayer(f_getuserplayerid()),
+                *c.SetCurrentPlayer(f_getuserplayerid()),
                 c.DisplayText(self.StringIndex),
             )
 
@@ -322,7 +322,7 @@ class StringBuffer(c.EUDStruct):
             f_cpstr_print(*args, EOS=False)
             cs.DoActions(
                 c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
-                c.SetCurrentPlayer(f_getuserplayerid()),
+                *c.SetCurrentPlayer(f_getuserplayerid()),
             )
             self.DisplayAt(line)
 

@@ -39,9 +39,7 @@ def _read_epd_func(
             )
             init = c.NextTrigger()
 
-        cs.DoActions(
-            [retv.SetNumber(initval) for retv, initval in zip(ret, initvals)]
-        )
+        cs.DoActions([retv.SetNumber(initval) for retv, initval in zip(ret, initvals)])
 
         for nth, i in enumerate(ut.bits(mask)):
             if all(arg[nth] == 0 for arg in args):
@@ -56,9 +54,7 @@ def _read_epd_func(
             )
 
         done << c.NextTrigger()
-        cp.f_setcurpl2cpcache(
-            actions=c.SetNextPtr(check, init) if _check_empty else []
-        )
+        cp.f_setcurpl2cpcache(actions=c.SetNextPtr(check, init) if _check_empty else [])
         # return ut.List2Assignable(ret)
 
     return readerfunc
@@ -74,9 +70,7 @@ def f_readgen_epd(
     initvals = tuple(arg[0] for arg in args)
     vals = tuple(tuple(arg[1](i) for i in ut.bits(mask)) for arg in args)
 
-    readerfunc = _read_epd_func(
-        mask, initvals, *vals, _check_empty=_check_empty
-    )
+    readerfunc = _read_epd_func(mask, initvals, *vals, _check_empty=_check_empty)
     if docstring:
         readerfunc.__doc__ = docstring
     return readerfunc
@@ -93,9 +87,7 @@ def _read_cp_func(
     @c.EUDFunc
     def reader():
         ret = reader._frets
-        init_actions = [
-            retv.SetNumber(initval) for retv, initval in zip(ret, initvals)
-        ]
+        init_actions = [retv.SetNumber(initval) for retv, initval in zip(ret, initvals)]
         if _check_empty:
             check, read_start = c.Forward(), c.Forward()
             init_actions.append(c.SetNextPtr(check, read_start))
@@ -151,9 +143,7 @@ def f_readgen_cp(
     initvals = tuple(arg[0] for arg in args)
     vals = tuple(tuple(arg[1](i) for i in ut.bits(mask)) for arg in args)
 
-    readerfunc = _read_cp_func(
-        mask, initvals, *vals, _check_empty=_check_empty
-    )
+    readerfunc = _read_cp_func(mask, initvals, *vals, _check_empty=_check_empty)
     if docstring:
         readerfunc.__doc__ = docstring
     return readerfunc
@@ -171,12 +161,8 @@ def _map_xy_mask():
     return x, y
 
 
-f_cunitread_epd = f_readgen_epd(
-    0x3FFFF0, (0x400008, lambda x: x), _check_empty=True
-)
-f_cunitread_cp = f_readgen_cp(
-    0x3FFFF0, (0x400008, lambda x: x), _check_empty=True
-)
+f_cunitread_epd = f_readgen_epd(0x3FFFF0, (0x400008, lambda x: x), _check_empty=True)
+f_cunitread_cp = f_readgen_cp(0x3FFFF0, (0x400008, lambda x: x), _check_empty=True)
 f_cunitepdread_epd = f_readgen_epd(
     0x3FFFF0,
     (0x400008, lambda x: x),
@@ -217,12 +203,8 @@ f_spriteepdread_cp = f_readgen_cp(
     (0x188000 - 0x58A364 // 4, lambda y: y // 4),
     _check_empty=True,
 )
-f_spriteread_epd = f_readgen_epd(
-    0x1FFFC, (0x620000, lambda x: x), _check_empty=True
-)
-f_spriteread_cp = f_readgen_cp(
-    0x1FFFC, (0x620000, lambda x: x), _check_empty=True
-)
+f_spriteread_epd = f_readgen_epd(0x1FFFC, (0x620000, lambda x: x), _check_empty=True)
+f_spriteread_cp = f_readgen_cp(0x1FFFC, (0x620000, lambda x: x), _check_empty=True)
 
 
 def _posread_epd():

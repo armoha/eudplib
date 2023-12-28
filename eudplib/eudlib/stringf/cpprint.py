@@ -175,7 +175,7 @@ def f_cpstr_addptr(number):
     """
     digit = [c.EUDLightVariable() for _ in range(8)]
     cs.DoActions(
-        [digit[i].SetNumber(0) for i in range(8)],
+        *[digit[i].SetNumber(0) for i in range(8)],
         c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
     )
 
@@ -203,12 +203,15 @@ def f_cpstr_addptr(number):
                         0,
                     ),
                 )
-            cs.DoActions(
-                c.AddCurrentPlayer(1),
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0)
-                if i == 16
-                else [],
-            )
+            if i == 16:
+                cs.DoActions(
+                    *c.AddCurrentPlayer(1),
+                    c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
+                )
+            else:
+                cs.DoActions(
+                    *c.AddCurrentPlayer(1),
+                )
 
 
 def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
@@ -248,8 +251,7 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
             f_cpstr_addptr(arg._value)
         else:
             raise ut.EPError(
-                "Object with unknown parameter type %s given to f_cpprint."
-                % type(arg)
+                f"Object with unknown parameter type {type(arg)} given to f_cpprint."
             )
     if EOS:
         cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
