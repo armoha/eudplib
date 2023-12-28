@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 import struct
-from collections.abc import Iterable
+from collections.abc import Sequence
 from typing import Literal, TypeAlias, overload
 
 from typing_extensions import Self
@@ -34,15 +34,6 @@ def GetTriggerCounter() -> int:  # noqa: N802
 # Aux
 
 
-def _bool2cond(x: bool | Condition) -> Condition:
-    if x is True:
-        return Condition(0, 0, 0, 0, 0, 22, 0, 0)  # Always
-    elif x is False:
-        return Condition(0, 0, 0, 0, 0, 23, 0, 0)  # Never
-    else:
-        return x
-
-
 @overload
 def Disabled(arg: Condition) -> Condition:
     ...
@@ -60,8 +51,8 @@ def Disabled(arg: Condition | Action) -> Condition | Action:  # noqa: N802
 
 
 Trigger: TypeAlias = ConstExpr | int | None
-_Condition: TypeAlias = Condition | bool | Iterable[Condition | bool | Iterable]
-_Action: TypeAlias = Action | Iterable[Action | Iterable]
+_Condition: TypeAlias = Condition | bool | Sequence[Condition | bool]
+_Action: TypeAlias = Action | Sequence[Action]
 
 
 class RawTrigger(EUDObject):
@@ -128,17 +119,24 @@ class RawTrigger(EUDObject):
             if conditions is None:
                 conditions = []
             conditions = ut.FlattenList(conditions)
-            _conditions: list[Condition] = list(map(_bool2cond, conditions))
 
             if actions is None:
                 actions = []
             actions = ut.FlattenList(actions)
 
-            ut.ep_assert(len(_conditions) <= 16, _("Too many conditions"))
-            ut.ep_assert(len(actions) <= 64, _("Too many actions"))
+            if len(conditions) > 16:
+                raise ut.EPError(_("Too many conditions"))
+            if len(actions) > 64:
+                raise ut.EPError(_("Too many actions"))
 
             # Register condition/actions to trigger
-            for i, cond in enumerate(_conditions):
+            for i, cond in enumerate(conditions):
+                if isinstance(cond, bool):
+                    if cond is True:
+                        cond = Condition(0, 0, 0, 0, 0, 22, 0, 0)  # Always
+                    else:
+                        cond = Condition(0, 0, 0, 0, 0, 23, 0, 0)  # Never
+                    conditions[i] = cond
                 cond.CheckArgs(i)
                 cond.SetParentTrigger(self, i)
 
@@ -146,7 +144,7 @@ class RawTrigger(EUDObject):
                 act.CheckArgs(i)
                 act.SetParentTrigger(self, i)
 
-            self._conditions = _conditions
+            self._conditions = conditions
             self._actions = actions
             self._flags = 4 if preserved else 0
 
