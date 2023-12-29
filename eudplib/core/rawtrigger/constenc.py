@@ -9,8 +9,8 @@ from collections.abc import Callable, Mapping
 from typing import TypeAlias, overload
 
 from ...localize import _
-from .. import variable as ev
 from ...utils import EPError, ExprProxy, unProxy
+from .. import variable as ev
 from ..mapdata import GetPropertyIndex, UnitProperty
 from .consttype import (
     Byte,

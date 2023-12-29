@@ -39,7 +39,9 @@ def _read_epd_func(
             )
             init = c.NextTrigger()
 
-        cs.DoActions([retv.SetNumber(initval) for retv, initval in zip(ret, initvals)])
+        cs.DoActions(
+            [retv.SetNumber(initval) for retv, initval in zip(ret, initvals)]
+        )
 
         for nth, i in enumerate(ut.bits(mask)):
             if all(arg[nth] == 0 for arg in args):
@@ -54,7 +56,9 @@ def _read_epd_func(
             )
 
         done << c.NextTrigger()
-        cp.f_setcurpl2cpcache(actions=c.SetNextPtr(check, init) if _check_empty else [])
+        cp.f_setcurpl2cpcache(
+            actions=c.SetNextPtr(check, init) if _check_empty else []
+        )
         # return ut.List2Assignable(ret)
 
     return readerfunc
@@ -87,7 +91,9 @@ def _read_cp_func(
     @c.EUDFunc
     def reader():
         ret = reader._frets
-        init_actions = [retv.SetNumber(initval) for retv, initval in zip(ret, initvals)]
+        init_actions = [
+            retv.SetNumber(initval) for retv, initval in zip(ret, initvals)
+        ]
         if _check_empty:
             check, read_start = c.Forward(), c.Forward()
             init_actions.append(c.SetNextPtr(check, read_start))

@@ -109,7 +109,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
         index = unProxy(unProxy)
         if not isinstance(index, int) or 0 <= index < size:
             return
-        e = _("index out of bounds: the length of EUDVArray is {} but the index is {}")  # noqa: E501
+        e = _(
+            "index out of bounds: the length of EUDVArray is {} but the index is {}"
+        )  # noqa: E501
         raise EPError(e.format(size, index))
 
     class _EUDVArray(ExprProxy):
@@ -875,7 +877,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val))
+                return EUDNot(
+                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val)
+                )
             raise AttributeError
 
         def leitem(self, i, val) -> bt.Condition:
@@ -895,7 +899,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val))
+                return EUDNot(
+                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val)
+                )
             raise AttributeError
 
         def gtitem(self, i, val):
@@ -903,7 +909,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val))
+                return EUDNot(
+                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val)
+                )
             raise AttributeError
 
     return _EUDVArray

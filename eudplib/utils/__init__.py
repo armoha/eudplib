@@ -25,8 +25,8 @@ from .eperror import (
 from .etc import (
     EPD,
     Assignable2List,
-    FlattenList,
     FlattenIter,
+    FlattenList,
     List2Assignable,
     SCMD2Text,
     _rand_lst,
@@ -58,6 +58,7 @@ __all__ = [
     "ep_warn",
     "EPD",
     "Assignable2List",
+    "FlattenIter",
     "FlattenList",
     "List2Assignable",
     "SCMD2Text",

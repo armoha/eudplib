@@ -58,7 +58,9 @@ class EUDByteReader:
         case = [c.Forward() for _ in range(5)]
         ret = _ev[4]
 
-        cs.DoActions(self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0))
+        cs.DoActions(
+            self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0)
+        )
 
         for i in range(4):
             case[i] << c.NextTrigger()
@@ -136,11 +138,15 @@ class EUDByteWriter:
             cs.EUDBreak()
         for i in range(1, 4):
             if cs.EUDSwitchCase()(i):
-                cs.DoActions(c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)))
+                cs.DoActions(
+                    c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i))
+                )
                 for j in _rand_lst(range(8)):
                     c.RawTrigger(
                         conditions=byte.AtLeastX(1, 2**j),
-                        actions=c.SetMemory(self._write + 348, c.Add, 2 ** (j + i * 8)),
+                        actions=c.SetMemory(
+                            self._write + 348, c.Add, 2 ** (j + i * 8)
+                        ),
                     )
                 cs.EUDBreak()
 

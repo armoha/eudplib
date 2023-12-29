@@ -9,8 +9,9 @@ import functools
 import os.path
 import random
 import sys
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from typing import Any, TypeVar, overload
+
 from .. import core as c
 
 T = TypeVar("T")
@@ -99,7 +100,7 @@ def FlattenList(lst: Any, ret=None) -> list:  # noqa: N802
         return ret
 
 
-def FlattenIter(lst: Any):  # noqa: N802
+def FlattenIter(lst: Any) -> Iterator:  # noqa: N802
     if isinstance(lst, _string_types) or hasattr(lst, "dont_flatten"):
         yield lst
     else:

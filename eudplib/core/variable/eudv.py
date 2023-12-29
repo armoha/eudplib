@@ -22,7 +22,6 @@ from ...utils import (
     _rand_lst,
     ep_assert,
     ep_warn,
-    isUnproxyInstance,
     unProxy,
 )
 from .. import rawtrigger as bt
@@ -277,7 +276,9 @@ class EUDVariable(VariableBase):
             _("Unexpected modifier {}").format(modifier),
         )
         modifier = bt.EncodeModifier(modifier) << 24
-        return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000)
+        return bt.SetDeathsX(
+            EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000
+        )
 
     # -------
 
@@ -627,7 +628,9 @@ class EUDVariable(VariableBase):
             ep_warn(_("{}: Comparing with temporary variable.").format(err))
             traceback.print_stack()
             t = EUDVariable()
-            SeqCompute(((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other)))
+            SeqCompute(
+                ((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other))
+            )
             return t.Exactly(0)
 
     def __gt__(self, other):
@@ -694,7 +697,9 @@ def VProc(v: EUDVariable, actions) -> bt.RawTrigger:
 
 
 @overload
-def VProc(v: Sequence[EUDVariable], actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
+def VProc(
+    v: Sequence[EUDVariable], actions
+) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
     ...
 
 
@@ -784,7 +789,11 @@ def _seqcompute_sub(assignpairs, _srcdict):
         if prev_nptr is None or vt_nextptr.expr is not prev_nptr.expr:
             non_const_actions.append(bt.SetNextPtr(src.GetVTable(), vt_nextptr))
 
-        _srcdict[src] = (dst if dst else prev_dst, mdt if mdt else prev_mdt, vt_nextptr)
+        _srcdict[src] = (
+            dst if dst else prev_dst,
+            mdt if mdt else prev_mdt,
+            vt_nextptr,
+        )
 
     for dst, mdt, src in assignpairs[const_assigning_index:]:
         dst = _get_computedest(dst)
@@ -945,7 +954,9 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:  # noqa: N802
         raise errlist[0]
     elif errlist:
         if sys.version_info >= (3, 11):
-            raise ExceptionGroup(_("Multiple error occurred on SetVariables:"), errlist)
+            raise ExceptionGroup(
+                _("Multiple error occurred on SetVariables:"), errlist
+            )
         else:
             raise EPError(_("Multiple error occurred on SetVariables:"), errlist)
 
