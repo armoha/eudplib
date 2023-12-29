@@ -27,36 +27,30 @@ def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
     if c.IsEUDVariable(p):
         if sys.getrefcount(p) <= 2:
             mask = 0b111
-            c.RawTrigger(
-                actions=[
-                    p.AddNumber(-0x58A364),
-                    p.SetNumberX(0, mask >> 1),
-                ]
-                + [
-                    p.SubtractNumberX((mask >> 1) << t, mask << t)
-                    for t in range(30)
-                ]
+            actions = [
+                p.AddNumber(-0x58A364),
+                p.SetNumberX(0, mask >> 1),
+            ]
+            actions.extend(
+                p.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(30)
             )
+            c.RawTrigger(actions=actions)
             return p
         if not hasattr(EPD, "_eudf"):
             c.PushTriggerScope()
             setter = c.SetDeaths(0, c.SetTo, 0, 0)
             vaddr = setter + 20
             mask = 0b111
-            ftrg = c.RawTrigger(
-                nextptr=0,
-                actions=[
-                    c.SetMemory(vaddr, c.Add, -0x58A364),
-                    c.SetMemoryX(vaddr, c.SetTo, 0, mask >> 1),
-                ]
-                + [
-                    c.SetMemoryX(
-                        vaddr, c.Subtract, (mask >> 1) << t, mask << t
-                    )
-                    for t in range(30)
-                ]
-                + [setter],
+            actions = [
+                c.SetMemory(vaddr, c.Add, -0x58A364),
+                c.SetMemoryX(vaddr, c.SetTo, 0, mask >> 1),
+            ]
+            actions.extend(
+                c.SetMemoryX(vaddr, c.Subtract, (mask >> 1) << t, mask << t)
+                for t in range(30)
             )
+            actions.append(setter)
+            ftrg = c.RawTrigger(nextptr=0, actions=actions)
             c.PopTriggerScope()
 
             setattr(EPD, "_eudf", (ftrg, setter))
@@ -84,13 +78,14 @@ def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
 
 # -------
 
-_stringTypes = (bytes, str)
+_string_types = (bytes, str)
 
-def FlattenList(lst: Any, ret = None) -> list:  # noqa: N802
+
+def FlattenList(lst: Any, ret=None) -> list:  # noqa: N802
     if ret is None:
         ret = []
 
-    if isinstance(lst, _stringTypes) or hasattr(lst, "dont_flatten"):
+    if isinstance(lst, _string_types) or hasattr(lst, "dont_flatten"):
         ret.append(lst)
         return ret
 
@@ -104,8 +99,8 @@ def FlattenList(lst: Any, ret = None) -> list:  # noqa: N802
         return ret
 
 
-def FlattenIter(lst: Any):
-    if isinstance(lst, _stringTypes) or hasattr(lst, "dont_flatten"):
+def FlattenIter(lst: Any):  # noqa: N802
+    if isinstance(lst, _string_types) or hasattr(lst, "dont_flatten"):
         yield lst
     else:
         try:
@@ -113,7 +108,6 @@ def FlattenIter(lst: Any):
                 yield from FlattenIter(item)
         except TypeError:
             yield lst
-
 
 
 def List2Assignable(lst: Sequence[T]) -> T | Sequence[T]:  # noqa: N802

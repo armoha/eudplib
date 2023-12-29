@@ -230,7 +230,7 @@ def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: _ExprProxy) -> _Dw
 
 
 def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: _Arg) -> _Dword:  # noqa: N802
-    if type(s) is int:
+    if isinstance(s, int):
         return s
 
     u = ut.unProxy(s)

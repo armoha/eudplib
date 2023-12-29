@@ -114,8 +114,18 @@ class Condition(ConstExpr):
         return _("Invalid fields for condition{} {}:").format(i, condname)
 
     def CheckArgs(self, i: int) -> None:  # noqa: N802
-        if all(IsConstExpr(field) for field in self.fields[:3]) and all(
-            isinstance(field, int) for field in self.fields[3:]
+        fields = self.fields
+
+        if (
+            IsConstExpr(fields[0])
+            and IsConstExpr(fields[1])
+            and IsConstExpr(fields[2])
+            and isinstance(fields[3], int)
+            and isinstance(fields[4], int)
+            and isinstance(fields[5], int)
+            and isinstance(fields[6], int)
+            and isinstance(fields[7], int)
+            and isinstance(fields[8], int)
         ):
             return
 
@@ -131,7 +141,7 @@ class Condition(ConstExpr):
             "flags",
             "maskflag",
         ]
-        condtype = self.fields[5]
+        condtype = fields[5]
         if isinstance(condtype, int):
             if condtype == 15:
                 fieldname[0] = "bitmask"
@@ -141,7 +151,7 @@ class Condition(ConstExpr):
             if condtype in (9, 19, 21):
                 fieldname[6] = "scoretype"
 
-        for i, field in enumerate(self.fields):
+        for i, field in enumerate(fields):
             if (i < 3 and not IsConstExpr(field)) or (
                 i >= 3 and not isinstance(field, int)
             ):
@@ -152,13 +162,12 @@ class Condition(ConstExpr):
         raise ut.EPError("\n".join(error))
 
     def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:  # noqa: N802
-        ut.ep_assert(
-            self.parenttrg is None,
-            _("Condition cannot be shared by two triggers."),
-        )
-
-        ut.ep_assert(trg is not None, _("Trigger should not be null."))
-        ut.ep_assert(0 <= index < 16, _("Condition index should be 0 to 15"))
+        if self.parenttrg is not None:
+            raise ut.EPError(_("Condition cannot be shared by two triggers."))
+        if trg is None:
+            raise ut.EPError(_("Trigger should not be null."))
+        if not (0 <= index < 16):
+            raise ut.EPError(_("Condition index should be 0 to 15"))
 
         self.parenttrg = trg
         self.condindex = index

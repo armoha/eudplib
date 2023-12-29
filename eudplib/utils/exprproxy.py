@@ -24,9 +24,7 @@ class ExprProxy(Generic[T_co]):
         try:
             return cls(_from=_from)
         except TypeError as e:
-            raise TypeError(
-                _("Type {} is not castable").format(cls.__name__), e
-            )
+            raise TypeError(_("Type {} is not castable").format(cls.__name__), e)
 
     def getValue(self) -> T_co:  # noqa: N802
         return self._value
@@ -210,6 +208,8 @@ _ClassInfo: TypeAlias = type | types.UnionType | tuple["_ClassInfo", ...]
 
 
 def isUnproxyInstance(x: object, cls: _ClassInfo) -> bool:  # noqa: N802
+    if isinstance(x, cls):
+        return True
     if isinstance(unProxy(x), cls):
         return True
     return False
