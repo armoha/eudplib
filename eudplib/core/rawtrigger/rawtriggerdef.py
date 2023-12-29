@@ -117,17 +117,18 @@ class RawTrigger(EUDObject):
         if trigSection is None:
             # Normalize conditions/actions
             if conditions is None:
-                conditions = []
-            conditions = ut.FlattenIter(conditions)
+                _conditions = []
+            else:
+                _conditions = ut.FlattenIter(conditions)
 
             if actions is None:
-                actions = []
+                _actions = []
             else:
-                actions = ut.FlattenIter(actions)
+                _actions = ut.FlattenIter(actions)
 
             # Register condition/actions to trigger
-            _conditions = []
-            for i, cond in enumerate(conditions):
+            conditions = []
+            for i, cond in enumerate(_conditions):
                 if i >= 16:
                     raise ut.EPError(_("Too many conditions"))
                 if isinstance(cond, bool):
@@ -137,18 +138,18 @@ class RawTrigger(EUDObject):
                         cond = Condition(0, 0, 0, 0, 0, 23, 0, 0)  # Never
                 cond.CheckArgs(i)
                 cond.SetParentTrigger(self, i)
-                _conditions.append(cond)
+                conditions.append(cond)
 
-            _actions = []
-            for i, act in enumerate(actions):
+            actions = []
+            for i, act in enumerate(_actions):
                 if i >= 64:
                     raise ut.EPError(_("Too many actions"))
                 act.CheckArgs(i)
                 act.SetParentTrigger(self, i)
-                _actions.append(act)
+                actions.append(act)
 
-            self._conditions = _conditions
-            self._actions = _actions
+            self._conditions: list[Condition] = conditions  # type: ignore[assignment]
+            self._actions: list[Action] = actions  # type: ignore[assignment]
             self._flags = 4 if preserved else 0
 
         # Uses trigger segment for initialization

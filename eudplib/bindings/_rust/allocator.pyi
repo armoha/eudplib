@@ -5,6 +5,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from collections.abc import Iterator
 from typing import Any, Callable
 
 from typing_extensions import Self
@@ -26,7 +27,7 @@ class PayloadBuffer:
     def WriteBytes(self, b: bytes) -> None: ...  # noqa: N802
     def WriteSpace(self, ssize: int) -> None: ...  # noqa: N802
     def _write_trigger(
-        self, prevptr, nextptr, conditions: list, actions: list, flags
+        self, prevptr, nextptr, conditions: Iterator, actions: Iterator, flags
     ) -> None: ...
 
 class PayloadBuilder:
