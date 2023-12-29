@@ -210,8 +210,6 @@ _ClassInfo: TypeAlias = type | types.UnionType | tuple["_ClassInfo", ...]
 
 
 def isUnproxyInstance(x: object, cls: _ClassInfo) -> bool:  # noqa: N802
-    if isinstance(x, cls):
-        return True
     if isinstance(unProxy(x), cls):
         return True
     return False

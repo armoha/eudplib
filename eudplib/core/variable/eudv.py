@@ -686,7 +686,7 @@ class EUDVariable(VariableBase):
 
 
 def IsEUDVariable(x: object) -> bool:  # noqa: N802
-    return isUnproxyInstance(x, EUDVariable)
+    return isinstance(unProxy(x), EUDVariable)
 
 
 # ---------
