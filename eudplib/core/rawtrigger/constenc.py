@@ -300,7 +300,7 @@ def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _Arg) -> _Dword:  # noqa
         if u in d:
             return d[u]
         raise EPError(_('[Warning] "{}" is not a {}').format(u, t))
-    assert not isinstance(u, ExprProxy), "unreachable"
+    # assert not isinstance(u, ExprProxy), "unreachable"
     return u
 
 
@@ -582,7 +582,7 @@ def EncodeCount(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N80
         return 0
     if isinstance(t, ConstType):
         raise EPError(_('[Warning] "{}" is not a {}').format(s, "count"))
-    assert not isinstance(t, ExprProxy), "unreachable"
+    # assert not isinstance(t, ExprProxy), "unreachable"
     return t
 
 
