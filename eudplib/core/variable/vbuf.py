@@ -66,26 +66,23 @@ class EUDVarBuffer(EUDObject):
         emitbuffer.WriteByte(0)  # nocond
         emitbuffer.WriteSpace(16)
 
-        output = bytearray(72 * len(self._initvals))
-
-        for i in range(len(self._initvals)):
-            # 'preserve rawtrigger'
-            output[72 * i : 72 * i + 4] = b"\xFF\xFF\xFF\xFF"
-            output[72 * i + 24 : 72 * i + 28] = b"\0\0\x2D\x07"
-            output[72 * i + 28 : 72 * i + 32] = b"\0\0SC"
-            output[72 * i + 32 : 72 * i + 36] = b"\x04\0\0\0"
+        output = bytearray(72)
+        output[0:4] = b"\xFF\xFF\xFF\xFF"
+        output[24:36] = b"\0\0\x2D\x07\0\0SC\x04\0\0\0"
+        output = output * len(self._initvals)
 
         heads = 0
         for i, initval in enumerate(self._initvals):
-            heade = 72 * i + 20
             if initval == 0:
                 continue
-            elif isinstance(initval, int):
+
+            heade = i * 72 + 20
+            if isinstance(initval, int):
                 output[heade : heade + 4] = ut.i2b4(initval)
                 continue
             emitbuffer.WriteBytes(bytes(output[heads:heade]))
             emitbuffer.WriteDword(initval)
-            heads = 72 * i + 24
+            heads = heade + 4
 
         emitbuffer.WriteBytes(bytes(output[heads:]))
 
@@ -170,7 +167,7 @@ class EUDCustomVarBuffer(EUDObject):
                 if not isinstance(initval, int):
                     emitbuffer.WriteDword(initval)
 
-    def WritePayload(self, emitbuffer):  # noqa: N802
+    def WritePayload(self, emitbuffer) -> None:  # noqa: N802
         output = bytearray(72 * (len(self._actnptr_pairs) + len(self._5acts)))
 
         emitbuffer.WriteSpace(4)
