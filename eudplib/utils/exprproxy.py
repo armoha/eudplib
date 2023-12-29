@@ -172,19 +172,37 @@ def unProxy(x: T) -> T:
 
 
 def unProxy(x):  # noqa: N802
-    objlist = []
-    objlist.clear()
+    k = 0
+
+    # Cyclic check without using list/set
+    # xCyclicCheck = ((lambda x: x.getValue) ** (2**n))(x)
+    # if there is a cycle, x will go though the cycle and meet with xCyclicCheck
+    # since (2**n) diverges, this code can catch cycles up to any size.
+    xCyclicCheck = x0 = x
     while isinstance(x, ExprProxy):
-        if any(x is e for e in objlist):
-            objlist.append(x)
+        x = x.getValue()
+        if x is xCyclicCheck:
+            # Reconstruct cyclic reference
             err = _("ExprProxy {} has cyclic references: ")
+            xList = []
+            xSet = set()
+
+            x = x0
+            while x not in xSet:
+                xList.append(x)
+                xSet.add(x)
+                x = x.getValue()
 
             raise RecursionError(
-                err.format(objlist[0]),
-                objlist,
+                err.format(xList[0]),
+                xList,
             )
-        objlist.append(x)
-        x = x.getValue()
+
+        k += 1
+        # only becomes true if k == 2**i for some integer i
+        if k & (k - 1) == 0:
+            xCyclicCheck = x
+
     return x
 
 
