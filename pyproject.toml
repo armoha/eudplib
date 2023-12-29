@@ -39,8 +39,8 @@ classifiers = [
 requires-python = ">=3.7"
 
 [project.urls]
-homepage = "https://github.com/armoha/eudplib/blob/main/docs/funclist.txt"
-documentation = "https://cryptography.io/"
+homepage = "https://github.com/armoha/eudplib/"
+documentation = "https://github.com/armoha/eudplib/blob/main/docs/funclist.txt"
 source = "https://github.com/armoha/eudplib/"
 issues = "https://github.com/armoha/eudplib/issues"
 changelog = "https://github.com/armoha/euddraft/CHANGELOG.md"
@@ -79,8 +79,6 @@ source = [
 [tool.coverage.paths]
 source = [
    "eudplib/",
-   "*.nox/*/lib*/python*/site-packages/cryptography",
-   "*.nox\\*\\Lib\\site-packages\\cryptography",
 ]
 tests =[
    "tests/",
