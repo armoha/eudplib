@@ -1,4 +1,5 @@
 use crate::allocator::pbuffer::PayloadBuffer;
+use crate::allocator::rlocint::{PyRlocInt, RlocInt};
 use indicatif::{ProgressBar, ProgressStyle};
 use pyo3::create_exception;
 use pyo3::intern;
@@ -332,7 +333,7 @@ impl PayloadBuilder {
         })
     }
 
-    fn offset(&self, index: usize) -> u32 {
-        self.alloctable[index]
+    fn get_object_addr(&self, index: usize) -> PyRlocInt {
+        PyRlocInt(RlocInt::new(self.alloctable[index] as i32, 4))
     }
 }
