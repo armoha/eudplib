@@ -234,13 +234,12 @@ class Action(ConstExpr):
         raise ut.EPError("\n".join(error))
 
     def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:  # noqa: N802
-        ut.ep_assert(
-            self.parenttrg is None,
-            _("Actions cannot be shared by two triggers."),
-        )
-
-        ut.ep_assert(trg is not None, _("Trigger should not be null."))
-        ut.ep_assert(0 <= index < 64, _("Triggers out of range"))
+        if self.parenttrg is not None:
+            raise ut.EPError(_("Actions cannot be shared by two triggers."))
+        if trg is None:
+            raise ut.EPError(_("Trigger should not be null."))
+        if not (0 <= index < 64):
+            raise ut.EPError(_("Triggers out of range"))
 
         self.parenttrg = trg
         self.actindex = index
