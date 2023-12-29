@@ -33,9 +33,7 @@ def _branch_sub(
     brtrg = Forward()
     tjtrg = Forward()
     brtrg << RawTrigger(
-        nextptr=onfalse,
-        conditions=conditions,
-        actions=c.SetNextPtr(brtrg, tjtrg),
+        nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg)
     )
     if _actions:
         actions = ut.FlattenList(_actions)

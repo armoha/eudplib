@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 import struct
-from collections.abc import Iterable
+from collections.abc import Sequence
 from typing import Literal, TypeAlias, overload
 
 from typing_extensions import Self
@@ -34,15 +34,6 @@ def GetTriggerCounter() -> int:  # noqa: N802
 # Aux
 
 
-def _bool2cond(x: bool | Condition) -> Condition:
-    if x is True:
-        return Condition(0, 0, 0, 0, 0, 22, 0, 0)  # Always
-    elif x is False:
-        return Condition(0, 0, 0, 0, 0, 23, 0, 0)  # Never
-    else:
-        return x
-
-
 @overload
 def Disabled(arg: Condition) -> Condition:
     ...
@@ -60,8 +51,8 @@ def Disabled(arg: Condition | Action) -> Condition | Action:  # noqa: N802
 
 
 Trigger: TypeAlias = ConstExpr | int | None
-_Condition: TypeAlias = Condition | bool | Iterable[Condition | bool | Iterable]
-_Action: TypeAlias = Action | Iterable[Action | Iterable]
+_Condition: TypeAlias = Condition | bool | Sequence[Condition | bool]
+_Action: TypeAlias = Action | Sequence[Action]
 
 
 class RawTrigger(EUDObject):
@@ -127,20 +118,23 @@ class RawTrigger(EUDObject):
             # Normalize conditions/actions
             if conditions is None:
                 conditions = []
-            else:
-                conditions = map(_bool2cond, ut.FlattenIter(conditions))
+            conditions = ut.FlattenIter(conditions)
 
             if actions is None:
                 actions = []
             else:
                 actions = ut.FlattenIter(actions)
 
-
             # Register condition/actions to trigger
             _conditions = []
             for i, cond in enumerate(conditions):
                 if i >= 16:
                     raise ut.EPError(_("Too many conditions"))
+                if isinstance(cond, bool):
+                    if cond:
+                        cond = Condition(0, 0, 0, 0, 0, 22, 0, 0)  # Always
+                    else:
+                        cond = Condition(0, 0, 0, 0, 0, 23, 0, 0)  # Never
                 cond.CheckArgs(i)
                 cond.SetParentTrigger(self, i)
                 _conditions.append(cond)

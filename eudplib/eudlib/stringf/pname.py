@@ -128,10 +128,7 @@ class _PlayerName:
         self.ptr, self.epd = c.EUDCreateVariables(2)
         self.odds_or_even = c.EUDLightBool()
         self.name_db_list = [c.Db(26) for _ in range(8)]
-        self.basenames, self.baselens = (
-            PVariable(self.name_db_list),
-            PVariable(),
-        )
+        self.basenames, self.baselens = PVariable(self.name_db_list), PVariable()
         self.optimize_start, self.optimize_end = c.Forward(), c.Forward()
         self.odd = [c.Forward() for p in range(8)]
         self.even0 = [c.Forward() for p in range(8)]
@@ -189,9 +186,7 @@ class _PlayerName:
         cs.EUDEndExecuteOnce()
 
         once = c.Forward()
-        cs.EUDJumpIf(
-            [once << c.Memory(0x57F23C, c.Exactly, ~0)], self.optimize_end
-        )
+        cs.EUDJumpIf([once << c.Memory(0x57F23C, c.Exactly, ~0)], self.optimize_end)
         cs.DoActions(
             self.is_chatptr_unchanged.Clear(),
             c.SetMemory(once + 8, c.SetTo, f_getgametick()),
@@ -229,8 +224,7 @@ class _PlayerName:
             if cs.EUDElseIf()(
                 [
                     self.odds_or_even,
-                    self.even0[i]
-                    << c.MemoryXEPD(dst, c.Exactly, 0, 0xFFFF0000),
+                    self.even0[i] << c.MemoryXEPD(dst, c.Exactly, 0, 0xFFFF0000),
                     self.even1[i] << c.MemoryEPD(dst + 1, c.Exactly, 0),
                 ]
             ):
@@ -282,9 +276,7 @@ class _PlayerName:
             c.RawTrigger(
                 conditions=self.odds_or_even.IsSet(),
                 actions=[
-                    c.SetDeaths(
-                        c.CurrentPlayer, c.SetTo, ut.b2i4(b"\r" * 4), 0
-                    ),
+                    c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"\r" * 4), 0),
                     c.AddCurrentPlayer(1),
                 ],
             )

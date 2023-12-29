@@ -55,9 +55,7 @@ class CPByteWriter:
             c.EUDReturn()
         cs.EUDEndIf()
 
-        c.VProc(
-            self._b[0], self._b[0].SetDest(c.EncodePlayer(c.CurrentPlayer))
-        )
+        c.VProc(self._b[0], self._b[0].SetDest(c.EncodePlayer(c.CurrentPlayer)))
         for k in ut._rand_lst(range(8, 32)):
             i, j = divmod(k, 8)
             c.RawTrigger(
@@ -65,7 +63,10 @@ class CPByteWriter:
                 actions=c.SetDeaths(c.CurrentPlayer, c.Add, 2**k, 0),
             )
         cs.DoActions(
-            c.AddCurrentPlayer(1),
+            *c.AddCurrentPlayer(1),
             self._suboffset.SetNumber(0),
-            [self._b[i].SetNumber(ut.b2i1(b"\r")) for i in range(4)],
+            self._b[0].SetNumber(ut.b2i1(b"\r")),
+            self._b[1].SetNumber(ut.b2i1(b"\r")),
+            self._b[2].SetNumber(ut.b2i1(b"\r")),
+            self._b[3].SetNumber(ut.b2i1(b"\r")),
         )

@@ -307,9 +307,7 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):  # noqa: N803
                     proc_arg(i, arg)
             proc_arg(-1, args[-1])
 
-            c.SeqCompute(
-                [(strlens[0], c.Add, strlen) for strlen in strlens[1:]]
-            )
+            c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
         else:
             proc_arg(0, args[0])
     else:
@@ -317,8 +315,6 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):  # noqa: N803
             for i, arg in enumerate(args):
                 proc_arg(i, arg)
         if len(args) >= 2:
-            c.SeqCompute(
-                [(strlens[0], c.Add, strlen) for strlen in strlens[1:]]
-            )
+            c.SeqCompute([(strlens[0], c.Add, strlen) for strlen in strlens[1:]])
 
     return strlens[0]

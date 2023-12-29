@@ -109,9 +109,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
         index = unProxy(unProxy)
         if not isinstance(index, int) or 0 <= index < size:
             return
-        e = _(
-            "index out of bounds: the length of EUDVArray is {} but the index is {}"
-        )  # noqa: E501
+        e = _("index out of bounds: the length of EUDVArray is {} but the index is {}")  # noqa: E501
         raise EPError(e.format(size, index))
 
     class _EUDVArray(ExprProxy):
@@ -188,7 +186,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, dst),
                         bt.SetMemory(bitstrg["ret"] + 48, bt.SetTo, self._epd + 1),
                         bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, nptr),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                     ],
                 )
@@ -196,9 +194,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                 VProc(
                     [self, self._epd],
                     [
-                        self.QueueAssignTo(EPD(bitstrg["end"]) + 1),
+                        *self.QueueAssignTo(EPD(bitstrg["end"]) + 1),
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 86),
-                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        *self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, dst),
                     ],
                 )
@@ -209,7 +207,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         self._epd.SetDest(EPD(bitstrg["ret"]) + 12),
                         bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, nptr),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                     ],
                 )
@@ -227,9 +225,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                 [self, self._epd],
                 [
                     bt.SetMemory(vtproc + 4, bt.SetTo, 72 * i),
-                    self.QueueAddTo(EPD(vtproc) + 1),
+                    *self.QueueAddTo(EPD(vtproc) + 1),
                     bt.SetMemory(a0 + 16, bt.SetTo, 18 * i + 344 // 4),
-                    self._epd.QueueAddTo(EPD(a0) + 4),
+                    *self._epd.QueueAddTo(EPD(a0) + 4),
                 ],
             )
             VProc(
@@ -293,14 +291,14 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        *self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
-                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
                         bt.SetMemoryX(
                             bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
                         ),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -310,13 +308,13 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        *self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
                         bt.SetMemoryX(
                             bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
                         ),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -326,12 +324,12 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=val.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
-                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
                         bt.SetMemoryX(
                             bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
                         ),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -345,7 +343,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetMemoryX(
                             bitstrg["ret"] + 24, bt.SetTo, modifier, 0xFF << 24
                         ),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -415,11 +413,11 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        *self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
-                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -429,9 +427,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=val.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
-                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -531,9 +529,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(0x6509B0, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(0x6509B0)),
+                        *self._epd.QueueAddTo(EPD(0x6509B0)),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
                     ],
@@ -543,7 +541,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
                     ],
@@ -589,9 +587,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(0x6509B0, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(0x6509B0)),
+                        *self._epd.QueueAddTo(EPD(0x6509B0)),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
                     ],
@@ -601,7 +599,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
                     ],
@@ -643,11 +641,11 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        *self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
-                        val.QueueAssignTo(EPD(bitstrg["ret"])),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"])),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -657,10 +655,10 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        *self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
                         bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -670,9 +668,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=val.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
-                        val.QueueAssignTo(EPD(bitstrg["ret"])),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"])),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -683,7 +681,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -715,11 +713,11 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        *self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
-                        val.QueueAssignTo(EPD(bitstrg["ret"])),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"])),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -729,10 +727,10 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
+                        *self._epd.QueueAddTo(EPD(bitstrg["ret"]) + 4),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
                         bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -742,9 +740,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=val.GetVTable(),
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
-                        val.QueueAssignTo(EPD(bitstrg["ret"])),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"])),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -755,7 +753,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     actions=[
                         bt.SetMemory(bitstrg["ret"] + 16, bt.SetTo, self._epd + 87),
                         bt.SetMemory(bitstrg["ret"], bt.SetTo, val),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(bitstrg["end"], nptr),
                     ],
@@ -792,9 +790,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(0x6509B0, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(0x6509B0)),
+                        *self._epd.QueueAddTo(EPD(0x6509B0)),
                         bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
-                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), trg2),
                         bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
                     ],
@@ -804,7 +802,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     actions=[
                         val.SetDest(EPD(bitstrg["ret"]) + 13),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                     ],
                 )
@@ -813,11 +811,11 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=self._epd.GetVTable(),
                     actions=[
                         bt.SetMemory(0x6509B0, bt.SetTo, 87),
-                        self._epd.QueueAddTo(EPD(0x6509B0)),
+                        *self._epd.QueueAddTo(EPD(0x6509B0)),
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
                         bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, val),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
                     ],
@@ -827,7 +825,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=val.GetVTable(),
                     actions=[
                         bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
-                        val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
+                        *val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), trg2),
                         bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
                     ],
@@ -837,7 +835,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     actions=[
                         val.SetDest(EPD(bitstrg["ret"]) + 13),
                         bt.SetNextPtr(val.GetVTable(), i.GetVTable()),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                     ],
                 )
@@ -848,7 +846,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
                         bt.SetMemory(bitstrg["ret"] + 20, bt.SetTo, val),
                         bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, val),
-                        i.QueueAssignTo(_index),
+                        *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
                         bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
                     ],
@@ -877,9 +875,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
-                return EUDNot(
-                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val)
-                )
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val))
             raise AttributeError
 
         def leitem(self, i, val) -> bt.Condition:
@@ -899,9 +895,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
-                return EUDNot(
-                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val)
-                )
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val))
             raise AttributeError
 
         def gtitem(self, i, val):
@@ -909,9 +903,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...eudlib.utilf import EUDNot
 
-                return EUDNot(
-                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val)
-                )
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val))
             raise AttributeError
 
     return _EUDVArray
