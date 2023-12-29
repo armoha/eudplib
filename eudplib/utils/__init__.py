@@ -26,6 +26,7 @@ from .etc import (
     EPD,
     Assignable2List,
     FlattenList,
+    FlattenIter,
     List2Assignable,
     SCMD2Text,
     _rand_lst,
