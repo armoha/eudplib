@@ -11,23 +11,18 @@ import random
 import sys
 from collections.abc import Iterable, Sequence
 from typing import Any, TypeVar, overload
+from .. import core as c
 
 T = TypeVar("T")
 
 
 def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
-    from ..core.allocator.constexpr import IsConstExpr
-
-    if IsConstExpr(p):
+    if c.IsConstExpr(p):
         epd = (p + (-0x58A364)) // 4
         if "ret" in kwargs:
-            from .. import core as c
-
             c.SeqCompute([(kwargs["ret"][0], c.SetTo, epd)])
             return kwargs["ret"][0]
         return epd
-
-    from .. import core as c
 
     if c.IsEUDVariable(p):
         if sys.getrefcount(p) <= 2:
