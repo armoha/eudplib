@@ -11,23 +11,18 @@ import random
 import sys
 from collections.abc import Iterable, Sequence
 from typing import Any, TypeVar, overload
+from .. import core as c
 
 T = TypeVar("T")
 
 
 def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
-    from ..core.allocator.constexpr import IsConstExpr
-
-    if IsConstExpr(p):
+    if c.IsConstExpr(p):
         epd = (p + (-0x58A364)) // 4
         if "ret" in kwargs:
-            from .. import core as c
-
             c.SeqCompute([(kwargs["ret"][0], c.SetTo, epd)])
             return kwargs["ret"][0]
         return epd
-
-    from .. import core as c
 
     if c.IsEUDVariable(p):
         if sys.getrefcount(p) <= 2:
@@ -89,19 +84,36 @@ def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
 
 # -------
 
+_stringTypes = (bytes, str)
 
-def FlattenList(lst: Any) -> list:  # noqa: N802
-    if isinstance(lst, (bytes, str)) or hasattr(lst, "dont_flatten"):
-        return [lst]
+def FlattenList(lst: Any, ret = None) -> list:  # noqa: N802
+    if ret is None:
+        ret = []
+
+    if isinstance(lst, _stringTypes) or hasattr(lst, "dont_flatten"):
+        ret.append(lst)
+        return ret
 
     try:
-        ret = []
         for item in lst:
-            ret.extend(FlattenList(item))
+            FlattenList(item, ret)
         return ret
 
     except TypeError:  # lst is not iterable
-        return [lst]
+        ret.append(lst)
+        return ret
+
+
+def FlattenIter(lst: Any):
+    if isinstance(lst, _stringTypes) or hasattr(lst, "dont_flatten"):
+        yield lst
+    else:
+        try:
+            for item in lst:
+                yield from FlattenIter(item)
+        except TypeError:
+            yield lst
+
 
 
 def List2Assignable(lst: Sequence[T]) -> T | Sequence[T]:  # noqa: N802

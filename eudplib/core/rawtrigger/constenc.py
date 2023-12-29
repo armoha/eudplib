@@ -9,6 +9,7 @@ from collections.abc import Callable, Mapping
 from typing import TypeAlias, overload
 
 from ...localize import _
+from .. import variable as ev
 from ...utils import EPError, ExprProxy, unProxy
 from ..mapdata import GetPropertyIndex, UnitProperty
 from .consttype import (
@@ -300,7 +301,7 @@ def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _Arg) -> _Dword:  # noqa
         if u in d:
             return d[u]
         raise EPError(_('[Warning] "{}" is not a {}').format(u, t))
-    assert not isinstance(u, ExprProxy), "unreachable"
+    # assert not isinstance(u, ExprProxy), "unreachable"
     return u
 
 
@@ -361,7 +362,10 @@ def EncodeModifier(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: 
 
 def EncodeModifier(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [SetTo, Add, Subtract] to number [7, 8, 9]."""
-    return _EncodeConst("Modifier", ModifierDict, s)  # type: ignore[return-value]
+    try:
+        return ModifierDict[s]
+    except KeyError:
+        return _EncodeConst("Modifier", ModifierDict, s)  # type: ignore[return-value]
 
 
 @overload
@@ -442,6 +446,9 @@ def EncodePlayer(s: _Arg, issueError: bool = False) -> _Dword:  # noqa: N802, N8
     ======================= ========
 
     """
+    if type(s) is ev.EUDVariable:
+        return s
+
     return _EncodeConst("Player", PlayerDict, s)
 
 
@@ -582,7 +589,7 @@ def EncodeCount(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N80
         return 0
     if isinstance(t, ConstType):
         raise EPError(_('[Warning] "{}" is not a {}').format(s, "count"))
-    assert not isinstance(t, ExprProxy), "unreachable"
+    # assert not isinstance(t, ExprProxy), "unreachable"
     return t
 
 
