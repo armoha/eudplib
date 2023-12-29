@@ -157,8 +157,18 @@ class Action(ConstExpr):
         return _("Invalid fields for action{} {}:").format(i, actname)
 
     def CheckArgs(self, i: int) -> None:  # noqa: N802
-        if all(IsConstExpr(field) for field in self.fields[:6]) and all(
-            isinstance(field, int) for field in self.fields[6:]
+        fields = self.fields
+        if (
+            IsConstExpr(fields[0]) and
+            IsConstExpr(fields[1]) and
+            IsConstExpr(fields[2]) and
+            IsConstExpr(fields[3]) and
+            IsConstExpr(fields[4]) and
+            IsConstExpr(fields[5]) and
+            isinstance(fields[6], int) and
+            isinstance(fields[7], int) and
+            isinstance(fields[8], int) and
+            isinstance(fields[9], int)
         ):
             return
 
