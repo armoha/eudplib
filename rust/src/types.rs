@@ -27,4 +27,5 @@ impl LazyPyImport {
 }
 
 pub(crate) static EXPRPROXY: LazyPyImport = LazyPyImport::new("eudplib.utils", &["ExprProxy"]);
-pub(crate) static GET_OBJECT_ADDR: LazyPyImport = LazyPyImport::new("eudplib.core.allocator", &["GetObjectAddr"]);
+pub(crate) static GET_OBJECT_ADDR: LazyPyImport =
+    LazyPyImport::new("eudplib.core.allocator", &["GetObjectAddr"]);

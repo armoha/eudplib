@@ -138,8 +138,8 @@ impl ObjAllocator {
     }
 
     fn _write_trigger(&mut self, conditions: u32, actions: u32) {
-        self.push(true);  // prevptr
-        self.push(true);  // nextptr
+        self.push(true); // prevptr
+        self.push(true); // nextptr
 
         // Conditions
         for _ in 0..(conditions * 5) {

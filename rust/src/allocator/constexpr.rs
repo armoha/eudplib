@@ -1,4 +1,4 @@
-use crate::allocator::rlocint::{PyRlocInt, RlocInt, DivFloor};
+use crate::allocator::rlocint::{DivFloor, PyRlocInt, RlocInt};
 use crate::types::EXPRPROXY;
 use pyo3::exceptions::{PyAttributeError, PyRuntimeError, PyValueError};
 use pyo3::intern;
