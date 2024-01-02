@@ -37,7 +37,8 @@ from ..core import (
 )
 from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
 from ..ctrlstru.loopblock import _unsafe_whilenot
-from ..utils import EPD, EUDPeekBlock, ep_assert
+from ..localize import _
+from ..utils import EPD, EPError, EUDPeekBlock, ep_assert
 from .memiof.modcurpl import f_setcurpl2cpcache
 
 _assign_helper = EUDVariable()
@@ -230,8 +231,12 @@ class _CpHelper:
         self._remove_start = remove
         self.get_epd = epdf
         self.dying = _Dying(self)
+        self._in_dying_block = False
 
     def remove(self) -> None:
+        if self._in_dying_block:
+            e = _("unit.remove() is automatically called at end of unit.dying block")
+            raise EPError(e)
         SetNextTrigger(self._remove_start)
 
     @property  # read-only
@@ -287,6 +292,7 @@ class _Dying:
         self._helper: _CpHelper = helper
 
     def __iter__(self) -> Iterator[_CpHelper]:
+        self._helper._in_dying_block = True
         dying_end, check_death, dying_block = Forward(), Forward(), Forward()
         RawTrigger(
             actions=[
@@ -310,6 +316,7 @@ class _Dying:
         )
         dying_block << NextTrigger()
         yield self._helper
+        self._helper._in_dying_block = False
         self._helper.remove()
         self._helper.offset = 19
         dying_end << NextTrigger()
