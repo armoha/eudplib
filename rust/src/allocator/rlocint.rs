@@ -97,12 +97,12 @@ impl PyRlocInt {
 
     #[getter]
     fn offset(&self) -> i32 {
-        self.0.offset as i32
+        self.0.offset
     }
 
     #[getter]
     fn rlocmode(&self) -> i32 {
-        self.0.rlocmode as i32
+        self.0.rlocmode
     }
 
     fn __repr__(&self) -> String {
