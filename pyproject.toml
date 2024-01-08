@@ -10,7 +10,7 @@ requires = [
 
 [project]
 name = "eudplib"
-version = "0.76.14"
+version = "0.76.15"
 authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},
@@ -28,15 +28,12 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Games/Entertainment :: Real Time Strategy",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 
 [project.urls]
 homepage = "https://github.com/armoha/eudplib/"
