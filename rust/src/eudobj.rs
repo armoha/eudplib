@@ -1,14 +1,14 @@
 use crate::allocator::constexpr::{ConstExpr, PyConstExpr};
 use crate::types::GET_OBJECT_ADDR;
 use pyo3::exceptions::PyNotImplementedError;
-use pyo3::prelude::*;
 use pyo3::intern;
+use pyo3::prelude::*;
 use pyo3::types::PyNone;
 
 /// Class for standalone object on memory
 ///
 /// .. note::
-///     Object collection occures in three steps:
+///     Object collection occurs in three steps:
 ///
 ///     - Collecting phase : collects object used in map generation. Object
 ///     used in WritePayload method are being collected. Methods Evaluate

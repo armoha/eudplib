@@ -89,8 +89,11 @@ void writeStringList(std::ostream& os, const std::vector<std::string>& slist) {
 void funcNamePreprocess(std::string& s) {
     if(strncmp(s.c_str(), "py_", 3) == 0) return; // Builtin function?
     else if(isBuiltinConst(s)) return;  // Some builtin function don't have f_ prefixes. (b2i4) Pass them as-is
-    else if(s[0] == '_' || ('A' <= s[0] && s[0] <= 'Z')) return;  // Name starts with uppercase -> Don't modify
-    else s = "f_" + s;
+    else if('a' <= s[0] && s[0] <= 'z') {  // Name starts with lowercase -> Prepend "f_"
+        s = "f_" + s;
+        return;
+    }
+    else return;
 }
 
 bool impPathProcess(const std::string& s, std::string& impPath, std::string& impModname) {

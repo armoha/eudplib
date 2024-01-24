@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 import struct
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Literal, TypeAlias, overload
 
 from typing_extensions import Self
@@ -116,13 +116,15 @@ class RawTrigger(EUDObject):
         # Uses normal condition/action initialization
         if trigSection is None:
             # Normalize conditions/actions
+            _conditions: Iterator[Condition]
             if conditions is None:
-                _conditions = []
+                _conditions = iter(())
             else:
                 _conditions = ut.FlattenIter(conditions)
 
+            _actions: Iterator[Action]
             if actions is None:
-                _actions = []
+                _actions = iter(())
             else:
                 _actions = ut.FlattenIter(actions)
 

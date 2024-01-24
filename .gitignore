@@ -16,6 +16,7 @@ htmlcov/
 target/
 .rust-cov/
 
+.idea/
 *.vscode
 .DS_Store
 tests/outputmap/

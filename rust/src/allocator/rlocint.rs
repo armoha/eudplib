@@ -97,12 +97,12 @@ impl PyRlocInt {
 
     #[getter]
     fn offset(&self) -> i32 {
-        self.0.offset as i32
+        self.0.offset
     }
 
     #[getter]
     fn rlocmode(&self) -> i32 {
-        self.0.rlocmode as i32
+        self.0.rlocmode
     }
 
     fn __repr__(&self) -> String {
@@ -193,9 +193,7 @@ impl PyRlocInt {
     fn __floordiv__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
         let rhs = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             if rhs.0.rlocmode != 0 {
-                return Err(PyTypeError::new_err(
-                    "Cannot divide RlocInt with non-const",
-                ));
+                return Err(PyTypeError::new_err("Cannot divide RlocInt with non-const"));
             }
             rhs.0.offset
         } else if let Ok(rhs) = rhs.extract::<i32>() {
