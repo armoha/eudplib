@@ -33,15 +33,6 @@ fn print_entries(linetable_bytes: Vec<u8>) {
 /// * `data` - UTF-8 encoded python source code compiled from .eps
 /// * `linetable` - `codeObj.co_linetable` bytes
 /// * `positions` - `codeObj.co_positions()` iterator
-///
-/// # Examples
-///
-/// ```
-/// // You can have rust code between fences inside the comments
-/// // If you pass --test to `rustdoc`, it will even test it for you!
-/// use doc::Person;
-/// let person = Person::new("name");
-/// ```
 #[pyfunction]
 pub fn generate_linetable<'a>(
     data: &'a [u8],
