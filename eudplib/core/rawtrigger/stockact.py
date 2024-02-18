@@ -138,6 +138,10 @@ def Transmission(  # noqa: N802
     """
     from ...epscript import IsSCDBMap
 
+    ep_assert(
+        isinstance(AlwaysDisplay, int),
+        _("AlwaysDisplay argument must be int, not '{}'").format(AlwaysDisplay),
+    )
     if not IsSCDBMap():
         ep_warn(_("Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"))
     unit = EncodeUnit(unit)
@@ -162,6 +166,10 @@ def DisplayText(text: String, AlwaysDisplay: Byte = 4) -> Action:  # noqa: N802,
 
     Displays a specific text message to each owner of the condition.
     """
+    ep_assert(
+        isinstance(AlwaysDisplay, int),
+        _("AlwaysDisplay argument must be int, not '{}'").format(AlwaysDisplay),
+    )
     text = EncodeString(text)
     return Action(0, text, 0, 0, 0, 0, 0, 9, 0, 4)
 
@@ -866,9 +874,7 @@ def SetDeathsX(  # noqa: N802
     player = EncodePlayer(player)
     modifier = EncodeModifier(modifier)
     unit = EncodeUnit(unit)
-    return Action(
-        mask, 0, 0, 0, player, number, unit, 45, modifier, 20, eudx=0x4353
-    )
+    return Action(mask, 0, 0, 0, player, number, unit, 45, modifier, 20, eudx=0x4353)
 
 
 def SetMemoryX(  # noqa: N802
