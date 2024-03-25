@@ -43,7 +43,7 @@ class MemberKind(enum.Enum):
     def cast(self, other):
         match self:
             case MemberKind.UNIT:
-                return scdata.UnitData(other)
+                return c.EncodeUnit(other)
             case MemberKind.TRG_PLAYER:
                 return c.EncodePlayer(other)
             case MemberKind.UNIT_ORDER:
@@ -366,3 +366,24 @@ class CSpriteMember(BaseMember):
             self.kind.write_epd(instance._epd + q, r, value)
             return
         raise AttributeError
+
+class UnitDataMember(BaseMember):
+    """Descriptor for EPDOffsetMap"""
+
+    __slots__ = ()
+
+    def __init__(self, offset: int) -> None:
+        super().__init__(offset, MemberKind.UNIT)
+
+    def __get__(self, instance, owner=None) -> "scdata.UnitData | UnitDataMember":
+        from .epdoffsetmap import EPDOffsetMap
+
+        if instance is None:
+            return self
+        q, r = divmod(self.offset, 4)
+        if isinstance(instance, EPDOffsetMap):
+            return scdata.UnitData(self.kind.read_epd(instance._epd + q, r))
+        raise AttributeError
+
+    def __set__(self, instance, value) -> None:
+        return super().__set__(instance, value)

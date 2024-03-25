@@ -52,11 +52,11 @@ def test_scdataobject():
     UnitData("Goliath Turret").maxHP = 512
 
     test_equality("UnitData Subunit, check UnitData to int conversion",
-                  unProxy(UnitData("Terran Goliath").subunit),
+                  unProxy(UnitData("Terran Goliath").subUnit),
                   EncodeUnit("Goliath Turret"))
 
     test_equality("UnitData Subunit, check if member type of unit works",
-                  UnitData("Terran Goliath").subunit.maxHP, 512)
+                  UnitData("Terran Goliath").subUnit.maxHP, 512)
 
     UnitData("Goliath Turret").maxHP = previous_value
 
@@ -64,4 +64,11 @@ def test_scdataobject():
 
 @TestInstance
 def test_epdoffsetmap_scdataobject_reference():
-    pass
+    goliath_cunit = CUnit.next()
+    DoActions(CreateUnit(1, "Terran Goliath", "Anywhere", P8))
+    goliath_data = goliath_cunit.unitID
+    test_equality("Cunit subunit type check",
+                  unProxy(goliath_data.subUnit),
+                  unProxy(UnitData("Terran Goliath").subUnit))
+    
+    DoActions(RemoveUnit("Terran Goliath", P8))

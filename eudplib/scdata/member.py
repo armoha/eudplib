@@ -125,7 +125,7 @@ class SCDataObjectMember:
             if self.kind.size == 4:
                 q, r = instance, 0
             else:
-                q, r = divmod(instance * self.kind.size, 4)
+                q, r = c.f_div(instance * self.kind.size, 4)
             return self.kind.read_epd(self.base_address_epd + q, r)
         raise AttributeError("SCDataObjectMember owner not of type SCDataObject!")
 
@@ -137,7 +137,7 @@ class SCDataObjectMember:
             if self.kind.size == 4:
                 q, r = instance, 0
             else:
-                q, r = divmod(instance * self.kind.size, 4)
+                q, r = c.f_div(instance * self.kind.size, 4)
             value = self.kind.cast(value)
             self.kind.write_epd(self.base_address_epd + q, r, value)
             return

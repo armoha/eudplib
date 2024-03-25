@@ -12,7 +12,7 @@ from .scdataobject import SCDataObject
 
 class UnitData(SCDataObject):
     maxHP = hitPoints = SCDataObjectMember(0x662350, MemberKind.DWORD)  # noqa: N815
-    subunit = subunit1 = UnitDataMember(0x6607C0, MemberKind.UNIT)
+    subUnit = subUnit1 = UnitDataMember(0x6607C0, MemberKind.UNIT)  # noqa: N815
 
     def __init__(self, index):
         super().__init__(strenc.EncodeUnit(index))
