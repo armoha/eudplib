@@ -73,6 +73,11 @@ class ExprProxy(Generic[T_co]):
     def __rfloordiv__(self, k):
         return k // self._value
 
+    def __divmod__(self, k):
+        div = self._value // k
+        mod = self._value % k
+        return div, mod
+
     def __mod__(self, k):
         return self._value % k
 

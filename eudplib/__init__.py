@@ -136,6 +136,9 @@ from .epscript import EPS_SetDebug, EPSLoader, epsCompile
 from .eudlib import *
 from .maprw import *
 from .offsetmap import CSprite, CUnit, EPDCUnitMap
+from .scdata import (
+    UnitData
+)
 from .trigger import *
 from .trigtrg.runtrigtrg import (
     GetFirstTrigTrigger,
