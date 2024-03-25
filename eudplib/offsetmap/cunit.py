@@ -656,8 +656,8 @@ class CUnit(EPDOffsetMap):
         # return False
 
     @classmethod
-    def get_next(cls: type[T]) -> "CUnit":
-        return CUnit.from_read(0x628438)
+    def next(cls: type[T]) -> "CUnit":
+        return CUnit.from_read(ut.EPD(0x628438))
 
     def check_buildq(self, unit_type) -> c.Condition:
         unit = c.EncodeUnit(unit_type)
