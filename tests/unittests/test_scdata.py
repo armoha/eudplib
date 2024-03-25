@@ -5,6 +5,9 @@ from helper import *  # noqa: F403
 
 @TestInstance
 def test_scdataobject():
+    test_assert("UnitData, check conversion to int", UnitData(13) == 13)
+    previous_value = EUDVariable()
+
     test_equality("UnitData Max HP, compare against const", UnitData(0).maxHP, 40 * 256)
 
     forty_times_256 = EUDVariable()
@@ -32,6 +35,7 @@ def test_scdataobject():
 
     zealot_data = UnitData("Protoss Zealot")
 
+    previous_value = zealot_data.maxHP
     zealot_data.maxHP = 80 * 256
 
     test_equality("UnitData Max HP, check if read/write points to the same address",
@@ -41,3 +45,20 @@ def test_scdataobject():
                   zealot_data.maxHP,
                   f_dwread(0x662350 + 4 * EncodeUnit("Protoss Zealot")))
 
+    zealot_data.maxHP = previous_value
+
+    previous_value = UnitData("Goliath Turret").maxHP
+    UnitData("Goliath Turret").maxHP = 512
+
+    test_equality("UnitData Subunit, check UnitData to int conversion",
+                  unProxy(UnitData("Terran Goliath").subunit),
+                  EncodeUnit("Goliath Turret"))
+
+    test_equality("UnitData Subunit, check if member type of unit works",
+                  UnitData("Terran Goliath").subunit.maxHP, 512)
+
+    UnitData("Goliath Turret").maxHP = previous_value
+
+@TestInstance
+def test_epdoffsetmap_scdataobject_reference():
+    pass
