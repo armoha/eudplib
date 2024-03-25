@@ -9,59 +9,49 @@ import functools
 import os.path
 import random
 import sys
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from typing import Any, TypeVar, overload
+
+from .. import core as c
 
 T = TypeVar("T")
 
 
 def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
-    from ..core.allocator.constexpr import IsConstExpr
-
-    if IsConstExpr(p):
+    if c.IsConstExpr(p):
         epd = (p + (-0x58A364)) // 4
         if "ret" in kwargs:
-            from .. import core as c
-
             c.SeqCompute([(kwargs["ret"][0], c.SetTo, epd)])
             return kwargs["ret"][0]
         return epd
 
-    from .. import core as c
-
     if c.IsEUDVariable(p):
         if sys.getrefcount(p) <= 2:
             mask = 0b111
-            c.RawTrigger(
-                actions=[
-                    p.AddNumber(-0x58A364),
-                    p.SetNumberX(0, mask >> 1),
-                ]
-                + [
-                    p.SubtractNumberX((mask >> 1) << t, mask << t)
-                    for t in range(30)
-                ]
+            actions = [
+                p.AddNumber(-0x58A364),
+                p.SetNumberX(0, mask >> 1),
+            ]
+            actions.extend(
+                p.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(30)
             )
+            c.RawTrigger(actions=actions)
             return p
         if not hasattr(EPD, "_eudf"):
             c.PushTriggerScope()
             setter = c.SetDeaths(0, c.SetTo, 0, 0)
             vaddr = setter + 20
             mask = 0b111
-            ftrg = c.RawTrigger(
-                nextptr=0,
-                actions=[
-                    c.SetMemory(vaddr, c.Add, -0x58A364),
-                    c.SetMemoryX(vaddr, c.SetTo, 0, mask >> 1),
-                ]
-                + [
-                    c.SetMemoryX(
-                        vaddr, c.Subtract, (mask >> 1) << t, mask << t
-                    )
-                    for t in range(30)
-                ]
-                + [setter],
+            actions = [
+                c.SetMemory(vaddr, c.Add, -0x58A364),
+                c.SetMemoryX(vaddr, c.SetTo, 0, mask >> 1),
+            ]
+            actions.extend(
+                c.SetMemoryX(vaddr, c.Subtract, (mask >> 1) << t, mask << t)
+                for t in range(30)
             )
+            actions.append(setter)
+            ftrg = c.RawTrigger(nextptr=0, actions=actions)
             c.PopTriggerScope()
 
             setattr(EPD, "_eudf", (ftrg, setter))
@@ -89,19 +79,36 @@ def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
 
 # -------
 
+_string_types = (bytes, str)
 
-def FlattenList(lst: Any) -> list:  # noqa: N802
-    if isinstance(lst, (bytes, str)) or hasattr(lst, "dont_flatten"):
-        return [lst]
+
+def FlattenList(lst: Any, ret=None) -> list:  # noqa: N802
+    if ret is None:
+        ret = []
+
+    if isinstance(lst, _string_types) or hasattr(lst, "dont_flatten"):
+        ret.append(lst)
+        return ret
 
     try:
-        ret = []
         for item in lst:
-            ret.extend(FlattenList(item))
+            FlattenList(item, ret)
         return ret
 
     except TypeError:  # lst is not iterable
-        return [lst]
+        ret.append(lst)
+        return ret
+
+
+def FlattenIter(lst: Any) -> Iterator:  # noqa: N802
+    if isinstance(lst, _string_types) or hasattr(lst, "dont_flatten"):
+        yield lst
+    else:
+        try:
+            for item in lst:
+                yield from FlattenIter(item)
+        except TypeError:
+            yield lst
 
 
 def List2Assignable(lst: Sequence[T]) -> T | Sequence[T]:  # noqa: N802

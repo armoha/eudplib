@@ -24,9 +24,7 @@ class ExprProxy(Generic[T_co]):
         try:
             return cls(_from=_from)
         except TypeError as e:
-            raise TypeError(
-                _("Type {} is not castable").format(cls.__name__), e
-            )
+            raise TypeError(_("Type {} is not castable").format(cls.__name__), e)
 
     def getValue(self) -> T_co:  # noqa: N802
         return self._value
@@ -172,19 +170,37 @@ def unProxy(x: T) -> T:
 
 
 def unProxy(x):  # noqa: N802
-    objlist = []
-    objlist.clear()
+    k = 0
+
+    # Cyclic check without using list/set
+    # x_cyclic_check = ((lambda x: x.getValue) ** (2**n))(x)
+    # if there is a cycle, x will go though the cycle and meet with x_cyclic_check
+    # since (2**n) diverges, this code can catch cycles up to any size.
+    x_cyclic_check = x0 = x
     while isinstance(x, ExprProxy):
-        if any(x is e for e in objlist):
-            objlist.append(x)
+        x = x.getValue()
+        if x is x_cyclic_check:
+            # Reconstruct cyclic reference
             err = _("ExprProxy {} has cyclic references: ")
+            x_list = []
+            x_set = set()
+
+            x = x0
+            while x not in x_set:
+                x_list.append(x)
+                x_set.add(x)
+                x = x.getValue()
 
             raise RecursionError(
-                err.format(objlist[0]),
-                objlist,
+                err.format(x_list[0]),
+                x_list,
             )
-        objlist.append(x)
-        x = x.getValue()
+
+        k += 1
+        # only becomes true if k == 2**i for some integer i
+        if k & (k - 1) == 0:
+            x_cyclic_check = x
+
     return x
 
 

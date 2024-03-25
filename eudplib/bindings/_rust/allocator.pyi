@@ -5,6 +5,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from collections.abc import Iterator
 from typing import Any, Callable
 
 from typing_extensions import Self
@@ -26,12 +27,11 @@ class PayloadBuffer:
     def WriteBytes(self, b: bytes) -> None: ...  # noqa: N802
     def WriteSpace(self, ssize: int) -> None: ...  # noqa: N802
     def _write_trigger(
-        self, prevptr, nextptr, conditions: list, actions: list, flags
+        self, prevptr, nextptr, conditions: Iterator, actions: Iterator, flags
     ) -> None: ...
 
 class PayloadBuilder:
     def __new__(cls) -> Self: ...
-    def offset(self, index: int) -> int: ...
     def alloc_objects(self, found_objects: dict) -> None: ...
     def construct_payload(
         self, found_objects: dict
@@ -40,6 +40,7 @@ class PayloadBuilder:
     def register_after_collecting_callback(self, f: Callable[[], Any]) -> None: ...
     def call_callbacks_on_create_payload(self) -> None: ...
     def call_callbacks_after_collecting(self) -> None: ...
+    def get_object_addr(self, index: int) -> RlocInt_C: ...
 
 class RlocInt_C:  # noqa: N801
     def __new__(cls, offset: int, rlocmode: int) -> Self: ...

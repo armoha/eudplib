@@ -187,14 +187,10 @@ def create_inject_finalizer(
         if mrgndata is None:
             mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
             mrgndata_db = c.Db(mrgndata)
-            sf.f_repmovsd_epd(
-                ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4
-            )
+            sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
         else:
             mrgndata_db = c.Db(mrgndata)
-            _repaddsd_epd(
-                ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4
-            )
+            _repaddsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
 
         # Flip TRIG properties
         i = c.EUDVariable()
@@ -230,9 +226,7 @@ def create_inject_finalizer(
             c.PopTriggerScope()
 
             prevtstart = sf.f_dwread_epd(ut.EPD(pts) + player * 3 + 2)
-            prevtend, prevtend_epd = sf.f_dwepdread_epd(
-                ut.EPD(pts) + player * 3 + 1
-            )
+            prevtend, prevtend_epd = sf.f_dwepdread_epd(ut.EPD(pts) + player * 3 + 1)
 
             # If there were triggers
             if cs.EUDIfNot()(prevtstart == ~(pts + player * 12 + 4)):

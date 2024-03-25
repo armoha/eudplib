@@ -8,6 +8,7 @@ publish = false
 [dependencies]
 pyo3 = "0.20.0"
 indicatif = "0.17.7"
+regex = { version = "1.10.3", features = [] }
 
 [features]
 # See https://github.com/PyO3/pyo3/issues/340

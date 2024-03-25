@@ -157,8 +157,18 @@ class Action(ConstExpr):
         return _("Invalid fields for action{} {}:").format(i, actname)
 
     def CheckArgs(self, i: int) -> None:  # noqa: N802
-        if all(IsConstExpr(field) for field in self.fields[:6]) and all(
-            isinstance(field, int) for field in self.fields[6:]
+        fields = self.fields
+        if (
+            IsConstExpr(fields[0])
+            and IsConstExpr(fields[1])
+            and IsConstExpr(fields[2])
+            and IsConstExpr(fields[3])
+            and IsConstExpr(fields[4])
+            and IsConstExpr(fields[5])
+            and isinstance(fields[6], int)
+            and isinstance(fields[7], int)
+            and isinstance(fields[8], int)
+            and isinstance(fields[9], int)
         ):
             return
 
@@ -177,7 +187,7 @@ class Action(ConstExpr):
             "padding",
             "maskflag",
         ]
-        acttype = self.fields[7]
+        acttype = fields[7]
         if isinstance(acttype, int):
             if acttype == 45:  # SetDeaths
                 fieldname[0] = "bitmask"
@@ -213,7 +223,7 @@ class Action(ConstExpr):
             elif acttype == 46:
                 fieldname[8] = "unit_order"
 
-        for i, field in enumerate(self.fields):
+        for i, field in enumerate(fields):
             if (i < 6 and not IsConstExpr(field)) or (
                 i >= 6 and not isinstance(field, int)
             ):
@@ -224,13 +234,12 @@ class Action(ConstExpr):
         raise ut.EPError("\n".join(error))
 
     def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:  # noqa: N802
-        ut.ep_assert(
-            self.parenttrg is None,
-            _("Actions cannot be shared by two triggers."),
-        )
-
-        ut.ep_assert(trg is not None, _("Trigger should not be null."))
-        ut.ep_assert(0 <= index < 64, _("Triggers out of range"))
+        if self.parenttrg is not None:
+            raise ut.EPError(_("Actions cannot be shared by two triggers."))
+        if trg is None:
+            raise ut.EPError(_("Trigger should not be null."))
+        if not (0 <= index < 64):
+            raise ut.EPError(_("Triggers out of range"))
 
         self.parenttrg = trg
         self.actindex = index

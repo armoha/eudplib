@@ -76,9 +76,7 @@ def main_starter(mf: Callable) -> c.Forward:
         else:
             start2 << mf_start
 
-        c.RawTrigger(
-            nextptr=0x80000000, actions=c.SetNextPtr(_jumper, 0x80000000)
-        )
+        c.RawTrigger(nextptr=0x80000000, actions=c.SetNextPtr(_jumper, 0x80000000))
         _jumper << c.RawTrigger(nextptr=rootstarter)
 
     c.PopTriggerScope()
@@ -92,10 +90,7 @@ def EUDDoEvents() -> None:  # noqa: N802
     oldcp = sf.f_getcurpl()
 
     _t = c.Forward()
-    c.RawTrigger(
-        nextptr=0x80000000,
-        actions=c.SetNextPtr(_jumper, _t),
-    )
+    c.RawTrigger(nextptr=0x80000000, actions=c.SetNextPtr(_jumper, _t))
     _t << c.NextTrigger()
 
     sf.f_setcurpl(oldcp)

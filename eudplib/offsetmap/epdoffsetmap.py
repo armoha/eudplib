@@ -69,9 +69,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def getpos(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
         member = type(self).__dict__[name]
-        ut.ep_assert(
-            member.kind.size == 4, _("Only dword can be read as position")
-        )
+        ut.ep_assert(member.kind.size == 4, _("Only dword can be read as position"))
         match member.kind:
             case MemberKind.C_UNIT | MemberKind.C_SPRITE:
                 raise ut.EPError(_("Only dword can be read as position"))
@@ -222,9 +220,7 @@ def epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
     is_ptr_equal = ptr.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))
     check << c.RawTrigger(
-        nextptr=update,
-        conditions=is_ptr_equal,
-        actions=c.SetNextPtr(check, skip),
+        nextptr=update, conditions=is_ptr_equal, actions=c.SetNextPtr(check, skip)
     )
     update << c.VProc(
         ptr,
@@ -245,9 +241,7 @@ def ptr_cache(epd: c.EUDVariable) -> c.EUDVariable:
     is_epd_equal = epd.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))
     check << c.RawTrigger(
-        nextptr=update,
-        conditions=is_epd_equal,
-        actions=c.SetNextPtr(check, skip),
+        nextptr=update, conditions=is_epd_equal, actions=c.SetNextPtr(check, skip)
     )
     update << c.VProc(
         epd,

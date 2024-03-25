@@ -1,4 +1,5 @@
 use crate::allocator::pbuffer::PayloadBuffer;
+use crate::allocator::rlocint::{PyRlocInt, RlocInt};
 use indicatif::{ProgressBar, ProgressStyle};
 use pyo3::create_exception;
 use pyo3::intern;
@@ -137,8 +138,8 @@ impl ObjAllocator {
     }
 
     fn _write_trigger(&mut self, conditions: u32, actions: u32) {
-        self.push(true);  // prevptr
-        self.push(true);  // nextptr
+        self.push(true); // prevptr
+        self.push(true); // nextptr
 
         // Conditions
         for _ in 0..(conditions * 5) {
@@ -263,7 +264,7 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
-        let arg: &PyTuple = PyTuple::new(py, &[obja]);
+        let arg: &PyTuple = PyTuple::new(py, [obja]);
         for (obj, _v) in found_objects.iter() {
             {
                 let mut obja = obja.borrow_mut();
@@ -304,7 +305,7 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
-        let arg: &PyTuple = PyTuple::new(py, &[pbuf]);
+        let arg: &PyTuple = PyTuple::new(py, [pbuf]);
         for (i, (obj, _v)) in found_objects.iter().enumerate() {
             {
                 let mut pbuf = pbuf.borrow_mut();
@@ -332,7 +333,7 @@ impl PayloadBuilder {
         })
     }
 
-    fn offset(&self, index: usize) -> u32 {
-        self.alloctable[index]
+    fn get_object_addr(&self, index: usize) -> PyRlocInt {
+        PyRlocInt(RlocInt::new(self.alloctable[index] as i32, 4))
     }
 }

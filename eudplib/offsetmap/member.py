@@ -276,8 +276,7 @@ class Flag:
             ret = c.EUDVariable()
             ret << True
             Trigger(
-                c.MemoryXEPD(epd, c.AtMost, mask - 1, mask),
-                ret.SetNumber(False),
+                c.MemoryXEPD(epd, c.AtMost, mask - 1, mask), ret.SetNumber(False)
             )
             return ret
         raise AttributeError

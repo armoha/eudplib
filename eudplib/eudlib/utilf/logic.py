@@ -66,10 +66,7 @@ def EUDNot(cond):  # noqa: N802
         # TODO: better handle !v in conditional
         v = c.EUDVariable()
         v << 0
-        c.RawTrigger(
-            conditions=cond.Exactly(0),
-            actions=v.SetNumber(1),
-        )
+        c.RawTrigger(conditions=cond.Exactly(0), actions=v.SetNumber(1))
         return v
 
     if isinstance(cond, bool):

@@ -10,7 +10,7 @@ requires = [
 
 [project]
 name = "eudplib"
-version = "0.76.13"
+version = "0.76.15"
 authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},
@@ -28,19 +28,16 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Games/Entertainment :: Real Time Strategy",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 
 [project.urls]
-homepage = "https://github.com/armoha/eudplib/blob/main/docs/funclist.txt"
-documentation = "https://cryptography.io/"
+homepage = "https://github.com/armoha/eudplib/"
+documentation = "https://github.com/armoha/eudplib/blob/main/docs/funclist.txt"
 source = "https://github.com/armoha/eudplib/"
 issues = "https://github.com/armoha/eudplib/issues"
 changelog = "https://github.com/armoha/euddraft/CHANGELOG.md"
@@ -79,8 +76,6 @@ source = [
 [tool.coverage.paths]
 source = [
    "eudplib/",
-   "*.nox/*/lib*/python*/site-packages/cryptography",
-   "*.nox\\*\\Lib\\site-packages\\cryptography",
 ]
 tests =[
    "tests/",

@@ -141,27 +141,21 @@ class VariableBase(metaclass=ABCMeta):
 
     def __ilshift__(self: Self, n: int) -> Self:  # type: ignore[misc]
         mask = (1 << (n + 1)) - 1
-        bt.RawTrigger(
-            actions=[
-                [
-                    self.SetNumberX(0, (mask >> 1) << (t + 1)),
-                    self.AddNumberX((mask >> 1) << t, mask << t),
-                ]
-                for t in reversed(range(32 - n))
-            ]
-            + [self.SetNumberX(0, mask >> 1)]  # lowest n bits
-        )
+        actions = []
+        for t in reversed(range(32 - n)):
+            actions.append(self.SetNumberX(0, (mask >> 1) << (t + 1)))
+            actions.append(self.AddNumberX((mask >> 1) << t, mask << t))
+        actions.append(self.SetNumberX(0, mask >> 1))  # lowest n bits
+        bt.RawTrigger(actions=actions)
         return self
 
     def __irshift__(self: Self, n: int) -> Self:
         mask = (1 << (n + 1)) - 1
-        bt.RawTrigger(
-            actions=[self.SetNumberX(0, mask >> 1)]  # lowest n bits
-            + [
-                self.SubtractNumberX((mask >> 1) << t, mask << t)
-                for t in range(32 - n)
-            ]
+        actions = [self.SetNumberX(0, mask >> 1)]  # lowest n bits
+        actions.extend(
+            self.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(32 - n)
         )
+        bt.RawTrigger(actions=actions)
         return self
 
     # -------

@@ -14,7 +14,6 @@ from .eudf import (
 from .eudfmethod import (
     EUDTracedMethod,
     EUDTracedTypedMethod,
-    EUDTypedMethod,
 )
 from .eudfuncn import EUDFuncN
 from .trace.tracetool import EUDTraceLog, GetTraceStackDepth
@@ -26,7 +25,6 @@ __all__ = [
     "EUDXTypedFunc",
     "EUDTracedMethod",
     "EUDTracedTypedMethod",
-    "EUDTypedMethod",
     "EUDFuncN",
     "EUDTraceLog",
     "GetTraceStackDepth",

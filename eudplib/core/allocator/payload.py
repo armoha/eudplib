@@ -255,7 +255,7 @@ def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:  # noqa: N802
 
     elif phase == PHASE_WRITING:
         # ep_assert(_payload_builder.offset(_found_objects_dict[obj]) & 3 == 0)
-        return RlocInt_C(_payload_builder.offset(_found_objects_dict[obj]), 4)  # type: ignore[union-attr]
+        return _payload_builder.get_object_addr(_found_objects_dict[obj])
 
     else:
         raise EPError(_("Can't calculate object address now"))

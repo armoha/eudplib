@@ -126,7 +126,7 @@ def _f_bitlshift(a, b):
     loopend = ac.Forward()
     loopcnt = ac.Forward()
 
-    rt.RawTrigger(actions=[rt.SetNextPtr(a.GetVTable(), loopcnt), a.QueueAddTo(a)])
+    rt.RawTrigger(actions=[rt.SetNextPtr(a.GetVTable(), loopcnt), *a.QueueAddTo(a)])
 
     loopstart << rt.RawTrigger(
         nextptr=loopend,

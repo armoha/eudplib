@@ -465,34 +465,54 @@ class CUnit(EPDOffsetMap):
         cs.EUDEndIf()
         prev_owner = unit.owner
         unit.owner = new_owner
-        if cs.EUDIf()(unit.subUnit >= 0x59CCA8):
-            unit.subUnit.owner = new_owner
-        cs.EUDEndIf()
-        prv, nxt = unit.prevPlayerUnit, unit.nextPlayerUnit
-        if cs.EUDIf()(prv == 0):
-            f_dwwrite_epd(ut.EPD(0x6283F8) + prev_owner, nxt.ptr)
-        if cs.EUDElse()():
-            unit.prevPlayerUnit = nxt
-        cs.EUDEndIf()
-        if cs.EUDIfNot()(nxt == 0):
-            unit.nextPlayerUnit = prv
-        cs.EUDEndIf()
         new_header = ut.EPD(0x6283F8) + new_owner
-        # ptr = unit.ptr
-        if cs.EUDIf()(c.MemoryEPD(new_header, c.AtLeast, 0x59CCA8)):
-            new_prev = CUnit.from_read(new_header)
-            new_next = new_prev.nextPlayerUnit
-            new_prev.nextPlayerUnit = ptr
-            unit.prevPlayerUnit = new_prev
-            unit.nextPlayerUnit = new_next
-            if cs.EUDIfNot()(new_next == 0):
-                new_next.prevPlayerUnit = ptr
+        new_owner_65536 = new_owner << 16
+
+        @c.EUDFunc
+        def cgive_unit(ptr, epd):
+            unit = CUnit.cast(epd)
+            prv, nxt = unit.prevPlayerUnit, unit.nextPlayerUnit
+            # no previous unit = unit is first unit of player
+            if cs.EUDIf()(prv == 0):
+                f_dwwrite_epd(ut.EPD(0x6283F8) + prev_owner, nxt.ptr)
+            if cs.EUDElse()():
+                # link next unit to previous unit
+                prv.nextPlayerUnit = nxt
             cs.EUDEndIf()
-        if cs.EUDElse()():
-            f_dwwrite_epd(new_header, ptr)
-            unit.prevPlayerUnit = 0
-            unit.nextPlayerUnit = 0
+            # link previous unit to next unit
+            if cs.EUDIfNot()(nxt == 0):
+                nxt.prevPlayerUnit = prv
+            cs.EUDEndIf()
+
+            if cs.EUDIf()(c.MemoryEPD(new_header, c.AtLeast, 0x59CCA8)):
+                # get previous, next player units of recipient
+                new_prev = CUnit.from_read(new_header)
+                new_next = new_prev.nextPlayerUnit
+                new_prev.nextPlayerUnit = ptr
+                unit.prevPlayerUnit = new_prev
+                unit.nextPlayerUnit = new_next
+                if cs.EUDIfNot()(new_next == 0):
+                    new_next.prevPlayerUnit = ptr
+                cs.EUDEndIf()
+            if cs.EUDElse()():
+                f_dwwrite_epd(new_header, ptr)
+                unit.prevPlayerUnit = 0
+                unit.nextPlayerUnit = 0
+            cs.EUDEndIf()
+
+            # change sprite color of unit
+            sprite = unit.sprite
+            cs.DoActions(
+                c.SetMemoryXEPD(
+                    sprite + 0xA0 // 4, c.SetTo, new_owner_65536, 0xFF0000
+                )
+            )
+
+        if cs.EUDIf()(unit.subUnit >= 0x59CCA8):
+            subunit = unit.subUnit
+            cgive_unit(subunit.ptr, subunit)
         cs.EUDEndIf()
+        cgive_unit(ptr, unit)
 
     def cgive(self, player) -> None:
         CUnit._cgive(self, self.ptr, player)
