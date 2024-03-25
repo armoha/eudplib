@@ -22,10 +22,10 @@ def test_scdataobject():
     test_equality("UnitData (variable) Max HP, compare against variable",
                   ghost_data.maxHP, fortyfive_times_256)
 
-    # one << 2
+    one << 2
 
-    # test_equality("UnitData (variable) Max HP, check robustness to variable change",
-    #               ghost_data.maxHP, fortyfive_times_256)
+    test_equality("UnitData (variable) Max HP, check robustness to variable change",
+                  ghost_data.maxHP, fortyfive_times_256)
 
     ghost_data + 3 # shouldn't raise error, but not an intended use case
     ghost_data -= 1 # also shouldn't raise error, not an intended use case either
