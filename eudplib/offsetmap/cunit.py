@@ -21,6 +21,7 @@ from .member import (
     Flag,
     Member,
     MemberKind,
+    UnitDataMember,
     UnsupportedMember,
 )
 
@@ -137,7 +138,7 @@ class CUnit(EPDOffsetMap):
     order = Member(0x04D, MemberKind.UNIT_ORDER)
     orderState = Member(0x04E, MemberKind.BYTE)
     orderSignal = Member(0x04F, MemberKind.BYTE)
-    orderUnitType = Member(0x050, MemberKind.UNIT)
+    orderUnitType = UnitDataMember(0x050)
     unknown0x52 = Member(0x052, MemberKind.WORD)  # 2-byte padding
     cooldown = Member(0x054, MemberKind.DWORD)
     orderTimer = Member(0x054, MemberKind.BYTE)
@@ -153,8 +154,8 @@ class CUnit(EPDOffsetMap):
     orderTarget = CUnitMember(0x05C)
     orderTargetUnit = CUnitMember(0x05C)
     shield = Member(0x060, MemberKind.DWORD)
-    unitID = Member(0x064, MemberKind.UNIT)
-    unitType = Member(0x064, MemberKind.UNIT)
+    unitID = UnitDataMember(0x064)
+    unitType = UnitDataMember(0x064)
     unknown0x66 = Member(0x066, MemberKind.WORD)  # 2-byte padding
     prevPlayerUnit = CUnitMember(0x068)
     nextPlayerUnit = CUnitMember(0x06C)
@@ -190,11 +191,11 @@ class CUnit(EPDOffsetMap):
     currentButtonSet = Member(0x094, MemberKind.WORD)
     isCloaked = Member(0x096, MemberKind.BOOL)
     movementState = Member(0x097, MemberKind.BYTE)
-    buildQueue1 = Member(0x098, MemberKind.UNIT)
-    buildQueue2 = Member(0x09A, MemberKind.UNIT)
-    buildQueue3 = Member(0x09C, MemberKind.UNIT)
-    buildQueue4 = Member(0x09E, MemberKind.UNIT)
-    buildQueue5 = Member(0x0A0, MemberKind.UNIT)
+    buildQueue1 = UnitDataMember(0x098)
+    buildQueue2 = UnitDataMember(0x09A)
+    buildQueue3 = UnitDataMember(0x09C)
+    buildQueue4 = UnitDataMember(0x09E)
+    buildQueue5 = UnitDataMember(0x0A0)
     buildQueue12 = Member(0x098, MemberKind.DWORD)
     buildQueue34 = Member(0x09C, MemberKind.DWORD)
     energy = Member(0x0A2, MemberKind.WORD)
@@ -240,7 +241,7 @@ class CUnit(EPDOffsetMap):
     flagSpawnFrame = Member(0x0C8, MemberKind.DWORD)  # beacon
     # building /==============================================
     addon = CUnitMember(0x0C0)
-    addonBuildType = Member(0x0C4, MemberKind.UNIT)
+    addonBuildType = UnitDataMember(0x0C4)
     upgradeResearchTime = Member(0x0C6, MemberKind.WORD)
     techType = Member(0x0C8, MemberKind.TECH)
     upgradeType = Member(0x0C9, MemberKind.UPGRADE)
