@@ -6,7 +6,8 @@
 # file that should have been included as part of this package.
 
 import enum
-from typing import Final, Literal, Union
+from abc import ABCMeta
+from typing import TYPE_CHECKING, Final, Generic, Literal, Self, TypeVar, Union
 
 from .. import core as c
 from .. import utils as ut
@@ -14,6 +15,8 @@ from ..localize import _
 from . import unitdata
 from .scdataobject import SCDataObject
 
+if TYPE_CHECKING:
+    from .unitdata import UnitData
 
 class MemberKind(enum.Enum):
     # TODO: Combine with offsetmap's MemberKind
@@ -22,8 +25,8 @@ class MemberKind(enum.Enum):
     WORD = enum.auto()
     BYTE = enum.auto()
     BOOL = enum.auto()
-    TRG_UNIT = enum.auto()
-    TRG_PLAYER = enum.auto()
+    UNIT = enum.auto()
+    PLAYER = enum.auto()
     UNIT_ORDER = enum.auto()
     POSITION = enum.auto()
     POSITION_X = enum.auto()
@@ -36,9 +39,9 @@ class MemberKind(enum.Enum):
 
     def cast(self, other):
         match self:
-            case MemberKind.TRG_UNIT:
-                return c.EncodeUnit(other)
-            case MemberKind.TRG_PLAYER:
+            case MemberKind.UNIT:
+                return unitdata.UnitData(other)
+            case MemberKind.PLAYER:
                 return c.EncodePlayer(other)
             case MemberKind.UNIT_ORDER:
                 return c.EncodeUnitOrder(other)
@@ -60,7 +63,7 @@ class MemberKind(enum.Enum):
                 return 4
             case (
                 MemberKind.WORD
-                | MemberKind.TRG_UNIT
+                | MemberKind.UNIT
                 | MemberKind.POSITION_X
                 | MemberKind.POSITION_Y
                 | MemberKind.FLINGY
@@ -108,32 +111,48 @@ class SCDataObjectMember:
         self.base_address_epd = ut.EPD(base_address)
         self.kind = kind
 
-    def __get__(self, obj, objtype=None) -> Union[ut.ExprProxy, "SCDataObject"]:
+    def __get__(
+            self, instance, objtype=None
+        ) -> Union[ut.ExprProxy, Self, "SCDataObject"]:
         from .scdataobject import SCDataObject
 
-        if obj is None:
+        if instance is None:
             return self
         # TODO improve performance for the cases not divisible by 4
         # Probably epdoffsetmap code can be referenced
 
-        if isinstance(obj, SCDataObject):
+        if isinstance(instance, SCDataObject):
             if self.kind.size == 4:
-                q, r = obj, 0
+                q, r = instance, 0
             else:
-                q, r = divmod(obj * self.kind.size, 4)
+                q, r = divmod(instance * self.kind.size, 4)
             return self.kind.read_epd(self.base_address_epd + q, r)
         raise AttributeError("SCDataObjectMember owner not of type SCDataObject!")
 
 
-    def __set__(self, obj, value) -> None:
+    def __set__(self, instance, value) -> None:
         from .scdataobject import SCDataObject
 
-        if isinstance(obj, SCDataObject):
+        if isinstance(instance, SCDataObject):
             if self.kind.size == 4:
-                q, r = obj, 0
+                q, r = instance, 0
             else:
-                q, r = divmod(obj * self.kind.size, 4)
+                q, r = divmod(instance * self.kind.size, 4)
             value = self.kind.cast(value)
             self.kind.write_epd(self.base_address_epd + q, r, value)
             return
         raise AttributeError
+
+M = TypeVar("M", bound=SCDataObject)
+
+class SCDataObjectTypeSCDOMember(SCDataObjectMember, Generic[M], metaclass=ABCMeta):
+    # TODO Think of a better name?
+    _data_object_type: type[M]
+
+    def __get__(self, instance, objtype=None) -> Self | M:
+        if instance is None:
+            return self
+        return self._data_object_type(super().__get__(instance))
+
+class UnitDataMember(SCDataObjectTypeSCDOMember["UnitData"]):
+    pass
