@@ -23,13 +23,13 @@ class SCDataObject(ut.ExprProxy, metaclass=ABCMeta):
     SCDataObject classes support manipulation of linked data
     via member get/set.
     """
-    # @abstractmethod
-    # def __init__(self, index) -> None:
-    #     if isinstance(index, c.EUDVariable):
-    #         new_index = c.EUDVariable()
-    #         new_index << index
-    #         index = new_index
-    #     super().__init__(index)
+    @abstractmethod
+    def __init__(self, index) -> None:
+        if isinstance(index, c.EUDVariable):
+            new_index = c.EUDVariable()
+            new_index << index
+            index = new_index
+        super().__init__(index)
 
     @classmethod
     def cast(cls: Self, _from) -> Self:
