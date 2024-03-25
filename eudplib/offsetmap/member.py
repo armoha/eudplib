@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Final, Literal, NoReturn
 
 from .. import core as c
 from .. import ctrlstru as cs
+from .. import scdata
 from .. import utils as ut
 from ..localize import _
 from ..trigger import Trigger
@@ -28,7 +29,7 @@ class MemberKind(enum.Enum):
     BOOL = enum.auto()
     C_UNIT = enum.auto()
     C_SPRITE = enum.auto()
-    TRG_UNIT = enum.auto()
+    UNIT = enum.auto()
     TRG_PLAYER = enum.auto()
     UNIT_ORDER = enum.auto()
     POSITION = enum.auto()
@@ -41,8 +42,8 @@ class MemberKind(enum.Enum):
 
     def cast(self, other):
         match self:
-            case MemberKind.TRG_UNIT:
-                return c.EncodeUnit(other)
+            case MemberKind.UNIT:
+                return scdata.UnitData(other)
             case MemberKind.TRG_PLAYER:
                 return c.EncodePlayer(other)
             case MemberKind.UNIT_ORDER:
@@ -70,7 +71,7 @@ class MemberKind(enum.Enum):
                 return 4
             case (
                 MemberKind.WORD
-                | MemberKind.TRG_UNIT
+                | MemberKind.UNIT
                 | MemberKind.POSITION_X
                 | MemberKind.POSITION_Y
                 | MemberKind.FLINGY
@@ -101,7 +102,7 @@ class MemberKind(enum.Enum):
                 return f_cunitepdread_epd(epd)
             case MemberKind.C_SPRITE:
                 return f_epdspriteread_epd(epd)
-            case MemberKind.TRG_UNIT | MemberKind.FLINGY:
+            case MemberKind.UNIT | MemberKind.FLINGY:
                 return f_bread_epd(epd, subp)
             case MemberKind.POSITION:
                 return f_maskread_epd(
