@@ -37,22 +37,31 @@ class EPSLoader(SourceFileLoader):
     def get_data(self, path):
         """Return the data from path as raw bytes."""
         global is_scdb_map
+
         file_data = open(path, "rb").read()
+
         if path.endswith(".pyc") or path.endswith(".pyo"):
             return file_data
         if "SCDB.eps" in os.path.relpath(path):
             is_scdb_map = True
+
+        # if eps file already exists and is newer than pyc or pyo file, skip compiling.
+        dirname, filename = os.path.split(path)
+        epsdir = os.path.join(dirname, "__epspy__")
+        os.makedirs(epsdir, exist_ok=True)
+
+        ofname = os.path.splitext(filename)[0] + ".py"
+        ofname = os.path.join(epsdir, ofname)    
+
+        if os.path.exists(ofname) and os.path.getmtime(ofname) > os.path.getmtime(path): # more recent than eps file
+            print(_('[epScript] Discovered an existing compiled file for "{}". Skipped compilation.').format(os.path.relpath(path)))
+            return open(ofname, "rb").read()
+        
         print(_('[epScript] Compiling "{}"...').format(os.path.relpath(path)))
         compiled = epsCompile(path, file_data)
         if compiled is None:
             raise EPError(_(" - Compiled failed for {}").format(path))
-        dirname, filename = os.path.split(path)
-        epsdir = os.path.join(dirname, "__epspy__")
-        try:
-            if not os.path.isdir(epsdir):
-                os.mkdir(epsdir)
-            ofname = os.path.splitext(filename)[0] + ".py"
-            ofname = os.path.join(epsdir, ofname)
+        try:           
             with open(ofname, "w", encoding="utf-8") as file:
                 file.write(compiled.decode("utf-8"))
         except OSError:
