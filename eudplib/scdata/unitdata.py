@@ -6,13 +6,15 @@
 # file that should have been included as part of this package.
 
 from ..core.rawtrigger import strenc
-from .member import MemberKind, SCDataObjectMember
+from .member import MemberKind, SCDataObjectMember, UnitDataMember
 from .scdataobject import SCDataObject
 
 
 class UnitData(SCDataObject):
     maxHP = hitPoints = SCDataObjectMember(0x662350, MemberKind.DWORD)  # noqa: N815
+    subunit = subunit1 = UnitDataMember(0x6607C0, MemberKind.UNIT)
 
     def __init__(self, index):
         super().__init__(strenc.EncodeUnit(index))
 
+UnitDataMember._data_object_type = UnitData
