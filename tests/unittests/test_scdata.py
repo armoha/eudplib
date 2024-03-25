@@ -5,7 +5,8 @@ from helper import *  # noqa: F403
 
 @TestInstance
 def test_scdataobject():
-    test_assert("UnitData, check conversion to int", UnitData(13) == 13)
+    test_equality("UnitData, check conversion to int",
+                  unProxy(UnitData(13)), 13)
     previous_value = EUDVariable()
 
     test_equality("UnitData Max HP, compare against const", UnitData(0).maxHP, 40 * 256)
@@ -58,6 +59,8 @@ def test_scdataobject():
                   UnitData("Terran Goliath").subunit.maxHP, 512)
 
     UnitData("Goliath Turret").maxHP = previous_value
+
+
 
 @TestInstance
 def test_epdoffsetmap_scdataobject_reference():
