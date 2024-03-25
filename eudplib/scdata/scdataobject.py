@@ -38,4 +38,7 @@ class SCDataObject(ut.ExprProxy, metaclass=ABCMeta):
         except TypeError as e:
             raise TypeError(_("Type {} is not castable").format(cls.__name__), e)
 
+    def Evaluate(self):  # noqa: N802
+        return c.Evaluate(self._value)
+
     # TODO maybe add caching functions for better performance later
