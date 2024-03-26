@@ -5,16 +5,15 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from .flingydata import FlingyData
+from ..core.rawtrigger import strenc
+from .member import FlingyDataMember, Member, MemberKind
 from .scdataobject import SCDataObject
-from .unitdata import UnitData
-from .unitorderdata import UnitOrderData
-from .weapondata import WeaponData
 
-__all__ = [
-    "SCDataObject",
-    "FlingyData",
-    "UnitData",
-    "UnitOrderData",
-    "WeaponData",
-]
+
+class FlingyData(SCDataObject):
+
+
+    def __init__(self, index):
+        super().__init__(strenc.EncodeUnit(index))
+
+FlingyDataMember._data_object_type = FlingyData

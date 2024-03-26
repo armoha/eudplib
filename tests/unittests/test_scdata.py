@@ -58,6 +58,9 @@ def test_scdataobject():
     test_equality("UnitData Subunit, check if member type of unit works",
                   UnitData("Terran Goliath").subUnit.maxHP, 512)
 
+    test_equality("UnitData Subunit, check if complex chain works",
+                  UnitData("Terran Goliath").subUnit.subUnit, 228)
+
     UnitData("Goliath Turret").maxHP = previous_value
 
 
@@ -66,9 +69,8 @@ def test_scdataobject():
 def test_epdoffsetmap_scdataobject_reference():
     goliath_cunit = CUnit.next()
     DoActions(CreateUnit(1, "Terran Goliath", "Anywhere", P8))
-    goliath_data = goliath_cunit.unitType
     test_equality("Cunit subunit type check",
-                  goliath_data.subUnit,
-                  UnitData("Terran Goliath").subUnit)
+                  goliath_cunit.subUnit.unitType,
+                  UnitData("Goliath Turret"))
 
     DoActions(RemoveUnit("Terran Goliath", P8))

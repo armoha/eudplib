@@ -6,15 +6,14 @@
 # file that should have been included as part of this package.
 
 from ..core.rawtrigger import strenc
-from .member import Member, MemberKind, WeaponDataMember
+from .member import Member, MemberKind, UnitOrderDataMember
 from .scdataobject import SCDataObject
 
 
-class WeaponData(SCDataObject):
-    damage = Member(0x656EB0, MemberKind.WORD)
-    cooldown = Member(0x656EBC, MemberKind.WORD)
+class UnitOrderData(SCDataObject):
+    animation = Member(0x664D40, MemberKind.BYTE)
 
     def __init__(self, index):
-        super().__init__(strenc.EncodeUnit(index))
+        super().__init__(strenc.EncodeUnitOrder(index))
 
-WeaponDataMember._data_object_type = WeaponData
+UnitOrderDataMember._data_object_type = UnitOrderData
