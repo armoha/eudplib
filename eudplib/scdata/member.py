@@ -7,7 +7,16 @@
 
 import enum
 from abc import ABCMeta
-from typing import TYPE_CHECKING, Final, Generic, Literal, Self, TypeVar, Union
+from types import NoneType
+from typing import (
+    TYPE_CHECKING,
+    Final,
+    Generic,
+    Literal,
+    Self,
+    TypeVar,
+    overload,
+)
 
 from .. import core as c
 from .. import utils as ut
@@ -16,7 +25,11 @@ from . import unitdata
 from .scdataobject import SCDataObject
 
 if TYPE_CHECKING:
-    from .unitdata import UnitData
+    # F401 refers to "unused import"
+    # Ruff is currently not correctly detecting in-quote references in Generic
+    # which is why those imports are marked as unused by default
+    # Therefore, these F401 warnings are suppressed now
+    from .unitdata import UnitData  # noqa: F401
 
 class MemberKind(enum.Enum):
     # TODO: Combine with offsetmap's MemberKind
@@ -104,21 +117,31 @@ class SCDataObjectMember:
     base_address_epd: Final[int]
     kind: Final[MemberKind]
 
-    def __init__(self, base_address, kind: MemberKind) -> None:
+    def __init__(self, base_address: int, kind: MemberKind) -> None:
         ut.ep_assert(base_address % 4 == 0, _("Malaligned member"))
         # ut.ep_assert(base_address % 4 + kind.size <= 4, _("Malaligned member"))
         self.base_address = base_address
         self.base_address_epd = ut.EPD(base_address)
         self.kind = kind
 
+    @overload
+    def __get__(self, instance: NoneType, objtype=None) -> Self:
+        ...
+
+    @overload
+    def __get__(
+            self, instance: SCDataObject, objtype=None
+        ) -> ut.ExprProxy | SCDataObject:
+        ...
+
     def __get__(
             self, instance, objtype=None
-        ) -> Union[ut.ExprProxy, Self, "SCDataObject"]:
+        ):
         from .scdataobject import SCDataObject
 
         if instance is None:
             return self
-        # TODO improve performance for the cases not divisible by 4
+        # TODO improve performance for the cases not divisible by 4 by caching
         # Probably epdoffsetmap code can be referenced
 
         if isinstance(instance, SCDataObject):
@@ -148,11 +171,23 @@ M = TypeVar("M", bound=SCDataObject)
 class SCDataObjectTypeSCDOMember(SCDataObjectMember, Generic[M], metaclass=ABCMeta):
     # TODO Think of a better name?
     _data_object_type: type[M]
+    _default_kind: MemberKind
 
-    def __get__(self, instance, objtype=None) -> Self | M:
+    def __init__(self, base_address: int) -> NoneType:
+        super().__init__(base_address, self._default_kind)
+
+    @overload
+    def __get__(self, instance: NoneType, objtype=None) -> Self:
+        ...
+
+    @overload
+    def __get__(self, instance: SCDataObject, objtype=None) -> M:
+        ...
+
+    def __get__(self, instance, objtype=None):
         if instance is None:
             return self
         return self._data_object_type(super().__get__(instance))
 
 class UnitDataMember(SCDataObjectTypeSCDOMember["UnitData"]):
-    pass
+    _default_kind = MemberKind.UNIT
