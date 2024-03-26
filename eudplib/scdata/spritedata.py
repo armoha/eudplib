@@ -6,12 +6,15 @@
 # file that should have been included as part of this package.
 
 from ..core.rawtrigger import strenc
-from .member import Member, MemberKind, SpriteDataMember
+from .member import ImageDataMember, Member, MemberKind, SpriteDataMember
 from .scdataobject import SCDataObject
 
 
 class SpriteData(SCDataObject):
-
+    __slots__ = []
+    # Read only data skipped
+    visible = Member(0x665C48, MemberKind.BOOL)
+    image = imageID = ImageDataMember(0x666160)  # noqa: N815
 
     def __init__(self, index):
         super().__init__(strenc.EncodeSprite(index))

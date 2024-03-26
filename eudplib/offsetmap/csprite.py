@@ -11,7 +11,15 @@ from .. import core as c
 from .. import utils as ut
 from ..localize import _
 from .epdoffsetmap import EPDOffsetMap, epd_cache, ptr_cache
-from .member import CSpriteMember, EnumMember, Flag, Member, MemberKind
+from .member import (
+    CSpriteMember,
+    EnumMember,
+    Flag,
+    Member,
+    MemberKind,
+    PlayerDataMember,
+    SpriteDataMember,
+)
 
 
 class CSpriteFlags(EnumMember):
@@ -35,8 +43,8 @@ class CSprite(EPDOffsetMap):
     __slots__ = "_ptr"
     prev = CSpriteMember(0x00)
     next = CSpriteMember(0x04)
-    sprite = Member(0x08, MemberKind.SPRITE)
-    playerID = Member(0x0A, MemberKind.PLAYER)  # officially "creator"
+    sprite = SpriteDataMember(0x08)
+    playerID = PlayerDataMember(0x0A)  # officially "creator"
     # 0 <= selectionIndex <= 11.
     # Index in the selection area at bottom of screen.
     selectionIndex = Member(0x0B, MemberKind.BYTE)

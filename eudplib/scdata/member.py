@@ -90,7 +90,11 @@ class MemberKind(enum.Enum):
     @property
     def size(self) -> Literal[1, 2, 4]:
         match self:
-            case MemberKind.DWORD | MemberKind.POSITION | MemberKind.DIMENSIONS:
+            case (
+                MemberKind.DWORD
+                | MemberKind.POSITION
+                | MemberKind.DIMENSIONS
+            ):
                 return 4
             case (
                 MemberKind.WORD
@@ -99,11 +103,11 @@ class MemberKind(enum.Enum):
                 | MemberKind.POSITION_Y
                 | MemberKind.DIMENSIONS_X
                 | MemberKind.DIMENSIONS_Y
-                | MemberKind.FLINGY
                 | MemberKind.SPRITE
+                | MemberKind.IMAGE
             ):
                 return 2
-            case _:
+            case _: # Flingy is 1 byte in Dat
                 return 1
 
     def read_epd(self, epd, subp) -> ut.ExprProxy | SCDataObject:
@@ -168,7 +172,10 @@ class Member:
             if self.kind.size == 4:
                 q, r = instance, 0
             else:
-                q, r = c.f_div(instance * self.kind.size, 4)
+                try:
+                    q, r = divmod(instance * self.kind.size, 4)
+                except TypeError:
+                    q, r = c.f_div(instance * self.kind.size, 4)
             return self.kind.read_epd(self.base_address_epd + q, r)
         raise AttributeError("SCDataObjectMember owner not of type SCDataObject!")
 
@@ -180,7 +187,10 @@ class Member:
             if self.kind.size == 4:
                 q, r = instance, 0
             else:
-                q, r = c.f_div(instance * self.kind.size, 4)
+                try:
+                    q, r = divmod(instance * self.kind.size, 4)
+                except TypeError:
+                    q, r = c.f_div(instance * self.kind.size, 4)
             value = self.kind.cast(value)
             self.kind.write_epd(self.base_address_epd + q, r, value)
             return
@@ -196,7 +206,9 @@ S = TypeVar("S", bound=SCDataObject)
 class SCDataObjectTypeMember(Member, Generic[S], metaclass=ABCMeta):
     # TODO Think of a better name?
     _data_object_type: type[S]
-    _default_kind: MemberKind
+
+    def __init_subclass__(cls, kind: MemberKind) -> None:
+        cls._default_kind = kind
 
     def __init__(self, base_address: int) -> None:
         super().__init__(base_address, self._default_kind)
@@ -214,24 +226,25 @@ class SCDataObjectTypeMember(Member, Generic[S], metaclass=ABCMeta):
             return self
         return self._data_object_type(super().__get__(instance))
 
-class FlingyDataMember(SCDataObjectTypeMember["FlingyData"]):
-    _default_kind = MemberKind.FLINGY
+class FlingyDataMember(SCDataObjectTypeMember["FlingyData"], kind=MemberKind.FLINGY):
+    pass
+class ImageDataMember(SCDataObjectTypeMember["ImageData"], kind=MemberKind.IMAGE):
+    pass
 
-class ImageDataMember(SCDataObjectTypeMember["ImageData"]):
-    _default_kind = MemberKind.IMAGE
+class PlayerDataMember(SCDataObjectTypeMember["PlayerData"], kind=MemberKind.PLAYER):
+    pass
 
-class PlayerDataMember(SCDataObjectTypeMember["PlayerData"]):
-    _default_kind = MemberKind.PLAYER
+class SpriteDataMember(SCDataObjectTypeMember["SpriteData"], kind=MemberKind.SPRITE):
+    pass
 
-class SpriteDataMember(SCDataObjectTypeMember["SpriteData"]):
-    _default_kind = MemberKind.SPRITE
+class UnitDataMember(SCDataObjectTypeMember["UnitData"], kind=MemberKind.UNIT):
+    pass
 
-class UnitDataMember(SCDataObjectTypeMember["UnitData"]):
-    _default_kind = MemberKind.UNIT
+class UnitOrderDataMember(
+        SCDataObjectTypeMember["UnitOrderData"], kind=MemberKind.UNIT_ORDER
+    ):
+    pass
 
-class UnitOrderDataMember(SCDataObjectTypeMember["UnitOrderData"]):
-    _default_kind = MemberKind.UNIT_ORDER
-
-class WeaponDataMember(SCDataObjectTypeMember["WeaponData"]):
+class WeaponDataMember(SCDataObjectTypeMember["WeaponData"], kind=MemberKind.WEAPON):
     _default_kind = MemberKind.WEAPON
 
