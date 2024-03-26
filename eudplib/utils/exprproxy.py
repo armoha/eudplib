@@ -15,7 +15,6 @@ T_co = TypeVar("T_co", covariant=True)
 
 class ExprProxy(Generic[T_co]):
     """Class which can contain both ConstExpr and EUDVariable"""
-
     def __init__(self, initval: T_co) -> None:
         self._value: T_co = initval
 
@@ -135,7 +134,7 @@ class ExprProxy(Generic[T_co]):
 
     # Proxy other methods
     def __getattribute__(self, name):
-        if name == "_value":
+        if name in ["_value"]:
             return super().__getattribute__(name)
         elif name == "__class__":
             return object.__getattribute__(self._value, name)
