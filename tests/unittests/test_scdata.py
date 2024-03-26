@@ -58,8 +58,36 @@ def test_scdataobject():
     test_equality("UnitData Subunit, check if member type of unit works",
                   UnitData("Terran Goliath").subUnit.maxHP, 512)
 
-    test_equality("UnitData Subunit, check if complex chain works",
+    test_equality("UnitData Subunit, check if chain works",
                   UnitData("Terran Goliath").subUnit.subUnit, 228)
+
+    test_equality("UnitData, check if chain through other data types works",
+                  UnitData("Protoss Dragoon").flingy,
+                  EncodeFlingy("Dragoon"))
+
+    test_equality("UnitData, check if chain through other data types works",
+                  UnitData("Zerg Zergling").flingy.sprite,
+                  EncodeSprite("Zergling"))
+
+    test_equality("UnitData, check if chain through other data types works",
+                  UnitData("Terran Marine").flingy.sprite.image,
+                  EncodeImage("Marine"))
+
+    archon_variable = EUDVariable()
+    archon_variable << EncodeUnit("Protoss Archon")
+    archon = UnitData(archon_variable)
+
+    test_equality("UnitData, check if chain from variable works",
+                  archon.flingy,
+                  EncodeFlingy("Archon Energy"))
+
+    test_equality("UnitData, check if chain from variable works",
+                  archon.flingy.sprite,
+                  EncodeSprite("Archon Energy"))
+
+    test_equality("UnitData, check if chain from variable works",
+                  archon.flingy.sprite.image,
+                  EncodeImage("Archon Energy"))
 
     UnitData("Goliath Turret").maxHP = previous_value
 
@@ -78,6 +106,9 @@ def test_scdataobject():
                 Accumulate(P7, Exactly, 300, Ore))
 
     DoActions(SetResources(P7, SetTo, 0, OreAndGas))
+
+    with expect_eperror():
+        u = UnitData("Artanis, GOD OF EUD")
 
 
 @TestInstance

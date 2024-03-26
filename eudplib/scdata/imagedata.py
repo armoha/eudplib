@@ -11,7 +11,14 @@ from .scdataobject import SCDataObject
 
 
 class ImageData(SCDataObject):
-
+    # Read only data skipped
+    drawIfCloaked = Member(0x667718, MemberKind.BOOL)
+    drawingFunction = Member(0x669E28, MemberKind.BYTE)
+    # Remapping table is skipped because it doesn't work in SC:R
+    clickable = Member(0x66C150, MemberKind.BOOL)
+    useFullIscript = Member(0x66D4D8, MemberKind.BOOL)
+    graphicsTurns = Member(0x66E860, MemberKind.BOOL)
+    iscript = iscriptID = Member(0x66EC48, MemberKind.DWORD)  # noqa: N815
 
     def __init__(self, index):
         super().__init__(strenc.EncodeImage(index))

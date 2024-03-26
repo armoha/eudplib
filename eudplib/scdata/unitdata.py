@@ -18,6 +18,7 @@ from .scdataobject import SCDataObject
 
 
 class UnitData(SCDataObject):
+    __slots__ = []
     maxHP = hitPoints = HP = Member(0x662350, MemberKind.DWORD)  # noqa: N815
     maxAirHits = Member(0x65FC18, MemberKind.BYTE)  # noqa: N815
     gas = gasCost = Member(0x65FD00, MemberKind.WORD)  # noqa: N815
@@ -65,7 +66,7 @@ class UnitData(SCDataObject):
     killScore = Member(0x663EB8, MemberKind.WORD)  # noqa: N815
     advancedFlags = Member(0x664080, MemberKind.DWORD)  # noqa: N815
     transportSpaceRequired = Member(0x664410, MemberKind.BYTE)  # noqa: N815
-    flingy = FlingyDataMember(0x664410)
+    flingy = FlingyDataMember(0x6644F8)
     maxGroundHits = Member(0x6645E0, MemberKind.BYTE)  # noqa: N815
     supplyProvided = Member(0x6646C8, MemberKind.BYTE)  # noqa: N815
     hasShields = Member(0x6647B0, MemberKind.BOOL)  # noqa: N815
