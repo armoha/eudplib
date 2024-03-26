@@ -36,7 +36,7 @@ class CSprite(EPDOffsetMap):
     prev = CSpriteMember(0x00)
     next = CSpriteMember(0x04)
     sprite = Member(0x08, MemberKind.SPRITE)
-    playerID = Member(0x0A, MemberKind.TRG_PLAYER)  # officially "creator"
+    playerID = Member(0x0A, MemberKind.PLAYER)  # officially "creator"
     # 0 <= selectionIndex <= 11.
     # Index in the selection area at bottom of screen.
     selectionIndex = Member(0x0B, MemberKind.BYTE)

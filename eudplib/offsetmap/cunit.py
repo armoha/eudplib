@@ -21,7 +21,9 @@ from .member import (
     Flag,
     Member,
     MemberKind,
+    PlayerDataMember,
     UnitDataMember,
+    UnitOrderDataMember,
     UnsupportedMember,
 )
 
@@ -91,7 +93,7 @@ class CUnit(EPDOffsetMap):
     __slots__ = "_ptr"
     # TODO: add docstring for descriptor
     prev = CUnitMember(0x000)
-    next = CUnitMember(0x004)  # link
+    get_next = CUnitMember(0x004)  # link
     # displayed value is ceil(healthPoints/256)
     hp = Member(0x008, MemberKind.DWORD)
     sprite = CSpriteMember(0x00C)
@@ -132,10 +134,10 @@ class CUnit(EPDOffsetMap):
     acceleration = Member(0x048, MemberKind.WORD)
     currentDirection2 = Member(0x04A, MemberKind.BYTE)
     velocityDirection2 = Member(0x04B, MemberKind.BYTE)  # pathing related
-    playerID = Member(0x04C, MemberKind.TRG_PLAYER)
-    owner = Member(0x04C, MemberKind.TRG_PLAYER)
-    orderID = Member(0x04D, MemberKind.UNIT_ORDER)
-    order = Member(0x04D, MemberKind.UNIT_ORDER)
+    playerID = PlayerDataMember(0x04C)
+    owner = PlayerDataMember(0x04C)
+    orderID = UnitOrderDataMember(0x04D)
+    order = UnitOrderDataMember(0x04D)
     orderState = Member(0x04E, MemberKind.BYTE)
     orderSignal = Member(0x04F, MemberKind.BYTE)
     orderUnitType = UnitDataMember(0x050)
@@ -181,7 +183,7 @@ class CUnit(EPDOffsetMap):
     unknown0x8C = Member(0x08C, MemberKind.WORD)
     rankIncrease = Member(0x08E, MemberKind.BYTE)
     killCount = Member(0x08F, MemberKind.BYTE)
-    lastAttackingPlayer = Member(0x090, MemberKind.TRG_PLAYER)
+    lastAttackingPlayer = PlayerDataMember(0x090)
     secondaryOrderTimer = Member(0x091, MemberKind.BYTE)
     AIActionFlag = Member(0x092, MemberKind.BYTE)
     # 2 = issued an order
@@ -202,8 +204,8 @@ class CUnit(EPDOffsetMap):
     buildQueueSlot = Member(0x0A4, MemberKind.BYTE)
     targetOrderSpecial = Member(0x0A5, MemberKind.BYTE)
     uniquenessIdentifier = Member(0x0A5, MemberKind.BYTE)
-    secondaryOrder = Member(0x0A6, MemberKind.UNIT_ORDER)
-    secondaryOrderID = Member(0x0A6, MemberKind.UNIT_ORDER)
+    secondaryOrder = UnitOrderDataMember(0x0A6)
+    secondaryOrderID = UnitOrderDataMember(0x0A6)
     # 0 means the building has the largest amount of fire/blood
     buildingOverlayState = Member(0x0A7, MemberKind.BYTE)
     hpGain = Member(0x0A8, MemberKind.WORD)  # buildRepairHpGain
@@ -348,7 +350,7 @@ class CUnit(EPDOffsetMap):
     # Used to tell if a unit is under psi storm	(is "stormTimer" in BWAPI)
     isUnderStorm = Member(0x11B, MemberKind.BYTE)
     irradiatedBy = CUnitMember(0x11C)
-    irradiatePlayerID = Member(0x120, MemberKind.TRG_PLAYER)
+    irradiatePlayerID = PlayerDataMember(0x120)
     # Each bit corresponds to the player who has parasited this unit
     parasiteFlags = Member(0x121, MemberKind.BYTE)
     # counts/cycles up from 0 to 7 (inclusive). See also 0x85
@@ -657,7 +659,7 @@ class CUnit(EPDOffsetMap):
         # return False
 
     @classmethod
-    def next(cls: type[T]) -> "CUnit":
+    def from_next(cls: type[T]) -> "CUnit":
         return CUnit.from_read(ut.EPD(0x628438))
 
     def check_buildq(self, unit_type) -> c.Condition:
