@@ -29,7 +29,8 @@ if TYPE_CHECKING:
     # which is why those imports are marked as unused by default
     # Therefore, these F401 warnings are suppressed now
     from .flingydata import FlingyData  # noqa: F401
-    from .imagedata import ImageData
+    from .imagedata import ImageData  # noqa: F401
+    from .playerdata import PlayerData  # noqa: F401
     from .spritedata import SpriteData  # noqa: F401
     from .unitdata import UnitData  # noqa: F401
     from .unitorderdata import UnitOrderData  # noqa: F401
@@ -56,7 +57,6 @@ class MemberKind(enum.Enum):
     UPGRADE = enum.auto()
     TECH = enum.auto()
     WEAPON = enum.auto()
-    SPRITE = enum.auto()
     IMAGE = enum.auto()
     # More to be added!
 
@@ -220,6 +220,9 @@ class FlingyDataMember(SCDataObjectTypeMember["FlingyData"]):
 
 class ImageDataMember(SCDataObjectTypeMember["ImageData"]):
     _default_kind = MemberKind.IMAGE
+
+class PlayerDataMember(SCDataObjectTypeMember["PlayerData"]):
+    _default_kind = MemberKind.PLAYER
 
 class SpriteDataMember(SCDataObjectTypeMember["SpriteData"]):
     _default_kind = MemberKind.SPRITE
