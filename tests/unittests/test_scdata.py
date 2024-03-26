@@ -82,7 +82,7 @@ def test_scdataobject():
 
 @TestInstance
 def test_epdoffsetmap_scdataobject_reference():
-    goliath_cunit = CUnit.get_next()
+    goliath_cunit = CUnit.from_next()
     DoActions(CreateUnit(1, "Terran Goliath", "Anywhere", P8))
     test_equality("Cunit subunit type check",
                   goliath_cunit.subUnit.unitType,
