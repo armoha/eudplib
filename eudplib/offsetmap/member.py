@@ -41,7 +41,7 @@ class MemberKind(enum.Enum):
     C_UNIT = enum.auto()
     C_SPRITE = enum.auto()
     UNIT = enum.auto()
-    TRG_PLAYER = enum.auto()
+    PLAYER = enum.auto()
     UNIT_ORDER = enum.auto()
     POSITION = enum.auto()
     POSITION_X = enum.auto()
@@ -55,7 +55,7 @@ class MemberKind(enum.Enum):
         match self:
             case MemberKind.UNIT:
                 return c.EncodeUnit(other)
-            case MemberKind.TRG_PLAYER:
+            case MemberKind.PLAYER:
                 return c.EncodePlayer(other)
             case MemberKind.UNIT_ORDER:
                 return c.EncodeUnitOrder(other)
@@ -409,4 +409,21 @@ class SCDataObjectMember(BaseMember, Generic[S], metaclass=ABCMeta):
 
 class UnitDataMember(SCDataObjectMember[scdata.UnitData],
                      data_type=scdata.UnitData, kind=MemberKind.UNIT):
+    pass
+
+class UnitOrderDataMember(SCDataObjectMember[scdata.UnitOrderData],
+                          data_type=scdata.UnitOrderData,
+                          kind=MemberKind.UNIT_ORDER):
+    pass
+
+class FlingyDataMember(SCDataObjectMember[scdata.FlingyData],
+                       data_type=scdata.FlingyData, kind=MemberKind.FLINGY):
+    pass
+
+class SpriteDataMember(SCDataObjectMember[scdata.SpriteData],
+                       data_type=scdata.SpriteData, kind=MemberKind.SPRITE):
+    pass
+
+class PlayerDataMember(SCDataObjectMember[scdata.PlayerData],
+                       data_type=scdata.PlayerData, kind=MemberKind.PLAYER):
     pass
