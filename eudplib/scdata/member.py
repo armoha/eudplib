@@ -7,7 +7,6 @@
 
 import enum
 from abc import ABCMeta
-from types import NoneType
 from typing import (
     TYPE_CHECKING,
     Final,
@@ -146,7 +145,7 @@ class Member:
         self.kind = kind
 
     @overload
-    def __get__(self, instance: NoneType, objtype=None) -> Self:
+    def __get__(self, instance: None, objtype=None) -> Self:
         ...
 
     @overload
@@ -189,25 +188,25 @@ class Member:
 
 class EnumMember(Member):
     # TODO: Implement this later
-    def __init__(self, base_address: int, kind: MemberKind) -> NoneType:
+    def __init__(self, base_address: int, kind: MemberKind) -> None:
         raise NotImplementedError("EnumMember is not implemented yet")
 
-M = TypeVar("M", bound=SCDataObject)
+S = TypeVar("S", bound=SCDataObject)
 
-class SCDataObjectTypeMember(Member, Generic[M], metaclass=ABCMeta):
+class SCDataObjectTypeMember(Member, Generic[S], metaclass=ABCMeta):
     # TODO Think of a better name?
-    _data_object_type: type[M]
+    _data_object_type: type[S]
     _default_kind: MemberKind
 
-    def __init__(self, base_address: int) -> NoneType:
+    def __init__(self, base_address: int) -> None:
         super().__init__(base_address, self._default_kind)
 
     @overload
-    def __get__(self, instance: NoneType, objtype=None) -> Self:
+    def __get__(self, instance: None, objtype=None) -> Self:
         ...
 
     @overload
-    def __get__(self, instance: SCDataObject, objtype=None) -> M:
+    def __get__(self, instance: SCDataObject, objtype=None) -> S:
         ...
 
     def __get__(self, instance, objtype=None):
