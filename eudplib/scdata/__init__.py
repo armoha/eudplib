@@ -6,7 +6,10 @@
 # file that should have been included as part of this package.
 
 from .flingydata import FlingyData
+from .imagedata import ImageData
+from .playerdata import PlayerData
 from .scdataobject import SCDataObject
+from .spritedata import SpriteData
 from .unitdata import UnitData
 from .unitorderdata import UnitOrderData
 from .weapondata import WeaponData
@@ -14,6 +17,9 @@ from .weapondata import WeaponData
 __all__ = [
     "SCDataObject",
     "FlingyData",
+    "ImageData",
+    "PlayerData",
+    "SpriteData",
     "UnitData",
     "UnitOrderData",
     "WeaponData",
