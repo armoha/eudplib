@@ -10,11 +10,11 @@ from .member import MemberKind, SCDataObjectMember, UnitDataMember
 from .scdataobject import SCDataObject
 
 
-class UnitData(SCDataObject):
-    maxHP = hitPoints = SCDataObjectMember(0x662350, MemberKind.DWORD)  # noqa: N815
-    subUnit = subUnit1 = UnitDataMember(0x6607C0)  # noqa: N815
+class WeaponData(SCDataObject):
+    damage = SCDataObjectMember(0x656EB0, MemberKind.WORD)
+    cooldown = SCDataObjectMember(0x656EBC, MemberKind.WORD)
 
     def __init__(self, index):
         super().__init__(strenc.EncodeUnit(index))
 
-UnitDataMember._data_object_type = UnitData
+UnitDataMember._data_object_type = WeaponData
