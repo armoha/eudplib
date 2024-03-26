@@ -15,6 +15,6 @@ class WeaponData(SCDataObject):
     cooldown = Member(0x656EBC, MemberKind.WORD)
 
     def __init__(self, index):
-        super().__init__(strenc.EncodeUnit(index))
+        super().__init__(strenc.EncodeWeapon(index))
 
 WeaponDataMember._data_object_type = WeaponData

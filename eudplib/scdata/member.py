@@ -29,6 +29,8 @@ if TYPE_CHECKING:
     # which is why those imports are marked as unused by default
     # Therefore, these F401 warnings are suppressed now
     from .flingydata import FlingyData  # noqa: F401
+    from .imagedata import ImageData
+    from .spritedata import SpriteData  # noqa: F401
     from .unitdata import UnitData  # noqa: F401
     from .unitorderdata import UnitOrderData  # noqa: F401
     from .weapondata import WeaponData  # noqa: F401
@@ -54,6 +56,8 @@ class MemberKind(enum.Enum):
     UPGRADE = enum.auto()
     TECH = enum.auto()
     WEAPON = enum.auto()
+    SPRITE = enum.auto()
+    IMAGE = enum.auto()
     # More to be added!
 
     def cast(self, other):
@@ -78,6 +82,9 @@ class MemberKind(enum.Enum):
             case MemberKind.WEAPON:
                 from . import weapondata
                 return weapondata.WeaponData(other)
+            case MemberKind.SPRITE:
+                from . import spritedata
+                return spritedata.SpriteData(other)
             case _:
                 return other
 
@@ -211,6 +218,12 @@ class SCDataObjectTypeMember(Member, Generic[M], metaclass=ABCMeta):
 class FlingyDataMember(SCDataObjectTypeMember["FlingyData"]):
     _default_kind = MemberKind.FLINGY
 
+class ImageDataMember(SCDataObjectTypeMember["ImageData"]):
+    _default_kind = MemberKind.IMAGE
+
+class SpriteDataMember(SCDataObjectTypeMember["SpriteData"]):
+    _default_kind = MemberKind.SPRITE
+
 class UnitDataMember(SCDataObjectTypeMember["UnitData"]):
     _default_kind = MemberKind.UNIT
 
@@ -219,3 +232,4 @@ class UnitOrderDataMember(SCDataObjectTypeMember["UnitOrderData"]):
 
 class WeaponDataMember(SCDataObjectTypeMember["WeaponData"]):
     _default_kind = MemberKind.WEAPON
+
