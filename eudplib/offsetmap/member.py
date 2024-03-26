@@ -7,7 +7,17 @@
 
 import enum
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Final, Literal, NoReturn
+from typing import (
+    TYPE_CHECKING,
+    Final,
+    Generic,
+    Literal,
+    NoReturn,
+    TypeVar,
+    overload,
+)
+
+from typing_extensions import Self
 
 from .. import core as c
 from .. import ctrlstru as cs
@@ -19,6 +29,7 @@ from ..trigger import Trigger
 if TYPE_CHECKING:
     from .csprite import CSprite
     from .cunit import CUnit
+    from .epdoffsetmap import EPDOffsetMap
 
 
 class MemberKind(enum.Enum):
@@ -367,22 +378,32 @@ class CSpriteMember(BaseMember):
             return
         raise AttributeError
 
-class UnitDataMember(BaseMember):
+S = TypeVar("S", bound=scdata.SCDataObject)
+class SCDataObjectMember(BaseMember, Generic[S], metaclass=ABCMeta):
     """Descriptor for EPDOffsetMap"""
-
-    __slots__ = ()
+    def __init_subclass__(cls, data_type: type[S], kind: MemberKind) -> None:
+        cls.bound_data_type = data_type
+        cls.bound_kind = kind
 
     def __init__(self, offset: int) -> None:
-        super().__init__(offset, MemberKind.UNIT)
+        super().__init__(offset, self.bound_kind)
 
-    def __get__(self, instance, owner=None) -> "scdata.UnitData | UnitDataMember":
+    @overload
+    def __get__(self, instance: None, owner=None) -> Self:
+        ...
+
+    @overload
+    def __get__(self, instance: "EPDOffsetMap", owner=None) -> S:
+        ...
+
+    def __get__(self, instance, owner=None):
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
             return self
         q, r = divmod(self.offset, 4)
         if isinstance(instance, EPDOffsetMap):
-            return scdata.UnitData(self.kind.read_epd(instance._epd + q, r))
+            return self.bound_data_type(self.kind.read_epd(instance._epd + q, r))
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
@@ -392,5 +413,9 @@ class UnitDataMember(BaseMember):
         if isinstance(instance, EPDOffsetMap):
             value = self.kind.cast(value)
             self.kind.write_epd(instance._epd + q, r, value)
-            return
-        raise AttributeError
+        else:
+            raise AttributeError
+
+class UnitDataMember(SCDataObjectMember[scdata.UnitData],
+                     data_type=scdata.UnitData, kind=MemberKind.UNIT):
+    pass
