@@ -63,6 +63,21 @@ def test_scdataobject():
 
     UnitData("Goliath Turret").maxHP = previous_value
 
+    DoActions(SetResources(P7, SetTo, 100, OreAndGas))
+
+    test_equality("PlayerData, check ore amount read",
+                  PlayerData(P7).mineral, 100)
+    test_equality("PlayerData, check gas amount read",
+                  PlayerData(P7).gas, 100)
+
+    PlayerData(P7).mineral += 200
+
+    test_equality("PlayerData, check ore amount write",
+                  PlayerData(P7).mineral, 300)
+    test_assert("PlayerData, check ore amount write",
+                Accumulate(P7, Exactly, 300, Ore))
+
+    DoActions(SetResources(P7, SetTo, 0, OreAndGas))
 
 
 @TestInstance

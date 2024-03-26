@@ -137,7 +137,13 @@ from .eudlib import *
 from .maprw import *
 from .offsetmap import CSprite, CUnit, EPDCUnitMap
 from .scdata import (
-    UnitData
+    FlingyData,
+    ImageData,
+    PlayerData,
+    SpriteData,
+    UnitData,
+    UnitOrderData,
+    WeaponData,
 )
 from .trigger import *
 from .trigtrg.runtrigtrg import (
