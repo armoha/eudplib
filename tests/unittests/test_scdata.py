@@ -6,7 +6,7 @@ from helper import *  # noqa: F403
 @TestInstance
 def test_scdataobject():
     test_equality("UnitData, check conversion to int",
-                  unProxy(UnitData(13)), 13)
+                  UnitData(13), 13)
     previous_value = EUDVariable()
 
     test_equality("UnitData Max HP, compare against const", UnitData(0).maxHP, 40 * 256)
@@ -52,7 +52,7 @@ def test_scdataobject():
     UnitData("Goliath Turret").maxHP = 512
 
     test_equality("UnitData Subunit, check UnitData to int conversion",
-                  unProxy(UnitData("Terran Goliath").subUnit),
+                  UnitData("Terran Goliath").subUnit,
                   EncodeUnit("Goliath Turret"))
 
     test_equality("UnitData Subunit, check if member type of unit works",
@@ -66,9 +66,9 @@ def test_scdataobject():
 def test_epdoffsetmap_scdataobject_reference():
     goliath_cunit = CUnit.next()
     DoActions(CreateUnit(1, "Terran Goliath", "Anywhere", P8))
-    goliath_data = goliath_cunit.unitID
+    goliath_data = goliath_cunit.unitType
     test_equality("Cunit subunit type check",
-                  unProxy(goliath_data.subUnit),
-                  unProxy(UnitData("Terran Goliath").subUnit))
-    
+                  goliath_data.subUnit,
+                  UnitData("Terran Goliath").subUnit)
+
     DoActions(RemoveUnit("Terran Goliath", P8))

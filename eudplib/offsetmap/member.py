@@ -386,4 +386,11 @@ class UnitDataMember(BaseMember):
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
-        return super().__set__(instance, value)
+        from .epdoffsetmap import EPDOffsetMap
+
+        q, r = divmod(self.offset, 4)
+        if isinstance(instance, EPDOffsetMap):
+            value = self.kind.cast(value)
+            self.kind.write_epd(instance._epd + q, r, value)
+            return
+        raise AttributeError
