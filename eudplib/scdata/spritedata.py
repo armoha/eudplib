@@ -6,14 +6,14 @@
 # file that should have been included as part of this package.
 
 from ..core.rawtrigger import strenc
-from .member import FlingyDataMember, Member, MemberKind
+from .member import Member, MemberKind, SpriteDataMember
 from .scdataobject import SCDataObject
 
 
-class FlingyData(SCDataObject):
+class SpriteData(SCDataObject):
 
 
     def __init__(self, index):
-        super().__init__(strenc.EncodeFlingy(index))
+        super().__init__(strenc.EncodeSprite(index))
 
-FlingyDataMember._data_object_type = FlingyData
+SpriteDataMember._data_object_type = SpriteData
