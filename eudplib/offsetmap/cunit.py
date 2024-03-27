@@ -100,8 +100,7 @@ class CUnit(EPDOffsetMap):
     moveTargetPos = Member(0x010, MemberKind.POSITION)
     moveTargetX = Member(0x010, MemberKind.POSITION_X)
     moveTargetY = Member(0x012, MemberKind.POSITION_Y)
-    moveTarget = CUnitMember(0x014)
-    moveTargetUnit = CUnitMember(0x014)
+    moveTarget = moveTargetUnit = CUnitMember(0x014)
     # The next way point in the path the unit is following to get to
     # its destination. Equal to moveToPos for air units since they
     # don't need to navigate around buildings.
@@ -134,30 +133,25 @@ class CUnit(EPDOffsetMap):
     acceleration = Member(0x048, MemberKind.WORD)
     currentDirection2 = Member(0x04A, MemberKind.BYTE)
     velocityDirection2 = Member(0x04B, MemberKind.BYTE)  # pathing related
-    playerID = PlayerDataMember(0x04C)
-    owner = PlayerDataMember(0x04C)
-    orderID = UnitOrderDataMember(0x04D)
-    order = UnitOrderDataMember(0x04D)
+    owner = playerID = PlayerDataMember(0x04C)
+    order = orderID = UnitOrderDataMember(0x04D)
     orderState = Member(0x04E, MemberKind.BYTE)
     orderSignal = Member(0x04F, MemberKind.BYTE)
     orderUnitType = UnitDataMember(0x050)
     unknown0x52 = Member(0x052, MemberKind.WORD)  # 2-byte padding
     cooldown = Member(0x054, MemberKind.DWORD)
     orderTimer = Member(0x054, MemberKind.BYTE)
-    gCooldown = Member(0x055, MemberKind.BYTE)
-    aCooldown = Member(0x056, MemberKind.BYTE)
+    groundWeaponCooldown = gCooldown = Member(0x055, MemberKind.BYTE)
+    airWeaponCooldown = aCooldown = Member(0x056, MemberKind.BYTE)
     spellCooldown = Member(0x057, MemberKind.BYTE)
-    groundWeaponCooldown = Member(0x055, MemberKind.BYTE)
-    airWeaponCooldown = Member(0x056, MemberKind.BYTE)
-    orderTargetPos = Member(0x058, MemberKind.POSITION)  # ActionFocus
-    orderTargetXY = Member(0x058, MemberKind.POSITION)
+    # ActionFocus
+    orderTargetXY = orderTargetPos = Member(0x058, MemberKind.POSITION)
     orderTargetX = Member(0x058, MemberKind.POSITION_X)
     orderTargetY = Member(0x05A, MemberKind.POSITION_Y)
     orderTarget = CUnitMember(0x05C)
     orderTargetUnit = CUnitMember(0x05C)
     shield = Member(0x060, MemberKind.DWORD)
-    unitID = UnitDataMember(0x064)
-    unitType = UnitDataMember(0x064)
+    unitType = unitID = UnitDataMember(0x064)
     unknown0x66 = Member(0x066, MemberKind.WORD)  # 2-byte padding
     prevPlayerUnit = CUnitMember(0x068)
     nextPlayerUnit = CUnitMember(0x06C)
@@ -202,10 +196,8 @@ class CUnit(EPDOffsetMap):
     buildQueue34 = Member(0x09C, MemberKind.DWORD)
     energy = Member(0x0A2, MemberKind.WORD)
     buildQueueSlot = Member(0x0A4, MemberKind.BYTE)
-    targetOrderSpecial = Member(0x0A5, MemberKind.BYTE)
-    uniquenessIdentifier = Member(0x0A5, MemberKind.BYTE)
-    secondaryOrder = UnitOrderDataMember(0x0A6)
-    secondaryOrderID = UnitOrderDataMember(0x0A6)
+    uniquenessIdentifier = targetOrderSpecial = Member(0x0A5, MemberKind.BYTE)
+    secondaryOrder = secondaryOrderID = UnitOrderDataMember(0x0A6)
     # 0 means the building has the largest amount of fire/blood
     buildingOverlayState = Member(0x0A7, MemberKind.BYTE)
     hpGain = Member(0x0A8, MemberKind.WORD)  # buildRepairHpGain
@@ -329,12 +321,12 @@ class CUnit(EPDOffsetMap):
     # 1 if a medic is currently healing this unit
     isBeingHealed = Member(0x107, MemberKind.BOOL)
     # A rect that specifies the closest contour (collision) points
-    contourBoundsLU = UnsupportedMember(0x108, MemberKind.DWORD)
     contourBoundsL = UnsupportedMember(0x108, MemberKind.WORD)
     contourBoundsU = UnsupportedMember(0x10A, MemberKind.WORD)
-    contourBoundsRB = UnsupportedMember(0x10C, MemberKind.DWORD)
     contourBoundsR = UnsupportedMember(0x10C, MemberKind.WORD)
     contourBoundsB = UnsupportedMember(0x10E, MemberKind.WORD)
+    contourBoundsLU = UnsupportedMember(0x108, MemberKind.DWORD)
+    contourBoundsRB = UnsupportedMember(0x10C, MemberKind.DWORD)
     # Hallucination, Dark Swarm, Disruption Web, Broodling
     # (but not Scanner Sweep according to BWAPI)
     removeTimer = Member(0x110, MemberKind.WORD)
