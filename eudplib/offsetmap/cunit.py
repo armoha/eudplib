@@ -93,7 +93,7 @@ class CUnit(EPDOffsetMap):
     __slots__ = "_ptr"
     # TODO: add docstring for descriptor
     prev = CUnitMember(0x000)
-    get_next = CUnitMember(0x004)  # link
+    next = CUnitMember(0x004)  # link
     # displayed value is ceil(healthPoints/256)
     hp = Member(0x008, MemberKind.DWORD)
     sprite = CSpriteMember(0x00C)
