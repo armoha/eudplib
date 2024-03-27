@@ -18,4 +18,5 @@ class SpriteData(SCDataObject):
     def __init__(self, index):
         super().__init__(strenc.EncodeSprite(index))
 
+
 SpriteDataMember._data_object_type = SpriteData

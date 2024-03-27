@@ -23,6 +23,7 @@ class SCDataObject(ut.ExprProxy, metaclass=ABCMeta):
     SCDataObject classes support manipulation of linked data
     via member get/set.
     """
+
     dont_flatten = True
 
     @abstractmethod
@@ -42,4 +43,3 @@ class SCDataObject(ut.ExprProxy, metaclass=ABCMeta):
 
     def Evaluate(self):  # noqa: N802
         return c.Evaluate(self._value)
-

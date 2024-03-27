@@ -40,4 +40,5 @@ class WeaponData(SCDataObject):
     def __init__(self, index):
         super().__init__(strenc.EncodeWeapon(index))
 
+
 WeaponDataMember._data_object_type = WeaponData

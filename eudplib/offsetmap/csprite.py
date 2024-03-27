@@ -64,9 +64,7 @@ class CSprite(EPDOffsetMap):
     imageHead = Member(0x1C, MemberKind.DWORD)
     imageTail = Member(0x20, MemberKind.DWORD)
 
-    def __init__(
-        self, epd: int_or_var, *, ptr: int_or_var | None = None
-    ) -> None:
+    def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
         """
         EPD Constructor of CSprite.
 
@@ -104,9 +102,7 @@ class CSprite(EPDOffsetMap):
                 _epd = c.EUDVariable()
                 _epd << u
         else:
-            raise ut.EPError(
-                _("Invalid input for CSprite: {}").format((epd, ptr))
-            )
+            raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
 
         super().__init__(_epd)
 
@@ -124,9 +120,7 @@ class CSprite(EPDOffsetMap):
             if r == 0 and 0 <= q < 1700:
                 epd = ut.EPD(u)
             else:
-                raise ut.EPError(
-                    _("Invalid input for CSprite: {}").format(ptr)
-                )
+                raise ut.EPError(_("Invalid input for CSprite: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
             epd = epd_cache(u)
         else:

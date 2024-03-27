@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from .unitorderdata import UnitOrderData  # noqa: F401
     from .weapondata import WeaponData  # noqa: F401
 
+
 class MemberKind(enum.Enum):
     # TODO: Combine with offsetmap's MemberKind
     # Get rid of boilerplate/duplicate codes later
@@ -64,14 +65,17 @@ class MemberKind(enum.Enum):
         match self:
             case MemberKind.UNIT:
                 from . import unitdata
+
                 return unitdata.UnitData(other)
             case MemberKind.PLAYER:
                 return c.EncodePlayer(other)
             case MemberKind.UNIT_ORDER:
                 from . import unitorderdata
+
                 return unitorderdata.UnitOrderData(other)
             case MemberKind.FLINGY:
                 from . import flingydata
+
                 return flingydata.FlingyData(other)
             case MemberKind.SPRITE:
                 return c.EncodeSprite(other)
@@ -81,9 +85,11 @@ class MemberKind(enum.Enum):
                 return c.EncodeTech(other)
             case MemberKind.WEAPON:
                 from . import weapondata
+
                 return weapondata.WeaponData(other)
             case MemberKind.SPRITE:
                 from . import spritedata
+
                 return spritedata.SpriteData(other)
             case _:
                 return other
@@ -91,11 +97,7 @@ class MemberKind(enum.Enum):
     @property
     def size(self) -> Literal[1, 2, 4]:
         match self:
-            case (
-                MemberKind.DWORD
-                | MemberKind.POSITION
-                | MemberKind.DIMENSIONS
-            ):
+            case MemberKind.DWORD | MemberKind.POSITION | MemberKind.DIMENSIONS:
                 return 4
             case (
                 MemberKind.WORD
@@ -108,11 +110,12 @@ class MemberKind(enum.Enum):
                 | MemberKind.IMAGE
             ):
                 return 2
-            case _: # Flingy is 1 byte in Dat
+            case _:  # Flingy is 1 byte in Dat
                 return 1
 
     def read_epd(self, epd, subp) -> ut.ExprProxy | SCDataObject:
         from ..eudlib import memiof
+
         match self.size:
             case 4:
                 value = memiof.f_dwread_epd(epd)
@@ -127,6 +130,7 @@ class MemberKind(enum.Enum):
 
     def write_epd(self, epd, subp, value) -> None:
         from ..eudlib import memiof
+
         match self.size:
             case 4:
                 memiof.f_dwwrite_epd(epd, value)
@@ -136,6 +140,7 @@ class MemberKind(enum.Enum):
                 memiof.f_bwrite_epd(epd, subp, value)
             case _:
                 raise ValueError("size of MemberKind not in 1, 2, 4")
+
 
 class Member:
     base_address: Final[int]
@@ -155,13 +160,11 @@ class Member:
 
     @overload
     def __get__(
-            self, instance: SCDataObject, objtype=None
-        ) -> ut.ExprProxy | SCDataObject:
+        self, instance: SCDataObject, objtype=None
+    ) -> ut.ExprProxy | SCDataObject:
         ...
 
-    def __get__(
-            self, instance, objtype=None
-        ):
+    def __get__(self, instance, objtype=None):
         from .scdataobject import SCDataObject
 
         if instance is None:
@@ -180,7 +183,6 @@ class Member:
             return self.kind.read_epd(self.base_address_epd + q, r)
         raise AttributeError("SCDataObjectMember owner not of type SCDataObject!")
 
-
     def __set__(self, instance, value) -> None:
         from .scdataobject import SCDataObject
 
@@ -197,12 +199,15 @@ class Member:
             return
         raise AttributeError
 
+
 class EnumMember(Member):
     # TODO: Implement this later
     def __init__(self, base_address: int, kind: MemberKind) -> None:
         raise NotImplementedError("EnumMember is not implemented yet")
 
+
 S = TypeVar("S", bound=SCDataObject)
+
 
 class SCDataObjectTypeMember(Member, Generic[S], metaclass=ABCMeta):
     # TODO Think of a better name?
@@ -228,25 +233,32 @@ class SCDataObjectTypeMember(Member, Generic[S], metaclass=ABCMeta):
             return self
         return self._data_object_type(super().__get__(instance))
 
+
 class FlingyDataMember(SCDataObjectTypeMember["FlingyData"], kind=MemberKind.FLINGY):
     _data_object_type: type["FlingyData"]
+
 
 class ImageDataMember(SCDataObjectTypeMember["ImageData"], kind=MemberKind.IMAGE):
     _data_object_type: type["ImageData"]
 
+
 class PlayerDataMember(SCDataObjectTypeMember["PlayerData"], kind=MemberKind.PLAYER):
     _data_object_type: type["PlayerData"]
+
 
 class SpriteDataMember(SCDataObjectTypeMember["SpriteData"], kind=MemberKind.SPRITE):
     _data_object_type: type["SpriteData"]
 
+
 class UnitDataMember(SCDataObjectTypeMember["UnitData"], kind=MemberKind.UNIT):
     _data_object_type: type["UnitData"]
 
+
 class UnitOrderDataMember(
-        SCDataObjectTypeMember["UnitOrderData"], kind=MemberKind.UNIT_ORDER
-    ):
+    SCDataObjectTypeMember["UnitOrderData"], kind=MemberKind.UNIT_ORDER
+):
     _data_object_type: type["UnitOrderData"]
+
 
 class WeaponDataMember(SCDataObjectTypeMember["WeaponData"], kind=MemberKind.WEAPON):
     _data_object_type: type["WeaponData"]

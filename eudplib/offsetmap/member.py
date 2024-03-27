@@ -378,9 +378,13 @@ class CSpriteMember(BaseMember):
             return
         raise AttributeError
 
+
 S = TypeVar("S", bound=scdata.SCDataObject)
+
+
 class SCDataObjectMember(BaseMember, Generic[S], metaclass=ABCMeta):
     """Descriptor for EPDOffsetMap"""
+
     def __init_subclass__(cls, data_type: type[S], kind: MemberKind) -> None:
         cls.bound_data_type = data_type
         cls.bound_kind = kind
@@ -416,23 +420,42 @@ class SCDataObjectMember(BaseMember, Generic[S], metaclass=ABCMeta):
         else:
             raise AttributeError
 
-class UnitDataMember(SCDataObjectMember[scdata.UnitData],
-                     data_type=scdata.UnitData, kind=MemberKind.UNIT):
+
+class UnitDataMember(
+    SCDataObjectMember[scdata.UnitData],
+    data_type=scdata.UnitData,
+    kind=MemberKind.UNIT,
+):
     pass
 
-class UnitOrderDataMember(SCDataObjectMember[scdata.UnitOrderData],
-                          data_type=scdata.UnitOrderData,
-                          kind=MemberKind.UNIT_ORDER):
+
+class UnitOrderDataMember(
+    SCDataObjectMember[scdata.UnitOrderData],
+    data_type=scdata.UnitOrderData,
+    kind=MemberKind.UNIT_ORDER,
+):
     pass
 
-class FlingyDataMember(SCDataObjectMember[scdata.FlingyData],
-                       data_type=scdata.FlingyData, kind=MemberKind.FLINGY):
+
+class FlingyDataMember(
+    SCDataObjectMember[scdata.FlingyData],
+    data_type=scdata.FlingyData,
+    kind=MemberKind.FLINGY,
+):
     pass
 
-class SpriteDataMember(SCDataObjectMember[scdata.SpriteData],
-                       data_type=scdata.SpriteData, kind=MemberKind.SPRITE):
+
+class SpriteDataMember(
+    SCDataObjectMember[scdata.SpriteData],
+    data_type=scdata.SpriteData,
+    kind=MemberKind.SPRITE,
+):
     pass
 
-class PlayerDataMember(SCDataObjectMember[scdata.PlayerData],
-                       data_type=scdata.PlayerData, kind=MemberKind.PLAYER):
+
+class PlayerDataMember(
+    SCDataObjectMember[scdata.PlayerData],
+    data_type=scdata.PlayerData,
+    kind=MemberKind.PLAYER,
+):
     pass
