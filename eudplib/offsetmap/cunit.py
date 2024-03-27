@@ -499,7 +499,7 @@ class CUnit(EPDOffsetMap):
             sprite = unit.sprite
             cs.DoActions(
                 c.SetMemoryXEPD(
-                    sprite + 0xA0 // 4, c.SetTo, new_owner_65536, 0xFF0000
+                    sprite + 0x0A // 4, c.SetTo, new_owner_65536, 0xFF0000
                 )
             )
 
