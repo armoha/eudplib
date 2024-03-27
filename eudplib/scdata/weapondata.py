@@ -11,8 +11,6 @@ from .scdataobject import SCDataObject
 
 
 class WeaponData(SCDataObject):
-    __slots__ = []
-
     damageFactor = Member(0x6564E0, MemberKind.BYTE)  # noqa: N815
     targetErrorMessage = Member(0x656568, MemberKind.WORD)  # noqa: N815
     behavior = Member(0x656670, MemberKind.BYTE)

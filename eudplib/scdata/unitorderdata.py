@@ -11,7 +11,6 @@ from .scdataobject import SCDataObject
 
 
 class UnitOrderData(SCDataObject):
-    __slots__ = []
     animation = Member(0x664D40, MemberKind.BYTE)
 
     def __init__(self, index):
