@@ -18,7 +18,6 @@ from .scdataobject import SCDataObject
 
 
 class UnitData(SCDataObject):
-    __slots__ = []
     maxHP = hitPoints = HP = Member(0x662350, MemberKind.DWORD)  # noqa: N815
     maxAirHits = Member(0x65FC18, MemberKind.BYTE)  # noqa: N815
     gas = gasCost = Member(0x65FD00, MemberKind.WORD)  # noqa: N815

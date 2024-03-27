@@ -23,7 +23,6 @@ class SCDataObject(ut.ExprProxy, metaclass=ABCMeta):
     SCDataObject classes support manipulation of linked data
     via member get/set.
     """
-    __slots__ = []
     dont_flatten = True
 
     @abstractmethod
@@ -35,7 +34,7 @@ class SCDataObject(ut.ExprProxy, metaclass=ABCMeta):
         super().__init__(index)
 
     @classmethod
-    def cast(cls: Self, _from) -> Self:
+    def cast(cls, _from) -> Self:
         try:
             return cls(_from)
         except TypeError as e:
