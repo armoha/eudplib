@@ -9,6 +9,7 @@ import enum
 from abc import ABCMeta
 from typing import (
     TYPE_CHECKING,
+    ClassVar,
     Final,
     Generic,
     Literal,
@@ -228,24 +229,24 @@ class SCDataObjectTypeMember(Member, Generic[S], metaclass=ABCMeta):
         return self._data_object_type(super().__get__(instance))
 
 class FlingyDataMember(SCDataObjectTypeMember["FlingyData"], kind=MemberKind.FLINGY):
-    pass
+    _data_object_type: type["FlingyData"]
+
 class ImageDataMember(SCDataObjectTypeMember["ImageData"], kind=MemberKind.IMAGE):
-    pass
+    _data_object_type: type["ImageData"]
 
 class PlayerDataMember(SCDataObjectTypeMember["PlayerData"], kind=MemberKind.PLAYER):
-    pass
+    _data_object_type: type["PlayerData"]
 
 class SpriteDataMember(SCDataObjectTypeMember["SpriteData"], kind=MemberKind.SPRITE):
-    pass
+    _data_object_type: type["SpriteData"]
 
 class UnitDataMember(SCDataObjectTypeMember["UnitData"], kind=MemberKind.UNIT):
-    pass
+    _data_object_type: type["UnitData"]
 
 class UnitOrderDataMember(
         SCDataObjectTypeMember["UnitOrderData"], kind=MemberKind.UNIT_ORDER
     ):
-    pass
+    _data_object_type: type["UnitOrderData"]
 
 class WeaponDataMember(SCDataObjectTypeMember["WeaponData"], kind=MemberKind.WEAPON):
-    _default_kind = MemberKind.WEAPON
-
+    _data_object_type: type["WeaponData"]
