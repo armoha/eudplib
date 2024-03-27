@@ -206,6 +206,7 @@ S = TypeVar("S", bound=SCDataObject)
 class SCDataObjectTypeMember(Member, Generic[S], metaclass=ABCMeta):
     # TODO Think of a better name?
     _data_object_type: type[S]
+    _default_kind: MemberKind
 
     def __init_subclass__(cls, kind: MemberKind) -> None:
         cls._default_kind = kind

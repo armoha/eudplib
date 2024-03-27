@@ -11,7 +11,6 @@ from .scdataobject import SCDataObject
 
 
 class SpriteData(SCDataObject):
-    __slots__ = []
     # Read only data skipped
     visible = Member(0x665C48, MemberKind.BOOL)
     image = imageID = ImageDataMember(0x666160)  # noqa: N815
