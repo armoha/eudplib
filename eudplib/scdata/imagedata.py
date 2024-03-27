@@ -23,4 +23,5 @@ class ImageData(SCDataObject):
     def __init__(self, index):
         super().__init__(strenc.EncodeImage(index))
 
+
 ImageDataMember._data_object_type = ImageData

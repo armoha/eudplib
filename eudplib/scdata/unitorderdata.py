@@ -16,4 +16,5 @@ class UnitOrderData(SCDataObject):
     def __init__(self, index):
         super().__init__(strenc.EncodeUnitOrder(index))
 
+
 UnitOrderDataMember._data_object_type = UnitOrderData
