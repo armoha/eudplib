@@ -21,6 +21,9 @@ from .member import (
     Flag,
     Member,
     MemberKind,
+    PlayerDataMember,
+    UnitDataMember,
+    UnitOrderDataMember,
     UnsupportedMember,
 )
 
@@ -97,8 +100,7 @@ class CUnit(EPDOffsetMap):
     moveTargetPos = Member(0x010, MemberKind.POSITION)
     moveTargetX = Member(0x010, MemberKind.POSITION_X)
     moveTargetY = Member(0x012, MemberKind.POSITION_Y)
-    moveTarget = CUnitMember(0x014)
-    moveTargetUnit = CUnitMember(0x014)
+    moveTarget = moveTargetUnit = CUnitMember(0x014)
     # The next way point in the path the unit is following to get to
     # its destination. Equal to moveToPos for air units since they
     # don't need to navigate around buildings.
@@ -131,30 +133,25 @@ class CUnit(EPDOffsetMap):
     acceleration = Member(0x048, MemberKind.WORD)
     currentDirection2 = Member(0x04A, MemberKind.BYTE)
     velocityDirection2 = Member(0x04B, MemberKind.BYTE)  # pathing related
-    playerID = Member(0x04C, MemberKind.TRG_PLAYER)
-    owner = Member(0x04C, MemberKind.TRG_PLAYER)
-    orderID = Member(0x04D, MemberKind.UNIT_ORDER)
-    order = Member(0x04D, MemberKind.UNIT_ORDER)
+    owner = playerID = PlayerDataMember(0x04C)
+    order = orderID = UnitOrderDataMember(0x04D)
     orderState = Member(0x04E, MemberKind.BYTE)
     orderSignal = Member(0x04F, MemberKind.BYTE)
-    orderUnitType = Member(0x050, MemberKind.TRG_UNIT)
+    orderUnitType = UnitDataMember(0x050)
     unknown0x52 = Member(0x052, MemberKind.WORD)  # 2-byte padding
     cooldown = Member(0x054, MemberKind.DWORD)
     orderTimer = Member(0x054, MemberKind.BYTE)
-    gCooldown = Member(0x055, MemberKind.BYTE)
-    aCooldown = Member(0x056, MemberKind.BYTE)
+    groundWeaponCooldown = gCooldown = Member(0x055, MemberKind.BYTE)
+    airWeaponCooldown = aCooldown = Member(0x056, MemberKind.BYTE)
     spellCooldown = Member(0x057, MemberKind.BYTE)
-    groundWeaponCooldown = Member(0x055, MemberKind.BYTE)
-    airWeaponCooldown = Member(0x056, MemberKind.BYTE)
-    orderTargetPos = Member(0x058, MemberKind.POSITION)  # ActionFocus
-    orderTargetXY = Member(0x058, MemberKind.POSITION)
+    # ActionFocus
+    orderTargetXY = orderTargetPos = Member(0x058, MemberKind.POSITION)
     orderTargetX = Member(0x058, MemberKind.POSITION_X)
     orderTargetY = Member(0x05A, MemberKind.POSITION_Y)
     orderTarget = CUnitMember(0x05C)
     orderTargetUnit = CUnitMember(0x05C)
     shield = Member(0x060, MemberKind.DWORD)
-    unitID = Member(0x064, MemberKind.TRG_UNIT)
-    unitType = Member(0x064, MemberKind.TRG_UNIT)
+    unitType = unitID = UnitDataMember(0x064)
     unknown0x66 = Member(0x066, MemberKind.WORD)  # 2-byte padding
     prevPlayerUnit = CUnitMember(0x068)
     nextPlayerUnit = CUnitMember(0x06C)
@@ -172,7 +169,7 @@ class CUnit(EPDOffsetMap):
     # Prevent "Your forces are under attack." on every attack
     attackNotifyTimer = Member(0x087, MemberKind.BYTE)
     # zerg buildings while morphing
-    prevUnitType = UnsupportedMember(0x088, MemberKind.TRG_UNIT)
+    prevUnitType = UnsupportedMember(0x088, MemberKind.UNIT)
     lastEventTimer = UnsupportedMember(0x08A, MemberKind.BYTE)
     # 17 = was completed (train, morph), 174 = was attacked
     lastEventColor = UnsupportedMember(0x08B, MemberKind.BYTE)
@@ -180,7 +177,7 @@ class CUnit(EPDOffsetMap):
     unknown0x8C = Member(0x08C, MemberKind.WORD)
     rankIncrease = Member(0x08E, MemberKind.BYTE)
     killCount = Member(0x08F, MemberKind.BYTE)
-    lastAttackingPlayer = Member(0x090, MemberKind.TRG_PLAYER)
+    lastAttackingPlayer = PlayerDataMember(0x090)
     secondaryOrderTimer = Member(0x091, MemberKind.BYTE)
     AIActionFlag = Member(0x092, MemberKind.BYTE)
     # 2 = issued an order
@@ -190,19 +187,17 @@ class CUnit(EPDOffsetMap):
     currentButtonSet = Member(0x094, MemberKind.WORD)
     isCloaked = Member(0x096, MemberKind.BOOL)
     movementState = Member(0x097, MemberKind.BYTE)
-    buildQueue1 = Member(0x098, MemberKind.TRG_UNIT)
-    buildQueue2 = Member(0x09A, MemberKind.TRG_UNIT)
-    buildQueue3 = Member(0x09C, MemberKind.TRG_UNIT)
-    buildQueue4 = Member(0x09E, MemberKind.TRG_UNIT)
-    buildQueue5 = Member(0x0A0, MemberKind.TRG_UNIT)
+    buildQueue1 = UnitDataMember(0x098)
+    buildQueue2 = UnitDataMember(0x09A)
+    buildQueue3 = UnitDataMember(0x09C)
+    buildQueue4 = UnitDataMember(0x09E)
+    buildQueue5 = UnitDataMember(0x0A0)
     buildQueue12 = Member(0x098, MemberKind.DWORD)
     buildQueue34 = Member(0x09C, MemberKind.DWORD)
     energy = Member(0x0A2, MemberKind.WORD)
     buildQueueSlot = Member(0x0A4, MemberKind.BYTE)
-    targetOrderSpecial = Member(0x0A5, MemberKind.BYTE)
-    uniquenessIdentifier = Member(0x0A5, MemberKind.BYTE)
-    secondaryOrder = Member(0x0A6, MemberKind.UNIT_ORDER)
-    secondaryOrderID = Member(0x0A6, MemberKind.UNIT_ORDER)
+    uniquenessIdentifier = targetOrderSpecial = Member(0x0A5, MemberKind.BYTE)
+    secondaryOrder = secondaryOrderID = UnitOrderDataMember(0x0A6)
     # 0 means the building has the largest amount of fire/blood
     buildingOverlayState = Member(0x0A7, MemberKind.BYTE)
     hpGain = Member(0x0A8, MemberKind.WORD)  # buildRepairHpGain
@@ -240,7 +235,7 @@ class CUnit(EPDOffsetMap):
     flagSpawnFrame = Member(0x0C8, MemberKind.DWORD)  # beacon
     # building /==============================================
     addon = CUnitMember(0x0C0)
-    addonBuildType = Member(0x0C4, MemberKind.TRG_UNIT)
+    addonBuildType = UnitDataMember(0x0C4)
     upgradeResearchTime = Member(0x0C6, MemberKind.WORD)
     techType = Member(0x0C8, MemberKind.TECH)
     upgradeType = Member(0x0C9, MemberKind.UPGRADE)
@@ -326,12 +321,12 @@ class CUnit(EPDOffsetMap):
     # 1 if a medic is currently healing this unit
     isBeingHealed = Member(0x107, MemberKind.BOOL)
     # A rect that specifies the closest contour (collision) points
-    contourBoundsLU = UnsupportedMember(0x108, MemberKind.DWORD)
     contourBoundsL = UnsupportedMember(0x108, MemberKind.WORD)
     contourBoundsU = UnsupportedMember(0x10A, MemberKind.WORD)
-    contourBoundsRB = UnsupportedMember(0x10C, MemberKind.DWORD)
     contourBoundsR = UnsupportedMember(0x10C, MemberKind.WORD)
     contourBoundsB = UnsupportedMember(0x10E, MemberKind.WORD)
+    contourBoundsLU = UnsupportedMember(0x108, MemberKind.DWORD)
+    contourBoundsRB = UnsupportedMember(0x10C, MemberKind.DWORD)
     # Hallucination, Dark Swarm, Disruption Web, Broodling
     # (but not Scanner Sweep according to BWAPI)
     removeTimer = Member(0x110, MemberKind.WORD)
@@ -347,7 +342,7 @@ class CUnit(EPDOffsetMap):
     # Used to tell if a unit is under psi storm	(is "stormTimer" in BWAPI)
     isUnderStorm = Member(0x11B, MemberKind.BYTE)
     irradiatedBy = CUnitMember(0x11C)
-    irradiatePlayerID = Member(0x120, MemberKind.TRG_PLAYER)
+    irradiatePlayerID = PlayerDataMember(0x120)
     # Each bit corresponds to the player who has parasited this unit
     parasiteFlags = Member(0x121, MemberKind.BYTE)
     # counts/cycles up from 0 to 7 (inclusive). See also 0x85
@@ -504,7 +499,7 @@ class CUnit(EPDOffsetMap):
             sprite = unit.sprite
             cs.DoActions(
                 c.SetMemoryXEPD(
-                    sprite + 0xA0 // 4, c.SetTo, new_owner_65536, 0xFF0000
+                    sprite + 0x0A // 4, c.SetTo, new_owner_65536, 0xFF0000
                 )
             )
 
@@ -648,6 +643,10 @@ class CUnit(EPDOffsetMap):
         )
         f_setcurpl2cpcache()
         # return False
+
+    @classmethod
+    def from_next(cls: type[T]) -> "CUnit":
+        return CUnit.from_read(ut.EPD(0x628438))
 
     def check_buildq(self, unit_type) -> c.Condition:
         unit = c.EncodeUnit(unit_type)

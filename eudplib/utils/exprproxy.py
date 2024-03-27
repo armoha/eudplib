@@ -73,6 +73,12 @@ class ExprProxy(Generic[T_co]):
     def __rfloordiv__(self, k):
         return k // self._value
 
+    def __divmod__(self, k):
+        return divmod(self._value, k)
+
+    def __rdivmod__(self, k):
+        return divmod(k, self._value)
+
     def __mod__(self, k):
         return self._value % k
 
@@ -130,7 +136,7 @@ class ExprProxy(Generic[T_co]):
 
     # Proxy other methods
     def __getattribute__(self, name):
-        if name == "_value":
+        if name in ["_value"]:
             return super().__getattribute__(name)
         elif name == "__class__":
             return object.__getattribute__(self._value, name)
