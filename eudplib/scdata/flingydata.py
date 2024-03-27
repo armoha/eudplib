@@ -22,4 +22,5 @@ class FlingyData(SCDataObject):
     def __init__(self, index):
         super().__init__(strenc.EncodeFlingy(index))
 
+
 FlingyDataMember._data_object_type = FlingyData

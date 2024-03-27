@@ -17,6 +17,7 @@ class PlayerData(SCDataObject):
     rather, it is intended to deal with various game state specific to players.
     e.g. the amount of gas a player has, can be accessed via PlayerData.
     """
+
     mineral = ore = Member(0x57F0F0, MemberKind.DWORD)
     gas = Member(0x57F120, MemberKind.DWORD)
 
@@ -25,5 +26,6 @@ class PlayerData(SCDataObject):
         if isinstance(unproxied, int):
             index = unproxied
         super().__init__(constenc.EncodePlayer(index))
+
 
 PlayerDataMember._data_object_type = PlayerData
