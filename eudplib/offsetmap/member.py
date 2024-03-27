@@ -7,10 +7,21 @@
 
 import enum
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Final, Literal, NoReturn
+from typing import (
+    TYPE_CHECKING,
+    Final,
+    Generic,
+    Literal,
+    NoReturn,
+    TypeVar,
+    overload,
+)
+
+from typing_extensions import Self
 
 from .. import core as c
 from .. import ctrlstru as cs
+from .. import scdata
 from .. import utils as ut
 from ..localize import _
 from ..trigger import Trigger
@@ -18,6 +29,7 @@ from ..trigger import Trigger
 if TYPE_CHECKING:
     from .csprite import CSprite
     from .cunit import CUnit
+    from .epdoffsetmap import EPDOffsetMap
 
 
 class MemberKind(enum.Enum):
@@ -28,8 +40,8 @@ class MemberKind(enum.Enum):
     BOOL = enum.auto()
     C_UNIT = enum.auto()
     C_SPRITE = enum.auto()
-    TRG_UNIT = enum.auto()
-    TRG_PLAYER = enum.auto()
+    UNIT = enum.auto()
+    PLAYER = enum.auto()
     UNIT_ORDER = enum.auto()
     POSITION = enum.auto()
     POSITION_X = enum.auto()
@@ -41,9 +53,9 @@ class MemberKind(enum.Enum):
 
     def cast(self, other):
         match self:
-            case MemberKind.TRG_UNIT:
+            case MemberKind.UNIT:
                 return c.EncodeUnit(other)
-            case MemberKind.TRG_PLAYER:
+            case MemberKind.PLAYER:
                 return c.EncodePlayer(other)
             case MemberKind.UNIT_ORDER:
                 return c.EncodeUnitOrder(other)
@@ -70,7 +82,7 @@ class MemberKind(enum.Enum):
                 return 4
             case (
                 MemberKind.WORD
-                | MemberKind.TRG_UNIT
+                | MemberKind.UNIT
                 | MemberKind.POSITION_X
                 | MemberKind.POSITION_Y
                 | MemberKind.FLINGY
@@ -101,7 +113,7 @@ class MemberKind(enum.Enum):
                 return f_cunitepdread_epd(epd)
             case MemberKind.C_SPRITE:
                 return f_epdspriteread_epd(epd)
-            case MemberKind.TRG_UNIT | MemberKind.FLINGY:
+            case MemberKind.UNIT | MemberKind.FLINGY:
                 return f_bread_epd(epd, subp)
             case MemberKind.POSITION:
                 return f_maskread_epd(
@@ -356,3 +368,62 @@ class CSpriteMember(BaseMember):
             self.kind.write_epd(instance._epd + q, r, value)
             return
         raise AttributeError
+
+S = TypeVar("S", bound=scdata.SCDataObject)
+class SCDataObjectMember(BaseMember, Generic[S], metaclass=ABCMeta):
+    """Descriptor for EPDOffsetMap"""
+    def __init_subclass__(cls, data_type: type[S], kind: MemberKind) -> None:
+        cls.bound_data_type = data_type
+        cls.bound_kind = kind
+
+    def __init__(self, offset: int) -> None:
+        super().__init__(offset, self.bound_kind)
+
+    @overload
+    def __get__(self, instance: None, owner=None) -> Self:
+        ...
+
+    @overload
+    def __get__(self, instance: "EPDOffsetMap", owner=None) -> S:
+        ...
+
+    def __get__(self, instance, owner=None):
+        from .epdoffsetmap import EPDOffsetMap
+
+        if instance is None:
+            return self
+        q, r = divmod(self.offset, 4)
+        if isinstance(instance, EPDOffsetMap):
+            return self.bound_data_type(self.kind.read_epd(instance._epd + q, r))
+        raise AttributeError
+
+    def __set__(self, instance, value) -> None:
+        from .epdoffsetmap import EPDOffsetMap
+
+        q, r = divmod(self.offset, 4)
+        if isinstance(instance, EPDOffsetMap):
+            value = self.kind.cast(value)
+            self.kind.write_epd(instance._epd + q, r, value)
+        else:
+            raise AttributeError
+
+class UnitDataMember(SCDataObjectMember[scdata.UnitData],
+                     data_type=scdata.UnitData, kind=MemberKind.UNIT):
+    pass
+
+class UnitOrderDataMember(SCDataObjectMember[scdata.UnitOrderData],
+                          data_type=scdata.UnitOrderData,
+                          kind=MemberKind.UNIT_ORDER):
+    pass
+
+class FlingyDataMember(SCDataObjectMember[scdata.FlingyData],
+                       data_type=scdata.FlingyData, kind=MemberKind.FLINGY):
+    pass
+
+class SpriteDataMember(SCDataObjectMember[scdata.SpriteData],
+                       data_type=scdata.SpriteData, kind=MemberKind.SPRITE):
+    pass
+
+class PlayerDataMember(SCDataObjectMember[scdata.PlayerData],
+                       data_type=scdata.PlayerData, kind=MemberKind.PLAYER):
+    pass

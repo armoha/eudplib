@@ -15,7 +15,6 @@ T_co = TypeVar("T_co", covariant=True)
 
 class ExprProxy(Generic[T_co]):
     """Class which can contain both ConstExpr and EUDVariable"""
-
     def __init__(self, initval: T_co) -> None:
         self._value: T_co = initval
 
@@ -72,6 +71,11 @@ class ExprProxy(Generic[T_co]):
 
     def __rfloordiv__(self, k):
         return k // self._value
+
+    def __divmod__(self, k):
+        div = self._value // k
+        mod = self._value % k
+        return div, mod
 
     def __mod__(self, k):
         return self._value % k
@@ -130,7 +134,7 @@ class ExprProxy(Generic[T_co]):
 
     # Proxy other methods
     def __getattribute__(self, name):
-        if name == "_value":
+        if name in ["_value"]:
             return super().__getattribute__(name)
         elif name == "__class__":
             return object.__getattribute__(self._value, name)
