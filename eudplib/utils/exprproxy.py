@@ -74,9 +74,10 @@ class ExprProxy(Generic[T_co]):
         return k // self._value
 
     def __divmod__(self, k):
-        div = self._value // k
-        mod = self._value % k
-        return div, mod
+        return divmod(self._value, k)
+
+    def __rdivmod__(self, k):
+        return divmod(k, self._value)
 
     def __mod__(self, k):
         return self._value % k
