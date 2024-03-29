@@ -9,7 +9,6 @@ import enum
 from abc import ABCMeta
 from typing import (
     TYPE_CHECKING,
-    ClassVar,
     Final,
     Generic,
     Literal,
@@ -28,13 +27,13 @@ if TYPE_CHECKING:
     # Ruff is currently not correctly detecting in-quote references in Generic
     # which is why those imports are marked as unused by default
     # Therefore, these F401 warnings are suppressed now
-    from .flingydata import FlingyData  # noqa: F401
-    from .imagedata import ImageData  # noqa: F401
-    from .playerdata import PlayerData  # noqa: F401
-    from .spritedata import SpriteData  # noqa: F401
-    from .unitdata import UnitData  # noqa: F401
-    from .unitorderdata import UnitOrderData  # noqa: F401
-    from .weapondata import WeaponData  # noqa: F401
+    from .flingydata import FlingyData
+    from .imagedata import ImageData
+    from .playerdata import PlayerData
+    from .spritedata import SpriteData
+    from .unitdata import UnitData
+    from .unitorderdata import UnitOrderData
+    from .weapondata import WeaponData
 
 
 class MemberKind(enum.Enum):
