@@ -110,7 +110,7 @@ class CUnit(EPDOffsetMap):
     movementFlags = MovementFlags(0x020, MemberKind.BYTE)
     # current direction the unit is facing
     currentDirection1 = Member(0x021, MemberKind.BYTE)
-    turnRadius = Member(0x022, MemberKind.BYTE)  # flingy
+    turnSpeed = turnRadius = Member(0x022, MemberKind.BYTE)  # flingy
     # usually only differs from the currentDirection field for units that
     # can accelerate and travel in a different direction than they are facing.
     # For example Mutalisks can change the direction they are facing

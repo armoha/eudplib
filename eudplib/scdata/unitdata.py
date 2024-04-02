@@ -18,10 +18,14 @@ from .scdataobject import SCDataObject
 
 
 class UnitData(SCDataObject):
-    flingy = FlingyDataMember(0x6644F8)
+    graphic = flingy = FlingyDataMember(0x6644F8)
     subUnit = UnitDataMember(0x6607C0)  # noqa: N815
-    # 0x660C38 subunit2 is unused
+    # subunit2 is unused
+    # subunit2 = Member(0x660C38, MemberKind.WORD)
     # infestationUnit is not implemented yet. (different beginning index)
+    # SCBW_DATA(u16*,		InfestedUnitPartial,	unitsDat[3].address);
+    # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
+    # last valid id is UnitId::Special_OvermindCocoon
     constructionGraphic = Member(0x6610B0, MemberKind.BYTE)  # noqa: N815
     startDirection = Member(0x6605F0, MemberKind.BYTE)  # noqa: N815
     hasShield = Member(0x6647B0, MemberKind.BOOL)  # noqa: N815
@@ -39,6 +43,7 @@ class UnitData(SCDataObject):
     maxGroundHits = Member(0x6645E0, MemberKind.BYTE)  # noqa: N815
     airWeapon = WeaponDataMember(0x6616E0)  # noqa: N815
     maxAirHits = Member(0x65FC18, MemberKind.BYTE)  # noqa: N815
+    # FIXME: split 2 flags into separate members
     AIFlags = Member(0x660178, MemberKind.BYTE)
     baseProperty = Member(0x664080, MemberKind.DWORD)  # noqa: N815
     seekRange = Member(0x662DB8, MemberKind.BYTE)  # noqa: N815
@@ -56,7 +61,9 @@ class UnitData(SCDataObject):
     yesSoundEnd = Member(0x661440, MemberKind.WORD)  # noqa: N815
     buildingDimensions = Member(0x662860, MemberKind.POSITION)  # noqa: N815
     # AddonPlacement is not implemented yet because its beginning index isn't 0.
+    # addonPlacement = Member(0x6626E0, MemberKind.POSITION)
     # unitDimensions is not implemented yet.
+    # unitBoundsLURB = Member(0x6617C8, 2 * MemberKind.POSITION)
     portrait = Member(0x662F88, MemberKind.WORD)
     mineralCost = Member(0x663888, MemberKind.WORD)  # noqa: N815
     gasCost = Member(0x65FD00, MemberKind.WORD)  # noqa: N815

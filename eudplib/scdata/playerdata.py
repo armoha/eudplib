@@ -20,6 +20,18 @@ class PlayerData(SCDataObject):
 
     mineral = ore = Member(0x57F0F0, MemberKind.DWORD)
     gas = Member(0x57F120, MemberKind.DWORD)
+    cumulativeGas = Member(0x57F150, MemberKind.DWORD)  # noqa: N815
+    cumulativeMineral = cumulativeOre = Member(0x57F180, MemberKind.DWORD)  # noqa: N815
+    # struct SupplyData {
+    # u32 provided[PLAYER_COUNT];
+    # u32 used[PLAYER_COUNT];
+    # u32 max[PLAYER_COUNT];
+    # SCBW_DATA(Units12*,     firstPlayerUnit,        0x006283F8);
+    # Contains various information (names, player types, race types, and associated forces)
+    # of each player in the current game
+    # SCBW_DATA(const PLAYER*,  playerTable,          0x0057EEE0);
+
+    # playerAlliance, playerVision? (needs a pair of players)
 
     def __init__(self, index):
         unproxied = unProxy(index)
