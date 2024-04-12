@@ -22,12 +22,17 @@ class PlayerData(SCDataObject):
     gas = Member(0x57F120, MemberKind.DWORD)
     cumulativeGas = Member(0x57F150, MemberKind.DWORD)  # noqa: N815
     cumulativeMineral = cumulativeOre = Member(0x57F180, MemberKind.DWORD)  # noqa: N815
-    # struct SupplyData {
-    # u32 provided[PLAYER_COUNT];
-    # u32 used[PLAYER_COUNT];
-    # u32 max[PLAYER_COUNT];
+    zergControlAvailable = Member(0x582144, MemberKind.DWORD)  # noqa: N815
+    zergControlUsed = Member(0x582174, MemberKind.DWORD)  # noqa: N815
+    zergControlMax = Member(0x5821A4, MemberKind.DWORD)  # noqa: N815
+    terranSupplyAvailable = Member(0x5821D4, MemberKind.DWORD)  # noqa: N815
+    terranSupplyUsed = Member(0x582204, MemberKind.DWORD)  # noqa: N815
+    terranSupplyMax = Member(0x582234, MemberKind.DWORD)  # noqa: N815
+    protossPsiAvailable = Member(0x582264, MemberKind.DWORD)  # noqa: N815
+    protossPsiUsed = Member(0x582294, MemberKind.DWORD)  # noqa: N815
+    protossPsiMax = Member(0x5822C4, MemberKind.DWORD)  # noqa: N815
     # SCBW_DATA(Units12*,     firstPlayerUnit,        0x006283F8);
-    # Contains various information (names, player types, race types, and associated forces)
+    # Contains various information (names, player types, race types, and forces)
     # of each player in the current game
     # SCBW_DATA(const PLAYER*,  playerTable,          0x0057EEE0);
 
