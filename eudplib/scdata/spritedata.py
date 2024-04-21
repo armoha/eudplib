@@ -12,8 +12,12 @@ from .scdataobject import SCDataObject
 
 class SpriteData(SCDataObject):
     # Read only data skipped
-    visible = Member(0x665C48, MemberKind.BOOL)
     image = imageID = ImageDataMember(0x666160)  # noqa: N815
+    # hpBarSize = Member(0x665E50, MemberKind.BYTE)
+    # ??? = Member(0x666570, MemberKind.BYTE)
+    isVisible = Member(0x665C48, MemberKind.BOOL)  # noqa: N815
+    # selectionCircle = Member(0x665AC0, MemberKind.BYTE)
+    # selectionVerticalOffset = Member(0x665FD8, MemberKind.BYTE)
 
     def __init__(self, index):
         super().__init__(strenc.EncodeSprite(index))
