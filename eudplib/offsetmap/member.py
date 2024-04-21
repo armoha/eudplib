@@ -385,6 +385,9 @@ S = TypeVar("S", bound=scdata.SCDataObject)
 class SCDataObjectMember(BaseMember, Generic[S], metaclass=ABCMeta):
     """Descriptor for EPDOffsetMap"""
 
+    bound_data_type: type[S]
+    bound_kind: MemberKind
+
     def __init_subclass__(cls, data_type: type[S], kind: MemberKind) -> None:
         cls.bound_data_type = data_type
         cls.bound_kind = kind

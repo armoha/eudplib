@@ -12,10 +12,11 @@ from typing import (
     Final,
     Generic,
     Literal,
-    Self,
     TypeVar,
     overload,
 )
+
+from typing_extensions import Self
 
 from .. import core as c
 from .. import utils as ut
@@ -31,8 +32,10 @@ if TYPE_CHECKING:
     from .imagedata import ImageData
     from .playerdata import PlayerData
     from .spritedata import SpriteData
+    from .tech_dat import TechData
     from .unitdata import UnitData
     from .unitorderdata import UnitOrderData
+    from .upgrade_dat import UpgradeData
     from .weapondata import WeaponData
 
 
@@ -261,3 +264,13 @@ class UnitOrderDataMember(
 
 class WeaponDataMember(SCDataObjectTypeMember["WeaponData"], kind=MemberKind.WEAPON):
     _data_object_type: type["WeaponData"]
+
+
+class UpgradeDataMember(
+    SCDataObjectTypeMember["UpgradeData"], kind=MemberKind.WEAPON
+):
+    _data_object_type: type["UpgradeData"]
+
+
+class TechDataMember(SCDataObjectTypeMember["TechData"], kind=MemberKind.WEAPON):
+    _data_object_type: type["TechData"]
