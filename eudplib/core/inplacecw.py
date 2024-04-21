@@ -26,13 +26,17 @@ def cpset(a, b):
     if not (IsEUDVariable(a) or IsEUDVariable(b)):
         return a + b, RawTrigger
     elif IsEUDVariable(a) and IsEUDVariable(b):
-        VProc(
-            [a, b],
-            [
-                *a.QueueAssignTo(EPD(0x6509B0)),
-                *b.QueueAddTo(EPD(0x6509B0)),
-            ],
-        )
+        if a is b:
+            VProc(a, [SetMemory(0x6509B0, SetTo, 0), *a.QueueAddTo(EPD(0x6509B0))])
+            VProc(a, [])
+        else:
+            VProc(
+                [a, b],
+                [
+                    *a.QueueAssignTo(EPD(0x6509B0)),
+                    *b.QueueAddTo(EPD(0x6509B0)),
+                ],
+            )
     else:
         if IsEUDVariable(b):
             a, b = b, a
@@ -50,7 +54,7 @@ def cpset(a, b):
 
 def iset(a, b, modifier, v):
     """SetMemoryEPD(a + b, modifier, v)"""
-    if not (IsEUDVariable(a) or IsEUDVariable(b)):
+    if not (IsEUDVariable(a) or IsEUDVariable(b)) or a is b or a is v or b is v:
         from ..eudlib.memiof.dwepdio import setdw_epd
 
         return setdw_epd(a + b, modifier, v)
@@ -97,7 +101,7 @@ def iset(a, b, modifier, v):
 
 
 def isub(a, b, v):
-    if not IsEUDVariable(v):
+    if not IsEUDVariable(v) or a is b or a is v or b is v:
         return iset(a, b, Add, -v)
     dst, trg = cpset(a, b)
     VProc(

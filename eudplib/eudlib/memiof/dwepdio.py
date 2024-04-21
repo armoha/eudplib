@@ -110,9 +110,7 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
                 if sum(bitandflags) == 0:
                     continue
                 c.RawTrigger(
-                    conditions=[
-                        c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i)
-                    ],
+                    conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i)],
                     actions=[
                         flagv.AddNumber(2**i)
                         for j, flagv in enumerate(flagsv)
@@ -135,6 +133,15 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
 def setdw_epd(targetplayer, modifier, value):
     if c.IsEUDVariable(value):
         if c.IsEUDVariable(targetplayer):
+            if targetplayer is value:
+                c.VProc(
+                    value,
+                    [
+                        value.SetDest(value),
+                        value.SetModifier(c.SetTo),
+                    ],
+                )
+                return c.VProc(value, value.SetModifier(modifier))
             return c.VProc(
                 [targetplayer, value],
                 [

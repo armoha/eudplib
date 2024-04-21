@@ -5,6 +5,7 @@ from helper import *
 from .test_eps_array import (
     DequeCases,
     DequeTest,
+    f_test_alias,
     f_test_compare,
     f_test_deque,
     f_test_queue,
@@ -74,6 +75,12 @@ def test_epscript():
         chr(14 + i % 4) + str(x) for i, x in enumerate(cases)
     )
     test_equality("epScript EUDDeque %s" % testname, f_test_deque(), cases)
+    arr_epd = f_test_alias()
+    test_equality(
+        "epScript array alias write a[i] = i",
+        [f_dwread_epd(arr_epd + i) for i in range(10)],
+        list(range(10)),
+    )
 
     test_equality("epScript object", f_test_object(), 511)
     test_equality("epScript nested object", f_test_nested_object(), 127)
