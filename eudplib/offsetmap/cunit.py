@@ -457,65 +457,71 @@ class CUnit(EPDOffsetMap):
     @staticmethod
     @c.EUDTypedFunc([None, None, c.TrgPlayer])
     def _cgive(unit, ptr, new_owner):
-        from ..eudlib.memiof import f_dwwrite_epd
+        from ..eudlib.memiof import f_cunitepdread_epd, f_dwwrite_epd, f_maskread_epd
 
-        unit = CUnit.cast(unit)
-        if cs.EUDIf()(unit.order == 0):
+        unit += 0x4C // 4  # playerID, orderID
+        if cs.EUDIf()(c.MemoryXEPD(unit, c.Exactly, 0, 0xFF00)):
             c.EUDReturn()
         cs.EUDEndIf()
-        prev_owner = unit.owner
-        unit.owner = new_owner
-        new_header = ut.EPD(0x6283F8) + new_owner
-        new_owner_65536 = new_owner << 16
 
-        @c.EUDFunc
-        def cgive_unit(ptr, epd):
-            unit = CUnit.cast(epd)
-            prv, nxt = unit.prevPlayerUnit, unit.nextPlayerUnit
-            # no previous unit = unit is first unit of player
-            if cs.EUDIf()(prv == 0):
-                f_dwwrite_epd(ut.EPD(0x6283F8) + prev_owner, nxt.ptr)
-            if cs.EUDElse()():
-                # link next unit to previous unit
-                prv.nextPlayerUnit = nxt
-            cs.EUDEndIf()
-            # link previous unit to next unit
-            if cs.EUDIfNot()(nxt == 0):
-                nxt.prevPlayerUnit = prv
-            cs.EUDEndIf()
+        prev_owner = f_maskread_epd(unit, 0xF)
+        cs.DoActions(c.SetMemoryXEPD(unit, c.SetTo, new_owner, 0xFF))
+        unit += 0x68 // 4 - 0x4C // 4  # prevPlayerUnit
+        prev_ptr, prev_epd = f_cunitepdread_epd(unit)
+        c.SetVariables(  # nextPlayerUnit
+            [unit, prev_epd, prev_owner, new_owner],  # new_header
+            [0x6C // 4 - 0x68 // 4, 0x6C // 4, ut.EPD(0x6283F8), ut.EPD(0x6283F8)],
+            [c.Add, c.Add, c.Add, c.Add],
+        )
+        next_ptr, next_epd = f_cunitepdread_epd(unit)
 
-            if cs.EUDIf()(c.MemoryEPD(new_header, c.AtLeast, 0x59CCA8)):
-                # get previous, next player units of recipient
-                new_prev = CUnit.from_read(new_header)
-                new_next = new_prev.nextPlayerUnit
-                new_prev.nextPlayerUnit = ptr
-                unit.prevPlayerUnit = new_prev
-                unit.nextPlayerUnit = new_next
-                if cs.EUDIfNot()(new_next == 0):
-                    new_next.prevPlayerUnit = ptr
-                cs.EUDEndIf()
-            if cs.EUDElse()():
-                f_dwwrite_epd(new_header, ptr)
-                unit.prevPlayerUnit = 0
-                unit.nextPlayerUnit = 0
-            cs.EUDEndIf()
-
-            # change sprite color of unit
-            sprite = unit.sprite
-            cs.DoActions(
-                c.SetMemoryXEPD(
-                    sprite + 0xA0 // 4, c.SetTo, new_owner_65536, 0xFF0000
-                )
-            )
-
-        if cs.EUDIf()(unit.subUnit >= 0x59CCA8):
-            subunit = unit.subUnit
-            cgive_unit(subunit.ptr, subunit)
+        if cs.EUDIf()(prev_ptr >= 0x59CCA8):
+            f_dwwrite_epd(prev_epd, next_ptr)
+        if cs.EUDElse()():
+            f_dwwrite_epd(ut.EPD(0x6283F8) + prev_owner, next_ptr)
         cs.EUDEndIf()
-        cgive_unit(ptr, unit)
 
-    def cgive(self, player) -> None:
-        CUnit._cgive(self, self.ptr, player)
+        if cs.EUDIf()(next_ptr >= 0x59CCA8):
+            next_epd += 0x68 // 4
+            f_dwwrite_epd(next_epd, prev_ptr)
+        cs.EUDEndIf()
+
+        if cs.EUDIf()(c.MemoryEPD(new_owner, c.AtLeast, 0x59CCA8)):
+            newprev_ptr, newprev_epd = f_cunitepdread_epd(new_owner)
+            newprev_epd += 0x6C // 4
+            newnext_ptr, newnext_epd = f_cunitepdread_epd(newprev_epd)
+            f_dwwrite_epd(newprev_epd, ptr)
+            f_dwwrite_epd(unit, newnext_ptr)
+            unit -= 0x6C // 4 - 0x68 // 4  # prevPlayerUnit
+            f_dwwrite_epd(unit, newprev_ptr)
+            if cs.EUDIf()(newnext_ptr >= 0x59CCA8):
+                newnext_epd += 0x68 // 4
+                f_dwwrite_epd(newnext_epd, ptr)
+            cs.EUDEndIf()
+        if cs.EUDElse()():
+            f_dwwrite_epd(new_owner, ptr)
+            f_dwwrite_epd(unit, 0)
+            unit -= 0x6C // 4 - 0x68 // 4  # prevPlayerUnit
+            f_dwwrite_epd(unit, 0)
+        cs.EUDEndIf()
+
+    @staticmethod
+    @c.EUDTypedFunc([None, None, c.TrgPlayer, None])
+    def _cgive_subunit(unit, ptr, new_owner, ignore_subunit):
+        from ..eudlib.memiof import f_cunitepdread_epd
+
+        CUnit._cgive(unit, ptr, new_owner)
+        unit += 0x70 // 4  # subunit
+        if cs.EUDIf()([c.MemoryEPD(unit, c.AtLeast, 0x59CCA8), ignore_subunit == 0]):
+            subunit_ptr, subunit = f_cunitepdread_epd(unit)
+            CUnit._cgive(subunit, subunit_ptr, new_owner)
+        cs.EUDEndIf()
+
+    def cgive(self, new_owner, *, ignore_subunit=False) -> None:
+        if ignore_subunit:
+            CUnit._cgive_subunit(self, self.ptr, new_owner, ignore_subunit)
+        else:
+            CUnit._cgive(self, self.ptr, new_owner)
 
     @staticmethod
     @c.EUDTypedFunc([None, c.TrgPlayer])
