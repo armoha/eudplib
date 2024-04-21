@@ -79,7 +79,7 @@ def test_epscript():
     test_equality("epScript nested object", f_test_nested_object(), 127)
     test_equality("epScript all object array", f_test_selftype_member(), 5)
     test_equality("epScript EUDMethod", f_test_eudmethods(), 7)
-    test_equality("epScript EPDCUnitMap", f_test_cunit1(), 131071)
+    test_equality("epScript EPDCUnitMap", f_test_cunit1(), 0x7FFFF)
     test_equality("epScript CUnit", f_test_cunit2(), 4095)
     test_equality("epScript compatibility", f_test_compatibility(), 32)
     test_equality(

@@ -37,6 +37,10 @@ function test_cunit1() {
 
     u.reset_buildq();
     if (u.are_buildq_empty()) ret += 65536;
+    var d = u.movementFlags;
+    if (d == 0xF8) ret += 1 << 17;
+    u.movementFlags += 1;
+    if (u.movementFlags == 0xF9) ret += 1 << 18;
     return ret;
 }
 function test_cunit2() {

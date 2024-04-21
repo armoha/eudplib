@@ -93,90 +93,102 @@ def f_test_cunit1():
     # (Line 39) if (u.are_buildq_empty()) ret += 65536;
     if EUDIf()(u.are_buildq_empty()):
         ret.__iadd__(65536)
-        # (Line 40) return ret;
+        # (Line 40) var d = u.movementFlags;
+    EUDEndIf()
+    d = _LVAR([u.movementFlags])
+    # (Line 41) if (d == 0xF8) ret += 1 << 17;
+    if EUDIf()(d == 0xF8):
+        ret.__iadd__(_LSH(1,17))
+        # (Line 42) u.movementFlags += 1;
+    EUDEndIf()
+    _ATTW(u, 'movementFlags').__iadd__(1)
+    # (Line 43) if (u.movementFlags == 0xF9) ret += 1 << 18;
+    if EUDIf()(_ATTC(u, 'movementFlags') == 0xF9):
+        ret.__iadd__(_LSH(1,18))
+        # (Line 44) return ret;
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 41) }
-    # (Line 42) function test_cunit2() {
+    # (Line 45) }
+    # (Line 46) function test_cunit2() {
 
 @EUDFunc
 def f_test_cunit2():
-    # (Line 43) const u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)));
+    # (Line 47) const u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)));
     u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)))
-    # (Line 44) var ret = 0;
+    # (Line 48) var ret = 0;
     ret = _LVAR([0])
-    # (Line 46) u.orderQueueCount = 123;
+    # (Line 50) u.orderQueueCount = 123;
     _ATTW(u, 'orderQueueCount') << (123)
-    # (Line 47) if (u.orderQueueCount == 123) ret += 1;
+    # (Line 51) if (u.orderQueueCount == 123) ret += 1;
     if EUDIf()(_ATTC(u, 'orderQueueCount') == 123):
         ret.__iadd__(1)
-        # (Line 48) u.orderQueueCount = 0;
+        # (Line 52) u.orderQueueCount = 0;
     EUDEndIf()
     _ATTW(u, 'orderQueueCount') << (0)
-    # (Line 49) if (u.orderQueueCount == 0) ret += 2;
+    # (Line 53) if (u.orderQueueCount == 0) ret += 2;
     if EUDIf()(_ATTC(u, 'orderQueueCount') == 0):
         ret.__iadd__(2)
-        # (Line 51) u.currentDirection1 = 234;
+        # (Line 55) u.currentDirection1 = 234;
     EUDEndIf()
     _ATTW(u, 'currentDirection1') << (234)
-    # (Line 52) if (u.currentDirection1 == 234) ret += 4;
+    # (Line 56) if (u.currentDirection1 == 234) ret += 4;
     if EUDIf()(_ATTC(u, 'currentDirection1') == 234):
         ret.__iadd__(4)
-        # (Line 53) u.currentDirection1 = 0;
+        # (Line 57) u.currentDirection1 = 0;
     EUDEndIf()
     _ATTW(u, 'currentDirection1') << (0)
-    # (Line 54) if (u.currentDirection1 == 0) ret += 8;
+    # (Line 58) if (u.currentDirection1 == 0) ret += 8;
     if EUDIf()(_ATTC(u, 'currentDirection1') == 0):
         ret.__iadd__(8)
-        # (Line 56) u.turnRadius = 34;
+        # (Line 60) u.turnRadius = 34;
     EUDEndIf()
     _ATTW(u, 'turnRadius') << (34)
-    # (Line 57) if (u.turnRadius == 34) ret += 16;
+    # (Line 61) if (u.turnRadius == 34) ret += 16;
     if EUDIf()(_ATTC(u, 'turnRadius') == 34):
         ret.__iadd__(16)
-        # (Line 58) u.turnRadius = 0;
+        # (Line 62) u.turnRadius = 0;
     EUDEndIf()
     _ATTW(u, 'turnRadius') << (0)
-    # (Line 59) if (u.turnRadius == 0) ret += 32;
+    # (Line 63) if (u.turnRadius == 0) ret += 32;
     if EUDIf()(_ATTC(u, 'turnRadius') == 0):
         ret.__iadd__(32)
-        # (Line 61) u.velocityDirection1 = 45;
+        # (Line 65) u.velocityDirection1 = 45;
     EUDEndIf()
     _ATTW(u, 'velocityDirection1') << (45)
-    # (Line 62) if (u.velocityDirection1 == 45) ret += 64;
+    # (Line 66) if (u.velocityDirection1 == 45) ret += 64;
     if EUDIf()(_ATTC(u, 'velocityDirection1') == 45):
         ret.__iadd__(64)
-        # (Line 63) u.velocityDirection1 = 0;
+        # (Line 67) u.velocityDirection1 = 0;
     EUDEndIf()
     _ATTW(u, 'velocityDirection1') << (0)
-    # (Line 64) if (u.velocityDirection1 == 0) ret += 128;
+    # (Line 68) if (u.velocityDirection1 == 0) ret += 128;
     if EUDIf()(_ATTC(u, 'velocityDirection1') == 0):
         ret.__iadd__(128)
-        # (Line 66) u.energy = 567;
+        # (Line 70) u.energy = 567;
     EUDEndIf()
     _ATTW(u, 'energy') << (567)
-    # (Line 67) if (u.energy == 567) ret += 256;
+    # (Line 71) if (u.energy == 567) ret += 256;
     if EUDIf()(_ATTC(u, 'energy') == 567):
         ret.__iadd__(256)
-        # (Line 68) u.energy = 0;
+        # (Line 72) u.energy = 0;
     EUDEndIf()
     _ATTW(u, 'energy') << (0)
-    # (Line 69) if (u.energy == 0) ret += 512;
+    # (Line 73) if (u.energy == 0) ret += 512;
     if EUDIf()(_ATTC(u, 'energy') == 0):
         ret.__iadd__(512)
-        # (Line 71) u.acceleration = 678;
+        # (Line 75) u.acceleration = 678;
     EUDEndIf()
     _ATTW(u, 'acceleration') << (678)
-    # (Line 72) if (u.acceleration == 678) ret += 1024;
+    # (Line 76) if (u.acceleration == 678) ret += 1024;
     if EUDIf()(_ATTC(u, 'acceleration') == 678):
         ret.__iadd__(1024)
-        # (Line 73) u.acceleration = 0;
+        # (Line 77) u.acceleration = 0;
     EUDEndIf()
     _ATTW(u, 'acceleration') << (0)
-    # (Line 74) if (u.acceleration == 0) ret += 2048;
+    # (Line 78) if (u.acceleration == 0) ret += 2048;
     if EUDIf()(_ATTC(u, 'acceleration') == 0):
         ret.__iadd__(2048)
-        # (Line 76) return ret;
+        # (Line 80) return ret;
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 77) }
+    # (Line 81) }

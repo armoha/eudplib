@@ -232,12 +232,21 @@ class Member(BaseMember):
         raise AttributeError
 
 
-class EnumMember(BaseMember):
+class EnumMember(BaseMember, ut.ExprProxy):
     __slots__ = "_epd"
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
         self._epd: int | c.EUDVariable = 0  # FIXME
         super().__init__(offset, kind)
+        super(BaseMember, self).__init__(None)
+
+    # FIXME: Overwriting ExprProxy.getValue is kinda hacky...
+    def getValue(self):  # noqa: N802
+        from ..eudlib.memiof import f_maskread_epd
+
+        q, r = divmod(self.offset, 4)
+        mask = ((1 << (8 * self.kind.size)) - 1) << (8 * r)
+        return f_maskread_epd(self._epd + q, mask)
 
     def __get__(self, instance, owner=None) -> "EnumMember":
         from .epdoffsetmap import EPDOffsetMap
