@@ -95,16 +95,16 @@ def patch_condition(cond: _Condition) -> Condition:
         condition = condition.expr
     if isinstance(condition, EUDLightBool):
         return c.MemoryX(condition.getValueAddr(), c.AtLeast, 1, condition._mask)
-    if isinstance(condition, (EUDVariable, EUDLightVariable)):
+    if isinstance(condition, (EUDVariable, EUDLightVariable)):  # noqa: UP038
         return c.Memory(condition.getValueAddr(), c.AtLeast, 1)
 
     # translate boolean condition
-    if isinstance(condition, (bool, int)):
+    if isinstance(condition, (bool, int)):  # noqa: UP038
         return c.Always() if condition else c.Never()
     if isinstance(condition, Condition):
         apply_patch_table(EPD(condition), condition, condpt)
         return condition
-    if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
+    if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):  # noqa: UP038
         ep_warn(_("Condition is always True"))
         return c.Always() if condition != 0 else c.Never()
     raise EPError(_("Invalid input for condition: {}").format(cond))
@@ -139,7 +139,7 @@ def is_const_cond(cond) -> bool:
         if cond._expr is None:
             return False
         cond = cond._expr
-    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):
+    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):  # noqa: UP038
         return True
 
     if isinstance(cond, Condition):
@@ -152,7 +152,7 @@ def is_const_cond(cond) -> bool:
                         return False
                 field_name += 1
         return True
-    if castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):
+    if castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):  # noqa: UP038
         return True
     return False
 
@@ -174,7 +174,7 @@ def is_nagatable_cond(cond) -> bool:
         if cond._expr is None:
             return False
         cond = cond._expr
-    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):
+    if isinstance(cond, (bool, int, EUDVariable, EUDLightVariable, EUDLightBool)):  # noqa: UP038
         return True
 
     if isinstance(cond, Condition):
@@ -226,7 +226,7 @@ def is_nagatable_cond(cond) -> bool:
             elif amount == 0xFFFFFFFF:
                 return True
         return False
-    if castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):
+    if castable and isinstance(cond, (ConstExpr, c.RlocInt_C)):  # noqa: UP038
         return True
     return False
 
@@ -238,19 +238,19 @@ def negate_cond(cond: _Condition) -> Condition:
         if condition._expr is None:
             raise EPError(_("Forward not initialized"))
         condition = condition._expr
-    if isinstance(condition, (EUDVariable, EUDLightVariable)):
+    if isinstance(condition, (EUDVariable, EUDLightVariable)):  # noqa: UP038
         return condition == 0
     if isinstance(condition, EUDLightBool):
         return condition.IsCleared()
 
     # translate boolean condition
-    if isinstance(condition, (bool, int)):
+    if isinstance(condition, (bool, int)):  # noqa: UP038
         return c.Never() if condition else c.Always()
 
     if isinstance(condition, Condition):
         condition.negate()
         return condition
-    if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
+    if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):  # noqa: UP038
         ep_warn(_("Condition is always False"))
         return c.Never() if condition == 0 else c.Always()
     raise EPError(_("Invalid input for condition: {}").format(cond))

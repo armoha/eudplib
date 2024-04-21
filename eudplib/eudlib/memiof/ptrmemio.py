@@ -91,7 +91,7 @@ def _dwread(ptr):
 def f_dwread(ptr, **kwargs):
     if (isinstance(ptr, int) and ptr % 4 == 0) or (
         not c.IsEUDVariable(ptr)
-        and isinstance(ptr, (c.RlocInt_C, c.ConstExpr))
+        and isinstance(ptr, (c.RlocInt_C, c.ConstExpr))  # noqa: UP038
         and ptr._is_aligned_ptr()
     ):
         return dwm.f_dwread_epd(ut.EPD(ptr), **kwargs)

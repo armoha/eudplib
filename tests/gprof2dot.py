@@ -3163,7 +3163,7 @@ class DotWriter:
         self.write("]")
 
     def id(self, id):
-        if isinstance(id, (int, float)):
+        if isinstance(id, (int, float)):  # noqa: UP038
             s = str(id)
         elif isinstance(id, basestring):
             if id.isalnum() and not id.startswith("0x"):

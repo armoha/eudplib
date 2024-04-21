@@ -197,7 +197,7 @@ def _omit_eos(*args):
     dw = any(
         (
             c.IsConstExpr(x)
-            and not isinstance(x, (int, str, bytes))
+            and not isinstance(x, (int, str, bytes))  # noqa: UP038
             and not ut.isUnproxyInstance(x, c.Db)
         )
         or c.IsEUDVariable(x)

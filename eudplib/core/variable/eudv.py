@@ -89,7 +89,7 @@ def _yield_and_check_rvalue(
         yield from _yield_and_check_rvalue(obj.getValue(), 3, is_rvalue)
     elif isinstance(obj, EUDVariable):
         yield obj, is_rvalue
-    elif isinstance(obj, (bytes, str)) or hasattr(obj, "dont_flatten"):
+    elif isinstance(obj, (bytes, str)) or hasattr(obj, "dont_flatten"):  # noqa: UP038
         yield obj, False
     else:
         try:
