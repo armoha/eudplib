@@ -5,8 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from collections.abc import Callable, Mapping
-from typing import TypeAlias, overload
+from collections.abc import Callable
+from typing import ClassVar, TypeAlias, overload
 
 from ...localize import _
 from ...utils import EPError, ExprProxy, unProxy
@@ -28,9 +28,8 @@ from .consttype import (
 
 
 class TrgAllyStatus(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeAllyStatus(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {"Enemy": 0, "Ally": 1, "AlliedVictory": 2}
 
 
 AllyStatus: TypeAlias = "TrgAllyStatus | Byte"
@@ -42,9 +41,8 @@ AllyStatusDict: dict[ConstType, int] = {Enemy: 0, Ally: 1, AlliedVictory: 2}
 
 
 class TrgComparison(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeComparison(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {"AtLeast": 0, "AtMost": 1, "Exactly": 10}
 
 
 Comparison: TypeAlias = "TrgComparison | Byte"
@@ -56,9 +54,8 @@ ComparisonDict: dict[ConstType, int] = {AtLeast: 0, AtMost: 1, Exactly: 10}
 
 
 class TrgCount(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeCount(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {"All": 0}
 
 
 Count: TypeAlias = "TrgCount | Byte"
@@ -66,9 +63,8 @@ All = TrgCount("All")
 
 
 class TrgModifier(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeModifier(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {"SetTo": 7, "Add": 8, "Subtract": 9}
 
 
 Modifier: TypeAlias = "TrgModifier | Byte"
@@ -80,9 +76,8 @@ ModifierDict: dict[ConstType, int] = {SetTo: 7, Add: 8, Subtract: 9}
 
 
 class TrgOrder(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeOrder(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {"Move": 0, "Patrol": 1, "Attack": 2}
 
 
 Order: TypeAlias = "TrgOrder | Byte"
@@ -94,9 +89,43 @@ OrderDict: dict[ConstType, int] = {Move: 0, Patrol: 1, Attack: 2}
 
 
 class TrgPlayer(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodePlayer(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {
+        "P1": 0,
+        "P2": 1,
+        "P3": 2,
+        "P4": 3,
+        "P5": 4,
+        "P6": 5,
+        "P7": 6,
+        "P8": 7,
+        "P9": 8,
+        "P10": 9,
+        "P11": 10,
+        "P12": 11,
+        "Player1": 0,
+        "Player2": 1,
+        "Player3": 2,
+        "Player4": 3,
+        "Player5": 4,
+        "Player6": 5,
+        "Player7": 6,
+        "Player8": 7,
+        "Player9": 8,
+        "Player10": 9,
+        "Player11": 10,
+        "Player12": 11,
+        "CurrentPlayer": 13,
+        "Foes": 14,
+        "Allies": 15,
+        "NeutralPlayers": 16,
+        "AllPlayers": 17,
+        "Force1": 18,
+        "Force2": 19,
+        "Force3": 20,
+        "Force4": 21,
+        "NonAlliedVictoryPlayers": 26,
+    }
 
 
 Player: TypeAlias = "TrgPlayer | Dword"
@@ -180,9 +209,8 @@ class TrgProperty(ConstType):
 
 
 class TrgPropState(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodePropState(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {"Enable": 4, "Disable": 5, "Toggle": 6}
 
 
 PropState: TypeAlias = "TrgPropState | Byte"
@@ -194,9 +222,8 @@ PropStateDict: dict[ConstType, int] = {Enable: 4, Disable: 5, Toggle: 6}
 
 
 class TrgResource(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeResource(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {"Ore": 0, "Gas": 1, "OreAndGas": 2}
 
 
 Resource: TypeAlias = "TrgResource | Byte"
@@ -208,9 +235,17 @@ ResourceDict: dict[ConstType, int] = {Ore: 0, Gas: 1, OreAndGas: 2}
 
 
 class TrgScore(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeScore(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {
+        "Total": 0,
+        "Units": 1,
+        "Buildings": 2,
+        "UnitsAndBuildings": 3,
+        "Kills": 4,
+        "Razings": 5,
+        "KillsAndRazings": 6,
+        "Custom": 7,
+    }
 
 
 class _KillsSpecialized(TrgScore):
@@ -249,19 +284,22 @@ ScoreDict: dict[ConstType, int] = {
 
 
 class TrgSwitchAction(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeSwitchAction(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {
+        "Set": 4,
+        "Clear": 5,
+        "Toggle": 6,
+        "Random": 11,
+    }
 
 
 class TrgSwitchState(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeSwitchState(s)
+    __slots__ = ()
+    _dict: ClassVar[dict[str, int]] = {"Set": 2, "Cleared": 3}
 
 
 class TrgSwitchStateOrAction(TrgSwitchState, TrgSwitchAction):
-    pass
+    __slots__ = ()
 
 
 SwitchState: TypeAlias = "TrgSwitchState | Byte"
@@ -281,27 +319,24 @@ SwitchStateDict: dict[ConstType, int] = {Set: 2, Cleared: 3}
 
 
 @overload
-def _EncodeConst(t: str, d: Mapping[ConstType, int], s: ConstType) -> int:
+def _EncodeConst(t: type[ConstType], s: ConstType) -> int:
     ...
 
 
 @overload
-def _EncodeConst(t: str, d: Mapping[ConstType, int], s: T) -> T:
+def _EncodeConst(t: type[ConstType], s: T) -> T:
     ...
 
 
 @overload
-def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _ExprProxy) -> _Dword:
+def _EncodeConst(t: type[ConstType], s: _ExprProxy) -> _Dword:
     ...
 
 
-def _EncodeConst(t: str, d: Mapping[ConstType, int], s: _Arg) -> _Dword:  # noqa: N802
-    u = unProxy(s)
-    if isinstance(u, ConstType):
-        if u in d:
-            return d[u]
-        raise EPError(_('[Warning] "{}" is not a {}').format(u, t))
-    return u  # type: ignore [return-value]
+def _EncodeConst(t: type[ConstType], s: _Arg) -> _Dword:  # noqa: N802
+    if isinstance(s, ConstType) and not isinstance(s, t):
+        raise EPError(_('[Warning] "{}" is not a {}').format(s, t.__name__))
+    return unProxy(s)  # type: ignore [return-value]
 
 
 @overload
@@ -321,7 +356,10 @@ def EncodeAllyStatus(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa
 
 def EncodeAllyStatus(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2]."""
-    return _EncodeConst("AllyStatus", AllyStatusDict, s)  # type: ignore[return-value]
+    try:
+        return AllyStatusDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgAllyStatus, s)  # type: ignore[return-value]
 
 
 @overload
@@ -341,7 +379,10 @@ def EncodeComparison(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa
 
 def EncodeComparison(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10]."""
-    return _EncodeConst("Comparison", ComparisonDict, s)  # type: ignore[return-value]
+    try:
+        return ComparisonDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgComparison, s)  # type: ignore[return-value]
 
 
 @overload
@@ -364,7 +405,7 @@ def EncodeModifier(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, 
     try:
         return ModifierDict[s]  # type: ignore[index]
     except KeyError:
-        return _EncodeConst("Modifier", ModifierDict, s)  # type: ignore[return-value]
+        return _EncodeConst(TrgModifier, s)  # type: ignore[return-value]
 
 
 @overload
@@ -384,7 +425,10 @@ def EncodeOrder(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N80
 
 def EncodeOrder(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Move, Patrol, Attack] to number [0, 1, 2]."""
-    return _EncodeConst("Order", OrderDict, s)  # type: ignore[return-value]
+    try:
+        return OrderDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgOrder, s)  # type: ignore[return-value]
 
 
 @overload
@@ -448,7 +492,10 @@ def EncodePlayer(s: _Arg, issueError: bool = False) -> _Dword:  # noqa: N802, N8
     if type(s) is ev.EUDVariable:
         return s
 
-    return _EncodeConst("Player", PlayerDict, s)
+    try:
+        return PlayerDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgPlayer, s)
 
 
 @overload
@@ -468,7 +515,10 @@ def EncodePropState(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa:
 
 def EncodePropState(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Enable, Disable, Toogle] to number [4, 5, 6]"""
-    return _EncodeConst("PropState", PropStateDict, s)  # type: ignore[return-value]
+    try:
+        return PropStateDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgPropState, s)  # type: ignore[return-value]
 
 
 @overload
@@ -488,7 +538,10 @@ def EncodeResource(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: 
 
 def EncodeResource(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Ore, Gas, OreAndGas] to [0, 1, 2]"""
-    return _EncodeConst("Resource", ResourceDict, s)  # type: ignore[return-value]
+    try:
+        return ResourceDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgResource, s)  # type: ignore[return-value]
 
 
 @overload
@@ -523,7 +576,10 @@ def EncodeScore(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N80
     ================= ========
 
     """
-    return _EncodeConst("Score", ScoreDict, s)  # type: ignore[return-value]
+    try:
+        return ScoreDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgScore, s)  # type: ignore[return-value]
 
 
 @overload
@@ -543,7 +599,10 @@ def EncodeSwitchAction(s: __ExprProxy, issueError: bool = False) -> _Byte:  # no
 
 def EncodeSwitchAction(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Set, Clear, Toogle, Random] to [4, 5, 6, 11]."""
-    return _EncodeConst("SwitchAction", SwitchActionDict, s)  # type: ignore[return-value]
+    try:
+        return SwitchActionDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgSwitchAction, s)  # type: ignore[return-value]
 
 
 @overload
@@ -563,7 +622,10 @@ def EncodeSwitchState(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noq
 
 def EncodeSwitchState(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [Set, Cleared] to [2, 3]."""
-    return _EncodeConst("_SwitchState", SwitchStateDict, s)  # type: ignore[return-value]
+    try:
+        return SwitchStateDict[s]  # type: ignore[index]
+    except KeyError:
+        return _EncodeConst(TrgSwitchState, s)  # type: ignore[return-value]
 
 
 @overload
@@ -583,12 +645,9 @@ def EncodeCount(s: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N80
 
 def EncodeCount(s: __Arg, issueError: bool = False) -> _Byte:  # noqa: N802, N803
     """Convert [All, (other numbers)] to number [0, (as-is)]."""
-    t = unProxy(s)
-    if t is All:
+    if s is All:
         return 0
-    if isinstance(t, ConstType):
-        raise EPError(_('[Warning] "{}" is not a {}').format(s, "count"))
-    return t  # type: ignore[return-value]
+    return _EncodeConst(TrgCount, s)  # type: ignore[return-value]
 
 
 # ========================
