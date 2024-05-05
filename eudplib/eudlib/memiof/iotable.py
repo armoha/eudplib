@@ -10,7 +10,7 @@ from ... import core as c
 from ... import utils as ut
 from . import modcurpl
 
-_table = {}
+_table: dict[int, dict[str, dict[int, list[c.RawTrigger]]]] = {}
 
 c.PushTriggerScope()
 _writeact = c.SetDeaths(0, c.SetTo, 0, 0)
