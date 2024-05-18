@@ -99,24 +99,38 @@ class StringBuffer(c.EUDStruct):
 
         :type content: str, bytes, int
         """
-        initval = None
-        if _from and isinstance(_from, StringBuffer) and c.IsConstExpr(_from):
-            self._capacity = _from._capacity
-            self._StringIndex = _from._StringIndex
-            self._epd = _from._epd
-        elif _from is None:
-            if content is None:
-                content = "\r" * 218
-            elif isinstance(content, int):
-                content = "\r" * content
+        if _from is None or (
+            isinstance(_from, StringBuffer) and c.IsConstExpr(_from)
+        ):
+            if _from is None:
+                if content is None:
+                    content = "\r" * 218
+                elif isinstance(content, int):
+                    content = "\r" * content
+                else:
+                    content = ut.u2utf8(content)
+
+                string_id = ForceAddString(content)
+                epd = ut.EPD(GetMapStringAddr(string_id))
+                capacity = len(content)
+                super().__init__(
+                    _from=None, _static_initval=[string_id, epd, 0, capacity]
+                )
             else:
-                content = ut.u2utf8(content)
+                string_id = _from._StringIndex
+                epd = _from._epd
+                capacity = _from._capacity
+                super().__init__(_from=_from)
+
             # static fields
-            self._capacity = len(content)
-            self._StringIndex = ForceAddString(content)
-            self._epd = ut.EPD(GetMapStringAddr(self._StringIndex))
-            initval = [self._StringIndex, self._epd, 0, self._capacity]
-        super().__init__(_from=_from, _static_initval=initval)
+            object.__setattr__(self, "_initialized", False)
+            self._StringIndex = string_id
+            self._epd = epd
+            self._capacity = capacity
+            self._initialized = True
+
+        else:
+            super().__init__(_from=_from)
 
     def constructor(self, *args, **kwargs):
         raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
@@ -147,7 +161,7 @@ class StringBuffer(c.EUDStruct):
 
     def getfield(self, name):
         # get static field
-        if c.IsConstExpr(self) and name != "pos":
+        if c.IsConstExpr(self.getValue()) and name != "pos":
             return getattr(self, f"_{name}")
         return super().getfield(name)
 
