@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
-    __slots__ = "_epd"
+    __slots__ = ("_epd",)
 
     def __init__(self, epd: int | c.EUDVariable) -> None:
         self._epd: int | c.EUDVariable = epd
