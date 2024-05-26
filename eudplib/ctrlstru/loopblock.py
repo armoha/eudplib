@@ -15,7 +15,7 @@ from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 
 
-def _is_loopblock(block):
+def _is_loopblock(block: dict[str, Any]) -> bool:
     return "contpoint" in block
 
 

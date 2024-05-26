@@ -5,6 +5,9 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from collections.abc import Callable
+from typing import Any
+
 from eudplib import utils as ut
 
 from .. import core as c
@@ -36,7 +39,9 @@ def EUDJumpIfNot(conditions, onfalse, *, _actions=None) -> None:  # noqa: N802
     ontrue << c.NextTrigger()
 
 
-def EUDTernary(conditions, *, neg=False):  # noqa: N802
+def EUDTernary(  # noqa: N802
+    conditions, *, neg=False
+) -> Callable[[Any], Callable[[Any], c.EUDVariable]]:
     v = c.EUDVariable()
     t = c.Forward()
     end = c.Forward()
