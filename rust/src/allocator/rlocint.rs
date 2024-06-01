@@ -1,4 +1,4 @@
-use pyo3::exceptions::PyTypeError;
+use pyo3::exceptions::{PyTypeError, PyValueError};
 use pyo3::prelude::*;
 use std::fmt;
 use std::ops::{Add, Div, Mul, Rem, Sub};
@@ -207,6 +207,92 @@ impl PyRlocInt {
             DivFloor::div_floor(&self.0.offset, rhs),
             DivFloor::div_floor(&self.0.rlocmode, rhs),
         )))
+    }
+
+    fn __and__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+        if self.0.rlocmode != 0 && self.0.rlocmode != 4 {
+            return Err(PyValueError::new_err(format!(
+                "unsupported rlocmode for &: '{}'",
+                self.0.rlocmode
+            )));
+        }
+        let rlocint = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
+            if self.0.rlocmode != 0 || rhs.0.rlocmode != 0 {
+                return Err(PyTypeError::new_err(
+                    "Cannot bitwise & RlocInt with non-const",
+                ));
+            }
+            RlocInt::new(self.0.offset & rhs.0.offset, 0)
+        } else if let Ok(rhs) = rhs.extract::<i32>() {
+            if self.0.rlocmode == 4 && rhs & 3 != rhs {
+                return Err(PyValueError::new_err(format!(
+                    "non-const ptr RlocInt can only compute bitwise & from 0 to 3"
+                )));
+            }
+            RlocInt::new(self.0.offset & rhs, self.0.rlocmode)
+        } else {
+            return Err(PyTypeError::new_err(format!(
+                "unsupported operand type(s) for &: 'eudplib.core.allocator.RlocInt_C' and '{rhs}'"
+            )));
+        };
+        Ok(PyRlocInt(rlocint))
+    }
+
+    fn __rand__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+        self.__and__(rhs)
+    }
+
+    fn __or__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+        if self.0.rlocmode != 0 && self.0.rlocmode != 4 {
+            return Err(PyValueError::new_err(format!(
+                "unsupported rlocmode for |: '{}'",
+                self.0.rlocmode
+            )));
+        }
+        let rlocint = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
+            if self.0.rlocmode != 0 || rhs.0.rlocmode != 0 {
+                return Err(PyTypeError::new_err(
+                    "Cannot bitwise | RlocInt with non-const",
+                ));
+            }
+            RlocInt::new(self.0.offset | rhs.0.offset, 0)
+        } else if let Ok(rhs) = rhs.extract::<i32>() {
+            if self.0.rlocmode == 4 && rhs & 3 != rhs {
+                return Err(PyValueError::new_err(format!(
+                    "non-const ptr RlocInt can only compute bitwise | from 0 to 3"
+                )));
+            }
+            RlocInt::new(self.0.offset | rhs, self.0.rlocmode)
+        } else {
+            return Err(PyTypeError::new_err(format!(
+                "unsupported operand type(s) for &: 'eudplib.core.allocator.RlocInt_C' and '{rhs}'"
+            )));
+        };
+        Ok(PyRlocInt(rlocint))
+    }
+
+    fn __ror__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+        self.__and__(rhs)
+    }
+
+    fn __invert__(&self) -> PyResult<PyRlocInt> {
+        if self.0.rlocmode != 0 {
+            return Err(PyValueError::new_err(format!(
+                "unsupported rlocmode for ~: '{}'",
+                self.0.rlocmode
+            )));
+        }
+        Ok(PyRlocInt(RlocInt::new(!self.0.offset, 0)))
+    }
+
+    fn __neg__(&self) -> PyResult<PyRlocInt> {
+        if self.0.rlocmode != 0 && self.0.rlocmode != 4 {
+            return Err(PyValueError::new_err(format!(
+                "unsupported rlocmode for -: '{}'",
+                self.0.rlocmode
+            )));
+        }
+        Ok(PyRlocInt(RlocInt::new(-self.0.offset, 0)))
     }
 
     fn _is_aligned_ptr(&self) -> bool {
