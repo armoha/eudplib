@@ -694,10 +694,10 @@ class CUnit(EPDOffsetMap):
         self.clear_status_flag(0x10000000)
 
     def set_hallucination(self) -> None:
-        self.set_status_flag(value=0x40000000, mask=0x40100000)
+        self.set_status_flag(0x40000000)
 
     def clear_hallucination(self) -> None:
-        self.set_status_flag(value=0x00100000, mask=0x40100000)
+        self.clear_status_flag(0x40000000)
 
     def power(self) -> None:
         self.clear_status_flag(0x00000008)
