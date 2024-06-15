@@ -405,7 +405,7 @@ DefAIScriptDict: dict[bytes, bytes] = {
     b"Move Dark Templars to Region": b"MvTe",
     b"Clear Previous Combat Data": b"ClrC",
     b"Set Player to Enemy": b"Enmy",
-    b"Set Player to Ally  ": b"y   ",
+    b"Set Player to Ally": b"Ally",
     b"Value This Area Higher": b"VluA",
     b"Enter Closest Bunker": b"EnBk",
     b"Set Generic Command Target": b"StTg",
