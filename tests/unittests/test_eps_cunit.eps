@@ -9,6 +9,11 @@ function test_cunit1() {
         5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
     ];
     const u = CUnit(EUDVariable(EPD(a)));
+    py_exec("\n\
+from helper import expect_error\n\
+with expect_error(AttributeError):\n\
+    u.zzt = 1\n\
+");
     var ret = 0;
     if (u.order == 0x56) ret += 1;
     if (u.owner == P8) ret += 2;

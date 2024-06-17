@@ -13,7 +13,7 @@ class T(EPDOffsetMap):
 @TestInstance
 def test_ctypes():
     a = Db(b"\x00\x01\x02\x03\x04\x05\x06\x07")
-    # FIXME: with expect_typeerror():
+    # FIXME: with expect_error(TypeError):
     t = T(a)
     t = T(EUDVariable(EPD(a)))
     test_equality(
