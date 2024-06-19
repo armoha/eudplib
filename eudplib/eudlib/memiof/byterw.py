@@ -17,12 +17,11 @@ class EUDByteReader:
     """Read byte by byte."""
 
     def __init__(self):
-        self._suboffset = c.EUDLightVariable()
         self._read = c.Forward()
+        self._case = [c.Forward() for _ in range(4)]
 
-        # Prevent Forward not initialized error
         c.PushTriggerScope()
-        self.readbyte()
+        self.readbyte()  # Prevent Forward not initialized error
         c.PopTriggerScope()
 
     # -------
@@ -33,44 +32,64 @@ class EUDByteReader:
             return c.VProc(
                 epdoffset,
                 [
-                    *epdoffset.QueueAssignTo(EPD(self._read) + 5),
-                    self._suboffset.SetNumber(0),
+                    *epdoffset.QueueAssignTo(EPD(self._read) + 87),
+                    c.SetNextPtr(self._read, self._case[0]),
                 ],
             )
         else:
             return c.RawTrigger(
                 actions=[
-                    c.SetMemory(self._read + 20, c.SetTo, epdoffset),
-                    self._suboffset.SetNumber(0),
+                    c.SetMemory(self._read + 348, c.SetTo, epdoffset),
+                    c.SetNextPtr(self._read, self._case[0]),
                 ]
             )
 
     @c.EUDMethod
+    def _seekoffset(self, offset):
+        c.f_div(offset, 4, ret=[EPD(self._read) + 87, _ev[3]])
+        c.RawTrigger(
+            actions=[
+                c.SetMemory(self._read + 348, c.Add, -(0x58A364 // 4)),
+                c.SetNextPtr(self._read, self._case[0]),
+            ]
+        )
+        for i in range(1, 4):
+            c.RawTrigger(
+                conditions=_ev[3].Exactly(i),
+                actions=c.SetNextPtr(self._read, self._case[i]),
+            )
+
     def seekoffset(self, offset):
         """Seek EUDByteReader to specific address"""
-        # convert offset to epd offset & suboffset
-        c.f_div(offset, 4, ret=[EPD(self._read) + 5, self._suboffset])
-        c.RawTrigger(actions=c.SetMemory(self._read + 20, c.Add, -(0x58A364 // 4)))
+        if c.IsEUDVariable(offset):
+            return self._seekoffset(offset)
+        else:
+            q, r = divmod(offset, 4)
+            return c.RawTrigger(
+                actions=[
+                    c.SetMemory(self._read + 348, c.SetTo, q - (0x58A364 // 4)),
+                    c.SetNextPtr(self._read, self._case[r]),
+                ]
+            )
 
     # -------
 
     @c.EUDMethod
     def readbyte(self):
-        """Read byte from current address. ByteReader will advance by 1 bytes.
+        """Read byte from current address. EUDByteReader will advance by 1 byte.
 
         :returns: Read byte
         """
-        case = [c.Forward() for _ in range(5)]
         ret = _ev[4]
 
-        cs.DoActions(
-            self._read << c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0)
+        self._read << c.RawTrigger(
+            nextptr=self._case[0],
+            actions=[c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0)],
         )
 
+        end = c.Forward()
         for i in range(4):
-            case[i] << c.NextTrigger()
-            if i < 3:
-                cs.EUDJumpIfNot(self._suboffset == i, case[i + 1])
+            self._case[i] << c.NextTrigger()
             for j in _rand_lst(range(8)):
                 c.RawTrigger(
                     conditions=c.DeathsX(
@@ -78,15 +97,15 @@ class EUDByteReader:
                     ),
                     actions=ret.AddNumber(2**j),
                 )
-            if i < 3:
-                c.RawTrigger(nextptr=case[-1], actions=self._suboffset.AddNumber(1))
-            else:  # suboffset == 3
-                cs.DoActions(
-                    c.SetMemory(self._read + 20, c.Add, 1),
-                    self._suboffset.SetNumber(0),
-                )
+            c.RawTrigger(
+                nextptr=end,
+                actions=[
+                    c.SetNextPtr(self._read, self._case[(i + 1) % 4]),
+                    c.SetMemory(self._read + 348, c.Add, 1) if i == 3 else [],
+                ],
+            )
 
-        case[-1] << c.NextTrigger()
+        end << c.NextTrigger()
         cp.f_setcurpl2cpcache()
         return ret
 
@@ -99,12 +118,11 @@ class EUDByteWriter:
         self._write = c.Forward()
         self._return = c.Forward()
 
-        # Prevent Forward not initialized error
         c.PushTriggerScope()
-        self._writebyte(0)
+        self._writebyte(0)  # Prevent Forward not initialized error
+        # EUDByteWriter._writebyte function has multiple entry points
         self._const = [
             c.RawTrigger(
-                nextptr=self._write,
                 conditions=self._suboffset.Exactly(i),
                 actions=[
                     c.SetMemory(self._write + 348, c.SetTo, 0),
@@ -113,6 +131,7 @@ class EUDByteWriter:
             )
             for i in range(4)
         ]
+        c.SetNextTrigger(self._write)
         c.PopTriggerScope()
 
     # -------
@@ -196,15 +215,17 @@ class EUDByteWriter:
         """
         if c.IsEUDVariable(byte):
             return self._writebyte(byte)
-        # multiple entry-point function
+
         nextptr = c.Forward()
         c.RawTrigger(
             nextptr=self._const[0],
             actions=[
-                c.SetMemory(self._const[i] + 348, c.SetTo, byte << (8 * i))
-                for i in range(4)
-            ]
-            + [c.SetNextPtr(self._return, nextptr)],
+                *[
+                    c.SetMemory(self._const[i] + 348, c.SetTo, byte << (8 * i))
+                    for i in range(4)
+                ],
+                c.SetNextPtr(self._return, nextptr),
+            ],
         )
         nextptr << c.NextTrigger()
 
