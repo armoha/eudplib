@@ -20,6 +20,11 @@ class EUDByteReader:
         self._suboffset = c.EUDLightVariable()
         self._read = c.Forward()
 
+        # Prevent Forward not initialized error
+        c.PushTriggerScope()
+        self.readbyte()
+        c.PopTriggerScope()
+
     # -------
 
     def seekepd(self, epdoffset):
@@ -92,8 +97,23 @@ class EUDByteWriter:
     def __init__(self):
         self._suboffset = c.EUDLightVariable()
         self._write = c.Forward()
-        self._const = [c.Forward() for _ in range(4)]
         self._return = c.Forward()
+
+        # Prevent Forward not initialized error
+        c.PushTriggerScope()
+        self._writebyte(0)
+        self._const = [
+            c.RawTrigger(
+                nextptr=self._write,
+                conditions=self._suboffset.Exactly(i),
+                actions=[
+                    c.SetMemory(self._write + 348, c.SetTo, 0),
+                    c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)),
+                ],
+            )
+            for i in range(4)
+        ]
+        c.PopTriggerScope()
 
     # -------
 
@@ -153,11 +173,11 @@ class EUDByteWriter:
         cs.EUDEndSwitch()
 
         self._write << c.RawTrigger(
-            actions=(
+            actions=[
                 c.SetDeathsX(0, c.SetTo, 0, 0, 0xFF00),
                 self._suboffset.AddNumber(1),
                 c.SetMemory(self._write + 348, c.SetTo, 0),
-            )
+            ]
         )
         c.RawTrigger(
             conditions=[self._suboffset >= 4],
@@ -176,18 +196,7 @@ class EUDByteWriter:
         """
         if c.IsEUDVariable(byte):
             return self._writebyte(byte)
-        if not self._const[0].IsSet():
-            c.PushTriggerScope()
-            for i in range(4):
-                self._const[i] << c.RawTrigger(
-                    conditions=self._suboffset.Exactly(i),
-                    actions=[
-                        c.SetMemory(self._write + 348, c.SetTo, 0),
-                        c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i)),
-                    ],
-                )
-            c.SetNextTrigger(self._write)
-            c.PopTriggerScope()
+        # multiple entry-point function
         nextptr = c.Forward()
         c.RawTrigger(
             nextptr=self._const[0],
