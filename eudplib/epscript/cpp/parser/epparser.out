@@ -4032,7 +4032,7 @@ State 18:
           import_chunk ::= * IMPORT dottedName
           fdef_header ::= * FUNCTION NAME LPAREN typedNameList RPAREN fdef_rettypes
           fdef_chunk ::= * fdef_header stmt
-          fdecl_chunk ::= * FUNCTION NAME LPAREN typedNameList RPAREN SEMICOLON
+          fdecl_chunk ::= * FUNCTION NAME LPAREN typedNameList RPAREN fdef_rettypes SEMICOLON
           object_body ::= * OBJECT NAME LBRACKET
           object_body ::= * OBJECT NAME EXTENDS expr LBRACKET
           object_body ::= * object_body VAR typedNameList_nonEmpty SEMICOLON
@@ -13585,7 +13585,7 @@ State 122:
 
 State 123:
           fdef_header ::= FUNCTION NAME LPAREN * typedNameList RPAREN fdef_rettypes
-          fdecl_chunk ::= FUNCTION NAME LPAREN * typedNameList RPAREN SEMICOLON
+          fdecl_chunk ::= FUNCTION NAME LPAREN * typedNameList RPAREN fdef_rettypes SEMICOLON
           typedName ::= * NAME
           typedName ::= * NAME COLON expr
           typedNameList_nonEmpty ::= * typedName
@@ -13732,7 +13732,7 @@ State 129:
      (24) fdef_rettypes ::= *
           fdef_rettypes ::= * COLON exprList_nonEmpty
           fdef_header ::= FUNCTION NAME LPAREN typedNameList RPAREN * fdef_rettypes
-          fdecl_chunk ::= FUNCTION NAME LPAREN typedNameList RPAREN * SEMICOLON
+          fdecl_chunk ::= FUNCTION NAME LPAREN typedNameList RPAREN * fdef_rettypes SEMICOLON
 
                           LNOT reduce 24
                           PLUS reduce 24
@@ -13740,8 +13740,7 @@ State 129:
                         BITNOT reduce 24
                         LPAREN reduce 24
                     LSQBRACKET reduce 24
-                     SEMICOLON shift  259
-                     SEMICOLON reduce 24  -- dropped by precedence
+                     SEMICOLON reduce 24
                           NAME reduce 24
                          COLON shift  52
                       FUNCTION reduce 24
@@ -22977,6 +22976,7 @@ State 248:
 
 State 249:
      (26) fdef_header ::= FUNCTION NAME LPAREN typedNameList RPAREN fdef_rettypes *
+          fdecl_chunk ::= FUNCTION NAME LPAREN typedNameList RPAREN fdef_rettypes * SEMICOLON
 
                           LNOT reduce 26
                           PLUS reduce 26
@@ -22984,7 +22984,8 @@ State 249:
                         BITNOT reduce 26
                         LPAREN reduce 26
                     LSQBRACKET reduce 26
-                     SEMICOLON reduce 26
+                     SEMICOLON shift  259
+                     SEMICOLON reduce 26  -- dropped by precedence
                           NAME reduce 26
                       FUNCTION reduce 26
                       LBRACKET reduce 26
@@ -23414,7 +23415,7 @@ State 258:
                 ACTIONALLPNAME reduce 27
 
 State 259:
-     (28) fdecl_chunk ::= FUNCTION NAME LPAREN typedNameList RPAREN SEMICOLON *
+     (28) fdecl_chunk ::= FUNCTION NAME LPAREN typedNameList RPAREN fdef_rettypes SEMICOLON *
 
                              $ reduce 28
                           LNOT reduce 28
@@ -26651,7 +26652,7 @@ State 375:
 
 State 376:
           fdef_header ::= FUNCTION * NAME LPAREN typedNameList RPAREN fdef_rettypes
-          fdecl_chunk ::= FUNCTION * NAME LPAREN typedNameList RPAREN SEMICOLON
+          fdecl_chunk ::= FUNCTION * NAME LPAREN typedNameList RPAREN fdef_rettypes SEMICOLON
           lambdaExprStart ::= FUNCTION * LPAREN typedNameList RPAREN fdef_rettypes
 
                         LPAREN shift  122
@@ -27123,13 +27124,13 @@ State 463:
 
 State 464:
           fdef_header ::= FUNCTION NAME LPAREN typedNameList * RPAREN fdef_rettypes
-          fdecl_chunk ::= FUNCTION NAME LPAREN typedNameList * RPAREN SEMICOLON
+          fdecl_chunk ::= FUNCTION NAME LPAREN typedNameList * RPAREN fdef_rettypes SEMICOLON
 
                         RPAREN shift  129
 
 State 465:
           fdef_header ::= FUNCTION NAME * LPAREN typedNameList RPAREN fdef_rettypes
-          fdecl_chunk ::= FUNCTION NAME * LPAREN typedNameList RPAREN SEMICOLON
+          fdecl_chunk ::= FUNCTION NAME * LPAREN typedNameList RPAREN fdef_rettypes SEMICOLON
 
                         LPAREN shift  123
 

@@ -292,7 +292,7 @@ fdef_chunk ::= fdef_header stmt . {
     currentFunction = "";
 }
 
-fdecl_chunk  ::= FUNCTION NAME(name) LPAREN typedNameList RPAREN SEMICOLON. {
+fdecl_chunk  ::= FUNCTION NAME(name) LPAREN typedNameList RPAREN fdef_rettypes SEMICOLON. {
     // Preprocess name
     funcNamePreprocess(name->data);
     if(isPyKeyword(name->data)) {

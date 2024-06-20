@@ -9,7 +9,7 @@ f_switch_test = _RELIMP(".test_eps_misc", "f_switch_test")
 f_test_array = _RELIMP(".test_eps_misc", "f_test_array")
 import warnings
 # (Line 5) import .test_eps_misc as misc;
-# (Line 6) function square();
+# (Line 6) function square(x) : None;
 misc = _RELIMP(".", "test_eps_misc")
 # (Line 8) const a = [
 # (Line 9) square(1),
