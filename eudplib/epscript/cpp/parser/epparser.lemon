@@ -81,7 +81,8 @@ chunk ::= relimp_chunk.
 chunk ::= import_chunk SEMICOLON.
 chunk ::= fdef_chunk.
 chunk ::= fdecl_chunk.
-chunk ::= object_chunk.
+chunk ::= objdef_chunk.
+chunk ::= objdecl_chunk.
 chunk ::= vdef_global_stmt SEMICOLON.
 chunk ::= funccall_global_stmt SEMICOLON.
 chunk ::= vdefAssign_global_stmt SEMICOLON.
@@ -453,7 +454,7 @@ object_body(A) ::= object_body(B) method_chunk . {
     A->line = currentTokenizingLine;
 }
 
-object_chunk ::= object_body(A) RBRACKET SEMICOLON. {
+objdef_chunk ::= object_body(A) RBRACKET SEMICOLON. {
     ps->gen << "_fields_ = [\n";
     subTokenListIter(A->subToken[1], [&](const Token* tok) {
         subTokenListIter(tok, [&](const Token* nameType) {
@@ -478,6 +479,37 @@ object_chunk ::= object_body(A) RBRACKET SEMICOLON. {
     ps->gen.unindent(true);
     delete A;
 }
+
+objdecl_chunk ::= OBJECT NAME(name) SEMICOLON. {
+    if(isBuiltinConst(name->data)) {
+        throw_error(6755, "Name collision with eudplib global " + name->data, name->line);
+    }
+    if(isPyKeyword(name->data)) {
+        throw_error(6756, "Name collision with Python keyword " + name->data, name->line);
+    }
+    if(isPyBuiltin(name->data)) {
+        throw_error(6757, "Name collision with Python builtin " + name->data, name->line);
+    }
+    if(!ps->closure.declareConstant(name->data)) {
+        throw_error(8228, "Declaring object with non-function name " + name->data, name->line);
+    }
+}
+
+objdecl_chunk ::= OBJECT NAME(name) EXTENDS expr SEMICOLON. {
+    if(isBuiltinConst(name->data)) {
+        throw_error(6755, "Name collision with eudplib global " + name->data, name->line);
+    }
+    if(isPyKeyword(name->data)) {
+        throw_error(6756, "Name collision with Python keyword " + name->data, name->line);
+    }
+    if(isPyBuiltin(name->data)) {
+        throw_error(6757, "Name collision with Python builtin " + name->data, name->line);
+    }
+    if(!ps->closure.declareConstant(name->data)) {
+        throw_error(8228, "Declaring object with non-function name " + name->data, name->line);
+    }
+}
+
 
 /// Single-line statements
 stmt ::= error SEMICOLON(X). { throw_error(6974, "Error while parsing statement", X->line); delete X; }

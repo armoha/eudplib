@@ -90,20 +90,21 @@ def f_test_object():
     EUDEndIf()
     EUDReturn(ret)
     # (Line 39) }
-    # (Line 41) object Coord { var x, y; };
+    # (Line 41) object Triangle;
 
+# (Line 42) object Coord { var x, y; };
 class Coord(EUDStruct):
-    # (Line 42) object Triangle {
+    # (Line 43) object Triangle {
     _fields_ = [
         'x',
         'y',
     ]
 
-# (Line 43) var p: Coord * 5;
+# (Line 44) var p: Coord * 5;
 class Triangle(EUDStruct):
-    # (Line 44) var q;
-    # (Line 45) };
-    # (Line 46) function test_nested_object() {
+    # (Line 45) var q;
+    # (Line 46) };
+    # (Line 48) function test_nested_object() {
     _fields_ = [
         ('p', Coord * 5),
         'q',
@@ -111,84 +112,84 @@ class Triangle(EUDStruct):
 
 @EUDFunc
 def f_test_nested_object():
-    # (Line 47) const a = Triangle();
+    # (Line 49) const a = Triangle();
     a = Triangle()
-    # (Line 48) a.p = (Coord * 5)();
+    # (Line 50) a.p = (Coord * 5)();
     _ATTW(a, 'p') << ((Coord * 5)())
-    # (Line 49) foreach(i : py_range(5)) {
+    # (Line 51) foreach(i : py_range(5)) {
     for i in range(5):
-        # (Line 50) a.p[i] = Coord();
+        # (Line 52) a.p[i] = Coord();
         _ARRW(a.p, i) << (Coord())
-        # (Line 51) }
-        # (Line 53) a.p[0].x = 1;
+        # (Line 53) }
+        # (Line 55) a.p[0].x = 1;
 
     _ATTW(a.p[0], 'x') << (1)
-    # (Line 54) a.p[1].y = 2;
+    # (Line 56) a.p[1].y = 2;
     _ATTW(a.p[1], 'y') << (2)
-    # (Line 55) a.p[1].y += 2;
+    # (Line 57) a.p[1].y += 2;
     _ATTW(a.p[1], 'y').__iadd__(2)
-    # (Line 56) a.q = 3;
+    # (Line 58) a.q = 3;
     _ATTW(a, 'q') << (3)
-    # (Line 58) var ret = list(a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3) ? 1 : 0;
+    # (Line 60) var ret = list(a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3) ? 1 : 0;
     ret = _LVAR([EUDTernary(FlattenList([_ATTC(a.p[0], 'x') == 1, _ATTC(a.p[0], 'y') == 0, _ATTC(a.p[1], 'y') == 4, _ATTC(a, 'q') == 3]))(1)(0)])
-    # (Line 60) const b = a.copy();
+    # (Line 62) const b = a.copy();
     b = a.copy()
-    # (Line 61) b.p[0].x = 5;
+    # (Line 63) b.p[0].x = 5;
     _ATTW(b.p[0], 'x') << (5)
-    # (Line 62) b.q = 2;
+    # (Line 64) b.q = 2;
     _ATTW(b, 'q') << (2)
-    # (Line 63) if (a.p[0].x == 5) ret += 2;
+    # (Line 65) if (a.p[0].x == 5) ret += 2;
     if EUDIf()(_ATTC(a.p[0], 'x') == 5):
         ret.__iadd__(2)
-        # (Line 64) if (b.p[0].x == 5) ret += 4;
+        # (Line 66) if (b.p[0].x == 5) ret += 4;
     EUDEndIf()
     if EUDIf()(_ATTC(b.p[0], 'x') == 5):
         ret.__iadd__(4)
-        # (Line 65) if (b.p[0].y == 0) ret += 8;
+        # (Line 67) if (b.p[0].y == 0) ret += 8;
     EUDEndIf()
     if EUDIf()(_ATTC(b.p[0], 'y') == 0):
         ret.__iadd__(8)
-        # (Line 66) if (b.p[1].y == 4) ret += 16;
+        # (Line 68) if (b.p[1].y == 4) ret += 16;
     EUDEndIf()
     if EUDIf()(_ATTC(b.p[1], 'y') == 4):
         ret.__iadd__(16)
-        # (Line 67) if (a.q == 3) ret += 32;
+        # (Line 69) if (a.q == 3) ret += 32;
     EUDEndIf()
     if EUDIf()(_ATTC(a, 'q') == 3):
         ret.__iadd__(32)
-        # (Line 68) if (b.q == 2) ret += 64;
+        # (Line 70) if (b.q == 2) ret += 64;
     EUDEndIf()
     if EUDIf()(_ATTC(b, 'q') == 2):
         ret.__iadd__(64)
-        # (Line 70) return ret;
+        # (Line 72) return ret;
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 71) }
-    # (Line 73) const ListList = py_list();
+    # (Line 73) }
+    # (Line 75) const ListList = py_list();
 
 ListList = _CGFW(lambda: [list()], 1)[0]
-# (Line 74) var AllList;  // EUDArray
+# (Line 76) var AllList;  // EUDArray
 AllList = EUDVariable()
-# (Line 75) object List {
-# (Line 76) var prev: selftype, next: selftype;
+# (Line 77) object List {
+# (Line 78) var prev: selftype, next: selftype;
 class List(EUDStruct):
-    # (Line 77) function constructor() {
+    # (Line 79) function constructor() {
     @EUDMethod
     def constructor(this):
-        # (Line 78) py_exec("\
-        # (Line 84) EUDOnStart(init)");
+        # (Line 80) py_exec("\
+        # (Line 86) EUDOnStart(init)");
         exec("if not ListList:\n    def init():\n        global AllList\n        ListList.append(-1)\n        AllList << EUDArray(ListList)\n    EUDOnStart(init)")
-        # (Line 85) ListList.append(this);
+        # (Line 87) ListList.append(this);
         ListList.append(this)
-        # (Line 86) }
-        # (Line 87) function foo(c: Coord) {}
+        # (Line 88) }
+        # (Line 89) function foo(c: Coord) {}
 
     @EUDTypedMethod([Coord])
     def foo(this, c):
-        # (Line 88) };
+        # (Line 90) };
         pass
 
-    # (Line 89) function test_selftype_member() {
+    # (Line 91) function test_selftype_member() {
     _fields_ = [
         ('prev', selftype),
         ('next', selftype),
@@ -196,62 +197,62 @@ class List(EUDStruct):
 
 @EUDFunc
 def f_test_selftype_member():
-    # (Line 90) const a, b = List(), List();
+    # (Line 92) const a, b = List(), List();
     a, b = List2Assignable([List(), List()])
-    # (Line 91) a.prev = b;
+    # (Line 93) a.prev = b;
     _ATTW(a, 'prev') << (b)
-    # (Line 92) a.next = b;
+    # (Line 94) a.next = b;
     _ATTW(a, 'next') << (b)
-    # (Line 93) b.prev = a;
+    # (Line 95) b.prev = a;
     _ATTW(b, 'prev') << (a)
-    # (Line 94) b.next = a;
+    # (Line 96) b.next = a;
     _ATTW(b, 'next') << (a)
-    # (Line 95) a.foo(0);
+    # (Line 97) a.foo(0);
     a.foo(0)
-    # (Line 96) const c = List();
+    # (Line 98) const c = List();
     c = List()
-    # (Line 97) const d = List();
+    # (Line 99) const d = List();
     d = List()
-    # (Line 98) const e = List();
+    # (Line 100) const e = List();
     e = List()
-    # (Line 100) const arr = EUDArray.cast(AllList);
+    # (Line 102) const arr = EUDArray.cast(AllList);
     arr = EUDArray.cast(AllList)
-    # (Line 101) var i;
+    # (Line 103) var i;
     i = EUDVariable()
-    # (Line 102) for (i = 0 ; arr[i] != -1 ; i++) {}
+    # (Line 104) for (i = 0 ; arr[i] != -1 ; i++) {}
     i << (0)
     if EUDWhile()(_ARRC(arr, i) == -1, neg=True):
         def _t2():
             i.__iadd__(1)
-        # (Line 103) return i;
+        # (Line 105) return i;
         EUDSetContinuePoint()
         _t2()
     EUDEndWhile()
     EUDReturn(i)
-    # (Line 104) }
-    # (Line 106) object RandomData {
+    # (Line 106) }
+    # (Line 108) object RandomData {
 
-# (Line 107) var arr: EUDArray;
+# (Line 109) var arr: EUDArray;
 class RandomData(EUDStruct):
-    # (Line 108) var count;
-    # (Line 110) function constructor(arr, count) {
+    # (Line 110) var count;
+    # (Line 112) function constructor(arr, count) {
     @EUDMethod
     def constructor(this, arr, count):
-        # (Line 111) this.arr = arr;
+        # (Line 113) this.arr = arr;
         _ATTW(this, 'arr') << (arr)
-        # (Line 112) this.count = count;
+        # (Line 114) this.count = count;
         _ATTW(this, 'count') << (count)
-        # (Line 113) }
-        # (Line 115) function get_value() {
+        # (Line 115) }
+        # (Line 117) function get_value() {
 
     @EUDMethod
     def get_value(this):
-        # (Line 116) return this.arr[dwrand() % this.count];
+        # (Line 118) return this.arr[dwrand() % this.count];
         EUDReturn(this.arr[f_dwrand() % this.count])
-        # (Line 117) }
-        # (Line 118) };
+        # (Line 119) }
+        # (Line 120) };
 
-    # (Line 119) function test_eudmethods() {
+    # (Line 121) function test_eudmethods() {
     _fields_ = [
         ('arr', EUDArray),
         'count',
@@ -259,20 +260,20 @@ class RandomData(EUDStruct):
 
 @EUDFunc
 def f_test_eudmethods():
-    # (Line 120) const rd = RandomData(EUDArray(list(1,2,3,4,5,6,7)), 7);
+    # (Line 122) const rd = RandomData(EUDArray(list(1,2,3,4,5,6,7)), 7);
     rd = RandomData(EUDArray(FlattenList([1, 2, 3, 4, 5, 6, 7])), 7)
-    # (Line 121) var ret = 0;
+    # (Line 123) var ret = 0;
     ret = _LVAR([0])
-    # (Line 122) foreach(n : py_range(7)) {
+    # (Line 124) foreach(n : py_range(7)) {
     for n in range(7):
-        # (Line 123) const v = rd.get_value();
+        # (Line 125) const v = rd.get_value();
         v = rd.get_value()
-        # (Line 124) if (1 <= v && v <= 7) ret += 1;
+        # (Line 126) if (1 <= v && v <= 7) ret += 1;
         if EUDIf()(EUDSCAnd()(1 <= v)(v <= 7)()):
             ret.__iadd__(1)
-            # (Line 125) }
+            # (Line 127) }
         EUDEndIf()
-        # (Line 126) return ret;
+        # (Line 128) return ret;
 
     EUDReturn(ret)
-    # (Line 127) }
+    # (Line 129) }

@@ -38,11 +38,13 @@ function test_object() {
     return ret;  // 511
 }
 
+object Triangle;
 object Coord { var x, y; };
 object Triangle {
     var p: Coord * 5;
     var q;
 };
+
 function test_nested_object() {
     const a = Triangle();
     a.p = (Coord * 5)();
