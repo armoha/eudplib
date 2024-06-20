@@ -586,6 +586,7 @@ exprList(A) ::= exprList_nonEmpty(B). { A = B; }
 
 // Related to expressions
 expr(A) ::= NUMBER(B). { A = B; }
+expr(A) ::= STRING(B). { A = B; }
 expr(A) ::= KILLS(B). {
     B->data = "4";
     A = B;
@@ -603,12 +604,6 @@ expr(A)::= expr(B) PERIOD NAME(C). [MEMBER] {
 }
 
 expr(A)::= expr(B) LSQBRACKET expr(C) RSQBRACKET. [SUBSCRIPT] {
-    B->data = B->data + "[" + C->data + "]";
-    delete C;
-    A = mkTokenTemp(B);
-}
-
-expr(A)::= expr(B) LSQBRACKET STRING(C) RSQBRACKET. [SUBSCRIPT] {
     B->data = B->data + "[" + C->data + "]";
     delete C;
     A = mkTokenTemp(B);
@@ -686,14 +681,7 @@ expr(A) ::= lambdaExprStart(B) stmt. {
 
 // Function calls
 fArg(A) ::= expr(B). { A = B; }
-fArg(A) ::= STRING(B). { A = B; }
 fArg(A) ::= NAME(B) ASSIGN expr(C). {  // Keyword argument
-    C->data = B->data + "=" + C->data;
-    C->type = TOKEN_TEMP;
-    A = C;
-    delete B;
-}
-fArg(A) ::= NAME(B) ASSIGN STRING(C). {  // Keyword argument
     C->data = B->data + "=" + C->data;
     C->type = TOKEN_TEMP;
     A = C;
@@ -801,27 +789,27 @@ expr(A) ::= L2V LPAREN expr(B) RPAREN. {
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= MAPSTRING LPAREN STRING(B) RPAREN. {
+expr(A) ::= MAPSTRING LPAREN expr(B) RPAREN. {
     B->data = "GetStringIndex(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= UNIT LPAREN STRING(B) RPAREN. {
+expr(A) ::= UNIT LPAREN expr(B) RPAREN. {
     B->data = "EncodeUnit(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= SWITCH LPAREN STRING(B) RPAREN. {
+expr(A) ::= SWITCH LPAREN expr(B) RPAREN. {
     B->data = "EncodeSwitch(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= LOCATION LPAREN STRING(B) RPAREN. {
+expr(A) ::= LOCATION LPAREN expr(B) RPAREN. {
     B->data = "GetLocationIndex(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 
-expr(A) ::= STATTXTTBL LPAREN STRING(B) RPAREN. {
+expr(A) ::= STATTXTTBL LPAREN expr(B) RPAREN. {
     B->data = "EncodeTBL(" + B->data + ")";
     A = mkTokenTemp(B);
 }
@@ -933,9 +921,6 @@ expr(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET GT expr(D). [GT] {
 
 expr(A) ::= expr(B) EQ expr(C).   { A = binopConcat(B, "==", C); }
 expr(A) ::= expr(B) NE expr(C).   { A = negate(binopConcat(B, "==", C)); }
-
-expr(A) ::= expr(B) EQ STRING(C).   { A = binopConcat(B, "==", C); }
-expr(A) ::= expr(B) NE STRING(C).   { A = negate(binopConcat(B, "==", C)); }
 
 expr(A) ::= expr(B) LE expr(C).   { A = binopConcat(B, "<=", C); }
 expr(A) ::= expr(B) GE expr(C).   { A = binopConcat(B, ">=", C); }
@@ -1167,12 +1152,6 @@ lvalue(A) ::= expr(B) LSQBRACKET expr(C) RSQBRACKET. [SUBSCRIPT] {
     delete B;
 }
 
-lvalue(A) ::= expr(B) LSQBRACKET STRING(C) RSQBRACKET. [SUBSCRIPT] {
-    C->data = "_ARRW(" + B->data + ", " + C->data + ")";
-    A = mkTokenTemp(C);
-    delete B;
-}
-
 lvalue(A) ::= expr(B) PERIOD NAME(C). [MEMBER] {
     C->data = "_ATTW(" + B->data + ", '" + C->data + "')";
     A = mkTokenTemp(C);
@@ -1183,12 +1162,6 @@ lvalueList_nonEmpty(A) ::= lvalue(B). { A = B; }
 lvalueList_nonEmpty(A) ::= lvalueList_nonEmpty(B) COMMA lvalue(C). { A = commaConcat(B, C); }
 
 assign_stmt ::= lvalue(A) ASSIGN expr(B). {
-    writeTraceInfo(ps->gen, A);
-    ps->gen << A->data << " << (" << B->data << ")" << std::endl;
-    delete A; delete B;
-}
-
-assign_stmt ::= lvalue(A) ASSIGN STRING(B). {
     writeTraceInfo(ps->gen, A);
     ps->gen << A->data << " << (" << B->data << ")" << std::endl;
     delete A; delete B;

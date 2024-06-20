@@ -42,9 +42,9 @@
 #define NUMBER                          42
 #define RSQBRACKET                      43
 #define SUBSCRIPT                       44
-#define KILLS                           45
-#define MEMBER                          46
-#define STRING                          47
+#define STRING                          45
+#define KILLS                           46
+#define MEMBER                          47
 #define FUNCCALL                        48
 #define L2V                             49
 #define MAPSTRING                       50
