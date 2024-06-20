@@ -332,7 +332,7 @@ object_body(A) ::= OBJECT NAME(name) LBRACKET. {
     A->subToken[1] = nullptr;
 }
 
-object_body(A) ::= OBJECT NAME(name) EXTENDS NAME(parent) LBRACKET. {
+object_body(A) ::= OBJECT NAME(name) EXTENDS expr(parent) LBRACKET. {
     ps->gen << "class " << name->data << "(" << parent->data << "):\n";
     ps->gen.indent();
 
