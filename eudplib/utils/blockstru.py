@@ -8,7 +8,7 @@
 from typing import Any
 
 from ..localize import _
-from .eperror import EPError, ep_assert
+from .eperror import EPError, TriggerScopeError, ep_assert
 
 block = tuple[str, Any]
 
@@ -54,6 +54,8 @@ def EUDGetLastBlockOfName(name: str) -> block:  # noqa: N802
     try:
         return _lastblockdict[name][-1]
     except (IndexError, KeyError):
+        if name == "triggerscope":
+            raise TriggerScopeError()
         raise EPError(_("Block not found: {}").format(name))
 
 

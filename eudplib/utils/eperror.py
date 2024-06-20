@@ -9,13 +9,21 @@
 import sys
 import warnings
 
+from ..localize import _
+
 
 class EPError(Exception):
     pass
 
 
+# fmt: off
+_ERR = _("Must put Trigger into onPluginStart, beforeTriggerExec or afterTriggerExec")  # noqa: E501
+# fmt: on
+
+
 class TriggerScopeError(EPError):
-    pass
+    def __init__(self, msg=_ERR, *args, **kwargs):
+        super().__init__(msg, *args, **kwargs)
 
 
 class EPWarning(Warning):
