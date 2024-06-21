@@ -10,15 +10,15 @@ from collections.abc import Iterable, Sequence
 from eudplib import utils as ut
 
 from .. import core as c
-from ..core import Condition, Forward, RawTrigger
+from ..core import Condition, ConstExpr
 from ..core.rawtrigger.rawtriggerdef import _Action
 from .tpatcher import _Condition, patch_condition
 
 
 def _branch_sub(
     conditions: Sequence[Condition],
-    ontrue: c.ConstExpr,
-    onfalse: c.ConstExpr,
+    ontrue: ConstExpr,
+    onfalse: ConstExpr,
     *,
     _actions: _Action | None = None,
 ) -> None:
@@ -30,9 +30,9 @@ def _branch_sub(
     """
     ut.ep_assert(len(conditions) <= 16)
 
-    brtrg = Forward()
-    tjtrg = Forward()
-    brtrg << RawTrigger(
+    brtrg = c.Forward()
+    tjtrg = c.Forward()
+    brtrg << c.RawTrigger(
         nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg)
     )
     if _actions:
@@ -40,13 +40,13 @@ def _branch_sub(
     else:
         actions = []
     actions.append(c.SetNextPtr(brtrg, onfalse))
-    tjtrg << RawTrigger(nextptr=ontrue, actions=actions)
+    tjtrg << c.RawTrigger(nextptr=ontrue, actions=actions)
 
 
 def EUDBranch(  # noqa: N802
     conditions: _Condition | Iterable[_Condition | Iterable],
-    ontrue: c.ConstExpr,
-    onfalse: c.ConstExpr,
+    ontrue: ConstExpr,
+    onfalse: ConstExpr,
     *,
     _actions: _Action | None = None,
 ) -> None:
@@ -55,22 +55,26 @@ def EUDBranch(  # noqa: N802
     :param conditions: Nested list of conditions.
     :param ontrue: When all conditions are true, this branch is taken.
     :param onfalse: When any of the conditions are false, this branch is taken.
+    :param _actions: When all conditions are true, those actions are executed.
     """
     conditions = ut.FlattenList(conditions)
     conds = list(map(patch_condition, conditions))
 
-    if len(conds) == 0:
-        RawTrigger(nextptr=ontrue, actions=_actions)  # Just jump
+    if len(conds) == 0:  # Just jump
+        if _actions:
+            c.RawTrigger(nextptr=ontrue, actions=_actions)
+        else:
+            c.SetNextTrigger(ontrue)
         return
 
     # Check all conditions
     for i in range(0, len(conds), 16):
-        subontrue = Forward()
+        subontrue = c.Forward()
         subonfalse = onfalse
 
         if i + 16 < len(conds):
             _branch_sub(conds[i : i + 16], subontrue, subonfalse)
             subontrue << c.NextTrigger()
-            continue
-        _branch_sub(conds[i:], subontrue, subonfalse, _actions=_actions)
-        subontrue << ontrue
+        else:
+            _branch_sub(conds[i:], subontrue, subonfalse, _actions=_actions)
+            subontrue << ontrue
