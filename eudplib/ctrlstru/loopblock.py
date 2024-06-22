@@ -175,7 +175,10 @@ def _get_last_loopblock() -> tuple[str, Any]:
 
 def eudloop_continue() -> None:
     block = _get_last_loopblock()[1]
-    EUDJump(block["contpoint"])
+    try:
+        EUDJump(block["contpoint"])
+    except ut.EPError:
+        raise ut.EPError(_("unreachable continue"))
 
 
 def eudloop_continue_if(conditions) -> None:
@@ -200,7 +203,10 @@ def set_continuepoint() -> None:
 
 def eudloop_break() -> None:
     block = _get_last_loopblock()[1]
-    EUDJump(block["loopend"])
+    try:
+        EUDJump(block["loopend"])
+    except ut.EPError:
+        raise ut.EPError(_("unreachable break"))
 
 
 def eudloop_break_if(conditions) -> None:

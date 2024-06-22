@@ -15,4 +15,17 @@ def test_ptrjump():
     t << NextTrigger()
     testvar += 8
 
-    test_assert("Pointer jump test", testvar == 11)
+    PushTriggerScope()
+    end = Forward()
+    trg = [
+        RawTrigger(nextptr=end, actions=testvar.AddNumber(16 << i)) for i in range(4)
+    ]
+    PopTriggerScope()
+    EUDJump(trg[1])
+    with expect_eperror():
+        EUDJump(trg[2])
+    with expect_eperror():
+        EUDJump(trg[3])
+    end << NextTrigger()
+
+    test_assert("Pointer jump test", testvar == 43)

@@ -71,11 +71,13 @@ def EUDSwitchCase() -> CtrlStruOpener:  # noqa: N802
 
         for number in numbers:
             case = number & block["bitmask"]
-            ut.ep_assert(case not in block["casebrlist"], _("Duplicate cases"))
             ut.ep_assert(
                 block["bitmask"] == 0xFFFFFFFF or case == number,
-                _("cases out of mask"),
+                _("case out of bitmask: {0} & 0x{1:X} != {0}").format(
+                    number, block["bitmask"]
+                ),
             )
+            ut.ep_assert(case not in block["casebrlist"], _("Duplicate cases"))
             block["casebrlist"][case] = c.NextTrigger()
 
         return True
@@ -99,7 +101,10 @@ def EUDSwitchDefault() -> CtrlStruOpener:  # noqa: N802
 
 def eudswitch_break() -> None:
     block = ut.EUDGetLastBlockOfName("swblock")[1]
-    EUDJump(block["swend"])
+    try:
+        EUDJump(block["swend"])
+    except ut.EPError:
+        raise ut.EPError(_("unreachable break"))
 
 
 def eudswitch_break_if(conditions) -> None:
@@ -116,7 +121,7 @@ def EUDEndSwitch() -> None:  # noqa: N802
     lb = ut.EUDPopBlock("swblock")
     block = lb[1]
     swend = block["swend"]
-    EUDJump(swend)  # Exit switch block
+    c.SetNextTrigger(swend)  # Exit switch block
     c.PopTriggerScope()
 
     bitmask: int = block["bitmask"]

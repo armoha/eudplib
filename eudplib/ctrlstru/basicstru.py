@@ -12,19 +12,24 @@ from eudplib import utils as ut
 
 from .. import core as c
 from .. import trigger as tg
+from ..localize import _
 
 
 def DoActions(*actions, preserved=True) -> tuple[c.Forward, c.RawTrigger]:  # noqa: N802
     return tg.Trigger(actions=actions, preserved=preserved)
 
 
-def EUDJump(nextptr) -> None:  # noqa: N802
+def EUDJump(nextptr, *, must_use=True) -> None:  # noqa: N802
+    nt_list = ut.EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
+    if must_use and not nt_list:
+        raise ut.EPError(_("unreachable EUDJump"))
     if c.IsEUDVariable(nextptr):
-        t = c.Forward()
-        c.SeqCompute([(ut.EPD(t + 4), c.SetTo, nextptr)])
-        t << c.RawTrigger()
+        c.RawTrigger(
+            nextptr=nextptr.GetVTable(),
+            actions=nextptr.QueueAssignTo(ut.EPD(nextptr.GetVTable) + 1),
+        )
     else:
-        c.RawTrigger(nextptr=nextptr)
+        c.SetNextTrigger(nextptr)
 
 
 def EUDJumpIf(conditions, ontrue, *, _actions=None) -> None:  # noqa: N802
@@ -53,7 +58,7 @@ def EUDTernary(  # noqa: N802
 
     def _1(ontrue):
         v << ontrue
-        EUDJump(end)
+        c.SetNextTrigger(end)
         t << c.NextTrigger()
 
         def _2(onfalse):

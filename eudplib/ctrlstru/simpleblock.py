@@ -11,7 +11,7 @@ from eudplib import utils as ut
 from eudplib.localize import _
 
 from .. import core as c
-from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
+from .basicstru import EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 
 """
@@ -56,7 +56,7 @@ def EUDElseIf() -> CtrlStruOpener:  # noqa: N802
         )
 
         # Finish previous if/elseif block
-        EUDJump(block["ifend"])
+        c.SetNextTrigger(block["ifend"])
 
         block["next_elseif"] << c.NextTrigger()
         block["next_elseif"] = c.Forward()
@@ -92,7 +92,7 @@ def EUDElse() -> CtrlStruOpener:  # noqa: N802
         )
 
         # Finish previous if/elseif block
-        EUDJump(block["ifend"])
+        c.SetNextTrigger(block["ifend"])
         block["next_elseif"] << c.NextTrigger()
         block["next_elseif"] = None
         return True

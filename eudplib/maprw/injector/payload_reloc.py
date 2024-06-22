@@ -46,9 +46,7 @@ def create_payload_relocator(payload: Payload) -> Payload:
                         epd.SetDest(ut.EPD(dst) + 4),
                     ],
                 )
-                cs.DoActions(
-                    dst << c.SetDeaths(0, c.Add, orig_payload // 4, 0)
-                )
+                cs.DoActions(dst << c.SetDeaths(0, c.Add, orig_payload // 4, 0))
             cs.EUDEndWhile()
 
         # init ort
@@ -69,7 +67,7 @@ def create_payload_relocator(payload: Payload) -> Payload:
             cs.EUDEndWhile()
 
         # Jump
-        cs.EUDJump(orig_payload)
+        c.SetNextTrigger(orig_payload)
 
     c.PopTriggerScope()
 
