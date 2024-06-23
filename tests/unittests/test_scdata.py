@@ -5,44 +5,42 @@ from helper import *  # noqa: F403
 
 @TestInstance
 def test_scdataobject():
+    # with expect_eperror():
+    TrgUnit(233)
+    marine = TrgUnit("Terran Marine")
+    # with expect_eperror():
+    TrgUnit(marine)
+    marine = TrgUnit.cast(marine)
+    test_equality("TrgUnit(marine) = 0", marine, 0)
+    # test_equality("marine.maxHp = 40 * 256", marine.maxHp, 40 * 256)
+    # test_equality(
+    #     "marine.maxHp = EUDVar(40 * 256)", marine.maxHp, EUDVariable(40 * 256)
+    # )
+
     test_equality("UnitData, check conversion to int", UnitData(13), 13)
-    previous_value = EUDVariable()
-
+    test_equality("marine.maxHp = 40 * 256", UnitData(0).maxHp, 40 * 256)
     test_equality(
-        "UnitData Max HP, compare against const", UnitData(0).maxHp, 40 * 256
+        "marine.maxHp = EUDVar(40 * 256)", UnitData(0).maxHp, EUDVariable(40 * 256)
     )
 
-    forty_times_256 = EUDVariable()
-    forty_times_256 << 40 * 256
+    one = EUDVariable(1)
+    ghost = UnitData(one)
     test_equality(
-        "UnitData Max HP, compare against variable",
-        UnitData(0).maxHp,
-        forty_times_256,
-    )
-
-    one = EUDVariable()
-    one << 1
-    fortyfive_times_256 = EUDVariable()
-    fortyfive_times_256 << 45 * 256
-
-    ghost_data = UnitData(one)
-
-    test_equality(
-        "UnitData (variable) Max HP, compare against variable",
-        ghost_data.maxHp,
-        fortyfive_times_256,
+        "UnitData(EUDVar(ghost)).maxHp = EUDVar(45 * 256)",
+        ghost.maxHp,
+        EUDVariable(45 * 256),
     )
 
     one << 2
-
     test_equality(
         "UnitData (variable) Max HP, check robustness to variable change",
-        ghost_data.maxHp,
-        fortyfive_times_256,
+        ghost.maxHp,
+        EUDVariable(45 * 256),
     )
 
-    ghost_data + 3  # shouldn't raise error, but not an intended use case
-    ghost_data -= 1  # also shouldn't raise error, not an intended use case either
+    test_equality("arithmetic on UnitData", ghost + 3, 4)
+    # with expect_eperror():
+    ghost -= 1  # FIXME: should raise error?
 
     zealot_data = UnitData("Protoss Zealot")
 
@@ -141,7 +139,7 @@ def test_scdataobject():
     DoActions(SetResources(P7, SetTo, 0, OreAndGas))
 
     with expect_eperror():
-        u = UnitData("Artanis, GOD OF EUD")
+        UnitData("Artanis, GOD OF EUD")
 
 
 @TestInstance
