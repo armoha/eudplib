@@ -18,13 +18,13 @@ if mode == 1:
         *eudftypes,
         type,
         types.FunctionType,
-        eudplib.core.rawtrigger.constenc._KillsSpecialized,
+        eudplib.core.rawtrigger.constenc._Kills,
     ]
 elif mode == 2:
     allowed_type = [
         int,
         eudplib.core.rawtrigger.consttype.ConstType,
-        eudplib.core.rawtrigger.constenc._KillsSpecialized,
+        eudplib.core.rawtrigger.constenc._Kills,
     ]
 else:
     allowed_type = [
@@ -33,7 +33,7 @@ else:
         eudplib.core.rawtrigger.consttype.ConstType,
         type,
         types.FunctionType,
-        eudplib.core.rawtrigger.constenc._KillsSpecialized,
+        eudplib.core.rawtrigger.constenc._Kills,
     ]
 exclude_names = ["__loader__", "__path__", "__spec__"]
 

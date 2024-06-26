@@ -63,7 +63,7 @@ from ..core.rawtrigger.constenc import (
     TrgScore,
     TrgSwitchAction,
     TrgSwitchState,
-    _KillsSpecialized,
+    _Kills,
 )
 from ..core.rawtrigger.constenc import Enemy as Enemy
 from ..core.rawtrigger.constenc import Exactly as Exactly
@@ -299,7 +299,7 @@ def __kills__internal(
     return Condition(0, player, number, unit, comparison, 5, 0, 0)
 
 
-Kills = _KillsSpecialized("Kills")
+Kills = _Kills()
 Kills._internalf = __kills__internal
 
 

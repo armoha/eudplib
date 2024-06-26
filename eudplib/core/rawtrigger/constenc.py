@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 from collections.abc import Callable
-from typing import ClassVar, TypeAlias, overload
+from typing import TypeAlias, overload
 
 from ...localize import _
 from ...utils import EPError, ExprProxy, unProxy
@@ -26,178 +26,77 @@ from .consttype import (
     _ExprProxy,
 )
 
+# fmt: off
+
 
 class TrgAllyStatus(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {"Enemy": 0, "Ally": 1, "AlliedVictory": 2}
 
 
 AllyStatus: TypeAlias = "TrgAllyStatus | Byte"
-Enemy = TrgAllyStatus("Enemy")
-Ally = TrgAllyStatus("Ally")
-AlliedVictory = TrgAllyStatus("AlliedVictory")
-
+Enemy, Ally, AlliedVictory = TrgAllyStatus(0), TrgAllyStatus(1), TrgAllyStatus(2)
 AllyStatusDict: dict[ConstType, int] = {Enemy: 0, Ally: 1, AlliedVictory: 2}
 
 
 class TrgComparison(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {"AtLeast": 0, "AtMost": 1, "Exactly": 10}
 
 
 Comparison: TypeAlias = "TrgComparison | Byte"
-AtLeast = TrgComparison("AtLeast")
-AtMost = TrgComparison("AtMost")
-Exactly = TrgComparison("Exactly")
-
+AtLeast, AtMost, Exactly = TrgComparison(0), TrgComparison(1), TrgComparison(10)
 ComparisonDict: dict[ConstType, int] = {AtLeast: 0, AtMost: 1, Exactly: 10}
 
 
 class TrgCount(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {"All": 0}
 
 
 Count: TypeAlias = "TrgCount | Byte"
-All = TrgCount("All")
+All = TrgCount(0)
 
 
 class TrgModifier(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {"SetTo": 7, "Add": 8, "Subtract": 9}
 
 
 Modifier: TypeAlias = "TrgModifier | Byte"
-SetTo = TrgModifier("SetTo")
-Add = TrgModifier("Add")
-Subtract = TrgModifier("Subtract")
-
+SetTo, Add, Subtract = TrgModifier(7), TrgModifier(8), TrgModifier(9)
 ModifierDict: dict[ConstType, int] = {SetTo: 7, Add: 8, Subtract: 9}
 
 
 class TrgOrder(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {"Move": 0, "Patrol": 1, "Attack": 2}
 
 
 Order: TypeAlias = "TrgOrder | Byte"
-Move = TrgOrder("Move")
-Patrol = TrgOrder("Patrol")
-Attack = TrgOrder("Attack")
-
+Move, Patrol, Attack = TrgOrder(0), TrgOrder(1), TrgOrder(2)
 OrderDict: dict[ConstType, int] = {Move: 0, Patrol: 1, Attack: 2}
 
 
 class TrgPlayer(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {
-        "P1": 0,
-        "P2": 1,
-        "P3": 2,
-        "P4": 3,
-        "P5": 4,
-        "P6": 5,
-        "P7": 6,
-        "P8": 7,
-        "P9": 8,
-        "P10": 9,
-        "P11": 10,
-        "P12": 11,
-        "Player1": 0,
-        "Player2": 1,
-        "Player3": 2,
-        "Player4": 3,
-        "Player5": 4,
-        "Player6": 5,
-        "Player7": 6,
-        "Player8": 7,
-        "Player9": 8,
-        "Player10": 9,
-        "Player11": 10,
-        "Player12": 11,
-        "CurrentPlayer": 13,
-        "Foes": 14,
-        "Allies": 15,
-        "NeutralPlayers": 16,
-        "AllPlayers": 17,
-        "Force1": 18,
-        "Force2": 19,
-        "Force3": 20,
-        "Force4": 21,
-        "NonAlliedVictoryPlayers": 26,
-    }
 
 
 Player: TypeAlias = "TrgPlayer | Dword"
-P1 = TrgPlayer("P1")
-P2 = TrgPlayer("P2")
-P3 = TrgPlayer("P3")
-P4 = TrgPlayer("P4")
-P5 = TrgPlayer("P5")
-P6 = TrgPlayer("P6")
-P7 = TrgPlayer("P7")
-P8 = TrgPlayer("P8")
-P9 = TrgPlayer("P9")
-P10 = TrgPlayer("P10")
-P11 = TrgPlayer("P11")
-P12 = TrgPlayer("P12")
-Player1 = TrgPlayer("Player1")
-Player2 = TrgPlayer("Player2")
-Player3 = TrgPlayer("Player3")
-Player4 = TrgPlayer("Player4")
-Player5 = TrgPlayer("Player5")
-Player6 = TrgPlayer("Player6")
-Player7 = TrgPlayer("Player7")
-Player8 = TrgPlayer("Player8")
-Player9 = TrgPlayer("Player9")
-Player10 = TrgPlayer("Player10")
-Player11 = TrgPlayer("Player11")
-Player12 = TrgPlayer("Player12")
-CurrentPlayer = TrgPlayer("CurrentPlayer")
-Foes = TrgPlayer("Foes")
-Allies = TrgPlayer("Allies")
-NeutralPlayers = TrgPlayer("NeutralPlayers")
-AllPlayers = TrgPlayer("AllPlayers")
-Force1 = TrgPlayer("Force1")
-Force2 = TrgPlayer("Force2")
-Force3 = TrgPlayer("Force3")
-Force4 = TrgPlayer("Force4")
-NonAlliedVictoryPlayers = TrgPlayer("NonAlliedVictoryPlayers")
-
+P1, P2, P3, P4 = TrgPlayer(0), TrgPlayer(1), TrgPlayer(2), TrgPlayer(3)
+P5, P6, P7, P8 = TrgPlayer(4), TrgPlayer(5), TrgPlayer(6), TrgPlayer(7)
+P9, P10, P11, P12 = TrgPlayer(8), TrgPlayer(9), TrgPlayer(10), TrgPlayer(11)
+Player1, Player2, Player3, Player4 = P1, P2, P3, P4
+Player5, Player6, Player7, Player8 = P5, P6, P7, P8
+Player9, Player10, Player11, Player12 = P9, P10, P11, P12
+CurrentPlayer = TrgPlayer(13)
+Foes, Allies, NeutralPlayers = TrgPlayer(14), TrgPlayer(15), TrgPlayer(16)
+AllPlayers = TrgPlayer(17)
+Force1, Force2, Force3, Force4 = TrgPlayer(18), TrgPlayer(19), TrgPlayer(20), TrgPlayer(21)  # noqa: E501
+NonAlliedVictoryPlayers = TrgPlayer(26)
 PlayerDict: dict[ConstType, int] = {
-    P1: 0,
-    P2: 1,
-    P3: 2,
-    P4: 3,
-    P5: 4,
-    P6: 5,
-    P7: 6,
-    P8: 7,
-    P9: 8,
-    P10: 9,
-    P11: 10,
-    P12: 11,
-    Player1: 0,
-    Player2: 1,
-    Player3: 2,
-    Player4: 3,
-    Player5: 4,
-    Player6: 5,
-    Player7: 6,
-    Player8: 7,
-    Player9: 8,
-    Player10: 9,
-    Player11: 10,
-    Player12: 11,
+    P1: 0, P2: 1, P3: 2, P4: 3,
+    P5: 4, P6: 5, P7: 6, P8: 7,
+    P9: 8, P10: 9, P11: 10, P12: 11,
     CurrentPlayer: 13,
-    Foes: 14,
-    Allies: 15,
-    NeutralPlayers: 16,
+    Foes: 14, Allies: 15, NeutralPlayers: 16,
     AllPlayers: 17,
-    Force1: 18,
-    Force2: 19,
-    Force3: 20,
-    Force4: 21,
+    Force1: 18, Force2: 19, Force3: 20, Force4: 21,
     NonAlliedVictoryPlayers: 26,
 }
 
@@ -210,47 +109,55 @@ class TrgProperty(ConstType):
 
 class TrgPropState(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {"Enable": 4, "Disable": 5, "Toggle": 6}
+
+
+class TrgSwitchAction(ConstType):
+    __slots__ = ()
+
+
+class TrgSwitchState(ConstType):
+    __slots__ = ()
+
+
+class _Toggle(TrgPropState, TrgSwitchAction):
+    __slots__ = ()
+    def __init__(self):
+        super().__init__(6)
+
+
+class _Set(TrgSwitchState, TrgSwitchAction):
+    __slots__ = ()
+    def __init__(self):
+        super().__init__(4)  # 2 or 4
 
 
 PropState: TypeAlias = "TrgPropState | Byte"
-Enable = TrgPropState("Enable")
-Disable = TrgPropState("Disable")
-Toggle = TrgPropState("Toggle")
-
+SwitchState: TypeAlias = "TrgSwitchState | Byte"
+SwitchAction: TypeAlias = "TrgSwitchAction | Byte"
+Enable, Disable, Toggle = TrgPropState(4), TrgPropState(5), _Toggle()
+Set, Clear, Random = _Set(), TrgSwitchAction(5), TrgSwitchAction(11)
+Cleared = TrgSwitchState(3)
 PropStateDict: dict[ConstType, int] = {Enable: 4, Disable: 5, Toggle: 6}
+SwitchActionDict: dict[ConstType, int] = {Set: 4, Clear: 5, Toggle: 6, Random: 11}
+SwitchStateDict: dict[ConstType, int] = {Set: 2, Cleared: 3}
 
 
 class TrgResource(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {"Ore": 0, "Gas": 1, "OreAndGas": 2}
 
 
 Resource: TypeAlias = "TrgResource | Byte"
-Ore = TrgResource("Ore")
-Gas = TrgResource("Gas")
-OreAndGas = TrgResource("OreAndGas")
-
+Ore, Gas, OreAndGas = TrgResource(0), TrgResource(1), TrgResource(2)
 ResourceDict: dict[ConstType, int] = {Ore: 0, Gas: 1, OreAndGas: 2}
 
 
 class TrgScore(ConstType):
     __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {
-        "Total": 0,
-        "Units": 1,
-        "Buildings": 2,
-        "UnitsAndBuildings": 3,
-        "Kills": 4,
-        "Razings": 5,
-        "KillsAndRazings": 6,
-        "Custom": 7,
-    }
 
 
-class _KillsSpecialized(TrgScore):
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
+class _Kills(TrgScore):
+    def __init__(self) -> None:
+        super().__init__(4)
         self._internalf: Callable
 
     # TODO: player: Player, comparison: Comparison, number: Dword, unit: Unit
@@ -260,62 +167,15 @@ class _KillsSpecialized(TrgScore):
 
 
 Score: TypeAlias = "TrgScore | Byte"
-Total = TrgScore("Total")
-Units = TrgScore("Units")
-Buildings = TrgScore("Buildings")
-UnitsAndBuildings = TrgScore("UnitsAndBuildings")
+Total, Units, Buildings, UnitsAndBuildings = TrgScore(0), TrgScore(1), TrgScore(2), TrgScore(3)  # noqa: E501
 # Name 'Kills' is used for both condition type and score type.
 # To resolve conflict, we initialize Kills differently from others.
-Kills = _KillsSpecialized("Kills")
-Razings = TrgScore("Razings")
-KillsAndRazings = TrgScore("KillsAndRazings")
-Custom = TrgScore("Custom")
-
+Kills, Razings, KillsAndRazings, Custom = _Kills(), TrgScore(5), TrgScore(6), TrgScore(7)  # noqa: E501
 ScoreDict: dict[ConstType, int] = {
-    Total: 0,
-    Units: 1,
-    Buildings: 2,
-    UnitsAndBuildings: 3,
-    Kills: 4,
-    Razings: 5,
-    KillsAndRazings: 6,
-    Custom: 7,
+    Total: 0, Units: 1, Buildings: 2, UnitsAndBuildings: 3,
+    Kills: 4, Razings: 5, KillsAndRazings: 6, Custom: 7,
 }
-
-
-class TrgSwitchAction(ConstType):
-    __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {
-        "Set": 4,
-        "Clear": 5,
-        "Toggle": 6,
-        "Random": 11,
-    }
-
-
-class TrgSwitchState(ConstType):
-    __slots__ = ()
-    _dict: ClassVar[dict[str, int]] = {"Set": 2, "Cleared": 3}
-
-
-class TrgSwitchStateOrAction(TrgSwitchState, TrgSwitchAction):
-    __slots__ = ()
-
-
-SwitchState: TypeAlias = "TrgSwitchState | Byte"
-SwitchAction: TypeAlias = "TrgSwitchAction | Byte"
-Set = TrgSwitchStateOrAction("Set")
-Clear = TrgSwitchAction("Clear")
-Random = TrgSwitchAction("Random")
-Cleared = TrgSwitchState("Cleared")
-
-SwitchActionDict: dict[ConstType, int] = {
-    Set: 4,
-    Clear: 5,
-    Toggle: 6,
-    Random: 11,
-}
-SwitchStateDict: dict[ConstType, int] = {Set: 2, Cleared: 3}
+# fmt: on
 
 
 @overload

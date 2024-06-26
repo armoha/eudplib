@@ -21,7 +21,7 @@ Byte: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
 
 
 class ConstType(ExprProxy, metaclass=ABCMeta):
-    __slots__ = ("_name",)
+    __slots__ = ()
 
     @classmethod
     def cast(cls, _from):
@@ -33,23 +33,11 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
             )
         return cls(_from)
 
-    def __init__(self, initval):
-        if isinstance(initval, str):
-            self._name = initval
-            initval = self._dict[initval]
-        super().__init__(initval)
-
     def __str__(self) -> str:
-        try:
-            return self._name
-        except AttributeError:
-            return f"<{type(self).__name__}({self._value}) at {id(self):X}>"
+        return f"{type(self).__name__}({self._value})"
 
     def __repr__(self) -> str:
-        try:
-            return self._name
-        except AttributeError:
-            return f"<{type(self).__name__}({self._value!r}) at {id(self):X}>"
+        return self.__str__()
 
 
 # return types
