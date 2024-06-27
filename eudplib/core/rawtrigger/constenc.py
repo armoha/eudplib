@@ -32,6 +32,12 @@ from .consttype import (
 class TrgAllyStatus(ConstType):
     __slots__ = ()
 
+    def __str__(self):
+        try:
+            return {0: "Enemy", 1: "Ally", 2: "AlliedVictory"}[self._value]
+        except KeyError:
+            return super().__str__()
+
 
 AllyStatus: TypeAlias = "TrgAllyStatus | Byte"
 Enemy, Ally, AlliedVictory = TrgAllyStatus(0), TrgAllyStatus(1), TrgAllyStatus(2)
@@ -40,6 +46,12 @@ AllyStatusDict: dict[ConstType, int] = {Enemy: 0, Ally: 1, AlliedVictory: 2}
 
 class TrgComparison(ConstType):
     __slots__ = ()
+
+    def __str__(self):
+        try:
+            return {0: "AtLeast", 1: "AtMost", 10: "Exactly"}[self._value]
+        except KeyError:
+            return super().__str__()
 
 
 Comparison: TypeAlias = "TrgComparison | Byte"
@@ -50,6 +62,11 @@ ComparisonDict: dict[ConstType, int] = {AtLeast: 0, AtMost: 1, Exactly: 10}
 class TrgCount(ConstType):
     __slots__ = ()
 
+    def __str__(self):
+        if self._value is 0:  # noqa: F632
+            return "All"
+        return super().__str__()
+
 
 Count: TypeAlias = "TrgCount | Byte"
 All = TrgCount(0)
@@ -57,6 +74,13 @@ All = TrgCount(0)
 
 class TrgModifier(ConstType):
     __slots__ = ()
+
+    def __str__(self):
+        try:
+            return {7: "SetTo", 8: "Add", 9: "Subtract"}[self._value]
+        except KeyError:
+            return super().__str__()
+
 
 
 Modifier: TypeAlias = "TrgModifier | Byte"
@@ -67,6 +91,12 @@ ModifierDict: dict[ConstType, int] = {SetTo: 7, Add: 8, Subtract: 9}
 class TrgOrder(ConstType):
     __slots__ = ()
 
+    def __str__(self):
+        try:
+            return {0: "Move", 1: "Patrol", 2: "Attack"}[self._value]
+        except KeyError:
+            return super().__str__()
+
 
 Order: TypeAlias = "TrgOrder | Byte"
 Move, Patrol, Attack = TrgOrder(0), TrgOrder(1), TrgOrder(2)
@@ -75,6 +105,21 @@ OrderDict: dict[ConstType, int] = {Move: 0, Patrol: 1, Attack: 2}
 
 class TrgPlayer(ConstType):
     __slots__ = ()
+
+    def __str__(self):
+        try:
+            return {
+                0: "Player1", 1: "Player2", 2: "Player3", 3: "Player4",
+                4: "Player5", 5: "Player6", 6: "Player7", 7: "Player8",
+                8: "Player9", 9: "Player10", 10: "Player11", 11: "Player12",
+                13: "CurrentPlayer",
+                14: "Foes", 15: "Allies", 16: "NeutralPlayers",
+                17: "AllPlayers",
+                18: "Force1", 19: "Force2", 20: "Force3", 21: "Force4",
+                26: "NonAlliedVictoryPlayers",
+            }[self._value]
+        except KeyError:
+            return super().__str__()
 
 
 Player: TypeAlias = "TrgPlayer | Dword"
@@ -102,6 +147,8 @@ PlayerDict: dict[ConstType, int] = {
 
 
 class TrgProperty(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeProperty(s)
@@ -110,13 +157,31 @@ class TrgProperty(ConstType):
 class TrgPropState(ConstType):
     __slots__ = ()
 
+    def __str__(self):
+        try:
+            return {4: "Enable", 5: "Disable", 6: "Toggle"}[self._value]
+        except KeyError:
+            return super().__str__()
+
 
 class TrgSwitchAction(ConstType):
     __slots__ = ()
 
+    def __str__(self):
+        try:
+            return {4: "Set", 5: "Clear", 6: "Toggle", 11: "Random"}[self._value]
+        except KeyError:
+            return super().__str__()
+
 
 class TrgSwitchState(ConstType):
     __slots__ = ()
+
+    def __str__(self):
+        try:
+            return {2: "Set", 3: "Cleared"}[self._value]
+        except KeyError:
+            return super().__str__()
 
 
 class _Toggle(TrgPropState, TrgSwitchAction):
@@ -145,6 +210,12 @@ SwitchStateDict: dict[ConstType, int] = {Set: 2, Cleared: 3}
 class TrgResource(ConstType):
     __slots__ = ()
 
+    def __str__(self):
+        try:
+            return {0: "Ore", 1: "Gas", 2: "OreAndGas"}[self._value]
+        except KeyError:
+            return super().__str__()
+
 
 Resource: TypeAlias = "TrgResource | Byte"
 Ore, Gas, OreAndGas = TrgResource(0), TrgResource(1), TrgResource(2)
@@ -153,6 +224,15 @@ ResourceDict: dict[ConstType, int] = {Ore: 0, Gas: 1, OreAndGas: 2}
 
 class TrgScore(ConstType):
     __slots__ = ()
+
+    def __str__(self):
+        try:
+            return {
+                0: "Total", 1: "Units", 2: "Buildings", 3: "UnitsAndBuildings",
+                4: "Kills", 5: "Razings", 6: "KillsAndRazings", 7: "Custom",
+            }[self._value]
+        except KeyError:
+            return super().__str__()
 
 
 class _Kills(TrgScore):
