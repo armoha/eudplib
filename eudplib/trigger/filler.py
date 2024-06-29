@@ -26,16 +26,20 @@ def _filldw(dstepd: Constant | EUDVariable, v1: Constant | EUDVariable) -> None:
 
 
 def _fillloword(dstepd: Constant, v1: EUDVariable) -> None:
-    c.VProc(
-        [v1, _lowordfilter],
-        [v1.QueueAssignTo(_lowordfilter), _lowordfilter.SetDest(dstepd)],
+    c.SeqCompute(
+        (
+            (_lowordfilter, c.SetTo, v1),
+            (dstepd, None, _lowordfilter),
+        )
     )
 
 
 def _filllsbyte(dstepd: Constant, v1: EUDVariable) -> None:
-    c.VProc(
-        [v1, _lsbytefilter],
-        [v1.QueueAssignTo(_lsbytefilter), _lsbytefilter.SetDest(dstepd)],
+    c.SeqCompute(
+        (
+            (_lsbytefilter, c.SetTo, v1),
+            (dstepd, None, _lsbytefilter),
+        )
     )
 
 
@@ -52,7 +56,7 @@ def _fill_b__(v1) -> None:
 
 def _filllobyte(dstepd: Constant, v1: Constant | EUDVariable) -> None:
     _fill_b__(v1)
-    c.VProc(_lobytefilter, _lobytefilter.SetDest(dstepd))
+    c.SeqCompute(((dstepd, None, _lobytefilter),))
 
 
 @_EUDPredefineParam(1)
@@ -68,7 +72,7 @@ def _fill__b_(v1) -> None:
 
 def _fillhibyte(dstepd: Constant, v1: Constant | EUDVariable) -> None:
     _fill__b_(v1)
-    c.VProc(_hibytefilter, _hibytefilter.SetDest(dstepd))
+    c.SeqCompute(((dstepd, None, _hibytefilter),))
 
 
 @_EUDPredefineParam(1)
@@ -84,4 +88,4 @@ def _fill___b(v1) -> None:
 
 def _fillmsbyte(dstepd: Constant, v1: Constant | EUDVariable) -> None:
     _fill___b(v1)
-    c.VProc(_msbytefilter, _msbytefilter.SetDest(dstepd))
+    c.SeqCompute(((dstepd, None, _msbytefilter),))
