@@ -19,6 +19,7 @@ from .test_eps_epsfile import (
     f_square,
     f_switch_test,
     f_test_array,
+    f_test_all_actions,
 )
 from .test_eps_object import (
     f_test_eudmethods,
@@ -45,6 +46,7 @@ def test_epscript():
         v[1:],
         [v[0]] * (len(v) - 1),
     )
+    f_test_all_actions()
     c = f_test_compare()
     test_equality(
         "epScript array compare",

@@ -17,10 +17,11 @@ from ..core import (
     SetVariables,
     f_bitlshift,
 )
-from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
-from ..eudlib import EUDArray
+from ..ctrlstru import DoActions, EUDElse, EUDEndIf, EUDIf
+from ..eudlib import EUDArray, f_setcurpl2cpcache
 from ..maprw import EUDOnStart
 from ..utils import (
+    EPError,
     ExprProxy,
     FlattenList,
     List2Assignable,
@@ -504,3 +505,11 @@ def _LSH(lhs, r):  # noqa: N802
         return f_bitlshift(lhs, r)
     else:
         return lhs << r
+
+
+def _ALL(*actions):  # noqa: N802
+    try:
+        f_setcurpl2cpcache([], actions)
+    except EPError:
+        DoActions(actions)
+        f_setcurpl2cpcache()
