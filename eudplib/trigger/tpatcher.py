@@ -27,28 +27,30 @@ from .filler import (
     _fillloword,
     _filllsbyte,
     _fillmsbyte,
+    _flush_filler,
 )
 
 
 def apply_patch_table(initepd, obj, patch_table: list[list[int | None]]) -> None:
     field_name = 0
-    for i, patch_entry in enumerate(patch_table):
-        patch_fields = patch_entry
+    for i, patch_fields in enumerate(patch_table):
         for field_size in patch_fields:
             if isinstance(field_size, int):
-                memory_filler = {
-                    -1: _filldw,
-                    0: _fillloword,
-                    2: _filllsbyte,
-                    3: _filllobyte,
-                    4: _fillhibyte,
-                    5: _fillmsbyte,
-                }[field_size]
                 field = obj.fields[field_name]
                 if c.IsEUDVariable(field):
+                    memory_filler = {
+                        -1: _filldw,
+                        0: _fillloword,
+                        # TODO: add _fillhiword? (ex. set action opcode & modifier)
+                        2: _filllsbyte,
+                        3: _filllobyte,
+                        4: _fillhibyte,
+                        5: _fillmsbyte,
+                    }[field_size]
                     memory_filler(initepd + i, field)
                     obj.fields[field_name] = 0
             field_name += 1
+    _flush_filler()
 
 
 condpt: list[list[int | None]] = [

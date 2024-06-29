@@ -17,15 +17,16 @@ from ..core import (
     SetVariables,
     f_bitlshift,
 )
-from ..ctrlstru import DoActions, EUDElse, EUDEndIf, EUDIf
+from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
 from ..eudlib import EUDArray, f_setcurpl2cpcache
 from ..maprw import EUDOnStart
 from ..utils import (
-    EPError,
+    EPD,
     ExprProxy,
     FlattenList,
     List2Assignable,
     TriggerScopeError,
+    ep_assert,
     ep_warn,
     isUnproxyInstance,
 )
@@ -507,9 +508,9 @@ def _LSH(lhs, r):  # noqa: N802
         return lhs << r
 
 
-def _ALL(*actions):  # noqa: N802
-    try:
-        f_setcurpl2cpcache([], actions)
-    except EPError:
-        DoActions(actions)
-        f_setcurpl2cpcache()
+def _ALL(actions):  # noqa: N802
+    from ..trigger.tpatcher import actpt, apply_patch_table
+
+    ep_assert(len(actions) == 2)
+    apply_patch_table(EPD(actions[1]), actions[1], actpt)
+    f_setcurpl2cpcache([], actions)

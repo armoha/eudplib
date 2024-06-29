@@ -19,14 +19,22 @@ _hibytefilter = c.EUDXVariable(0, 0xFF0000)
 _msbytefilter = c.EUDXVariable(0, 0xFF000000)
 
 Constant: TypeAlias = ConstExpr | int | RlocInt_C
+_fillers_use_seqcompute = []
+
+
+def _flush_filler():
+    global _fillers_use_seqcompute
+    if _fillers_use_seqcompute:
+        c.SeqCompute(_fillers_use_seqcompute)
+        _fillers_use_seqcompute.clear()
 
 
 def _filldw(dstepd: Constant | EUDVariable, v1: Constant | EUDVariable) -> None:
-    c.SeqCompute(((dstepd, c.SetTo, v1),))
+    _fillers_use_seqcompute.append((dstepd, c.SetTo, v1))
 
 
 def _fillloword(dstepd: Constant, v1: EUDVariable) -> None:
-    c.SeqCompute(
+    _fillers_use_seqcompute.extend(
         (
             (_lowordfilter, c.SetTo, v1),
             (dstepd, None, _lowordfilter),
@@ -35,7 +43,7 @@ def _fillloword(dstepd: Constant, v1: EUDVariable) -> None:
 
 
 def _filllsbyte(dstepd: Constant, v1: EUDVariable) -> None:
-    c.SeqCompute(
+    _fillers_use_seqcompute.extend(
         (
             (_lsbytefilter, c.SetTo, v1),
             (dstepd, None, _lsbytefilter),
@@ -55,8 +63,9 @@ def _fill_b__(v1) -> None:
 
 
 def _filllobyte(dstepd: Constant, v1: Constant | EUDVariable) -> None:
+    _flush_filler()
     _fill_b__(v1)
-    c.SeqCompute(((dstepd, None, _lobytefilter),))
+    _fillers_use_seqcompute.append((dstepd, None, _lobytefilter))
 
 
 @_EUDPredefineParam(1)
@@ -71,8 +80,9 @@ def _fill__b_(v1) -> None:
 
 
 def _fillhibyte(dstepd: Constant, v1: Constant | EUDVariable) -> None:
+    _flush_filler()
     _fill__b_(v1)
-    c.SeqCompute(((dstepd, None, _hibytefilter),))
+    _fillers_use_seqcompute.append((dstepd, None, _hibytefilter))
 
 
 @_EUDPredefineParam(1)
@@ -87,5 +97,6 @@ def _fill___b(v1) -> None:
 
 
 def _fillmsbyte(dstepd: Constant, v1: Constant | EUDVariable) -> None:
+    _flush_filler()
     _fill___b(v1)
-    c.SeqCompute(((dstepd, None, _msbytefilter),))
+    _fillers_use_seqcompute.append((dstepd, None, _msbytefilter))
