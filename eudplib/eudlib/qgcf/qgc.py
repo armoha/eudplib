@@ -9,6 +9,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib.utils import EPD, ep_assert
 
+from ...offsetmap import TrgUnit
 from ..memiof import (
     EUDByteWriter,
     f_dwread_epd,
@@ -232,7 +233,7 @@ def QueueGameCommand_MinimapPing(xy):  # noqa: N802
     QueueGameCommand(minimap_ping_command + 3, 5)
 
 
-@c.EUDTypedFunc([c.TrgUnit])
+@c.EUDTypedFunc([TrgUnit])
 def QueueGameCommand_TrainUnit(unit):  # noqa: N802
     train_unit_command = c.Db(b"...\x1FUU..")
     c.SetVariables(EPD(train_unit_command + 4), unit)

@@ -18,6 +18,7 @@ from .member import (
     MemberKind,
     UnsupportedMember,
 )
+from .scdata import Flingy, Image, Sprite, Tech, TrgUnit, UnitOrder, Upgrade, Weapon
 
 __all__ = [
     "CSprite",
@@ -32,4 +33,12 @@ __all__ = [
     "Member",
     "MemberKind",
     "UnsupportedMember",
+    "Flingy",
+    "Image",
+    "Sprite",
+    "Tech",
+    "TrgUnit",
+    "UnitOrder",
+    "Upgrade",
+    "Weapon",
 ]

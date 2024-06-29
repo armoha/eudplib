@@ -26,6 +26,7 @@ from .member import (
     UnitOrderDataMember,
     UnsupportedMember,
 )
+from .scdata import TrgUnit
 
 
 class MovementFlags(EnumMember):
@@ -567,7 +568,7 @@ class CUnit(EPDOffsetMap):
 
     @staticmethod
     @_EUDPredefineReturn(2, 3)
-    @c.EUDTypedFunc([None, c.TrgUnit])
+    @c.EUDTypedFunc([None, TrgUnit])
     def _check_buildq(unit, unit_type):
         from ..eudlib import f_setcurpl2cpcache
         from ..trigger import Trigger
@@ -611,7 +612,7 @@ class CUnit(EPDOffsetMap):
 
     @staticmethod
     @_EUDPredefineReturn(1, 2)
-    @c.EUDTypedFunc([None, c.TrgUnit, None])
+    @c.EUDTypedFunc([None, TrgUnit, None])
     def _check_buildq_const(unit, unit_type, unit65536):
         from ..eudlib import f_setcurpl2cpcache
         from ..trigger import Trigger

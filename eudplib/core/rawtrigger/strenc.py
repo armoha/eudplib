@@ -67,46 +67,10 @@ class TrgSwitch(ConstType):
         return EncodeSwitch(s)
 
 
-class TrgUnit(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeUnit(s)
-
-
-class Weapon(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeWeapon(s)
-
-
-class Flingy(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeFlingy(s)
-
-
-class Sprite(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeSprite(s)
-
-
-class Image(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeImage(s)
-
-
 class Iscript(ConstType):
     @classmethod
     def cast(cls, s):
         return EncodeIscript(s)
-
-
-class Upgrade(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeUpgrade(s)
 
 
 class StatText(ConstType):
@@ -116,18 +80,6 @@ class StatText(ConstType):
     @classmethod
     def cast(cls, s):
         return EncodeTBL(s)
-
-
-class Tech(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeTech(s)
-
-
-class UnitOrder(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeUnitOrder(s)
 
 
 class Icon(ConstType):
