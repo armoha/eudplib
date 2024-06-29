@@ -13,6 +13,7 @@ from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ...core.eudfunc.eudtypedfuncn import EUDTypedFuncN
+from . import iotable
 from . import modcurpl as cp
 
 
@@ -241,13 +242,16 @@ def f_posread_cp(cpoffset, **kwargs):
     return _rf(cpoffset, **kwargs)
 
 
-def f_maskread_epd(targetplayer, mask, _fdict={}, **kwargs):
+def f_maskread_epd(targetplayer, mask, *, _fdict={}, **kwargs):
+    if iotable._is_consecutive(mask):
+        return iotable._insert_or_get(mask, 0)(targetplayer, **kwargs)
+
     if mask not in _fdict:
         _fdict[mask] = f_readgen_epd(mask, (0, lambda x: x))
     return _fdict[mask](targetplayer, **kwargs)
 
 
-def f_maskread_cp(cpoffset, mask, _fdict={}, **kwargs):
+def f_maskread_cp(cpoffset, mask, *, _fdict={}, **kwargs):
     if mask not in _fdict:
         _fdict[mask] = f_readgen_cp(mask, (0, lambda x: x))
     return _fdict[mask](cpoffset, **kwargs)

@@ -13,6 +13,7 @@ from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ...localize import _
+from . import iotable
 from .modcurpl import f_setcurpl2cpcache
 
 
@@ -44,26 +45,8 @@ def f_dwepdread_epd(targetplayer):
     # return ptr, epd
 
 
-@_EUDPredefineReturn(1)
-@_EUDPredefineParam(c.CurrentPlayer)
-@c.EUDFunc
-def f_dwread_epd(targetplayer):
-    ptr = f_dwread_epd._frets[0]
-    u = random.randint(234, 65535)
-    acts = [
-        ptr.SetNumber(0),
-        c.SetMemory(0x6509B0, c.Add, -12 * u),
-    ]
-    cs.DoActions(ut._rand_lst(acts))
-    for i in ut._rand_lst(range(32)):
-        c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
-            actions=ptr.AddNumber(2**i),
-        )
-
-    f_setcurpl2cpcache()
-
-    # return ptr
+def f_dwread_epd(targetplayer, *, ret=None):
+    return iotable._get(0xFFFFFFFF, 0)(targetplayer, ret=ret)
 
 
 @_EUDPredefineReturn(1)
