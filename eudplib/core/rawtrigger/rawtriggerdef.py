@@ -97,22 +97,6 @@ class RawTrigger(EUDObject):
     ) -> None:
         super().__init__()
 
-        # Register trigger to global table
-        global _trg_counter
-        _trg_counter += 1
-        _register_trigger(self)  # This should be called before (1)
-
-        # Set linked list pointers
-        if prevptr is None:
-            prevptr = 0
-        if nextptr is None:
-            nextptr = NextTrigger()  # (1)
-        else:
-            ut.ep_assert(IsConstExpr(nextptr), _("nextptr should be ConstExpr"))
-
-        self._prevptr = prevptr
-        self._nextptr = nextptr
-
         # Uses normal condition/action initialization
         if trigSection is None:
             # Normalize conditions/actions
@@ -139,7 +123,6 @@ class RawTrigger(EUDObject):
                     else:
                         cond = Condition(0, 0, 0, 0, 0, 23, 0, 0)  # Never
                 cond.CheckArgs(i)
-                cond.SetParentTrigger(self, i)
                 conditions.append(cond)
 
             actions = []
@@ -147,8 +130,12 @@ class RawTrigger(EUDObject):
                 if i >= 64:
                     raise ut.EPError(_("Too many actions"))
                 act.CheckArgs(i)
-                act.SetParentTrigger(self, i)
                 actions.append(act)
+
+            for i, cond in enumerate(conditions):
+                cond.SetParentTrigger(self, i)
+            for i, act in enumerate(actions):
+                act.SetParentTrigger(self, i)
 
             self._conditions: list[Condition] = conditions  # type: ignore[assignment]
             self._actions: list[Action] = actions  # type: ignore[assignment]
@@ -177,6 +164,23 @@ class RawTrigger(EUDObject):
                         "<IIIIIIHBBBBH", trigSection, 320 + i * 32
                     )
                     self._actions.append(Action(*action[:10], eudx=action[11]))
+
+        if nextptr is not None and not IsConstExpr(nextptr):
+            raise ut.EPError(_("nextptr should be ConstExpr"))
+
+        # Register trigger to global table
+        global _trg_counter
+        _trg_counter += 1
+        _register_trigger(self)  # This should be called before (1)
+
+        # Set linked list pointers
+        if prevptr is None:
+            prevptr = 0
+        if nextptr is None:
+            nextptr = NextTrigger()  # (1)
+
+        self._prevptr = prevptr
+        self._nextptr = nextptr
 
     @property
     def preserved(self) -> bool:
