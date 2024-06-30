@@ -44,36 +44,47 @@ if TYPE_CHECKING:
 
 
 class TrgAIScript(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeAIScript(s)
 
 
 class TrgLocation(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeLocation(s)
 
 
 class TrgString(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeString(s)
 
 
 class TrgSwitch(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeSwitch(s)
 
 
 class Iscript(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeIscript(s)
 
 
 class StatText(ConstType):
+    __slots__ = ()
     _encoding = "UTF-8"
     _data = b""
 
@@ -83,12 +94,16 @@ class StatText(ConstType):
 
 
 class Icon(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeIcon(s)
 
 
 class Portrait(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodePortrait(s)
