@@ -495,7 +495,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                 return
             mask = (1 << (n + 1)) - 1
             bitstrg = BitsTrg(f"varrlshift{n}")
-            cp = bt.EncodePlayer(bt.CurrentPlayer)
+            cp = 13  # CurrentPlayer
             for trg in bitstrg:
                 trg["end"] = Forward()
                 for t in range(27, -1, -1):
@@ -559,7 +559,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                 return
             mask = (1 << (n + 1)) - 1
             bitstrg = BitsTrg(f"varrrshift{n}")
-            cp = bt.EncodePlayer(bt.CurrentPlayer)
+            cp = 13  # CurrentPlayer
             for trg in bitstrg:
                 trg["end"] = Forward()
                 for t in range(27, -1, -1):
@@ -777,8 +777,10 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=GetCPCache().GetVTable(),
                     actions=[
                         trg["ret"]
-                        << bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0x55555555),
-                        bt.SetDeathsX(bt.CurrentPlayer, bt.Add, 0, 0, 0xAAAAAAAA),
+                        << bt.SetDeathsX(
+                            13, bt.Add, 0, 0, 0x55555555
+                        ),  # CurrentPlayer
+                        bt.SetDeathsX(13, bt.Add, 0, 0, 0xAAAAAAAA),  # CurrentPlayer
                         GetCPCache().SetDest(EPD(0x6509B0)),
                     ],
                 )

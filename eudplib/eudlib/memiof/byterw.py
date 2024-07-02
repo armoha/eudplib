@@ -92,9 +92,7 @@ class EUDByteReader:
             self._case[i] << c.NextTrigger()
             for j in _rand_lst(range(8)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(
-                        c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)
-                    ),
+                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2 ** (j + 8 * i)),
                     actions=ret.AddNumber(2**j),
                 )
             c.RawTrigger(
@@ -306,9 +304,7 @@ class EUDByteStream:
                 cs.EUDJumpIfNot(self._suboffset == i, case[i + 1])
             for j in _rand_lst(range(8)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(
-                        c.CurrentPlayer, c.AtLeast, 1, 0, 2 ** (j + 8 * i)
-                    ),
+                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2 ** (j + 8 * i)),
                     actions=ret.AddNumber(2**j),
                 )
             if i < 3:

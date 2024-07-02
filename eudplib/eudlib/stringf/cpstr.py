@@ -13,6 +13,7 @@ from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import get_string_section_name
 from eudplib.localize import _
 
+from ...offsetmap import CurrentPlayer
 from ..memiof import f_dwread_epd, f_wread_epd
 
 _STR_ADDRESS = 0x191943C8
@@ -129,7 +130,7 @@ class CPString:
         actions = [
             [
                 c.SetDeaths(
-                    c.CurrentPlayer,
+                    CurrentPlayer,
                     c.SetTo,
                     ut.b2i4(self.content[i : i + 4]),
                     i // 48,

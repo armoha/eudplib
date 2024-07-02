@@ -14,11 +14,11 @@ from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ...localize import _
 from . import iotable
-from .modcurpl import f_setcurpl2cpcache
+from . import modcurpl as cp
 
 
 @_EUDPredefineReturn(2)
-@_EUDPredefineParam(c.CurrentPlayer)
+@_EUDPredefineParam(cp.CP)
 @c.EUDFunc
 def f_dwepdread_epd(targetplayer):
     ptr, epd = f_dwepdread_epd._frets
@@ -36,11 +36,11 @@ def f_dwepdread_epd(targetplayer):
             epd.AddNumber(2 ** (i - 2)) if i >= 2 else [],
         ]
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
+            conditions=c.DeathsX(cp.CP, c.AtLeast, 1, u, 2**i),
             actions=ut._rand_lst(acts),
         )
 
-    f_setcurpl2cpcache()
+    cp.f_setcurpl2cpcache()
 
     # return ptr, epd
 
@@ -50,7 +50,7 @@ def f_dwread_epd(targetplayer, *, ret=None):
 
 
 @_EUDPredefineReturn(1)
-@_EUDPredefineParam(c.CurrentPlayer)
+@_EUDPredefineParam(cp.CP)
 @c.EUDFunc
 def f_epdread_epd(targetplayer):
     ptr = f_epdread_epd._frets[0]
@@ -62,11 +62,11 @@ def f_epdread_epd(targetplayer):
     cs.DoActions(ut._rand_lst(acts))
     for i in ut._rand_lst(range(2, 32)):
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, u, 2**i),
+            conditions=c.DeathsX(cp.CP, c.AtLeast, 1, u, 2**i),
             actions=ptr.AddNumber(2 ** (i - 2)),
         )
 
-    f_setcurpl2cpcache()
+    cp.f_setcurpl2cpcache()
 
     # return ptr
 
@@ -79,7 +79,7 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
         readerf = _readerdict[flags]
     else:
         # Create reader function
-        @_EUDPredefineParam(c.CurrentPlayer)
+        @_EUDPredefineParam(cp.CP)
         @c.EUDFunc
         def readerf(targetplayer):
             flagsv = c.EUDCreateVariables(len(flags))
@@ -93,7 +93,7 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
                 if sum(bitandflags) == 0:
                     continue
                 c.RawTrigger(
-                    conditions=[c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i)],
+                    conditions=[c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**i)],
                     actions=[
                         flagv.AddNumber(2**i)
                         for j, flagv in enumerate(flagsv)
@@ -101,7 +101,7 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
                     ],
                 )
 
-            f_setcurpl2cpcache()
+            cp.f_setcurpl2cpcache()
 
             return flagsv
 

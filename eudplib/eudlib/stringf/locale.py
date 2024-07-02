@@ -1,5 +1,4 @@
 from ...core import (
-    AllPlayers,
     Db,
     EUDFunc,
     EUDReturn,
@@ -16,6 +15,7 @@ from ...ctrlstru import (
     EUDSwitchCase,
     EUDSwitchDefault,
 )
+from ...offsetmap import AllPlayers
 from ...utils import EPD, ExprProxy, ep_assert
 from .cpprint import f_raise_CCMU
 

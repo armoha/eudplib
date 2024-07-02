@@ -8,8 +8,6 @@
 from ..utils import EPD, ep_assert
 from .rawtrigger import (
     Add,
-    CurrentPlayer,
-    EncodePlayer,
     RawTrigger,
     SetDeaths,
     SetMemory,
@@ -49,7 +47,7 @@ def cpset(a, b):
         )
     from ..eudlib.memiof.modcurpl import f_setcurpl2cpcache
 
-    return EncodePlayer(CurrentPlayer), f_setcurpl2cpcache
+    return 13, f_setcurpl2cpcache  # CurrentPlayer
 
 
 def iset(a, b, modifier, v):

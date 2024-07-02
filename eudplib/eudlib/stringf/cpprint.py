@@ -11,6 +11,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
+from ...offsetmap import AllPlayers, CurrentPlayer, TrgPlayer
 from ..eudarray import EUDArray
 from ..memiof import (
     CPByteWriter,
@@ -58,8 +59,8 @@ def _pcolor(p):
 
 
 def PColor(i):  # noqa: N802
-    if isinstance(i, type(c.P1)):
-        if i == c.CurrentPlayer:
+    if isinstance(i, TrgPlayer):
+        if i == CurrentPlayer:
             i = prevcp
         else:
             i = c.EncodePlayer(i)
@@ -67,9 +68,9 @@ def PColor(i):  # noqa: N802
 
 
 def PName(x):  # noqa: N802
-    if ut.isUnproxyInstance(x, type(c.P1)):
+    if isinstance(x, TrgPlayer):
         x = c.EncodePlayer(x)
-        if x == c.EncodePlayer(c.CurrentPlayer):
+        if x == c.EncodePlayer(CurrentPlayer):
             x = prevcp
     return ptr2s(0x57EEEB + 36 * x)
 
@@ -176,7 +177,7 @@ def f_cpstr_addptr(number):
     digit = [c.EUDLightVariable() for _ in range(8)]
     cs.DoActions(
         *[digit[i].SetNumber(0) for i in range(8)],
-        c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
+        c.SetDeaths(CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
     )
 
     def f(x):
@@ -189,7 +190,7 @@ def f_cpstr_addptr(number):
             conditions=number.AtLeastX(1, 2**i),
             actions=[
                 digit[i // 4].AddNumber(2 ** (i % 4)),
-                c.SetDeaths(c.CurrentPlayer, c.Add, f(i), 0),
+                c.SetDeaths(CurrentPlayer, c.Add, f(i), 0),
             ],
         )
         if i % 16 == 0:
@@ -197,7 +198,7 @@ def f_cpstr_addptr(number):
                 c.RawTrigger(
                     conditions=digit[j + 4 * (i // 16)].AtLeast(10),
                     actions=c.SetDeaths(
-                        c.CurrentPlayer,
+                        CurrentPlayer,
                         c.Add,
                         (b"A"[0] - b":"[0]) * (256 ** (3 - j)),
                         0,
@@ -206,7 +207,7 @@ def f_cpstr_addptr(number):
             if i == 16:
                 cs.DoActions(
                     *c.AddCurrentPlayer(1),
-                    c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
+                    c.SetDeaths(CurrentPlayer, c.SetTo, ut.b2i4(b"0000"), 0),
                 )
             else:
                 cs.DoActions(*c.AddCurrentPlayer(1))
@@ -252,10 +253,10 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
                 f"Object with unknown parameter type {type(arg)} given to f_cpprint."
             )
     if EOS:
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+        cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
 
 
-@c.EUDTypedFunc([c.TrgPlayer])
+@c.EUDTypedFunc([TrgPlayer])
 def f_raise_CCMU(player):  # noqa: N802
     if cs.EUDIf()(c.Memory(0x628438, c.AtLeast, 0x59CCA8)):
         orignextptr = f_cunitread_epd(ut.EPD(0x628438))
@@ -286,14 +287,14 @@ def _eprint_init():
         return
     c.PushTriggerScope()
     _eprintln_template << c.NextTrigger()
-    f_raise_CCMU(c.CurrentPlayer)
+    f_raise_CCMU(CurrentPlayer)
     if cs.EUDIf()(_eprintln_desync << IsUserCP()):
         prevcp << f_getcurpl()
         _eprintln_print << c.RawTrigger(
             nextptr=0, actions=c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))
         )
         _eprintln_eos << c.RawTrigger(
-            actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
+            actions=c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0)
         )
         f_setcurpl(prevcp)
     cs.EUDEndIf()
@@ -309,7 +310,7 @@ def eprint_all(*args):
         nextptr=_eprintln_template,
         actions=[
             c.SetMemory(  # 348 + 32
-                _eprintln_template + 380, c.SetTo, c.EncodePlayer(c.AllPlayers)
+                _eprintln_template + 380, c.SetTo, c.EncodePlayer(AllPlayers)
             ),
             c.SetMemoryX(_eprintln_desync + 12, c.SetTo, 0, 0xFF000000),
             c.SetNextPtr(_eprintln_print, _print),
@@ -332,7 +333,7 @@ def f_eprintln(*args):
             c.SetMemory(
                 _eprintln_template + 380,
                 c.SetTo,
-                c.EncodePlayer(c.CurrentPlayer),
+                c.EncodePlayer(CurrentPlayer),
             ),
             c.SetMemoryX(_eprintln_desync + 12, c.SetTo, 15 << 24, 0xFF000000),
             c.SetNextPtr(_eprintln_print, _print),

@@ -10,6 +10,7 @@ import itertools
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
+from ...offsetmap import CurrentPlayer
 from ..memiof import (
     f_dwepdread_epd,
     f_dwwrite,
@@ -121,7 +122,7 @@ def f_eprintln2(*args) -> None:
             f_setcurpl(epd)
             _eprintln2_print << c.RawTrigger(nextptr=0)
             _eprintln2_eos << c.RawTrigger(
-                actions=c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
+                actions=c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0)
             )
             f_setcurpl(f_getuserplayerid())
         cs.EUDEndIf()

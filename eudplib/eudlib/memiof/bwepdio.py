@@ -31,9 +31,7 @@ def _wwriter(epd, subp, w):
     for i in ut._rand_lst(range(3)):
         if cs.EUDSwitchCase()(i):
             c.f_bitlshift(w, 8 * i, ret=[w])
-            cs.DoActions(
-                c.SetDeathsX(c.CurrentPlayer, c.SetTo, w, 0, 0xFFFF << (8 * i))
-            )
+            cs.DoActions(c.SetDeathsX(cp.CP, c.SetTo, w, 0, 0xFFFF << (8 * i)))
             cs.EUDBreak()
 
     # Things gets complicated on this case.
@@ -65,9 +63,7 @@ def _wadder(epd, subp, w):
     for i in ut._rand_lst(range(3)):
         if cs.EUDSwitchCase()(i):
             c.f_bitlshift(w, 8 * i, ret=[w])
-            cs.DoActions(
-                c.SetDeathsX(c.CurrentPlayer, c.Add, w, 0, 0xFFFF << (8 * i))
-            )
+            cs.DoActions(c.SetDeathsX(cp.CP, c.Add, w, 0, 0xFFFF << (8 * i)))
             cs.EUDBreak()
 
     # Not implemented yet
@@ -96,9 +92,7 @@ def _wsubtracter(epd, subp, w):
     for i in ut._rand_lst(range(3)):
         if cs.EUDSwitchCase()(i):
             c.f_bitlshift(w, 8 * i, ret=[w])
-            cs.DoActions(
-                c.SetDeathsX(c.CurrentPlayer, c.Subtract, w, 0, 0xFFFF << (8 * i))
-            )
+            cs.DoActions(c.SetDeathsX(cp.CP, c.Subtract, w, 0, 0xFFFF << (8 * i)))
             cs.EUDBreak()
 
     # Not implemented yet
@@ -130,7 +124,7 @@ def _bwriter(epd, subp, b):
         if cs.EUDSwitchCase()(i):
             cs.DoActions(
                 c.SetDeathsX(
-                    c.CurrentPlayer,
+                    cp.CP,
                     c.SetTo,
                     _lshift(b, 8 * i),
                     0,
@@ -159,7 +153,7 @@ def _badder(epd, subp, b):
     for i in ut._rand_lst(range(4)):
         if cs.EUDSwitchCase()(i):
             c.f_bitlshift(b, 8 * i, ret=[b])
-            cs.DoActions(c.SetDeathsX(c.CurrentPlayer, c.Add, b, 0, 0xFF << (8 * i)))
+            cs.DoActions(c.SetDeathsX(13, c.Add, b, 0, 0xFF << (8 * i)))
             cs.EUDBreak()
     cs.EUDEndSwitch()
     cp.f_setcurpl2cpcache()
@@ -182,9 +176,7 @@ def _bsubtracter(epd, subp, b):
     for i in ut._rand_lst(range(4)):
         if cs.EUDSwitchCase()(i):
             c.f_bitlshift(b, 8 * i, ret=[b])
-            cs.DoActions(
-                c.SetDeathsX(c.CurrentPlayer, c.Subtract, b, 0, 0xFF << (8 * i))
-            )
+            cs.DoActions(c.SetDeathsX(cp.CP, c.Subtract, b, 0, 0xFF << (8 * i)))
             cs.EUDBreak()
     cs.EUDEndSwitch()
     cp.f_setcurpl2cpcache()
@@ -214,7 +206,7 @@ def _wread_epd(epd, subp):
         if cs.EUDSwitchCase()(i):
             for j in ut._rand_lst(range(8 * i, 8 * i + 16)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
                     actions=w.AddNumber(2 ** (j - 8 * i)),
                 )
 
@@ -250,7 +242,7 @@ def _bread_epd(epd, subp) -> c.EUDVariable:
         if cs.EUDSwitchCase()(i):
             for j in ut._rand_lst(range(8 * i, 8 * i + 8)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
                     actions=b.AddNumber(2 ** (j - 8 * i)),
                 )
 

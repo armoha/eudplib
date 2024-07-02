@@ -11,6 +11,7 @@ from ... import utils as ut
 from ...core.eudfunc import EUDFullFunc
 from ...core.mapdata.stringmap import ForceAddString
 from ...localize import _
+from ...offsetmap import CurrentPlayer
 from ..memiof import f_getcurpl, f_setcurpl
 from ..utilf import IsUserCP, f_getuserplayerid
 from .cpprint import FixedText, f_cpstr_print, f_gettextptr
@@ -69,7 +70,7 @@ def _tag_print(identifier, *args, encoding="UTF-8"):
         else:
             f_cpstr_print(arg, EOS=False, encoding=encoding)
 
-    cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+    cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
 
 
 class StringBuffer(c.EUDStruct):
@@ -289,7 +290,7 @@ class StringBuffer(c.EUDStruct):
             f_setcurpl(pos)
             cs.DoActions(
                 [
-                    c.SetDeaths(c.CurrentPlayer, c.SetTo, 0x0D0D0D0D, 0),
+                    c.SetDeaths(CurrentPlayer, c.SetTo, 0x0D0D0D0D, 0),
                     c.AddCurrentPlayer(1),
                 ]
                 for _ in range(length)
@@ -319,7 +320,7 @@ class StringBuffer(c.EUDStruct):
             f_setcurpl(self.epd)
             f_cpstr_print(*args, EOS=False)
             cs.DoActions(
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
                 *c.SetCurrentPlayer(f_getuserplayerid()),
                 c.DisplayText(self.StringIndex),
             )
@@ -334,7 +335,7 @@ class StringBuffer(c.EUDStruct):
             f_setcurpl(self.epd)
             f_cpstr_print(*args, EOS=False)
             cs.DoActions(
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
                 *c.SetCurrentPlayer(f_getuserplayerid()),
             )
             self.DisplayAt(line)

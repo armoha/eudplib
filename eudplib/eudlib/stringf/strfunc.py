@@ -7,6 +7,7 @@
 
 from ... import core as c
 from ... import ctrlstru as cs
+from ...offsetmap import CurrentPlayer
 from ...utils import EPD
 from ..memiof import f_setcurpl2cpcache
 from ..stringf.rwcommon import br1, br2, bs1, bw1
@@ -80,7 +81,7 @@ def _strlen_epd(epd, subp):
     if cs.EUDInfLoop()():
         b[0] << c.RawTrigger(
             nextptr=loopend,
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF),
+            conditions=c.DeathsX(CurrentPlayer, c.AtLeast, 1, 0, 0xFF),
             actions=[
                 c.SetNextPtr(b[0], b[1]),
                 c.SetNextPtr(b[1], loopend),
@@ -89,7 +90,7 @@ def _strlen_epd(epd, subp):
         )
         b[1] << c.RawTrigger(
             nextptr=loopend,
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF00),
+            conditions=c.DeathsX(CurrentPlayer, c.AtLeast, 1, 0, 0xFF00),
             actions=[
                 c.SetNextPtr(b[1], b[2]),
                 c.SetNextPtr(b[2], loopend),
@@ -98,7 +99,7 @@ def _strlen_epd(epd, subp):
         )
         b[2] << c.RawTrigger(
             nextptr=loopend,
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF0000),
+            conditions=c.DeathsX(CurrentPlayer, c.AtLeast, 1, 0, 0xFF0000),
             actions=[
                 c.SetNextPtr(b[2], b[3]),
                 c.SetNextPtr(b[3], loopend),
@@ -107,7 +108,7 @@ def _strlen_epd(epd, subp):
         )
         b[3] << c.RawTrigger(
             nextptr=loopend,
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 0xFF000000),
+            conditions=c.DeathsX(CurrentPlayer, c.AtLeast, 1, 0, 0xFF000000),
             actions=[
                 c.SetNextPtr(b[3], b[0]),
                 c.SetNextPtr(b[0], loopend),

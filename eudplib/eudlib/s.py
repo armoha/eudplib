@@ -12,10 +12,10 @@ from typing import Any
 from ..core.rawtrigger import (
     Action,
     Add,
-    CurrentPlayer,
     EncodeModifier,
     SetDeaths,
 )
+from ..offsetmap import CurrentPlayer
 from ..utils import EPD
 
 _seed = 0

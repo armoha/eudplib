@@ -8,13 +8,13 @@ from collections.abc import Callable
 
 from ... import core as c
 from ... import utils as ut
-from . import modcurpl
+from . import modcurpl as cp
 
 _table: dict[int, dict[str, dict[int, list[c.RawTrigger]]]] = {}
 
 c.PushTriggerScope()
 _writeact = c.SetDeaths(0, c.SetTo, 0, 0)
-_readend = modcurpl.f_setcurpl2cpcache(
+_readend = cp.f_setcurpl2cpcache(
     [],
     [
         _writeact,
@@ -65,7 +65,7 @@ def _insert(bitmask: int, shift: int, ordering: str | None = None) -> Callable:
     c.PushTriggerScope()
     _readtrig = [
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 1 << x),
+            conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 1 << x),
             actions=c.SetMemory(_writeact + 20, c.Add, signed_shift(1, x + shift)),
         )
         for x in bit_range

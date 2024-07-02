@@ -25,7 +25,7 @@ def _read_epd_func(
     _check_empty: bool = False,
 ) -> EUDTypedFuncN:
     @_EUDPredefineReturn(len(args))
-    @_EUDPredefineParam(c.CurrentPlayer)
+    @_EUDPredefineParam(cp.CP)
     @c.EUDFunc
     def readerfunc(targetplayer):
         ret = readerfunc._frets
@@ -34,7 +34,7 @@ def _read_epd_func(
         if _check_empty:
             check = c.Forward()
             check << c.RawTrigger(
-                conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
+                conditions=c.Deaths(cp.CP, c.Exactly, 0, 0),
                 actions=[retv.SetNumber(0) for retv in ret]
                 + [c.SetNextPtr(check, done)],
             )
@@ -48,7 +48,7 @@ def _read_epd_func(
             if all(arg[nth] == 0 for arg in args):
                 continue
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i),
+                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, i),
                 actions=[
                     retv.AddNumber(arg[nth])
                     for retv, arg in zip(ret, args)
@@ -103,7 +103,7 @@ def _read_cp_func(
         if _check_empty:
             done = c.Forward()
             check << c.RawTrigger(
-                conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
+                conditions=c.Deaths(cp.CP, c.Exactly, 0, 0),
                 actions=[
                     retv.SetNumber(0)
                     for retv, initval in zip(ret, initvals)
@@ -117,7 +117,7 @@ def _read_cp_func(
             if all(arg[nth] == 0 for arg in args):
                 continue
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, i),
+                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, i),
                 actions=[
                     retv.AddNumber(arg[nth])
                     for retv, arg in zip(ret, args)

@@ -10,6 +10,7 @@ import itertools
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
+from ...offsetmap import CurrentPlayer
 from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from ..stringf.rwcommon import br1
 from ..utilf import f_getgametick
@@ -72,7 +73,7 @@ def f_cpchar_adddw(number):
             skipper[i] << c.NextTrigger()
         cs.DoActions(
             c.SetDeaths(
-                c.CurrentPlayer,
+                CurrentPlayer,
                 c.SetTo,
                 color_v + ch[i] * 256 + (0x0D0D3000),
                 0,
@@ -119,7 +120,7 @@ def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
         else:
             f_cpstr_print(arg, EOS=False, encoding=encoding)
     if EOS:
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+        cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
 
 
 _TextFX_dict = dict()
@@ -192,15 +193,15 @@ def _remove_textfx(o0, o1, e0, e1):
         incr_e, incr_o = c.Forward(), c.Forward()
         e0t << c.RawTrigger(
             nextptr=incr_e,
-            conditions=c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000),
+            conditions=c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000),
             actions=[c.SetMemory(0x6509B0, c.Add, 1), c.SetNextPtr(e0t, e1t)],
         )
         e1t << c.RawTrigger(
-            conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
+            conditions=c.Deaths(CurrentPlayer, c.Exactly, 0, 0),
             actions=[
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
                 c.SetMemory(0x6509B0, c.Subtract, 1),
-                c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
+                c.SetDeathsX(CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
                 setptr_e << textptr.SetNumber(0),
                 c.SetNextPtr(e1t, incr_e),
             ],
@@ -216,15 +217,15 @@ def _remove_textfx(o0, o1, e0, e1):
         )
         o0t << c.RawTrigger(
             nextptr=incr_o,
-            conditions=c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
+            conditions=c.Deaths(CurrentPlayer, c.Exactly, 0, 0),
             actions=[c.SetMemory(0x6509B0, c.Add, 1), c.SetNextPtr(o0t, o1t)],
         )
         o1t << c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFFFF),
+            conditions=c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF),
             actions=[
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
                 c.SetMemory(0x6509B0, c.Subtract, 1),
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
                 setptr_o << textptr.SetNumber(0),
                 c.SetNextPtr(o1t, incr_o),
             ],
@@ -301,7 +302,7 @@ def _r2l(colors, colors_dict={}):
                 c.RawTrigger(
                     conditions=_cpbelowbuffer.IsCleared(),
                     actions=[
-                        c.SetDeathsX(c.CurrentPlayer, c.SetTo, color, 0, 0xFF),
+                        c.SetDeathsX(CurrentPlayer, c.SetTo, color, 0, 0xFF),
                         c.AddCurrentPlayer(-1),
                     ],
                 )
@@ -333,7 +334,7 @@ def _textfx_print(*args, identifier, encoding="UTF-8"):
         else:
             f_cpchar_print(arg, EOS=False, encoding=encoding)
 
-    cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+    cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
 
 
 def TextFX_FadeIn(  # noqa: N802
@@ -393,7 +394,7 @@ def TextFX_FadeIn(  # noqa: N802
     )
     _is_finished << c.RawTrigger(
         conditions=[
-            c.Deaths(c.CurrentPlayer, c.Exactly, 0, 0),
+            c.Deaths(CurrentPlayer, c.Exactly, 0, 0),
             timer.AtLeast(2 + len(color)),
         ],
         actions=[
@@ -492,7 +493,7 @@ def TextFX_FadeOut(  # noqa: N802
             ],
         )
         f_setcurpl2cpcache(
-            [], c.SetDeathsX(c.CurrentPlayer, c.SetTo, color[-1], 0, 0xFF)
+            [], c.SetDeathsX(CurrentPlayer, c.SetTo, color[-1], 0, 0xFF)
         )
         skip << c.NextTrigger()
     else:

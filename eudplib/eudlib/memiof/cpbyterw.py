@@ -9,6 +9,8 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
+from . import modcurpl as cp
+
 
 class CPByteWriter:
     """Write byte by byte"""
@@ -50,17 +52,17 @@ class CPByteWriter:
     def flushdword(self):
         """Flush buffer."""
         # mux bytes
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0))
+        cs.DoActions(c.SetDeaths(cp.CP, c.SetTo, 0, 0))
         if cs.EUDIf()(self._suboffset == 0):
             c.EUDReturn()
         cs.EUDEndIf()
 
-        c.VProc(self._b[0], self._b[0].SetDest(c.EncodePlayer(c.CurrentPlayer)))
+        c.VProc(self._b[0], self._b[0].SetDest(cp.CP))
         for k in ut._rand_lst(range(8, 32)):
             i, j = divmod(k, 8)
             c.RawTrigger(
                 conditions=self._b[i].AtLeastX(1, 2**j),
-                actions=c.SetDeaths(c.CurrentPlayer, c.Add, 2**k, 0),
+                actions=c.SetDeaths(cp.CP, c.Add, 2**k, 0),
             )
         cs.DoActions(
             *c.AddCurrentPlayer(1),

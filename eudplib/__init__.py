@@ -101,6 +101,7 @@ from .prelude import (
     Clear, Random,
     # TrgCount
     All,
+    CUnit,
 )
 from .core import (
     TBL, Action, AddCurrentPlayer,
@@ -121,8 +122,6 @@ from .core import (
     GetStringIndex, GetSwitchIndex, GetUnitIndex,
     IsConstExpr, IsEUDVariable, RlocInt, RlocInt_C, toRlocInt,
     IsMapdataInitialized,
-    Player1, Player2, Player3, Player4, Player5, Player6,
-    Player7, Player8, Player9, Player10, Player11, Player12,
     PopTriggerScope, PushTriggerScope,
     RegisterCreatePayloadCallback,
     SeqCompute, NonSeqCompute,
@@ -135,7 +134,11 @@ from .ctrlstru import *
 from .epscript import EPS_SetDebug, EPSLoader, epsCompile
 from .eudlib import *
 from .maprw import *
-from .offsetmap import CSprite, CUnit, EPDCUnitMap
+from .offsetmap import CSprite, EPDCUnitMap
+from .offsetmap.scdata import (
+    Player1, Player2, Player3, Player4, Player5, Player6,
+    Player7, Player8, Player9, Player10, Player11, Player12,
+)
 from .scdata import (
     FlingyData,
     ImageData,

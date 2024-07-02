@@ -48,8 +48,6 @@ def process_dest(dest):
     if isinstance(epd, VariableBase):
         epd.checkNonRValue()
         return EPD(epd.getValueAddr())
-    if dest is bt.CurrentPlayer:
-        return bt.EncodePlayer(dest)
     return epd
 
 

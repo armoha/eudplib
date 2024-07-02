@@ -8,7 +8,7 @@ from eudplib.maprw.injector.mainloop import (
     eud_onstart2,
     has_already_started,
 )
-from eudplib.offsetmap import TrgUnit
+from eudplib.offsetmap import TrgUnit, CurrentPlayer
 
 from ..eudarray import EUDArray
 from ..memiof import (
@@ -181,11 +181,11 @@ def _set_wireframe(unit, wireframe, size, ptr, default32, default64):
         )
         actions = [
             c.SetMemory(0x6509B0, c.SetTo, 0),
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
+            c.SetDeathsX(CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
             c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
             c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF),
+            c.SetDeathsX(CurrentPlayer, c.SetTo, 0, 0, 0xFFFF),
         ]
         c.VProc(
             [unit, wireframe],

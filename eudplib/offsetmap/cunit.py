@@ -26,7 +26,7 @@ from .member import (
     UnitOrderDataMember,
     UnsupportedMember,
 )
-from .scdata import TrgUnit
+from .scdata import CurrentPlayer, TrgPlayer, TrgUnit
 
 
 class MovementFlags(EnumMember):
@@ -451,7 +451,7 @@ class CUnit(EPDOffsetMap):
         return ptr_cache(cast(c.EUDVariable, self._epd))
 
     @staticmethod
-    @c.EUDTypedFunc([None, None, c.TrgPlayer])
+    @c.EUDTypedFunc([None, None, TrgPlayer])
     def _cgive(unit, ptr, new_owner):
         from ..eudlib.memiof import f_cunitepdread_epd, f_dwwrite_epd, f_maskread_epd
 
@@ -502,7 +502,7 @@ class CUnit(EPDOffsetMap):
         cs.EUDEndIf()
 
     @staticmethod
-    @c.EUDTypedFunc([None, None, c.TrgPlayer, None])
+    @c.EUDTypedFunc([None, None, TrgPlayer, None])
     def _cgive_subunit(unit, ptr, new_owner, ignore_subunit):
         from ..eudlib.memiof import f_cunitepdread_epd
 
@@ -520,7 +520,7 @@ class CUnit(EPDOffsetMap):
             CUnit._cgive(self, self.ptr, new_owner)
 
     @staticmethod
-    @c.EUDTypedFunc([None, c.TrgPlayer])
+    @c.EUDTypedFunc([None, TrgPlayer])
     def _set_color(unit, color_player65536):
         from ..eudlib.memiof import f_maskwrite_epd, f_spriteepdread_epd
 
@@ -583,27 +583,27 @@ class CUnit(EPDOffsetMap):
             ],
         )
         Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
+            c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
             ret.SetNumber(1),
         )
         if cs.EUDIfNot()(ret == 1):
             unit65536 = unit_type * 65536  # Does not change CurrentPlayer
             Trigger(
-                c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
+                c.DeathsX(CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
                 ret.SetNumber(1),
             )
             c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
             Trigger(
-                c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
+                c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
                 ret.SetNumber(1),
             )
             Trigger(
-                c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
+                c.DeathsX(CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
                 ret.SetNumber(1),
             )
             c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
             Trigger(
-                c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
+                c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
                 ret.SetNumber(1),
             )
         cs.EUDEndIf()
@@ -627,25 +627,25 @@ class CUnit(EPDOffsetMap):
             ],
         )
         Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
+            c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
             ret.SetNumber(1),
         )
         Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
-            ret.SetNumber(1),
-        )
-        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-        Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
-            ret.SetNumber(1),
-        )
-        Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
+            c.DeathsX(CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
             ret.SetNumber(1),
         )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
         Trigger(
-            c.DeathsX(c.CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
+            c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
+            ret.SetNumber(1),
+        )
+        Trigger(
+            c.DeathsX(CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
+            ret.SetNumber(1),
+        )
+        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
+        Trigger(
+            c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
             ret.SetNumber(1),
         )
         f_setcurpl2cpcache()

@@ -14,7 +14,6 @@ from .constenc import (
     AllyStatus,
     Byte,
     Count,
-    CurrentPlayer,
     Dword,
     EncodeAllyStatus,
     EncodeCount,
@@ -901,7 +900,7 @@ def SetKills(  # noqa: N802
         if player == 13:
             return (
                 SetMemory(0x6509B0, Add, -12 * 228),
-                SetDeaths(CurrentPlayer, modifier, number, unit),
+                SetDeaths(13, modifier, number, unit),  # CurrentPlayer
                 SetMemory(0x6509B0, Add, 12 * 228),
             )
         ep_assert(

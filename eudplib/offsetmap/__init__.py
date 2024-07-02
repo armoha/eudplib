@@ -18,7 +18,22 @@ from .member import (
     MemberKind,
     UnsupportedMember,
 )
-from .scdata import Flingy, Image, Sprite, Tech, TrgUnit, UnitOrder, Upgrade, Weapon
+
+# fmt: off
+from .scdata import (
+    Flingy,
+    Image,
+    Sprite,
+    Tech,
+    TrgUnit,
+    UnitOrder,
+    Upgrade,
+    Weapon,
+    TrgPlayer,
+    P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12,
+    Force1, Force2, Force3, Force4, AllPlayers, CurrentPlayer,
+    Allies, Foes, NeutralPlayers, NonAlliedVictoryPlayers,
+)
 
 __all__ = [
     "CSprite",
@@ -41,4 +56,9 @@ __all__ = [
     "UnitOrder",
     "Upgrade",
     "Weapon",
+    "TrgPlayer",
+    "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12",
+    "Force1", "Force2", "Force3", "Force4", "AllPlayers", "CurrentPlayer",
+    "Allies", "Foes", "NeutralPlayers", "NonAlliedVictoryPlayers",
 ]
+# fmt: on

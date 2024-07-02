@@ -12,6 +12,8 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 from eudplib.eudlib.s import SetMemoryC
 
+CP = 13
+
 
 def f_setcurpl(cp, *, actions=[], set_modifier=True):
     if c.IsEUDVariable(cp):

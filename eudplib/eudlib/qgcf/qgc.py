@@ -9,7 +9,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib.utils import EPD, ep_assert
 
-from ...offsetmap import TrgUnit
+from ...offsetmap import CurrentPlayer, TrgUnit
 from ..memiof import (
     EUDByteWriter,
     f_dwread_epd,
@@ -105,7 +105,7 @@ def _qgc_alphaids(packet_id, n, arr_epd):
         c.SetVariables(cp2arr_quantity, arr_epd)
         if cs.EUDWhileNot()(n.Exactly(0)):
             b0, b1 = c.EUDCreateVariables(2)
-            restore_arr = c.SetDeaths(c.CurrentPlayer, c.Add, 0, 0)
+            restore_arr = c.SetDeaths(CurrentPlayer, c.Add, 0, 0)
             cp2uniqueness_identifier = c.SetMemory(0x6509B0, c.SetTo, 0)
             cp2ui_quantity = EPD(cp2uniqueness_identifier) + 5
             cunit_initval = EPD(0x59CCA8) + 0xA5 // 4
@@ -121,9 +121,9 @@ def _qgc_alphaids(packet_id, n, arr_epd):
             for i in range(10, -1, -1):
                 ptr = 0x59CCA8 + (336 << i)
                 c.RawTrigger(
-                    conditions=c.Deaths(c.CurrentPlayer, c.AtLeast, ptr, 0),
+                    conditions=c.Deaths(CurrentPlayer, c.AtLeast, ptr, 0),
                     actions=[
-                        c.SetDeaths(c.CurrentPlayer, c.Subtract, 336 << i, 0),
+                        c.SetDeaths(CurrentPlayer, c.Subtract, 336 << i, 0),
                         c.SetMemory(restore_arr + 20, c.Add, 336 << i),
                         c.SetMemoryEPD(cp2ui_quantity, c.Add, 84 << i),
                         b0.AddNumber(1 << i)
@@ -142,7 +142,7 @@ def _qgc_alphaids(packet_id, n, arr_epd):
             for i in range(8):
                 m = 1 << (i + 8)
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, m),
+                    conditions=c.DeathsX(CurrentPlayer, c.AtLeast, 1, 0, m),
                     actions=b1.AddNumber(1 << (i + 3)),
                 )
             bw.writebyte(b0)

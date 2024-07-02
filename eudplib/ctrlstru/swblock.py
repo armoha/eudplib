@@ -216,7 +216,7 @@ def EUDEndSwitch() -> None:  # noqa: N802
 
         cmpplayer = epd
         if c.IsEUDVariable(epd):
-            cmpplayer = c.EncodePlayer(c.CurrentPlayer)
+            cmpplayer = 13  # CurrentPlayer
             cpcache = c.curpl.GetCPCache()
             c.VProc(
                 epd,
@@ -244,7 +244,7 @@ def EUDEndSwitch() -> None:  # noqa: N802
             jumper << lastbit
     elif c.IsEUDVariable(epd):
         # use binary search with CP trick
-        cmpplayer = c.EncodePlayer(c.CurrentPlayer)
+        cmpplayer = 13  # CurrentPlayer
         cpcache = c.curpl.GetCPCache()
         c.VProc(
             epd,

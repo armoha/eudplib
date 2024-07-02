@@ -12,7 +12,7 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 from eudplib.localize import _
 
-from ...offsetmap import CUnit
+from ...offsetmap import CUnit, CurrentPlayer
 from ...trigtrg.runtrigtrg import TrigTriggerBegin, TrigTriggerEnd
 from ...utils import EPD
 from ..memiof import (
@@ -94,7 +94,7 @@ def EUDLoopNewUnit(  # noqa: N802
         )
         uniq = f_bread_cp(0, 1)
         unique_identifier = _UniqueIdentifier()
-        check_unique = c.DeathsX(c.CurrentPlayer, c.Exactly, 0, 0, 0xFF)
+        check_unique = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFF)
         c.VProc(
             uniq,
             [
@@ -107,7 +107,7 @@ def EUDLoopNewUnit(  # noqa: N802
             ],
         )
         if cs.EUDIfNot()(check_unique):
-            f_setcurpl2cpcache(uniq, uniq.SetDest(c.CurrentPlayer))
+            f_setcurpl2cpcache(uniq, uniq.SetDest(CurrentPlayer))
             yield ptr, epd
         if cs.EUDElse()():
             tos0 += 1

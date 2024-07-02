@@ -24,13 +24,9 @@ from ..core import (
     Portrait, Icon,
     StatText,
     TrgAIScript, TrgAllyStatus, TrgComparison, TrgCount,
-    TrgLocation, TrgModifier, TrgOrder, TrgPlayer, TrgProperty,
+    TrgLocation, TrgModifier, TrgOrder, TrgProperty,
     TrgPropState, TrgResource, TrgScore, TrgString, TrgSwitch,
     TrgSwitchAction, TrgSwitchState,
-    # TrgPlayer
-    P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12,
-    Force1, Force2, Force3, Force4, AllPlayers, CurrentPlayer,
-    Allies, Foes, NeutralPlayers, NonAlliedVictoryPlayers,
     # Condition
     Always, Never,
     Accumulate, Bring,
@@ -105,6 +101,10 @@ from ..offsetmap import (
     UnitOrder,
     Upgrade,
     Weapon,
+    TrgPlayer,
+    P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12,
+    Force1, Force2, Force3, Force4, AllPlayers, CurrentPlayer,
+    Allies, Foes, NeutralPlayers, NonAlliedVictoryPlayers,
 )
 
 __all__ = [

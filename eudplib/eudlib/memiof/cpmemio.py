@@ -11,6 +11,7 @@ from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...core.variable.evcommon import _ev
 from . import dwepdio as dwm
+from . import modcurpl as cp
 
 
 @_EUDPredefineReturn(2)
@@ -20,7 +21,7 @@ def _reader():
     cs.DoActions(ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)))
     for i in ut._rand_lst(range(32)):
         c.RawTrigger(
-            conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**i),
+            conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**i),
             actions=[
                 ptr.AddNumber(2**i),
                 epd.AddNumber(2 ** (i - 2)),
@@ -66,20 +67,20 @@ def _wreader(subp):
             byte = 8 * bits
             for power in ut._rand_lst(range(byte, byte + 16)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
+                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**power),
                     actions=w.AddNumber(2 ** (power - byte)),
                 )
             cs.EUDBreak()
     if cs.EUDSwitchCase()(3):
         for power in ut._rand_lst(range(24, 32)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
+                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**power),
                 actions=w.AddNumber(2 ** (power - 24)),
             )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
         for power in ut._rand_lst(range(8)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**power),
+                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**power),
                 actions=w.AddNumber(2 ** (power + 8)),
             )
         c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, -1))
@@ -106,7 +107,7 @@ def _breader(subp):
         if cs.EUDSwitchCase()(i):
             for j in ut._rand_lst(range(8 * i, 8 * i + 8)):
                 c.RawTrigger(
-                    conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
                     actions=b.AddNumber(2 ** (j - 8 * i)),
                 )
 
@@ -126,39 +127,39 @@ def f_bread_cp(cpo, subp, **kwargs):
 
 def f_dwwrite_cp(cpo, value):
     if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
-        c.VProc(value, value.QueueAssignTo(c.CurrentPlayer))
+        c.VProc(value, value.QueueAssignTo(cp.CP))
     elif isinstance(cpo, int) and cpo == 0:
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0))
+        cs.DoActions(c.SetDeaths(cp.CP, c.SetTo, value, 0))
     else:
         cs.DoActions(
             c.SetMemory(0x6509B0, c.Add, cpo),
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, value, 0),
+            c.SetDeaths(cp.CP, c.SetTo, value, 0),
             c.SetMemory(0x6509B0, c.Add, -cpo),
         )
 
 
 def f_dwadd_cp(cpo, value):
     if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
-        c.VProc(value, value.QueueAddTo(c.CurrentPlayer))
+        c.VProc(value, value.QueueAddTo(cp.CP))
     elif isinstance(cpo, int) and cpo == 0:
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.Add, value, 0))
+        cs.DoActions(c.SetDeaths(cp.CP, c.Add, value, 0))
     else:
         cs.DoActions(
             c.SetMemory(0x6509B0, c.Add, cpo),
-            c.SetDeaths(c.CurrentPlayer, c.Add, value, 0),
+            c.SetDeaths(cp.CP, c.Add, value, 0),
             c.SetMemory(0x6509B0, c.Add, -cpo),
         )
 
 
 def f_dwsubtract_cp(cpo, value):
     if isinstance(cpo, int) and cpo == 0 and c.IsEUDVariable(value):
-        c.VProc(value, value.QueueSubtractTo(c.CurrentPlayer))
+        c.VProc(value, value.QueueSubtractTo(cp.CP))
     elif isinstance(cpo, int) and cpo == 0:
-        cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0))
+        cs.DoActions(c.SetDeaths(cp.CP, c.Subtract, value, 0))
     else:
         cs.DoActions(
             c.SetMemory(0x6509B0, c.Add, cpo),
-            c.SetDeaths(c.CurrentPlayer, c.Subtract, value, 0),
+            c.SetDeaths(cp.CP, c.Subtract, value, 0),
             c.SetMemory(0x6509B0, c.Add, -cpo),
         )
 
@@ -169,11 +170,9 @@ def _wwriter(subp, w):
     for i in ut._rand_lst(range(3)):
         if cs.EUDSwitchCase()(i):
             c.RawTrigger(
-                actions=c.SetDeathsX(
-                    c.CurrentPlayer, c.SetTo, 0, 0, 65535 << (8 * i)
-                )
+                actions=c.SetDeathsX(cp.CP, c.SetTo, 0, 0, 65535 << (8 * i))
             )
-            c.SeqCompute([(c.CurrentPlayer, c.Add, w * (256**i))])
+            c.SeqCompute([(cp.CP, c.Add, w * (256**i))])
             cs.EUDBreak()
 
     # Things gets complicated on this case.
@@ -193,7 +192,7 @@ def f_wwrite_cp(cpo, subp, w):
             if isinstance(cpo, int) and cpo == 0
             else c.SetMemory(0x6509B0, c.Add, cpo),
             c.SetDeathsX(
-                c.CurrentPlayer,
+                cp.CP,
                 c.SetTo,
                 w * (256**subp),
                 0,
@@ -216,11 +215,9 @@ def _bwriter(subp, b):
     cs.EUDSwitch(subp)
     for i in ut._rand_lst(range(4)):
         if cs.EUDSwitchCase()(i):
-            c.RawTrigger(
-                actions=c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 255 << (8 * i))
-            )
+            c.RawTrigger(actions=c.SetDeathsX(cp.CP, c.SetTo, 0, 0, 255 << (8 * i)))
 
-            c.SeqCompute([(c.CurrentPlayer, c.Add, b * (256**i))])
+            c.SeqCompute([(cp.CP, c.Add, b * (256**i))])
             cs.EUDBreak()
     cs.EUDEndSwitch()
     return b
@@ -233,7 +230,7 @@ def f_bwrite_cp(cpo, subp, b):
             if isinstance(cpo, int) and cpo == 0
             else c.SetMemory(0x6509B0, c.Add, cpo),
             c.SetDeathsX(
-                c.CurrentPlayer,
+                cp.CP,
                 c.SetTo,
                 b * (256**subp),
                 0,
@@ -253,10 +250,10 @@ def f_bwrite_cp(cpo, subp, b):
 
 def f_maskwrite_cp(cpo, value, mask):
     if isinstance(cpo, int) and cpo == 0:
-        cs.DoActions(c.SetDeathsX(c.CurrentPlayer, c.SetTo, value, 0, mask))
+        cs.DoActions(c.SetDeathsX(cp.CP, c.SetTo, value, 0, mask))
     else:
         cs.DoActions(
             c.SetMemory(0x6509B0, c.Add, cpo),
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, value, 0, mask),
+            c.SetDeathsX(cp.CP, c.SetTo, value, 0, mask),
             c.SetMemory(0x6509B0, c.Add, -cpo),
         )

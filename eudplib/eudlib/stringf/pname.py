@@ -11,6 +11,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...localize import _
+from ...offsetmap import CurrentPlayer, TrgPlayer
 from ...trigger import Trigger
 from ..eudarray import EUDArray
 from ..memiof import (
@@ -106,7 +107,7 @@ def IsPName(player, name):  # noqa: N802
         else:
             # fmt: off
             ut.ep_assert(
-                p == c.EncodePlayer(c.CurrentPlayer),
+                p == c.EncodePlayer(CurrentPlayer),
                 _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),  # noqa: E501
             )
             # fmt: on
@@ -247,11 +248,10 @@ class _PlayerName:
 
         _end = c.Forward()
         cs.EUDJumpIf(self.is_chatptr_unchanged, _end)
-        if ut.isUnproxyInstance(player, type(c.P1)):
-            if player == c.CurrentPlayer:
+        if isinstance(player, TrgPlayer):
+            player = c.EncodePlayer(player)
+            if isinstance(player, int) and player == 13:
                 player = f_getcurpl()
-            else:
-                player = c.EncodePlayer(player)
         cs.EUDJumpIf(f_playerexist(player) == 0, _end)
         basename, baselen = self.basenames[player], self.baselens[player]
 
@@ -269,14 +269,14 @@ class _PlayerName:
             )  # fix setpname save 1byte less chat contents
             f_cpstr_print(ptr2s(self.ptr + baselen), EOS=False)
             cs.DoActions(
-                c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+                c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
                 baselen.AddNumber(1),
                 c.SetCurrentPlayer(self.epd),
             )
             c.RawTrigger(
                 conditions=self.odds_or_even.IsSet(),
                 actions=[
-                    c.SetDeaths(c.CurrentPlayer, c.SetTo, ut.b2i4(b"\r" * 4), 0),
+                    c.SetDeaths(CurrentPlayer, c.SetTo, ut.b2i4(b"\r" * 4), 0),
                     c.AddCurrentPlayer(1),
                 ],
             )
@@ -303,7 +303,7 @@ class _PlayerName:
 _global_pname_class = _PlayerName()
 
 
-@c.EUDTypedFunc([c.TrgPlayer, None])
+@c.EUDTypedFunc([TrgPlayer, None])
 def f_check_id(player, dst):
     return _global_pname_class.check_id(player, dst)
 

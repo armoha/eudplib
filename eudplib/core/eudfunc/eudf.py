@@ -10,7 +10,7 @@ import inspect
 
 from ... import utils as ut
 from ...localize import _
-from ..rawtrigger import CurrentPlayer
+from ..rawtrigger import EncodePlayer
 from ..variable import EUDVariable, IsEUDVariable
 from ..variable.evcommon import _ev
 from .eudtypedfuncn import EUDFullFuncN, EUDTypedFuncN, EUDXTypedFuncN, _apply_types
@@ -125,7 +125,7 @@ def _EUDPredefineParam(*args):  # noqa: N802
     """
     fnargs, slicer = list(), list()
     for arg in args:
-        if arg is CurrentPlayer:
+        if EncodePlayer(arg) == 13:  # CurrentPlayer
             fnargs.append(ut.EPD(0x6509B0))
         elif isinstance(arg, (list, tuple)):  # noqa: UP038
             fnargs.extend(arg)

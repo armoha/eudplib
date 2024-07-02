@@ -13,6 +13,7 @@ from ... import eudlib as sf
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
 from ...eudlib.memiof.mblockio import _repaddsd_epd
+from ...offsetmap import CurrentPlayer
 from ...trigtrg import runtrigtrg as rtt
 from ..inlinecode.ilcprocesstrig import _get_inline_code_list
 
@@ -59,7 +60,7 @@ def _dispatch_inline_code(
             c.SetNextPtr(t, end),
         ]
         t << c.RawTrigger(
-            conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, func_id, v)],
+            conditions=[c.Deaths(CurrentPlayer, c.Exactly, func_id, v)],
             actions=ut._rand_lst(acts),
         )
         nt << c.NextTrigger()
@@ -83,20 +84,20 @@ def _dispatch_inline_code(
     c.RawTrigger(
         nextptr=trigepd.GetVTable(),
         actions=[
-            st1 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            st1 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             c.SetMemory(0x6509B0, c.Add, 1),
-            cs0 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            cs0 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             # SetNextPtr for codeend
             # action #2
             c.SetMemory(0x6509B0, c.Add, 7),
-            cs1 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            cs1 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             c.SetMemory(0x6509B0, c.Add, 1),
-            st2 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            st2 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             # This trigger sets argument for cs_a0_epd
             # cs_a0 will be SetNextPtr(trigepd + 1, nextptr) after this
             # action #3
             c.SetMemory(0x6509B0, c.Add, 7),
-            cs2 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            cs2 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             c.SetMemory(0x6509B0, c.Add, 1),
             trigepd.SetDest(ut.EPD(st3) + 5),
             nextptr.SetDest(ut.EPD(st4) + 5),
@@ -105,12 +106,12 @@ def _dispatch_inline_code(
     )
     stf << c.RawTrigger(
         actions=[
-            st3 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            st3 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             # action #4
             c.SetMemory(0x6509B0, c.Add, 7),
-            cs3 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            cs3 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             c.SetMemory(0x6509B0, c.Add, 1),
-            st4 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            st4 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
         ]
     )
 
@@ -136,20 +137,20 @@ def _flip_prop(trigepd: c.EUDVariable) -> None:
             ],
         )
 
-        c.RawTrigger(actions=c.SetDeathsX(c.CurrentPlayer, c.Add, 8, u, 8))
+        c.RawTrigger(actions=c.SetDeathsX(CurrentPlayer, c.Add, 8, u, 8))
         """
-        if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 4, u)):  # Preserved
+        if cs.EUDIf()(c.Deaths(CurrentPlayer, c.Exactly, 4, u)):  # Preserved
             # Disable now
-            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 8, u))
+            cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 8, u))
         if cs.EUDElse()():
-            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.Subtract, 8, u))
+            cs.DoActions(c.SetDeaths(CurrentPlayer, c.Subtract, 8, u))
         cs.EUDEndIf()
         """
 
         # Dispatch inline code
-        if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 0x10000000, u)):
+        if cs.EUDIf()(c.Deaths(CurrentPlayer, c.Exactly, 0x10000000, u)):
             # Preserve
-            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 4, u))
+            cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 4, u))
             _dispatch_inline_code(nexttrig, trigepd, prop)
         cs.EUDEndIf()
 

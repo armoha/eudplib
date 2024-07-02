@@ -103,7 +103,7 @@ Move, Patrol, Attack = TrgOrder(0), TrgOrder(1), TrgOrder(2)
 OrderDict: dict[ConstType, int] = {Move: 0, Patrol: 1, Attack: 2}
 
 
-class TrgPlayer(ConstType):
+class _Player(ConstType):
     __slots__ = ()
 
     def __str__(self):
@@ -122,28 +122,8 @@ class TrgPlayer(ConstType):
             return super().__str__()
 
 
-Player: TypeAlias = "TrgPlayer | Dword"
-P1, P2, P3, P4 = TrgPlayer(0), TrgPlayer(1), TrgPlayer(2), TrgPlayer(3)
-P5, P6, P7, P8 = TrgPlayer(4), TrgPlayer(5), TrgPlayer(6), TrgPlayer(7)
-P9, P10, P11, P12 = TrgPlayer(8), TrgPlayer(9), TrgPlayer(10), TrgPlayer(11)
-Player1, Player2, Player3, Player4 = P1, P2, P3, P4
-Player5, Player6, Player7, Player8 = P5, P6, P7, P8
-Player9, Player10, Player11, Player12 = P9, P10, P11, P12
-CurrentPlayer = TrgPlayer(13)
-Foes, Allies, NeutralPlayers = TrgPlayer(14), TrgPlayer(15), TrgPlayer(16)
-AllPlayers = TrgPlayer(17)
-Force1, Force2, Force3, Force4 = TrgPlayer(18), TrgPlayer(19), TrgPlayer(20), TrgPlayer(21)  # noqa: E501
-NonAlliedVictoryPlayers = TrgPlayer(26)
-PlayerDict: dict[ConstType, int] = {
-    P1: 0, P2: 1, P3: 2, P4: 3,
-    P5: 4, P6: 5, P7: 6, P8: 7,
-    P9: 8, P10: 9, P11: 10, P12: 11,
-    CurrentPlayer: 13,
-    Foes: 14, Allies: 15, NeutralPlayers: 16,
-    AllPlayers: 17,
-    Force1: 18, Force2: 19, Force3: 20, Force4: 21,
-    NonAlliedVictoryPlayers: 26,
-}
+Player: TypeAlias = "_Player | Dword"
+PlayerDict: dict[ConstType, int] = {}  # update in offsetmap.scdata
 
 
 class TrgProperty(ConstType):
@@ -259,23 +239,25 @@ ScoreDict: dict[ConstType, int] = {
 
 
 @overload
-def _EncodeConst(t: type[ConstType], s: ConstType) -> int:
+def _EncodeConst(t: type[ConstType], s: ConstType, u: str | None) -> int:
     ...
 
 
 @overload
-def _EncodeConst(t: type[ConstType], s: T) -> T:
+def _EncodeConst(t: type[ConstType], s: T, u: str | None) -> T:
     ...
 
 
 @overload
-def _EncodeConst(t: type[ConstType], s: _ExprProxy) -> _Dword:
+def _EncodeConst(t: type[ConstType], s: _ExprProxy, u: str | None) -> _Dword:
     ...
 
 
-def _EncodeConst(t: type[ConstType], s: _Arg) -> _Dword:  # noqa: N802
+def _EncodeConst(t: type[ConstType], s: _Arg, u: str | None = None) -> _Dword:  # noqa: N802
     if isinstance(s, ConstType) and not isinstance(s, t):
-        raise EPError(_('[Warning] "{}" is not a {}').format(s, t.__name__))
+        raise EPError(
+            _('[Warning] "{}" is not a {}').format(s, u if u else t.__name__)
+        )
     return unProxy(s)  # type: ignore [return-value]
 
 
@@ -435,7 +417,7 @@ def EncodePlayer(s: _Arg, issueError: bool = False) -> _Dword:  # noqa: N802, N8
     try:
         return PlayerDict[s]  # type: ignore[index]
     except KeyError:
-        return _EncodeConst(TrgPlayer, s)
+        return _EncodeConst(_Player, s, "TrgPlayer")
 
 
 @overload

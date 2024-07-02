@@ -69,7 +69,7 @@ def _dwread(ptr):
 
         for j in ut._rand_lst(range(8 * i, 32)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
                 actions=dw.AddNumber(2 ** (j - 8 * i)),
             )
 
@@ -77,7 +77,7 @@ def _dwread(ptr):
 
         for j in ut._rand_lst(range(8 * i)):
             c.RawTrigger(
-                conditions=c.DeathsX(c.CurrentPlayer, c.AtLeast, 1, 0, 2**j),
+                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
                 actions=dw.AddNumber(2 ** (j + 32 - 8 * i)),
             )
 
