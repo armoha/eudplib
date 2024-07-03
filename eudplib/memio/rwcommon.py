@@ -5,7 +5,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ..memiof import byterw as bm
+from . import byterw as bm
 
 br1 = bm.EUDByteReader()
 br2 = bm.EUDByteReader()

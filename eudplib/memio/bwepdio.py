@@ -5,13 +5,13 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import utils as ut
-from . import cpmemio as cpm
-from . import dwepdio as dwm
-from . import iotable
-from . import modcurpl as cp
+from .. import core as c
+from .. import cpmemio as cpm
+from .. import ctrlstru as cs
+from .. import dwepdio as dwm
+from .. import iotable
+from .. import modcurpl as cp
+from .. import utils as ut
 
 # Helper functions
 
@@ -259,5 +259,5 @@ def f_bread_epd(epd, subp, *, ret=None):
     return _bread_epd(epd, subp, ret=ret)
 
 
-def f_maskwrite_epd(epd, value, mask):
+def f_maskwrite_epd(epd, value, mask) -> None:
     cs.DoActions(c.SetDeathsX(epd, c.SetTo, value, 0, mask))

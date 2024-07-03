@@ -5,10 +5,10 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import utils as ut
-from ...core.eudfunc import EUDFullFunc
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
+from ..core.eudfunc import EUDFullFunc
 from . import cpmemio as cm
 from . import modcurpl as cp
 
@@ -81,7 +81,7 @@ def _repaddsd_epd(dstepdp, srcepdp, copydwn):
 
 @c.EUDFunc
 def _memcpy(dst, src, copylen):
-    from ..stringf.rwcommon import br1, bw1
+    from .rwcommon import br1, bw1
 
     br1.seekoffset(src)
     bw1.seekoffset(dst)
@@ -106,7 +106,7 @@ def f_memcpy(dst, src, copylen, **kwargs):
 
 @c.EUDFunc
 def f_memcmp(buf1, buf2, count):
-    from ..stringf.rwcommon import br1, br2
+    from .rwcommon import br1, br2
 
     br1.seekoffset(buf1)
     br2.seekoffset(buf2)

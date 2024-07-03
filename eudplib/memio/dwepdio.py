@@ -8,11 +8,11 @@
 import random
 import warnings
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import utils as ut
-from ...core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
-from ...localize import _
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
+from ..core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
+from ..localize import _
 from . import iotable
 from . import modcurpl as cp
 

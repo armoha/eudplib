@@ -27,7 +27,7 @@ def f_dwwrite(ptr, dw):
         dwm.f_dwwrite_epd(ut.EPD(ptr), dw)
     else:
         chars = dwm.f_dwbreak(dw)[2:]
-        from ..stringf.rwcommon import bw1
+        from .rwcommon import bw1
 
         _bw = bw1
         _bw.seekoffset(ptr)
