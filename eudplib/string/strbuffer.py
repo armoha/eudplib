@@ -5,15 +5,15 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import utils as ut
-from ...core.eudfunc import EUDFullFunc
-from ...core.mapdata.stringmap import ForceAddString
-from ...localize import _
-from ...offsetmap import CurrentPlayer
-from ..memiof import f_getcurpl, f_setcurpl
-from ..utilf import IsUserCP, f_getuserplayerid
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
+from ..core.eudfunc import EUDFullFunc
+from ..core.mapdata.stringmap import ForceAddString
+from ..eudlib.utilf import IsUserCP, f_getuserplayerid
+from ..localize import _
+from ..memio import f_getcurpl, f_setcurpl
+from ..offsetmap import CurrentPlayer
 from .cpprint import FixedText, f_cpstr_print, f_gettextptr
 from .cpstr import GetMapStringAddr
 from .fmtprint import _format_args

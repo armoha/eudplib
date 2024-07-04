@@ -7,11 +7,11 @@
 
 import itertools
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import utils as ut
-from ...offsetmap import CurrentPlayer
-from ..memiof import (
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
+from ..eudlib.utilf.userpl import IsUserCP, f_getuserplayerid
+from ..memio import (
     f_dwepdread_epd,
     f_dwwrite,
     f_epdread_epd,
@@ -19,7 +19,7 @@ from ..memiof import (
     f_setcurpl,
     f_wread_epd,
 )
-from ..utilf import IsUserCP, f_getuserplayerid
+from ..offsetmap.scdata import CurrentPlayer
 from .cpprint import f_cpstr_print
 from .eudprint import f_dbstr_print
 from .fmtprint import f_sprintf
@@ -32,7 +32,7 @@ def GetTBLAddr(tbl_id):  # noqa: N802
     add_tblptr, add_tblepd = c.Forward(), c.Forward()
     check_pointer = c.MemoryEPD(_STAT_TEXT_POINTER, c.Exactly, 0)
     if cs.EUDIfNot()(check_pointer):
-        from ...core.variable.evcommon import _ev
+        from ..core.variable.evcommon import _ev
 
         f_dwepdread_epd(_STAT_TEXT_POINTER, ret=[_ev[4], ut.EPD(add_tblepd) + 5])
         c.VProc(_ev[4], _ev[4].SetDest(ut.EPD(check_pointer) + 2))

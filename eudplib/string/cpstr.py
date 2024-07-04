@@ -13,8 +13,8 @@ from eudplib.core.curpl import _curpl_checkcond, _curpl_var
 from eudplib.core.mapdata.stringmap import get_string_section_name
 from eudplib.localize import _
 
-from ...offsetmap import CurrentPlayer
-from ..memiof import f_dwread_epd, f_wread_epd
+from ..memio import f_dwread_epd, f_wread_epd
+from ..offsetmap.scdata import CurrentPlayer
 
 _STR_ADDRESS = 0x191943C8
 
@@ -48,7 +48,7 @@ _const_strptr: dict[int, c.Forward] = {}
 
 
 def _initialize_queries():
-    from ...core.mapdata.stringmap import get_string_map
+    from ..core.mapdata.stringmap import get_string_map
 
     strmap = get_string_map()
     strmap.finalize()

@@ -7,13 +7,13 @@
 
 import itertools
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import utils as ut
-from ...offsetmap import CurrentPlayer
-from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
-from ..stringf.rwcommon import br1
-from ..utilf import f_getgametick
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
+from ..eudlib.utilf import f_getgametick
+from ..memio import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
+from ..memio.rwcommon import br1
+from ..offsetmap import CurrentPlayer
 from .cpprint import cw, f_cpstr_print
 from .eudprint import epd2s, ptr2s
 

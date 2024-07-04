@@ -11,20 +11,20 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
-from ...offsetmap import AllPlayers, CurrentPlayer, TrgPlayer
-from ..eudarray import EUDArray
-from ..memiof import (
+from ..collections.eudarray import EUDArray
+from ..eudlib.utilf.userpl import IsUserCP
+from ..memio import (
     CPByteWriter,
     f_bread_epd,
     f_cunitread_epd,
     f_getcurpl,
     f_setcurpl,
 )
-from ..utilf import IsUserCP
+from ..memio.rwcommon import br1
+from ..offsetmap.scdata import CurrentPlayer, TrgPlayer
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
-from .rwcommon import br1
 
 cw = CPByteWriter()
 prevcp = c.EUDVariable()
@@ -309,9 +309,7 @@ def eprint_all(*args):
     c.RawTrigger(
         nextptr=_eprintln_template,
         actions=[
-            c.SetMemory(  # 348 + 32
-                _eprintln_template + 380, c.SetTo, c.EncodePlayer(AllPlayers)
-            ),
+            c.SetMemory(_eprintln_template + 380, c.SetTo, 17),  # AllPlayers
             c.SetMemoryX(_eprintln_desync + 12, c.SetTo, 0, 0xFF000000),
             c.SetNextPtr(_eprintln_print, _print),
             c.SetNextPtr(_eprintln_end, _next),

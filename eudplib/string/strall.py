@@ -1,12 +1,12 @@
 #!/usr/bin/python
-from ... import core as c
-from ... import utils as ut
-from ...core.eudfunc import EUDFullFunc
-from ..memiof import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
-from ..utilf import (
+from .. import core as c
+from .. import utils as ut
+from ..core.eudfunc import EUDFullFunc
+from ..eudlib.utilf import (
     DisplayTextAll,
     f_getuserplayerid,
 )
+from ..memio import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from .cpprint import FixedText
 from .strbuffer import GetGlobalStringBuffer
 

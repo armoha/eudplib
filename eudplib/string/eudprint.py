@@ -9,7 +9,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
-from ..stringf.rwcommon import br1, bw1
+from ..memio.rwcommon import br1, bw1
 from .dbstr import DBString
 
 _conststr_dict = dict()

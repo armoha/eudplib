@@ -1,4 +1,4 @@
-from ...core import (
+from ..core import (
     Db,
     EUDFunc,
     EUDReturn,
@@ -9,14 +9,14 @@ from ...core import (
     SetMemory,
     SetTo,
 )
-from ...ctrlstru import (
+from ..ctrlstru import (
     EUDEndSwitch,
     EUDSwitch,
     EUDSwitchCase,
     EUDSwitchDefault,
 )
-from ...offsetmap import AllPlayers
-from ...utils import EPD, ExprProxy, ep_assert
+from ..offsetmap.scdata import AllPlayers
+from ..utils import EPD, ExprProxy, ep_assert
 from .cpprint import f_raise_CCMU
 
 LOCALES = (

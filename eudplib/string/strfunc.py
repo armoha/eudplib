@@ -5,12 +5,12 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ...offsetmap import CurrentPlayer
-from ...utils import EPD
-from ..memiof import f_setcurpl2cpcache
-from ..stringf.rwcommon import br1, br2, bs1, bw1
+from .. import core as c
+from .. import ctrlstru as cs
+from ..memio import f_setcurpl2cpcache
+from ..memio.rwcommon import br1, br2, bs1, bw1
+from ..offsetmap import CurrentPlayer
+from ..utils import EPD
 
 
 @c.EUDFunc

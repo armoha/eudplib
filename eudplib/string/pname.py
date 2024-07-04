@@ -7,14 +7,14 @@
 
 from math import ceil
 
-from ... import core as c
-from ... import ctrlstru as cs
-from ... import utils as ut
-from ...localize import _
-from ...offsetmap import CurrentPlayer, TrgPlayer
-from ...trigger import Trigger
-from ..eudarray import EUDArray
-from ..memiof import (
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
+from ..collections.eudarray import EUDArray
+from ..collections.playerv import PVariable
+from ..eudlib.utilf import EUDLoopPlayer, f_getgametick, f_playerexist
+from ..localize import _
+from ..memio import (
     f_dwbreak,
     f_dwread_epd,
     f_getcurpl,
@@ -22,8 +22,8 @@ from ..memiof import (
     f_setcurpl,
     f_wread_epd,
 )
-from ..playerv import PVariable
-from ..utilf import EUDLoopPlayer, f_getgametick, f_playerexist
+from ..offsetmap import CurrentPlayer, TrgPlayer
+from ..trigger import Trigger
 from .cpprint import f_cpstr_print
 from .eudprint import epd2s, f_dbstr_print, ptr2s
 from .fmtprint import _format_args

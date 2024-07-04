@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 
-from ...core import EUDFunc
-from ...ctrlstru import (
+from ..collections.eudarray import EUDArray
+from ..core import EUDFunc
+from ..ctrlstru import (
     DoActions,
     EUDBreakIf,
     EUDElse,
@@ -11,8 +12,7 @@ from ...ctrlstru import (
     EUDIf,
     EUDInfLoop,
 )
-from ..eudarray import EUDArray
-from ..stringf.rwcommon import br1, bw1
+from ..memio.rwcommon import br1, bw1
 from .cp949_table import cp949_table
 
 """

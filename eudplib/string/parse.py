@@ -9,7 +9,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
-from ..memiof import EUDByteReader
+from ..memio import EUDByteReader
 
 _global_parser = None
 
