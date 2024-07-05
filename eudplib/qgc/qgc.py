@@ -9,13 +9,13 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib.utils import EPD, ep_assert
 
-from ...offsetmap import CurrentPlayer, TrgUnit
-from ..memiof import (
+from ..memio import (
     EUDByteWriter,
     f_dwread_epd,
     f_memcpy,
     f_setcurpl2cpcache,
 )
+from ..offsetmap import CurrentPlayer, TrgUnit
 
 _PROV_MAXBUFFER = 0x57F0D8
 _cmdqlen = c.EUDVariable()
