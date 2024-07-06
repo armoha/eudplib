@@ -12,7 +12,7 @@ from .. import core as c
 from .. import utils as ut
 from ..core.inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
 from ..localize import _
-from .memiof import f_dwread_epd, f_dwwrite_epd
+from ..memio import f_dwread_epd, f_dwwrite_epd
 
 
 class EUDArrayData(c.EUDObject):
@@ -220,7 +220,7 @@ class EUDArray(ut.ExprProxy):
         return c.MemoryEPD(self._epd + key, c.Exactly, val)
 
     def neitem(self, key, val):
-        from .utilf import EUDNot
+        from ..eudlib.utilf import EUDNot
 
         self._bound_check(key)
         return EUDNot(c.MemoryEPD(self._epd + key, c.Exactly, val))
@@ -234,13 +234,13 @@ class EUDArray(ut.ExprProxy):
         return c.MemoryEPD(self._epd + key, c.AtLeast, val)
 
     def ltitem(self, key, val):
-        from .utilf import EUDNot
+        from ..eudlib.utilf import EUDNot
 
         self._bound_check(key)
         return EUDNot(c.MemoryEPD(self._epd + key, c.AtLeast, val))
 
     def gtitem(self, key, val):
-        from .utilf import EUDNot
+        from ..eudlib.utilf import EUDNot
 
         self._bound_check(key)
         return EUDNot(c.MemoryEPD(self._epd + key, c.AtMost, val))

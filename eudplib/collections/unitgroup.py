@@ -37,9 +37,9 @@ from ..core import (
 from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
 from ..ctrlstru.loopblock import _unsafe_whilenot
 from ..localize import _
+from ..memio.modcurpl import f_setcurpl2cpcache
 from ..offsetmap import CurrentPlayer
 from ..utils import EPD, EPError, EUDPeekBlock, ep_assert
-from .memiof.modcurpl import f_setcurpl2cpcache
 
 _assign_helper = EUDVariable()
 
