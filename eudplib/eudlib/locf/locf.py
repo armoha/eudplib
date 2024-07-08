@@ -11,8 +11,8 @@ from ... import core as c
 from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam
 from ...localize import _
-from ...offsetmap import CurrentPlayer
-from ..memiof import f_dwread_cp, f_posread_cp, f_setcurpl2cpcache
+from ...memio import f_dwread_cp, f_posread_cp, f_setcurpl2cpcache
+from ...memio import modcurpl as cp
 
 _loct = ut.EPD(0x58DC60) - 5
 
@@ -314,7 +314,7 @@ _set_loc: c.Action = c.SetMemory(0x6509B0, c.SetTo, 0)
 _setcp2loc: c.ConstExpr = ut.EPD(_set_loc) + 5
 
 
-@_EUDPredefineParam((_setcp2loc,), CurrentPlayer)
+@_EUDPredefineParam((_setcp2loc,), cp.CP)
 @c.EUDFunc
 def _setloc_epd(loc, epd):
     global _setcp2loc
@@ -328,12 +328,12 @@ def _setloc_epd(loc, epd):
         ]
     )
 
-    set_x = c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0)
+    set_x = c.SetDeaths(cp.CP, c.SetTo, 0, 0)
     set_xy = c.RawTrigger(
         actions=[
             set_x,
             c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
+            c.SetDeaths(cp.CP, c.SetTo, 0, 0),
         ]
     )
     set_x_epd << ut.EPD(set_x) + 5

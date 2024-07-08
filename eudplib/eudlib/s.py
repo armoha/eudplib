@@ -15,7 +15,7 @@ from ..core.rawtrigger import (
     EncodeModifier,
     SetDeaths,
 )
-from ..offsetmap import CurrentPlayer
+from ..memio import modcurpl as cp
 from ..utils import EPD
 
 _seed = 0
@@ -56,7 +56,7 @@ def SetMemoryS(dest, modtype, value) -> tuple[Action, Action]:  # noqa: N802
     cpo, unit = rand(dest)
     return (
         SetMemoryC(0x6509B0, Add, cpo),
-        SetDeaths(CurrentPlayer, modtype, value, unit),
+        SetDeaths(cp.CP, modtype, value, unit),
     )
 
 

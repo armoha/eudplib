@@ -116,30 +116,30 @@ class MemberKind(enum.Enum):
                 return 1
 
     def read_epd(self, epd, subp) -> ut.ExprProxy | SCDataObject:
-        from ..eudlib import memiof
+        from .. import memio
 
         match self.size:
             case 4:
-                value = memiof.f_dwread_epd(epd)
+                value = memio.f_dwread_epd(epd)
             case 2:
-                value = memiof.f_wread_epd(epd, subp)
+                value = memio.f_wread_epd(epd, subp)
             case 1:
-                value = memiof.f_bread_epd(epd, subp)
+                value = memio.f_bread_epd(epd, subp)
             case _:
                 raise ValueError("size of MemberKind not in 1, 2, 4")
 
         return self.cast(value)
 
     def write_epd(self, epd, subp, value) -> None:
-        from ..eudlib import memiof
+        from .. import memio
 
         match self.size:
             case 4:
-                memiof.f_dwwrite_epd(epd, value)
+                memio.f_dwwrite_epd(epd, value)
             case 2:
-                memiof.f_wwrite_epd(epd, subp, value)
+                memio.f_wwrite_epd(epd, subp, value)
             case 1:
-                memiof.f_bwrite_epd(epd, subp, value)
+                memio.f_bwrite_epd(epd, subp, value)
             case _:
                 raise ValueError("size of MemberKind not in 1, 2, 4")
 

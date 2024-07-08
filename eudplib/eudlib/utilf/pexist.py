@@ -12,8 +12,8 @@ from eudplib import utils as ut
 
 from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...localize import _
+from ...memio import f_getcurpl, f_setcurpl
 from ...offsetmap import TrgPlayer
-from ..memiof import f_getcurpl, f_setcurpl
 
 
 @_EUDPredefineReturn(2, 3)

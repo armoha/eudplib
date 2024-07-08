@@ -12,8 +12,8 @@ from ... import ctrlstru as cs
 from ... import eudlib as sf
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
-from ...eudlib.memiof.mblockio import _repaddsd_epd
-from ...offsetmap import CurrentPlayer
+from ...memio.mblockio import _repaddsd_epd
+from ...offsetmap.scdata import CurrentPlayer
 from ...trigtrg import runtrigtrg as rtt
 from ..inlinecode.ilcprocesstrig import _get_inline_code_list
 

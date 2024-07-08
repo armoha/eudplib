@@ -6,12 +6,12 @@
 # file that should have been included as part of this package.
 
 from .. import core as c
-from .. import cpmemio as cpm
 from .. import ctrlstru as cs
-from .. import dwepdio as dwm
-from .. import iotable
-from .. import modcurpl as cp
 from .. import utils as ut
+from . import cpmemio as cpm
+from . import dwepdio as dwm
+from . import iotable
+from . import modcurpl as cp
 
 # Helper functions
 

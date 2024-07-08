@@ -47,6 +47,14 @@ from .dwepdio import (
 )
 from .mblockio import f_memcmp, f_memcpy, f_repmovsd_epd
 from .memifgen import (
+    f_maskread_cp,
+    f_maskread_epd,
+    f_readgen_cp,
+    f_readgen_epd,
+)
+from .modcurpl import f_addcurpl, f_getcurpl, f_setcurpl, f_setcurpl2cpcache
+from .ptrmemio import f_bread, f_bwrite, f_dwread, f_dwwrite, f_wread, f_wwrite
+from .specialized import (
     f_cunitepdread_cp,
     f_cunitepdread_epd,
     f_cunitread_cp,
@@ -55,19 +63,13 @@ from .memifgen import (
     f_epdcunitread_epd,
     f_epdspriteread_cp,
     f_epdspriteread_epd,
-    f_maskread_cp,
-    f_maskread_epd,
     f_posread_cp,
     f_posread_epd,
-    f_readgen_cp,
-    f_readgen_epd,
     f_spriteepdread_cp,
     f_spriteepdread_epd,
     f_spriteread_cp,
     f_spriteread_epd,
 )
-from .modcurpl import f_addcurpl, f_getcurpl, f_setcurpl, f_setcurpl2cpcache
-from .ptrmemio import f_bread, f_bwrite, f_dwread, f_dwwrite, f_wread, f_wwrite
 from .varrayreader import EUDVArrayReader
 
 __all__ = [

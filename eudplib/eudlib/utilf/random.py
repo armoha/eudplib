@@ -11,7 +11,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
-from ..memiof import f_wread_epd
+from ...memio import f_wread_epd
 
 _seed: c.EUDVariable = c.EUDVariable()
 

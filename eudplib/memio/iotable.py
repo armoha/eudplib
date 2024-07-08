@@ -6,8 +6,8 @@
 # file that should have been included as part of this package.
 from collections.abc import Callable
 
-from ... import core as c
-from ... import utils as ut
+from .. import core as c
+from .. import utils as ut
 from . import modcurpl as cp
 
 _table: dict[int, dict[str, dict[int, list[c.RawTrigger]]]] = {}
