@@ -10,10 +10,10 @@ from collections.abc import Callable
 from ... import core as c
 from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
-from ...eudlib.stringf.locale import _detect_locale
-from ...eudlib.stringf.tblprint import _f_initstattext
 from ...eudlib.utilf.userpl import _f_initisusercp, _f_inituserplayerid
 from ...localize import _
+from ...string.locale import _detect_locale
+from ...string.tblprint import _f_initstattext
 from ...utils import EPError, ep_assert
 
 _jumper: c.Forward | None = None

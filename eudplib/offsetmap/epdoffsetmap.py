@@ -39,7 +39,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             case MemberKind.POSITION:
                 raise ut.EPError(_("Only dword can be read as epd"))
             case _:
-                from ..eudlib.memiof import f_epdread_epd
+                from ..memio import f_epdread_epd
 
                 return f_epdread_epd(epd)
 
@@ -63,7 +63,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             case MemberKind.POSITION:
                 raise ut.EPError(_("Only dword can be read as epd"))
             case _:
-                from ..eudlib.memiof import f_dwepdread_epd
+                from ..memio import f_dwepdread_epd
 
                 return f_dwepdread_epd(epd)
 
@@ -74,7 +74,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             case MemberKind.C_UNIT | MemberKind.C_SPRITE:
                 raise ut.EPError(_("Only dword can be read as position"))
             case _:
-                from ..eudlib.memiof import f_posread_epd
+                from ..memio import f_posread_epd
 
                 return f_posread_epd(self._epd + member.offset // 4)
 
@@ -215,7 +215,7 @@ c.RawTrigger(
 c.PopTriggerScope()
 
 
-def epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
+def _epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
     epd = c.EUDVariable(0)
     is_ptr_equal = ptr.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))
@@ -236,7 +236,7 @@ def epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
     return epd
 
 
-def ptr_cache(epd: c.EUDVariable) -> c.EUDVariable:
+def _ptr_cache(epd: c.EUDVariable) -> c.EUDVariable:
     ptr = c.EUDVariable()
     is_epd_equal = epd.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))

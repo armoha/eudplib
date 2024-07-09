@@ -239,17 +239,17 @@ ScoreDict: dict[ConstType, int] = {
 
 
 @overload
-def _EncodeConst(t: type[ConstType], s: ConstType, u: str | None) -> int:
+def _EncodeConst(t: type[ConstType], s: ConstType, u: str | None = None) -> int:
     ...
 
 
 @overload
-def _EncodeConst(t: type[ConstType], s: T, u: str | None) -> T:
+def _EncodeConst(t: type[ConstType], s: T, u: str | None = None) -> T:
     ...
 
 
 @overload
-def _EncodeConst(t: type[ConstType], s: _ExprProxy, u: str | None) -> _Dword:
+def _EncodeConst(t: type[ConstType], s: _ExprProxy, u: str | None = None) -> _Dword:
     ...
 
 

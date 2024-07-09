@@ -8,7 +8,7 @@
 import functools
 from collections.abc import Iterator
 from math import log2
-from typing import NoReturn
+from typing import ClassVar, NoReturn
 
 from typing_extensions import Self
 
@@ -79,7 +79,7 @@ _index = EUDLightVariable()
 
 
 class BitsTrg:
-    cache: dict[str, dict[int | str, Forward]] = {}
+    cache: ClassVar[dict[str, dict[int | str, Forward]]] = {}
 
     def __init__(self, key: str) -> None:
         self._key: str = key

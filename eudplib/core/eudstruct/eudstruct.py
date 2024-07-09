@@ -31,13 +31,13 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
     # Due to cyclic dependency we import objpool inside methods
     @classmethod
     def alloc(cls, *args, **kwargs):
-        from ...eudlib.objpool import get_global_pool
+        from ...collections.objpool import get_global_pool
 
         return get_global_pool().alloc(cls, *args, **kwargs)
 
     @classmethod
     def free(cls, data):
-        from ...eudlib.objpool import get_global_pool
+        from ...collections.objpool import get_global_pool
 
         return get_global_pool().free(cls, data)
 

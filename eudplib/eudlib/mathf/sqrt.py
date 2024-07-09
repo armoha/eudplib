@@ -7,9 +7,9 @@
 
 from eudplib import core as c
 
-from ..utilf import EUDBinaryMax
-
 
 @c.EUDFunc
 def f_sqrt(n):
+    from ..utilf.binsearch import EUDBinaryMax
+
     return EUDBinaryMax(lambda x: x * x <= n, 0, 0xFFFF)
