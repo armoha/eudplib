@@ -6,11 +6,12 @@
 # file that should have been included as part of this package.
 
 import functools
+from collections.abc import Iterator
 from typing import TYPE_CHECKING
 
 from .. import core as c
 from ..core import EUDVariable
-from ..ctrlstru import EUDJumpIf
+from ..ctrlstru import EUDEndIf, EUDIfNot, EUDJumpIf
 
 if TYPE_CHECKING:
     from ..core.rawtrigger.constenc import Player
@@ -95,3 +96,18 @@ def TrigTriggerEnd(player: "Player") -> c.Forward | EUDVariable:  # noqa: N802
     if isinstance(player, int):
         return _runner_end[player]
     return runner_end_array[player]
+
+
+#######
+
+
+def EUDLoopTrigger(player) -> Iterator[tuple[EUDVariable, EUDVariable]]:  # noqa: N802
+    from ..eudlib import EUDLoopList
+
+    player = c.EncodePlayer(player)
+
+    tbegin = TrigTriggerBegin(player)
+    if EUDIfNot()(tbegin == 0):
+        tend = TrigTriggerEnd(player)
+        yield from EUDLoopList(tbegin, tend)
+    EUDEndIf()
