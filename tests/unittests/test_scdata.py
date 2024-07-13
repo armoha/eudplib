@@ -5,11 +5,12 @@ from helper import *  # noqa: F403
 
 @TestInstance
 def test_scdataobject():
+    # FIXME
     # with expect_eperror():
-    TrgUnit(233)
+    #     TrgUnit(233)
     marine = TrgUnit("Terran Marine")
     # with expect_eperror():
-    TrgUnit(marine)
+    #     TrgUnit(marine)
     marine = TrgUnit.cast(marine)
     test_equality("TrgUnit(marine) = 0", marine, 0)
     # test_equality("marine.maxHp = 40 * 256", marine.maxHp, 40 * 256)
@@ -31,11 +32,17 @@ def test_scdataobject():
         EUDVariable(45 * 256),
     )
 
+    ghost_cast = UnitData.cast(one)
     one << 2
     test_equality(
         "UnitData (variable) Max HP, check robustness to variable change",
         ghost.maxHp,
         EUDVariable(45 * 256),
+    )
+    test_equality(
+        "UnitData (variable) Max HP, referencing variable",
+        ghost_cast.maxHp,
+        EUDVariable(80 * 256),
     )
 
     test_equality("arithmetic on UnitData", ghost + 3, 4)

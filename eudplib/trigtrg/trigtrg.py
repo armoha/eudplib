@@ -73,31 +73,30 @@ from ..core.rawtrigger.strenc import (
     EncodeSwitch,
     EncodeUnit,
 )
-from ..offsetmap import P1 as P1
-from ..offsetmap import P2 as P2
-from ..offsetmap import P3 as P3
-from ..offsetmap import P4 as P4
-from ..offsetmap import P5 as P5
-from ..offsetmap import P6 as P6
-from ..offsetmap import P7 as P7
-from ..offsetmap import P8 as P8
-from ..offsetmap import P9 as P9
-from ..offsetmap import P10 as P10
-from ..offsetmap import P11 as P11
-from ..offsetmap import P12 as P12
-from ..offsetmap import Allies as Allies
-from ..offsetmap import AllPlayers as AllPlayers
-from ..offsetmap import CurrentPlayer as CurrentPlayer
-from ..offsetmap import Foes as Foes
-from ..offsetmap import Force1 as Force1
-from ..offsetmap import Force2 as Force2
-from ..offsetmap import Force3 as Force3
-from ..offsetmap import Force4 as Force4
-from ..offsetmap import NeutralPlayers as NeutralPlayers
-from ..offsetmap import (
+from ..offsetmap.scdata import P1 as P1
+from ..offsetmap.scdata import P2 as P2
+from ..offsetmap.scdata import P3 as P3
+from ..offsetmap.scdata import P4 as P4
+from ..offsetmap.scdata import P5 as P5
+from ..offsetmap.scdata import P6 as P6
+from ..offsetmap.scdata import P7 as P7
+from ..offsetmap.scdata import P8 as P8
+from ..offsetmap.scdata import P9 as P9
+from ..offsetmap.scdata import P10 as P10
+from ..offsetmap.scdata import P11 as P11
+from ..offsetmap.scdata import P12 as P12
+from ..offsetmap.scdata import Allies as Allies
+from ..offsetmap.scdata import AllPlayers as AllPlayers
+from ..offsetmap.scdata import CurrentPlayer as CurrentPlayer
+from ..offsetmap.scdata import Foes as Foes
+from ..offsetmap.scdata import Force1 as Force1
+from ..offsetmap.scdata import Force2 as Force2
+from ..offsetmap.scdata import Force3 as Force3
+from ..offsetmap.scdata import Force4 as Force4
+from ..offsetmap.scdata import NeutralPlayers as NeutralPlayers
+from ..offsetmap.scdata import (
     NonAlliedVictoryPlayers as NonAlliedVictoryPlayers,
 )
-from ..offsetmap import TrgPlayer
 from ..offsetmap.scdata import Player1 as Player1
 from ..offsetmap.scdata import Player2 as Player2
 from ..offsetmap.scdata import Player3 as Player3
@@ -110,6 +109,7 @@ from ..offsetmap.scdata import Player9 as Player9
 from ..offsetmap.scdata import Player10 as Player10
 from ..offsetmap.scdata import Player11 as Player11
 from ..offsetmap.scdata import Player12 as Player12
+from ..offsetmap.scdata import TrgPlayer
 from ..utils import EPD, FlattenList, ep_assert
 
 """

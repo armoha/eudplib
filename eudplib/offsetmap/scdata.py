@@ -1,3 +1,9 @@
+#!/usr/bin/python
+# Copyright 2024 by zzt (Defender).
+# All rights reserved.
+# This file is part of EUD python library (eudplib),
+# and is released under "MIT License Agreement". Please see the LICENSE
+# file that should have been included as part of this package.
 from ..core.rawtrigger.constenc import PlayerDict, _Player
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import (
@@ -10,11 +16,12 @@ from ..core.rawtrigger.strenc import (
     EncodeUpgrade,
     EncodeWeapon,
 )
+from .epdoffsetmap import EPDOffsetMap
 
 # fmt: off
 
 
-class TrgPlayer(_Player):
+class TrgPlayer(_Player, EPDOffsetMap):
     __slots__ = ()
 
 
@@ -43,7 +50,7 @@ PlayerDict.update({
 # fmt: on
 
 
-class TrgUnit(ConstType):
+class TrgUnit(ConstType, EPDOffsetMap):
     __slots__ = ()
 
     @classmethod
@@ -51,7 +58,7 @@ class TrgUnit(ConstType):
         return EncodeUnit(s)
 
 
-class Weapon(ConstType):
+class Weapon(ConstType, EPDOffsetMap):
     __slots__ = ()
 
     @classmethod
@@ -59,7 +66,7 @@ class Weapon(ConstType):
         return EncodeWeapon(s)
 
 
-class Flingy(ConstType):
+class Flingy(ConstType, EPDOffsetMap):
     __slots__ = ()
 
     @classmethod
@@ -67,7 +74,7 @@ class Flingy(ConstType):
         return EncodeFlingy(s)
 
 
-class Sprite(ConstType):
+class Sprite(ConstType, EPDOffsetMap):
     __slots__ = ()
 
     @classmethod
@@ -75,7 +82,7 @@ class Sprite(ConstType):
         return EncodeSprite(s)
 
 
-class Image(ConstType):
+class Image(ConstType, EPDOffsetMap):
     __slots__ = ()
 
     @classmethod
@@ -83,7 +90,7 @@ class Image(ConstType):
         return EncodeImage(s)
 
 
-class Upgrade(ConstType):
+class Upgrade(ConstType, EPDOffsetMap):
     __slots__ = ()
 
     @classmethod
@@ -91,7 +98,7 @@ class Upgrade(ConstType):
         return EncodeUpgrade(s)
 
 
-class Tech(ConstType):
+class Tech(ConstType, EPDOffsetMap):
     __slots__ = ()
 
     @classmethod
@@ -99,7 +106,7 @@ class Tech(ConstType):
         return EncodeTech(s)
 
 
-class UnitOrder(ConstType):
+class UnitOrder(ConstType, EPDOffsetMap):
     __slots__ = ()
 
     @classmethod

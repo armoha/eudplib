@@ -91,8 +91,8 @@ from ..core import (
     # TrgCount
     All,
 )
-from ..offsetmap import (
-    CUnit,
+from ..offsetmap.cunit import CUnit
+from ..offsetmap.scdata import (
     Flingy,
     Image,
     Sprite,

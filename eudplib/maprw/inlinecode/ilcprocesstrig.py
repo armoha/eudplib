@@ -10,7 +10,7 @@ from random import random
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
 from ...core.rawtrigger import SetTo
-from ...offsetmap import AllPlayers
+from ...offsetmap.scdata import AllPlayers
 from ...trigtrg import trigtrg as tt
 from .btInliner import (
     get_executing_players,
