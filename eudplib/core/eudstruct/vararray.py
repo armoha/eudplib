@@ -875,7 +875,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
         def neitem(self, i, val):
             _bound_check(i)
             if not IsEUDVariable(i):
-                from ...eudlib.utilf import EUDNot
+                from ...ctrlstru import EUDNot
 
                 return EUDNot(
                     bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val)
@@ -897,7 +897,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
         def ltitem(self, i, val):
             _bound_check(i)
             if not IsEUDVariable(i):
-                from ...eudlib.utilf import EUDNot
+                from ...ctrlstru import EUDNot
 
                 return EUDNot(
                     bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val)
@@ -907,7 +907,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
         def gtitem(self, i, val):
             _bound_check(i)
             if not IsEUDVariable(i):
-                from ...eudlib.utilf import EUDNot
+                from ...ctrlstru import EUDNot
 
                 return EUDNot(
                     bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val)
