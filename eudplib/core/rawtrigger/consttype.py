@@ -8,7 +8,8 @@
 from abc import ABCMeta
 from typing import TYPE_CHECKING, TypeAlias, TypeVar
 
-from ...utils import ExprProxy
+from ...localize import _
+from ...utils import EPError, ExprProxy
 
 if TYPE_CHECKING:
     from ..allocator import ConstExpr
@@ -20,10 +21,16 @@ Byte: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
 
 
 class ConstType(ExprProxy, metaclass=ABCMeta):
-    __slots__ = ()
+    __slots__ = ("_name",)
 
     @classmethod
     def cast(cls, _from):
+        if isinstance(_from, cls):
+            return _from
+        if isinstance(_from, ConstType):
+            raise EPError(
+                _('[Warning] "{}" is not a {}').format(_from, cls.__name__)
+            )
         return cls(_from)
 
     def __init__(self, initval):
