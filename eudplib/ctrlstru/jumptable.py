@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from typing import Literal
+
 from typing_extensions import Self
 
 from .. import core as c
@@ -11,36 +13,36 @@ class EUDJumpBuffer(c.EUDObject):
     20 bytes per nextptr.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-        self._jdict = {}
-        self._nextptrs = []
+        self._jdict: "dict[JumpTriggerForward, c.ConstExpr]" = {}
+        self._nextptrs: list[int | c.ConstExpr] = []
 
-    def DynamicConstructed(self):  # noqa: N802
+    def DynamicConstructed(self) -> Literal[True]:  # noqa: N802
         return True
 
-    def create_jump_trigger(self, v, nextptr):
+    def create_jump_trigger(self, v, nextptr) -> c.ConstExpr:
         ret = self + (20 * len(self._nextptrs) - 4)
         self._nextptrs.append(nextptr)
         self._jdict[v] = ret
         return ret
 
-    def create_jump_triggers(self, v, nextptrs):
+    def create_jump_triggers(self, v, nextptrs) -> c.ConstExpr:
         ret = self + (20 * len(self._nextptrs) - 4)
         self._nextptrs.extend(nextptrs)
         self._jdict[v] = ret
         return ret
 
-    def GetDataSize(self):  # noqa: N802
+    def GetDataSize(self) -> int:  # noqa: N802
         return 2356 + 20 * len(self._nextptrs)
 
-    def CollectDependency(self, emitbuffer):  # noqa: N802
+    def CollectDependency(self, emitbuffer) -> None:  # noqa: N802
         for nextptr in self._nextptrs:
             if not isinstance(nextptr, int):
                 emitbuffer.WriteDword(nextptr)
 
-    def WritePayload(self, emitbuffer):  # noqa: N802
+    def WritePayload(self, emitbuffer) -> None:  # noqa: N802
         for nextptr in self._nextptrs[:17]:
             emitbuffer.WriteDword(nextptr)  # nextptr
             emitbuffer.WriteSpace(12)

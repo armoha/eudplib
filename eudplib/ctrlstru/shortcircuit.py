@@ -12,14 +12,15 @@ from .basicstru import EUDJumpIf, EUDJumpIfNot
 
 
 class EUDSCAnd:
-    def __init__(self):
+    def __init__(self) -> None:
         self.const = True
-        self.cond = list()
+        self.cond: list[c.Condition] = list()
         c.PushTriggerScope()
         self.side_effect = c.NextTrigger()
         self.scope = ut.EUDGetLastBlock()
+        self.v: c.EUDLightBool | c.EUDVariable
 
-    def patch(self):
+    def patch(self) -> None:
         self.const = False
         self.jb = c.Forward()
         try:
@@ -37,7 +38,9 @@ class EUDSCAnd:
             c.PopTriggerScope()
             self.v << True
 
-    def __call__(self, cond=None, *, neg=False):
+    def __call__(
+        self, cond=None, *, neg=False
+    ) -> "EUDSCAnd | list | c.EUDLightBool | c.EUDVariable":
         if cond is None:
             if self.const:
                 c.PopTriggerScope()
@@ -96,7 +99,7 @@ class EUDSCAnd:
 
 
 class EUDSCOr:
-    def __init__(self):
+    def __init__(self) -> None:
         self.jb = c.Forward()
         self.v = c.EUDLightBool()
         c.RawTrigger(actions=self.v.Clear())
@@ -105,7 +108,7 @@ class EUDSCOr:
             self.tb = c.RawTrigger(nextptr=self.jb, actions=self.v.Set())
         c.PopTriggerScope()
 
-    def __call__(self, cond=None, *, neg=False):
+    def __call__(self, cond=None, *, neg=False) -> "EUDSCOr | c.EUDLightBool":
         if cond is None:
             self.jb << c.NextTrigger()
             return self.v
