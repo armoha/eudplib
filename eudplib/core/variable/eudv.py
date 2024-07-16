@@ -30,7 +30,7 @@ from .vbase import VariableBase
 from .vbuf import get_current_custom_varbuffer, get_current_varbuffer
 
 if TYPE_CHECKING:
-    from ..rawtrigger.constenc import Dword, TrgModifier, TrgPlayer
+    from ..rawtrigger.constenc import Dword, TrgModifier
 
 
 _is_rvalue_strict = False
@@ -42,29 +42,14 @@ def EP_SetRValueStrictMode(mode: bool) -> None:  # noqa: N802
     _is_rvalue_strict = mode
 
 
-@overload
-def process_dest(dest: T) -> T:
-    ...
-
-
-@overload
-def process_dest(dest: "VariableBase | ExprProxy[VariableBase]") -> ConstExpr:
-    ...
-
-
-@overload
-def process_dest(dest: "TrgPlayer") -> int:
-    ...
-
-
 def process_dest(dest):
     epd = unProxy(dest)
     if isinstance(epd, VariableBase):
         epd.checkNonRValue()
         return EPD(epd.getValueAddr())
-    if epd is bt.CurrentPlayer:
-        return bt.EncodePlayer(epd)
-    return dest
+    if dest is bt.CurrentPlayer:
+        return bt.EncodePlayer(dest)
+    return epd
 
 
 def _is_rvalue(obj: object, refcount: int = 3) -> bool:

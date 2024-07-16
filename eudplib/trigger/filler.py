@@ -11,6 +11,7 @@ from .. import core as c
 from .. import utils as ut
 from ..core import ConstExpr, EUDVariable, RlocInt_C
 from ..core.eudfunc.eudf import _EUDPredefineParam
+from ..core.rawtrigger.constenc import TrgModifier
 
 _lowordfilter = c.EUDXVariable(0, 0xFFFF)
 _lsbytefilter = c.EUDXVariable(0, 0xFF)
@@ -19,7 +20,13 @@ _hibytefilter = c.EUDXVariable(0, 0xFF0000)
 _msbytefilter = c.EUDXVariable(0, 0xFF000000)
 
 Constant: TypeAlias = ConstExpr | int | RlocInt_C
-_fillers_use_seqcompute = []
+_fillers_use_seqcompute: list[
+    tuple[
+        Constant | EUDVariable,
+        TrgModifier | None,
+        Constant | EUDVariable,
+    ]
+] = []
 
 
 def _flush_filler():

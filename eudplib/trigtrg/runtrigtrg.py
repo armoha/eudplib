@@ -6,15 +6,14 @@
 # file that should have been included as part of this package.
 
 import functools
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING
 
 from .. import core as c
-from ..core import ConstExpr, EUDVariable
+from ..core import EUDVariable
 from ..ctrlstru import EUDJumpIf
-from ..utils import ExprProxy
 
 if TYPE_CHECKING:
-    from ..core.rawtrigger.constenc import Player, TrgPlayer
+    from ..core.rawtrigger.constenc import Player
     from ..eudlib import EUDArray
 
 _runner_start: list[c.Forward] = [c.Forward() for _ in range(8)]
@@ -55,9 +54,7 @@ def RunTrigTrigger() -> None:  # noqa: N802
             ],
         )
         nt << c.RawTrigger(
-            actions=c.SetNextPtr(
-                _runner_end[player], ~(0x51A280 + player * 12 + 4)
-            )
+            actions=c.SetNextPtr(_runner_end[player], ~(0x51A280 + player * 12 + 4))
         )
         skipt << c.NextTrigger()
 
@@ -92,21 +89,7 @@ def TrigTriggerBegin(player: "Player") -> EUDVariable:  # noqa: N802
     return GetFirstTrigTrigger(player)
 
 
-@overload
-def TrigTriggerEnd(
-    player: "int | TrgPlayer | ExprProxy[int | TrgPlayer]"
-) -> c.Forward:
-    ...
-
-
-@overload
-def TrigTriggerEnd(
-    player: EUDVariable | ConstExpr | ExprProxy[EUDVariable | ConstExpr],
-) -> EUDVariable:
-    ...
-
-
-def TrigTriggerEnd(player):  # noqa: N802
+def TrigTriggerEnd(player: "Player") -> c.Forward | EUDVariable:  # noqa: N802
     _orig_tstart, _orig_tend, runner_end_array = _alloc_trigtrigger_link()
     player = c.EncodePlayer(player)
     if isinstance(player, int):
