@@ -40,7 +40,7 @@ int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
 
 # ruff: noqa: N815
 class CSprite(EPDOffsetMap):
-    __slots__ = "_ptr"
+    __slots__ = ("_ptr",)
     prev = CSpriteMember(0x00)
     next = CSpriteMember(0x04)
     sprite = SpriteDataMember(0x08)

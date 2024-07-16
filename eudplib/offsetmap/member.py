@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 class MemberKind(enum.Enum):
-    # FIXME: __slots__ = ()
+    __slots__ = ()
     DWORD = enum.auto()
     WORD = enum.auto()
     BYTE = enum.auto()
@@ -182,15 +182,15 @@ class MemberKind(enum.Enum):
 class BaseMember(metaclass=ABCMeta):
     """Base descriptor class for EPDOffsetMap"""
 
-    __slots__ = ("offset", "kind")
+    __slots__ = ()
 
     offset: Final[int]
     kind: Final[MemberKind]
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
         ut.ep_assert(offset % 4 + kind.size <= 4, _("Malaligned member"))
-        self.offset = offset
-        self.kind = kind
+        self.offset = offset  # type: ignore[misc]
+        self.kind = kind  # type: ignore[misc]
 
     @abstractmethod
     def __get__(self, instance, owner=None):
@@ -204,7 +204,7 @@ class BaseMember(metaclass=ABCMeta):
 class UnsupportedMember(BaseMember):
     """Not supported EUD"""
 
-    __slots__ = "name"
+    __slots__ = ("offset", "kind", "name")
 
     def __set_name__(self, owner, name):
         self.name = name
@@ -221,7 +221,7 @@ class UnsupportedMember(BaseMember):
 class Member(BaseMember):
     """Descriptor for EPDOffsetMap"""
 
-    __slots__ = ()
+    __slots__ = ("offset", "kind")
 
     def __get__(self, instance, owner=None) -> "c.EUDVariable | Member":
         from .epdoffsetmap import EPDOffsetMap
@@ -245,7 +245,7 @@ class Member(BaseMember):
 
 
 class EnumMember(BaseMember, ut.ExprProxy):
-    __slots__ = "_epd"
+    __slots__ = ("offset", "kind", "_epd")
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
         self._epd: int | c.EUDVariable = 0  # FIXME
@@ -282,7 +282,7 @@ class EnumMember(BaseMember, ut.ExprProxy):
 
 
 class Flag:
-    __slots__ = "mask"
+    __slots__ = ("mask",)
 
     mask: Final[int]
 
@@ -320,9 +320,10 @@ class Flag:
 class CUnitMember(BaseMember):
     """Descriptor for EPDOffsetMap"""
 
-    __slots__ = ()
+    __slots__ = ("offset", "kind")
 
     def __init__(self, offset: int) -> None:
+        ut.ep_assert(offset % 4 == 0)
         super().__init__(offset, MemberKind.C_UNIT)
 
     def __get__(self, instance, owner=None) -> "CUnit | CUnitMember":
@@ -351,7 +352,7 @@ class CUnitMember(BaseMember):
 class CSpriteMember(BaseMember):
     """Descriptor for EPDOffsetMap"""
 
-    __slots__ = ()
+    __slots__ = ("offset", "kind")
 
     def __init__(self, offset: int) -> None:
         super().__init__(offset, MemberKind.C_SPRITE)
