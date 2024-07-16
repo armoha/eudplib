@@ -96,17 +96,15 @@ def test_strbuffer():
     )
     test_equality("IsPName test4", ret, 0b1111)
 
-    s2.fadeIn("abc", line=10)
-    s2.fadeIn("abc", line=EUDVariable(-1))
-    s2.fadeOut("abc", line=10)
-    s2.fadeOut("abc", line=EUDVariable(-1))
-    s2.tagprint("dpdkfah")
-    s2.tagprint("dpdkfah", line=EUDVariable(-1))
-    SetPName(userid, "TestPName{:c}{:n}", userid, userid)
-    SetPName(P1, "TestTest")
-    SetPName(P2, "TestTest")
-    SetPName(P4, "TestTest")
-    SetPNamef(userid, "SetPNameTest{}", userid)
+    v3 = EUDVariable(s2)
+    s3 = StringBuffer.cast(v3)
+    f_dwwrite(0x640B58, 8)
+    s3.print("dpdkfah!")
+    test_equality(
+        "StringBuffer.cast(var) test",
+        [f_bread(0x641230 + i) for i in range(len(b"dpdkfah!\0"))],
+        b"dpdkfah!\0",
+    )
 
     f_dwwrite(0x640B58, 0)
     f_setcurpl(userid)
@@ -118,15 +116,22 @@ def test_strbuffer():
         b = Db("Never say never")
         neverstr.printf("{:t}", EPD(b))
     EUDEndIf()
-    test_assert(
+    test_equality(
         "StringBuffer branch test",
-        [
-            Memory(0x640B60, Exactly, b2i4(b"Neve")),
-            Memory(0x640B64, Exactly, b2i4(b"r sa")),
-            Memory(0x640B68, Exactly, b2i4(b"y ne")),
-            Memory(0x640B6C, Exactly, b2i4(b"ver\r")),
-            MemoryX(0x640B70, Exactly, 0, 0xFF),
-        ],
+        [f_bread(0x640B60 + i) for i in range(len("Never say never\r\0"))],
+        b"Never say never\r\0",
     )
+
+    s2.fadeIn("abc", line=10)
+    s2.fadeIn("abc", line=EUDVariable(-1))
+    s2.fadeOut("abc", line=10)
+    s2.fadeOut("abc", line=EUDVariable(-1))
+    s2.tagprint("dpdkfah")
+    s2.tagprint("dpdkfah", line=EUDVariable(-1))
+    SetPName(userid, "TestPName{:c}{:n}", userid, userid)
+    SetPName(P1, "TestTest")
+    SetPName(P2, "TestTest")
+    SetPName(P4, "TestTest")
+    SetPNamef(userid, "SetPNameTest{}", userid)
 
     f_setcurpl(origcp)

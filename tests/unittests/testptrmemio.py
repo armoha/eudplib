@@ -3,7 +3,7 @@ from helper import *
 
 @TestInstance
 def test_ptr_read():
-    a = Db(b"\x01\x02\x03\x04\x05\x06\x07\x08")
+    a = EUDVariable(Db(b"\x01\x02\x03\x04\x05\x06\x07\x08"))
 
     # bread
     f_setcurpl(Player1)
