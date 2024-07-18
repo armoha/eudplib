@@ -91,6 +91,33 @@ from ..core import (
     # TrgCount
     All,
 )
+from ..utils import EPD
+from ..ctrlstru import (
+    DoActions, EUDTernary, EUDLoopRange,
+    EUDWhile, EUDWhileNot, EUDEndWhile,
+    EUDBreak, EUDContinue, EUDSetContinuePoint,
+    EUDContinueIf, EUDContinueIfNot,
+    EUDSCAnd, EUDSCOr,
+    EUDIf, EUDIfNot, EUDEndIf,
+    EUDElseIf, EUDElseIfNot, EUDElse,
+    EUDSwitch, EPDSwitch, EUDEndSwitch,
+    EUDSwitchCase, EUDSwitchDefault,
+)
+from ..memio import (
+    f_getcurpl, f_setcurpl,
+    f_dwread_epd, f_dwepdread_epd, f_epdread_epd,
+    f_dwwrite_epd, f_dwadd_epd, f_dwsubtract_epd,
+    f_wread_epd, f_wwrite_epd,
+    f_bread_epd, f_bwrite_epd,
+    f_maskread_epd, f_posread_epd,
+    f_dwread, f_dwwrite,
+    f_wread, f_wwrite,
+    f_bread, f_bwrite,
+)
+from ..collections import (
+    EUDArray, EUDDeque, EUDQueue, EUDStack,
+    PVariable, UnitGroup
+)
 from ..offsetmap.cunit import CUnit
 from ..offsetmap.scdata import (
     Flingy,
@@ -105,6 +132,14 @@ from ..offsetmap.scdata import (
     P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12,
     Force1, Force2, Force3, Force4, AllPlayers, CurrentPlayer,
     Allies, Foes, NeutralPlayers, NonAlliedVictoryPlayers,
+)
+from ..string import (
+    IsPName, SetPNamef,
+    StringBuffer,
+    f_println, f_printAt,
+    f_printAll, f_printAllAt,
+    f_simpleprint,
+    f_eprintf, f_settblf,
 )
 
 __all__ = [
@@ -194,5 +229,38 @@ __all__ = [
     "Clear", "Random",
     # TrgCount
     "All",
+    # utils
+    "EPD",
+    # control structures
+    "DoActions", "EUDTernary", "EUDLoopRange",
+    "EUDWhile", "EUDWhileNot", "EUDEndWhile",
+    "EUDBreak", "EUDContinue", "EUDSetContinuePoint",
+    "EUDContinueIf", "EUDContinueIfNot",
+    "EUDSCAnd", "EUDSCOr",
+    "EUDIf", "EUDIfNot", "EUDEndIf",
+    "EUDElseIf", "EUDElseIfNot", "EUDElse",
+    "EUDSwitch", "EPDSwitch", "EUDEndSwitch",
+    "EUDSwitchCase", "EUDSwitchDefault",
+    # memio
+    "f_getcurpl", "f_setcurpl",
+    "f_dwread_epd", "f_dwepdread_epd", "f_epdread_epd",
+    "f_dwwrite_epd", "f_dwadd_epd", "f_dwsubtract_epd",
+    "f_wread_epd", "f_wwrite_epd",
+    "f_bread_epd", "f_bwrite_epd",
+    "f_maskread_epd", "f_posread_epd",
+    "f_dwread", "f_dwwrite",
+    "f_wread", "f_wwrite",
+    "f_bread", "f_bwrite",
+    # collections
+    "EUDArray", "EUDDeque", "EUDQueue", "EUDStack",
+    "PVariable", "UnitGroup",
+    # string
+    "IsPName", "SetPNamef",
+    "StringBuffer",
+    "f_println", "f_printAt",
+    "f_printAll", "f_printAllAt",
+    "f_simpleprint",
+    "f_eprintf", "f_settblf",
+    # offsetmap
     "CUnit",
 ]
