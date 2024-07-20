@@ -12,7 +12,6 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 from ..collections.eudarray import EUDArray
 from ..collections.playerv import PVariable
-from ..eudlib.utilf import EUDLoopPlayer, f_getgametick, f_playerexist
 from ..localize import _
 from ..memio import (
     f_dwbreak,
@@ -22,7 +21,7 @@ from ..memio import (
     f_setcurpl,
     f_wread_epd,
 )
-from ..offsetmap import CurrentPlayer, TrgPlayer
+from ..offsetmap.scdata import CurrentPlayer, TrgPlayer
 from ..trigger import Trigger
 from .cpprint import f_cpstr_print
 from .eudprint import epd2s, f_dbstr_print, ptr2s
@@ -85,6 +84,8 @@ def _get_ispname_cond(name, _plvars={}):
                 )
         else:
             # TODO: compare every names in a single loop
+            from ..eudlib.utilf.listloop import EUDLoopPlayer
+
             for player in EUDLoopPlayer(None):
                 equals = f_memcmp(0x57EEEB + 36 * player, name, 25)
                 Trigger(
@@ -136,6 +137,9 @@ class _PlayerName:
         self.even1 = [c.Forward() for p in range(8)]
 
     def _optimize(self):
+        from ..eudlib.utilf.gametick import f_getgametick
+        from ..eudlib.utilf.listloop import EUDLoopPlayer
+
         if self.optimize_start.IsSet():
             return
 
@@ -237,6 +241,8 @@ class _PlayerName:
         return ret
 
     def set_pname(self, player, *name):
+        from ..eudlib.utilf.pexist import f_playerexist
+
         self._optimize()
 
         start = c.Forward()

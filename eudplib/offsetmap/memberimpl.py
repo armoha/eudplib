@@ -56,7 +56,7 @@ class BoolKind(ByteKind):
     def read_epd(cls, epd, subp) -> c.EUDVariable:
         from ..memio.specialized import _boolread_epd
 
-        return _boolread_epd[subp](epd)
+        return _boolread_epd()[subp](epd)
 
 
 class PlayerKind(ByteKind):
@@ -64,9 +64,9 @@ class PlayerKind(ByteKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> c.EUDVariable:
-        from ..memio import f_maskread_epd
+        from ..memio.specialized import _playerread_epd
 
-        return f_maskread_epd(epd, subp, 0x0F)
+        return _playerread_epd()[subp](epd)
 
 
 class UnitOrderKind(ByteKind):
@@ -124,7 +124,7 @@ class PositionXKind(WordKind):
     def read_epd(cls, epd, subp) -> c.EUDVariable:
         from ..memio.specialized import _mapxread_epd
 
-        return _mapxread_epd[subp // 2](epd)
+        return _mapxread_epd()[subp // 2](epd)
 
 
 class PositionYKind(WordKind):
@@ -132,9 +132,9 @@ class PositionYKind(WordKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> c.EUDVariable:
-        from ..memio.specialized import _mapyead_epd
+        from ..memio.specialized import _mapyread_epd
 
-        return _mapyead_epd[subp // 2](epd)
+        return _mapyread_epd()[subp // 2](epd)
 
 
 class UnitKind(WordKind):

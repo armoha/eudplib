@@ -10,12 +10,12 @@ from collections.abc import Iterator
 from typing import TYPE_CHECKING
 
 from .. import core as c
+from ..collections import EUDArray
 from ..core import EUDVariable
 from ..ctrlstru import EUDEndIf, EUDIfNot, EUDJumpIf
 
 if TYPE_CHECKING:
     from ..core.rawtrigger.constenc import Player
-    from ..eudlib import EUDArray
 
 _runner_start: list[c.Forward] = [c.Forward() for _ in range(8)]
 _runner_end: list[c.Forward] = [c.Forward() for _ in range(8)]
@@ -31,9 +31,9 @@ c.PopTriggerScope()
 
 @c.EUDFunc
 def RunTrigTrigger() -> None:  # noqa: N802
-    from .. import eudlib as sf
+    from ..memio import f_getcurpl, f_setcurpl
 
-    oldcp = sf.f_getcurpl()
+    oldcp = f_getcurpl()
 
     for player in range(8):
         skipt = c.Forward()
@@ -59,17 +59,15 @@ def RunTrigTrigger() -> None:  # noqa: N802
         )
         skipt << c.NextTrigger()
 
-    sf.f_setcurpl(oldcp)
+    f_setcurpl(oldcp)
 
 
 #######
 
 
 @functools.cache
-def _alloc_trigtrigger_link() -> "tuple[EUDArray, EUDArray, EUDArray]":
-    from .. import eudlib as sf
-
-    return sf.EUDArray(8), sf.EUDArray(8), sf.EUDArray(_runner_end)
+def _alloc_trigtrigger_link() -> tuple[EUDArray, EUDArray, EUDArray]:
+    return EUDArray(8), EUDArray(8), EUDArray(_runner_end)
 
 
 def GetFirstTrigTrigger(player: "Player") -> EUDVariable:  # noqa: N802
@@ -102,7 +100,7 @@ def TrigTriggerEnd(player: "Player") -> c.Forward | EUDVariable:  # noqa: N802
 
 
 def EUDLoopTrigger(player) -> Iterator[tuple[EUDVariable, EUDVariable]]:  # noqa: N802
-    from ..eudlib import EUDLoopList
+    from ..eudlib.utilf.listloop import EUDLoopList
 
     player = c.EncodePlayer(player)
 

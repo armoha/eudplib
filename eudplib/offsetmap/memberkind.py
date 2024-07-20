@@ -63,7 +63,7 @@ class MemberKind(enum.Enum):
     UPGRADE = enum.auto()
     TECH = enum.auto()
 
-    def impl(self) -> BaseKind:
+    def impl(self) -> type[BaseKind]:
         from .memberimpl import (
             BoolKind,
             ByteKind,

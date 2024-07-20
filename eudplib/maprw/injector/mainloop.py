@@ -8,7 +8,6 @@
 from collections.abc import Callable
 
 from ... import core as c
-from ... import eudlib as sf
 from ...core.eudfunc.trace.tracetool import _f_initstacktrace
 from ...eudlib.utilf.userpl import _f_initisusercp, _f_inituserplayerid
 from ...localize import _
@@ -85,12 +84,14 @@ def main_starter(mf: Callable) -> c.Forward:
 
 
 def EUDDoEvents() -> None:  # noqa: N802
+    from ... import memio
+
     if _jumper is None:
         raise EPError(_("main_starter has not called"))
-    oldcp = sf.f_getcurpl()
+    oldcp = memio.f_getcurpl()
 
     _t = c.Forward()
     c.RawTrigger(nextptr=0x80000000, actions=c.SetNextPtr(_jumper, _t))
     _t << c.NextTrigger()
 
-    sf.f_setcurpl(oldcp)
+    memio.f_setcurpl(oldcp)

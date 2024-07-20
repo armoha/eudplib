@@ -9,9 +9,10 @@ import random
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ... import eudlib as sf
+from ... import memio as mi
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
+from ...eudlib.utilf.gametick import f_getgametick
 from ...memio.mblockio import _repaddsd_epd
 from ...offsetmap.scdata import CurrentPlayer
 from ...trigtrg import runtrigtrg as rtt
@@ -126,7 +127,7 @@ def _flip_prop(trigepd: c.EUDVariable) -> None:
         # trigepd's nextptr may change during flipping process, so
         # we get it now.
         trigepd += 1
-        nexttrig, nexttrigepd = sf.f_dwepdread_epd(trigepd)
+        nexttrig, nexttrigepd = mi.f_dwepdread_epd(trigepd)
         u = random.randint(234, 65535)
         prop = (8 + 320 + 2048) // 4 - 12 * u
         c.VProc(
@@ -173,8 +174,8 @@ def create_inject_finalizer(
         ret = c.NextTrigger()
 
         # Revert nextptr
-        triggerend = sf.f_dwread_epd(9)
-        ptsprev_epd = sf.f_dwread_epd(10)
+        triggerend = mi.f_dwread_epd(9)
+        ptsprev_epd = mi.f_dwread_epd(10)
         c.VProc(
             [ptsprev_epd, triggerend],
             [
@@ -188,7 +189,7 @@ def create_inject_finalizer(
         if mrgndata is None:
             mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
             mrgndata_db = c.Db(mrgndata)
-            sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
+            mi.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
         else:
             mrgndata_db = c.Db(mrgndata)
             _repaddsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
@@ -197,7 +198,7 @@ def create_inject_finalizer(
         i = c.EUDVariable()
         if cs.EUDWhile()(i <= 3 * 7):
             i += ut.EPD(pts + 8)
-            _flip_prop(sf.f_epdread_epd(i))
+            _flip_prop(mi.f_epdread_epd(i))
             i += 3 - ut.EPD(pts + 8)
         cs.EUDEndWhile()
 
@@ -226,8 +227,8 @@ def create_inject_finalizer(
 
             c.PopTriggerScope()
 
-            prevtstart = sf.f_dwread_epd(ut.EPD(pts) + player * 3 + 2)
-            prevtend, prevtend_epd = sf.f_dwepdread_epd(ut.EPD(pts) + player * 3 + 1)
+            prevtstart = mi.f_dwread_epd(ut.EPD(pts) + player * 3 + 2)
+            prevtend, prevtend_epd = mi.f_dwepdread_epd(ut.EPD(pts) + player * 3 + 1)
 
             # If there were triggers
             if cs.EUDIfNot()(prevtstart == ~(pts + player * 12 + 4)):
@@ -261,7 +262,7 @@ def create_inject_finalizer(
 
         if c.PushTriggerScope():
             tmcheckt << c.NextTrigger()
-            sf.f_getgametick(ret=curtime)
+            f_getgametick(ret=curtime)
             if cs.EUDIf()(curtime > lasttime):  # beware QueueAddTo (-)
                 c.VProc(curtime, curtime.SetDest(lasttime))
                 c.SetNextTrigger(root)
@@ -274,7 +275,7 @@ def create_inject_finalizer(
         c.PopTriggerScope()
 
         # lasttime << curtime
-        sf.f_getgametick(ret=curtime)
+        f_getgametick(ret=curtime)
         c.VProc(
             curtime,
             [

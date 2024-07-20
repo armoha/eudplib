@@ -9,7 +9,7 @@ from .. import core as c
 from .. import ctrlstru as cs
 from ..memio import f_setcurpl2cpcache
 from ..memio.rwcommon import br1, br2, bs1, bw1
-from ..offsetmap import CurrentPlayer
+from ..offsetmap.scdata import CurrentPlayer
 from ..utils import EPD
 
 

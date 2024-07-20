@@ -21,7 +21,7 @@ class BaseMember(metaclass=ABCMeta):
     __slots__ = ()
 
     offset: Final[int]
-    kind: Final[BaseKind]
+    kind: Final[type[BaseKind]]
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
         self.offset = offset  # type: ignore[misc]
@@ -40,7 +40,7 @@ class BaseMember(metaclass=ABCMeta):
 class StructMember(BaseMember):
     __slots__ = ("offset", "kind")
 
-    def __init__(self, offset: int, kind: type | int) -> None:
+    def __init__(self, offset: int, kind: MemberKind) -> None:
         super().__init__(offset, kind)
 
     def __get__(self, instance, owner=None) -> "c.EUDVariable | StructMember":
@@ -67,7 +67,7 @@ class StructMember(BaseMember):
 class ArrayMember(BaseMember):
     __slots__ = ("offset", "kind")
 
-    def __init__(self, offset: int, kind: type | int) -> None:
+    def __init__(self, offset: int, kind: MemberKind) -> None:
         super().__init__(offset, kind)
 
     def div(self, instance):
@@ -80,7 +80,7 @@ class ArrayMember(BaseMember):
             return q, r
         return instance, 0
 
-    def __get__(self, instance, owner=None) -> "c.EUDVariable | StructMember":
+    def __get__(self, instance, owner=None) -> "c.EUDVariable | ArrayMember":
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:

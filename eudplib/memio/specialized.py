@@ -119,3 +119,14 @@ def _boolread_epd():
         )
         _boolread_epd.f = f
     return f
+
+
+def _playerread_epd():
+    f = getattr(_playerread_epd, "f", None)
+    if f is None:
+        f = tuple(
+            f_readgen_epd(0xF << shift, (0, lambda x: x >> shift))
+            for shift in range(0, 32, 8)
+        )
+        _playerread_epd.f = f
+    return f

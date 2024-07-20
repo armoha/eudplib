@@ -2,7 +2,7 @@
 from .. import core as c
 from .. import utils as ut
 from ..core.eudfunc import EUDFullFunc
-from ..eudlib.utilf import (
+from ..eudlib.utilf.userpl import (
     DisplayTextAll,
     f_getuserplayerid,
 )

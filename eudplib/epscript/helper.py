@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from types import ModuleType
 
+from ..collections import EUDArray
 from ..core import (
     ConstExpr,
     EUDCreateVariables,
@@ -18,8 +19,8 @@ from ..core import (
     f_bitlshift,
 )
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
-from ..eudlib import EUDArray, f_setcurpl2cpcache
 from ..maprw import EUDOnStart
+from ..memio import f_setcurpl2cpcache
 from ..utils import (
     EPD,
     ExprProxy,

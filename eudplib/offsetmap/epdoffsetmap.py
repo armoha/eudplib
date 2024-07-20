@@ -26,57 +26,63 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         super().__init__(epd)
 
     def getepd(self, name: str) -> "c.EUDVariable | CUnit":
+        from .memberimpl import CSpriteKind, CUnitKind, PositionKind
+
         member = type(self).__dict__[name]
-        ut.ep_assert(member.kind.size == 4, _("Only dword can be read as epd"))
+        kind = member.kind
+        ut.ep_assert(kind.size() == 4, _("Only dword can be read as epd"))
         epd = self._epd + member.offset // 4
-        match member.kind:
-            case MemberKind.C_UNIT:
-                from .cunit import CUnit
+        if kind is CUnitKind:
+            from .cunit import CUnit
 
-                return CUnit.from_read(epd)
-            case MemberKind.C_SPRITE:
-                return member.kind.read_epd(epd, 0)
-            case MemberKind.POSITION:
-                raise ut.EPError(_("Only dword can be read as epd"))
-            case _:
-                from ..memio import f_epdread_epd
+            return CUnit.from_read(epd)
+        if kind is CSpriteKind:
+            return kind.read_epd(epd, 0)
+        if kind is PositionKind:
+            raise ut.EPError(_("Only dword can be read as epd"))
 
-                return f_epdread_epd(epd)
+        from ..memio import f_epdread_epd
+
+        return f_epdread_epd(epd)
 
     def getdwepd(
         self, name: str
     ) -> tuple[c.EUDVariable, "c.EUDVariable | CUnit | CSprite"]:
+        from .memberimpl import CSpriteKind, CUnitKind, PositionKind
+
         member = type(self).__dict__[name]
-        ut.ep_assert(member.kind.size == 4, _("Only dword can be read as epd"))
+        kind = member.kind
+        ut.ep_assert(kind.size() == 4, _("Only dword can be read as epd"))
         epd = self._epd + member.offset // 4
-        match member.kind:
-            case MemberKind.C_UNIT:
-                from .cunit import CUnit
+        if kind is CUnitKind:
+            from .cunit import CUnit
 
-                cunit = CUnit.from_read(epd)
-                return cast(c.EUDVariable, cunit._ptr), cunit
-            case MemberKind.C_SPRITE:
-                from .csprite import CSprite
+            cunit = CUnit.from_read(epd)
+            return cast(c.EUDVariable, cunit._ptr), cunit
+        if kind is CSpriteKind:
+            from .csprite import CSprite
 
-                csprite = CSprite.from_read(epd)
-                return cast(c.EUDVariable, csprite._ptr), csprite
-            case MemberKind.POSITION:
-                raise ut.EPError(_("Only dword can be read as epd"))
-            case _:
-                from ..memio import f_dwepdread_epd
+            csprite = CSprite.from_read(epd)
+            return cast(c.EUDVariable, csprite._ptr), csprite
+        if kind is PositionKind:
+            raise ut.EPError(_("Only dword can be read as epd"))
 
-                return f_dwepdread_epd(epd)
+        from ..memio import f_dwepdread_epd
+
+        return f_dwepdread_epd(epd)
 
     def getpos(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
-        member = type(self).__dict__[name]
-        ut.ep_assert(member.kind.size == 4, _("Only dword can be read as position"))
-        match member.kind:
-            case MemberKind.C_UNIT | MemberKind.C_SPRITE:
-                raise ut.EPError(_("Only dword can be read as position"))
-            case _:
-                from ..memio import f_posread_epd
+        from .memberimpl import CSpriteKind, CUnitKind
 
-                return f_posread_epd(self._epd + member.offset // 4)
+        member = type(self).__dict__[name]
+        kind = member.kind
+        ut.ep_assert(kind.size() == 4, _("Only dword can be read as position"))
+        if kind in (CUnitKind, CSpriteKind):
+            raise ut.EPError(_("Only dword can be read as position"))
+
+        from ..memio import f_posread_epd
+
+        return f_posread_epd(self._epd + member.offset // 4)
 
     def iaddattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]

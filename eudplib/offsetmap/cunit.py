@@ -567,7 +567,7 @@ class CUnit(EPDOffsetMap):
     @_EUDPredefineReturn(2, 3)
     @c.EUDTypedFunc([None, TrgUnit])
     def _check_buildq(unit, unit_type):
-        from ..eudlib import f_setcurpl2cpcache
+        from ..memio import f_setcurpl2cpcache
         from ..trigger import Trigger
 
         ret = CUnit._check_buildq._frets[0]
@@ -611,7 +611,7 @@ class CUnit(EPDOffsetMap):
     @_EUDPredefineReturn(1, 2)
     @c.EUDTypedFunc([None, TrgUnit, None])
     def _check_buildq_const(unit, unit_type, unit65536):
-        from ..eudlib import f_setcurpl2cpcache
+        from ..memio import f_setcurpl2cpcache
         from ..trigger import Trigger
 
         ret = CUnit._check_buildq_const._frets[0]
@@ -744,7 +744,7 @@ class CUnit(EPDOffsetMap):
         return self.check_status_flag(0x00000010)
 
     def setloc(self, location) -> None:
-        from ..eudlib import f_setloc_epd
+        from ..eudlib.locf import f_setloc_epd
 
         f_setloc_epd(location, self._epd + 0x28 // 4)
 

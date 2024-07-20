@@ -10,10 +10,9 @@ import itertools
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
-from ..eudlib.utilf import f_getgametick
 from ..memio import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from ..memio.rwcommon import br1
-from ..offsetmap import CurrentPlayer
+from ..offsetmap.scdata import CurrentPlayer
 from .cpprint import cw, f_cpstr_print
 from .eudprint import epd2s, ptr2s
 
@@ -348,6 +347,8 @@ def TextFX_FadeIn(  # noqa: N802
     reset -- automatically reset when didn't run for a moment (default True)
     tag   -- internal tag and identifier (default: vargs)
     """
+    from ..eudlib.utilf.gametick import f_getgametick
+
     if color is None:
         color = (0x03, 0x04, 0x05, 0x14)
     if tag is None:
@@ -430,6 +431,8 @@ def TextFX_FadeOut(  # noqa: N802
     reset -- automatically reset when didn't run for a moment (default True)
     tag   -- internal tag and identifier (default: vargs)
     """
+    from ..eudlib.utilf.gametick import f_getgametick
+
     if color is None:
         color = (0x03, 0x04, 0x05, 0x14)
     if tag is None:

@@ -15,7 +15,7 @@ from ..memio import (
     f_memcpy,
     f_setcurpl2cpcache,
 )
-from ..offsetmap import CurrentPlayer, TrgUnit
+from ..offsetmap.scdata import CurrentPlayer, TrgUnit
 
 _PROV_MAXBUFFER = 0x57F0D8
 _cmdqlen = c.EUDVariable()
