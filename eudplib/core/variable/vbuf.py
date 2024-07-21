@@ -106,7 +106,7 @@ def _register_new_varbuffer() -> None:
     _evb = EUDVarBuffer()
 
 
-def get_current_varbuffer():
+def get_current_varbuffer() -> EUDVarBuffer | None:
     return _evb
 
 

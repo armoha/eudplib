@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 import types
-from typing import Generic, TypeAlias, TypeVar, overload
+from typing import Generic, TypeAlias, TypeGuard, TypeVar, overload
 
 from eudplib.localize import _
 
@@ -218,6 +218,16 @@ def unProxy(x):  # noqa: N802
 
 
 _ClassInfo: TypeAlias = type | types.UnionType | tuple["_ClassInfo", ...]
+
+
+@overload
+def isUnproxyInstance(x: object, cls: type) -> TypeGuard[type]:
+    ...
+
+
+@overload
+def isUnproxyInstance(x: object, cls: types.UnionType) -> TypeGuard[types.UnionType]:
+    ...
 
 
 def isUnproxyInstance(x: object, cls: _ClassInfo) -> bool:  # noqa: N802

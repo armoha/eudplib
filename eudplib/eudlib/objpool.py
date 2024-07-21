@@ -46,7 +46,7 @@ class ObjPool:
         self.baseobj = _ObjPoolData(size, max_fieldn)
         self.data = EUDArray([72 * max_fieldn * i for i in range(size)])
 
-    def full(self) -> bool:
+    def full(self) -> c.Condition:
         return self.remaining == 0
 
     @c.EUDMethod
