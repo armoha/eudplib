@@ -15,8 +15,8 @@ from ..core.rawtrigger import (
     EncodeModifier,
     SetDeaths,
 )
-from ..memio import modcurpl as cp
 from ..utils import EPD
+from . import modcurpl as cp
 
 _seed = 0
 _stack = []

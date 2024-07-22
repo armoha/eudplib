@@ -7,10 +7,9 @@
 
 import random
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
-from eudplib import utils as ut
-from eudplib.eudlib.s import SetMemoryC
+from .. import core as c
+from .. import ctrlstru as cs
+from .. import utils as ut
 
 CP = 13
 
@@ -48,6 +47,8 @@ def f_setcurpl2cpcache(v=[], actions=[]):
 # This function initializes _curpl_checkcond, so should be called at least once
 @c.EUDFunc
 def _f_updatecpcache():
+    from .s import SetMemoryC
+
     cpcond = c.curpl.cpcache_match_cond()
     cpcache = c.curpl.GetCPCache()
     c.RawTrigger(actions=SetMemoryC(cpcache.getValueAddr(), c.SetTo, 0))
