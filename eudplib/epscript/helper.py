@@ -97,7 +97,7 @@ def _IGVA(var_count, expr_list_gen):  # noqa: N802
     except (TriggerScopeError, NameError):
         var_list = EUDCreateVariables(var_count)
 
-        def _():
+        def _() -> None:
             expr_list = expr_list_gen()
             SetVariables(var_list, expr_list)
 

@@ -27,6 +27,7 @@ from unittests import (
     test_once,
     test_parse,
     test_pexists,
+    test_scdata,
     test_sq_from_1var,
     test_trace,
     test_unitgroup,

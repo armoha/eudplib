@@ -188,7 +188,13 @@ def f_test_cunit2():
     # (Line 78) if (u.acceleration == 0) ret += 2048;
     if EUDIf()(_ATTC(u, 'acceleration') == 0):
         ret.__iadd__(2048)
-        # (Line 80) return ret;
+        # (Line 80) u.remove();
+    EUDEndIf()
+    u.remove()
+    # (Line 81) if (u.order == 0 && u.userActionFlags & 4) ret += 4096;
+    if EUDIf()(EUDSCAnd()(_ATTC(u, 'order') == 0)(u.userActionFlags & 4)()):
+        ret.__iadd__(4096)
+        # (Line 83) return ret;
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 81) }
+    # (Line 84) }

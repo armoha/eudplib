@@ -18,6 +18,8 @@ Self = TypeVar("Self", bound="VariableBase")
 
 
 class VariableBase(metaclass=ABCMeta):
+    __slots__ = ()
+
     @abstractmethod
     def __init__(self) -> None:
         pass
@@ -72,11 +74,12 @@ class VariableBase(metaclass=ABCMeta):
 
     # -------
 
-    def Assign(self, value: "Dword") -> None:  # noqa: N802
+    def Assign(self: Self, value: "Dword") -> Self:  # noqa: N802
         bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.SetTo, value))
+        return self
 
-    def __lshift__(self, value: "Dword") -> None:
-        self.Assign(value)
+    def __lshift__(self: Self, value: "Dword") -> Self:
+        return self.Assign(value)
 
     def __iadd__(self: Self, value: "Dword") -> Self:
         bt.RawTrigger(actions=bt.SetMemory(self.getValueAddr(), bt.Add, value))
@@ -94,8 +97,19 @@ class VariableBase(metaclass=ABCMeta):
         bt.RawTrigger(actions=self.SetNumberX(0xFFFFFFFF, value))
         return self
 
-    def __iand__(self: Self, value: int) -> Self:
-        bt.RawTrigger(actions=self.SetNumberX(0, ~value))
+    def __iand__(self: Self, value: int | ConstExpr) -> Self:
+        if isinstance(value, int):
+            bt.RawTrigger(actions=self.SetNumberX(0, ~value))
+        else:  # FIXME: calculate ~ConstExpr on compile time
+            apply_and = self.SetNumberX(0, 0)
+            bt.RawTrigger(
+                actions=[
+                    bt.SetMemory(apply_and, bt.SetTo, value),
+                    bt.SetMemoryX(apply_and, bt.Add, 0xFFFFFFFF, 0x55555555),
+                    bt.SetMemoryX(apply_and, bt.Add, 0xFFFFFFFF, 0xAAAAAAAA),
+                    apply_and,
+                ]
+            )
         return self
 
     def __ixor__(self: Self, value: "Dword") -> Self:

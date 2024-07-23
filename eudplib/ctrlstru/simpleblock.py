@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from typing import Literal, TypedDict
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
@@ -18,7 +20,7 @@ TODO : Remove code duplication if possible.
 """
 
 
-def EUDIf():  # noqa: N802
+def EUDIf() -> CtrlStruOpener:  # noqa: N802
     block = {
         "ifend": c.Forward(),
         "next_elseif": c.Forward(),
@@ -26,7 +28,7 @@ def EUDIf():  # noqa: N802
     }
     ut.EUDCreateBlock("ifblock", block)
 
-    def _footer(conditions, *, neg=False):
+    def _footer(conditions, *, neg=False) -> Literal[True]:
         if neg:
             EUDJumpIf(conditions, block["next_elseif"])
         else:
@@ -37,7 +39,7 @@ def EUDIf():  # noqa: N802
     return CtrlStruOpener(_footer)
 
 
-def EUDIfNot():  # noqa: N802
+def EUDIfNot() -> CtrlStruOpener:  # noqa: N802
     c = EUDIf()
     return CtrlStruOpener(lambda conditions: c(conditions, neg=True))
 
@@ -45,8 +47,8 @@ def EUDIfNot():  # noqa: N802
 # -------
 
 
-def EUDElseIf():  # noqa: N802
-    def _header():
+def EUDElseIf() -> CtrlStruOpener:  # noqa: N802
+    def _header() -> None:
         block = ut.EUDPeekBlock("ifblock")[1]
         ut.ep_assert(
             block["next_elseif"] is not None,
@@ -60,7 +62,7 @@ def EUDElseIf():  # noqa: N802
         block["next_elseif"] = c.Forward()
         block["conditional"] = True
 
-    def _footer(conditions, *, neg=False):
+    def _footer(conditions, *, neg=False) -> Literal[True]:
         block = ut.EUDPeekBlock("ifblock")[1]
         if neg:
             EUDJumpIf(conditions, block["next_elseif"])
@@ -73,7 +75,7 @@ def EUDElseIf():  # noqa: N802
     return CtrlStruOpener(_footer)
 
 
-def EUDElseIfNot():  # noqa: N802
+def EUDElseIfNot() -> CtrlStruOpener:  # noqa: N802
     c = EUDElseIf()
     return CtrlStruOpener(lambda conditions: c(conditions, neg=True))
 
@@ -81,8 +83,8 @@ def EUDElseIfNot():  # noqa: N802
 # -------
 
 
-def EUDElse():  # noqa: N802
-    def _footer():
+def EUDElse() -> CtrlStruOpener:  # noqa: N802
+    def _footer() -> Literal[True]:
         block = ut.EUDPeekBlock("ifblock")[1]
         ut.ep_assert(
             block["next_elseif"] is not None,
@@ -98,7 +100,7 @@ def EUDElse():  # noqa: N802
     return CtrlStruOpener(_footer)
 
 
-def EUDEndIf():  # noqa: N802
+def EUDEndIf() -> None:  # noqa: N802
     lb = ut.EUDPopBlock("ifblock")
     block = lb[1]
 
@@ -113,18 +115,24 @@ def EUDEndIf():  # noqa: N802
 # -------
 
 
-def EUDExecuteOnce():  # noqa: N802
-    def _header():
-        block = {
+def EUDExecuteOnce() -> CtrlStruOpener:  # noqa: N802
+    def _header() -> None:
+        class OnceBlock(TypedDict):
+            blockstart: c.Forward
+            blockend: c.Forward
+            blockmode: bool
+            conditional: bool
+
+        block: OnceBlock = {
             "blockstart": c.Forward(),
             "blockend": c.Forward(),
-            "blockmode": None,
+            "blockmode": False,
             "conditional": True,
         }
         ut.EUDCreateBlock("executeonceblock", block)
         block["blockstart"] << c.NextTrigger()
 
-    def _footer(conditions=None, *, neg=False):
+    def _footer(conditions=None, *, neg=False) -> Literal[True]:
         block = ut.EUDPeekBlock("executeonceblock")[1]
         if conditions is not None:
             if neg:
@@ -144,11 +152,11 @@ def EUDExecuteOnce():  # noqa: N802
     return CtrlStruOpener(_footer)
 
 
-def EUDEndExecuteOnce():  # noqa: N802
+def EUDEndExecuteOnce() -> None:  # noqa: N802
     lb = ut.EUDPopBlock("executeonceblock")
     ut.ep_assert(lb[0] == "executeonceblock", _("Block start/end mismatch"))
     block = lb[1]
-    if (block["blockmode"] is None) or (block["blockmode"] is False):
+    if not block["blockmode"]:
         c.RawTrigger(
             actions=[
                 c.SetNextPtr(block["blockstart"], block["blockend"]),

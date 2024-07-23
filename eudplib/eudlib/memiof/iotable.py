@@ -10,7 +10,7 @@ from ... import core as c
 from ... import utils as ut
 from . import modcurpl
 
-_table = {}
+_table: dict[int, dict[str, dict[int, list[c.RawTrigger]]]] = {}
 
 c.PushTriggerScope()
 _writeact = c.SetDeaths(0, c.SetTo, 0, 0)
@@ -85,7 +85,7 @@ def _get(bitmask: int, shift: int) -> Callable | None:
     lsb_index = (bitmask & -bitmask).bit_length() - 1
 
     for key in _table:
-        if key & bitmask == 0:
+        if key & bitmask != bitmask:
             continue
         key_msb_index = key.bit_length() - 1
         key_lsb_index = (key & -key).bit_length() - 1

@@ -175,9 +175,7 @@ def f_setloc(loc, *coords, action=False):
     )
     loc = c.EncodeLocation(loc)
     if action is True:
-        ut.ep_assert(
-            all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc)
-        )
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc))
     if c.IsConstExpr(loc):
         dst = _loct + 5 * loc
         if len(coords) == 2:
@@ -221,9 +219,7 @@ def f_addloc(loc, *coords, action=False):
     )
     loc = c.EncodeLocation(loc)
     if action is True:
-        ut.ep_assert(
-            all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc)
-        )
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc))
     if c.IsConstExpr(loc):
         dst = _loct + 5 * loc
         if len(coords) == 2:
@@ -235,13 +231,13 @@ def f_addloc(loc, *coords, action=False):
             return [
                 c.SetMemoryEPD(dst + i, c.Add, x)
                 for i, x in enumerate((left, t, r, b))
+                if not (isinstance(x, int) and x == 0)
             ]
         c.NonSeqCompute(
             [
-                (dst, c.Add, left),
-                (dst + 1, c.Add, t),
-                (dst + 2, c.Add, r),
-                (dst + 3, c.Add, b),
+                (dst + i, c.Add, x)
+                for i, x in enumerate((left, t, r, b))
+                if not (isinstance(x, int) and x == 0)
             ]
         )
     elif len(coords) == 2:
@@ -267,9 +263,7 @@ def f_dilateloc(loc, *coords, action=False):
     )
     loc = c.EncodeLocation(loc)
     if action is True:
-        ut.ep_assert(
-            all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc)
-        )
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc))
     if c.IsConstExpr(loc):
         dst = _loct + 5 * loc
         if len(coords) == 2:
@@ -281,13 +275,13 @@ def f_dilateloc(loc, *coords, action=False):
             return [
                 c.SetMemoryEPD(dst + i, c.Add, x)
                 for i, x in enumerate((-left, -t, r, b))
+                if not (isinstance(x, int) and x == 0)
             ]
         c.NonSeqCompute(
             [
-                (dst, c.Add, -left),
-                (dst + 1, c.Add, -t),
-                (dst + 2, c.Add, r),
-                (dst + 3, c.Add, b),
+                (dst + i, c.Add, x)
+                for i, x in enumerate((-left, -t, r, b))
+                if not (isinstance(x, int) and x == 0)
             ]
         )
     elif len(coords) == 2:

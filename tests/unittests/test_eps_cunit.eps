@@ -77,5 +77,8 @@ function test_cunit2() {
     u.acceleration = 0;
     if (u.acceleration == 0) ret += 2048;
 
+    u.remove();
+    if (u.order == 0 && u.userActionFlags & 4) ret += 4096;
+
     return ret;
 }
