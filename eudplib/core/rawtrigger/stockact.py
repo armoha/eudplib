@@ -135,7 +135,7 @@ def Transmission(  # noqa: N802
     and it will prevent any other action (in the same trigger) from resuming
     until it has finished.
     """
-    from ...epscript import IsSCDBMap
+    from ...epscript.epsimp import IsSCDBMap
 
     ep_assert(
         isinstance(AlwaysDisplay, int),
