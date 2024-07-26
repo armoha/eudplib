@@ -15,44 +15,34 @@ import types
 __version__ = "0.76.15"
 
 from .prelude import *
-from .core import (
-    TBL, Action, AddCurrentPlayer,
-    CompressPayload, Condition, ConstExpr, CreatePayload,
-    EncodeAIScript, EncodeAllyStatus, EncodeComparison, EncodeCount,
-    EncodeFlingy, EncodeIcon, EncodeImage, EncodeIscript,
-    EncodeLocation, EncodeModifier, EncodeOrder, EncodePlayer,
-    EncodePortrait, EncodeProperty, EncodePropState, EncodeResource,
-    EncodeScore, EncodeSprite, EncodeString, EncodeSwitch,
-    EncodeSwitchAction, EncodeSwitchState, EncodeTBL, EncodeTech,
-    EncodeUnit, EncodeUnitOrder, EncodeUpgrade, EncodeWeapon,
-    EP_SetRValueStrictMode, ShufflePayload,
-    EUDLightBool, EUDLightVariable, EUDObject, GetObjectAddr,
-    EUDRegistered, EUDRegisterObjectToNamespace, EUDClearNamespace,
-    EUDXVariable, Evaluate, Forward,
-    GetChkTokenized, GetEUDNamespace, GetTriggerCounter,
-    GetLocationIndex, GetPlayerInfo, GetPropertyIndex,
-    GetStringIndex, GetSwitchIndex, GetUnitIndex,
-    IsConstExpr, IsEUDVariable, RlocInt, RlocInt_C, toRlocInt,
-    IsMapdataInitialized,
-    PopTriggerScope, PushTriggerScope,
-    RegisterCreatePayloadCallback,
-    SeqCompute, NonSeqCompute,
-    NextTrigger, SetNextPtr, SetNextTrigger,
-    f_bitand, f_bitlshift, f_bitnand, f_bitnor, f_bitnot,
-    f_bitnxor, f_bitor, f_bitrshift, f_bitsplit, f_bitxor,
-    f_mul,
-)
+# TODO: remove lines below
+from .core import *
+from .utils import *
+from .trigger import *
 from .ctrlstru import *
-from .epscript import EPS_SetDebug, EPSLoader, epsCompile
+from .epscript import *
 from .memio import *
-from .eudlib import *
-from .maprw import *
+from .collections import *
 from .offsetmap import CSprite, EPDCUnitMap
-from .offsetmap.cunit import EUDLoopCUnit, EUDLoopNewCUnit, EUDLoopPlayerCUnit
 from .offsetmap.scdata import (
     Player1, Player2, Player3, Player4, Player5, Player6,
     Player7, Player8, Player9, Player10, Player11, Player12,
 )
+from .eudlib.mathf.div import f_div_euclid, f_div_floor, f_div_towards_zero
+from .eudlib.utilf.gametick import f_getgametick
+from .eudlib.utilf.listloop import (
+    EUDLoopList,
+    EUDLoopNewUnit,
+    EUDLoopPlayerUnit,
+    EUDLoopUnit,
+    EUDLoopUnit2,
+)
+from .eudlib.utilf.pexist import (
+    EUDEndPlayerLoop,
+    EUDPlayerLoop,
+)
+from .string import *
+from .maprw import *
 from .scdata import (
     FlingyData,
     ImageData,
@@ -62,7 +52,6 @@ from .scdata import (
     UnitOrderData,
     WeaponData,
 )
-from .trigger import *
 from .trigtrg.runtrigtrg import (
     GetFirstTrigTrigger,
     GetLastTrigTrigger,
@@ -70,7 +59,6 @@ from .trigtrg.runtrigtrg import (
     TrigTriggerBegin,
     TrigTriggerEnd,
 )
-from .utils import *
 
 # remove modules from __all__
 _old_globals = [

@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, cast
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
-from .member import MemberKind
 
 if TYPE_CHECKING:
     from .csprite import CSprite
@@ -143,7 +142,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         member = type(self).__dict__[name]
         offset_epd, subp = divmod(member.offset, 4)
         epd = self._epd + offset_epd
-        mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
+        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
             value = c.f_bitlshift(value, 8 * subp)
@@ -162,7 +161,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         member = type(self).__dict__[name]
         offset_epd, subp = divmod(member.offset, 4)
         epd = self._epd + offset_epd
-        mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
+        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
             value = c.f_bitlshift(value, 8 * subp)
@@ -178,7 +177,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         member = type(self).__dict__[name]
         offset_epd, subp = divmod(member.offset, 4)
         epd = self._epd + offset_epd
-        mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
+        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
             value = c.f_bitlshift(value, 8 * subp)

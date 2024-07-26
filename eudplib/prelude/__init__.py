@@ -118,7 +118,7 @@ from ..collections import (
     EUDArray, EUDDeque, EUDQueue, EUDStack,
     PVariable, UnitGroup
 )
-from ..offsetmap.cunit import CUnit
+from ..offsetmap.cunit import CUnit, EUDLoopCUnit, EUDLoopNewCUnit, EUDLoopPlayerCUnit
 from ..offsetmap.scdata import (
     Flingy,
     Image,
@@ -132,6 +132,26 @@ from ..offsetmap.scdata import (
     P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12,
     Force1, Force2, Force3, Force4, AllPlayers, CurrentPlayer,
     Allies, Foes, NeutralPlayers, NonAlliedVictoryPlayers,
+)
+from ..eudlib.locf.locf import (
+    f_setloc, f_addloc, f_dilateloc,
+    f_getlocTL, f_setloc_epd,
+)
+from ..eudlib.mathf.atan2 import f_atan2, f_atan2_256
+from ..eudlib.mathf.lengthdir import f_lengthdir, f_lengthdir_256
+from ..eudlib.mathf.pow import f_pow
+from ..eudlib.mathf.sqrt import f_sqrt
+from ..eudlib.utilf.binsearch import EUDBinaryMax, EUDBinaryMin
+from ..eudlib.utilf.pexist import EUDLoopPlayer, f_playerexist
+from ..eudlib.utilf.random import f_dwrand, f_getseed, f_rand, f_randomize, f_srand
+from ..eudlib.utilf.userpl import (
+    IsUserCP, f_getuserplayerid,
+    DisplayTextAll, PlayWAVAll, CenterViewAll,
+    MinimapPingAll, SetMissionObjectivesAll, TalkingPortraitAll,
+)
+from ..eudlib.wireframe.wireframe import (
+    InitialWireframe, Is64BitWireframe,
+    SetGrpWire, SetTranWire,  SetWirefram, SetWireframes,
 )
 from ..string import (
     IsPName, SetPNamef,
@@ -254,6 +274,23 @@ __all__ = [
     # collections
     "EUDArray", "EUDDeque", "EUDQueue", "EUDStack",
     "PVariable", "UnitGroup",
+    # offsetmap
+    "CUnit", "EUDLoopCUnit", "EUDLoopNewCUnit", "EUDLoopPlayerCUnit",
+    # eudlib
+    "f_setloc", "f_addloc", "f_dilateloc",
+    "f_getlocTL", "f_setloc_epd",
+    "f_atan2", "f_atan2_256",
+    "f_lengthdir", "f_lengthdir_256",
+    "f_pow",
+    "f_sqrt",
+    "EUDBinaryMax", "EUDBinaryMin",
+    "EUDLoopPlayer", "f_playerexist",
+    "f_dwrand", "f_getseed", "f_rand", "f_randomize", "f_srand",
+    "IsUserCP", "f_getuserplayerid",
+    "DisplayTextAll", "PlayWAVAll", "CenterViewAll",
+    "MinimapPingAll", "SetMissionObjectivesAll", "TalkingPortraitAll",
+    "InitialWireframe", "Is64BitWireframe",
+    "SetGrpWire", "SetTranWire",  "SetWirefram", "SetWireframes",
     # string
     "IsPName", "SetPNamef",
     "StringBuffer",
@@ -261,6 +298,4 @@ __all__ = [
     "f_printAll", "f_printAllAt",
     "f_simpleprint",
     "f_eprintf", "f_settblf",
-    # offsetmap
-    "CUnit",
 ]
