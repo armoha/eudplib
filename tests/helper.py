@@ -45,7 +45,7 @@ def test_assert(testname, condition):
         test_wait(0)
     if EUDElse()():
         f_simpleprint("\x08 - [FAIL]", testname)
-        failedTestDb = DBString(testname)
+        failedTestDb = Db(testname)
         _failedTest[_failedNum] = failedTestDb
         _testFailed << 1
         test_wait(24)
@@ -72,7 +72,7 @@ def test_equality(testname, real, expt):
         f_simpleprint("\x08 - [FAIL]", testname)
         f_simpleprint(" \x03   - \x04 Output   : ", *real)
         f_simpleprint(" \x03   - \x04 Expected : ", *expt)
-        failedTestDb = DBString(testname)
+        failedTestDb = Db(testname)
         _failedTest[_failedNum] = failedTestDb
         _failedNum += 1
         test_wait(24)

@@ -72,7 +72,7 @@ def f():
     helper.test_runall("unittest")
 
 
-from eudplib.eudlib.stringf.tblprint import _AddStatText
+from eudplib.string.tblprint import _AddStatText
 
 
 _AddStatText(open("unittests/custom_txt.tbl", "rb").read())
