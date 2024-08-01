@@ -52,6 +52,7 @@ from .scdata import (
     UnitOrderData,
     WeaponData,
 )
+from .qgc import *
 from .trigtrg.runtrigtrg import (
     GetFirstTrigTrigger,
     GetLastTrigTrigger,
