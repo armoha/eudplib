@@ -131,7 +131,7 @@ class StructEnumMember(BaseMember, ut.ExprProxy):
         from ..memio import f_maskread_epd
 
         q, r = divmod(self.offset, 4)
-        mask = ((1 << (8 * self.kind.size)) - 1) << (8 * r)
+        mask = ((1 << (8 * self.kind.size())) - 1) << (8 * r)
         return f_maskread_epd(self._epd + q, mask)
 
     def __get__(self, instance, owner=None) -> "StructEnumMember":
