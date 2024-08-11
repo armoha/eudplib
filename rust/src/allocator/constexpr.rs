@@ -302,7 +302,7 @@ pub fn evaluate(x: &PyAny) -> PyResult<PyRlocInt> {
         Ok(PyRlocInt(RlocInt::new(expr as i32, 0)))
     } else {
         let expr = x.call_method0(intern!(x.py(), "Evaluate"))?;
-        expr.extract::<PyRlocInt>()
+        evaluate(expr)
     }
 }
 

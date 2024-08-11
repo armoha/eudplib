@@ -168,6 +168,12 @@ class ExprProxy(Generic[T_co]):
         except AttributeError:
             return self._value
 
+    def Evaluate(self):  # noqa: N802
+        try:
+            return self._value.Evaluate()
+        except AttributeError:
+            return self._value
+
 
 T = TypeVar("T")
 
