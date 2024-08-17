@@ -14,9 +14,8 @@ class BaseKind(metaclass=ABCMeta):
     __slots__ = ()
 
     @classmethod
-    @abstractmethod
     def cast(cls, other):
-        ...
+        return other
 
     @classmethod
     @abstractmethod

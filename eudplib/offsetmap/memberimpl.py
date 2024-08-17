@@ -17,10 +17,6 @@ class ByteKind(BaseKind):
     __slots__ = ()
 
     @classmethod
-    def cast(cls, other):
-        return other
-
-    @classmethod
     def size(cls) -> Literal[1]:
         return 1
 
@@ -63,6 +59,12 @@ class PlayerKind(ByteKind):
     __slots__ = ()
 
     @classmethod
+    def cast(cls, other):
+        from .scdata import TrgPlayer
+
+        return TrgPlayer.cast(other)
+
+    @classmethod
     def read_epd(cls, epd, subp) -> c.EUDVariable:
         from ..memio.specialized import _playerread_epd
 
@@ -72,21 +74,35 @@ class PlayerKind(ByteKind):
 class UnitOrderKind(ByteKind):
     __slots__ = ()
 
+    @classmethod
+    def cast(cls, other):
+        from .scdata import UnitOrder
+
+        return UnitOrder.cast(other)
+
 
 class UpgradeKind(ByteKind):
     __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        from .scdata import Upgrade
+
+        return Upgrade.cast(other)
 
 
 class TechKind(ByteKind):
     __slots__ = ()
 
+    @classmethod
+    def cast(cls, other):
+        from .scdata import Tech
+
+        return Tech.cast(other)
+
 
 class WordKind(BaseKind):
     __slots__ = ()
-
-    @classmethod
-    def cast(cls, other):
-        return other
 
     @classmethod
     def size(cls) -> Literal[2]:
@@ -142,7 +158,9 @@ class UnitKind(WordKind):
 
     @classmethod
     def cast(cls, other):
-        return other
+        from .scdata import TrgUnit
+
+        return TrgUnit.cast(other)
 
     @classmethod
     def read_epd(cls, epd, subp) -> c.EUDVariable:
@@ -156,7 +174,9 @@ class FlingyKind(WordKind):
 
     @classmethod
     def cast(cls, other):
-        return other
+        from .scdata import Flingy
+
+        return Flingy.cast(other)
 
     @classmethod
     def read_epd(cls, epd, subp) -> c.EUDVariable:
@@ -170,15 +190,13 @@ class SpriteKind(WordKind):
 
     @classmethod
     def cast(cls, other):
-        return other
+        from .scdata import Sprite
+
+        return Sprite.cast(other)
 
 
 class DwordKind(BaseKind):
     __slots__ = ()
-
-    @classmethod
-    def cast(cls, other):
-        return other
 
     @classmethod
     def size(cls) -> Literal[4]:
@@ -224,22 +242,14 @@ class CUnitKind(DwordKind):
     __slots__ = ()
 
     @classmethod
-    def cast(cls, other):
-        return other
-
-    @classmethod
     def read_epd(cls, epd, subp) -> c.EUDVariable:
-        from ..memio import f_cunitepdread_epd
+        from .cunit import CUnit
 
-        return f_cunitepdread_epd(epd)
+        return CUnit.from_read(epd)
 
 
 class CSpriteKind(DwordKind):
     __slots__ = ()
-
-    @classmethod
-    def cast(cls, other):
-        return other
 
     @classmethod
     def read_epd(cls, epd, subp) -> c.EUDVariable:
