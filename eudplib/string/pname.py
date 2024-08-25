@@ -84,7 +84,7 @@ def _get_ispname_cond(name, _plvars={}):
                 )
         else:
             # TODO: compare every names in a single loop
-            from ..eudlib.utilf.listloop import EUDLoopPlayer
+            from ..eudlib.utilf.pexist import EUDLoopPlayer
 
             for player in EUDLoopPlayer(None):
                 equals = f_memcmp(0x57EEEB + 36 * player, name, 25)
@@ -138,7 +138,7 @@ class _PlayerName:
 
     def _optimize(self):
         from ..eudlib.utilf.gametick import f_getgametick
-        from ..eudlib.utilf.listloop import EUDLoopPlayer
+        from ..eudlib.utilf.pexist import EUDLoopPlayer
 
         if self.optimize_start.IsSet():
             return
