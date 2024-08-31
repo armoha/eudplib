@@ -165,8 +165,8 @@ class ExprProxy(Generic[T_co]):
     def __iter__(self):
         try:
             return self._value.__iter__()
-        except AttributeError:
-            return self._value
+        except AttributeError as err:
+            raise TypeError(err)
 
     def Evaluate(self):  # noqa: N802
         try:
