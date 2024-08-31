@@ -138,7 +138,7 @@ class Action(ConstExpr):
             0,
             eudx,
         ]
-        self.parenttrg: "RawTrigger | None" = None
+        self.parenttrg: RawTrigger | None = None
         self.actindex: int | None = None
 
     def __copy__(self) -> "Action":

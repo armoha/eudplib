@@ -26,7 +26,7 @@ class EUDVarBuffer(EUDObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self._vdict: "dict[VariableTriggerForward, ConstExpr]" = {}
+        self._vdict: dict[VariableTriggerForward, ConstExpr] = {}
         self._initvals: list[int | ConstExpr] = []
 
     def DynamicConstructed(self) -> Literal[True]:  # noqa: N802

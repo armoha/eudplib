@@ -95,7 +95,7 @@ class Condition(ConstExpr):
             flags,
             eudx,
         ]
-        self.parenttrg: "RawTrigger | None" = None
+        self.parenttrg: RawTrigger | None = None
         self.condindex: int | None = None
 
     def __copy__(self) -> "Condition":

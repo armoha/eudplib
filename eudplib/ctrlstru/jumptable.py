@@ -16,7 +16,7 @@ class EUDJumpBuffer(c.EUDObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self._jdict: "dict[JumpTriggerForward, c.ConstExpr]" = {}
+        self._jdict: dict[JumpTriggerForward, c.ConstExpr] = {}
         self._nextptrs: list[int | c.ConstExpr] = []
 
     def DynamicConstructed(self) -> Literal[True]:  # noqa: N802

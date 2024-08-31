@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from typing import ClassVar
+
 from ... import utils as ut
 from ...localize import _
 from .. import allocator as ac
@@ -84,7 +86,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
     retn = len(rettypes)
 
     class PtrDataClass(EUDStruct):
-        _fields_ = ["_fstart", "_fendnext_epd"]
+        _fields_: ClassVar[list] = ["_fstart", "_fendnext_epd"]
 
         def __init__(self, _from=None):
             if _from is not None and isinstance(_from, EUDFuncN):
