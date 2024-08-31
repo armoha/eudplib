@@ -48,156 +48,160 @@ def f_test_cunit1():
     # (Line 25) if (u.orderUnitType == py_str("Artanis")) ret += 32;
     if EUDIf()(_ATTC(u, 'orderUnitType') == str("Artanis")):
         ret.__iadd__(32)
-        # (Line 28) ret += 64;
+        # (Line 26) u.set_color(P12);
     EUDEndIf()
-    ret.__iadd__(64)
-    # (Line 29) u.cgive(P2);
+    u.set_color(P12)
+    # (Line 27) if (sp[2] == 0xFE0BBA98) ret += 64;
+    if EUDIf()(_ARRC(sp, 2) == 0xFE0BBA98):
+        ret.__iadd__(64)
+        # (Line 28) u.cgive(P2);
+    EUDEndIf()
     u.cgive(P2)
-    # (Line 30) if (u.owner == P2) ret += 128;
+    # (Line 29) if (u.owner == P2) ret += 128;
     if EUDIf()(_ATTC(u, 'owner') == P2):
         ret.__iadd__(128)
-        # (Line 32) u.die();
+        # (Line 31) u.die();
     EUDEndIf()
     u.die()
-    # (Line 33) if (a[0x4C/4] == 0x12340001) ret += 256;
+    # (Line 32) if (a[0x4C/4] == 0x12340001) ret += 256;
     if EUDIf()(_ARRC(a, 0x4C // 4) == 0x12340001):
         ret.__iadd__(256)
-        # (Line 34) if (u.is_dying()) ret += 512;
+        # (Line 33) if (u.is_dying()) ret += 512;
     EUDEndIf()
     if EUDIf()(u.is_dying()):
         ret.__iadd__(512)
-        # (Line 35) if (!u.are_buildq_empty()) ret += 1024;
+        # (Line 34) if (!u.are_buildq_empty()) ret += 1024;
     EUDEndIf()
     if EUDIf()(u.are_buildq_empty(), neg=True):
         ret.__iadd__(1024)
-        # (Line 36) if (u.check_buildq(EUDVariable(0x11))) ret += 2048;
+        # (Line 35) if (u.check_buildq(EUDVariable(0x11))) ret += 2048;
     EUDEndIf()
     if EUDIf()(u.check_buildq(EUDVariable(0x11))):
         ret.__iadd__(2048)
-        # (Line 38) if (u.check_buildq("Terran Medic")) ret += 4096;
+        # (Line 37) if (u.check_buildq("Terran Medic")) ret += 4096;
     EUDEndIf()
     if EUDIf()(u.check_buildq("Terran Medic")):
         ret.__iadd__(4096)
-        # (Line 39) if (u.check_buildq(EUDVariable(0x33))) ret += 8192;
+        # (Line 38) if (u.check_buildq(EUDVariable(0x33))) ret += 8192;
     EUDEndIf()
     if EUDIf()(u.check_buildq(EUDVariable(0x33))):
         ret.__iadd__(8192)
-        # (Line 40) if (u.check_buildq("Protoss Archon")) ret += 16384;
+        # (Line 39) if (u.check_buildq("Protoss Archon")) ret += 16384;
     EUDEndIf()
     if EUDIf()(u.check_buildq("Protoss Archon")):
         ret.__iadd__(16384)
-        # (Line 41) if (u.check_buildq("Protoss Scarab")) ret += 32768;
+        # (Line 40) if (u.check_buildq("Protoss Scarab")) ret += 32768;
     EUDEndIf()
     if EUDIf()(u.check_buildq("Protoss Scarab")):
         ret.__iadd__(32768)
-        # (Line 43) u.reset_buildq();
+        # (Line 42) u.reset_buildq();
     EUDEndIf()
     u.reset_buildq()
-    # (Line 44) if (u.are_buildq_empty()) ret += 65536;
+    # (Line 43) if (u.are_buildq_empty()) ret += 65536;
     if EUDIf()(u.are_buildq_empty()):
         ret.__iadd__(65536)
-        # (Line 45) var d = u.movementFlags;
+        # (Line 44) var d = u.movementFlags;
     EUDEndIf()
     d = _LVAR([u.movementFlags])
-    # (Line 46) if (d == 0xF8) ret += 1 << 17;
+    # (Line 45) if (d == 0xF8) ret += 1 << 17;
     if EUDIf()(d == 0xF8):
         ret.__iadd__(_LSH(1,17))
-        # (Line 47) u.movementFlags += 1;
+        # (Line 46) u.movementFlags += 1;
     EUDEndIf()
     _ATTW(u, 'movementFlags').__iadd__(1)
-    # (Line 48) if (u.movementFlags == 0xF9) ret += 1 << 18;
+    # (Line 47) if (u.movementFlags == 0xF9) ret += 1 << 18;
     if EUDIf()(_ATTC(u, 'movementFlags') == 0xF9):
         ret.__iadd__(_LSH(1,18))
-        # (Line 49) return ret;
+        # (Line 48) return ret;
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 50) }
-    # (Line 51) function test_cunit2() {
+    # (Line 49) }
+    # (Line 50) function test_cunit2() {
 
 @EUDFunc
 def f_test_cunit2():
-    # (Line 52) const u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)));
+    # (Line 51) const u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)));
     u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)))
-    # (Line 53) var ret = 0;
+    # (Line 52) var ret = 0;
     ret = _LVAR([0])
-    # (Line 55) u.orderQueueCount = 123;
+    # (Line 54) u.orderQueueCount = 123;
     _ATTW(u, 'orderQueueCount') << (123)
-    # (Line 56) if (u.orderQueueCount == 123) ret += 1;
+    # (Line 55) if (u.orderQueueCount == 123) ret += 1;
     if EUDIf()(_ATTC(u, 'orderQueueCount') == 123):
         ret.__iadd__(1)
-        # (Line 57) u.orderQueueCount = 0;
+        # (Line 56) u.orderQueueCount = 0;
     EUDEndIf()
     _ATTW(u, 'orderQueueCount') << (0)
-    # (Line 58) if (u.orderQueueCount == 0) ret += 2;
+    # (Line 57) if (u.orderQueueCount == 0) ret += 2;
     if EUDIf()(_ATTC(u, 'orderQueueCount') == 0):
         ret.__iadd__(2)
-        # (Line 60) u.currentDirection1 = 234;
+        # (Line 59) u.currentDirection1 = 234;
     EUDEndIf()
     _ATTW(u, 'currentDirection1') << (234)
-    # (Line 61) if (u.currentDirection1 == 234) ret += 4;
+    # (Line 60) if (u.currentDirection1 == 234) ret += 4;
     if EUDIf()(_ATTC(u, 'currentDirection1') == 234):
         ret.__iadd__(4)
-        # (Line 62) u.currentDirection1 = 0;
+        # (Line 61) u.currentDirection1 = 0;
     EUDEndIf()
     _ATTW(u, 'currentDirection1') << (0)
-    # (Line 63) if (u.currentDirection1 == 0) ret += 8;
+    # (Line 62) if (u.currentDirection1 == 0) ret += 8;
     if EUDIf()(_ATTC(u, 'currentDirection1') == 0):
         ret.__iadd__(8)
-        # (Line 65) u.turnRadius = 34;
+        # (Line 64) u.turnRadius = 34;
     EUDEndIf()
     _ATTW(u, 'turnRadius') << (34)
-    # (Line 66) if (u.turnRadius == 34) ret += 16;
+    # (Line 65) if (u.turnRadius == 34) ret += 16;
     if EUDIf()(_ATTC(u, 'turnRadius') == 34):
         ret.__iadd__(16)
-        # (Line 67) u.turnRadius = 0;
+        # (Line 66) u.turnRadius = 0;
     EUDEndIf()
     _ATTW(u, 'turnRadius') << (0)
-    # (Line 68) if (u.turnRadius == 0) ret += 32;
+    # (Line 67) if (u.turnRadius == 0) ret += 32;
     if EUDIf()(_ATTC(u, 'turnRadius') == 0):
         ret.__iadd__(32)
-        # (Line 70) u.velocityDirection1 = 45;
+        # (Line 69) u.velocityDirection1 = 45;
     EUDEndIf()
     _ATTW(u, 'velocityDirection1') << (45)
-    # (Line 71) if (u.velocityDirection1 == 45) ret += 64;
+    # (Line 70) if (u.velocityDirection1 == 45) ret += 64;
     if EUDIf()(_ATTC(u, 'velocityDirection1') == 45):
         ret.__iadd__(64)
-        # (Line 72) u.velocityDirection1 = 0;
+        # (Line 71) u.velocityDirection1 = 0;
     EUDEndIf()
     _ATTW(u, 'velocityDirection1') << (0)
-    # (Line 73) if (u.velocityDirection1 == 0) ret += 128;
+    # (Line 72) if (u.velocityDirection1 == 0) ret += 128;
     if EUDIf()(_ATTC(u, 'velocityDirection1') == 0):
         ret.__iadd__(128)
-        # (Line 75) u.energy = 567;
+        # (Line 74) u.energy = 567;
     EUDEndIf()
     _ATTW(u, 'energy') << (567)
-    # (Line 76) if (u.energy == 567) ret += 256;
+    # (Line 75) if (u.energy == 567) ret += 256;
     if EUDIf()(_ATTC(u, 'energy') == 567):
         ret.__iadd__(256)
-        # (Line 77) u.energy = 0;
+        # (Line 76) u.energy = 0;
     EUDEndIf()
     _ATTW(u, 'energy') << (0)
-    # (Line 78) if (u.energy == 0) ret += 512;
+    # (Line 77) if (u.energy == 0) ret += 512;
     if EUDIf()(_ATTC(u, 'energy') == 0):
         ret.__iadd__(512)
-        # (Line 80) u.acceleration = 678;
+        # (Line 79) u.acceleration = 678;
     EUDEndIf()
     _ATTW(u, 'acceleration') << (678)
-    # (Line 81) if (u.acceleration == 678) ret += 1024;
+    # (Line 80) if (u.acceleration == 678) ret += 1024;
     if EUDIf()(_ATTC(u, 'acceleration') == 678):
         ret.__iadd__(1024)
-        # (Line 82) u.acceleration = 0;
+        # (Line 81) u.acceleration = 0;
     EUDEndIf()
     _ATTW(u, 'acceleration') << (0)
-    # (Line 83) if (u.acceleration == 0) ret += 2048;
+    # (Line 82) if (u.acceleration == 0) ret += 2048;
     if EUDIf()(_ATTC(u, 'acceleration') == 0):
         ret.__iadd__(2048)
-        # (Line 85) u.remove();
+        # (Line 84) u.remove();
     EUDEndIf()
     u.remove()
-    # (Line 86) if (u.order == 0 && u.userActionFlags & 4) ret += 4096;
+    # (Line 85) if (u.order == 0 && u.userActionFlags & 4) ret += 4096;
     if EUDIf()(EUDSCAnd()(_ATTC(u, 'order') == 0)(u.userActionFlags & 4)()):
         ret.__iadd__(4096)
-        # (Line 88) return ret;
+        # (Line 87) return ret;
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 89) }
+    # (Line 88) }

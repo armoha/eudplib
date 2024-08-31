@@ -23,9 +23,8 @@ with expect_error(AttributeError):\n\
     if (u.orderUnitType == 0xCDEF) ret += 16;
     wwrite_epd(EPD(a) + 0x50/4, 0, $U("Artanis"));
     if (u.orderUnitType == py_str("Artanis")) ret += 32;
-    // u.set_color(P12);
-    // if (sp[2] == 0xFE0BBA98) ret += 64;
-    ret += 64;
+    u.set_color(P12);
+    if (sp[2] == 0xFE0BBA98) ret += 64;
     u.cgive(P2);
     if (u.owner == P2) ret += 128;
 
