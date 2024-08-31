@@ -90,11 +90,11 @@ exclude_lines = [
 ]
 
 [tool.ruff]
-select = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
+lint.select = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
 line-length = 85
 exclude = ["pybind11"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["eudplib", "tests"]
 
 [tool.check-sdist]
