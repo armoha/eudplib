@@ -57,8 +57,10 @@ class MemberKind(enum.Enum):
     POSITION = enum.auto()
     POSITION_X = enum.auto()
     POSITION_Y = enum.auto()
+    WEAPON = enum.auto()
     FLINGY = enum.auto()
     SPRITE = enum.auto()
+    IMAGE = enum.auto()
     UPGRADE = enum.auto()
     TECH = enum.auto()
 
@@ -70,6 +72,7 @@ class MemberKind(enum.Enum):
             CUnitKind,
             DwordKind,
             FlingyKind,
+            ImageKind,
             PlayerKind,
             PositionKind,
             PositionXKind,
@@ -79,6 +82,7 @@ class MemberKind(enum.Enum):
             UnitKind,
             UnitOrderKind,
             UpgradeKind,
+            WeaponKind,
             WordKind,
         )
 
@@ -107,10 +111,14 @@ class MemberKind(enum.Enum):
                 return PositionXKind
             case MemberKind.POSITION_Y:
                 return PositionYKind
+            case MemberKind.WEAPON:
+                return WeaponKind
             case MemberKind.FLINGY:
                 return FlingyKind
             case MemberKind.SPRITE:
                 return SpriteKind
+            case MemberKind.IMAGE:
+                return ImageKind
             case MemberKind.UPGRADE:
                 return UpgradeKind
             case MemberKind.TECH:

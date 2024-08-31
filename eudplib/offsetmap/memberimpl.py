@@ -71,6 +71,16 @@ class PlayerKind(ByteKind):
         return _playerread_epd()[subp](epd)
 
 
+class WeaponKind(ByteKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        from .scdata import Weapon
+
+        return Weapon.cast(other)
+
+
 class UnitOrderKind(ByteKind):
     __slots__ = ()
 
@@ -193,6 +203,16 @@ class SpriteKind(WordKind):
         from .scdata import Sprite
 
         return Sprite.cast(other)
+
+
+class ImageKind(WordKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        from .scdata import Image
+
+        return Image.cast(other)
 
 
 class DwordKind(BaseKind):

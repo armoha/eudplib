@@ -50,7 +50,7 @@ class StructMember(BaseMember):
             return self
         q, r = divmod(self.offset, 4)
         if isinstance(instance, EPDOffsetMap):
-            return self.kind.read_epd(instance._epd + q, r)
+            return self.kind.cast(self.kind.read_epd(instance._epd + q, r))
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
@@ -75,7 +75,7 @@ class ArrayMember(BaseMember):
         if self.kind.size() == 1:
             return c.f_div(instance, 4)
         if self.kind.size() == 2:
-            q, r = c.c_div(instance, 2)
+            q, r = c.f_div(instance, 2)
             c.RawTrigger(r.Exactly(1), r.SetNumber(2))
             return q, r
         return instance, 0
@@ -87,7 +87,7 @@ class ArrayMember(BaseMember):
             return self
         q, r = self.div(instance)
         if isinstance(instance, EPDOffsetMap):
-            return self.kind.read_epd(ut.EPD(self.offset) + q, r)
+            return self.kind.cast(self.kind.read_epd(ut.EPD(self.offset) + q, r))
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
