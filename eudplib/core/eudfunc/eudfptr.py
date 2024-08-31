@@ -88,7 +88,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
     class PtrDataClass(EUDStruct):
         _fields_: ClassVar[list] = ["_fstart", "_fendnext_epd"]
 
-        def __init__(self, _from=None):
+        def __init__(self, _from=None) -> None:
             if _from is not None and isinstance(_from, EUDFuncN):
                 # Statically generate with EUDFuncN
                 self._check_valid_function(_from)
