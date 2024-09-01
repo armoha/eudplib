@@ -21,7 +21,7 @@ from .fmtprint import f_eprintAll, f_eprintf, f_sprintf, f_sprintf_cp
 from .locale import LocalLocale
 from .parse import f_parse
 from .pname import IsPName, SetPName, SetPNamef
-from .strall import f_printAll, f_printAllAt
+from .strall import DisplayTextAll, DisplayTextAllAt, f_printAll, f_printAllAt
 from .strbuffer import (
     DisplayTextAt,
     GetGlobalStringBuffer,
@@ -64,6 +64,8 @@ __all__ = [
     "IsPName",
     "SetPName",
     "SetPNamef",
+    "DisplayTextAll",
+    "DisplayTextAllAt",
     "f_printAll",
     "f_printAllAt",
     "DisplayTextAt",
