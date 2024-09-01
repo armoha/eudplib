@@ -6,8 +6,8 @@
 # file that should have been included as part of this package.
 from ...core import Db, SetMemory, SetTo
 from ...ctrlstru import DoActions
+from ...memio import f_epdread_epd, f_repmovsd_epd
 from ...utils import EPD
-from ..memiof import f_epdread_epd, f_repmovsd_epd
 from .mempatch import f_dwpatch_epd
 
 _data = []
@@ -24,9 +24,7 @@ def _f_datadumper():
 
         # Reset?
         if "unpatchable" in flags:
-            assert (
-                "copy" not in flags
-            ), "Cannot apply both 'copy' and 'unpatchable'"
+            assert "copy" not in flags, "Cannot apply both 'copy' and 'unpatchable'"
             for out_offset in out_offsets:
                 f_dwpatch_epd(EPD(out_offset), Db(input_data))
 

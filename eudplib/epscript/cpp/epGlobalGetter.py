@@ -18,13 +18,13 @@ if mode == 1:
         *eudftypes,
         type,
         types.FunctionType,
-        eudplib.core.rawtrigger.constenc._KillsSpecialized,
+        eudplib.core.rawtrigger.constenc._Kills,
     ]
 elif mode == 2:
     allowed_type = [
         int,
         eudplib.core.rawtrigger.consttype.ConstType,
-        eudplib.core.rawtrigger.constenc._KillsSpecialized,
+        eudplib.core.rawtrigger.constenc._Kills,
     ]
 else:
     allowed_type = [
@@ -33,7 +33,7 @@ else:
         eudplib.core.rawtrigger.consttype.ConstType,
         type,
         types.FunctionType,
-        eudplib.core.rawtrigger.constenc._KillsSpecialized,
+        eudplib.core.rawtrigger.constenc._Kills,
     ]
 exclude_names = ["__loader__", "__path__", "__spec__"]
 
@@ -59,7 +59,7 @@ if mode != 2:
     )
 print("\n==================================\n")
 nlist.sort()
-nlist = ['"%s", ' % name for name in nlist]
+nlist = [f'"{name}", ' for name in nlist]
 col = 4
 s: list[str] = []
 

@@ -5,180 +5,28 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-import enum
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Final, Literal, NoReturn
+from typing import Final, NoReturn
 
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
 from ..localize import _
-from ..trigger import Trigger
-
-if TYPE_CHECKING:
-    from .csprite import CSprite
-    from .cunit import CUnit
-
-
-class MemberKind(enum.Enum):
-    # FIXME: __slots__ = ()
-    DWORD = enum.auto()
-    WORD = enum.auto()
-    BYTE = enum.auto()
-    BOOL = enum.auto()
-    C_UNIT = enum.auto()
-    C_SPRITE = enum.auto()
-    TRG_UNIT = enum.auto()
-    TRG_PLAYER = enum.auto()
-    UNIT_ORDER = enum.auto()
-    POSITION = enum.auto()
-    POSITION_X = enum.auto()
-    POSITION_Y = enum.auto()
-    FLINGY = enum.auto()
-    SPRITE = enum.auto()
-    UPGRADE = enum.auto()
-    TECH = enum.auto()
-
-    def cast(self, other):
-        match self:
-            case MemberKind.TRG_UNIT:
-                return c.EncodeUnit(other)
-            case MemberKind.TRG_PLAYER:
-                return c.EncodePlayer(other)
-            case MemberKind.UNIT_ORDER:
-                return c.EncodeUnitOrder(other)
-            case MemberKind.FLINGY:
-                return c.EncodeFlingy(other)
-            case MemberKind.SPRITE:
-                return c.EncodeSprite(other)
-            case MemberKind.UPGRADE:
-                return c.EncodeUpgrade(other)
-            case MemberKind.TECH:
-                return c.EncodeTech(other)
-            case _:
-                return other
-
-    @property
-    def size(self) -> Literal[1, 2, 4]:
-        match self:
-            case (
-                MemberKind.DWORD
-                | MemberKind.C_UNIT
-                | MemberKind.C_SPRITE
-                | MemberKind.POSITION
-            ):
-                return 4
-            case (
-                MemberKind.WORD
-                | MemberKind.TRG_UNIT
-                | MemberKind.POSITION_X
-                | MemberKind.POSITION_Y
-                | MemberKind.FLINGY
-                | MemberKind.SPRITE
-            ):
-                return 2
-            case _:
-                return 1
-
-    def read_epd(self, epd, subp) -> c.EUDVariable:
-        from ..eudlib.memiof import (
-            f_bread_epd,
-            f_cunitepdread_epd,
-            f_dwread_epd,
-            f_epdspriteread_epd,
-            f_maskread_epd,
-            f_readgen_epd,
-            f_wread_epd,
-        )
-        from ..eudlib.memiof.memifgen import _map_xy_mask
-
-        match self:
-            case MemberKind.BOOL:
-                shift = 8 * subp
-                f_boolread_epd = f_readgen_epd(1 << shift, (0, lambda x: 1))
-                return f_boolread_epd(epd)
-            case MemberKind.C_UNIT:
-                return f_cunitepdread_epd(epd)
-            case MemberKind.C_SPRITE:
-                return f_epdspriteread_epd(epd)
-            case MemberKind.TRG_UNIT | MemberKind.FLINGY:
-                return f_bread_epd(epd, subp)
-            case MemberKind.POSITION:
-                return f_maskread_epd(
-                    epd, (lambda x, y: x + 65536 * y)(*_map_xy_mask())
-                )
-            case MemberKind.POSITION_X:
-                shift = 8 * subp
-                f_xread_epd = f_readgen_epd(
-                    _map_xy_mask()[0] << shift, (0, lambda x: x >> shift)
-                )
-                return f_xread_epd(epd)
-            case MemberKind.POSITION_Y:
-                shift = 8 * subp
-                f_yread_epd = f_readgen_epd(
-                    _map_xy_mask()[1] << shift, (0, lambda x: x >> shift)
-                )
-                return f_yread_epd(epd)
-            case _:
-                match self.size:
-                    case 4:
-                        return f_dwread_epd(epd)
-                    case 2:
-                        return f_wread_epd(epd, subp)
-                    case 1:
-                        return f_bread_epd(epd, subp)
-                raise AttributeError
-
-    def write_epd(self, epd, subp, value) -> None:
-        from ..eudlib.memiof import f_bwrite_epd, f_dwwrite_epd, f_wwrite_epd
-
-        match self.size:
-            case 4:
-                f_dwwrite_epd(epd, value)
-            case 2:
-                f_wwrite_epd(epd, subp, value)
-            case 1:
-                f_bwrite_epd(epd, subp, value)
-
-    def add_epd(self, epd, subp, value) -> None:
-        from ..eudlib.memiof import f_badd_epd, f_dwadd_epd, f_wadd_epd
-
-        match self.size:
-            case 4:
-                f_dwadd_epd(epd, value)
-            case 2:
-                f_wadd_epd(epd, subp, value)
-            case 1:
-                f_badd_epd(epd, subp, value)
-
-    def subtract_epd(self, epd, subp, value) -> None:
-        from ..eudlib.memiof import (
-            f_bsubtract_epd,
-            f_dwsubtract_epd,
-            f_wsubtract_epd,
-        )
-
-        match self.size:
-            case 4:
-                f_dwsubtract_epd(epd, value)
-            case 2:
-                f_wsubtract_epd(epd, subp, value)
-            case 1:
-                f_bsubtract_epd(epd, subp, value)
+from .memberkind import BaseKind, MemberKind
 
 
 class BaseMember(metaclass=ABCMeta):
     """Base descriptor class for EPDOffsetMap"""
 
-    __slots__ = ("offset", "kind")
+    __slots__ = ()
 
     offset: Final[int]
-    kind: Final[MemberKind]
+    kind: Final[type[BaseKind]]
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
-        ut.ep_assert(offset % 4 + kind.size <= 4, _("Malaligned member"))
-        self.offset = offset
-        self.kind = kind
+        self.offset = offset  # type: ignore[misc]
+        self.kind = kind.impl()  # type: ignore[misc]
+        ut.ep_assert(offset % 4 + self.kind.size() <= 4, _("Malaligned member"))
 
     @abstractmethod
     def __get__(self, instance, owner=None):
@@ -189,12 +37,84 @@ class BaseMember(metaclass=ABCMeta):
         ...
 
 
+class StructMember(BaseMember):
+    __slots__ = ("offset", "kind")
+
+    def __init__(self, offset: int, kind: MemberKind) -> None:
+        super().__init__(offset, kind)
+
+    def _get_epd(self, instance):
+        q, r = divmod(self.offset, 4)
+        return instance._epd + q, r
+
+    def __get__(self, instance, owner=None) -> "c.EUDVariable | StructMember":
+        from .epdoffsetmap import EPDOffsetMap
+
+        if instance is None:
+            return self
+        if isinstance(instance, EPDOffsetMap):
+            epd, subp = self._get_epd(instance)
+            return self.kind.cast(self.kind.read_epd(epd, subp))
+        raise AttributeError
+
+    def __set__(self, instance, value) -> None:
+        from .epdoffsetmap import EPDOffsetMap
+
+        if isinstance(instance, EPDOffsetMap):
+            value = self.kind.cast(value)
+            epd, subp = self._get_epd(instance)
+            self.kind.write_epd(epd, subp, value)
+            return
+        raise AttributeError
+
+
+class ArrayMember(BaseMember):
+    __slots__ = ("offset", "kind")
+
+    def __init__(self, offset: int, kind: MemberKind) -> None:
+        super().__init__(offset, kind)
+
+    def _get_epd(self, instance):
+        # TODO: lazy calculate division
+        if self.kind.size() == 1:
+            q, r = c.f_div(instance, 4)
+        elif self.kind.size() == 2:
+            q, r = c.f_div(instance, 2)
+            if c.IsEUDVariable(r):
+                c.RawTrigger(conditions=r.Exactly(1), actions=r.SetNumber(2))
+            elif r == 1:
+                r = 2
+        else:
+            q, r = instance, 0
+        return ut.EPD(self.offset) + q, r
+
+    def __get__(self, instance, owner=None) -> "c.EUDVariable | ArrayMember":
+        from .epdoffsetmap import EPDOffsetMap
+
+        if instance is None:
+            return self
+        if isinstance(instance, EPDOffsetMap):
+            epd, subp = self._get_epd(instance)
+            return self.kind.cast(self.kind.read_epd(epd, subp))
+        raise AttributeError
+
+    def __set__(self, instance, value) -> None:
+        from .epdoffsetmap import EPDOffsetMap
+
+        if isinstance(instance, EPDOffsetMap):
+            value = self.kind.cast(value)
+            epd, subp = self._get_epd(instance)
+            self.kind.write_epd(epd, subp, value)
+            return
+        raise AttributeError
+
+
 class UnsupportedMember(BaseMember):
     """Not supported EUD"""
 
-    __slots__ = "name"
+    __slots__ = ("offset", "kind", "name")
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, owner, name) -> None:
         self.name = name
 
     def __get__(self, instance, owner=None) -> "UnsupportedMember":
@@ -206,49 +126,29 @@ class UnsupportedMember(BaseMember):
         raise ut.EPError(_("Unsupported EUD: {}").format(self.name))
 
 
-class Member(BaseMember):
-    """Descriptor for EPDOffsetMap"""
-
-    __slots__ = ()
-
-    def __get__(self, instance, owner=None) -> "c.EUDVariable | Member":
-        from .epdoffsetmap import EPDOffsetMap
-
-        if instance is None:
-            return self
-        q, r = divmod(self.offset, 4)
-        if isinstance(instance, EPDOffsetMap):
-            return self.kind.read_epd(instance._epd + q, r)
-        raise AttributeError
-
-    def __set__(self, instance, value) -> None:
-        from .epdoffsetmap import EPDOffsetMap
-
-        q, r = divmod(self.offset, 4)
-        if isinstance(instance, EPDOffsetMap):
-            value = self.kind.cast(value)
-            self.kind.write_epd(instance._epd + q, r, value)
-            return
-        raise AttributeError
-
-
-class EnumMember(BaseMember, ut.ExprProxy):
-    __slots__ = "_epd"
+class StructEnumMember(BaseMember, ut.ExprProxy):
+    __slots__ = ("offset", "kind", "_epd")
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
         self._epd: int | c.EUDVariable = 0  # FIXME
         super().__init__(offset, kind)
         super(BaseMember, self).__init__(None)
 
+    def _get_epd(self, instance=None):
+        q, r = divmod(self.offset, 4)
+        if instance is None:
+            return self._epd + q, r
+        return instance._epd + q, r
+
     # FIXME: Overwriting ExprProxy.getValue is kinda hacky...
     def getValue(self):  # noqa: N802
-        from ..eudlib.memiof import f_maskread_epd
+        from ..memio import f_maskread_epd
 
-        q, r = divmod(self.offset, 4)
-        mask = ((1 << (8 * self.kind.size)) - 1) << (8 * r)
-        return f_maskread_epd(self._epd + q, mask)
+        epd, subp = self._get_epd()
+        mask = ((1 << (8 * self.kind.size())) - 1) << (8 * subp)
+        return f_maskread_epd(epd, mask)
 
-    def __get__(self, instance, owner=None) -> "EnumMember":
+    def __get__(self, instance, owner=None) -> "StructEnumMember":
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
@@ -270,7 +170,7 @@ class EnumMember(BaseMember, ut.ExprProxy):
 
 
 class Flag:
-    __slots__ = "mask"
+    __slots__ = ("mask",)
 
     mask: Final[int]
 
@@ -278,7 +178,9 @@ class Flag:
         self.mask = mask
 
     def __get__(self, instance, owner=None) -> c.EUDVariable:
-        if isinstance(instance, EnumMember):
+        if isinstance(instance, StructEnumMember):
+            from ..trigger import Trigger
+
             q, r = divmod(instance.offset, 4)
             epd = instance._epd + q
             mask = self.mask << (8 * r)
@@ -291,9 +193,9 @@ class Flag:
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
-        from ..eudlib.memiof import f_maskwrite_epd
+        from ..memio import f_maskwrite_epd
 
-        if isinstance(instance, EnumMember):
+        if isinstance(instance, StructEnumMember):
             q, r = divmod(instance.offset, 4)
             epd = instance._epd + q
             mask = self.mask << (8 * r)
@@ -301,67 +203,5 @@ class Flag:
             if cs.EUDIfNot()(value):
                 f_maskwrite_epd(epd, 0, mask)
             cs.EUDEndIf()
-            return
-        raise AttributeError
-
-
-class CUnitMember(BaseMember):
-    """Descriptor for EPDOffsetMap"""
-
-    __slots__ = ()
-
-    def __init__(self, offset: int) -> None:
-        super().__init__(offset, MemberKind.C_UNIT)
-
-    def __get__(self, instance, owner=None) -> "CUnit | CUnitMember":
-        from .cunit import CUnit
-        from .epdoffsetmap import EPDOffsetMap
-
-        if instance is None:
-            return self
-        if isinstance(instance, EPDOffsetMap):
-            return CUnit.from_read(instance._epd + self.offset // 4)
-        raise AttributeError
-
-    def __set__(self, instance, value) -> None:
-        from .cunit import CUnit
-        from .epdoffsetmap import EPDOffsetMap
-
-        q, r = divmod(self.offset, 4)
-        if isinstance(value, CUnit):
-            value = value.ptr
-        if isinstance(instance, EPDOffsetMap):
-            self.kind.write_epd(instance._epd + q, r, value)
-            return
-        raise AttributeError
-
-
-class CSpriteMember(BaseMember):
-    """Descriptor for EPDOffsetMap"""
-
-    __slots__ = ()
-
-    def __init__(self, offset: int) -> None:
-        super().__init__(offset, MemberKind.C_SPRITE)
-
-    def __get__(self, instance, owner=None) -> "CSprite | CSpriteMember":
-        from .csprite import CSprite
-        from .epdoffsetmap import EPDOffsetMap
-
-        if instance is None:
-            return self
-        if isinstance(instance, EPDOffsetMap):
-            return CSprite.from_read(instance._epd + self.offset // 4)
-        raise AttributeError
-
-    def __set__(self, instance, value) -> None:
-        from .csprite import CSprite
-        from .epdoffsetmap import EPDOffsetMap
-
-        q, r = divmod(self.offset, 4)
-        if isinstance(value, CSprite):
-            value = value.ptr
-        if isinstance(instance, EPDOffsetMap):
-            self.kind.write_epd(instance._epd + q, r, value)
             return
         raise AttributeError

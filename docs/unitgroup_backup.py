@@ -37,7 +37,7 @@ from ..core import (
 from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
 from ..ctrlstru.loopblock import _unsafe_whilenot
 from ..utils import EPD, EUDCreateBlock, EUDPeekBlock, ep_assert
-from .memiof import f_maskread_epd
+from ..memio import f_maskread_epd
 
 _assign_helper = EUDVariable()
 

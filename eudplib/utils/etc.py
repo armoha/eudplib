@@ -138,11 +138,13 @@ def Assignable2List(a: Any) -> list:  # noqa: N802
     if a is None:
         return []
 
-    elif isinstance(a, Iterable) and not hasattr(a, "dont_flatten"):
-        return list(a)
+    if not hasattr(a, "dont_flatten"):
+        try:
+            return list(a)
+        except TypeError:
+            pass
 
-    else:
-        return [a]
+    return [a]
 
 
 cachedfunc = functools.cache

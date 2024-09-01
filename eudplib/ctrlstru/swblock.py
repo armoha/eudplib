@@ -6,6 +6,7 @@
 # file that should have been included as part of this package.
 
 from itertools import chain, combinations
+from typing import Literal
 
 from eudplib import utils as ut
 from eudplib.localize import _
@@ -17,11 +18,11 @@ from .cshelper import CtrlStruOpener
 from .jumptable import JumpTriggerForward
 
 
-def _is_switch_blockid(idf):
+def _is_switch_blockid(idf) -> bool:
     return idf == "swblock"
 
 
-def EPDSwitch(epd, mask=0xFFFFFFFF):  # noqa: N802
+def EPDSwitch(epd, mask=0xFFFFFFFF) -> Literal[True]:  # noqa: N802
     epd = c.EncodePlayer(epd)
     epd = ut.unProxy(epd)
     block = {
@@ -39,7 +40,7 @@ def EPDSwitch(epd, mask=0xFFFFFFFF):  # noqa: N802
     return True
 
 
-def EUDSwitch(var, mask=0xFFFFFFFF):  # noqa: N802
+def EUDSwitch(var, mask=0xFFFFFFFF) -> Literal[True]:  # noqa: N802
     var = ut.unProxy(var)
     block = {
         "targetvar": var,
@@ -56,8 +57,8 @@ def EUDSwitch(var, mask=0xFFFFFFFF):  # noqa: N802
     return True
 
 
-def EUDSwitchCase():  # noqa: N802
-    def _footer(*numbers):
+def EUDSwitchCase() -> CtrlStruOpener:  # noqa: N802
+    def _footer(*numbers: int | c.ConstExpr) -> Literal[True]:
         for number in numbers:
             ut.ep_assert(
                 isinstance(number, int) or isinstance(number, c.ConstExpr),
@@ -70,11 +71,13 @@ def EUDSwitchCase():  # noqa: N802
 
         for number in numbers:
             case = number & block["bitmask"]
-            ut.ep_assert(case not in block["casebrlist"], _("Duplicate cases"))
             ut.ep_assert(
                 block["bitmask"] == 0xFFFFFFFF or case == number,
-                _("cases out of mask"),
+                _("case out of bitmask: {0} & 0x{1:X} != {0}").format(
+                    number, block["bitmask"]
+                ),
             )
+            ut.ep_assert(case not in block["casebrlist"], _("Duplicate cases"))
             block["casebrlist"][case] = c.NextTrigger()
 
         return True
@@ -82,8 +85,8 @@ def EUDSwitchCase():  # noqa: N802
     return CtrlStruOpener(_footer)
 
 
-def EUDSwitchDefault():  # noqa: N802
-    def _footer():
+def EUDSwitchDefault() -> CtrlStruOpener:  # noqa: N802
+    def _footer() -> Literal[True]:
         lb = ut.EUDGetLastBlock()
         ut.ep_assert(lb[0] == "swblock", _("Block start/end mismatch"))
         block = lb[1]
@@ -96,32 +99,35 @@ def EUDSwitchDefault():  # noqa: N802
     return CtrlStruOpener(_footer)
 
 
-def eudswitch_break():
+def eudswitch_break() -> None:
     block = ut.EUDGetLastBlockOfName("swblock")[1]
-    EUDJump(block["swend"])
+    try:
+        EUDJump(block["swend"])
+    except ut.EPError:
+        raise ut.EPError(_("unreachable break"))
 
 
-def eudswitch_break_if(conditions):
+def eudswitch_break_if(conditions) -> None:
     block = ut.EUDGetLastBlockOfName("swblock")[1]
     EUDJumpIf(conditions, block["swend"])
 
 
-def eudswitch_break_ifnot(conditions):
+def eudswitch_break_ifnot(conditions) -> None:
     block = ut.EUDGetLastBlockOfName("swblock")[1]
     EUDJumpIfNot(conditions, block["swend"])
 
 
-def EUDEndSwitch():  # noqa: N802
+def EUDEndSwitch() -> None:  # noqa: N802
     lb = ut.EUDPopBlock("swblock")
     block = lb[1]
     swend = block["swend"]
-    EUDJump(swend)  # Exit switch block
+    c.SetNextTrigger(swend)  # Exit switch block
     c.PopTriggerScope()
 
-    bitmask = block["bitmask"]
-    casebrlist = block["casebrlist"]
-    defbranch = block["defaultbr"]
-    casekeylist = sorted(block["casebrlist"].keys())
+    bitmask: int = block["bitmask"]
+    casebrlist: dict[int, c.Forward] = block["casebrlist"]
+    defbranch: c.Forward = block["defaultbr"]
+    casekeylist: list[int] = sorted(block["casebrlist"].keys())
 
     # If default block is not specified, skip it.
     if not defbranch.IsSet():
@@ -150,18 +156,9 @@ def EUDEndSwitch():  # noqa: N802
         len(casekeylist) == 2
         and casebrlist[casekeylist[0]] == casebrlist[casekeylist[1]]
     ):
-
-        def popcount(x):
-            x -= (x >> 1) & 0x55555555
-            x = (x & 0x33333333) + ((x >> 2) & 0x33333333)
-            x = (x + (x >> 4)) & 0x0F0F0F0F
-            x += x >> 8
-            x += x >> 16
-            return x & 0x0000003F
-
         keyand = casekeylist[0] & casekeylist[1]
         keyxor = (casekeylist[0] | casekeylist[1]) - keyand
-        if popcount(keyxor) == 1:
+        if keyxor.bit_count() == 1:
             tg.EUDBranch(
                 c.MemoryXEPD(epd, c.Exactly, keyand, ~keyxor & bitmask),
                 casebrlist[casekeylist[0]],
@@ -206,7 +203,7 @@ def EUDEndSwitch():  # noqa: N802
             )
             EUDJumpIfNot(check_invariant, defbranch)
 
-        def powerset(iterable):
+        def powerset(iterable) -> chain[tuple]:
             "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
             s = list(iterable)
             return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
@@ -219,7 +216,7 @@ def EUDEndSwitch():  # noqa: N802
 
         cmpplayer = epd
         if c.IsEUDVariable(epd):
-            cmpplayer = c.EncodePlayer(c.CurrentPlayer)
+            cmpplayer = 13  # CurrentPlayer
             cpcache = c.curpl.GetCPCache()
             c.VProc(
                 epd,
@@ -247,7 +244,7 @@ def EUDEndSwitch():  # noqa: N802
             jumper << lastbit
     elif c.IsEUDVariable(epd):
         # use binary search with CP trick
-        cmpplayer = c.EncodePlayer(c.CurrentPlayer)
+        cmpplayer = 13  # CurrentPlayer
         cpcache = c.curpl.GetCPCache()
         c.VProc(
             epd,
@@ -258,13 +255,13 @@ def EUDEndSwitch():  # noqa: N802
                 *block["_actions"],
             ],
         )
-        reset = []
+        reset: list[tuple[c.Forward, c.Forward]] = []
 
         def _reset():
             nonlocal reset
             return [c.SetNextPtr(trg, nptr) for trg, nptr in reset]
 
-        def _key_selector(keys):
+        def _key_selector(keys: list[int]) -> c.Forward:
             nonlocal reset
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list
@@ -323,7 +320,7 @@ def EUDEndSwitch():  # noqa: N802
             nonlocal reset
             return [c.SetNextPtr(trg, nptr) for trg, nptr in reset]
 
-        def _key_selector(keys):
+        def _key_selector(keys: list[int]) -> c.Forward:
             nonlocal reset
             ret = c.NextTrigger()
             if len(keys) == 1:  # Only one keys on the list

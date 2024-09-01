@@ -8,8 +8,6 @@
 from ..utils import EPD, ep_assert
 from .rawtrigger import (
     Add,
-    CurrentPlayer,
-    EncodePlayer,
     RawTrigger,
     SetDeaths,
     SetMemory,
@@ -47,15 +45,15 @@ def cpset(a, b):
                 *a.QueueAddTo(EPD(0x6509B0)),
             ],
         )
-    from ..eudlib.memiof.modcurpl import f_setcurpl2cpcache
+    from ..memio.modcurpl import f_setcurpl2cpcache
 
-    return EncodePlayer(CurrentPlayer), f_setcurpl2cpcache
+    return 13, f_setcurpl2cpcache  # CurrentPlayer
 
 
 def iset(a, b, modifier, v):
     """SetMemoryEPD(a + b, modifier, v)"""
     if not (IsEUDVariable(a) or IsEUDVariable(b)) or a is b or a is v or b is v:
-        from ..eudlib.memiof.dwepdio import setdw_epd
+        from ..memio.dwepdio import setdw_epd
 
         return setdw_epd(a + b, modifier, v)
     if IsEUDVariable(v):

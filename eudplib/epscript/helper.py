@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from types import ModuleType
 
+from ..collections import EUDArray
 from ..core import (
     ConstExpr,
     EUDCreateVariables,
@@ -18,8 +19,8 @@ from ..core import (
     f_bitlshift,
 )
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
-from ..eudlib import EUDArray, f_setcurpl2cpcache
 from ..maprw import EUDOnStart
+from ..memio import f_setcurpl2cpcache
 from ..utils import (
     EPD,
     ExprProxy,
@@ -97,7 +98,7 @@ def _IGVA(var_count, expr_list_gen):  # noqa: N802
     except (TriggerScopeError, NameError):
         var_list = EUDCreateVariables(var_count)
 
-        def _():
+        def _() -> None:
             expr_list = expr_list_gen()
             SetVariables(var_list, expr_list)
 

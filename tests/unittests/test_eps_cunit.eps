@@ -1,7 +1,9 @@
 function test_cunit1() {
+    const cspritePtr = 0x629D98 + 36 * 1;  // Sprite Table
     const sp = [0x2468ACE0, 0x13579BDF, 0xFEDCBA98, 0x76543210];
+    repmovsd_epd(EPD(cspritePtr), EPD(sp), 4);
     const a = [
-          0,  -1,  -2,  sp,  -4,  -5,  -6,  -7,  -8, -9,
+          0,  -1,  -2,  cspritePtr,  -4,  -5,  -6,  -7,  -8, -9,
         -10, -11, -12, -13, -14, -15, -16, -17, -18, 0x12345607,
         0x89ABCDEF, 0xEDACEDAC, 0xEDACEDAC, 0xEDACEDAC, 0x220011, 0x440033, 0xFFFF0055, 0, 0, 0,
         3, 3, 3, 3, 3, 3, 3, 3, 0x220011, 0x440033,
@@ -9,6 +11,11 @@ function test_cunit1() {
         5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
     ];
     const u = CUnit(EUDVariable(EPD(a)));
+    py_exec("\n\
+from helper import expect_error\n\
+with expect_error(AttributeError):\n\
+    u.zzt = 1\n\
+");
     var ret = 0;
     if (u.order == 0x56) ret += 1;
     if (u.owner == P8) ret += 2;
@@ -18,9 +25,8 @@ function test_cunit1() {
     if (u.orderUnitType == 0xCDEF) ret += 16;
     wwrite_epd(EPD(a) + 0x50/4, 0, $U("Artanis"));
     if (u.orderUnitType == py_str("Artanis")) ret += 32;
-    // u.set_color(P12);
-    // if (sp[2] == 0xFE0BBA98) ret += 64;
-    ret += 64;
+    u.set_color(P12);
+    if (Memory(cspritePtr + 8, Exactly, 0xFE0BBA98)) ret += 64;
     u.cgive(P2);
     if (u.owner == P2) ret += 128;
 
@@ -76,6 +82,9 @@ function test_cunit2() {
     if (u.acceleration == 678) ret += 1024;
     u.acceleration = 0;
     if (u.acceleration == 0) ret += 2048;
+
+    u.remove();
+    if (u.order == 0 && u.userActionFlags & 4) ret += 4096;
 
     return ret;
 }

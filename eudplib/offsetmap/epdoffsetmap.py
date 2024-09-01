@@ -6,12 +6,11 @@
 # file that should have been included as part of this package.
 
 from abc import ABCMeta
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
-from .member import MemberKind
 
 if TYPE_CHECKING:
     from .csprite import CSprite
@@ -19,84 +18,100 @@ if TYPE_CHECKING:
 
 
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
-    __slots__ = "_epd"
+    __slots__ = ("_epd",)
+    _cast: ClassVar[bool] = False
+
+    @classmethod
+    def cast(cls, other, **kwargs):
+        if isinstance(other, cls):
+            return other
+        cls._cast = True
+        return cls(other, **kwargs)
 
     def __init__(self, epd: int | c.EUDVariable) -> None:
         self._epd: int | c.EUDVariable = epd
+        if isinstance(epd, c.EUDVariable) and not EPDOffsetMap._cast:
+            source = epd
+            epd = c.EUDVariable()
+            epd << source
+        EPDOffsetMap._cast = False
         super().__init__(epd)
 
     def getepd(self, name: str) -> "c.EUDVariable | CUnit":
+        from .memberimpl import CSpriteKind, CUnitKind, PositionKind
+
         member = type(self).__dict__[name]
-        ut.ep_assert(member.kind.size == 4, _("Only dword can be read as epd"))
-        epd = self._epd + member.offset // 4
-        match member.kind:
-            case MemberKind.C_UNIT:
-                from .cunit import CUnit
+        kind = member.kind
+        ut.ep_assert(kind.size() == 4, _("Only dword can be read as epd"))
+        epd = member._get_epd(self)[0]
+        if kind is CUnitKind:
+            from .cunit import CUnit
 
-                return CUnit.from_read(epd)
-            case MemberKind.C_SPRITE:
-                return member.kind.read_epd(epd, 0)
-            case MemberKind.POSITION:
-                raise ut.EPError(_("Only dword can be read as epd"))
-            case _:
-                from ..eudlib.memiof import f_epdread_epd
+            return CUnit.from_read(epd)
+        if kind is CSpriteKind:
+            return kind.read_epd(epd, 0)
+        if kind is PositionKind:
+            raise ut.EPError(_("Only dword can be read as epd"))
 
-                return f_epdread_epd(epd)
+        from ..memio import f_epdread_epd
+
+        return f_epdread_epd(epd)
 
     def getdwepd(
         self, name: str
     ) -> tuple[c.EUDVariable, "c.EUDVariable | CUnit | CSprite"]:
+        from .memberimpl import CSpriteKind, CUnitKind, PositionKind
+
         member = type(self).__dict__[name]
-        ut.ep_assert(member.kind.size == 4, _("Only dword can be read as epd"))
-        epd = self._epd + member.offset // 4
-        match member.kind:
-            case MemberKind.C_UNIT:
-                from .cunit import CUnit
+        kind = member.kind
+        ut.ep_assert(kind.size() == 4, _("Only dword can be read as epd"))
+        epd = member._get_epd(self)[0]
+        if kind is CUnitKind:
+            from .cunit import CUnit
 
-                cunit = CUnit.from_read(epd)
-                return cast(c.EUDVariable, cunit._ptr), cunit
-            case MemberKind.C_SPRITE:
-                from .csprite import CSprite
+            cunit = CUnit.from_read(epd)
+            return cast(c.EUDVariable, cunit._ptr), cunit
+        if kind is CSpriteKind:
+            from .csprite import CSprite
 
-                csprite = CSprite.from_read(epd)
-                return cast(c.EUDVariable, csprite._ptr), csprite
-            case MemberKind.POSITION:
-                raise ut.EPError(_("Only dword can be read as epd"))
-            case _:
-                from ..eudlib.memiof import f_dwepdread_epd
+            csprite = CSprite.from_read(epd)
+            return cast(c.EUDVariable, csprite._ptr), csprite
+        if kind is PositionKind:
+            raise ut.EPError(_("Only dword can be read as epd"))
 
-                return f_dwepdread_epd(epd)
+        from ..memio import f_dwepdread_epd
+
+        return f_dwepdread_epd(epd)
 
     def getpos(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
-        member = type(self).__dict__[name]
-        ut.ep_assert(member.kind.size == 4, _("Only dword can be read as position"))
-        match member.kind:
-            case MemberKind.C_UNIT | MemberKind.C_SPRITE:
-                raise ut.EPError(_("Only dword can be read as position"))
-            case _:
-                from ..eudlib.memiof import f_posread_epd
+        from .memberimpl import CSpriteKind, CUnitKind
 
-                return f_posread_epd(self._epd + member.offset // 4)
+        member = type(self).__dict__[name]
+        kind = member.kind
+        ut.ep_assert(kind.size() == 4, _("Only dword can be read as position"))
+        if kind in (CUnitKind, CSpriteKind):
+            raise ut.EPError(_("Only dword can be read as position"))
+
+        from ..memio import f_posread_epd
+
+        return f_posread_epd(member._get_epd(self)[0])
 
     def iaddattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         value = member.kind.cast(value)
         member.kind.add_epd(epd, subp, value)
 
     # TODO: add operator for Subtract
     def isubtractattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         value = member.kind.cast(value)
         member.kind.subtract_epd(epd, subp, value)
 
     def isubattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         value = member.kind.cast(value)
         member.kind.add_epd(epd, subp, -value)
 
@@ -135,9 +150,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def eqattr(self, name: str, value):
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
-        mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
+        epd, subp = member._get_epd(self)
+        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
             value = c.f_bitlshift(value, 8 * subp)
@@ -154,9 +168,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def leattr(self, name, value):
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
-        mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
+        epd, subp = member._get_epd(self)
+        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
             value = c.f_bitlshift(value, 8 * subp)
@@ -170,9 +183,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def geattr(self, name, value):
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
-        mask = ((1 << (8 * member.kind.size)) - 1) << (8 * subp)
+        epd, subp = member._get_epd(self)
+        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
             value = c.f_bitlshift(value, 8 * subp)
@@ -215,7 +227,7 @@ c.RawTrigger(
 c.PopTriggerScope()
 
 
-def epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
+def _epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
     epd = c.EUDVariable(0)
     is_ptr_equal = ptr.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))
@@ -236,7 +248,7 @@ def epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
     return epd
 
 
-def ptr_cache(epd: c.EUDVariable) -> c.EUDVariable:
+def _ptr_cache(epd: c.EUDVariable) -> c.EUDVariable:
     ptr = c.EUDVariable()
     is_epd_equal = epd.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))

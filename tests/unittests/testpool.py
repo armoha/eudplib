@@ -8,7 +8,7 @@ class Coord(EUDStruct):
 
 @TestInstance
 def test_pool():
-    from eudplib.eudlib.objpool import SetGlobalPoolFieldN
+    from eudplib.collections.objpool import SetGlobalPoolFieldN
 
     # Basic allocation
     a = Coord.alloc()

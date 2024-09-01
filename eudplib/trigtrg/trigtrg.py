@@ -11,23 +11,9 @@ from typing import TypeAlias
 from ..core import UnitProperty
 
 # re-export stuffs
-from ..core.rawtrigger.constenc import P1 as P1
-from ..core.rawtrigger.constenc import P2 as P2
-from ..core.rawtrigger.constenc import P3 as P3
-from ..core.rawtrigger.constenc import P4 as P4
-from ..core.rawtrigger.constenc import P5 as P5
-from ..core.rawtrigger.constenc import P6 as P6
-from ..core.rawtrigger.constenc import P7 as P7
-from ..core.rawtrigger.constenc import P8 as P8
-from ..core.rawtrigger.constenc import P9 as P9
-from ..core.rawtrigger.constenc import P10 as P10
-from ..core.rawtrigger.constenc import P11 as P11
-from ..core.rawtrigger.constenc import P12 as P12
 from ..core.rawtrigger.constenc import Add as Add
 from ..core.rawtrigger.constenc import All as All
 from ..core.rawtrigger.constenc import AlliedVictory as AlliedVictory
-from ..core.rawtrigger.constenc import Allies as Allies
-from ..core.rawtrigger.constenc import AllPlayers as AllPlayers
 from ..core.rawtrigger.constenc import Ally as Ally
 from ..core.rawtrigger.constenc import AtLeast as AtLeast
 from ..core.rawtrigger.constenc import AtMost as AtMost
@@ -35,7 +21,6 @@ from ..core.rawtrigger.constenc import Attack as Attack
 from ..core.rawtrigger.constenc import Buildings as Buildings
 from ..core.rawtrigger.constenc import Clear as Clear
 from ..core.rawtrigger.constenc import Cleared as Cleared
-from ..core.rawtrigger.constenc import CurrentPlayer as CurrentPlayer
 from ..core.rawtrigger.constenc import Custom as Custom
 from ..core.rawtrigger.constenc import Disable as Disable
 from ..core.rawtrigger.constenc import Enable as Enable
@@ -57,43 +42,21 @@ from ..core.rawtrigger.constenc import (
     TrgCount,
     TrgModifier,
     TrgOrder,
-    TrgPlayer,
     TrgPropState,
     TrgResource,
     TrgScore,
     TrgSwitchAction,
     TrgSwitchState,
-    _KillsSpecialized,
+    _Kills,
 )
 from ..core.rawtrigger.constenc import Enemy as Enemy
 from ..core.rawtrigger.constenc import Exactly as Exactly
-from ..core.rawtrigger.constenc import Foes as Foes
-from ..core.rawtrigger.constenc import Force1 as Force1
-from ..core.rawtrigger.constenc import Force2 as Force2
-from ..core.rawtrigger.constenc import Force3 as Force3
-from ..core.rawtrigger.constenc import Force4 as Force4
 from ..core.rawtrigger.constenc import Gas as Gas
 from ..core.rawtrigger.constenc import KillsAndRazings as KillsAndRazings
 from ..core.rawtrigger.constenc import Move as Move
-from ..core.rawtrigger.constenc import NeutralPlayers as NeutralPlayers
-from ..core.rawtrigger.constenc import (
-    NonAlliedVictoryPlayers as NonAlliedVictoryPlayers,
-)
 from ..core.rawtrigger.constenc import Ore as Ore
 from ..core.rawtrigger.constenc import OreAndGas as OreAndGas
 from ..core.rawtrigger.constenc import Patrol as Patrol
-from ..core.rawtrigger.constenc import Player1 as Player1
-from ..core.rawtrigger.constenc import Player2 as Player2
-from ..core.rawtrigger.constenc import Player3 as Player3
-from ..core.rawtrigger.constenc import Player4 as Player4
-from ..core.rawtrigger.constenc import Player5 as Player5
-from ..core.rawtrigger.constenc import Player6 as Player6
-from ..core.rawtrigger.constenc import Player7 as Player7
-from ..core.rawtrigger.constenc import Player8 as Player8
-from ..core.rawtrigger.constenc import Player9 as Player9
-from ..core.rawtrigger.constenc import Player10 as Player10
-from ..core.rawtrigger.constenc import Player11 as Player11
-from ..core.rawtrigger.constenc import Player12 as Player12
 from ..core.rawtrigger.constenc import Random as Random
 from ..core.rawtrigger.constenc import Razings as Razings
 from ..core.rawtrigger.constenc import Set as Set
@@ -110,6 +73,43 @@ from ..core.rawtrigger.strenc import (
     EncodeSwitch,
     EncodeUnit,
 )
+from ..offsetmap.scdata import P1 as P1
+from ..offsetmap.scdata import P2 as P2
+from ..offsetmap.scdata import P3 as P3
+from ..offsetmap.scdata import P4 as P4
+from ..offsetmap.scdata import P5 as P5
+from ..offsetmap.scdata import P6 as P6
+from ..offsetmap.scdata import P7 as P7
+from ..offsetmap.scdata import P8 as P8
+from ..offsetmap.scdata import P9 as P9
+from ..offsetmap.scdata import P10 as P10
+from ..offsetmap.scdata import P11 as P11
+from ..offsetmap.scdata import P12 as P12
+from ..offsetmap.scdata import Allies as Allies
+from ..offsetmap.scdata import AllPlayers as AllPlayers
+from ..offsetmap.scdata import CurrentPlayer as CurrentPlayer
+from ..offsetmap.scdata import Foes as Foes
+from ..offsetmap.scdata import Force1 as Force1
+from ..offsetmap.scdata import Force2 as Force2
+from ..offsetmap.scdata import Force3 as Force3
+from ..offsetmap.scdata import Force4 as Force4
+from ..offsetmap.scdata import NeutralPlayers as NeutralPlayers
+from ..offsetmap.scdata import (
+    NonAlliedVictoryPlayers as NonAlliedVictoryPlayers,
+)
+from ..offsetmap.scdata import Player1 as Player1
+from ..offsetmap.scdata import Player2 as Player2
+from ..offsetmap.scdata import Player3 as Player3
+from ..offsetmap.scdata import Player4 as Player4
+from ..offsetmap.scdata import Player5 as Player5
+from ..offsetmap.scdata import Player6 as Player6
+from ..offsetmap.scdata import Player7 as Player7
+from ..offsetmap.scdata import Player8 as Player8
+from ..offsetmap.scdata import Player9 as Player9
+from ..offsetmap.scdata import Player10 as Player10
+from ..offsetmap.scdata import Player11 as Player11
+from ..offsetmap.scdata import Player12 as Player12
+from ..offsetmap.scdata import TrgPlayer
 from ..utils import EPD, FlattenList, ep_assert
 
 """
@@ -299,7 +299,7 @@ def __kills__internal(
     return Condition(0, player, number, unit, comparison, 5, 0, 0)
 
 
-Kills = _KillsSpecialized("Kills")
+Kills = _Kills()
 Kills._internalf = __kills__internal
 
 
@@ -731,9 +731,7 @@ def Order(  # noqa: N802
     startloc = EncodeLocation(start_location)
     order_type = EncodeOrder(order_type)
     dest_location = EncodeLocation(dest_location)
-    return Action(
-        startloc, 0, 0, 0, owner, dest_location, unit, 46, order_type, 20
-    )
+    return Action(startloc, 0, 0, 0, owner, dest_location, unit, 46, order_type, 20)
 
 
 def Comment(text: String) -> bytes:  # noqa: N802
@@ -834,9 +832,7 @@ def DeathsX(  # noqa: N802
     player = EncodePlayer(player)
     comparison = EncodeComparison(comparison)
     unit = EncodeUnit(unit)
-    return Condition(
-        mask, player, number, unit, comparison, 15, 0, 0, eudx=0x4353
-    )
+    return Condition(mask, player, number, unit, comparison, 15, 0, 0, eudx=0x4353)
 
 
 def MemoryX(dest: int, cmptype: Comparison, value: int, mask: int) -> bytes:  # noqa: N802
@@ -849,9 +845,7 @@ def SetDeathsX(  # noqa: N802
     player = EncodePlayer(player)
     modifier = EncodeModifier(modifier)
     unit = EncodeUnit(unit)
-    return Action(
-        mask, 0, 0, 0, player, number, unit, 45, modifier, 20, eudx=0x4353
-    )
+    return Action(mask, 0, 0, 0, player, number, unit, 45, modifier, 20, eudx=0x4353)
 
 
 def SetMemoryX(dest: int, modtype: Modifier, value: int, mask: int) -> bytes:  # noqa: N802

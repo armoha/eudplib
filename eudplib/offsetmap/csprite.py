@@ -10,11 +10,16 @@ from typing import TypeAlias, TypeVar, cast
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
-from .epdoffsetmap import EPDOffsetMap, epd_cache, ptr_cache
-from .member import CSpriteMember, EnumMember, Flag, Member, MemberKind
+from .epdoffsetmap import EPDOffsetMap, _epd_cache, _ptr_cache
+from .member import (
+    Flag,
+    StructEnumMember,
+    StructMember,
+)
+from .member import MemberKind as Mk
 
 
-class CSpriteFlags(EnumMember):
+class CSpriteFlags(StructEnumMember):
     __slots__ = ()
     DrawSelCircle = Flag(0x01)  # Draw selection circle
     AllySel1 = Flag(0x02)
@@ -32,33 +37,31 @@ int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
 
 # ruff: noqa: N815
 class CSprite(EPDOffsetMap):
-    __slots__ = "_ptr"
-    prev = CSpriteMember(0x00)
-    next = CSpriteMember(0x04)
-    sprite = Member(0x08, MemberKind.SPRITE)
-    playerID = Member(0x0A, MemberKind.TRG_PLAYER)  # officially "creator"
+    __slots__ = ("_ptr",)
+    prev = StructMember(0x00, Mk.C_SPRITE)
+    next = StructMember(0x04, Mk.C_SPRITE)
+    sprite = StructMember(0x08, Mk.SPRITE)
+    playerID = StructMember(0x0A, Mk.PLAYER)  # officially "creator"
     # 0 <= selectionIndex <= 11.
     # Index in the selection area at bottom of screen.
-    selectionIndex = Member(0x0B, MemberKind.BYTE)
+    selectionIndex = StructMember(0x0B, Mk.BYTE)
     # Player bits indicating the visibility for a player
     # (not hidden by the fog-of-war)
-    visibilityFlags = Member(0x0C, MemberKind.BYTE)
-    elevationLevel = Member(0x0D, MemberKind.BYTE)
-    flags = CSpriteFlags(0x0E, MemberKind.BYTE)
-    selectionTimer = Member(0x0F, MemberKind.BYTE)
-    index = Member(0x10, MemberKind.WORD)
-    unknown0x12 = Member(0x12, MemberKind.BYTE)
-    unknown0x13 = Member(0x13, MemberKind.BYTE)
-    pos = Member(0x14, MemberKind.POSITION)
-    posX = Member(0x14, MemberKind.POSITION_X)
-    posY = Member(0x16, MemberKind.POSITION_Y)
-    mainGraphic = Member(0x18, MemberKind.DWORD)  # officially "pImagePrimary"
-    imageHead = Member(0x1C, MemberKind.DWORD)
-    imageTail = Member(0x20, MemberKind.DWORD)
+    visibilityFlags = StructMember(0x0C, Mk.BYTE)
+    elevationLevel = StructMember(0x0D, Mk.BYTE)
+    flags = CSpriteFlags(0x0E, Mk.BYTE)
+    selectionTimer = StructMember(0x0F, Mk.BYTE)
+    index = StructMember(0x10, Mk.WORD)
+    unknown0x12 = StructMember(0x12, Mk.BYTE)
+    unknown0x13 = StructMember(0x13, Mk.BYTE)
+    pos = StructMember(0x14, Mk.POSITION)
+    posX = StructMember(0x14, Mk.POSITION_X)
+    posY = StructMember(0x16, Mk.POSITION_Y)
+    mainGraphic = StructMember(0x18, Mk.DWORD)  # officially "pImagePrimary"
+    imageHead = StructMember(0x1C, Mk.DWORD)
+    imageTail = StructMember(0x20, Mk.DWORD)
 
-    def __init__(
-        self, epd: int_or_var, *, ptr: int_or_var | None = None
-    ) -> None:
+    def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
         """
         EPD Constructor of CSprite.
 
@@ -89,17 +92,22 @@ class CSprite(EPDOffsetMap):
                     raise ut.EPError(
                         _("Invalid input for CSprite: {}").format((epd, ptr))
                     )
-                _epd, self._ptr = c.EUDCreateVariables(2)
-                c.SetVariables((_epd, self._ptr), (u, p))
+                if EPDOffsetMap._cast:
+                    _epd, self._ptr = u, p
+                else:
+                    _epd, self._ptr = c.EUDCreateVariables(2)
+                    c.SetVariables((_epd, self._ptr), (u, p))
             else:
                 self._ptr = None
-                _epd = c.EUDVariable()
-                _epd << u
+                if EPDOffsetMap._cast:
+                    _epd = u
+                else:
+                    _epd = c.EUDVariable()
+                    _epd << u
         else:
-            raise ut.EPError(
-                _("Invalid input for CSprite: {}").format((epd, ptr))
-            )
+            raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
 
+        EPDOffsetMap._cast = False
         super().__init__(_epd)
 
     @classmethod
@@ -116,11 +124,9 @@ class CSprite(EPDOffsetMap):
             if r == 0 and 0 <= q < 1700:
                 epd = ut.EPD(u)
             else:
-                raise ut.EPError(
-                    _("Invalid input for CSprite: {}").format(ptr)
-                )
+                raise ut.EPError(_("Invalid input for CSprite: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
-            epd = epd_cache(u)
+            epd = _epd_cache(u)
         else:
             raise ut.EPError(_("Invalid input for CSprite: {}").format(epd))
 
@@ -128,7 +134,7 @@ class CSprite(EPDOffsetMap):
 
     @classmethod
     def from_read(cls: type[T], epd) -> T:
-        from ..eudlib.memiof import f_spriteepdread_epd
+        from ..memio import f_spriteepdread_epd
 
         _ptr, _epd = f_spriteepdread_epd(epd)
         return cls(_epd, ptr=_ptr)
@@ -137,4 +143,4 @@ class CSprite(EPDOffsetMap):
     def ptr(self) -> int | c.EUDVariable:
         if self._ptr is not None:
             return self._ptr
-        return ptr_cache(cast(c.EUDVariable, self._epd))
+        return _ptr_cache(cast(c.EUDVariable, self._epd))

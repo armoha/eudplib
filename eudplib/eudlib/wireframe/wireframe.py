@@ -8,9 +8,10 @@ from eudplib.maprw.injector.mainloop import (
     eud_onstart2,
     has_already_started,
 )
+from eudplib.offsetmap.scdata import CurrentPlayer, TrgUnit
 
-from ..eudarray import EUDArray
-from ..memiof import (
+from ...collections.eudarray import EUDArray
+from ...memio import (
     f_dwread_cp,
     f_epdread_epd,
     f_maskread_cp,
@@ -78,13 +79,9 @@ class InitialWireframe:
                     init = default
                 return ut.EPD(init)
 
-            tranwire_init = create_init64(
-                cls._tranwires, tranwire_default64, 106
-            )
+            tranwire_init = create_init64(cls._tranwires, tranwire_default64, 106)
             grpwire_init = create_init64(cls._grpwires, grpwire_default64, 131)
-            wirefram_init = create_init64(
-                cls._wireframs, wirefram_default64, 228
-            )
+            wirefram_init = create_init64(cls._wireframs, wirefram_default64, 228)
 
             f_repmovsd_epd(tranwire, tranwire_init, len(wd.TranWire64))
             f_repmovsd_epd(grpwire, grpwire_init, len(wd.GrpWire64))
@@ -94,9 +91,7 @@ class InitialWireframe:
             def init32(ptr, src, data):
                 if not src:
                     return
-                key_min = min(
-                    min(src.keys()), 5
-                )  # Terran Siege Tank (Tank Mode)
+                key_min = min(min(src.keys()), 5)  # Terran Siege Tank (Tank Mode)
                 key_max = max(max(src.keys()), 87)  # Aldaris (Templar)
 
                 def wf(n):
@@ -122,9 +117,7 @@ class InitialWireframe:
                 )
                 if key_min > 0:
                     ptr = ptr + 2 * key_min
-                f_repmovsd_epd(
-                    ptr, ut.EPD(init), (key_max - key_min + 1) * 2 + 1
-                )
+                f_repmovsd_epd(ptr, ut.EPD(init), (key_max - key_min + 1) * 2 + 1)
 
             init32(tranwire, cls._tranwires, wd.TranWire32)
             init32(grpwire, cls._grpwires, wd.GrpWire32)
@@ -188,11 +181,11 @@ def _set_wireframe(unit, wireframe, size, ptr, default32, default64):
         )
         actions = [
             c.SetMemory(0x6509B0, c.SetTo, 0),
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
+            c.SetDeathsX(CurrentPlayer, c.SetTo, 0, 0, 0xFFFF0000),
             c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0),
             c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeathsX(c.CurrentPlayer, c.SetTo, 0, 0, 0xFFFF),
+            c.SetDeathsX(CurrentPlayer, c.SetTo, 0, 0, 0xFFFF),
         ]
         c.VProc(
             [unit, wireframe],
@@ -210,7 +203,7 @@ def _set_wireframe(unit, wireframe, size, ptr, default32, default64):
     cs.EUDEndIf()
 
 
-@c.EUDTypedFunc([c.TrgUnit, c.TrgUnit])
+@c.EUDTypedFunc([TrgUnit, TrgUnit])
 def SetTranWire(unit, wireframe):  # noqa: N802
     InitialWireframe.init()
     _set_wireframe(
@@ -218,7 +211,7 @@ def SetTranWire(unit, wireframe):  # noqa: N802
     )
 
 
-@c.EUDTypedFunc([c.TrgUnit, c.TrgUnit])
+@c.EUDTypedFunc([TrgUnit, TrgUnit])
 def SetGrpWire(unit, wireframe):  # noqa: N802
     InitialWireframe.init()
     _set_wireframe(
@@ -226,7 +219,7 @@ def SetGrpWire(unit, wireframe):  # noqa: N802
     )
 
 
-@c.EUDTypedFunc([c.TrgUnit, c.TrgUnit])
+@c.EUDTypedFunc([TrgUnit, TrgUnit])
 def SetWirefram(unit, wireframe):  # noqa: N802
     InitialWireframe.init()
     _set_wireframe(
@@ -234,7 +227,7 @@ def SetWirefram(unit, wireframe):  # noqa: N802
     )
 
 
-@c.EUDTypedFunc([c.TrgUnit, c.TrgUnit])
+@c.EUDTypedFunc([TrgUnit, TrgUnit])
 def SetWireframes(unit, wireframe):  # noqa: N802
     InitialWireframe.init()
     SetTranWire(unit, wireframe)

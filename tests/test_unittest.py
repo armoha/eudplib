@@ -27,6 +27,7 @@ from unittests import (
     test_once,
     test_parse,
     test_pexists,
+    test_scdata,
     test_sq_from_1var,
     test_trace,
     test_unitgroup,
@@ -71,7 +72,7 @@ def f():
     helper.test_runall("unittest")
 
 
-from eudplib.eudlib.stringf.tblprint import _AddStatText
+from eudplib.string.tblprint import _AddStatText
 
 
 _AddStatText(open("unittests/custom_txt.tbl", "rb").read())

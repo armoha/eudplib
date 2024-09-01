@@ -2,8 +2,8 @@
 from eudplib import *
 from eudplib.core.eudfunc import EUDTraceLog, EUDTracedFunc, EUDTracedTypedFunc, EUDTracedMethod, EUDTracedTypedMethod
 from eudplib.epscript.helper import _RELIMP, _IGVA, _CGFW, _ARR, _VARR, _SRET, _SV, _ATTW, _ARRW, _ATTC, _ARRC, _L2V, _LVAR, _LSH, _ALL
-# (Line 1) import eudplib.eudlib.stringf.tblprint;
-from eudplib.eudlib.stringf import tblprint
+# (Line 1) import eudplib.string.tblprint;
+from eudplib.string import tblprint
 # (Line 2) const inputData = py_bytes(1000);
 inputData = _CGFW(lambda: [bytes(1000)], 1)[0]
 # (Line 3) tblprint._AddStatText(inputData);

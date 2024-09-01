@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 import types
-from typing import Generic, TypeAlias, TypeVar, overload
+from typing import Generic, TypeAlias, TypeGuard, TypeVar, overload
 
 from eudplib.localize import _
 
@@ -16,8 +16,22 @@ T_co = TypeVar("T_co", covariant=True)
 class ExprProxy(Generic[T_co]):
     """Class which can contain both ConstExpr and EUDVariable"""
 
+    __slots__ = ("_value",)
+
     def __init__(self, initval: T_co) -> None:
-        self._value: T_co = initval
+        # Python __slots__ is just a sugar for auto-generated descriptors.
+        # Calling descriptors is implemented within __setattr__ and __getattr__
+        # (or __*attribute__, I haven't dug deep) of object. The most importantly,
+        # we have overridden the default __setattr__ and as a result, were unable to
+        # initialize the value using dot notation within the ctor. Since the value of
+        # the slotted variable is not yet initialized, our __setattr__ causes access
+        # to __getattr__ (an incorrect behaviour by itself!), and __getattr__ needs
+        # the slotted variable itself, so - infinite recursion.
+        #
+        # So, to initialize the value correctly, we should call the descriptor method
+        # explicitly. See: https://stackoverflow.com/a/63338642
+        super().__setattr__("_value", initval)
+        # self._value: T_co = initval
 
     @classmethod
     def cast(cls, _from):
@@ -72,6 +86,12 @@ class ExprProxy(Generic[T_co]):
 
     def __rfloordiv__(self, k):
         return k // self._value
+
+    def __divmod__(self, k):
+        return divmod(self._value, k)
+
+    def __rdivmod__(self, k):
+        return divmod(k, self._value)
 
     def __mod__(self, k):
         return self._value % k
@@ -129,19 +149,12 @@ class ExprProxy(Generic[T_co]):
     # TODO: add inplace operators
 
     # Proxy other methods
-    def __getattribute__(self, name):
-        if name == "_value":
-            return super().__getattribute__(name)
-        elif name == "__class__":
-            return object.__getattribute__(self._value, name)
-        else:
-            return super().__getattribute__(name)
 
     def __call__(self, *args, **kwargs):
         return self._value(*args, **kwargs)
 
     def __getattr__(self, name):
-        return getattr(self._value, name)
+        return getattr(super().__getattribute__("_value"), name)
 
     def __getitem__(self, name):
         return self._value[name]
@@ -152,6 +165,12 @@ class ExprProxy(Generic[T_co]):
     def __iter__(self):
         try:
             return self._value.__iter__()
+        except AttributeError as err:
+            raise TypeError(err)
+
+    def Evaluate(self):  # noqa: N802
+        try:
+            return self._value.Evaluate()
         except AttributeError:
             return self._value
 
@@ -205,6 +224,16 @@ def unProxy(x):  # noqa: N802
 
 
 _ClassInfo: TypeAlias = type | types.UnionType | tuple["_ClassInfo", ...]
+
+
+@overload
+def isUnproxyInstance(x: object, cls: type) -> TypeGuard[type]:
+    ...
+
+
+@overload
+def isUnproxyInstance(x: object, cls: types.UnionType) -> TypeGuard[types.UnionType]:
+    ...
 
 
 def isUnproxyInstance(x: object, cls: _ClassInfo) -> bool:  # noqa: N802

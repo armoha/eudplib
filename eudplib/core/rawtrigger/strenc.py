@@ -44,72 +44,47 @@ if TYPE_CHECKING:
 
 
 class TrgAIScript(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeAIScript(s)
 
 
 class TrgLocation(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeLocation(s)
 
 
 class TrgString(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeString(s)
 
 
 class TrgSwitch(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeSwitch(s)
 
 
-class TrgUnit(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeUnit(s)
-
-
-class Weapon(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeWeapon(s)
-
-
-class Flingy(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeFlingy(s)
-
-
-class Sprite(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeSprite(s)
-
-
-class Image(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeImage(s)
-
-
 class Iscript(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeIscript(s)
 
 
-class Upgrade(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeUpgrade(s)
-
-
 class StatText(ConstType):
+    __slots__ = ()
     _encoding = "UTF-8"
     _data = b""
 
@@ -118,25 +93,17 @@ class StatText(ConstType):
         return EncodeTBL(s)
 
 
-class Tech(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeTech(s)
-
-
-class UnitOrder(ConstType):
-    @classmethod
-    def cast(cls, s):
-        return EncodeUnitOrder(s)
-
-
 class Icon(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodeIcon(s)
 
 
 class Portrait(ConstType):
+    __slots__ = ()
+
     @classmethod
     def cast(cls, s):
         return EncodePortrait(s)

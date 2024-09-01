@@ -7,19 +7,12 @@
 
 from typing import Literal
 
-from ...localize import _
 from ...utils import (
-    EPError,
     EUDCreateBlock,
     EUDGetLastBlockOfName,
     EUDPopBlock,
-    TriggerScopeError,
 )
 from ..allocator import ConstExpr, Forward
-
-# fmt: off
-_ERR = _("Must put Trigger into onPluginStart, beforeTriggerExec or afterTriggerExec")  # noqa: E501
-# fmt: on
 
 
 def PushTriggerScope() -> Literal[True]:  # noqa: N802
@@ -29,10 +22,7 @@ def PushTriggerScope() -> Literal[True]:  # noqa: N802
 
 def SetNextTrigger(trg: ConstExpr) -> None:  # noqa: N802
     """For optimization purpose, one may call this function directly"""
-    try:
-        nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
-    except EPError as exc:
-        raise TriggerScopeError(_ERR) from exc
+    nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
     for fw in nt_list:
         fw << trg
     nt_list.clear()
@@ -40,10 +30,7 @@ def SetNextTrigger(trg: ConstExpr) -> None:  # noqa: N802
 
 def NextTrigger() -> Forward:  # noqa: N802
     fw = Forward()
-    try:
-        nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
-    except EPError as exc:
-        raise TriggerScopeError(_ERR) from exc
+    nt_list = EUDGetLastBlockOfName("triggerscope")[1]["nexttrigger_list"]
     nt_list.append(fw)
     return fw
 

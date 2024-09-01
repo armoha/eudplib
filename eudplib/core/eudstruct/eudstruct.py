@@ -14,6 +14,7 @@ from .vararray import EUDVArray
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
     def __init__(self, *args, _from=None, _static_initval=None, **kwargs) -> None:
+        super().__setattr__("_initialized", False)
         fieldcount = len(self._fielddict)
 
         if _from is not None:
@@ -23,7 +24,6 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
             if _static_initval is None:  # hacky way...
                 _static_initval = [0] * fieldcount
             super().__init__(EUDVArray(fieldcount)(_static_initval))
-            self.isPooled = False
             self._initialized = True
             self.constructor_static(*args, **kwargs)
 
@@ -31,13 +31,13 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
     # Due to cyclic dependency we import objpool inside methods
     @classmethod
     def alloc(cls, *args, **kwargs):
-        from ...eudlib.objpool import get_global_pool
+        from ...collections.objpool import get_global_pool
 
         return get_global_pool().alloc(cls, *args, **kwargs)
 
     @classmethod
     def free(cls, data):
-        from ...eudlib.objpool import get_global_pool
+        from ...collections.objpool import get_global_pool
 
         return get_global_pool().free(cls, data)
 
@@ -124,13 +124,13 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
                 raise AttributeError from e
 
     def __setattr__(self, name, value):
-        if "_initialized" in self.__dict__:
+        if self._initialized:
             try:
                 self.setfield(name, value)
             except KeyError:
                 raise ut.EPError(_("Unknown field name {}").format(name))
         else:
-            self.__dict__[name] = value
+            super().__setattr__(name, value)
 
     # Utilities
 

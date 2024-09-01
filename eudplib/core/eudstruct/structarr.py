@@ -28,6 +28,8 @@ class _EUDStructMetaclass(type):
                     fieldtype = nametype[1]
                 if fieldtype is selftype:
                     fieldtype = cls
+                    if not isinstance(basetype._fields_, list):
+                        basetype._fields_ = list(basetype._fields_)
                     basetype._fields_[i] = (fieldname, cls)
 
                 if fieldname in fielddict:

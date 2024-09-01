@@ -17,6 +17,7 @@ from .breakcont import (
     EUDSetContinuePoint,
 )
 from .cshelper import CtrlStruOpener
+from .logic import EUDAnd, EUDNot, EUDOr
 from .loopblock import (
     EUDEndInfLoop,
     EUDEndLoopN,
@@ -61,6 +62,9 @@ __all__ = [
     "EUDIsContinuePointSet",
     "EUDSetContinuePoint",
     "CtrlStruOpener",
+    "EUDAnd",
+    "EUDNot",
+    "EUDOr",
     "EUDEndInfLoop",
     "EUDEndLoopN",
     "EUDEndWhile",

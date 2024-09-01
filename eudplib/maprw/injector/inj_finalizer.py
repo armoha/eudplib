@@ -9,10 +9,12 @@ import random
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ... import eudlib as sf
+from ... import memio as mi
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
-from ...eudlib.memiof.mblockio import _repaddsd_epd
+from ...eudlib.utilf.gametick import f_getgametick
+from ...memio.mblockio import _repaddsd_epd
+from ...offsetmap.scdata import CurrentPlayer
 from ...trigtrg import runtrigtrg as rtt
 from ..inlinecode.ilcprocesstrig import _get_inline_code_list
 
@@ -59,7 +61,7 @@ def _dispatch_inline_code(
             c.SetNextPtr(t, end),
         ]
         t << c.RawTrigger(
-            conditions=[c.Deaths(c.CurrentPlayer, c.Exactly, func_id, v)],
+            conditions=[c.Deaths(CurrentPlayer, c.Exactly, func_id, v)],
             actions=ut._rand_lst(acts),
         )
         nt << c.NextTrigger()
@@ -83,20 +85,20 @@ def _dispatch_inline_code(
     c.RawTrigger(
         nextptr=trigepd.GetVTable(),
         actions=[
-            st1 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            st1 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             c.SetMemory(0x6509B0, c.Add, 1),
-            cs0 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            cs0 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             # SetNextPtr for codeend
             # action #2
             c.SetMemory(0x6509B0, c.Add, 7),
-            cs1 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            cs1 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             c.SetMemory(0x6509B0, c.Add, 1),
-            st2 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            st2 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             # This trigger sets argument for cs_a0_epd
             # cs_a0 will be SetNextPtr(trigepd + 1, nextptr) after this
             # action #3
             c.SetMemory(0x6509B0, c.Add, 7),
-            cs2 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            cs2 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             c.SetMemory(0x6509B0, c.Add, 1),
             trigepd.SetDest(ut.EPD(st3) + 5),
             nextptr.SetDest(ut.EPD(st4) + 5),
@@ -105,12 +107,12 @@ def _dispatch_inline_code(
     )
     stf << c.RawTrigger(
         actions=[
-            st3 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            st3 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             # action #4
             c.SetMemory(0x6509B0, c.Add, 7),
-            cs3 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            cs3 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
             c.SetMemory(0x6509B0, c.Add, 1),
-            st4 << c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, v),
+            st4 << c.SetDeaths(CurrentPlayer, c.SetTo, 0, v),
         ]
     )
 
@@ -125,7 +127,7 @@ def _flip_prop(trigepd: c.EUDVariable) -> None:
         # trigepd's nextptr may change during flipping process, so
         # we get it now.
         trigepd += 1
-        nexttrig, nexttrigepd = sf.f_dwepdread_epd(trigepd)
+        nexttrig, nexttrigepd = mi.f_dwepdread_epd(trigepd)
         u = random.randint(234, 65535)
         prop = (8 + 320 + 2048) // 4 - 12 * u
         c.VProc(
@@ -136,20 +138,20 @@ def _flip_prop(trigepd: c.EUDVariable) -> None:
             ],
         )
 
-        c.RawTrigger(actions=c.SetDeathsX(c.CurrentPlayer, c.Add, 8, u, 8))
+        c.RawTrigger(actions=c.SetDeathsX(CurrentPlayer, c.Add, 8, u, 8))
         """
-        if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 4, u)):  # Preserved
+        if cs.EUDIf()(c.Deaths(CurrentPlayer, c.Exactly, 4, u)):  # Preserved
             # Disable now
-            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 8, u))
+            cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 8, u))
         if cs.EUDElse()():
-            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.Subtract, 8, u))
+            cs.DoActions(c.SetDeaths(CurrentPlayer, c.Subtract, 8, u))
         cs.EUDEndIf()
         """
 
         # Dispatch inline code
-        if cs.EUDIf()(c.Deaths(c.CurrentPlayer, c.Exactly, 0x10000000, u)):
+        if cs.EUDIf()(c.Deaths(CurrentPlayer, c.Exactly, 0x10000000, u)):
             # Preserve
-            cs.DoActions(c.SetDeaths(c.CurrentPlayer, c.SetTo, 4, u))
+            cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 4, u))
             _dispatch_inline_code(nexttrig, trigepd, prop)
         cs.EUDEndIf()
 
@@ -172,8 +174,8 @@ def create_inject_finalizer(
         ret = c.NextTrigger()
 
         # Revert nextptr
-        triggerend = sf.f_dwread_epd(9)
-        ptsprev_epd = sf.f_dwread_epd(10)
+        triggerend = mi.f_dwread_epd(9)
+        ptsprev_epd = mi.f_dwread_epd(10)
         c.VProc(
             [ptsprev_epd, triggerend],
             [
@@ -187,7 +189,7 @@ def create_inject_finalizer(
         if mrgndata is None:
             mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
             mrgndata_db = c.Db(mrgndata)
-            sf.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
+            mi.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
         else:
             mrgndata_db = c.Db(mrgndata)
             _repaddsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
@@ -196,7 +198,7 @@ def create_inject_finalizer(
         i = c.EUDVariable()
         if cs.EUDWhile()(i <= 3 * 7):
             i += ut.EPD(pts + 8)
-            _flip_prop(sf.f_epdread_epd(i))
+            _flip_prop(mi.f_epdread_epd(i))
             i += 3 - ut.EPD(pts + 8)
         cs.EUDEndWhile()
 
@@ -225,8 +227,8 @@ def create_inject_finalizer(
 
             c.PopTriggerScope()
 
-            prevtstart = sf.f_dwread_epd(ut.EPD(pts) + player * 3 + 2)
-            prevtend, prevtend_epd = sf.f_dwepdread_epd(ut.EPD(pts) + player * 3 + 1)
+            prevtstart = mi.f_dwread_epd(ut.EPD(pts) + player * 3 + 2)
+            prevtend, prevtend_epd = mi.f_dwepdread_epd(ut.EPD(pts) + player * 3 + 1)
 
             # If there were triggers
             if cs.EUDIfNot()(prevtstart == ~(pts + player * 12 + 4)):
@@ -260,7 +262,7 @@ def create_inject_finalizer(
 
         if c.PushTriggerScope():
             tmcheckt << c.NextTrigger()
-            sf.f_getgametick(ret=curtime)
+            f_getgametick(ret=curtime)
             if cs.EUDIf()(curtime > lasttime):  # beware QueueAddTo (-)
                 c.VProc(curtime, curtime.SetDest(lasttime))
                 c.SetNextTrigger(root)
@@ -273,7 +275,7 @@ def create_inject_finalizer(
         c.PopTriggerScope()
 
         # lasttime << curtime
-        sf.f_getgametick(ret=curtime)
+        f_getgametick(ret=curtime)
         c.VProc(
             curtime,
             [

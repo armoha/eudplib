@@ -12,11 +12,12 @@ from eudplib import utils as ut
 
 from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...localize import _
-from ..memiof import f_getcurpl, f_setcurpl
+from ...memio import f_getcurpl, f_setcurpl
+from ...offsetmap.scdata import TrgPlayer
 
 
 @_EUDPredefineReturn(2, 3)
-@c.EUDTypedFunc([c.TrgPlayer], [None])
+@c.EUDTypedFunc([TrgPlayer], [None])
 def f_playerexist(player):
     """Check if player has not left the game.
 

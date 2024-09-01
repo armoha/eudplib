@@ -5,11 +5,13 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from typing import TYPE_CHECKING, TypeAlias, TypeVar
 
+from ...localize import _
+from ...utils import EPError, ExprProxy
+
 if TYPE_CHECKING:
-    from ...utils import ExprProxy
     from ..allocator import ConstExpr
     from ..variable import EUDVariable
 
@@ -18,20 +20,24 @@ Word: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
 Byte: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
 
 
-class ConstType(metaclass=ABCMeta):
+class ConstType(ExprProxy, metaclass=ABCMeta):
+    __slots__ = ()
+
     @classmethod
-    @abstractmethod
-    def cast(cls, s):
-        ...
-
-    def __init__(self, name: str) -> None:
-        self._name = name
-
-    def __repr__(self) -> str:
-        return self._name
+    def cast(cls, _from):
+        if isinstance(_from, cls):
+            return _from
+        if isinstance(_from, ConstType):
+            raise EPError(
+                _('[Warning] "{}" is not a {}').format(_from, cls.__name__)
+            )
+        return cls(_from)
 
     def __str__(self) -> str:
-        return repr(self)
+        return f"{type(self).__name__}({self._value})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
 # return types

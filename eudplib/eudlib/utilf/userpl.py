@@ -11,7 +11,7 @@ from eudplib import core as c
 from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
-from ..memiof import f_bread_epd, f_dwread_epd
+from ...memio import f_bread_epd, f_dwread_epd
 
 _userp: c.EUDVariable = c.EUDVariable()
 _userp_fws: set[tuple] = set()

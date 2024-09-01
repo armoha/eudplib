@@ -9,7 +9,8 @@ from random import random
 
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
-from ...core.rawtrigger import AllPlayers, SetTo
+from ...core.rawtrigger import SetTo
+from ...offsetmap.scdata import AllPlayers
 from ...trigtrg import trigtrg as tt
 from .btInliner import (
     get_executing_players,
@@ -40,7 +41,7 @@ def _preprocess_inline_code(chkt: CHK) -> None:
 
 
 def _preprocess_trig_section(
-    trig_section: bytes
+    trig_section: bytes,
 ) -> tuple[list[tuple[int, t_start_end]], bytes]:
     """Fetch inline codes & compiles them"""
     compute_base_inline_code_globals()
@@ -92,9 +93,7 @@ def _consecutive_inline_trig_section(
     def append_ptriggers(p):
         if ptriggers[p]:
             func = inline_codify_binary_triggers(ptriggers[p])
-            trig_segment = _create_inline_code_dispatcher(
-                inline_codes, func, 1 << p
-            )
+            trig_segment = _create_inline_code_dispatcher(inline_codes, func, 1 << p)
             trig_segments.append(trig_segment)
             ptriggers[p].clear()
 

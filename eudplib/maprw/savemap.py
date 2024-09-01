@@ -109,7 +109,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
         if trace_header is None:
             raise EPError(_("Unreachable callback error"))
         with open(trace_fname, "w", encoding="utf-8") as wf:
-            wf.write("H0: %s\n" % binascii.hexlify(trace_header[0]).decode("ascii"))
-            wf.write("H1: %s\n" % binascii.hexlify(trace_header[1]).decode("ascii"))
+            wf.write(f"H0: {binascii.hexlify(trace_header[0]).decode('ascii')}\n")
+            wf.write(f"H1: {binascii.hexlify(trace_header[1]).decode('ascii')}\n")
             for k, v in trace_map:
                 wf.write(f" - {k:08}%08X : {v}\n")

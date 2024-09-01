@@ -26,19 +26,19 @@ class EUDVarBuffer(EUDObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self._vdict: "dict[VariableTriggerForward, int]" = {}
+        self._vdict: dict[VariableTriggerForward, ConstExpr] = {}
         self._initvals: list[int | ConstExpr] = []
 
     def DynamicConstructed(self) -> Literal[True]:  # noqa: N802
         return True
 
-    def create_vartrigger(self, v, initval):
+    def create_vartrigger(self, v, initval) -> ConstExpr:
         ret = self + (72 * len(self._initvals))
         self._initvals.append(initval)
         self._vdict[v] = ret
         return ret
 
-    def create_vartriggers(self, v, initvals):
+    def create_vartriggers(self, v, initvals) -> ConstExpr:
         ret = self + (72 * len(self._initvals))
         self._initvals.extend(initvals)
         self._vdict[v] = ret
@@ -106,7 +106,7 @@ def _register_new_varbuffer() -> None:
     _evb = EUDVarBuffer()
 
 
-def get_current_varbuffer():
+def get_current_varbuffer() -> EUDVarBuffer | None:
     return _evb
 
 

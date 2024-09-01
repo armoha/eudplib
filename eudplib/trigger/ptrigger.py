@@ -12,13 +12,13 @@ from eudplib import utils as ut
 
 from .. import core as c
 from ..core.mapdata.playerinfo import PlayerInfo
-from ..core.rawtrigger.constenc import TrgPlayer
+from ..core.rawtrigger.constenc import _Player
 from .triggerdef import Actions, Conditions, Trigger
 
 _pinfos: list[PlayerInfo] = []
 _pdbtable: dict[bytes, c.Db] = {}
 
-Players: TypeAlias = TrgPlayer | int | Iterable[TrgPlayer | int | Iterable]
+Players: TypeAlias = _Player | int | Iterable[_Player | int | Iterable]
 
 
 def init_ptrigger() -> None:
@@ -94,7 +94,7 @@ def PTrigger(  # noqa: N802
 
     t2 << c.RawTrigger(
         nextptr=t3,
-        conditions=c.Deaths(c.CurrentPlayer, c.Exactly, ut.b2i4(b"aaaa"), 0),
+        conditions=c.Deaths(13, c.Exactly, ut.b2i4(b"aaaa"), 0),  # CurrentPlayer
         actions=[
             c.SetNextPtr(t2, tc),
             c.SetMemory(offset_curpl, c.Subtract, ut.EPD(pdb)),

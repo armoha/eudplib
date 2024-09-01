@@ -8,7 +8,8 @@
 import sys
 import traceback
 from collections.abc import Iterator, Sequence
-from typing import TYPE_CHECKING, Any, TypeVar, overload
+from itertools import pairwise
+from typing import TYPE_CHECKING, Any, TypeGuard, TypeVar, overload
 
 from typing_extensions import Self
 
@@ -47,15 +48,13 @@ def process_dest(dest):
     if isinstance(epd, VariableBase):
         epd.checkNonRValue()
         return EPD(epd.getValueAddr())
-    if dest is bt.CurrentPlayer:
-        return bt.EncodePlayer(dest)
     return epd
 
 
-def _is_rvalue(obj: object, refcount: int = 3) -> bool:
+def _is_rvalue(obj: object, refcount: int = 4) -> bool:
     if isinstance(obj, EUDVariable) and sys.getrefcount(obj) != refcount:
         return False
-    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.getValue(), 4):
+    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.getValue(), 5):
         return False
     return True
 
@@ -107,6 +106,9 @@ class VariableTriggerForward(ConstExpr):
 
 class EUDVariable(VariableBase):
     """Full variable."""
+
+    _addor: "EUDVariable"
+    __slots__ = ("_vartrigger", "_varact", "_rvalue")
 
     @overload
     def __init__(
@@ -241,15 +243,15 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def SetDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+    def SetDestX(self, dest, mask: "Dword") -> bt.Action:  # noqa: N802
         dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.SetTo, dest, mask)
 
-    def AddDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+    def AddDestX(self, dest, mask: "Dword") -> bt.Action:  # noqa: N802
         dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.Add, dest, mask)
 
-    def SubtractDestX(self, dest: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+    def SubtractDestX(self, dest, mask: "Dword") -> bt.Action:  # noqa: N802
         dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.Subtract, dest, mask)
 
@@ -278,26 +280,27 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def Assign(self, other):  # noqa: N802
+    def Assign(self, other: "Dword") -> "EUDVariable":  # noqa: N802
         self.checkNonRValue()
         SeqCompute(((self, bt.SetTo, other),))
+        return self
 
-    def __lshift__(self, other):
+    def __lshift__(self, other: "Dword") -> "EUDVariable":
         self.Assign(other)
         return self
 
-    def __iadd__(self, other):
+    def __iadd__(self, other: "Dword") -> "EUDVariable":
         SeqCompute(((self, bt.Add, other),))
         return self
 
-    def __isub__(self, other):
+    def __isub__(self, other: "Dword") -> "EUDVariable":
         if isinstance(other, int):
             return self.__iadd__(-other)  # 1A
         try:
-            addor = EUDVariable.addor
+            addor = EUDVariable._addor
         except AttributeError:
             addor = EUDVariable(0, bt.Add, 0)
-            EUDVariable.addor = addor
+            EUDVariable._addor = addor
         SeqCompute(
             [  # (~0 - other) + (self + 1)
                 (self, bt.Add, 1),
@@ -310,7 +313,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __add__(self, other):
+    def __add__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__iadd__(other)
         if IsEUDVariable(other) and _is_rvalue(other):
@@ -319,15 +322,18 @@ class EUDVariable(VariableBase):
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
-    def __radd__(self, other):
+    def __radd__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__iadd__(other)
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
-    def __sub__(self, other):
+    def __sub__(self, other: "Dword") -> "EUDVariable":
         if IsEUDVariable(other) and _is_rvalue(other):
+            rvalue_strict = _is_rvalue_strict
+            if rvalue_strict:
+                EP_SetRValueStrictMode(False)
             VProc(
                 self,  # -other += self
                 [
@@ -337,6 +343,8 @@ class EUDVariable(VariableBase):
                     self.QueueAddTo(other),
                 ],
             )  # 1T 7A
+            if rvalue_strict:
+                EP_SetRValueStrictMode(True)
             return other
         if _is_rvalue(self):
             return self.__isub__(other)
@@ -360,7 +368,7 @@ class EUDVariable(VariableBase):
             )
         return t.makeR()
 
-    def __rsub__(self, other):
+    def __rsub__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self) and IsConstExpr(other):
             bt.RawTrigger(  # -self += other
                 actions=[
@@ -390,12 +398,12 @@ class EUDVariable(VariableBase):
             )
         return t.makeR()
 
-    def __neg__(self):
+    def __neg__(self) -> "EUDVariable":
         if _is_rvalue(self):
             return self.ineg()
         return (0 - self).makeR()
 
-    def __invert__(self):
+    def __invert__(self) -> "EUDVariable":
         if _is_rvalue(self):
             return self.iinvert()
         t = EUDVariable()
@@ -404,7 +412,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __ior__(self, other):
+    def __ior__(self, other: "Dword") -> "EUDVariable":
         if IsConstExpr(other):
             return super().__ior__(other)  # 1A
         write = self.SetNumberX(0xFFFFFFFF, 0)
@@ -412,8 +420,9 @@ class EUDVariable(VariableBase):
         bt.RawTrigger(actions=write)  # 1T 5A
         return self
 
-    def __iand__(self, other):
-        if IsConstExpr(other):
+    def __iand__(self, other: "Dword") -> "EUDVariable":
+        _u = unProxy(other)
+        if isinstance(other, (int, ConstExpr)):  # noqa: UP038
             return super().__iand__(other)  # 1A
         write = self.SetNumberX(0, 0xFFFFFFFF)
         SeqCompute(
@@ -427,7 +436,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __and__(self, other):
+    def __and__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__iand__(other)
         if IsEUDVariable(other) and _is_rvalue(other):
@@ -448,7 +457,7 @@ class EUDVariable(VariableBase):
             bt.RawTrigger(actions=write)  # 2T 10A
         return t.makeR()
 
-    def __rand__(self, other):
+    def __rand__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__iand__(other)
         t = EUDVariable()
@@ -467,7 +476,7 @@ class EUDVariable(VariableBase):
             bt.RawTrigger(actions=write)  # 2T 10A
         return t.makeR()
 
-    def __or__(self, other):
+    def __or__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__ior__(other)
         if IsEUDVariable(other) and _is_rvalue(other):
@@ -482,7 +491,7 @@ class EUDVariable(VariableBase):
             bt.RawTrigger(actions=write)  # 2T 9A
         return t.makeR()
 
-    def __ror__(self, other):
+    def __ror__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__ior__(other)
         t = EUDVariable()
@@ -497,10 +506,8 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __ixor__(self, other):
-        if IsConstExpr(other):
-            return super().__ixor__(other)  # 2A
-        else:
+    def __ixor__(self, other: "Dword") -> "EUDVariable":
+        if IsEUDVariable(other):
             VProc(
                 other,
                 [
@@ -512,18 +519,17 @@ class EUDVariable(VariableBase):
             bt.RawTrigger(
                 actions=other.SetMask(0xFFFFFFFF)
             )  # FIXME: restore to previous mask???
+        else:
+            super().__ixor__(other)  # 2A
         return self
 
-    def __xor__(self, other):
+    def __xor__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__ixor__(other)
         if IsEUDVariable(other) and _is_rvalue(other):
             return other.__ixor__(self)
         t = EUDVariable()
-        if IsConstExpr(other):
-            t << self
-            t ^= other
-        else:
+        if IsEUDVariable(other):
             VProc(
                 [self, other],
                 [
@@ -536,16 +542,16 @@ class EUDVariable(VariableBase):
             bt.RawTrigger(
                 actions=other.SetMask(0xFFFFFFFF)
             )  # FIXME: restore to previous mask???
+        else:
+            t << self
+            t ^= other
         return t.makeR()
 
-    def __rxor__(self, other):
+    def __rxor__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__ixor__(other)
         t = EUDVariable()
-        if IsConstExpr(other):
-            t << self
-            t ^= other
-        else:
+        if IsEUDVariable(other):
             SeqCompute(
                 [
                     (EPD(other.getMaskAddr()), bt.SetTo, 0x55555555),
@@ -557,11 +563,14 @@ class EUDVariable(VariableBase):
             bt.RawTrigger(
                 actions=other.SetMask(0xFFFFFFFF)
             )  # FIXME: restore to previous mask???
+        else:
+            t << self
+            t ^= other
         return t.makeR()
 
     # -------
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bt.Condition:  # type: ignore[override]
         try:
             return self.Exactly(other)
 
@@ -570,7 +579,7 @@ class EUDVariable(VariableBase):
             traceback.print_stack()
             return (self - other).Exactly(0)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> bt.Condition:  # type: ignore[override]
         if isinstance(other, int):
             if other & 0xFFFFFFFF == 0:
                 return self.AtLeast(1)
@@ -578,7 +587,7 @@ class EUDVariable(VariableBase):
                 return self.AtMost(0xFFFFFFFE)
         return (self - other).AtLeast(1)
 
-    def __le__(self, other):
+    def __le__(self, other) -> bt.Condition:  # type: ignore[override]
         try:
             return self.AtMost(other)
 
@@ -589,7 +598,7 @@ class EUDVariable(VariableBase):
             SeqCompute(((t, bt.SetTo, self), (t, bt.Subtract, other)))
             return t.Exactly(0)
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> bt.Condition:  # type: ignore[override]
         try:
             return self.AtLeast(other)
 
@@ -600,11 +609,11 @@ class EUDVariable(VariableBase):
             SeqCompute(((t, bt.SetTo, other), (t, bt.Subtract, self)))
             return t.Exactly(0)
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bt.Condition:  # type: ignore[override]
         if isinstance(other, int) and other <= 0:
             ep_warn(_("No unsigned number can be leq than {}").format(other))
             traceback.print_stack()
-            return [bt.Never()]  # No unsigned number is less than 0
+            return bt.Never()  # No unsigned number is less than 0
 
         try:
             return self.AtMost(other - 1)
@@ -618,11 +627,11 @@ class EUDVariable(VariableBase):
             )
             return t.Exactly(0)
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bt.Condition:  # type: ignore[override]
         if isinstance(other, int) and other >= 0xFFFFFFFF:
             ep_warn(_("No unsigned number can be greater than {}").format(other))
             traceback.print_stack()
-            return [bt.Never()]  # No unsigned number is less than 0
+            return bt.Never()  # No unsigned number is less than 0
 
         try:
             return self.AtLeast(other + 1)
@@ -662,14 +671,14 @@ class EUDVariable(VariableBase):
     def __imod__(self, a):
         raise NotImplementedError
 
-    def __ilshift__(self, a):
+    def __ilshift__(self, a):  # type: ignore[misc]
         raise NotImplementedError
 
     def __irshift__(self, a):
         raise NotImplementedError
 
 
-def IsEUDVariable(x: object) -> bool:  # noqa: N802
+def IsEUDVariable(x: object) -> TypeGuard[EUDVariable]:  # noqa: N802
     return isinstance(unProxy(x), EUDVariable)
 
 
@@ -694,7 +703,7 @@ def VProc(v, actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:  # noqa: N802
     end = Forward()
     triggers = list()
 
-    for cv, nv in zip(v, v[1:]):
+    for cv, nv in pairwise(v):
         actions.append(bt.SetNextPtr(cv.GetVTable(), nv.GetVTable()))
     actions.append(bt.SetNextPtr(v[-1].GetVTable(), end))
 

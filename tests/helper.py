@@ -45,7 +45,7 @@ def test_assert(testname, condition):
         test_wait(0)
     if EUDElse()():
         f_simpleprint("\x08 - [FAIL]", testname)
-        failedTestDb = DBString(testname)
+        failedTestDb = Db(testname)
         _failedTest[_failedNum] = failedTestDb
         _testFailed << 1
         test_wait(24)
@@ -72,7 +72,7 @@ def test_equality(testname, real, expt):
         f_simpleprint("\x08 - [FAIL]", testname)
         f_simpleprint(" \x03   - \x04 Output   : ", *real)
         f_simpleprint(" \x03   - \x04 Expected : ", *expt)
-        failedTestDb = DBString(testname)
+        failedTestDb = Db(testname)
         _failedTest[_failedNum] = failedTestDb
         _failedNum += 1
         test_wait(24)
@@ -112,30 +112,25 @@ def test_operator(testname, realf, exptf=None):
         )
 
 
-class expect_eperror:
+class expect_error:
+    def __init__(self, error):
+        self._error = error
+
     def __enter__(self):
         PushTriggerScope()
 
     def __exit__(self, type, e, traceback):
         PopTriggerScope()
-        if isinstance(e, EPError):
-            print(" - EPError as expected: %s" % e)
+        if isinstance(e, self._error):
+            print(f" - {self._error.__name__} as expected: {e}")
             return True
         else:
-            raise RuntimeError("EPError not thrown")
+            raise RuntimeError(f"{self._error.__name__} not thrown")
 
 
-class expect_typeerror:
-    def __enter__(self):
-        PushTriggerScope()
-
-    def __exit__(self, type, e, traceback):
-        PopTriggerScope()
-        if isinstance(e, TypeError):
-            print(" - TypeError as expected: %s" % e)
-            return True
-        else:
-            raise RuntimeError("TypeError not thrown")
+class expect_eperror(expect_error):
+    def __init__(self):
+        super().__init__(EPError)
 
 
 ###############################################################

@@ -10,8 +10,8 @@ from eudplib import ctrlstru as cs
 from eudplib import trigger as t
 from eudplib import utils as ut
 
-from ..eudarray import EUDArray
-from ..memiof import f_dwread_epd, f_repmovsd_epd
+from ...collections.eudarray import EUDArray
+from ...memio import f_dwread_epd, f_repmovsd_epd
 
 _patch_max = 8192
 

@@ -6,30 +6,27 @@
 # file that should have been included as part of this package.
 
 from .csprite import CSprite
-from .cunit import CUnit, EPDCUnitMap
+from .cunit import EPDCUnitMap
 from .epdoffsetmap import EPDOffsetMap
 from .member import (
+    ArrayMember,
     BaseMember,
-    CSpriteMember,
-    CUnitMember,
-    EnumMember,
     Flag,
-    Member,
-    MemberKind,
+    StructEnumMember,
+    StructMember,
     UnsupportedMember,
 )
+from .memberkind import MemberKind
 
 __all__ = [
     "CSprite",
-    "CUnit",
     "EPDCUnitMap",
     "EPDOffsetMap",
+    "ArrayMember",
     "BaseMember",
-    "CSpriteMember",
-    "CUnitMember",
-    "EnumMember",
     "Flag",
-    "Member",
-    "MemberKind",
+    "StructEnumMember",
+    "StructMember",
     "UnsupportedMember",
+    "MemberKind",
 ]

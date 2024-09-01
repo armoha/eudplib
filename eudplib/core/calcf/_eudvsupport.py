@@ -13,13 +13,13 @@ from .muldiv import _quot, _rem, f_mul
 
 
 def _def_cls_method(name: str, f: Callable) -> None:
-    f.__name__ = "EUDVariable.%s" % name
+    f.__name__ = f"EUDVariable.{name}"
     setattr(EUDVariable, name, f)
 
 
 def _def_bin_operator(name: str, f: Callable) -> None:
     _def_cls_method(name, f)
-    _def_cls_method("__r%s" % name[2:], lambda self, lhs: f(lhs, self))
+    _def_cls_method(f"__r{name[2:]}", lambda self, lhs: f(lhs, self))
 
 
 def _def_inplace_operator(name: str, f: Callable) -> None:

@@ -9,8 +9,8 @@ from eudplib import utils as ut
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ... import eudlib as sf
 from ...core.allocator.pbuffer import Payload
+from ...memio import f_dwread_epd
 
 """ Stage 2 :
 - Initialize payload (stage3+ + user code) & execute it
@@ -37,7 +37,7 @@ def create_payload_relocator(payload: Payload) -> Payload:
             n << len(payload.prttable)
             if cs.EUDWhile()(n >= 1):
                 n += ut.EPD(prtdb) - 1
-                epd, dst = sf.f_dwread_epd(n), c.Forward()
+                epd, dst = f_dwread_epd(n), c.Forward()
                 c.VProc(
                     epd,
                     [
@@ -46,9 +46,7 @@ def create_payload_relocator(payload: Payload) -> Payload:
                         epd.SetDest(ut.EPD(dst) + 4),
                     ],
                 )
-                cs.DoActions(
-                    dst << c.SetDeaths(0, c.Add, orig_payload // 4, 0)
-                )
+                cs.DoActions(dst << c.SetDeaths(0, c.Add, orig_payload // 4, 0))
             cs.EUDEndWhile()
 
         # init ort
@@ -56,7 +54,7 @@ def create_payload_relocator(payload: Payload) -> Payload:
             n << len(payload.orttable)
             if cs.EUDWhile()(n >= 1):
                 n += ut.EPD(ortdb) - 1
-                epd, dst = sf.f_dwread_epd(n), c.Forward()
+                epd, dst = f_dwread_epd(n), c.Forward()
                 c.VProc(
                     epd,
                     [
@@ -69,7 +67,7 @@ def create_payload_relocator(payload: Payload) -> Payload:
             cs.EUDEndWhile()
 
         # Jump
-        cs.EUDJump(orig_payload)
+        c.SetNextTrigger(orig_payload)
 
     c.PopTriggerScope()
 

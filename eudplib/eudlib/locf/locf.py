@@ -11,7 +11,8 @@ from ... import core as c
 from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineParam
 from ...localize import _
-from ..memiof import f_dwread_cp, f_posread_cp, f_setcurpl2cpcache
+from ...memio import f_dwread_cp, f_posread_cp, f_setcurpl2cpcache
+from ...memio import modcurpl as cp
 
 _loct = ut.EPD(0x58DC60) - 5
 
@@ -175,9 +176,7 @@ def f_setloc(loc, *coords, action=False):
     )
     loc = c.EncodeLocation(loc)
     if action is True:
-        ut.ep_assert(
-            all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc)
-        )
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc))
     if c.IsConstExpr(loc):
         dst = _loct + 5 * loc
         if len(coords) == 2:
@@ -221,9 +220,7 @@ def f_addloc(loc, *coords, action=False):
     )
     loc = c.EncodeLocation(loc)
     if action is True:
-        ut.ep_assert(
-            all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc)
-        )
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc))
     if c.IsConstExpr(loc):
         dst = _loct + 5 * loc
         if len(coords) == 2:
@@ -235,13 +232,13 @@ def f_addloc(loc, *coords, action=False):
             return [
                 c.SetMemoryEPD(dst + i, c.Add, x)
                 for i, x in enumerate((left, t, r, b))
+                if not (isinstance(x, int) and x == 0)
             ]
         c.NonSeqCompute(
             [
-                (dst, c.Add, left),
-                (dst + 1, c.Add, t),
-                (dst + 2, c.Add, r),
-                (dst + 3, c.Add, b),
+                (dst + i, c.Add, x)
+                for i, x in enumerate((left, t, r, b))
+                if not (isinstance(x, int) and x == 0)
             ]
         )
     elif len(coords) == 2:
@@ -267,9 +264,7 @@ def f_dilateloc(loc, *coords, action=False):
     )
     loc = c.EncodeLocation(loc)
     if action is True:
-        ut.ep_assert(
-            all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc)
-        )
+        ut.ep_assert(all(c.IsConstExpr(x) for x in coords) and c.IsConstExpr(loc))
     if c.IsConstExpr(loc):
         dst = _loct + 5 * loc
         if len(coords) == 2:
@@ -281,13 +276,13 @@ def f_dilateloc(loc, *coords, action=False):
             return [
                 c.SetMemoryEPD(dst + i, c.Add, x)
                 for i, x in enumerate((-left, -t, r, b))
+                if not (isinstance(x, int) and x == 0)
             ]
         c.NonSeqCompute(
             [
-                (dst, c.Add, -left),
-                (dst + 1, c.Add, -t),
-                (dst + 2, c.Add, r),
-                (dst + 3, c.Add, b),
+                (dst + i, c.Add, x)
+                for i, x in enumerate((-left, -t, r, b))
+                if not (isinstance(x, int) and x == 0)
             ]
         )
     elif len(coords) == 2:
@@ -319,7 +314,7 @@ _set_loc: c.Action = c.SetMemory(0x6509B0, c.SetTo, 0)
 _setcp2loc: c.ConstExpr = ut.EPD(_set_loc) + 5
 
 
-@_EUDPredefineParam((_setcp2loc,), c.CurrentPlayer)
+@_EUDPredefineParam((_setcp2loc,), cp.CP)
 @c.EUDFunc
 def _setloc_epd(loc, epd):
     global _setcp2loc
@@ -333,12 +328,12 @@ def _setloc_epd(loc, epd):
         ]
     )
 
-    set_x = c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0)
+    set_x = c.SetDeaths(cp.CP, c.SetTo, 0, 0)
     set_xy = c.RawTrigger(
         actions=[
             set_x,
             c.SetMemory(0x6509B0, c.Add, 1),
-            c.SetDeaths(c.CurrentPlayer, c.SetTo, 0, 0),
+            c.SetDeaths(cp.CP, c.SetTo, 0, 0),
         ]
     )
     set_x_epd << ut.EPD(set_x) + 5
