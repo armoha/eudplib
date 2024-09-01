@@ -12,7 +12,7 @@ import builtins
 import keyword
 import types
 
-__version__ = "0.76.15"
+__version__ = "0.77.1"
 
 from .prelude import *
 # TODO: remove lines below
