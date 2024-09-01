@@ -11,7 +11,7 @@ from typing import Any, Literal
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
-from .basicstru import EUDJumpIf, EUDJumpIfNot
+from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 
 
@@ -72,9 +72,7 @@ def EUDEndLoopN() -> None:  # noqa: N802
         block["contpoint"] << c.NextTrigger()
 
     vardb = block["vardb"]
-    c.RawTrigger(
-        nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1)
-    )
+    c.RawTrigger(nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1))
     block["loopend"] << c.NextTrigger()
 
 
@@ -175,7 +173,10 @@ def _get_last_loopblock() -> tuple[str, Any]:
 
 def eudloop_continue() -> None:
     block = _get_last_loopblock()[1]
-    c.SetNextTrigger(block["contpoint"])
+    try:
+        EUDJump(block["contpoint"])
+    except ut.EPError:
+        ut.ep_warn(_("unreachable continue"))
 
 
 def eudloop_continue_if(conditions) -> None:
@@ -200,7 +201,10 @@ def set_continuepoint() -> None:
 
 def eudloop_break() -> None:
     block = _get_last_loopblock()[1]
-    c.SetNextTrigger(block["loopend"])
+    try:
+        EUDJump(block["loopend"])
+    except ut.EPError:
+        ut.ep_warn(_("unreachable break"))
 
 
 def eudloop_break_if(conditions) -> None:

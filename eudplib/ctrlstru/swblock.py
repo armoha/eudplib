@@ -13,7 +13,7 @@ from eudplib.localize import _
 
 from .. import core as c
 from .. import trigger as tg
-from .basicstru import EUDJumpIf, EUDJumpIfNot
+from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 from .jumptable import JumpTriggerForward
 
@@ -101,7 +101,10 @@ def EUDSwitchDefault() -> CtrlStruOpener:  # noqa: N802
 
 def eudswitch_break() -> None:
     block = ut.EUDGetLastBlockOfName("swblock")[1]
-    c.SetNextTrigger(block["swend"])
+    try:
+        EUDJump(block["swend"])
+    except ut.EPError:
+        ut.ep_warn(_("unreachable break"))
 
 
 def eudswitch_break_if(conditions) -> None:
