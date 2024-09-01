@@ -179,7 +179,7 @@ class UnitKind(WordKind):
         return f_bread_epd(epd, subp)
 
 
-class FlingyKind(WordKind):
+class FlingyKind(ByteKind):  # size of Flingy is byte in units.dat / word in CUnit
     __slots__ = ()
 
     @classmethod
@@ -187,12 +187,6 @@ class FlingyKind(WordKind):
         from .scdata import Flingy
 
         return Flingy.cast(other)
-
-    @classmethod
-    def read_epd(cls, epd, subp) -> c.EUDVariable:
-        from ..memio import f_bread_epd
-
-        return f_bread_epd(epd, subp)
 
 
 class SpriteKind(WordKind):

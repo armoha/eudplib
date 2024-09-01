@@ -58,7 +58,7 @@ def test_scdata():
     test_equality(
         "TrgUnit.maxH, check if write writes to the correct address",
         zealot_data.maxHp,
-        f_dwread(0x662350 + 4 * EncodeUnit("Protoss Zealot")),
+        f_dwread(0x662350 + 4 * TrgUnit("Protoss Zealot")),
     )
 
     zealot_data.maxHp = previous_value
@@ -66,11 +66,10 @@ def test_scdata():
     previous_value = TrgUnit("Goliath Turret").maxHp
     TrgUnit("Goliath Turret").maxHp = 512
 
-    """
     test_equality(
         "TrgUnit.subUnit, check UnitData to int conversion",
         TrgUnit("Terran Goliath").subUnit,
-        EncodeUnit("Goliath Turret"),
+        TrgUnit("Goliath Turret"),
     )
     test_equality(
         "TrgUnit.subUnit, check if member type of unit works",
@@ -87,43 +86,42 @@ def test_scdata():
     test_equality(
         "TrgUnit.flingy, check if chain through other data types works",
         TrgUnit("Protoss Dragoon").flingy,
-        EncodeFlingy("Dragoon"),
+        Flingy("Dragoon"),
     )
 
     test_equality(
         "TrgUnit.flingy.sprite, check if chain through other data types works",
         TrgUnit("Zerg Zergling").flingy.sprite,
-        EncodeSprite("Zergling"),
+        Sprite("Zergling"),
     )
 
     test_equality(
         "TrgUnit.flingy.sprite.image, check if chain through other data types works",
         TrgUnit("Terran Marine").flingy.sprite.image,
-        EncodeImage("Marine"),
+        Image("Marine"),
     )
 
     archon_variable = EUDVariable()
-    archon_variable << EncodeUnit("Protoss Archon")
+    archon_variable << TrgUnit("Protoss Archon")
     archon = TrgUnit(archon_variable)
 
     test_equality(
         "TrgUnit.flingy, check if chain from variable works",
         archon.flingy,
-        EncodeFlingy("Archon Energy"),
+        Flingy("Archon Energy"),
     )
 
     test_equality(
         "TrgUnit.flingy.sprite, check if chain from variable works",
         archon.flingy.sprite,
-        EncodeSprite("Archon Energy"),
+        Sprite("Archon Energy"),
     )
 
     test_equality(
         "TrgUnit.flingy.sprite.image, check if chain from variable works",
         archon.flingy.sprite.image,
-        EncodeImage("Archon Energy"),
+        Image("Archon Energy"),
     )
-    """
 
     TrgUnit("Goliath Turret").maxHp = previous_value
     DoActions(SetResources(P7, SetTo, 100, OreAndGas))

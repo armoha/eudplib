@@ -76,7 +76,10 @@ class ArrayMember(BaseMember):
             return c.f_div(instance, 4)
         if self.kind.size() == 2:
             q, r = c.f_div(instance, 2)
-            c.RawTrigger(r.Exactly(1), r.SetNumber(2))
+            if c.IsEUDVariable(r):
+                c.RawTrigger(conditions=r.Exactly(1), actions=r.SetNumber(2))
+            elif r == 1:
+                r = 2
             return q, r
         return instance, 0
 
