@@ -43,7 +43,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         member = type(self).__dict__[name]
         kind = member.kind
         ut.ep_assert(kind.size() == 4, _("Only dword can be read as epd"))
-        epd = self._epd + member.offset // 4
+        epd = member._get_epd(self)[0]
         if kind is CUnitKind:
             from .cunit import CUnit
 
@@ -65,7 +65,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         member = type(self).__dict__[name]
         kind = member.kind
         ut.ep_assert(kind.size() == 4, _("Only dword can be read as epd"))
-        epd = self._epd + member.offset // 4
+        epd = member._get_epd(self)[0]
         if kind is CUnitKind:
             from .cunit import CUnit
 
@@ -94,27 +94,24 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
         from ..memio import f_posread_epd
 
-        return f_posread_epd(self._epd + member.offset // 4)
+        return f_posread_epd(member._get_epd(self)[0])
 
     def iaddattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         value = member.kind.cast(value)
         member.kind.add_epd(epd, subp, value)
 
     # TODO: add operator for Subtract
     def isubtractattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         value = member.kind.cast(value)
         member.kind.subtract_epd(epd, subp, value)
 
     def isubattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         value = member.kind.cast(value)
         member.kind.add_epd(epd, subp, -value)
 
@@ -153,8 +150,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def eqattr(self, name: str, value):
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
@@ -172,8 +168,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def leattr(self, name, value):
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:
@@ -188,8 +183,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     def geattr(self, name, value):
         member = type(self).__dict__[name]
-        offset_epd, subp = divmod(member.offset, 4)
-        epd = self._epd + offset_epd
+        epd, subp = member._get_epd(self)
         mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
         value = member.kind.cast(value)
         if subp != 0:

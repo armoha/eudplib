@@ -43,23 +43,27 @@ class StructMember(BaseMember):
     def __init__(self, offset: int, kind: MemberKind) -> None:
         super().__init__(offset, kind)
 
+    def _get_epd(self, instance):
+        q, r = divmod(self.offset, 4)
+        return instance._epd + q, r
+
     def __get__(self, instance, owner=None) -> "c.EUDVariable | StructMember":
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
             return self
-        q, r = divmod(self.offset, 4)
         if isinstance(instance, EPDOffsetMap):
-            return self.kind.cast(self.kind.read_epd(instance._epd + q, r))
+            epd, subp = self._get_epd(instance)
+            return self.kind.cast(self.kind.read_epd(epd, subp))
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
         from .epdoffsetmap import EPDOffsetMap
 
-        q, r = divmod(self.offset, 4)
         if isinstance(instance, EPDOffsetMap):
             value = self.kind.cast(value)
-            self.kind.write_epd(instance._epd + q, r, value)
+            epd, subp = self._get_epd(instance)
+            self.kind.write_epd(epd, subp, value)
             return
         raise AttributeError
 
@@ -70,36 +74,37 @@ class ArrayMember(BaseMember):
     def __init__(self, offset: int, kind: MemberKind) -> None:
         super().__init__(offset, kind)
 
-    def div(self, instance):
+    def _get_epd(self, instance):
         # TODO: lazy calculate division
         if self.kind.size() == 1:
-            return c.f_div(instance, 4)
-        if self.kind.size() == 2:
+            q, r = c.f_div(instance, 4)
+        elif self.kind.size() == 2:
             q, r = c.f_div(instance, 2)
             if c.IsEUDVariable(r):
                 c.RawTrigger(conditions=r.Exactly(1), actions=r.SetNumber(2))
             elif r == 1:
                 r = 2
-            return q, r
-        return instance, 0
+        else:
+            q, r = instance, 0
+        return ut.EPD(self.offset) + q, r
 
     def __get__(self, instance, owner=None) -> "c.EUDVariable | ArrayMember":
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
             return self
-        q, r = self.div(instance)
         if isinstance(instance, EPDOffsetMap):
-            return self.kind.cast(self.kind.read_epd(ut.EPD(self.offset) + q, r))
+            epd, subp = self._get_epd(instance)
+            return self.kind.cast(self.kind.read_epd(epd, subp))
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
         from .epdoffsetmap import EPDOffsetMap
 
-        q, r = self.div(instance)
         if isinstance(instance, EPDOffsetMap):
             value = self.kind.cast(value)
-            self.kind.write_epd(ut.EPD(self.offset) + q, r, value)
+            epd, subp = self._get_epd(instance)
+            self.kind.write_epd(epd, subp, value)
             return
         raise AttributeError
 
@@ -129,13 +134,19 @@ class StructEnumMember(BaseMember, ut.ExprProxy):
         super().__init__(offset, kind)
         super(BaseMember, self).__init__(None)
 
+    def _get_epd(self, instance=None):
+        q, r = divmod(self.offset, 4)
+        if instance is None:
+            return self._epd + q, r
+        return instance._epd + q, r
+
     # FIXME: Overwriting ExprProxy.getValue is kinda hacky...
     def getValue(self):  # noqa: N802
         from ..memio import f_maskread_epd
 
-        q, r = divmod(self.offset, 4)
-        mask = ((1 << (8 * self.kind.size())) - 1) << (8 * r)
-        return f_maskread_epd(self._epd + q, mask)
+        epd, subp = self._get_epd()
+        mask = ((1 << (8 * self.kind.size())) - 1) << (8 * subp)
+        return f_maskread_epd(epd, mask)
 
     def __get__(self, instance, owner=None) -> "StructEnumMember":
         from .epdoffsetmap import EPDOffsetMap
