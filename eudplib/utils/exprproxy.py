@@ -150,9 +150,6 @@ class ExprProxy(Generic[T_co]):
 
     # Proxy other methods
 
-    def __call__(self, *args, **kwargs):
-        return self._value(*args, **kwargs)
-
     def __getattr__(self, name):
         return getattr(super().__getattribute__("_value"), name)
 

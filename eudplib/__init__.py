@@ -12,7 +12,7 @@ import builtins
 import keyword
 import types
 
-__version__ = "0.77.3"
+__version__ = "0.77.4"
 
 from .prelude import *
 # TODO: remove lines below
@@ -42,6 +42,7 @@ from .eudlib.utilf.pexist import (
     EUDPlayerLoop,
 )
 from .string import *
+from .string.cpprint import f_cpstr_adddw, f_cpstr_addptr, f_cpstr_addstr
 from .maprw import *
 from .qgc import *
 from .trigtrg.runtrigtrg import (
