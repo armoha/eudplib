@@ -92,15 +92,22 @@ class CSprite(EPDOffsetMap):
                     raise ut.EPError(
                         _("Invalid input for CSprite: {}").format((epd, ptr))
                     )
-                _epd, self._ptr = c.EUDCreateVariables(2)
-                c.SetVariables((_epd, self._ptr), (u, p))
+                if EPDOffsetMap._cast:
+                    _epd, self._ptr = u, p
+                else:
+                    _epd, self._ptr = c.EUDCreateVariables(2)
+                    c.SetVariables((_epd, self._ptr), (u, p))
             else:
                 self._ptr = None
-                _epd = c.EUDVariable()
-                _epd << u
+                if EPDOffsetMap._cast:
+                    _epd = u
+                else:
+                    _epd = c.EUDVariable()
+                    _epd << u
         else:
             raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
 
+        EPDOffsetMap._cast = False
         super().__init__(_epd)
 
     @classmethod

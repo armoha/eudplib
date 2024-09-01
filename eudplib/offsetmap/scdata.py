@@ -4,6 +4,8 @@
 # This file is part of EUD python library (eudplib),
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
+
+from .. import utils as ut
 from ..core.rawtrigger.constenc import EncodePlayer, PlayerDict, _Player
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import (
@@ -16,6 +18,7 @@ from ..core.rawtrigger.strenc import (
     EncodeUpgrade,
     EncodeWeapon,
 )
+from ..localize import _
 from .epdoffsetmap import EPDOffsetMap
 from .member import ArrayMember
 from .memberkind import MemberKind as Mk
@@ -44,8 +47,15 @@ class TrgPlayer(_Player, EPDOffsetMap):
     protossPsiMax = ArrayMember(0x5822C4, Mk.DWORD)  # noqa: N815
 
     @classmethod
-    def cast(cls, s):
-        return cls(s)
+    def cast(cls, other):
+        if isinstance(other, cls):
+            return other
+        if isinstance(other, ConstType):
+            raise ut.EPError(
+                _('[Warning] "{}" is not a {}').format(other, cls.__name__)
+            )
+        EPDOffsetMap._cast = True
+        return cls(other)
 
     def __init__(self, initval) -> None:
         super().__init__(EncodePlayer(initval))
@@ -142,6 +152,11 @@ class TrgUnit(ConstType, EPDOffsetMap):
 
     @classmethod
     def cast(cls, s):
+        if isinstance(s, cls):
+            return s
+        if isinstance(s, ConstType):
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+        EPDOffsetMap._cast = True
         return cls(s)
 
     def __init__(self, initval) -> None:
@@ -180,6 +195,11 @@ class Weapon(ConstType, EPDOffsetMap):
 
     @classmethod
     def cast(cls, s):
+        if isinstance(s, cls):
+            return s
+        if isinstance(s, ConstType):
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+        EPDOffsetMap._cast = True
         return cls(s)
 
     def __init__(self, initval) -> None:
@@ -198,6 +218,11 @@ class Flingy(ConstType, EPDOffsetMap):
 
     @classmethod
     def cast(cls, s):
+        if isinstance(s, cls):
+            return s
+        if isinstance(s, ConstType):
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+        EPDOffsetMap._cast = True
         return cls(s)
 
     def __init__(self, initval) -> None:
@@ -216,6 +241,11 @@ class Sprite(ConstType, EPDOffsetMap):
 
     @classmethod
     def cast(cls, s):
+        if isinstance(s, cls):
+            return s
+        if isinstance(s, ConstType):
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+        EPDOffsetMap._cast = True
         return cls(s)
 
     def __init__(self, initval) -> None:
@@ -244,6 +274,11 @@ class Image(ConstType, EPDOffsetMap):
 
     @classmethod
     def cast(cls, s):
+        if isinstance(s, cls):
+            return s
+        if isinstance(s, ConstType):
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+        EPDOffsetMap._cast = True
         return cls(s)
 
     def __init__(self, initval) -> None:
@@ -267,6 +302,11 @@ class Upgrade(ConstType, EPDOffsetMap):
 
     @classmethod
     def cast(cls, s):
+        if isinstance(s, cls):
+            return s
+        if isinstance(s, ConstType):
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+        EPDOffsetMap._cast = True
         return cls(s)
 
     def __init__(self, initval) -> None:
@@ -289,6 +329,11 @@ class Tech(ConstType, EPDOffsetMap):
 
     @classmethod
     def cast(cls, s):
+        if isinstance(s, cls):
+            return s
+        if isinstance(s, ConstType):
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+        EPDOffsetMap._cast = True
         return cls(s)
 
     def __init__(self, initval) -> None:
@@ -319,6 +364,11 @@ class UnitOrder(ConstType, EPDOffsetMap):
 
     @classmethod
     def cast(cls, s):
+        if isinstance(s, cls):
+            return s
+        if isinstance(s, ConstType):
+            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+        EPDOffsetMap._cast = True
         return cls(s)
 
     def __init__(self, initval) -> None:

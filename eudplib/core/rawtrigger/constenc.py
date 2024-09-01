@@ -106,10 +106,6 @@ OrderDict: dict[ConstType, int] = {Move: 0, Patrol: 1, Attack: 2}
 class _Player(ConstType):
     __slots__ = ()
 
-    @classmethod
-    def cast(cls, s):
-        return EncodePlayer(s)
-
     def __str__(self):
         try:
             return {

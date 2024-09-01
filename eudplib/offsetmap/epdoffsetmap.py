@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 from abc import ABCMeta
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from .. import core as c
 from .. import utils as ut
@@ -19,9 +19,22 @@ if TYPE_CHECKING:
 
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     __slots__ = ("_epd",)
+    _cast: ClassVar[bool] = False
+
+    @classmethod
+    def cast(cls, other, **kwargs):
+        if isinstance(other, cls):
+            return other
+        cls._cast = True
+        return cls(other, **kwargs)
 
     def __init__(self, epd: int | c.EUDVariable) -> None:
         self._epd: int | c.EUDVariable = epd
+        if isinstance(epd, c.EUDVariable) and not EPDOffsetMap._cast:
+            source = epd
+            epd = c.EUDVariable()
+            epd << source
+        EPDOffsetMap._cast = False
         super().__init__(epd)
 
     def getepd(self, name: str) -> "c.EUDVariable | CUnit":
