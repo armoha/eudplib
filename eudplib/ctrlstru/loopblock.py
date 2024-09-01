@@ -11,7 +11,7 @@ from typing import Any, Literal
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
-from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
+from .basicstru import EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 
 
@@ -175,10 +175,7 @@ def _get_last_loopblock() -> tuple[str, Any]:
 
 def eudloop_continue() -> None:
     block = _get_last_loopblock()[1]
-    try:
-        EUDJump(block["contpoint"])
-    except ut.EPError:
-        raise ut.EPError(_("unreachable continue"))
+    c.SetNextTrigger(block["contpoint"])
 
 
 def eudloop_continue_if(conditions) -> None:
@@ -203,10 +200,7 @@ def set_continuepoint() -> None:
 
 def eudloop_break() -> None:
     block = _get_last_loopblock()[1]
-    try:
-        EUDJump(block["loopend"])
-    except ut.EPError:
-        raise ut.EPError(_("unreachable break"))
+    c.SetNextTrigger(block["loopend"])
 
 
 def eudloop_break_if(conditions) -> None:
