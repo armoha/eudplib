@@ -256,7 +256,7 @@ class CUnitKind(DwordKind):
     __slots__ = ()
 
     @classmethod
-    def read_epd(cls, epd, subp) -> c.EUDVariable:
+    def read_epd(cls, epd, subp):
         from .cunit import CUnit
 
         return CUnit.from_read(epd)

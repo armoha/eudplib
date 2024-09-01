@@ -13,7 +13,7 @@ from eudplib import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...localize import _
 from ...memio import f_getcurpl, f_setcurpl
-from ...offsetmap.scdata import TrgPlayer
+from ...offsetmap.scdata import TrgPlayer, Force1, Force2, Force3, Force4
 
 
 @_EUDPredefineReturn(2, 3)
@@ -33,9 +33,7 @@ def f_playerexist(player):
         if cs.EUDSwitchCase()(p):
             c.RawTrigger(
                 nextptr=block["swend"],
-                conditions=c.Memory(
-                    pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)
-                ),
+                conditions=c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)),
                 actions=ret.SetNumber(0),
             )
 
@@ -52,7 +50,7 @@ def EUDLoopPlayer(  # noqa: N802
     ptype: str | None = "Human", force=None, race: str | None = None
 ) -> Iterator[c.EUDVariable]:
     def encode_force(f):
-        force_dict = {c.Force1: 0, c.Force2: 1, c.Force3: 2, c.Force4: 3}
+        force_dict = {Force1: 0, Force2: 1, Force3: 2, Force4: 3}
         if not isinstance(f, int) and f in force_dict:
             return force_dict[f]
         return f

@@ -76,16 +76,12 @@ class CSprite(EPDOffsetMap):
             u, p = epd._epd, epd._ptr
         if isinstance(u, int):
             if p is not None and not isinstance(p, int):
-                raise ut.EPError(
-                    _("Invalid input for CSprite: {}").format((epd, ptr))
-                )
+                raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
             q, r = divmod(u - ut.EPD(0x629D98), 9)  # check epd
             if r == 0 and 0 <= q < 2500:
                 _epd, self._ptr = u, 0x629D98 + 36 * q
             else:
-                raise ut.EPError(
-                    _("Invalid input for CSprite: {}").format((epd, ptr))
-                )
+                raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
         elif isinstance(u, c.EUDVariable):
             if p is not None:
                 if not isinstance(p, c.EUDVariable):
@@ -109,10 +105,6 @@ class CSprite(EPDOffsetMap):
 
         EPDOffsetMap._cast = False
         super().__init__(_epd)
-
-    @classmethod
-    def cast(cls: type[T], _from: int_or_var) -> T:
-        return cls(_from)
 
     @classmethod
     def from_ptr(cls: type[T], ptr: int_or_var) -> T:
