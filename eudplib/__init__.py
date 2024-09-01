@@ -43,15 +43,6 @@ from .eudlib.utilf.pexist import (
 )
 from .string import *
 from .maprw import *
-from .scdata import (
-    FlingyData,
-    ImageData,
-    PlayerData,
-    SpriteData,
-    UnitData,
-    UnitOrderData,
-    WeaponData,
-)
 from .qgc import *
 from .trigtrg.runtrigtrg import (
     GetFirstTrigTrigger,
