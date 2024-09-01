@@ -5,15 +5,16 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+# ruff: noqa: N815
 from collections.abc import Iterator
 from typing import TypeVar, cast
 
 from .. import core as c
 from .. import ctrlstru as cs
-from .. import utils as ut
 from ..core.eudfunc.eudf import _EUDPredefineReturn
 from ..eudlib.utilf.listloop import EUDLoopNewUnit, EUDLoopPlayerUnit, EUDLoopUnit2
 from ..localize import _
+from ..utils import EPD, EPError, unProxy
 from .csprite import int_or_var
 from .epdoffsetmap import EPDOffsetMap, _epd_cache, _ptr_cache
 from .member import (
@@ -85,7 +86,6 @@ class StatusFlags(StructEnumMember):
 T = TypeVar("T", bound="CUnit")
 
 
-# ruff: noqa: N815
 class CUnit(EPDOffsetMap):
     __slots__ = ("_ptr",)
     # TODO: add docstring for descriptor
@@ -383,38 +383,38 @@ class CUnit(EPDOffsetMap):
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
-        if not isinstance(epd, CUnit):
-            u, p = ut.unProxy(epd), ut.unProxy(ptr)
-        else:
+        if isinstance(epd, CUnit):
             u, p = epd._epd, epd._ptr
+        else:
+            u, p = unProxy(epd), unProxy(ptr)
+
         if isinstance(u, int):
-            if p is not None and not isinstance(p, int):
-                raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
-            q, r = divmod(u - ut.EPD(0x59CCA8), 84)  # check epd
+            q, r = divmod(u - EPD(0x59CCA8), 84)  # check epd
             if r == 0 and 0 <= q < 1700:
                 _epd, self._ptr = u, 0x59CCA8 + 336 * q
             else:
-                raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
+                raise EPError(_("Invalid input for CUnit: {}").format(epd))
+
+            if p is not None and not isinstance(p, int) or p != self._ptr:
+                raise EPError(_("Invalid input for CUnit.ptr: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
-            if p is not None:
-                if not isinstance(p, c.EUDVariable):
-                    raise ut.EPError(
-                        _("Invalid input for CUnit: {}").format((epd, ptr))
-                    )
-                if EPDOffsetMap._cast:
-                    _epd, self._ptr = u, p
-                else:
-                    _epd, self._ptr = c.EUDCreateVariables(2)
-                    c.SetVariables((_epd, self._ptr), (u, p))
-            else:
+            if p is None:
                 self._ptr = None
                 if EPDOffsetMap._cast:
                     _epd = u
                 else:
                     _epd = c.EUDVariable()
                     _epd << u
+            else:
+                if not isinstance(p, c.EUDVariable):
+                    raise EPError(_("Invalid input for CUnit.ptr: {}").format(ptr))
+                if EPDOffsetMap._cast:
+                    _epd, self._ptr = u, p
+                else:
+                    _epd, self._ptr = c.EUDCreateVariables(2)
+                    c.SetVariables((_epd, self._ptr), (u, p))
         else:
-            raise ut.EPError(_("Invalid input for CUnit: {}").format((epd, ptr)))
+            raise EPError(_("Invalid input for CUnit: {}").format(epd))
 
         EPDOffsetMap._cast = False
         super().__init__(_epd)
@@ -422,18 +422,18 @@ class CUnit(EPDOffsetMap):
     @classmethod
     def from_ptr(cls: type[T], ptr: int_or_var) -> T:
         epd: int | c.EUDVariable
-        u = ut.unProxy(ptr)
+        u = unProxy(ptr)
         # check ptr
         if isinstance(u, int):
             q, r = divmod(u - 0x59CCA8, 336)
             if r == 0 and 0 <= q < 1700:
-                epd = ut.EPD(u)
+                epd = EPD(u)
             else:
-                raise ut.EPError(_("Invalid input for CUnit: {}").format(ptr))
+                raise EPError(_("Invalid input for CUnit: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
             epd = _epd_cache(u)
         else:
-            raise ut.EPError(_("Invalid input for CUnit: {}").format(epd))
+            raise EPError(_("Invalid input for CUnit: {}").format(epd))
 
         return cls(epd, ptr=u)
 
@@ -466,7 +466,7 @@ class CUnit(EPDOffsetMap):
         prev_ptr, prev_epd = f_cunitepdread_epd(unit)
         c.SetVariables(  # nextPlayerUnit
             [unit, prev_epd, prev_owner, new_owner],  # new_header
-            [0x6C // 4 - 0x68 // 4, 0x6C // 4, ut.EPD(0x6283F8), ut.EPD(0x6283F8)],
+            [0x6C // 4 - 0x68 // 4, 0x6C // 4, EPD(0x6283F8), EPD(0x6283F8)],
             [c.Add, c.Add, c.Add, c.Add],
         )
         next_ptr, next_epd = f_cunitepdread_epd(unit)
@@ -474,7 +474,7 @@ class CUnit(EPDOffsetMap):
         if cs.EUDIf()(prev_ptr >= 0x59CCA8):
             f_dwwrite_epd(prev_epd, next_ptr)
         if cs.EUDElse()():
-            f_dwwrite_epd(ut.EPD(0x6283F8) + prev_owner, next_ptr)
+            f_dwwrite_epd(EPD(0x6283F8) + prev_owner, next_ptr)
         cs.EUDEndIf()
 
         if cs.EUDIf()(next_ptr >= 0x59CCA8):
@@ -530,11 +530,11 @@ class CUnit(EPDOffsetMap):
             unit,
             [
                 unit.AddNumber(0x0C // 4),
-                unit.SetDest(ut.EPD(check_sprite) + 1),
+                unit.SetDest(EPD(check_sprite) + 1),
             ],
         )
         if cs.EUDIfNot()(check_sprite):
-            f_spriteepdread_epd(unit, ret=[ut.EPD(check_sprite) + 2, color_epd])
+            f_spriteepdread_epd(unit, ret=[EPD(check_sprite) + 2, color_epd])
         cs.EUDEndIf()
         if cs.EUDIfNot()(color_epd <= 2):
             f_maskwrite_epd(color_epd + 2, color_player65536, 0xFF0000)
@@ -579,7 +579,7 @@ class CUnit(EPDOffsetMap):
             [
                 ret.SetNumber(0),
                 c.SetMemory(0x6509B0, c.SetTo, 0x98 // 4),
-                unit.QueueAddTo(ut.EPD(0x6509B0)),
+                unit.QueueAddTo(EPD(0x6509B0)),
             ],
         )
         Trigger(
@@ -623,7 +623,7 @@ class CUnit(EPDOffsetMap):
             [
                 ret.SetNumber(0),
                 c.SetMemory(0x6509B0, c.SetTo, 0x98 // 4),
-                unit.QueueAddTo(ut.EPD(0x6509B0)),
+                unit.QueueAddTo(EPD(0x6509B0)),
             ],
         )
         Trigger(
@@ -653,7 +653,7 @@ class CUnit(EPDOffsetMap):
 
     @classmethod
     def from_next(cls: type[T]) -> "CUnit":
-        return CUnit.from_read(ut.EPD(0x628438))
+        return CUnit.from_read(EPD(0x628438))
 
     def check_buildq(self, unit_type) -> c.Condition:
         unit = c.EncodeUnit(unit_type)
@@ -721,9 +721,9 @@ class CUnit(EPDOffsetMap):
     def is_dying(self) -> tuple[c.Condition, c.Condition]:
         from ..eudlib.utilf.unlimiterflag import IsUnlimiterOn
 
-        ut.ep_assert(not IsUnlimiterOn(), "Can't detect unit dying with [unlimiter]")
-        # return (self.order == 0, self.sprite >= 1)
-        return (
+        if IsUnlimiterOn():
+            raise EPError(_("Can't detect unit dying with [unlimiter]"))
+        return (  # return (self.order == 0, self.sprite >= 1)
             c.MemoryXEPD(self._epd + 0x4D // 4, c.Exactly, 0, 0xFF00),
             c.MemoryEPD(self._epd + 0x0C // 4, c.AtLeast, 1),
         )

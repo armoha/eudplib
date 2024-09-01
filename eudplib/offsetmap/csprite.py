@@ -5,11 +5,12 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+# ruff: noqa: N815
 from typing import TypeAlias, TypeVar, cast
 
 from .. import core as c
-from .. import utils as ut
 from ..localize import _
+from ..utils import EPD, EPError, ExprProxy, unProxy
 from .epdoffsetmap import EPDOffsetMap, _epd_cache, _ptr_cache
 from .member import (
     Flag,
@@ -32,10 +33,9 @@ class CSpriteFlags(StructEnumMember):
 
 
 T = TypeVar("T", bound="CSprite")
-int_or_var: TypeAlias = int | c.EUDVariable | ut.ExprProxy
+int_or_var: TypeAlias = int | c.EUDVariable | ExprProxy
 
 
-# ruff: noqa: N815
 class CSprite(EPDOffsetMap):
     __slots__ = ("_ptr",)
     prev = StructMember(0x00, Mk.C_SPRITE)
@@ -62,46 +62,43 @@ class CSprite(EPDOffsetMap):
     imageTail = StructMember(0x20, Mk.DWORD)
 
     def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
-        """
-        EPD Constructor of CSprite.
-
-        Use CSprite.from_ptr(ptr) for ptr value
-        """
+        """EPD Constructor of CSprite. Use CSprite.from_ptr(ptr) for ptr value"""
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
-        if not isinstance(epd, CSprite):
-            u, p = ut.unProxy(epd), ut.unProxy(ptr)
-        else:
+        if isinstance(epd, CSprite):
             u, p = epd._epd, epd._ptr
+        else:
+            u, p = unProxy(epd), unProxy(ptr)
+
         if isinstance(u, int):
-            if p is not None and not isinstance(p, int):
-                raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
-            q, r = divmod(u - ut.EPD(0x629D98), 9)  # check epd
+            q, r = divmod(u - EPD(0x629D98), 9)  # check epd
             if r == 0 and 0 <= q < 2500:
                 _epd, self._ptr = u, 0x629D98 + 36 * q
             else:
-                raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+                raise EPError(_("Invalid input for CSprite: {}").format(epd))
+
+            if p is not None and not isinstance(p, int) or p != self._ptr:
+                raise EPError(_("Invalid input for CSprite.ptr: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
-            if p is not None:
-                if not isinstance(p, c.EUDVariable):
-                    raise ut.EPError(
-                        _("Invalid input for CSprite: {}").format((epd, ptr))
-                    )
-                if EPDOffsetMap._cast:
-                    _epd, self._ptr = u, p
-                else:
-                    _epd, self._ptr = c.EUDCreateVariables(2)
-                    c.SetVariables((_epd, self._ptr), (u, p))
-            else:
+            if p is None:
                 self._ptr = None
                 if EPDOffsetMap._cast:
                     _epd = u
                 else:
                     _epd = c.EUDVariable()
                     _epd << u
+
+            else:
+                if not isinstance(p, c.EUDVariable):
+                    raise EPError(_("Invalid input for CSprite.ptr: {}").format(ptr))
+                if EPDOffsetMap._cast:
+                    _epd, self._ptr = u, p
+                else:
+                    _epd, self._ptr = c.EUDCreateVariables(2)
+                    c.SetVariables((_epd, self._ptr), (u, p))
         else:
-            raise ut.EPError(_("Invalid input for CSprite: {}").format((epd, ptr)))
+            raise EPError(_("Invalid input for CSprite: {}").format(epd))
 
         EPDOffsetMap._cast = False
         super().__init__(_epd)
@@ -109,18 +106,18 @@ class CSprite(EPDOffsetMap):
     @classmethod
     def from_ptr(cls: type[T], ptr: int_or_var) -> T:
         epd: int | c.EUDVariable
-        u = ut.unProxy(ptr)
+        u = unProxy(ptr)
         # check ptr
         if isinstance(u, int):
             q, r = divmod(u - 0x59CCA8, 336)
             if r == 0 and 0 <= q < 1700:
-                epd = ut.EPD(u)
+                epd = EPD(u)
             else:
-                raise ut.EPError(_("Invalid input for CSprite: {}").format(ptr))
+                raise EPError(_("Invalid input for CSprite: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
             epd = _epd_cache(u)
         else:
-            raise ut.EPError(_("Invalid input for CSprite: {}").format(epd))
+            raise EPError(_("Invalid input for CSprite: {}").format(epd))
 
         return cls(epd, ptr=u)
 
