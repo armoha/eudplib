@@ -26,7 +26,8 @@ class CSpriteFlags(StructEnumMember):
     AllySel1 = Flag(0x02)
     AllySel2 = Flag(0x04)
     Selected = Flag(0x08)  # Draw HP bar, Selected
-    Flag4 = Flag(0x10)
+    # sorts sprite elevation higher, so that subunits always appear above base unit
+    IsSubunit = Flag(0x10)
     Hidden = Flag(0x20)  # Hidden
     Burrowed = Flag(0x40)  # Burrowed
     IscriptCode = Flag(0x80)  # Iscript unbreakable code section
