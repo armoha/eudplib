@@ -58,7 +58,7 @@ class CSprite(EPDOffsetMap):
     pos = StructMember(0x14, Mk.POSITION)
     posX = StructMember(0x14, Mk.POSITION_X)
     posY = StructMember(0x16, Mk.POSITION_Y)
-    mainGraphic = StructMember(0x18, Mk.DWORD)  # officially "pImagePrimary"
+    mainGraphic = StructMember(0x18, Mk.DWORD)  # officially "pImagePrimary", CImage
     imageHead = StructMember(0x1C, Mk.DWORD)
     imageTail = StructMember(0x20, Mk.DWORD)
 

@@ -350,7 +350,7 @@ class CUnit(EPDOffsetMap):
     plagueTimer = StructMember(0x11A, Mk.BYTE)
     stormTimer = StructMember(0x11B, Mk.BYTE)
     # Used to tell if a unit is under psi storm	(is "stormTimer" in BWAPI)
-    isUnderStorm = StructMember(0x11B, Mk.BYTE)
+    isUnderStorm = StructMember(0x11B, Mk.BOOL)
     irradiatedBy = StructMember(0x11C, Mk.C_UNIT)
     irradiatePlayerID = StructMember(0x120, Mk.PLAYER)
     # Each bit corresponds to the player who has parasited this unit
