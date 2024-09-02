@@ -124,9 +124,8 @@ class TrgUnit(ConstType, EPDOffsetMap):
     maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
-    # FIXME: split 2 flags into separate members
     ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL(0x01))
-    AIDontGuard = ArrayMember(0x660178, Mk.BOOL(0x02))
+    dontBecomeGuard = ArrayMember(0x660178, Mk.BOOL(0x02))
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
