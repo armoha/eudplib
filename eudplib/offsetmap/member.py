@@ -61,24 +61,31 @@ class StructMember(BaseMember):
         from .epdoffsetmap import EPDOffsetMap
 
         if isinstance(instance, EPDOffsetMap):
-            value = self.kind.cast(value)
             epd, subp = self._get_epd(instance)
-            self.kind.write_epd(epd, subp, value)
+            self.kind.write_epd(epd, subp, self.kind.cast(value))
             return
         raise AttributeError
 
 
 class ArrayMember(BaseMember):
-    __slots__ = ("offset", "kind")
+    __slots__ = ("offset", "kind", "stride")
 
-    def __init__(self, offset: int, kind: MemberKind) -> None:
+    def __init__(
+        self, offset: int, kind: MemberKind, *, stride: int | None = None
+    ) -> None:
+        ut.ep_assert(offset % 4 == 0)
         super().__init__(offset, kind)
+        if stride is None:
+            self.stride = self.kind.size()
+        else:
+            ut.ep_assert(self.kind.size() <= stride and stride in (1, 2, 4))
+            self.stride = stride
 
     def _get_epd(self, instance):
         # TODO: lazy calculate division
-        if self.kind.size() == 1:
+        if self.stride == 1:
             q, r = c.f_div(instance, 4)
-        elif self.kind.size() == 2:
+        elif self.stride == 2:
             q, r = c.f_div(instance, 2)
             if c.IsEUDVariable(r):
                 c.RawTrigger(conditions=r.Exactly(1), actions=r.SetNumber(2))
@@ -102,9 +109,8 @@ class ArrayMember(BaseMember):
         from .epdoffsetmap import EPDOffsetMap
 
         if isinstance(instance, EPDOffsetMap):
-            value = self.kind.cast(value)
             epd, subp = self._get_epd(instance)
-            self.kind.write_epd(epd, subp, value)
+            self.kind.write_epd(epd, subp, self.kind.cast(value))
             return
         raise AttributeError
 

@@ -97,7 +97,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     # SCBW_DATA(u16*,		InfestedUnitPartial,	unitsDat[3].address);
     # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
     # last valid id is UnitId::Special_OvermindCocoon
-    constructionGraphic = ArrayMember(0x6610B0, Mk.DWORD)  # FIXME: should be IMAGE
+    constructionGraphic = ArrayMember(0x6610B0, Mk.IMAGE, stride=4)
     startDirection = ArrayMember(0x6605F0, Mk.BYTE)
     hasShield = ArrayMember(0x6647B0, Mk.BOOL)
     maxShield = ArrayMember(0x660E00, Mk.WORD)
