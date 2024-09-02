@@ -48,13 +48,30 @@ class ByteKind(BaseKind):
 
 
 class BoolKind(ByteKind):
-    __slots__ = ()
+    __slots__ = ("_bit",)
 
-    @classmethod
-    def read_epd(cls, epd, subp) -> c.EUDVariable:
-        from ..memio.specialized import _boolread_epd
+    def __init__(self, bit: int = 1) -> None:
+        if isinstance(bit, int) and 1 <= bit <= 128 and bit.bit_count() == 1:
+            self._bit = bit
+        else:
+            raise EPError(_("invalid bit value for bool: {}").format(bit))
+        super().__init__()
 
-        return _boolread_epd()[subp](epd)
+    def read_epd(self, epd, subp) -> c.EUDVariable:
+        from ..memio.bwepdio import _boolread_epd
+
+        return _boolread_epd(self._bit)(epd, subp)
+
+    def write_epd(self, epd, subp, value) -> None:
+        from ..memio.bwepdio import _bitwrite_epd
+
+        _bitwrite_epd(epd, subp, self._bit, value)
+
+    def add_epd(self, epd, subp, value) -> None:
+        raise NotImplementedError
+
+    def subtract_epd(self, epd, subp, value) -> None:
+        raise NotImplementedError
 
 
 class PlayerKind(ByteKind):

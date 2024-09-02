@@ -137,13 +137,76 @@ def _bwriter(epd, subp, b):
     return b
 
 
-def f_bwrite_epd(epd, subp, b):
+def f_bwrite_epd(epd, subp, b) -> None:
     if isinstance(subp, int) and isinstance(b, int):
         cs.DoActions(
             c.SetDeathsX(epd, c.SetTo, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp))
         )
     else:
         _bwriter(epd, subp, b)
+
+
+def _bitwrite_epd(epd, subp, bit, b) -> None:
+    ut.ep_assert(isinstance(bit, int) and bit.bit_count() == 1)
+    if isinstance(subp, int):
+        bit <<= 8 * subp
+        if c.IsEUDVariable(b):
+            from ..trigger import Trigger
+
+            cs.DoActions(c.SetDeathsX(epd, c.SetTo, 0, 0, bit))
+            Trigger(
+                conditions=b.AtLeast(1),
+                actions=c.SetDeathsX(epd, c.SetTo, bit, 0, bit),
+            )
+        elif b == 0:
+            cs.DoActions(c.SetDeathsX(epd, c.SetTo, 0, 0, bit))
+        else:
+            cs.DoActions(c.SetDeathsX(epd, c.SetTo, bit, 0, bit))
+        return
+
+    try:
+        f = getattr(_bitwrite_epd, "f")
+    except AttributeError:
+        f = {}
+        _bitwrite_epd.f = f
+
+    try:
+        _bitwriter = f[bit]
+    except KeyError:
+
+        @c.EUDFunc
+        def _bitwriter(epd, subp, b):
+            c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
+            cs.EUDSwitch(subp)
+            for i in ut._rand_lst(range(4)):
+                if cs.EUDSwitchCase()(i):
+                    c.RawTrigger(
+                        actions=c.SetDeathsX(
+                            cp.CP,
+                            c.SetTo,
+                            0,
+                            0,
+                            bit << (8 * i),
+                        )
+                    )
+                    c.RawTrigger(
+                        conditions=b.AtLeast(1),
+                        actions=c.SetDeathsX(
+                            cp.CP,
+                            c.SetTo,
+                            bit << (8 * i),
+                            0,
+                            bit << (8 * i),
+                        ),
+                    )
+                    cs.EUDBreak()
+            cs.EUDEndSwitch()
+            cp.f_setcurpl2cpcache()
+            return b
+
+        f[bit] = _bitwriter
+
+    return _bitwriter(epd, subp, b)
 
 
 @c.EUDFunc
@@ -261,3 +324,35 @@ def f_bread_epd(epd, subp, *, ret=None):
 
 def f_maskwrite_epd(epd, value, mask) -> None:
     cs.DoActions(c.SetDeathsX(epd, c.SetTo, value, 0, mask))
+
+
+def _boolread_epd(bit):
+    ut.ep_assert(bit.bit_count() == 1)
+    f = getattr(_boolread_epd, "f", None)
+    if f is None:
+        f = {}
+        _boolread_epd.f = f
+    try:
+        readfn = f[bit]
+    except KeyError:
+
+        @c.EUDFunc
+        def readfn(epd, subp):
+            b = c.EUDVariable()
+            c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), b.SetNumber(0)])
+            cs.EUDSwitch(subp)
+            for i in ut._rand_lst(range(4)):
+                if cs.EUDSwitchCase()(i):
+                    mask = bit << (8 * i)
+                    c.RawTrigger(
+                        conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, mask),
+                        actions=b.SetNumber(1),
+                    )
+                    cs.EUDBreak()
+            cs.EUDEndSwitch()
+            cp.f_setcurpl2cpcache()
+            return b
+
+        f[bit] = readfn
+
+    return readfn

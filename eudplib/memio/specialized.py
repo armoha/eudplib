@@ -111,16 +111,6 @@ def _mapyread_epd():
     return f
 
 
-def _boolread_epd():
-    f = getattr(_boolread_epd, "f", None)
-    if f is None:
-        f = tuple(
-            f_readgen_epd(1 << shift, (0, lambda x: 1)) for shift in range(0, 32, 8)
-        )
-        _boolread_epd.f = f
-    return f
-
-
 def _playerread_epd():
     f = getattr(_playerread_epd, "f", None)
     if f is None:

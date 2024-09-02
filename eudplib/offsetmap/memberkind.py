@@ -9,6 +9,9 @@ import enum
 from abc import ABCMeta, abstractmethod
 from typing import Literal
 
+from ..localize import _
+from ..utils import EPError
+
 
 class BaseKind(metaclass=ABCMeta):
     __slots__ = ()
@@ -44,7 +47,7 @@ class BaseKind(metaclass=ABCMeta):
 
 
 class MemberKind(enum.Enum):
-    __slots__ = ()
+    __slots__ = ("_payload",)
     DWORD = enum.auto()
     WORD = enum.auto()
     BYTE = enum.auto()
@@ -68,7 +71,28 @@ class MemberKind(enum.Enum):
     ICON = enum.auto()
     W_STRING = enum.auto()
 
-    def impl(self) -> type[BaseKind]:
+    def __init__(self, value):
+        self._payload = None
+        super().__init__(value)
+
+    def __call__(self, payload):
+        match self:
+            case MemberKind.BOOL:
+                if (
+                    isinstance(payload, int)
+                    and 1 <= payload <= 128
+                    and payload.bit_count() == 1
+                ):
+                    self._payload = payload
+                else:
+                    raise EPError(
+                        _("invalid bit value for bool: {}").format(payload)
+                    )
+            case _:
+                raise TypeError
+        return self
+
+    def impl(self) -> type[BaseKind] | BaseKind:
         from .memberimpl import (
             BoolKind,
             ByteKind,
@@ -102,7 +126,10 @@ class MemberKind(enum.Enum):
             case MemberKind.BYTE:
                 return ByteKind
             case MemberKind.BOOL:
-                return BoolKind
+                if self._payload:
+                    return BoolKind(self._payload)
+                else:
+                    return BoolKind(0x01)
             case MemberKind.C_UNIT:
                 return CUnitKind
             case MemberKind.C_SPRITE:
