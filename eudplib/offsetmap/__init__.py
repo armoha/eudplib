@@ -7,27 +7,20 @@
 
 from .csprite import CSprite
 from .cunit import EPDCUnitMap
+from .enummember import ArrayEnumMember, Flag, StructEnumMember
 from .epdoffsetmap import EPDOffsetMap
-from .member import (
-    ArrayEnumMember,
-    ArrayMember,
-    BaseMember,
-    Flag,
-    StructEnumMember,
-    StructMember,
-    UnsupportedMember,
-)
+from .member import ArrayMember, BaseMember, StructMember, UnsupportedMember
 from .memberkind import MemberKind
 
 __all__ = [
     "CSprite",
     "EPDCUnitMap",
-    "EPDOffsetMap",
     "ArrayEnumMember",
-    "ArrayMember",
-    "BaseMember",
     "Flag",
     "StructEnumMember",
+    "EPDOffsetMap",
+    "ArrayMember",
+    "BaseMember",
     "StructMember",
     "UnsupportedMember",
     "MemberKind",

@@ -16,13 +16,9 @@ from ..eudlib.utilf.listloop import EUDLoopNewUnit, EUDLoopPlayerUnit, EUDLoopUn
 from ..localize import _
 from ..utils import EPD, EPError, unProxy
 from .csprite import int_or_var
+from .enummember import Flag, StructEnumMember
 from .epdoffsetmap import EPDOffsetMap, _epd_cache, _ptr_cache
-from .member import (
-    Flag,
-    StructEnumMember,
-    StructMember,
-    UnsupportedMember,
-)
+from .member import StructMember, UnsupportedMember
 from .memberkind import MemberKind as Mk
 from .scdata import CurrentPlayer, TrgPlayer
 from .unit import TrgUnit

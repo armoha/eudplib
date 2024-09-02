@@ -10,8 +10,9 @@ from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeUnit
 from ..localize import _
+from .enummember import ArrayEnumMember, Flag
 from .epdoffsetmap import EPDOffsetMap
-from .member import ArrayEnumMember, ArrayMember, Flag
+from .member import ArrayMember
 from .memberkind import MemberKind as Mk
 
 
@@ -124,7 +125,8 @@ class TrgUnit(ConstType, EPDOffsetMap):
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
     # FIXME: split 2 flags into separate members
-    AIFlags = ArrayMember(0x660178, Mk.BYTE)  # FIXME: should be flags
+    ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL(0x01))
+    AIDontGuard = ArrayMember(0x660178, Mk.BOOL(0x02))
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
