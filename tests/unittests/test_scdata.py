@@ -9,10 +9,9 @@ def test_scdata():
     # with expect_eperror():
     #     TrgUnit(233)
     marine = TrgUnit("Terran Marine")
-    # with expect_eperror():
-    #     TrgUnit(marine)
-    marine = TrgUnit.cast(marine)
-    test_equality("TrgUnit(marine) = 0", marine, EUDVariable(0))
+    marine = TrgUnit(marine)  # copy inner value
+    marine = TrgUnit.cast(marine)  # share reference
+    test_equality("TrgUnit(marine) = 0", marine, 0)
     test_equality("marine.maxHp = 40 * 256", marine.maxHp, 40 * 256)
     test_equality(
         "marine.maxHp = EUDVar(40 * 256)", marine.maxHp, EUDVariable(40 * 256)
@@ -126,8 +125,9 @@ def test_scdata():
     TrgUnit("Goliath Turret").maxHp = previous_value
     DoActions(SetResources(P7, SetTo, 100, OreAndGas))
 
-    test_equality("TrgPlayer.ore, check ore amount read", P7.ore, 100)
-    test_equality("TrgPlayer.gas, check gas amount read", P7.gas, 100)
+    test_equality(
+        "TrgPlayer.ore, check ore, gas amounts read", [P7.ore, P7.gas], [100, 100]
+    )
 
     P7.ore += 200
 
@@ -138,8 +138,52 @@ def test_scdata():
     with expect_eperror():
         TrgUnit("zzt, GOD OF EUD")
 
+    scv = TrgUnit("Terran SCV")
+    test_equality("scv.baseProperty flags", scv.baseProperty, 0x58010008)
+    scv.baseProperty.Hero = True
+    test_equality(
+        "scv.baseProperty individual flags",
+        [
+            scv.baseProperty.Worker,
+            scv.baseProperty.AutoAttackAndMove,
+            scv.baseProperty.CanAttack,
+            scv.baseProperty.Mechanical,
+            scv.baseProperty.Hero,
+            scv.baseProperty.ResourceDepot,
+        ],
+        [
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+        ],
+    )
 
-@TestInstance
+    test_equality("scv.nameString == 0", scv.nameString, 0)
+    name = EncodeString("dpdkfah!")  # EncodeString does string interning
+    scv.nameString = "dpdkfah!"
+    test_equality("scv.nameString test", scv.nameString, name)
+    with expect_eperror():
+        scv.nameString = 65536
+
+    test_equality(
+        "scv.ignoreStrategicSuicideMissions == True",
+        scv.ignoreStrategicSuicideMissions,
+        True,
+    )
+    scv.ignoreStrategicSuicideMissions = False
+    test_equality(
+        "scv.ignoreStrategicSuicideMissions == False",
+        scv.ignoreStrategicSuicideMissions,
+        False,
+    )
+    with expect_error(NotImplementedError):
+        scv.iaddattr("ignoreStrategicSuicideMissions", 1)
+
+
+@TestInstance  # noqa: F405
 def test_epdoffsetmap_scdataobject_reference():
     goliath_cunit = CUnit.from_next()
     DoActions(CreateUnit(1, "Terran Goliath", "Anywhere", P8))
