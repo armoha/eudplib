@@ -244,7 +244,9 @@ class CUnit(EPDOffsetMap):
     # resource -----------------------------------------------
     resourceAmount = StructMember(0x0D0, Mk.WORD)  # 0x0D0 union
     resourceIscript = StructMember(0x0D2, Mk.BYTE)
-    gatherQueueCount = StructMember(0x0D3, Mk.BYTE)
+    # it is byte but effectively bool; always set to 1 when beginning to harvest,\
+    # but when finshed is decremented by 1 instead of set to 0
+    gatherQueueCount = StructMember(0x0D3, Mk.BOOL)
     # pointer to the next worker unit waiting in line to gather
     nextGatherer = StructMember(0x0D4, Mk.C_UNIT)
     resourceGroup = StructMember(0x0D8, Mk.BYTE)
