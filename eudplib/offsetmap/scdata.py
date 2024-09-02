@@ -97,7 +97,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     # SCBW_DATA(u16*,		InfestedUnitPartial,	unitsDat[3].address);
     # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
     # last valid id is UnitId::Special_OvermindCocoon
-    constructionGraphic = ArrayMember(0x6610B0, Mk.BYTE)
+    constructionGraphic = ArrayMember(0x6610B0, Mk.DWORD)  # FIXME: should be IMAGE
     startDirection = ArrayMember(0x6605F0, Mk.BYTE)
     hasShield = ArrayMember(0x6647B0, Mk.BOOL)
     maxShield = ArrayMember(0x660E00, Mk.WORD)
@@ -116,13 +116,13 @@ class TrgUnit(ConstType, EPDOffsetMap):
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
     # FIXME: split 2 flags into separate members
     AIFlags = ArrayMember(0x660178, Mk.BYTE)
-    baseProperty = ArrayMember(0x664080, Mk.DWORD)
+    baseProperty = ArrayMember(0x664080, Mk.DWORD)  # FIXME: should be enum
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
-    armorUpgrade = ArrayMember(0x6635D0, Mk.BYTE)
-    sizeType = ArrayMember(0x662180, Mk.BYTE)
+    armorUpgrade = ArrayMember(0x6635D0, Mk.UPGRADE)
+    sizeType = ArrayMember(0x662180, Mk.BYTE)  # FIXME: should be enum
     armor = ArrayMember(0x65FEC8, Mk.BYTE)
-    rightClickAction = ArrayMember(0x662098, Mk.BYTE)
+    rightClickAction = ArrayMember(0x662098, Mk.BYTE)  # FIXME: should be enum
     readySound = ArrayMember(0x661FC0, Mk.WORD)
     whatSoundStart = ArrayMember(0x65FFB0, Mk.WORD)
     whatSoundEnd = ArrayMember(0x662BF0, Mk.WORD)
@@ -135,7 +135,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     # addonPlacement = ArrayMember(0x6626E0, Mk.POSITION)
     # unitDimensions is not implemented yet.
     # unitBoundsLURB = ArrayMember(0x6617C8, 2 * Mk.POSITION)
-    portrait = ArrayMember(0x662F88, Mk.WORD)
+    portrait = ArrayMember(0x662F88, Mk.WORD)  # FIXME: should be PORTRAIT
     mineralCost = ArrayMember(0x663888, Mk.WORD)
     gasCost = ArrayMember(0x65FD00, Mk.WORD)
     timeCost = ArrayMember(0x660428, Mk.WORD)
@@ -166,33 +166,33 @@ class TrgUnit(ConstType, EPDOffsetMap):
 
 class Weapon(ConstType, EPDOffsetMap):
     __slots__ = ()
-    label = ArrayMember(0x6572E0, Mk.WORD)
+    label = ArrayMember(0x6572E0, Mk.WORD)  # FIXME: should be STATTEXT
     graphic = flingy = ArrayMember(0x656CA8, Mk.FLINGY)
     # special attack is for reference only?
     # specialAttack = ArrayMember(0x6573E8, Mk.BYTE)
-    targetFlags = ArrayMember(0x657998, Mk.DWORD)
+    targetFlags = ArrayMember(0x657998, Mk.WORD)  # FIXME: should be enum
     # can't use range because it's a python keyword
     minRange = ArrayMember(0x656A18, Mk.DWORD)
-    maxRange = ArrayMember(0x6573E8, Mk.DWORD)
-    upgrade = upgradeID = ArrayMember(0x6571D0, Mk.BYTE)
-    damageType = ArrayMember(0x657258, Mk.BYTE)
+    maxRange = ArrayMember(0x657470, Mk.DWORD)
+    upgrade = ArrayMember(0x6571D0, Mk.UPGRADE)
+    damageType = ArrayMember(0x657258, Mk.BYTE)  # FIXME: should be enum
     # Fly and follow target, appear on target unit, etc.
     behavior = ArrayMember(0x656670, Mk.BYTE)
     removeAfter = ArrayMember(0x657040, Mk.BYTE)
-    explosionType = ArrayMember(0x6566F8, Mk.BYTE)
+    explosionType = ArrayMember(0x6566F8, Mk.BYTE)  # FIXME: should be enum
     splashInnerRadius = ArrayMember(0x656888, Mk.WORD)
     splashMiddleRadius = ArrayMember(0x6570C8, Mk.WORD)
     splashOuterRadius = ArrayMember(0x657780, Mk.WORD)
     damage = ArrayMember(0x656EB0, Mk.WORD)
     damageBonus = ArrayMember(0x657678, Mk.WORD)
-    cooldown = ArrayMember(0x656EBC, Mk.BYTE)
+    cooldown = ArrayMember(0x656FB8, Mk.BYTE)
     damageFactor = ArrayMember(0x6564E0, Mk.BYTE)
     attackAngle = ArrayMember(0x656990, Mk.BYTE)
     launchSpin = ArrayMember(0x657888, Mk.BYTE)
     forwardOffset = graphicXOffset = ArrayMember(0x657910, Mk.BYTE)
     verticalOffset = graphicYOffset = ArrayMember(0x656C20, Mk.BYTE)
-    targetErrorMessage = ArrayMember(0x656568, Mk.WORD)
-    icon = ArrayMember(0x656780, Mk.WORD)
+    targetErrorMessage = ArrayMember(0x656568, Mk.WORD)  # FIXME: should be STATTEXT
+    icon = ArrayMember(0x656780, Mk.WORD)  # FIXME: should be ICON
 
     @classmethod
     def cast(cls, s):
@@ -209,7 +209,7 @@ class Weapon(ConstType, EPDOffsetMap):
 
 class Flingy(ConstType, EPDOffsetMap):
     __slots__ = ()
-    sprite = spriteID = ArrayMember(0x6CA318, Mk.SPRITE)
+    sprite = ArrayMember(0x6CA318, Mk.SPRITE)
     topSpeed = ArrayMember(0x6C9EF8, Mk.DWORD)
     acceleration = ArrayMember(0x6C9C78, Mk.WORD)
     haltDistance = ArrayMember(0x6C9930, Mk.DWORD)
@@ -233,7 +233,7 @@ class Flingy(ConstType, EPDOffsetMap):
 class Sprite(ConstType, EPDOffsetMap):
     __slots__ = ()
     # Read only data skipped
-    image = imageID = ArrayMember(0x666160, Mk.IMAGE)
+    image = ArrayMember(0x666160, Mk.IMAGE)
     # hpBarSize = ArrayMember(0x665E50, Mk.BYTE)
     # ??? = ArrayMember(0x666570, Mk.BYTE)
     isVisible = ArrayMember(0x665C48, Mk.BOOL)
@@ -261,11 +261,11 @@ class Image(ConstType, EPDOffsetMap):
     isClickable = ArrayMember(0x66C150, Mk.BOOL)
     useFullIscript = ArrayMember(0x66D4D8, Mk.BOOL)
     drawIfCloaked = ArrayMember(0x667718, Mk.BOOL)
-    drawingFunction = ArrayMember(0x669E28, Mk.BYTE)
+    drawingFunction = ArrayMember(0x669E28, Mk.BYTE)  # FIXME: it should be enum
     # Remapping table is skipped because it doesn't work in SC:R
     # FIXME: Add UnsupportedMember
     # remapping = ArrayMember(0x669A40, Mk.BYTE)
-    iscript = iscriptID = ArrayMember(0x66EC48, Mk.DWORD)
+    iscript = ArrayMember(0x66EC48, Mk.DWORD)  # FIXME: should be ISCRIPT
     # shieldsOverlay = ArrayMember(0x66C538, Mk.DWORD)
     # attackOverlay = ArrayMember(0x66B1B0, Mk.DWORD)
     # damageOverlay = ArrayMember(0x66A210, Mk.DWORD)
@@ -288,7 +288,7 @@ class Image(ConstType, EPDOffsetMap):
 
 class Upgrade(ConstType, EPDOffsetMap):
     __slots__ = ()
-    mineralCostBase = ArrayMember(0x656740, Mk.WORD)
+    mineralCostBase = ArrayMember(0x655740, Mk.WORD)
     mineralCostFactor = ArrayMember(0x6559C0, Mk.WORD)
     gasCostBase = ArrayMember(0x655840, Mk.WORD)
     gasCostFactor = ArrayMember(0x6557C0, Mk.WORD)
@@ -345,23 +345,23 @@ class UnitOrder(ConstType, EPDOffsetMap):
     __slots__ = ()
     label = ArrayMember(0x665280, Mk.WORD)
     useWeaponTargeting = ArrayMember(0x664B00, Mk.BOOL)
-    # secondaryOrder = ArrayMember(0x665940, Mk.BYTE)
-    # nonSubUnit = ArrayMember(0x665A00, Mk.BYTE)
-    # ??? = ArrayMember(0x664A40, Mk.BYTE)
-    # subUnitcanUse = ArrayMember(0x6657C0, Mk.BYTE)
+    # isSecondaryOrder = ArrayMember(0x665940, Mk.BOOL)
+    # nonSubUnit = ArrayMember(0x665A00, Mk.BOOL)
+    # ??? = ArrayMember(0x664A40, Mk.BOOL)
+    # subUnitcanUse = ArrayMember(0x6657C0, Mk.BOOL)
     canBeInterrupted = ArrayMember(0x665040, Mk.BOOL)
-    # ??? = ArrayMember(0x665100, Mk.BYTE)
+    # ??? = ArrayMember(0x665100, Mk.BOOL)
     canBeQueued = ArrayMember(0x665700, Mk.BOOL)
-    # ??? = ArrayMember(0x6651C0, Mk.BYTE)
+    # ??? = ArrayMember(0x6651C0, Mk.BOOL)
     canBeObstructed = ArrayMember(0x6654C0, Mk.BOOL)
-    # ??? = ArrayMember(0x664C80, Mk.BYTE)
-    # requireMoving = ArrayMember(0x664BC0, Mk.BYTE)
-    weapon = weaponID = ArrayMember(0x665880, Mk.BYTE)
-    techUsed = ArrayMember(0x664E00, Mk.BYTE)
+    # ??? = ArrayMember(0x664C80, Mk.BOOL)
+    # requireMoving = ArrayMember(0x664BC0, Mk.BOOL)
+    weapon = ArrayMember(0x665880, Mk.WEAPON)
+    techUsed = ArrayMember(0x664E00, Mk.TECH)
     animation = ArrayMember(0x664D40, Mk.BYTE)
     buttonIcon = ArrayMember(0x664EC0, Mk.WORD)
     requirementOffset = ArrayMember(0x665580, Mk.WORD)
-    obscuredOrder = ArrayMember(0x665400, Mk.BYTE)
+    obscuredOrder = ArrayMember(0x665400, Mk.UNIT_ORDER)
 
     @classmethod
     def cast(cls, s):
