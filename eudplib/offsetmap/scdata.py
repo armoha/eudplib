@@ -11,13 +11,10 @@ from ..core.rawtrigger.constenc import EncodePlayer, PlayerDict, _Player
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import (
     EncodeFlingy,
-    EncodeImage,
     EncodeSprite,
     EncodeTech,
-    EncodeUnit,
     EncodeUnitOrder,
     EncodeUpgrade,
-    EncodeWeapon,
 )
 from ..localize import _
 from .epdoffsetmap import EPDOffsetMap
@@ -87,126 +84,6 @@ PlayerDict.update({
 # fmt: on
 
 
-class TrgUnit(ConstType, EPDOffsetMap):
-    __slots__ = ()
-    graphic = flingy = ArrayMember(0x6644F8, Mk.FLINGY)
-    subUnit = ArrayMember(0x6607C0, Mk.UNIT)
-    # subunit2 is unused
-    # subunit2 = ArrayMember(0x660C38, Mk.WORD)
-    # infestationUnit is not implemented yet. (different beginning index)
-    # SCBW_DATA(u16*,		InfestedUnitPartial,	unitsDat[3].address);
-    # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
-    # last valid id is UnitId::Special_OvermindCocoon
-    constructionGraphic = ArrayMember(0x6610B0, Mk.IMAGE, stride=4)
-    startDirection = ArrayMember(0x6605F0, Mk.BYTE)
-    hasShield = ArrayMember(0x6647B0, Mk.BOOL)
-    maxShield = ArrayMember(0x660E00, Mk.WORD)
-    maxHp = ArrayMember(0x662350, Mk.DWORD)
-    elevation = ArrayMember(0x663150, Mk.BYTE)
-    movementFlags = ArrayMember(0x660FC8, Mk.BYTE)
-    rank = ArrayMember(0x663DD0, Mk.BYTE)
-    computerIdleOrder = ArrayMember(0x662EA0, Mk.UNIT_ORDER)
-    humanIdleOrder = ArrayMember(0x662268, Mk.UNIT_ORDER)
-    returnToIdleOrder = ArrayMember(0x664898, Mk.UNIT_ORDER)
-    attackUnitOrder = ArrayMember(0x663320, Mk.UNIT_ORDER)
-    attackMoveOrder = ArrayMember(0x663A50, Mk.UNIT_ORDER)
-    groundWeapon = ArrayMember(0x6636B8, Mk.WEAPON)
-    maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
-    airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
-    maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
-    # FIXME: split 2 flags into separate members
-    AIFlags = ArrayMember(0x660178, Mk.BYTE)
-    baseProperty = ArrayMember(0x664080, Mk.DWORD)  # FIXME: should be enum
-    seekRange = ArrayMember(0x662DB8, Mk.BYTE)
-    sightRange = ArrayMember(0x663238, Mk.BYTE)
-    armorUpgrade = ArrayMember(0x6635D0, Mk.UPGRADE)
-    sizeType = ArrayMember(0x662180, Mk.BYTE)  # FIXME: should be enum
-    armor = ArrayMember(0x65FEC8, Mk.BYTE)
-    rightClickAction = ArrayMember(0x662098, Mk.BYTE)  # FIXME: should be enum
-    readySound = ArrayMember(0x661FC0, Mk.WORD)
-    whatSoundStart = ArrayMember(0x65FFB0, Mk.WORD)
-    whatSoundEnd = ArrayMember(0x662BF0, Mk.WORD)
-    pissedSoundStart = ArrayMember(0x663B38, Mk.WORD)
-    pissedSoundEnd = ArrayMember(0x661EE8, Mk.WORD)
-    yesSoundStart = ArrayMember(0x663C10, Mk.WORD)
-    yesSoundEnd = ArrayMember(0x661440, Mk.WORD)
-    buildingDimensions = ArrayMember(0x662860, Mk.POSITION)
-    # AddonPlacement is not implemented yet because its beginning index isn't 0.
-    # addonPlacement = ArrayMember(0x6626E0, Mk.POSITION)
-    # unitDimensions is not implemented yet.
-    # unitBoundsLURB = ArrayMember(0x6617C8, 2 * Mk.POSITION)
-    portrait = ArrayMember(0x662F88, Mk.WORD)  # FIXME: should be PORTRAIT
-    mineralCost = ArrayMember(0x663888, Mk.WORD)
-    gasCost = ArrayMember(0x65FD00, Mk.WORD)
-    timeCost = ArrayMember(0x660428, Mk.WORD)
-    requirementOffset = ArrayMember(0x660A70, Mk.WORD)
-    groupFlags = ArrayMember(0x6637A0, Mk.BYTE)
-    supplyProvided = ArrayMember(0x6646C8, Mk.BYTE)
-    supplyUsed = ArrayMember(0x663CE8, Mk.BYTE)
-    transportSpaceProvided = ArrayMember(0x660988, Mk.BYTE)
-    transportSpaceRequired = ArrayMember(0x664410, Mk.BYTE)
-    buildScore = ArrayMember(0x663408, Mk.WORD)
-    killScore = ArrayMember(0x663EB8, Mk.WORD)
-    nameString = ArrayMember(0x660260, Mk.WORD)
-    broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)
-    stareditAvailabilityFlags = ArrayMember(0x661528, Mk.WORD)
-
-    @classmethod
-    def cast(cls, s):
-        if isinstance(s, cls):
-            return s
-        if isinstance(s, ConstType):
-            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
-        EPDOffsetMap._cast = True
-        return cls(s)
-
-    def __init__(self, initval) -> None:
-        super().__init__(EncodeUnit(initval))
-
-
-class Weapon(ConstType, EPDOffsetMap):
-    __slots__ = ()
-    label = ArrayMember(0x6572E0, Mk.WORD)  # FIXME: should be STATTEXT
-    graphic = flingy = ArrayMember(0x656CA8, Mk.FLINGY)
-    # special attack is for reference only?
-    # specialAttack = ArrayMember(0x6573E8, Mk.BYTE)
-    targetFlags = ArrayMember(0x657998, Mk.WORD)  # FIXME: should be enum
-    # can't use range because it's a python keyword
-    minRange = ArrayMember(0x656A18, Mk.DWORD)
-    maxRange = ArrayMember(0x657470, Mk.DWORD)
-    upgrade = ArrayMember(0x6571D0, Mk.UPGRADE)
-    damageType = ArrayMember(0x657258, Mk.BYTE)  # FIXME: should be enum
-    # Fly and follow target, appear on target unit, etc.
-    behavior = ArrayMember(0x656670, Mk.BYTE)
-    removeAfter = ArrayMember(0x657040, Mk.BYTE)
-    explosionType = ArrayMember(0x6566F8, Mk.BYTE)  # FIXME: should be enum
-    splashInnerRadius = ArrayMember(0x656888, Mk.WORD)
-    splashMiddleRadius = ArrayMember(0x6570C8, Mk.WORD)
-    splashOuterRadius = ArrayMember(0x657780, Mk.WORD)
-    damage = ArrayMember(0x656EB0, Mk.WORD)
-    damageBonus = ArrayMember(0x657678, Mk.WORD)
-    cooldown = ArrayMember(0x656FB8, Mk.BYTE)
-    damageFactor = ArrayMember(0x6564E0, Mk.BYTE)
-    attackAngle = ArrayMember(0x656990, Mk.BYTE)
-    launchSpin = ArrayMember(0x657888, Mk.BYTE)
-    forwardOffset = graphicXOffset = ArrayMember(0x657910, Mk.BYTE)
-    verticalOffset = graphicYOffset = ArrayMember(0x656C20, Mk.BYTE)
-    targetErrorMessage = ArrayMember(0x656568, Mk.WORD)  # FIXME: should be STATTEXT
-    icon = ArrayMember(0x656780, Mk.WORD)  # FIXME: should be ICON
-
-    @classmethod
-    def cast(cls, s):
-        if isinstance(s, cls):
-            return s
-        if isinstance(s, ConstType):
-            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
-        EPDOffsetMap._cast = True
-        return cls(s)
-
-    def __init__(self, initval) -> None:
-        super().__init__(EncodeWeapon(initval))
-
-
 class Flingy(ConstType, EPDOffsetMap):
     __slots__ = ()
     sprite = ArrayMember(0x6CA318, Mk.SPRITE)
@@ -251,39 +128,6 @@ class Sprite(ConstType, EPDOffsetMap):
 
     def __init__(self, initval) -> None:
         super().__init__(EncodeSprite(initval))
-
-
-class Image(ConstType, EPDOffsetMap):
-    __slots__ = ()
-    # Read only data skipped
-    # grpFile = ArrayMember(0x668AA0, Mk.DWORD)
-    isTurnable = graphicTurn = ArrayMember(0x66E860, Mk.BOOL)
-    isClickable = ArrayMember(0x66C150, Mk.BOOL)
-    useFullIscript = ArrayMember(0x66D4D8, Mk.BOOL)
-    drawIfCloaked = ArrayMember(0x667718, Mk.BOOL)
-    drawingFunction = ArrayMember(0x669E28, Mk.BYTE)  # FIXME: it should be enum
-    # Remapping table is skipped because it doesn't work in SC:R
-    # FIXME: Add UnsupportedMember
-    # remapping = ArrayMember(0x669A40, Mk.BYTE)
-    iscript = ArrayMember(0x66EC48, Mk.DWORD)  # FIXME: should be ISCRIPT
-    # shieldsOverlay = ArrayMember(0x66C538, Mk.DWORD)
-    # attackOverlay = ArrayMember(0x66B1B0, Mk.DWORD)
-    # damageOverlay = ArrayMember(0x66A210, Mk.DWORD)
-    # specialOverlay = ArrayMember(0x667B00, Mk.DWORD)
-    # landingDustOverlay = ArrayMember(0x666778, Mk.DWORD)
-    # liftOffDustOverlay = ArrayMember(0x66D8C0, Mk.DWORD)
-
-    @classmethod
-    def cast(cls, s):
-        if isinstance(s, cls):
-            return s
-        if isinstance(s, ConstType):
-            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
-        EPDOffsetMap._cast = True
-        return cls(s)
-
-    def __init__(self, initval) -> None:
-        super().__init__(EncodeImage(initval))
 
 
 class Upgrade(ConstType, EPDOffsetMap):

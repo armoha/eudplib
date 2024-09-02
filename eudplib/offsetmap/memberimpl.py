@@ -76,7 +76,7 @@ class WeaponKind(ByteKind):
 
     @classmethod
     def cast(cls, other):
-        from .scdata import Weapon
+        from .weapon import Weapon
 
         return Weapon.cast(other)
 
@@ -168,7 +168,7 @@ class UnitKind(WordKind):
 
     @classmethod
     def cast(cls, other):
-        from .scdata import TrgUnit
+        from .unit import TrgUnit
 
         return TrgUnit.cast(other)
 
@@ -204,7 +204,7 @@ class ImageKind(WordKind):
 
     @classmethod
     def cast(cls, other):
-        from .scdata import Image
+        from .image import Image
 
         return Image.cast(other)
 

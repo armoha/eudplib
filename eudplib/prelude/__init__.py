@@ -119,15 +119,15 @@ from ..collections import (
     PVariable, UnitGroup
 )
 from ..offsetmap.cunit import CUnit, EUDLoopCUnit, EUDLoopNewCUnit, EUDLoopPlayerCUnit
+from ..offsetmap.image import Image
+from ..offsetmap.unit import TrgUnit
+from ..offsetmap.weapon import Weapon
 from ..offsetmap.scdata import (
     Flingy,
-    Image,
     Sprite,
     Tech,
-    TrgUnit,
     UnitOrder,
     Upgrade,
-    Weapon,
     TrgPlayer,
     P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12,
     Force1, Force2, Force3, Force4, AllPlayers, CurrentPlayer,

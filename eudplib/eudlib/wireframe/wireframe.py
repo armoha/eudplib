@@ -8,7 +8,8 @@ from eudplib.maprw.injector.mainloop import (
     eud_onstart2,
     has_already_started,
 )
-from eudplib.offsetmap.scdata import CurrentPlayer, TrgUnit
+from eudplib.offsetmap.scdata import CurrentPlayer
+from eudplib.offsetmap.unit import TrgUnit
 
 from ...collections.eudarray import EUDArray
 from ...memio import (

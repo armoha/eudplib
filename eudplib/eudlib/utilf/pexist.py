@@ -13,7 +13,7 @@ from eudplib import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...localize import _
 from ...memio import f_getcurpl, f_setcurpl
-from ...offsetmap.scdata import TrgPlayer, Force1, Force2, Force3, Force4
+from ...offsetmap.scdata import Force1, Force2, Force3, Force4, TrgPlayer
 
 
 @_EUDPredefineReturn(2, 3)
@@ -33,7 +33,9 @@ def f_playerexist(player):
         if cs.EUDSwitchCase()(p):
             c.RawTrigger(
                 nextptr=block["swend"],
-                conditions=c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)),
+                conditions=c.Memory(
+                    pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)
+                ),
                 actions=ret.SetNumber(0),
             )
 

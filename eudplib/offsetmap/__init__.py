@@ -9,6 +9,7 @@ from .csprite import CSprite
 from .cunit import EPDCUnitMap
 from .epdoffsetmap import EPDOffsetMap
 from .member import (
+    ArrayEnumMember,
     ArrayMember,
     BaseMember,
     Flag,
@@ -22,6 +23,7 @@ __all__ = [
     "CSprite",
     "EPDCUnitMap",
     "EPDOffsetMap",
+    "ArrayEnumMember",
     "ArrayMember",
     "BaseMember",
     "Flag",

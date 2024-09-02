@@ -24,7 +24,8 @@ from .member import (
     UnsupportedMember,
 )
 from .memberkind import MemberKind as Mk
-from .scdata import CurrentPlayer, TrgPlayer, TrgUnit
+from .scdata import CurrentPlayer, TrgPlayer
+from .unit import TrgUnit
 
 
 class MovementFlags(StructEnumMember):
