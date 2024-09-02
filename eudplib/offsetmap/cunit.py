@@ -83,6 +83,13 @@ class StatusFlags(StructEnumMember):
     IsSelfDestructing = Flag(0x80000000)
 
 
+class PathingFlags(StructEnumMember):
+    __slots__ = ()
+    HasCollision = Flag(0x01)
+    IsStacked = Flag(0x02)
+    Decollide = Flag(0x04)
+
+
 T = TypeVar("T", bound="CUnit")
 
 
@@ -250,11 +257,13 @@ class CUnit(EPDOffsetMap):
     # pointer to the next worker unit waiting in line to gather
     nextGatherer = StructMember(0x0D4, Mk.C_UNIT)
     resourceGroup = StructMember(0x0D8, Mk.BYTE)
-    resourceBelongsToAI = StructMember(0x0D9, Mk.BYTE)
+    resourceBelongsToAI = StructMember(0x0D9, Mk.BOOL)
     # other buildings ----------------------------------------
     nydusExit = StructMember(0x0D0, Mk.C_UNIT)  # connected nydus canal
     # confirmed to be CUnit* and not CSprite*
-    ghostNukeMissile = StructMember(0x0D0, Mk.C_UNIT)
+    # CThingy struct is same as CUnit but trimmed down to [prev, next, hp, sprite],
+    # with "hp" field used as unitID for fog thingies or otherwise unused
+    ghostNukeDot = StructMember(0x0D0, Mk.C_UNIT)  # FIXME: should be CThingy
     pylonAura = StructMember(0x0D0, Mk.C_SPRITE)
     # silo
     siloNuke = StructMember(0x0D0, Mk.C_UNIT)
@@ -316,7 +325,7 @@ class CUnit(EPDOffsetMap):
     path = UnsupportedMember(0x100, Mk.DWORD)
     pathingCollisionInterval = StructMember(0x104, Mk.BYTE)
     # 0x01 = uses pathing; 0x02 = ?; 0x04 = ?
-    pathingFlags = StructMember(0x105, Mk.BYTE)
+    pathingFlags = PathingFlags(0x105, Mk.BYTE)
     unknown0x106 = StructMember(0x106, Mk.BYTE)
     # 1 if a medic is currently healing this unit
     isBeingHealed = StructMember(0x107, Mk.BOOL)
@@ -348,6 +357,7 @@ class CUnit(EPDOffsetMap):
     # counts/cycles up from 0 to 7 (inclusive). See also 0x85
     cycleCounter = StructMember(0x122, Mk.BYTE)
     # Each bit corresponds to the player who has optical flared this unit
+    # like parasiteFlags, but is read as a bool for vision check
     blindFlags = StructMember(0x123, Mk.BYTE)  # bool in BWAPI
     maelstromTimer = StructMember(0x124, Mk.BYTE)
     # Might be afterburner timer or ultralisk roar timer
