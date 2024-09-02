@@ -8,6 +8,8 @@
 from typing import Literal
 
 from .. import core as c
+from ..localize import _
+from ..utils import EPError
 
 # from .. import utils as ut
 from .memberkind import BaseKind
@@ -209,6 +211,33 @@ class ImageKind(WordKind):
         return Image.cast(other)
 
 
+class StatTextKind(WordKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        return c.EncodeTBL(other)
+
+
+class IconKind(WordKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        return c.EncodeIcon(other)
+
+
+class WordStringKind(WordKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        other = c.EncodeString(other)
+        if isinstance(other, int) and not (0 <= other <= 65535):
+            raise EPError(_("OldStringID should be 0 <= id <= 65535"))
+        return other
+
+
 class DwordKind(BaseKind):
     __slots__ = ()
 
@@ -270,6 +299,14 @@ class CSpriteKind(DwordKind):
         from ..memio import f_spriteepdread_epd
 
         return f_spriteepdread_epd(epd)
+
+
+class IscriptKind(DwordKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        return c.EncodeIscript(other)
 
 
 class SelfKind(BaseKind):

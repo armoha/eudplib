@@ -29,6 +29,18 @@ class MovementFlags(ArrayEnumMember):
     HoverUnit = Flag(0xC1)
 
 
+class GroupFlags(ArrayEnumMember):
+    __slots__ = ()
+    Zerg = Flag(0x01)
+    Terran = Flag(0x02)
+    Protoss = Flag(0x04)
+    Men = Flag(0x08)
+    Building = Flag(0x10)
+    Factory = Flag(0x20)
+    Independent = Flag(0x40)
+    Neutral = Flag(0x80)
+
+
 class BaseProperty(ArrayEnumMember):  # UnitPrototypeFlags in bwapi
     __slots__ = ()
     Building = Flag(0x00000001)
@@ -101,7 +113,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     maxHp = ArrayMember(0x662350, Mk.DWORD)
     elevation = ArrayMember(0x663150, Mk.BYTE)
     movementFlags = MovementFlags(0x660FC8, Mk.BYTE)
-    rank = ArrayMember(0x663DD0, Mk.BYTE)
+    rank = ArrayMember(0x663DD0, Mk.BYTE)  # FIXME: should be RANK? (STATTEXT?)
     computerIdleOrder = ArrayMember(0x662EA0, Mk.UNIT_ORDER)
     humanIdleOrder = ArrayMember(0x662268, Mk.UNIT_ORDER)
     returnToIdleOrder = ArrayMember(0x664898, Mk.UNIT_ORDER)
@@ -112,7 +124,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
     # FIXME: split 2 flags into separate members
-    AIFlags = ArrayMember(0x660178, Mk.BYTE)
+    AIFlags = ArrayMember(0x660178, Mk.BYTE)  # FIXME: should be flags
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
@@ -120,7 +132,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     sizeType = ArrayMember(0x662180, Mk.BYTE)  # FIXME: should be enum
     armor = ArrayMember(0x65FEC8, Mk.BYTE)
     rightClickAction = ArrayMember(0x662098, Mk.BYTE)  # FIXME: should be enum
-    readySound = ArrayMember(0x661FC0, Mk.WORD)
+    readySound = ArrayMember(0x661FC0, Mk.WORD)  # sfxdata.dat start index
     whatSoundStart = ArrayMember(0x65FFB0, Mk.WORD)
     whatSoundEnd = ArrayMember(0x662BF0, Mk.WORD)
     pissedSoundStart = ArrayMember(0x663B38, Mk.WORD)
@@ -137,14 +149,14 @@ class TrgUnit(ConstType, EPDOffsetMap):
     gasCost = ArrayMember(0x65FD00, Mk.WORD)
     timeCost = ArrayMember(0x660428, Mk.WORD)
     requirementOffset = ArrayMember(0x660A70, Mk.WORD)
-    groupFlags = ArrayMember(0x6637A0, Mk.BYTE)
+    groupFlags = GroupFlags(0x6637A0, Mk.BYTE)
     supplyProvided = ArrayMember(0x6646C8, Mk.BYTE)
     supplyUsed = ArrayMember(0x663CE8, Mk.BYTE)
     transportSpaceProvided = ArrayMember(0x660988, Mk.BYTE)
     transportSpaceRequired = ArrayMember(0x664410, Mk.BYTE)
     buildScore = ArrayMember(0x663408, Mk.WORD)
     killScore = ArrayMember(0x663EB8, Mk.WORD)
-    nameString = ArrayMember(0x660260, Mk.WORD)
+    nameString = ArrayMember(0x660260, Mk.W_STRING)  # WORD
     broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)
     stareditAvailabilityFlags = StareditAvailabilityFlags(0x661518, Mk.WORD)
 

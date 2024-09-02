@@ -61,8 +61,12 @@ class MemberKind(enum.Enum):
     FLINGY = enum.auto()
     SPRITE = enum.auto()
     IMAGE = enum.auto()
+    ISCRIPT = enum.auto()
     UPGRADE = enum.auto()
     TECH = enum.auto()
+    STATTEXT = enum.auto()
+    ICON = enum.auto()
+    W_STRING = enum.auto()
 
     def impl(self) -> type[BaseKind]:
         from .memberimpl import (
@@ -72,18 +76,22 @@ class MemberKind(enum.Enum):
             CUnitKind,
             DwordKind,
             FlingyKind,
+            IconKind,
             ImageKind,
+            IscriptKind,
             PlayerKind,
             PositionKind,
             PositionXKind,
             PositionYKind,
             SpriteKind,
+            StatTextKind,
             TechKind,
             UnitKind,
             UnitOrderKind,
             UpgradeKind,
             WeaponKind,
             WordKind,
+            WordStringKind,
         )
 
         match self:
@@ -119,9 +127,17 @@ class MemberKind(enum.Enum):
                 return SpriteKind
             case MemberKind.IMAGE:
                 return ImageKind
+            case MemberKind.ISCRIPT:
+                return IscriptKind
             case MemberKind.UPGRADE:
                 return UpgradeKind
             case MemberKind.TECH:
                 return TechKind
+            case MemberKind.STATTEXT:
+                return StatTextKind
+            case MemberKind.ICON:
+                return IconKind
+            case MemberKind.W_STRING:
+                return WordStringKind
             case _:
                 raise NotImplementedError

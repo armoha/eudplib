@@ -30,7 +30,7 @@ class TargetFlags(ArrayEnumMember):
 
 class Weapon(ConstType, EPDOffsetMap):
     __slots__ = ()
-    label = ArrayMember(0x6572E0, Mk.WORD)  # FIXME: should be STATTEXT
+    label = ArrayMember(0x6572E0, Mk.STATTEXT)
     graphic = flingy = ArrayMember(0x656CA8, Mk.FLINGY)
     # special attack is for reference only?
     # specialAttack = ArrayMember(0x6573E8, Mk.BYTE)
@@ -56,7 +56,7 @@ class Weapon(ConstType, EPDOffsetMap):
     forwardOffset = graphicXOffset = ArrayMember(0x657910, Mk.BYTE)
     verticalOffset = graphicYOffset = ArrayMember(0x656C20, Mk.BYTE)
     targetErrorMessage = ArrayMember(0x656568, Mk.WORD)  # FIXME: should be STATTEXT
-    icon = ArrayMember(0x656780, Mk.WORD)  # FIXME: should be ICON
+    icon = ArrayMember(0x656780, Mk.ICON)
 
     @classmethod
     def cast(cls, s):

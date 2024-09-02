@@ -92,7 +92,7 @@ class Flingy(ConstType, EPDOffsetMap):
     haltDistance = ArrayMember(0x6C9930, Mk.DWORD)
     turnSpeed = turnRadius = ArrayMember(0x6C9E20, Mk.BYTE)
     # unused = ArrayMember(0x6CA240, Mk.BYTE)
-    movementControl = ArrayMember(0x6C9858, Mk.BYTE)
+    movementControl = ArrayMember(0x6C9858, Mk.BYTE)  # FIXME: should be enum
 
     @classmethod
     def cast(cls, s):
@@ -139,11 +139,11 @@ class Upgrade(ConstType, EPDOffsetMap):
     timeCostBase = ArrayMember(0x655B80, Mk.WORD)
     timeCostFactor = ArrayMember(0x655940, Mk.WORD)
     requirementOffset = ArrayMember(0x6558C0, Mk.WORD)
-    icon = ArrayMember(0x655AC0, Mk.WORD)
-    label = ArrayMember(0x655A40, Mk.WORD)
-    race = ArrayMember(0x655BFC, Mk.BYTE)
+    icon = ArrayMember(0x655AC0, Mk.ICON)
+    label = ArrayMember(0x655A40, Mk.STATTEXT)
+    race = ArrayMember(0x655BFC, Mk.BYTE)  # FIXME: should be enum
     maxLevel = ArrayMember(0x655700, Mk.BYTE)
-    broodWarFlag = ArrayMember(0x655B3C, Mk.BYTE)
+    broodWarFlag = ArrayMember(0x655B3C, Mk.BYTE)  # bool?
 
     @classmethod
     def cast(cls, s):
@@ -164,13 +164,13 @@ class Tech(ConstType, EPDOffsetMap):
     gasCost = ArrayMember(0x6561F0, Mk.WORD)
     timeCost = ArrayMember(0x6563D8, Mk.WORD)
     energyCost = ArrayMember(0x656380, Mk.WORD)
-    # ??? = ArrayMember(0x656198, Mk.WORD)
-    requirementOffset = ArrayMember(0x6562F8, Mk.WORD)
-    icon = ArrayMember(0x656430, Mk.WORD)
-    label = ArrayMember(0x6562A0, Mk.WORD)
-    race = ArrayMember(0x656488, Mk.BYTE)
+    researchRequirementOffset = ArrayMember(0x656198, Mk.WORD)
+    techUseRequirementOffset = ArrayMember(0x6562F8, Mk.WORD)
+    icon = ArrayMember(0x656430, Mk.ICON)
+    label = ArrayMember(0x6562A0, Mk.STATTEXT)
+    race = ArrayMember(0x656488, Mk.BYTE)  # FIXME: should be enum
     researched = ArrayMember(0x656350, Mk.BYTE)  # UNUSED?
-    broodWarFlag = ArrayMember(0x6564B4, Mk.BYTE)
+    broodWarFlag = ArrayMember(0x6564B4, Mk.BYTE)  # bool?
 
     @classmethod
     def cast(cls, s):
@@ -187,7 +187,7 @@ class Tech(ConstType, EPDOffsetMap):
 
 class UnitOrder(ConstType, EPDOffsetMap):
     __slots__ = ()
-    label = ArrayMember(0x665280, Mk.WORD)
+    label = ArrayMember(0x665280, Mk.STATTEXT)
     useWeaponTargeting = ArrayMember(0x664B00, Mk.BOOL)
     # isSecondaryOrder = ArrayMember(0x665940, Mk.BOOL)
     # nonSubUnit = ArrayMember(0x665A00, Mk.BOOL)
@@ -203,7 +203,7 @@ class UnitOrder(ConstType, EPDOffsetMap):
     weapon = ArrayMember(0x665880, Mk.WEAPON)
     techUsed = ArrayMember(0x664E00, Mk.TECH)
     animation = ArrayMember(0x664D40, Mk.BYTE)
-    buttonIcon = ArrayMember(0x664EC0, Mk.WORD)
+    buttonIcon = ArrayMember(0x664EC0, Mk.ICON)
     requirementOffset = ArrayMember(0x665580, Mk.WORD)
     obscuredOrder = ArrayMember(0x665400, Mk.UNIT_ORDER)
 
