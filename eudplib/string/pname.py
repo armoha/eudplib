@@ -256,7 +256,7 @@ class _PlayerName:
         cs.EUDJumpIf(self.is_chatptr_unchanged, _end)
         if isinstance(player, TrgPlayer):
             player = c.EncodePlayer(player)
-            if isinstance(player, int) and player == 13:
+            if not c.IsEUDVariable(player) and player == CurrentPlayer:
                 player = f_getcurpl()
         cs.EUDJumpIf(f_playerexist(player) == 0, _end)
         basename, baselen = self.basenames[player], self.baselens[player]

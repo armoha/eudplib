@@ -1,0 +1,54 @@
+function updateUnitNameAndRank() {
+    // 다른 스트링까지 내용 바뀌면 99보다 더 높이기!
+    const NAME_STR = EncodeString(py_eval("99 * '\\r'"));
+    // 사용할 계급 stat_txt.tbl의 번호나 원래 내용 넣기
+    // 주의: EUD Editor 안에서 계급 내용을 수정할 내용보다 길게 만들어야 함!
+    const RANK_TBL = $B("Recruit (Rank)");
+
+    const LOCAL_UNIT_SELECT = EPD(0x6284B8);  // 선택한 유닛 (비공유)
+    /* TEST */ dwwrite_epd(LOCAL_UNIT_SELECT, 0x59CCA8 + 336);
+    static var selectedUnitPtr, selectedUnitEpd = 0, 0;
+    if (!MemoryEPD(LOCAL_UNIT_SELECT, Exactly, selectedUnitPtr)) {
+        selectedUnitPtr, selectedUnitEpd = cunitepdread_epd(LOCAL_UNIT_SELECT);
+    }
+    if (selectedUnitPtr == 0) return -1, -1;
+    /* TEST */ dwwrite_epd(LOCAL_UNIT_SELECT, 0);
+    const namePtr = GetMapStringAddr(NAME_STR);
+    var rankPtr;
+    once rankPtr = GetTBLAddr(RANK_TBL);
+    const unitTypes = py_list();
+    const unit = CUnit(selectedUnitEpd, ptr=selectedUnitPtr);
+
+    const Ticket = EUDArray(py_range(8));
+    const Ore = EUDArray(py_range(1, 17, 2));
+    const Gas = EUDArray(py_range(2, 26, 3));
+
+    /* TEST */ dwwrite(0x59CCA8 + 336 + 0x64, $U("Terran Academy"));
+    /* TEST */ bwrite(0x59CCA8 + 336 + 0x4C, $P2);
+    // 예시: 클릭한 유닛의 종류마다 경우 나누기
+    epdswitch (unit + 0x64/4, 255) {
+    case $U("Terran Academy"):
+        sprintf(namePtr, "Ticket {}, Ore {}, Gas {}", Ticket[unit.owner], Ore[unit.owner], Gas[unit.owner]);
+        sprintf(rankPtr, "{}", unit.unitType);
+        break;
+    unitTypes.extend((EUDGetLastBlockOfName("swblock"))[1][py_str("casebrlist")].keys());
+    }
+    once {
+        const actions = py_list();
+        foreach(unitType : unitTypes) {
+            actions.append(SetMemoryX(
+                0x660260 + 2 * unitType,
+                SetTo,
+                NAME_STR << (16 * (unitType % 2)),
+                0xFFFF << (16 * (unitType % 2))
+            ));
+        }
+        DoActions(actions);
+    }
+    /* TEST */
+    setcurpl(getuserplayerid());
+    DisplayText(NAME_STR);
+    const tests = "Ticket 1, Ore 3, Gas 5\0", "{}\0".format($U("Terran Academy"));
+    return memcmp(namePtr, Db(tests[0]), py_len(tests[0].encode("utf-8"))),
+        memcmp(rankPtr, Db(tests[1]), py_len(tests[1].encode("utf-8")));
+}

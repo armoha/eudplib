@@ -20,6 +20,7 @@ from .test_eps_epsfile import (
     f_switch_test,
     f_test_array,
     f_test_all_actions,
+    f_test_reported,
 )
 from .test_eps_object import (
     f_test_eudmethods,
@@ -96,3 +97,4 @@ def test_epscript():
         stat.f_test_stattext(),
         [ord(c) for c in stat.expected_result],
     )
+    test_equality("test updateUnitNameAndRank", f_test_reported(), [0, 0])

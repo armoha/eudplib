@@ -60,17 +60,16 @@ def _pcolor(p):
 
 def PColor(i):  # noqa: N802
     if isinstance(i, TrgPlayer):
-        if i == CurrentPlayer:
+        i = c.EncodePlayer(i)
+        if not c.IsEUDVariable(i) and i == CurrentPlayer:
             i = prevcp
-        else:
-            i = c.EncodePlayer(i)
     return epd2s(_pcolor(i * 2))
 
 
 def PName(x):  # noqa: N802
     if isinstance(x, TrgPlayer):
         x = c.EncodePlayer(x)
-        if x == c.EncodePlayer(CurrentPlayer):
+        if not c.IsEUDVariable(x) and x == CurrentPlayer:
             x = prevcp
     return ptr2s(0x57EEEB + 36 * x)
 
