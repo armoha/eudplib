@@ -32,7 +32,8 @@ class MovementFlags(StructEnumMember):
     StartingAttack = Flag(0x08)
     Moving = Flag(0x10)
     Lifted = Flag(0x20)
-    Unknown = Flag(0x40)
+    # unit decelerates when reaching the end of current path segment
+    BrakeOnPathStep = Flag(0x40)
     AlwaysZero = Flag(0x80)
     HoverUnit = Flag(0xC1)
 
@@ -66,8 +67,10 @@ class StatusFlags(StructEnumMember):
     UNKNOWN5 = Flag(0x00400000)
     # if set, the unit wont collide with other units (like workers gathering)
     IsGathering = Flag(0x00800000)
-    UNKNOWN6 = Flag(0x01000000)
-    UNKNOWN7 = Flag(0x02000000)  # Turret related
+    # makes subunit play walking animation if base unit movement flag 2 is set
+    SubunitWalking = Flag(0x01000000)
+    # makes subunit instantly follow base unit's facing direction
+    SubunitFollow = Flag(0x02000000)  # Turret related
     Invincible = Flag(0x04000000)
     # Set if the unit is currently holding position
     HoldingPosition = Flag(0x08000000)
@@ -248,8 +251,8 @@ class CUnit(EPDOffsetMap):
     # resource -----------------------------------------------
     resourceAmount = StructMember(0x0D0, Mk.WORD)  # 0x0D0 union
     resourceIscript = StructMember(0x0D2, Mk.BYTE)
-    # it is byte but effectively bool; always set to 1 when beginning to harvest,\
-    # but when finshed is decremented by 1 instead of set to 0
+    # it is byte but effectively bool; always set to 1 when beginning to harvest,
+    # but when finshed, it is    by 1 instead of set to 0
     gatherQueueCount = StructMember(0x0D3, Mk.BOOL)
     # pointer to the next worker unit waiting in line to gather
     nextGatherer = StructMember(0x0D4, Mk.C_UNIT)
@@ -257,10 +260,9 @@ class CUnit(EPDOffsetMap):
     resourceBelongsToAI = StructMember(0x0D9, Mk.BOOL)
     # other buildings ----------------------------------------
     nydusExit = StructMember(0x0D0, Mk.C_UNIT)  # connected nydus canal
-    # confirmed to be CUnit* and not CSprite*
     # CThingy struct is same as CUnit but trimmed down to [prev, next, hp, sprite],
     # with "hp" field used as unitID for fog thingies or otherwise unused
-    ghostNukeDot = StructMember(0x0D0, Mk.C_UNIT)  # FIXME: should be CThingy
+    ghostNukeDot = StructMember(0x0D0, Mk.DWORD)  # FIXME: should be CThingy
     pylonAura = StructMember(0x0D0, Mk.C_SPRITE)
     # silo
     siloNuke = StructMember(0x0D0, Mk.C_UNIT)
@@ -299,7 +301,7 @@ class CUnit(EPDOffsetMap):
     # Minerals = 0x02,
     # GasOrMineral = 0x03,
     # PowerUp = 0x04
-    resourceType = StructMember(0x0E0, Mk.BYTE)
+    resourceType = StructMember(0x0E0, Mk.BYTE)  # FIXME: should be enum
     wireframeRandomizer = StructMember(0x0E1, Mk.BYTE)
     secondaryOrderState = StructMember(0x0E2, Mk.BYTE)
     # Counts down from 15 to 0 when most orders are given,
@@ -321,7 +323,6 @@ class CUnit(EPDOffsetMap):
     nextPsiProvider = StructMember(0x0FC, Mk.C_UNIT)
     path = UnsupportedMember(0x100, Mk.DWORD)
     pathingCollisionInterval = StructMember(0x104, Mk.BYTE)
-    # 0x01 = uses pathing; 0x02 = ?; 0x04 = ?
     pathingFlags = PathingFlags(0x105, Mk.BYTE)
     unknown0x106 = StructMember(0x106, Mk.BYTE)
     # 1 if a medic is currently healing this unit
