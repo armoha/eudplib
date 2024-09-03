@@ -79,16 +79,17 @@ class ArrayMember(BaseMember):
     def __init__(
         self, offset: int, kind: MemberKind, *, stride: int | None = None
     ) -> None:
-        ut.ep_assert(offset % 4 == 0)
         super().__init__(offset, kind)
         if stride is None:
             self.stride = self.kind.size()
         else:
-            ut.ep_assert(self.kind.size() <= stride and stride in (1, 2, 4))
+            ut.ep_assert(self.kind.size() <= stride and stride in (1, 2, 4, 8))
             self.stride = stride
 
     def _get_epd(self, instance):
         # TODO: lazy calculate division
+        if self.offset % 4 != 0 and self.stride in (1, 2):
+            instance = instance + self.offset % 4
         if self.stride == 1:
             q, r = c.f_div(instance, 4)
         elif self.stride == 2:
@@ -97,8 +98,10 @@ class ArrayMember(BaseMember):
                 c.RawTrigger(conditions=r.Exactly(1), actions=r.SetNumber(2))
             elif r == 1:
                 r = 2
+        elif self.stride == 4:
+            q, r = instance, self.offset % 4
         else:
-            q, r = instance, 0
+            q, r = instance + instance, self.offset % 4
         return ut.EPD(self.offset) + q, r
 
     def __get__(self, instance, owner=None) -> "c.EUDVariable | ArrayMember":
