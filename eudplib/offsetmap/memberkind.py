@@ -9,9 +9,6 @@ import enum
 from abc import ABCMeta, abstractmethod
 from typing import Literal
 
-from ..localize import _
-from ..utils import EPError
-
 
 class BaseKind(metaclass=ABCMeta):
     __slots__ = ()
@@ -47,11 +44,12 @@ class BaseKind(metaclass=ABCMeta):
 
 
 class MemberKind(enum.Enum):
-    __slots__ = ("_payload",)
+    __slots__ = ()
     DWORD = enum.auto()
     WORD = enum.auto()
     BYTE = enum.auto()
     BOOL = enum.auto()
+    BIT_1 = enum.auto()
     C_UNIT = enum.auto()
     C_SPRITE = enum.auto()
     UNIT = enum.auto()
@@ -71,30 +69,10 @@ class MemberKind(enum.Enum):
     ICON = enum.auto()
     W_STRING = enum.auto()
 
-    def __init__(self, value):
-        self._payload = None
-        super().__init__(value)
-
-    def __call__(self, payload):
-        match self:
-            case MemberKind.BOOL:
-                if (
-                    isinstance(payload, int)
-                    and 1 <= payload <= 128
-                    and payload.bit_count() == 1
-                ):
-                    self._payload = payload
-                else:
-                    raise EPError(
-                        _("invalid bit value for bool: {}").format(payload)
-                    )
-            case _:
-                raise TypeError
-        return self
-
-    def impl(self) -> type[BaseKind] | BaseKind:
+    def impl(self) -> type[BaseKind]:
         from .memberimpl import (
-            BoolKind,
+            Bit0Kind,
+            Bit1Kind,
             ByteKind,
             CSpriteKind,
             CUnitKind,
@@ -126,10 +104,9 @@ class MemberKind(enum.Enum):
             case MemberKind.BYTE:
                 return ByteKind
             case MemberKind.BOOL:
-                if self._payload:
-                    return BoolKind(self._payload)
-                else:
-                    return BoolKind(0x01)
+                return Bit0Kind
+            case MemberKind.BIT_1:
+                return Bit1Kind
             case MemberKind.C_UNIT:
                 return CUnitKind
             case MemberKind.C_SPRITE:

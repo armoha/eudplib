@@ -115,17 +115,17 @@ class EnumMember(ExprProxy):
 
 
 class StructEnumMember(BaseMember, EnumMember):
-    __slots__ = ("offset", "kind", "_epd")
+    __slots__ = ("offset", "kind", "_instance")
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
-        self._epd: int | c.EUDVariable = 0  # FIXME
+        self._instance = None  # FIXME
         super().__init__(offset, kind)
         super(BaseMember, self).__init__()
 
     def _get_epd(self, instance=None):
         q, r = divmod(self.offset, 4)
         if instance is None:
-            return self._epd + q, r
+            instance = self._instance
         return instance._epd + q, r
 
     def __get__(self, instance, owner=None) -> "StructEnumMember":
@@ -134,7 +134,7 @@ class StructEnumMember(BaseMember, EnumMember):
         if instance is None:
             return self
         if isinstance(instance, EPDOffsetMap):
-            self._epd = instance._epd
+            self._instance = instance
             # FIXME: fix reading value on every usages
             # example)
             # const movementFlags = unit.movementFlags;
@@ -149,7 +149,7 @@ class StructEnumMember(BaseMember, EnumMember):
         from .epdoffsetmap import EPDOffsetMap
 
         if isinstance(instance, EPDOffsetMap):
-            self._epd = instance._epd
+            self._instance = instance
             epd, subp = self._get_epd(instance)
             self.kind.write_epd(epd, subp, self.kind.cast(value))
             return
@@ -163,7 +163,7 @@ class ArrayEnumMember(BaseMember, EnumMember):
         self, offset: int, kind: MemberKind, *, stride: int | None = None
     ) -> None:
         ep_assert(offset % 4 == 0)
-        self._instance: int | c.EUDVariable = 0  # FIXME
+        self._instance = None  # FIXME
         super().__init__(offset, kind)
         super(BaseMember, self).__init__()
         if stride is None:
@@ -219,7 +219,7 @@ class Flag:
         ep_assert(mask != 0)
         self.mask = mask
 
-    def __get__(self, instance, owner=None) -> c.EUDVariable:
+    def __get__(self, instance, owner=None) -> "Flag | c.EUDVariable":
         if instance is None:
             return self
         if isinstance(instance, StructEnumMember):

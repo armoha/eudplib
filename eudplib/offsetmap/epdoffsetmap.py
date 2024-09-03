@@ -25,7 +25,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     def cast(cls, other, **kwargs):
         if isinstance(other, cls):
             return other
-        cls._cast = True
+        EPDOffsetMap._cast = True
         return cls(other, **kwargs)
 
     def __init__(self, epd: int | c.EUDVariable) -> None:
@@ -38,19 +38,15 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         super().__init__(epd)
 
     def getepd(self, name: str) -> "c.EUDVariable | CUnit":
-        from .memberimpl import CSpriteKind, CUnitKind, PositionKind
+        from .memberimpl import CSpriteKind, CUnitKind, IscriptKind, PositionKind
 
         member = type(self).__dict__[name]
         kind = member.kind
         ut.ep_assert(kind.size() == 4, _("Only dword can be read as epd"))
         epd = member._get_epd(self)[0]
-        if kind is CUnitKind:
-            from .cunit import CUnit
-
-            return CUnit.from_read(epd)
-        if kind is CSpriteKind:
+        if kind in (CUnitKind, CSpriteKind):
             return kind.read_epd(epd, 0)
-        if kind is PositionKind:
+        if kind in (PositionKind, IscriptKind):
             raise ut.EPError(_("Only dword can be read as epd"))
 
         from ..memio import f_epdread_epd
@@ -60,23 +56,16 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     def getdwepd(
         self, name: str
     ) -> tuple[c.EUDVariable, "c.EUDVariable | CUnit | CSprite"]:
-        from .memberimpl import CSpriteKind, CUnitKind, PositionKind
+        from .memberimpl import CSpriteKind, CUnitKind, IscriptKind, PositionKind
 
         member = type(self).__dict__[name]
         kind = member.kind
         ut.ep_assert(kind.size() == 4, _("Only dword can be read as epd"))
         epd = member._get_epd(self)[0]
-        if kind is CUnitKind:
-            from .cunit import CUnit
-
-            cunit = CUnit.from_read(epd)
-            return cast(c.EUDVariable, cunit._ptr), cunit
-        if kind is CSpriteKind:
-            from .csprite import CSprite
-
-            csprite = CSprite.from_read(epd)
-            return cast(c.EUDVariable, csprite._ptr), csprite
-        if kind is PositionKind:
+        if kind in (CUnitKind, CSpriteKind):
+            cinstance = kind.read_epd(epd, 0)
+            return cast(c.EUDVariable, cinstance._ptr), cinstance
+        if kind in (PositionKind, IscriptKind):
             raise ut.EPError(_("Only dword can be read as epd"))
 
         from ..memio import f_dwepdread_epd
@@ -84,12 +73,12 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         return f_dwepdread_epd(epd)
 
     def getpos(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
-        from .memberimpl import CSpriteKind, CUnitKind
+        from .memberimpl import CSpriteKind, CUnitKind, IscriptKind
 
         member = type(self).__dict__[name]
         kind = member.kind
         ut.ep_assert(kind.size() == 4, _("Only dword can be read as position"))
-        if kind in (CUnitKind, CSpriteKind):
+        if kind in (CUnitKind, CSpriteKind, IscriptKind):
             raise ut.EPError(_("Only dword can be read as position"))
 
         from ..memio import f_posread_epd
@@ -99,21 +88,19 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     def iaddattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
-        value = member.kind.cast(value)
-        member.kind.add_epd(epd, subp, value)
+        member.kind.add_epd(epd, subp, member.kind.cast(value))
 
     # TODO: add operator for Subtract
     def isubtractattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
-        value = member.kind.cast(value)
-        member.kind.subtract_epd(epd, subp, value)
+        member.kind.subtract_epd(epd, subp, member.kind.cast(value))
 
     def isubattr(self, name: str, value) -> None:
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
         value = member.kind.cast(value)
-        member.kind.add_epd(epd, subp, -value)
+        member.kind.add_epd(epd, subp, -member.kind.cast(value))
 
     def imulattr(self, name, value):
         raise AttributeError

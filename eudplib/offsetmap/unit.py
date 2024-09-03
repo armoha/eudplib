@@ -129,7 +129,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     # those units from being counted as being missing from the attack group or
     # something like that. i'm not fully understanding its purpose yet and not seeing
     # much of a noticeable effect by ticking it on for regular military units
-    # ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL(0x01))
+    # ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL)
 
     # dontBecomeGuard affects unit's eligibility for strategic suicide missions;
     # basically if a unit has an AI ptr that is type 1 or 4, it will be picked up for
@@ -137,7 +137,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     # they have the worker unitsdat property (becomes unitAI type 2), or has building
     # unitsdat property and isn't geyser, or is unitid larva/egg/overlord (becomes
     # unitAI type 3)
-    dontBecomeGuard = ArrayMember(0x660178, Mk.BOOL(0x02))
+    dontBecomeGuard = ArrayMember(0x660178, Mk.BIT_1)
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)

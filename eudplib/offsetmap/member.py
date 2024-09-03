@@ -27,6 +27,9 @@ class BaseMember(metaclass=ABCMeta):
         self.kind = kind.impl()  # type: ignore[misc]
         ut.ep_assert(offset % 4 + self.kind.size() <= 4, _("Malaligned member"))
 
+    def _get_epd(self, instance):
+        raise NotImplementedError
+
     @abstractmethod
     def __get__(self, instance, owner=None):
         ...

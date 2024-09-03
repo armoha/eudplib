@@ -64,10 +64,10 @@ class CSprite(EPDOffsetMap):
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
-        if isinstance(epd, CSprite):
-            u, p = epd._epd, epd._ptr
-        else:
+        if not isinstance(epd, CSprite):
             u, p = unProxy(epd), unProxy(ptr)
+        else:
+            u, p = epd._epd, epd._ptr
 
         if isinstance(u, int):
             q, r = divmod(u - EPD(0x629D98), 9)  # check epd

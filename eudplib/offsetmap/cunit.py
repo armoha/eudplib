@@ -392,10 +392,10 @@ class CUnit(EPDOffsetMap):
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
-        if isinstance(epd, CUnit):
-            u, p = epd._epd, epd._ptr
-        else:
+        if not isinstance(epd, CUnit):
             u, p = unProxy(epd), unProxy(ptr)
+        else:
+            u, p = epd._epd, epd._ptr
 
         if isinstance(u, int):
             q, r = divmod(u - EPD(0x59CCA8), 84)  # check epd

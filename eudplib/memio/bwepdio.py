@@ -168,7 +168,7 @@ def _bitwrite_epd(epd, subp, bit, b) -> None:
         f = getattr(_bitwrite_epd, "f")
     except AttributeError:
         f = {}
-        _bitwrite_epd.f = f
+        setattr(_bitwrite_epd, "f", f)
 
     try:
         _bitwriter = f[bit]
@@ -181,22 +181,12 @@ def _bitwrite_epd(epd, subp, bit, b) -> None:
             for i in ut._rand_lst(range(4)):
                 if cs.EUDSwitchCase()(i):
                     c.RawTrigger(
-                        actions=c.SetDeathsX(
-                            cp.CP,
-                            c.SetTo,
-                            0,
-                            0,
-                            bit << (8 * i),
-                        )
+                        actions=c.SetDeathsX(cp.CP, c.SetTo, 0, 0, bit << (8 * i))
                     )
                     c.RawTrigger(
                         conditions=b.AtLeast(1),
                         actions=c.SetDeathsX(
-                            cp.CP,
-                            c.SetTo,
-                            bit << (8 * i),
-                            0,
-                            bit << (8 * i),
+                            cp.CP, c.SetTo, bit << (8 * i), 0, bit << (8 * i)
                         ),
                     )
                     cs.EUDBreak()

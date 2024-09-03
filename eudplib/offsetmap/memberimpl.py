@@ -47,30 +47,51 @@ class ByteKind(BaseKind):
         f_bsubtract_epd(epd, subp, value)
 
 
-class BoolKind(ByteKind):
-    __slots__ = ("_bit",)
+class Bit0Kind(ByteKind):
+    __slots__ = ()
 
-    def __init__(self, bit: int = 1) -> None:
-        if isinstance(bit, int) and 1 <= bit <= 128 and bit.bit_count() == 1:
-            self._bit = bit
-        else:
-            raise EPError(_("invalid bit value for bool: {}").format(bit))
-        super().__init__()
-
-    def read_epd(self, epd, subp) -> c.EUDVariable:
+    @classmethod
+    def read_epd(cls, epd, subp) -> c.EUDVariable:
         from ..memio.bwepdio import _boolread_epd
 
-        return _boolread_epd(self._bit)(epd, subp)
+        return _boolread_epd(0x01)(epd, subp)
 
-    def write_epd(self, epd, subp, value) -> None:
+    @classmethod
+    def write_epd(cls, epd, subp, value) -> None:
         from ..memio.bwepdio import _bitwrite_epd
 
-        _bitwrite_epd(epd, subp, self._bit, value)
+        _bitwrite_epd(epd, subp, 0x01, value)
 
-    def add_epd(self, epd, subp, value) -> None:
+    @classmethod
+    def add_epd(cls, epd, subp, value) -> None:
         raise NotImplementedError
 
-    def subtract_epd(self, epd, subp, value) -> None:
+    @classmethod
+    def subtract_epd(cls, epd, subp, value) -> None:
+        raise NotImplementedError
+
+
+class Bit1Kind(ByteKind):
+    __slots__ = ()
+
+    @classmethod
+    def read_epd(cls, epd, subp) -> c.EUDVariable:
+        from ..memio.bwepdio import _boolread_epd
+
+        return _boolread_epd(0x02)(epd, subp)
+
+    @classmethod
+    def write_epd(cls, epd, subp, value) -> None:
+        from ..memio.bwepdio import _bitwrite_epd
+
+        _bitwrite_epd(epd, subp, 0x02, value)
+
+    @classmethod
+    def add_epd(cls, epd, subp, value) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def subtract_epd(cls, epd, subp, value) -> None:
         raise NotImplementedError
 
 
@@ -312,10 +333,10 @@ class CSpriteKind(DwordKind):
     __slots__ = ()
 
     @classmethod
-    def read_epd(cls, epd, subp) -> c.EUDVariable:
-        from ..memio import f_spriteepdread_epd
+    def read_epd(cls, epd, subp):
+        from .csprite import CSprite
 
-        return f_spriteepdread_epd(epd)
+        return CSprite.from_read(epd)
 
 
 class IscriptKind(DwordKind):

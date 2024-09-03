@@ -26,7 +26,8 @@ def test_scdata():
     )
 
     ghost_cast = TrgUnit.cast(one)
-    ep_assert(one is not ghost._value and one is ghost_cast._value)
+    ep_assert(one is not ghost._value)
+    ep_assert(one is ghost_cast._value)
     one << 2
     test_equality(
         "TrgUnit(eudvar).maxHp, check robustness to variable change",
@@ -169,18 +170,18 @@ def test_scdata():
         scv.nameString = 65536
 
     test_equality(
-        "scv.ignoreStrategicSuicideMissions == True",
-        scv.ignoreStrategicSuicideMissions,
+        "scv.dontBecomeGuard == True",
+        scv.dontBecomeGuard,
         True,
     )
-    scv.ignoreStrategicSuicideMissions = False
+    scv.dontBecomeGuard = False
     test_equality(
-        "scv.ignoreStrategicSuicideMissions == False",
-        scv.ignoreStrategicSuicideMissions,
+        "scv.dontBecomeGuard == False",
+        scv.dontBecomeGuard,
         False,
     )
     with expect_error(NotImplementedError):
-        scv.iaddattr("ignoreStrategicSuicideMissions", 1)
+        scv.iaddattr("dontBecomeGuard", 1)
 
 
 @TestInstance  # noqa: F405
