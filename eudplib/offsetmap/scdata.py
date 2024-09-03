@@ -203,7 +203,7 @@ class UnitOrder(ConstType, EPDOffsetMap):
     weapon = ArrayMember(0x665880, Mk.WEAPON)
     techUsed = ArrayMember(0x664E00, Mk.TECH)
     animation = ArrayMember(0x664D40, Mk.BYTE)
-    buttonIcon = ArrayMember(0x664EC0, Mk.ICON)
+    icon = ArrayMember(0x664EC0, Mk.ICON)
     requirementOffset = ArrayMember(0x665580, Mk.WORD)
     obscuredOrder = ArrayMember(0x665400, Mk.UNIT_ORDER)
 
