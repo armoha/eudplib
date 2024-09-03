@@ -10,8 +10,9 @@ from .icon import DefIconDict
 from .image import DefImageDict
 from .iscript import DefIscriptDict
 from .portrait import DefPortraitDict
+from .sfxdata import DefSfxDataDict
 from .sprite import DefSpriteDict
-from .stattxt import DefStatTextDict
+from .stattxt import DefRankDict, DefStatTextDict
 from .tech import DefTechDict
 from .trg import (
     DefAIScriptDict,
@@ -29,7 +30,9 @@ __all__ = [
     "DefImageDict",
     "DefIscriptDict",
     "DefPortraitDict",
+    "DefSfxDataDict",
     "DefSpriteDict",
+    "DefRankDict",
     "DefStatTextDict",
     "DefTechDict",
     "DefAIScriptDict",

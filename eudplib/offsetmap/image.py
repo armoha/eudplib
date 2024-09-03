@@ -23,7 +23,7 @@ class Image(ConstType, EPDOffsetMap):
     isClickable = ArrayMember(0x66C150, Mk.BOOL)
     useFullIscript = ArrayMember(0x66D4D8, Mk.BOOL)
     drawIfCloaked = ArrayMember(0x667718, Mk.BOOL)
-    drawingFunction = ArrayMember(0x669E28, Mk.BYTE)  # FIXME: it should be enum
+    drawingFunction = ArrayMember(0x669E28, Mk.DRAWING_FUNCION)
     # Remapping table is skipped because it doesn't work in SC:R
     # FIXME: Add UnsupportedMember
     # remapping = ArrayMember(0x669A40, Mk.BYTE)

@@ -92,7 +92,7 @@ class Flingy(ConstType, EPDOffsetMap):
     haltDistance = ArrayMember(0x6C9930, Mk.DWORD)
     turnSpeed = turnRadius = ArrayMember(0x6C9E20, Mk.BYTE)
     # unused = ArrayMember(0x6CA240, Mk.BYTE)
-    movementControl = ArrayMember(0x6C9858, Mk.BYTE)  # FIXME: should be enum
+    movementControl = ArrayMember(0x6C9858, Mk.MOVEMENT_CONTROL)
 
     @classmethod
     def cast(cls, s):
@@ -111,9 +111,11 @@ class Sprite(ConstType, EPDOffsetMap):
     __slots__ = ()
     # Read only data skipped
     image = ArrayMember(0x666160, Mk.IMAGE)
+    # hpBarSize starts on Sprites.dat ID 130
     # hpBarSize = ArrayMember(0x665E50, Mk.BYTE)
-    # ??? = ArrayMember(0x666570, Mk.BYTE)
+    # unknownFlag = ArrayMember(0x666570, Mk.BYTE)
     isVisible = ArrayMember(0x665C48, Mk.BOOL)
+    # selectionCircle and selectionVerticalOffset start on Sprites.dat ID 130
     # selectionCircle = ArrayMember(0x665AC0, Mk.BYTE)
     # selectionVerticalOffset = ArrayMember(0x665FD8, Mk.BYTE)
 
@@ -141,7 +143,7 @@ class Upgrade(ConstType, EPDOffsetMap):
     requirementOffset = ArrayMember(0x6558C0, Mk.WORD)
     icon = ArrayMember(0x655AC0, Mk.ICON)
     label = ArrayMember(0x655A40, Mk.STATTEXT)
-    race = ArrayMember(0x655BFC, Mk.BYTE)  # FIXME: should be enum
+    race = ArrayMember(0x655BFC, Mk.RACE_RESEARCH)
     maxLevel = ArrayMember(0x655700, Mk.BYTE)
     broodWarFlag = ArrayMember(0x655B3C, Mk.BYTE)  # bool?
 
@@ -168,7 +170,7 @@ class Tech(ConstType, EPDOffsetMap):
     techUseRequirementOffset = ArrayMember(0x6562F8, Mk.WORD)
     icon = ArrayMember(0x656430, Mk.ICON)
     label = ArrayMember(0x6562A0, Mk.STATTEXT)
-    race = ArrayMember(0x656488, Mk.BYTE)  # FIXME: should be enum
+    race = ArrayMember(0x656488, Mk.RACE_RESEARCH)
     researched = ArrayMember(0x656350, Mk.BYTE)  # UNUSED?
     broodWarFlag = ArrayMember(0x6564B4, Mk.BYTE)  # bool?
 
@@ -210,7 +212,7 @@ class UnitOrder(ConstType, EPDOffsetMap):
     # requireMoving = ArrayMember(0x664BC0, Mk.BOOL)
     weapon = ArrayMember(0x665880, Mk.WEAPON)
     techUsed = ArrayMember(0x664E00, Mk.TECH)
-    animation = ArrayMember(0x664D40, Mk.BYTE)
+    animation = ArrayMember(0x664D40, Mk.ANIMATION)
     icon = ArrayMember(0x664EC0, Mk.ICON)
     requirementOffset = ArrayMember(0x665580, Mk.WORD)
     obscuredOrder = ArrayMember(0x665400, Mk.UNIT_ORDER)

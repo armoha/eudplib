@@ -301,7 +301,7 @@ class CUnit(EPDOffsetMap):
     # Minerals = 0x02,
     # GasOrMineral = 0x03,
     # PowerUp = 0x04
-    resourceType = StructMember(0x0E0, Mk.BYTE)  # FIXME: should be enum
+    resourceType = StructMember(0x0E0, Mk.WORKER_CARRY_TYPE)
     wireframeRandomizer = StructMember(0x0E1, Mk.BYTE)
     secondaryOrderState = StructMember(0x0E2, Mk.BYTE)
     # Counts down from 15 to 0 when most orders are given,

@@ -66,36 +66,60 @@ class MemberKind(enum.Enum):
     UPGRADE = enum.auto()
     TECH = enum.auto()
     STATTEXT = enum.auto()
+    RANK = enum.auto()
     PORTRAIT = enum.auto()
     ICON = enum.auto()
-    W_STRING = enum.auto()
+    UNIT_SIZE = enum.auto()
+    RCLICK_ACTION = enum.auto()
+    SFXDATA_DAT = enum.auto()
+    WORD_STRING = enum.auto()
+    MOVEMENT_CONTROL = enum.auto()
+    DAMAGE_TYPE = enum.auto()
+    WEAPON_BEHAVIOR = enum.auto()
+    EXPLOSION_TYPE = enum.auto()
+    DRAWING_FUNCION = enum.auto()
+    ANIMATION = enum.auto()
+    RACE_RESEARCH = enum.auto()
+    WORKER_CARRY_TYPE = enum.auto()
 
     def impl(self) -> type[BaseKind]:
         from .memberimpl import (
+            AnimationKind,
             Bit0Kind,
             Bit1Kind,
             ByteKind,
             CSpriteKind,
             CUnitKind,
+            DamageTypeKind,
+            DrawingFunctionKind,
             DwordKind,
+            ExplosionTypeKind,
             FlingyKind,
             IconKind,
             ImageKind,
             IscriptKind,
+            MovementControlKind,
             PlayerKind,
             PortraitKind,
             PositionKind,
             PositionXKind,
             PositionYKind,
+            RaceResearchKind,
+            RankKind,
+            RightClickActionKind,
+            SfxDataKind,
             SpriteKind,
             StatTextKind,
             TechKind,
             UnitKind,
             UnitOrderKind,
+            UnitSizeKind,
             UpgradeKind,
+            WeaponBehaviorKind,
             WeaponKind,
             WordKind,
             WordStringKind,
+            WorkerCarryTypeKind,
         )
 
         match self:
@@ -141,11 +165,35 @@ class MemberKind(enum.Enum):
                 return TechKind
             case MemberKind.STATTEXT:
                 return StatTextKind
+            case MemberKind.RANK:
+                return RankKind
             case MemberKind.PORTRAIT:
                 return PortraitKind
             case MemberKind.ICON:
                 return IconKind
-            case MemberKind.W_STRING:
+            case MemberKind.UNIT_SIZE:
+                return UnitSizeKind
+            case MemberKind.RCLICK_ACTION:
+                return RightClickActionKind
+            case MemberKind.SFXDATA_DAT:
+                return SfxDataKind
+            case MemberKind.WORD_STRING:
                 return WordStringKind
+            case MemberKind.MOVEMENT_CONTROL:
+                return MovementControlKind
+            case MemberKind.DAMAGE_TYPE:
+                return DamageTypeKind
+            case MemberKind.WEAPON_BEHAVIOR:
+                return WeaponBehaviorKind
+            case MemberKind.EXPLOSION_TYPE:
+                return ExplosionTypeKind
+            case MemberKind.DRAWING_FUNCION:
+                return DrawingFunctionKind
+            case MemberKind.ANIMATION:
+                return AnimationKind
+            case MemberKind.RACE_RESEARCH:
+                return RaceResearchKind
+            case MemberKind.WORKER_CARRY_TYPE:
+                return WorkerCarryTypeKind
             case _:
                 raise NotImplementedError

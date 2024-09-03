@@ -42,57 +42,58 @@ class GroupFlags(ArrayEnumMember):
     Neutral = Flag(0x80)
 
 
-class BaseProperty(ArrayEnumMember):  # UnitPrototypeFlags in bwapi
+# SpecialAbilityFlag in PyMS, UnitPrototypeFlags in bwapi, BaseProperty in GPTP
+class BaseProperty(ArrayEnumMember):
     __slots__ = ()
     Building = Flag(0x00000001)
     Addon = Flag(0x00000002)
     Flyer = Flag(0x00000004)
-    Worker = Flag(0x00000008)
+    Worker = Flag(0x00000008)  # resource_miner in PyMS
     Subunit = Flag(0x00000010)
     FlyingBuilding = Flag(0x00000020)
     Hero = Flag(0x00000040)
-    RegeneratesHP = Flag(0x00000080)
+    RegeneratesHp = Flag(0x00000080)
     AnimatedIdle = Flag(0x00000100)
     Cloakable = Flag(0x00000200)
-    TwoUnitsIn1Egg = Flag(0x00000400)
-    # AKA "Single entity" (prevents multi-select, set on all pickup items)
-    NeutralAccessories = Flag(0x00000800)
+    TwoUnitsInOneEgg = Flag(0x00000400)
+    # NeutralAccessories in GPTP (prevents multi-select, set on all pickup items)
+    SingleEntity = Flag(0x00000800)
     ResourceDepot = Flag(0x00001000)  # Place where resources are brought back
     ResourceContainer = Flag(0x00002000)  # Resource Source
-    RoboticUnit = Flag(0x00004000)
+    Robotic = Flag(0x00004000)
     Detector = Flag(0x00008000)
     Organic = Flag(0x00010000)
-    CreepBuilding = Flag(0x00020000)
+    RequiresCreep = Flag(0x00020000)
     Unused = Flag(0x00040000)
-    RequiredPsi = Flag(0x00080000)
+    RequiresPsi = Flag(0x00080000)
     Burrowable = Flag(0x00100000)
     Spellcaster = Flag(0x00200000)
     PermanentCloak = Flag(0x00400000)
-    # AKA "Pickup item" (data disc, crystals, mineral chunks, gas tanks, etc.)
-    NPCOrAccessories = Flag(0x00800000)
-    MorphFromOtherUnit = Flag(0x01000000)
+    # NPCOrAccessories in GPTP (data disc, crystals, mineral chunks, gas tanks, etc.)
+    PickupItem = Flag(0x00800000)
+    IgnoresSupplyCheck = Flag(0x01000000)  # MorphFromOtherUnit in GPTP
     # Used to determine overlay for various spells and effects
     MediumOverlay = Flag(0x02000000)
     LargeOverlay = Flag(0x04000000)
-    AutoAttackAndMove = Flag(0x08000000)
-    CanAttack = Flag(0x10000000)
+    AutoAttackAndMove = Flag(0x08000000)  # battle_reactions in PyMS
+    CanAttack = Flag(0x10000000)  # full_auto_attack in PyMS
     Invincible = Flag(0x20000000)
     Mechanical = Flag(0x40000000)
     # It can produce units directly (making buildings doesn't count)
     ProducesUnits = Flag(0x80000000)
 
 
-class StareditAvailabilityFlags(ArrayEnumMember):
+class AvailabilityFlags(ArrayEnumMember):
     __slots__ = ()
     NonNeutral = Flag(0x001)
     # set availability to be created by CreateUnit action
-    UnitListingAndPalette = Flag(0x002)
+    UnitListing = Flag(0x002)
     MissionBriefing = Flag(0x004)
     PlayerSettings = Flag(0x008)
     AllRaces = Flag(0x010)
     SetDoodadState = Flag(0x020)
     NonLocationTriggers = Flag(0x040)
-    UnitAndHeroSettings = Flag(0x080)
+    UnitHeroSettings = Flag(0x080)
     LocationTriggers = Flag(0x100)
     BroodWarOnly = Flag(0x200)
 
@@ -108,13 +109,13 @@ class TrgUnit(ConstType, EPDOffsetMap):
     # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
     # last valid id is UnitId::Special_OvermindCocoon
     constructionGraphic = ArrayMember(0x6610B0, Mk.IMAGE, stride=4)
-    startDirection = ArrayMember(0x6605F0, Mk.BYTE)
+    startDirection = ArrayMember(0x6605F0, Mk.BYTE)  # 0~31, 32
     hasShield = ArrayMember(0x6647B0, Mk.BOOL)
     maxShield = ArrayMember(0x660E00, Mk.WORD)
     maxHp = ArrayMember(0x662350, Mk.DWORD)
     elevation = ArrayMember(0x663150, Mk.BYTE)
     movementFlags = MovementFlags(0x660FC8, Mk.BYTE)
-    rank = ArrayMember(0x663DD0, Mk.BYTE)  # FIXME: should be RANK subset of STATTEXT
+    rank = ArrayMember(0x663DD0, Mk.RANK)
     computerIdleOrder = ArrayMember(0x662EA0, Mk.UNIT_ORDER)
     humanIdleOrder = ArrayMember(0x662268, Mk.UNIT_ORDER)
     returnToIdleOrder = ArrayMember(0x664898, Mk.UNIT_ORDER)
@@ -142,16 +143,16 @@ class TrgUnit(ConstType, EPDOffsetMap):
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
     armorUpgrade = ArrayMember(0x6635D0, Mk.UPGRADE)
-    sizeType = ArrayMember(0x662180, Mk.BYTE)  # FIXME: should be enum
+    sizeType = ArrayMember(0x662180, Mk.UNIT_SIZE)
     armor = ArrayMember(0x65FEC8, Mk.BYTE)
-    rightClickAction = ArrayMember(0x662098, Mk.BYTE)  # FIXME: should be enum
-    readySound = ArrayMember(0x661FC0, Mk.WORD)  # sfxdata.dat start index
-    whatSoundStart = ArrayMember(0x65FFB0, Mk.WORD)
-    whatSoundEnd = ArrayMember(0x662BF0, Mk.WORD)
-    pissedSoundStart = ArrayMember(0x663B38, Mk.WORD)
-    pissedSoundEnd = ArrayMember(0x661EE8, Mk.WORD)
-    yesSoundStart = ArrayMember(0x663C10, Mk.WORD)
-    yesSoundEnd = ArrayMember(0x661440, Mk.WORD)
+    rightClickAction = ArrayMember(0x662098, Mk.RCLICK_ACTION)
+    readySound = ArrayMember(0x661FC0, Mk.SFXDATA_DAT)
+    whatSoundStart = ArrayMember(0x65FFB0, Mk.SFXDATA_DAT)
+    whatSoundEnd = ArrayMember(0x662BF0, Mk.SFXDATA_DAT)
+    pissedSoundStart = ArrayMember(0x663B38, Mk.SFXDATA_DAT)
+    pissedSoundEnd = ArrayMember(0x661EE8, Mk.SFXDATA_DAT)
+    yesSoundStart = ArrayMember(0x663C10, Mk.SFXDATA_DAT)
+    yesSoundEnd = ArrayMember(0x661440, Mk.SFXDATA_DAT)
     buildingDimensions = ArrayMember(0x662860, Mk.POSITION)
     # AddonPlacement is not implemented yet because its beginning index isn't 0.
     # addonPlacement = ArrayMember(0x6626E0, Mk.POSITION)
@@ -169,9 +170,9 @@ class TrgUnit(ConstType, EPDOffsetMap):
     transportSpaceRequired = ArrayMember(0x664410, Mk.BYTE)
     buildScore = ArrayMember(0x663408, Mk.WORD)
     killScore = ArrayMember(0x663EB8, Mk.WORD)
-    nameString = ArrayMember(0x660260, Mk.W_STRING)  # WORD
+    nameString = ArrayMember(0x660260, Mk.WORD_STRING)
     broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)  # bool?
-    stareditAvailabilityFlags = StareditAvailabilityFlags(0x661518, Mk.WORD)
+    availabilityFlags = AvailabilityFlags(0x661518, Mk.WORD)
 
     @classmethod
     def cast(cls, s):

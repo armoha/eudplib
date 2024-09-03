@@ -40,11 +40,11 @@ class Weapon(ConstType, EPDOffsetMap):
     minRange = ArrayMember(0x656A18, Mk.DWORD)
     maxRange = ArrayMember(0x657470, Mk.DWORD)
     upgrade = ArrayMember(0x6571D0, Mk.UPGRADE)
-    damageType = ArrayMember(0x657258, Mk.BYTE)  # FIXME: should be enum
+    damageType = ArrayMember(0x657258, Mk.DAMAGE_TYPE)
     # Fly and follow target, appear on target unit, etc.
-    behavior = ArrayMember(0x656670, Mk.BYTE)  # FIXME: should be enum
+    behavior = ArrayMember(0x656670, Mk.WEAPON_BEHAVIOR)
     removeAfter = ArrayMember(0x657040, Mk.BYTE)
-    explosionType = ArrayMember(0x6566F8, Mk.BYTE)  # FIXME: should be enum
+    explosionType = ArrayMember(0x6566F8, Mk.EXPLOSION_TYPE)
     splashInnerRadius = ArrayMember(0x656888, Mk.WORD)
     splashMiddleRadius = ArrayMember(0x6570C8, Mk.WORD)
     splashOuterRadius = ArrayMember(0x657780, Mk.WORD)
