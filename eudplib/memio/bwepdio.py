@@ -316,12 +316,12 @@ def f_maskwrite_epd(epd, value, mask) -> None:
     cs.DoActions(c.SetDeathsX(epd, c.SetTo, value, 0, mask))
 
 
-def _boolread_epd(bit):
+def _bitread_epd(bit):
     ut.ep_assert(bit.bit_count() == 1)
-    f = getattr(_boolread_epd, "f", None)
+    f = getattr(_bitread_epd, "f", None)
     if f is None:
         f = {}
-        _boolread_epd.f = f
+        _bitread_epd.f = f
     try:
         readfn = f[bit]
     except KeyError:

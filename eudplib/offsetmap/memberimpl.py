@@ -61,9 +61,9 @@ class Bit0Kind(ByteKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio.bwepdio import _boolread_epd
+        from ..memio.bwepdio import _bitread_epd
 
-        return _boolread_epd(0x01)(epd, subp)
+        return _bitread_epd(0x01)(epd, subp)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
@@ -85,9 +85,9 @@ class Bit1Kind(ByteKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio.bwepdio import _boolread_epd
+        from ..memio.bwepdio import _bitread_epd
 
-        return _boolread_epd(0x02)(epd, subp)
+        return _bitread_epd(0x02)(epd, subp)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
