@@ -66,6 +66,7 @@ class MemberKind(enum.Enum):
     UPGRADE = enum.auto()
     TECH = enum.auto()
     STATTEXT = enum.auto()
+    PORTRAIT = enum.auto()
     ICON = enum.auto()
     W_STRING = enum.auto()
 
@@ -82,6 +83,7 @@ class MemberKind(enum.Enum):
             ImageKind,
             IscriptKind,
             PlayerKind,
+            PortraitKind,
             PositionKind,
             PositionXKind,
             PositionYKind,
@@ -139,6 +141,8 @@ class MemberKind(enum.Enum):
                 return TechKind
             case MemberKind.STATTEXT:
                 return StatTextKind
+            case MemberKind.PORTRAIT:
+                return PortraitKind
             case MemberKind.ICON:
                 return IconKind
             case MemberKind.W_STRING:

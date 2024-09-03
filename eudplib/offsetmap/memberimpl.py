@@ -257,6 +257,14 @@ class StatTextKind(WordKind):
         return c.EncodeTBL(other)
 
 
+class PortraitKind(WordKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        return c.EncodePortrait(other)
+
+
 class IconKind(WordKind):
     __slots__ = ()
 
@@ -272,7 +280,7 @@ class WordStringKind(WordKind):
     def cast(cls, other):
         other = c.EncodeString(other)
         if isinstance(other, int) and not (0 <= other <= 65535):
-            raise EPError(_("OldStringID should be 0 <= id <= 65535"))
+            raise EPError(_("MapStringOldID should be 0 <= id <= 65535"))
         return other
 
 

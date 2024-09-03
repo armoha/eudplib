@@ -157,7 +157,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     # addonPlacement = ArrayMember(0x6626E0, Mk.POSITION)
     # unitDimensions is not implemented yet.
     # unitBoundsLURB = ArrayMember(0x6617C8, 2 * Mk.POSITION)
-    portrait = ArrayMember(0x662F88, Mk.WORD)  # FIXME: should be PORTRAIT
+    portrait = ArrayMember(0x662F88, Mk.PORTRAIT)
     mineralCost = ArrayMember(0x663888, Mk.WORD)
     gasCost = ArrayMember(0x65FD00, Mk.WORD)
     timeCost = ArrayMember(0x660428, Mk.WORD)
