@@ -114,7 +114,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     maxHp = ArrayMember(0x662350, Mk.DWORD)
     elevation = ArrayMember(0x663150, Mk.BYTE)
     movementFlags = MovementFlags(0x660FC8, Mk.BYTE)
-    rank = ArrayMember(0x663DD0, Mk.BYTE)  # FIXME: should be RANK? (STATTEXT?)
+    rank = ArrayMember(0x663DD0, Mk.BYTE)  # FIXME: should be RANK subset of STATTEXT
     computerIdleOrder = ArrayMember(0x662EA0, Mk.UNIT_ORDER)
     humanIdleOrder = ArrayMember(0x662268, Mk.UNIT_ORDER)
     returnToIdleOrder = ArrayMember(0x664898, Mk.UNIT_ORDER)
@@ -124,7 +124,19 @@ class TrgUnit(ConstType, EPDOffsetMap):
     maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
-    ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL(0x01))
+    # this is unrelated to strategic suicide mission; it's only checked with units
+    # that have already been added to an attack wave, and looks like it prevents
+    # those units from being counted as being missing from the attack group or
+    # something like that. i'm not fully understanding its purpose yet and not seeing
+    # much of a noticeable effect by ticking it on for regular military units
+    # ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL(0x01))
+
+    # dontBecomeGuard affects unit's eligibility for strategic suicide missions;
+    # basically if a unit has an AI ptr that is type 1 or 4, it will be picked up for
+    # strategic suicide. units with flag 2 set only have an AI assigned to them if
+    # they have the worker unitsdat property (becomes unitAI type 2), or has building
+    # unitsdat property and isn't geyser, or is unitid larva/egg/overlord (becomes
+    # unitAI type 3)
     dontBecomeGuard = ArrayMember(0x660178, Mk.BOOL(0x02))
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
