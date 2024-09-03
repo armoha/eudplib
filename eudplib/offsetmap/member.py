@@ -40,6 +40,8 @@ class BaseMember(metaclass=ABCMeta):
 
 
 class StructMember(BaseMember):
+    """Struct field member"""
+
     __slots__ = ("offset", "kind")
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
@@ -70,6 +72,8 @@ class StructMember(BaseMember):
 
 
 class ArrayMember(BaseMember):
+    """Parallel array member"""
+
     __slots__ = ("offset", "kind", "stride")
 
     def __init__(
@@ -118,7 +122,7 @@ class ArrayMember(BaseMember):
 
 
 class UnsupportedMember(BaseMember):
-    """Not supported EUD"""
+    """'Sorry, this EUD map is not supported' error is raised when it's accessed"""
 
     __slots__ = ("offset", "kind", "name")
 
