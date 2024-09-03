@@ -170,7 +170,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     buildScore = ArrayMember(0x663408, Mk.WORD)
     killScore = ArrayMember(0x663EB8, Mk.WORD)
     nameString = ArrayMember(0x660260, Mk.W_STRING)  # WORD
-    broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)
+    broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)  # bool?
     stareditAvailabilityFlags = StareditAvailabilityFlags(0x661518, Mk.WORD)
 
     @classmethod

@@ -33,10 +33,10 @@ class Weapon(ConstType, EPDOffsetMap):
     __slots__ = ()
     label = ArrayMember(0x6572E0, Mk.STATTEXT)
     graphic = flingy = ArrayMember(0x656CA8, Mk.FLINGY)
-    # special attack is for reference only?
+    # special attack is for reference only (unused)
     # specialAttack = ArrayMember(0x6573E8, Mk.BYTE)
     targetFlags = TargetFlags(0x657998, Mk.WORD)
-    # can't use range because it's a python keyword
+    # can't use name 'range' because it's a python keyword
     minRange = ArrayMember(0x656A18, Mk.DWORD)
     maxRange = ArrayMember(0x657470, Mk.DWORD)
     upgrade = ArrayMember(0x6571D0, Mk.UPGRADE)
@@ -56,7 +56,7 @@ class Weapon(ConstType, EPDOffsetMap):
     launchSpin = ArrayMember(0x657888, Mk.BYTE)
     forwardOffset = graphicXOffset = ArrayMember(0x657910, Mk.BYTE)
     verticalOffset = graphicYOffset = ArrayMember(0x656C20, Mk.BYTE)
-    targetErrorMessage = ArrayMember(0x656568, Mk.WORD)  # FIXME: should be STATTEXT
+    targetErrorMessage = ArrayMember(0x656568, Mk.STATTEXT)
     icon = ArrayMember(0x656780, Mk.ICON)
 
     @classmethod
