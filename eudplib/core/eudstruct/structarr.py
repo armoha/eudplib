@@ -74,9 +74,16 @@ class EUDStructArray(ExprProxy, metaclass=_EUDStructMetaclass):
             inst[i] = self[i]
 
     def __getitem__(self, index):
+        if isinstance(index, int) and not 0 <= index < self._times:
+            e = _("index out of bounds: the length of EUDVArray is {} but the index is {}")  # noqa: E501
+            raise EPError(e.format(self._times, index))
+
         return self.getValue()[index]
 
     def __setitem__(self, index, newval):
+        if isinstance(index, int) and not 0 <= index < self._times:
+            e = _("index out of bounds: the length of EUDVArray is {} but the index is {}")  # noqa: E501
+            raise EPError(e.format(self._times, index))
         self.getValue()[index] = newval
 
     def __getattr__(self, name):
