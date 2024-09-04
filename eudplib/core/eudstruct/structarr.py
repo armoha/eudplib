@@ -101,3 +101,6 @@ class _EUDStructArray:
 
     def cast(self, _from):
         return self(_from=_from)
+
+    def __mul__(self, times: int):
+        return _EUDStructArray(times, self)

@@ -40,7 +40,9 @@ def test_struct():
 
     d = a.copy()
     a.add(d)
-    test_equality("EUDTypedMethod test", [a.x, a.y, a.z, d.x, d.y, d.z], [6, 14, 16, 3, 7, 8])
+    test_equality(
+        "EUDTypedMethod test", [a.x, a.y, a.z, d.x, d.y, d.z], [6, 14, 16, 3, 7, 8]
+    )
 
     e = EUDVariable()
     e << a
@@ -76,7 +78,10 @@ def test_nested_struct():
     a.p[1].y += 2
     a.q = 3
 
-    test_assert("Nested EUDStruct test", [a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3])
+    test_assert(
+        "Nested EUDStruct test",
+        [a.p[0].x == 1, a.p[0].y == 0, a.p[1].y == 4, a.q == 3],
+    )
 
     b = a.copy()
     b.p[0].x = 5
@@ -85,6 +90,34 @@ def test_nested_struct():
         "Shallow EUDStruct copy test",
         [a.p[0].x, b.p[0].x, b.p[0].y, b.p[1].y, a.q, b.q],
         [5, 5, 0, 4, 3, 2],
+    )
+
+    p5x5 = (Coord * 5 * 5)()
+    for i in range(5):
+        p5x5[i] = (Coord * 5)()
+        for j in range(5):
+            p5x5[i][j] = Coord()
+
+    p5x5[0][0].x = 1
+    p5x5[0][0].y = 2
+    p5x5[1][0].x = 3
+    p5x5[0][1].y = 4
+    p5x5[1][1].x = 5
+    p5x5[1][1].y = 6
+
+    test_equality(
+        "Nested EUDStructArray test",
+        [
+            p5x5[0][0].x,
+            p5x5[0][0].y,
+            p5x5[0][1].x,
+            p5x5[0][1].y,
+            p5x5[1][0].x,
+            p5x5[1][0].y,
+            p5x5[1][1].x,
+            p5x5[1][1].y,
+        ],
+        [1, 2, 0, 4, 3, 0, 5, 6],
     )
 
 
