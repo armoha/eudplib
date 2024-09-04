@@ -72,6 +72,7 @@ class MemberKind(enum.Enum):
     UNIT_SIZE = enum.auto()
     RCLICK_ACTION = enum.auto()
     SFXDATA_DAT = enum.auto()
+    MAP_STRING = enum.auto()
     WORD_STRING = enum.auto()
     MOVEMENT_CONTROL = enum.auto()
     DAMAGE_TYPE = enum.auto()
@@ -98,6 +99,7 @@ class MemberKind(enum.Enum):
             IconKind,
             ImageKind,
             IscriptKind,
+            MapStringKind,
             MovementControlKind,
             PlayerKind,
             PortraitKind,
@@ -177,6 +179,8 @@ class MemberKind(enum.Enum):
                 return RightClickActionKind
             case MemberKind.SFXDATA_DAT:
                 return SfxDataKind
+            case MemberKind.MAP_STRING:
+                return MapStringKind
             case MemberKind.WORD_STRING:
                 return WordStringKind
             case MemberKind.MOVEMENT_CONTROL:

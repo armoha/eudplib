@@ -45,6 +45,17 @@ class TrgPlayer(_Player, EPDOffsetMap):
     protossPsiMax = ArrayMember(0x5822C4, Mk.DWORD)
     unitColor = ArrayMember(0x581D76, Mk.BYTE, stride=8)
     minimapColor = ArrayMember(0x581DD6, Mk.BYTE)
+    remainingGamePause = ArrayMember(0x58D718, Mk.BYTE)  # length=8
+    missionObjectives = ArrayMember(0x58D6C4, Mk.MAP_STRING)
+    unitScore = ArrayMember(0x581E44, Mk.DWORD)  # Score for units produced
+    buildingScore = ArrayMember(0x582024, Mk.DWORD)  # Score for buildings produced
+    killScore = ArrayMember(0x581F04, Mk.DWORD)
+    razingScore = ArrayMember(0x582054, Mk.DWORD)
+    customScore = ArrayMember(0x5822F4, Mk.DWORD)
+    # scoreUnitTotal = ArrayMember(0x581ED4)
+    # numOfFactoriesRazed = ArrayMember(0x582114) Kills for "Factories" stored
+    # numOfBuildingsRazed = ArrayMember(0x581FF4) Kills for "Buildings" stored
+    # numOfUnitsKilled = ArrayMember(0x581EA4) Kills for "Any Unit" stored here.
     # humanID = ArrayMember(0x57EE7C, Mk.DWORD)
     # nationID = ArrayMember(0x57EEC0, Mk.DWORD)
     # networkStatus = ArrayMember(0x57F0B8, Mk.DWORD)
@@ -57,29 +68,18 @@ class TrgPlayer(_Player, EPDOffsetMap):
     # selectionCircleColor = ArrayMember(0x581D6A, Mk.BYTE)
     # ownedTotalUnitsScore = ArrayMember(0x581DE4)
     # ownedUnitsScore = ArrayMember(0x581E14)
-    # unitsScore = ArrayMember(0x581E44) Score for units produced.
     # numOfUnitsLost = ArrayMember(0x581E74) Deaths for "Any Unit" stored here.
-    # numOfUnitsKilled = ArrayMember(0x581EA4) Kills for "Any Unit" stored here.
-    # scoreUnitTotal = ArrayMember(0x581ED4)
-    # scoreKillTotal = ArrayMember(0x581F04)
     # scoreStructuresConstructedTotal = ArrayMember(0x581F34)
     # numOfBuildingsConstructed = ArrayMember(0x581F64)
     # numOfBuildingsOwned = ArrayMember(0x581F94)
     # numOfBuildingsLost = ArrayMember(0x581FC4) Deaths for "Buildings" stored
-    # numOfBuildingsRazed = ArrayMember(0x581FF4) Kills for "Buildings" stored
-    # buildingsScore = ArrayMember(0x582024) Score for buildings produced.
-    # razingsScore = ArrayMember(0x582054) Score for buildings killed.
     # numOfFactoriesConstructed = ArrayMember(0x582084)
     # numOfFactoriesOwned = ArrayMember(0x5820B4)
     # numOfFactoriesLost = ArrayMember(0x5820E4) Deaths for "Factories" stored
-    # numOfFactoriesRazed = ArrayMember(0x582114) Kills for "Factories" stored
-    # customScore = ArrayMember(0x5822F4, Mk.DWORD)
     # larvaCount = ArrayMember(0x585474, Mk.BYTE)
     # force = ArrayMember(0x58D5B0, Mk.BYTE) length=8
     # allyStatus = ArrayMember(0x58D634, Mk.BYTE)
-    # missionObjectives = ArrayMember(0x58D6C4, Mk.DWORD) mapString
     # victoryStatus = ArrayMember(0x58D700, Mk.BYTE) length=8
-    # remainingGamePause = ArrayMember(0x58D718, Mk.BYTE) length=8
     # startLocationPos = ArrayMember(0x58D720, Mk.POSITION) length=8
     # 0x58F442 Unknown Player Color Something length=8
     # triggerWaitTimer = ArrayMember(0x650980, Mk.DWORD) length=8

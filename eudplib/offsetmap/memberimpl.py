@@ -604,6 +604,14 @@ class DwordKind(BaseKind):
         f_dwsubtract_epd(epd, value)
 
 
+class MapStringKind(DwordKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        return EncodeString(other)
+
+
 class PositionKind(DwordKind):
     __slots__ = ()
 
