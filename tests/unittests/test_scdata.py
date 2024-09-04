@@ -183,6 +183,12 @@ def test_scdata():
     with expect_error(NotImplementedError):
         scv.iaddattr("dontBecomeGuard", 1)
 
+    P1.unitColor = 123
+    test_equality("P1.unitColor = 123", P1.unitColor, 123)
+    test_equality("P1.unitColor", P1.unitColor, f_bread(0x581D76))
+    P2.unitColor = 234
+    test_equality("P2.unitColor = 234", P2.unitColor, 234)
+
 
 @TestInstance  # noqa: F405
 def test_epdoffsetmap_scdataobject_reference():
