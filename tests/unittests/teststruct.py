@@ -92,35 +92,33 @@ def test_nested_struct():
         [5, 5, 0, 4, 3, 2],
     )
 
-    p2x3 = (Coord * 3 * 2)()
-    for i in range(2):
-        p2x3[i] = (Coord * 3)()
-        for j in range(3):
-            p2x3[i][j] = Coord()
+    point3x2 = (Coord * 3 * 2)(
+        [(Coord * 3)([Coord() for _ in range(3)]) for _ in range(2)]
+    )
 
     with expect_eperror():
-        p2x3[2]
+        point3x2[2]
     with expect_eperror():
-        p2x3[0][3]
+        point3x2[0][3]
 
-    p2x3[0][0].x = 1
-    p2x3[0][0].y = 2
-    p2x3[1][0].x = 3
-    p2x3[0][1].y = 4
-    p2x3[1][1].x = 5
-    p2x3[1][1].y = 6
+    point3x2[0][0].x = 1
+    point3x2[0][0].y = 2
+    point3x2[1][0].x = 3
+    point3x2[0][1].y = 4
+    point3x2[1][1].x = 5
+    point3x2[1][1].y = 6
 
     test_equality(
         "Nested EUDStructArray test",
         [
-            p2x3[0][0].x,
-            p2x3[0][0].y,
-            p2x3[0][1].x,
-            p2x3[0][1].y,
-            p2x3[1][0].x,
-            p2x3[1][0].y,
-            p2x3[1][1].x,
-            p2x3[1][1].y,
+            point3x2[0][0].x,
+            point3x2[0][0].y,
+            point3x2[0][1].x,
+            point3x2[0][1].y,
+            point3x2[1][0].x,
+            point3x2[1][0].y,
+            point3x2[1][1].x,
+            point3x2[1][1].y,
         ],
         [1, 2, 0, 4, 3, 0, 5, 6],
     )
