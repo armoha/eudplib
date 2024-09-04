@@ -25,7 +25,8 @@ class MovementFlags(ArrayEnumMember):
     StartingAttack = Flag(0x08)
     Moving = Flag(0x10)
     Lifted = Flag(0x20)
-    Unknown = Flag(0x40)
+    # unit decelerates when reaching the end of current path segment
+    BrakeOnPathStep = Flag(0x40)
     AlwaysZero = Flag(0x80)
     HoverUnit = Flag(0xC1)
 
