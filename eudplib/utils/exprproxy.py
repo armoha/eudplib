@@ -43,6 +43,12 @@ class ExprProxy(Generic[T_co]):
     def getValue(self) -> T_co:  # noqa: N802
         return self._value
 
+    def __str__(self):
+        return f"{type(self).__name__}({self._value})"
+
+    def __repr__(self):
+        return self.__str__()
+
     def __len__(self):
         return len(self._value)
 

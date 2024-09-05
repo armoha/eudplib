@@ -33,12 +33,6 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
             )
         return cls(_from)
 
-    def __str__(self) -> str:
-        return f"{type(self).__name__}({self._value})"
-
-    def __repr__(self) -> str:
-        return self.__str__()
-
 
 # return types
 _Dword: TypeAlias = "int | EUDVariable | ConstExpr"
