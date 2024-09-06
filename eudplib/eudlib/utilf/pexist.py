@@ -50,7 +50,7 @@ def f_playerexist(player):
 
 def EUDLoopPlayer(  # noqa: N802
     ptype: str | None = "Human", force=None, race: str | None = None
-) -> Iterator[c.EUDVariable]:
+) -> Iterator[TrgPlayer]:
     def encode_force(f):
         force_dict = {Force1: 0, Force2: 1, Force3: 2, Force4: 3}
         if not isinstance(f, int) and f in force_dict:
@@ -88,7 +88,7 @@ def EUDLoopPlayer(  # noqa: N802
             if i not in plist:
                 cs.EUDContinueIf(v == i)
         cs.EUDContinueIfNot(f_playerexist(v))
-        yield v
+        yield TrgPlayer.cast(v)
         cs.EUDSetContinuePoint()
         v += 1
     cs.EUDEndWhile()
