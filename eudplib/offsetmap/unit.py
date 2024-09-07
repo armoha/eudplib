@@ -171,7 +171,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     transportSpaceRequired = ArrayMember(0x664410, Mk.BYTE)
     buildScore = ArrayMember(0x663408, Mk.WORD)
     killScore = ArrayMember(0x663EB8, Mk.WORD)
-    nameString = ArrayMember(0x660260, Mk.WORD_STRING)
+    nameString = ArrayMember(0x660260, Mk.MAP_STRING)
     broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)  # bool?
     availabilityFlags = AvailabilityFlags(0x661518, Mk.WORD)
 

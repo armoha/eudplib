@@ -73,7 +73,6 @@ class MemberKind(enum.Enum):
     RCLICK_ACTION = enum.auto()
     SFXDATA_DAT = enum.auto()
     MAP_STRING = enum.auto()
-    WORD_STRING = enum.auto()
     MOVEMENT_CONTROL = enum.auto()
     DAMAGE_TYPE = enum.auto()
     WEAPON_BEHAVIOR = enum.auto()
@@ -120,7 +119,6 @@ class MemberKind(enum.Enum):
             WeaponBehaviorKind,
             WeaponKind,
             WordKind,
-            WordStringKind,
             WorkerCarryTypeKind,
         )
 
@@ -181,8 +179,6 @@ class MemberKind(enum.Enum):
                 return SfxDataKind
             case MemberKind.MAP_STRING:
                 return MapStringKind
-            case MemberKind.WORD_STRING:
-                return WordStringKind
             case MemberKind.MOVEMENT_CONTROL:
                 return MovementControlKind
             case MemberKind.DAMAGE_TYPE:

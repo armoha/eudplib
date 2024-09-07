@@ -46,7 +46,7 @@ class TrgPlayer(_Player, EPDOffsetMap):
     unitColor = ArrayMember(0x581D76, Mk.BYTE, stride=8)
     minimapColor = ArrayMember(0x581DD6, Mk.BYTE)
     remainingGamePause = ArrayMember(0x58D718, Mk.BYTE)  # length=8
-    missionObjectives = ArrayMember(0x58D6C4, Mk.MAP_STRING)
+    missionObjectives = ArrayMember(0x58D6C4, Mk.MAP_STRING, stride=4)
     unitScore = ArrayMember(0x581E44, Mk.DWORD)  # Score for units produced
     buildingScore = ArrayMember(0x582024, Mk.DWORD)  # Score for buildings produced
     killScore = ArrayMember(0x581F04, Mk.DWORD)

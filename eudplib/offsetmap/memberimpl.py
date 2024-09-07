@@ -561,15 +561,12 @@ class IconKind(WordKind):
         return EncodeIcon(other)
 
 
-class WordStringKind(WordKind):
+class MapStringKind(WordKind):
     __slots__ = ()
 
     @classmethod
     def cast(cls, other):
-        other = EncodeString(other)
-        if isinstance(other, int) and not (0 <= other <= 65535):
-            raise EPError(_("MapStringOldID should be 0 <= id <= 65535"))
-        return other
+        return EncodeString(other)
 
 
 class DwordKind(BaseKind):
@@ -602,14 +599,6 @@ class DwordKind(BaseKind):
         from ..memio import f_dwsubtract_epd
 
         f_dwsubtract_epd(epd, value)
-
-
-class MapStringKind(DwordKind):
-    __slots__ = ()
-
-    @classmethod
-    def cast(cls, other):
-        return EncodeString(other)
 
 
 class PositionKind(DwordKind):
