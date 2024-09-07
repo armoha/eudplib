@@ -57,12 +57,12 @@ impl PyConstExpr {
         Ok(PyRlocInt(rlocint))
     }
 
-    fn __repr__(&self) -> String {
+    fn __str__(&self) -> String {
         format!("{:?}", self.0)
     }
 
-    fn __str__(&self) -> String {
-        self.__repr__()
+    fn __repr__(&self) -> String {
+        self.__str__()
     }
 
     fn __int__(&self, py: Python) -> PyResult<i32> {
@@ -143,7 +143,7 @@ impl PyConstExpr {
 
     fn __floordiv__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<Self> {
         if slf.0.rlocmode != 0 && slf.0.rlocmode % rhs != 0 {
-            return Err(PyValueError::new_err("Address not divisible"));
+            return Err(PyValueError::new_err(format!("Address not divisible: {} ÷ {}", slf.__str__(), rhs)));
         }
         let offset = DivFloor::div_floor(&slf.0.offset, rhs);
         let rlocmode = DivFloor::div_floor(&slf.0.rlocmode, rhs);
@@ -160,14 +160,14 @@ impl PyConstExpr {
 
     fn __mod__(&self, rhs: i32) -> PyResult<i32> {
         if self.0.rlocmode != 4 || 4 % rhs != 0 {
-            return Err(PyValueError::new_err("Address not divisible"));
+            return Err(PyValueError::new_err(format!("Address not divisible: {} ÷ {}", self.__str__(), rhs)));
         }
         Ok(DivFloor::rem_floor(&self.0.offset, rhs))
     }
 
     fn __divmod__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<(Self, i32)> {
         if slf.0.rlocmode != 4 || 4 % rhs != 0 {
-            return Err(PyValueError::new_err("Address not divisible"));
+            return Err(PyValueError::new_err(format!("Address not divisible: {} ÷ {}", slf.__str__(), rhs)));
         }
         let (offset, modulo) = slf.0.offset.divrem_floor(rhs);
         let rlocmode = slf.0.rlocmode / rhs;
