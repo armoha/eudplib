@@ -191,7 +191,7 @@ def test_scdata():
 
 
 @TestInstance  # noqa: F405
-def test_epdoffsetmap_scdataobject_reference():
+def test_scdata_reference():
     goliath_cunit = CUnit.from_next()
     DoActions(CreateUnit(1, "Terran Goliath", "Anywhere", P8))
     test_equality(
@@ -201,3 +201,28 @@ def test_epdoffsetmap_scdataobject_reference():
     )
 
     DoActions(RemoveUnit("Terran Goliath", P8))
+
+
+@TestInstance  # noqa: F405
+def test_scdata_caching():
+    ptr = EUDVariable()
+
+    @EUDFunc
+    def foo():
+        return CUnit.from_ptr(ptr)
+
+    test_equality("caching skip test", foo(), 0)
+
+    epds = []
+    ptr << 0x58A364 + 4
+    epds.append(foo())
+
+    ptr << 0x58A364
+    epds.append(foo())
+
+    ptr << 0x58A364 + 8
+    epds.append(foo())
+
+    ptr << 0
+    epds.append(foo())
+    test_equality("caching tests", epds, [1, 0, 2, 0])

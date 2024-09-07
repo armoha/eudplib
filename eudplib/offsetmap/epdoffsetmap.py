@@ -222,9 +222,10 @@ def _epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
         nextptr=update, conditions=is_ptr_equal, actions=c.SetNextPtr(check, skip)
     )
     update << c.VProc(
-        ptr,
+        [ptr, _epdcache_ptr],
         [
             ptr.QueueAssignTo(_epdcache_ptr),
+            _epdcache_ptr.SetDest(ut.EPD(is_ptr_equal) + 2),
             _epdcache_epd.SetDest(epd),
             c.SetNextPtr(_epdcache_epd.GetVTable(), end),
         ],
@@ -236,16 +237,17 @@ def _epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
 
 
 def _ptr_cache(epd: c.EUDVariable) -> c.EUDVariable:
-    ptr = c.EUDVariable()
+    ptr = c.EUDVariable(0)
     is_epd_equal = epd.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))
     check << c.RawTrigger(
         nextptr=update, conditions=is_epd_equal, actions=c.SetNextPtr(check, skip)
     )
     update << c.VProc(
-        epd,
+        [epd, _ptrcache_epd],
         [
             epd.QueueAssignTo(_ptrcache_epd),
+            _ptrcache_epd.SetDest(ut.EPD(is_epd_equal) + 2),
             _ptrcache_ptr.SetDest(ptr),
             c.SetNextPtr(_ptrcache_ptr.GetVTable(), end),
         ],
