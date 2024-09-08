@@ -316,6 +316,7 @@ class TBL:
             self._capacity < (1 << (8 * self._saveentry)),
             _("String table overflow"),
         )
+        ut.ep_assert(0 <= stringindex < 65535, _("String count exceeded"))
 
         return stringindex
 
@@ -400,5 +401,6 @@ class TBL:
             self._capacity < (1 << (8 * self._saveentry)),
             _("String table overflow"),
         )
+        ut.ep_assert(0 <= stringindex < 65535, _("String count exceeded"))
 
         return stringindex
