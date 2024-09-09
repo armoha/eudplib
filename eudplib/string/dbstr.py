@@ -41,7 +41,7 @@ class DBString(ut.ExprProxy):
 
         :returns: Memory address of DBString content.
         """
-        return self + 4
+        return self + 8
 
     @c.EUDMethod
     def Display(self):  # noqa: N802
@@ -83,9 +83,9 @@ class DBStringData(c.EUDObject):
             self.content = ut.u2utf8(content)
 
     def GetDataSize(self):  # noqa: N802
-        return len(self.content) + 5
+        return len(self.content) + 9
 
     def WritePayload(self, pbuf):  # noqa: N802
-        pbuf.WriteBytes(b"\x01\x00\x04\x00")
+        pbuf.WriteBytes(b"\x01\x00\x00\x00\x08\x00\x00\x00")
         pbuf.WriteBytes(self.content)
         pbuf.WriteByte(0)
