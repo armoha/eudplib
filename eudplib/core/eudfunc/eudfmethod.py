@@ -12,6 +12,7 @@ from collections.abc import Callable
 from ... import utils as ut
 from ...localize import _
 from .. import variable as ev
+from ..eudstruct.eudstruct import EUDStruct
 from ..eudstruct.selftype import _set_selftype, selftype
 from .eudtypedfuncn import EUDTypedFuncN, _apply_types
 
@@ -51,7 +52,7 @@ def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):  # noqa: N802
         # Return function
         def call(self, *args):
             # Use purely eudfun method
-            if ev.IsEUDVariable(self):
+            if isinstance(self, EUDStruct) or ev.IsEUDVariable(self):
                 selftype = type(self)
                 if method not in _mth_classtype:
                     _mth_classtype[method] = selftype
