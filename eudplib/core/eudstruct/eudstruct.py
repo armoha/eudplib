@@ -80,6 +80,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
         except TypeError:
             obj = cls.__new__(cls)
             EUDStruct.__init__(obj, _from=_from)
+            return obj
 
     # Initializer
 
