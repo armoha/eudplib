@@ -11,7 +11,7 @@ from typing_extensions import Self
 from .. import core as c
 from .. import utils as ut
 from ..core.inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
-from ..ctrlstru import EUDNot, EUDIf, EUDEndIf, EUDElse
+from ..ctrlstru import EUDElse, EUDEndIf, EUDIf, EUDNot
 from ..localize import _
 from ..memio import f_dwread_epd, f_dwwrite_epd
 
@@ -117,7 +117,7 @@ class EUDArray(ut.ExprProxy):
                 ),
             )
         # lazy calculate self._epd
-        if isinstance(self._epd, c.Forward):
+        if type(self._epd) == c.Forward:
             if c.PushTriggerScope():
                 nptr = self._epd.expr
                 self._epd.Reset()
