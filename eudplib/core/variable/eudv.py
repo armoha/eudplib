@@ -286,8 +286,7 @@ class EUDVariable(VariableBase):
         return self
 
     def __lshift__(self, other: "Dword") -> "EUDVariable":
-        self.Assign(other)
-        return self
+        return self.Assign(other)
 
     def __iadd__(self, other: "Dword") -> "EUDVariable":
         SeqCompute(((self, bt.Add, other),))
