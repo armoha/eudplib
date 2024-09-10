@@ -18,14 +18,24 @@ def test_scdata():
     )
 
     one = EUDVariable(1)
-    ghost = TrgUnit(one)
+    trigcount = GetTriggerCounter()
+    ghost = TrgUnit(one)  # copy variable one
+    ep_assert(
+        trigcount + 1 == GetTriggerCounter(),
+        f"Trigger count mismatch: {trigcount} + 1 != {GetTriggerCounter()}",
+    )
     test_equality(
         "TrgUnit(EUDVar(ghost)).maxHp = EUDVar(45 * 256)",
         ghost.maxHp,
         EUDVariable(45 * 256),
     )
 
-    ghost_cast = TrgUnit.cast(one)
+    trigcount = GetTriggerCounter()
+    ghost_cast = TrgUnit.cast(one)  # reuse variable
+    ep_assert(
+        trigcount == GetTriggerCounter(),
+        f"Trigger count mismatch: {trigcount} != {GetTriggerCounter()}",
+    )
     ep_assert(one is not ghost._value)
     ep_assert(one is ghost_cast._value)
     one << 2

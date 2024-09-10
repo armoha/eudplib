@@ -69,11 +69,11 @@ with expect_eperror():\n\
 
     const vlist = EUDCreateVariables(3);
     var x8, y8, z8 = vlist;
-    ep_assert(tc != GetTriggerCounter(), "Wrongly elide var copy");
+    ep_assert(tc + 1 == GetTriggerCounter(), "Wrongly elide var copy");
 
     const tc2 = GetTriggerCounter();
     var x9, y9, z9 = list(vlist[2], vlist[1], vlist[0]);
-    ep_assert(tc2 != GetTriggerCounter(), "Wrongly elide var copy");
+    ep_assert(tc2 + 1 == GetTriggerCounter(), "Wrongly elide var copy");
 
     cond.__lshift__(Memory(empty, AtLeast, 1));
     if (cond) { ret += 1 << 3; }

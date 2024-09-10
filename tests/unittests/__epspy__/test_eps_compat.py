@@ -107,14 +107,14 @@ def f_test_compatibility():
     vlist = EUDCreateVariables(3)
     # (Line 71) var x8, y8, z8 = vlist;
     x8, y8, z8 = _LVAR([vlist])
-    # (Line 72) ep_assert(tc != GetTriggerCounter(), "Wrongly elide var copy");
-    ep_assert(EUDNot(tc == GetTriggerCounter()), "Wrongly elide var copy")
+    # (Line 72) ep_assert(tc + 1 == GetTriggerCounter(), "Wrongly elide var copy");
+    ep_assert(tc + 1 == GetTriggerCounter(), "Wrongly elide var copy")
     # (Line 74) const tc2 = GetTriggerCounter();
     tc2 = GetTriggerCounter()
     # (Line 75) var x9, y9, z9 = list(vlist[2], vlist[1], vlist[0]);
     x9, y9, z9 = _LVAR([FlattenList([vlist[2], vlist[1], vlist[0]])])
-    # (Line 76) ep_assert(tc2 != GetTriggerCounter(), "Wrongly elide var copy");
-    ep_assert(EUDNot(tc2 == GetTriggerCounter()), "Wrongly elide var copy")
+    # (Line 76) ep_assert(tc2 + 1 == GetTriggerCounter(), "Wrongly elide var copy");
+    ep_assert(tc2 + 1 == GetTriggerCounter(), "Wrongly elide var copy")
     # (Line 78) cond.__lshift__(Memory(empty, AtLeast, 1));
     cond.__lshift__(Memory(empty, AtLeast, 1))
     # (Line 79) if (cond) { ret += 1 << 3; }
