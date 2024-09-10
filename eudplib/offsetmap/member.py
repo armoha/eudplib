@@ -81,7 +81,7 @@ class ArrayMember(BaseMember):
     ) -> None:
         super().__init__(offset, kind)
         if stride is None:
-            self.stride = self.kind.size()
+            self.stride: int = self.kind.size()
         else:
             ut.ep_assert(self.kind.size() <= stride and stride in (1, 2, 4, 8))
             self.stride = stride

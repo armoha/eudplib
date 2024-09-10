@@ -9,7 +9,12 @@ from collections import deque
 from typing import TYPE_CHECKING, Literal
 
 from ... import utils as ut
-from ..allocator import ConstExpr, RegisterCreatePayloadCallback
+from ..allocator import (
+    ConstExpr,
+    GetObjectAddr,
+    RegisterCreatePayloadCallback,
+    RlocInt_C,
+)
 from ..eudobj import EUDObject
 
 if TYPE_CHECKING:
@@ -32,6 +37,9 @@ class EUDVarBuffer(EUDObject):
     def DynamicConstructed(self) -> Literal[True]:  # noqa: N802
         return True
 
+    def Evaluate(self) -> RlocInt_C:  # noqa: N802
+        return GetObjectAddr(self) - 4
+
     def create_vartrigger(self, v, initval) -> ConstExpr:
         ret = self + (72 * len(self._initvals))
         self._initvals.append(initval)
@@ -45,7 +53,7 @@ class EUDVarBuffer(EUDObject):
         return ret
 
     def GetDataSize(self) -> int:  # noqa: N802
-        return 2408 + 72 * (len(self._initvals) - 1)
+        return 2404 + 72 * (len(self._initvals) - 1)
 
     def CollectDependency(self, emitbuffer: "ObjCollector") -> None:  # noqa: N802
         for initval in self._initvals:
@@ -53,8 +61,6 @@ class EUDVarBuffer(EUDObject):
                 emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802
-        emitbuffer.WriteSpace(4)
-
         for _ in range(4):
             emitbuffer.WriteDword(0)  # nextptr
             emitbuffer.WriteSpace(15)
@@ -130,6 +136,9 @@ class EUDCustomVarBuffer(EUDObject):
     def DynamicConstructed(self):  # noqa: N802
         return True
 
+    def Evaluate(self) -> RlocInt_C:  # noqa: N802
+        return GetObjectAddr(self) - 4
+
     def create_vartrigger(self, v, initval):
         # bitmask, player, #, modifier, nptr
         ret = self + 72 * (len(self._actnptr_pairs) + len(self._5acts))
@@ -152,7 +161,7 @@ class EUDCustomVarBuffer(EUDObject):
         return ret
 
     def GetDataSize(self):  # noqa: N802
-        return 2408 + 72 * (len(self._actnptr_pairs) + len(self._5acts) - 1)
+        return 2404 + 72 * (len(self._actnptr_pairs) + len(self._5acts) - 1)
 
     def CollectDependency(self, emitbuffer: "ObjCollector"):  # noqa: N802
         for initval in self._5nptrs:
@@ -169,8 +178,6 @@ class EUDCustomVarBuffer(EUDObject):
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802
         output = bytearray(72 * (len(self._actnptr_pairs) + len(self._5acts)))
-
-        emitbuffer.WriteSpace(4)
 
         for i in range(5):
             try:

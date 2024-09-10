@@ -22,14 +22,17 @@ class EUDJumpBuffer(c.EUDObject):
     def DynamicConstructed(self) -> Literal[True]:  # noqa: N802
         return True
 
+    def Evaluate(self) -> c.RlocInt_C:  # noqa: N802
+        return c.GetObjectAddr(self) - 4
+
     def create_jump_trigger(self, v, nextptr) -> c.ConstExpr:
-        ret = self + (20 * len(self._nextptrs) - 4)
+        ret = self + 20 * len(self._nextptrs)
         self._nextptrs.append(nextptr)
         self._jdict[v] = ret
         return ret
 
     def create_jump_triggers(self, v, nextptrs) -> c.ConstExpr:
-        ret = self + (20 * len(self._nextptrs) - 4)
+        ret = self + 20 * len(self._nextptrs)
         self._nextptrs.extend(nextptrs)
         self._jdict[v] = ret
         return ret
