@@ -69,13 +69,17 @@ class EUDArray(ut.ExprProxy):
                 self.length = _from._arrlen
             except AttributeError:
                 self.length = None
+            try:
+                self._epd = _from._epd
+            except AttributeError:
+                self._epd = ut.EPD(_from)
 
         else:
             data_obj = EUDArrayData(initval)
             self.length = data_obj._arrlen
+            self._epd = ut.EPD(data_obj)
 
         super().__init__(data_obj)
-        self._epd = ut.EPD(self)
 
     def fmt(self, formatter):
         if isinstance(self.length, int):
