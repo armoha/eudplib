@@ -11,7 +11,7 @@ from typing_extensions import Self
 from .. import core as c
 from .. import utils as ut
 from ..core.inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
-from ..ctrlstru import EUDNot
+from ..ctrlstru import EUDNot, EUDIf, EUDEndIf, EUDElse
 from ..localize import _
 from ..memio import f_dwread_epd, f_dwwrite_epd
 
@@ -58,6 +58,16 @@ class EUDArrayData(c.EUDObject):
         return self._arrlen
 
 
+@c.EUDFunc
+def _get_epd(ptr):
+    if EUDIf()(ptr >= 1 << 31):
+        ptr -= 1 << 31
+    if EUDElse()():
+        ut.EPD(ptr, ret=[ptr])
+    EUDEndIf()
+    c.EUDReturn(ptr)
+
+
 class EUDArray(ut.ExprProxy):
     dont_flatten = True
 
@@ -72,7 +82,12 @@ class EUDArray(ut.ExprProxy):
             try:
                 self._epd = _from._epd
             except AttributeError:
-                self._epd = ut.EPD(_from)
+                if c.IsEUDVariable(_from):
+                    self._epd = c.Forward()
+                    c.SetNextTrigger(self._epd)
+                    self._epd << c.NextTrigger()
+                else:
+                    self._epd = ut.EPD(_from)
 
         else:
             data_obj = EUDArrayData(initval)
@@ -92,7 +107,7 @@ class EUDArray(ut.ExprProxy):
 
     def _bound_check(self, index: object) -> None:
         index = ut.unProxy(index)
-        if isinstance(index, int) and isinstance(self.length, int):
+        if isinstance(index, int) and self.length is not None:
             ut.ep_assert(
                 0 <= index < self.length,
                 _("index out of bounds")
@@ -101,6 +116,14 @@ class EUDArray(ut.ExprProxy):
                     self.length, index
                 ),
             )
+        if isinstance(self._epd, c.Forward):
+            c.PushTriggerScope()
+            nptr = self._epd.expr
+            self._epd.Reset()
+            self._epd << c.NextTrigger()
+            self._epd = _get_epd(self)
+            c.SetNextTrigger(nptr)
+            c.PopTriggerScope()
 
     def get(self, key) -> c.EUDVariable:
         self._bound_check(key)
