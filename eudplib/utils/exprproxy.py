@@ -35,6 +35,8 @@ class ExprProxy(Generic[T_co]):
 
     @classmethod
     def cast(cls, _from):
+        if type(_from) == cls:
+            return _from
         try:
             return cls(_from=_from)
         except TypeError as e:
