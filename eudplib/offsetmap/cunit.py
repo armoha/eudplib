@@ -405,7 +405,7 @@ class CUnit(EPDOffsetMap):
             else:
                 raise EPError(_("Invalid input for CUnit: {}").format(epd))
 
-            if p is not None and not isinstance(p, int) or p != self._ptr:
+            if p is not None and (not isinstance(p, int) or p != self._ptr):
                 raise EPError(_("Invalid input for CUnit.ptr: {}").format(ptr))
         elif isinstance(u, c.EUDVariable):
             if p is None:
