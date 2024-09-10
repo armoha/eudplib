@@ -51,8 +51,15 @@ def test_scdata():
     )
 
     test_equality("arithmetic on UnitData", ghost + 3, 4)
-    # with expect_eperror():
-    ghost -= 1  # FIXME: should raise error?
+    ghost << 2
+    ep_assert(isinstance(ghost, TrgUnit), "preserve type on assignment")
+    test_equality(
+        "TrgUnit(eudvar).maxHp, after assignment",
+        ghost_cast.maxHp,
+        EUDVariable(80 * 256),
+    )
+    ghost -= 1
+    ep_assert(not isinstance(ghost, TrgUnit), "losing type on in-place operations")
 
     zealot_data = TrgUnit("Protoss Zealot")
 
