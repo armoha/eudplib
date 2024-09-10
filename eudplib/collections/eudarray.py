@@ -116,13 +116,14 @@ class EUDArray(ut.ExprProxy):
                     self.length, index
                 ),
             )
+        # lazy calculate self._epd
         if isinstance(self._epd, c.Forward):
-            c.PushTriggerScope()
-            nptr = self._epd.expr
-            self._epd.Reset()
-            self._epd << c.NextTrigger()
-            self._epd = _get_epd(self)
-            c.SetNextTrigger(nptr)
+            if c.PushTriggerScope():
+                nptr = self._epd.expr
+                self._epd.Reset()
+                self._epd << c.NextTrigger()
+                self._epd = _get_epd(self)
+                c.SetNextTrigger(nptr)
             c.PopTriggerScope()
 
     def get(self, key) -> c.EUDVariable:
