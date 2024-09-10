@@ -26,7 +26,7 @@ from ...utils import (
     unProxy,
 )
 from .. import rawtrigger as bt
-from ..allocator import ConstExpr, Forward, IsConstExpr
+from ..allocator import ConstExpr, Forward
 from .vbase import VariableBase
 from .vbuf import get_current_custom_varbuffer, get_current_varbuffer
 
@@ -294,20 +294,21 @@ class EUDVariable(VariableBase):
 
     def __isub__(self, other: "Dword") -> "EUDVariable":
         if isinstance(other, int):
-            return self.__iadd__(-other)  # 1A
-        try:
-            addor = EUDVariable._addor
-        except AttributeError:
-            addor = EUDVariable(0, bt.Add, 0)
-            EUDVariable._addor = addor
-        SeqCompute(
-            [  # (~0 - other) + (self + 1)
-                (self, bt.Add, 1),
-                (addor, bt.SetTo, 0xFFFFFFFF),
-                (addor, bt.Subtract, other),
-                (self, None, addor),
-            ]
-        )
+            self.__iadd__(-other)  # 1A
+        else:
+            try:
+                addor = EUDVariable._addor
+            except AttributeError:
+                addor = EUDVariable(0, bt.Add, 0)
+                EUDVariable._addor = addor
+            SeqCompute(
+                [  # (~0 - other) + (self + 1)
+                    (self, bt.Add, 1),
+                    (addor, bt.SetTo, 0xFFFFFFFF),
+                    (addor, bt.Subtract, other),
+                    (self, None, addor),
+                ]
+            )
         return self
 
     # -------
@@ -368,7 +369,8 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rsub__(self, other: "Dword") -> "EUDVariable":
-        if _is_rvalue(self) and IsConstExpr(other):
+        is_eudvariable = IsEUDVariable(other)
+        if _is_rvalue(self) and not is_eudvariable:
             bt.RawTrigger(  # -self += other
                 actions=[
                     self.AddNumberX(0xFFFFFFFF, 0x55555555),
@@ -378,12 +380,13 @@ class EUDVariable(VariableBase):
             )
             return self
         t = EUDVariable()
-        if IsConstExpr(other):
+        if is_eudvariable:
             SeqCompute(
                 [
                     (t, bt.SetTo, 0xFFFFFFFF),
                     (t, bt.Subtract, self),
-                    (t, bt.Add, other + 1),
+                    (t, bt.Add, 1),
+                    (t, bt.Add, other),
                 ]
             )
         else:
@@ -391,8 +394,7 @@ class EUDVariable(VariableBase):
                 [
                     (t, bt.SetTo, 0xFFFFFFFF),
                     (t, bt.Subtract, self),
-                    (t, bt.Add, 1),
-                    (t, bt.Add, other),
+                    (t, bt.Add, other + 1),
                 ]
             )
         return t.makeR()
@@ -412,25 +414,26 @@ class EUDVariable(VariableBase):
     # -------
 
     def __ior__(self, other: "Dword") -> "EUDVariable":
-        if IsConstExpr(other):
-            return super().__ior__(other)  # 1A
-        write = self.SetNumberX(0xFFFFFFFF, 0)
-        SeqCompute([(EPD(write), bt.SetTo, other)])
-        bt.RawTrigger(actions=write)  # 1T 5A
+        if IsEUDVariable(other):
+            write = self.SetNumberX(0xFFFFFFFF, 0)
+            SeqCompute([(EPD(write), bt.SetTo, other)])
+            bt.RawTrigger(actions=write)  # 1T 5A
+        else:
+            super().__ior__(other)  # 1A
         return self
 
     def __iand__(self, other: "Dword") -> "EUDVariable":
-        _u = unProxy(other)
-        if isinstance(other, (int, ConstExpr)):  # noqa: UP038
-            return super().__iand__(other)  # 1A
-        write = self.SetNumberX(0, 0xFFFFFFFF)
-        SeqCompute(
-            [
-                (EPD(write), bt.SetTo, 0xFFFFFFFF),
-                (EPD(write), bt.Subtract, other),
-            ]
-        )
-        bt.RawTrigger(actions=write)  # 1T 6A
+        if IsEUDVariable(other):
+            write = self.SetNumberX(0, 0xFFFFFFFF)
+            SeqCompute(
+                [
+                    (EPD(write), bt.SetTo, 0xFFFFFFFF),
+                    (EPD(write), bt.Subtract, other),
+                ]
+            )
+            bt.RawTrigger(actions=write)  # 1T 6A
+        else:
+            super().__iand__(other)  # 1A
         return self
 
     # -------
@@ -438,13 +441,11 @@ class EUDVariable(VariableBase):
     def __and__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__iand__(other)
-        if IsEUDVariable(other) and _is_rvalue(other):
+        is_eudvariable = IsEUDVariable(other)
+        if is_eudvariable and _is_rvalue(other):
             return other.__iand__(self)
         t = EUDVariable()
-        if IsConstExpr(other):
-            t << self
-            t &= other  # 1T 5A
-        else:
+        if is_eudvariable:
             write = t.SetNumberX(0, 0xFFFFFFFF)
             SeqCompute(
                 [
@@ -454,16 +455,16 @@ class EUDVariable(VariableBase):
                 ]
             )
             bt.RawTrigger(actions=write)  # 2T 10A
+        else:
+            t << self
+            t &= other  # 1T 5A
         return t.makeR()
 
     def __rand__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__iand__(other)
         t = EUDVariable()
-        if IsConstExpr(other):
-            t << self
-            t &= other  # 1T 5A
-        else:
+        if IsEUDVariable(other):
             write = t.SetNumberX(0, 0xFFFFFFFF)
             SeqCompute(
                 [
@@ -473,34 +474,38 @@ class EUDVariable(VariableBase):
                 ]
             )
             bt.RawTrigger(actions=write)  # 2T 10A
+        else:
+            t << self
+            t &= other  # 1T 5A
         return t.makeR()
 
     def __or__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__ior__(other)
-        if IsEUDVariable(other) and _is_rvalue(other):
+        is_eudvariable = IsEUDVariable(other)
+        if is_eudvariable and _is_rvalue(other):
             return other.__ior__(self)
         t = EUDVariable()
-        if IsConstExpr(other):
-            t << self
-            t |= other  # 1T 5A
-        else:
+        if is_eudvariable:
             write = t.SetNumberX(0xFFFFFFFF, 0)
             SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, other)])
             bt.RawTrigger(actions=write)  # 2T 9A
+        else:
+            t << self
+            t |= other  # 1T 5A
         return t.makeR()
 
     def __ror__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__ior__(other)
         t = EUDVariable()
-        if IsConstExpr(other):
-            t << self
-            t |= other  # 1T 5A
-        else:
+        if IsEUDVariable(other):
             write = t.SetNumberX(0xFFFFFFFF, 0)
             SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, other)])
             bt.RawTrigger(actions=write)  # 2T 9A
+        else:
+            t << self
+            t |= other  # 1T 5A
         return t.makeR()
 
     # -------
@@ -525,10 +530,11 @@ class EUDVariable(VariableBase):
     def __xor__(self, other: "Dword") -> "EUDVariable":
         if _is_rvalue(self):
             return self.__ixor__(other)
-        if IsEUDVariable(other) and _is_rvalue(other):
+        is_eudvariable = IsEUDVariable(other)
+        if is_eudvariable and _is_rvalue(other):
             return other.__ixor__(self)
         t = EUDVariable()
-        if IsEUDVariable(other):
+        if is_eudvariable:
             VProc(
                 [self, other],
                 [
