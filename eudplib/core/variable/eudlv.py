@@ -12,6 +12,8 @@ from .vbase import VariableBase
 
 
 class EUDLightVariable(VariableBase):
+    __slots__ = ("_memaddr",)
+
     def __init__(self, initvalue=0):
         super().__init__()
         self._memaddr = Db(i2b4(initvalue))
@@ -27,6 +29,7 @@ class EUDLightVariable(VariableBase):
 
 
 class EUDLightBool:
+    __slots__ = ("_basev", "_mask", "_memaddr")
     _lv = EUDLightVariable()
     _bit = 0
 

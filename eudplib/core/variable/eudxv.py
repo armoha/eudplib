@@ -12,6 +12,8 @@ from .eudv import EUDVariable, VariableTriggerForward, process_dest
 
 
 class EUDXVariable(EUDVariable):
+    __slots__ = ()
+
     def __init__(
         self, _initval=0, modifier=None, /, initval=None, mask=None, *, nextptr=0
     ):
