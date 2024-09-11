@@ -615,38 +615,32 @@ class EUDVariable(VariableBase):
             return t.Exactly(0)
 
     def __lt__(self, other) -> bt.Condition:  # type: ignore[override]
-        if isinstance(other, int) and other <= 0:
-            ep_warn(_("No unsigned number can be leq than {}").format(other))
-            traceback.print_stack()
-            return bt.Never()  # No unsigned number is less than 0
-
-        try:
-            return self.AtMost(other - 1)
-
-        except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.").format(err))
-            traceback.print_stack()
-            t = EUDVariable()
-            SeqCompute(
-                ((t, bt.SetTo, 1), (t, bt.Add, self), (t, bt.Subtract, other))
-            )
-            return t.Exactly(0)
+        if isinstance(other, int):
+            if other <= 0:
+                ep_warn(_("No unsigned number can be leq than {}").format(other))
+                traceback.print_stack()
+                return bt.Never()  # No unsigned number is less than 0
+        if IsEUDVariable(other):
+            bitmask = Forward()
+            condition = bt.MemoryEPD(bitmask, bt.AtLeast, 1)
+            bitmask << EPD(condition)
+            SeqCompute(((bitmask, bt.SetTo, other), (bitmask, bt.Subtract, self)))
+            return condition
+        return self.AtMost(other - 1)
 
     def __gt__(self, other) -> bt.Condition:  # type: ignore[override]
-        if isinstance(other, int) and other >= 0xFFFFFFFF:
-            ep_warn(_("No unsigned number can be greater than {}").format(other))
-            traceback.print_stack()
-            return bt.Never()  # No unsigned number is less than 0
-
-        try:
-            return self.AtLeast(other + 1)
-
-        except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.").format(err))
-            traceback.print_stack()
-            t = EUDVariable()
-            SeqCompute(((t, bt.SetTo, self), (t, bt.Subtract, other)))
-            return t.AtLeast(1)
+        if isinstance(other, int):
+            if other >= 0xFFFFFFFF:
+                ep_warn(_("No unsigned number can be greater than {}").format(other))
+                traceback.print_stack()
+                return bt.Never()  # No unsigned number is greater than 0xFFFFFFFF
+        if IsEUDVariable(other):
+            bitmask = Forward()
+            condition = bt.MemoryEPD(bitmask, bt.AtLeast, 1)
+            bitmask << EPD(condition)
+            SeqCompute(((bitmask, bt.SetTo, self), (bitmask, bt.Subtract, other)))
+            return condition
+        return self.AtLeast(other + 1)
 
     # operator placeholders
     def __mul__(self, a):
