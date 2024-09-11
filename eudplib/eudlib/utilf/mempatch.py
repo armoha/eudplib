@@ -68,16 +68,30 @@ def f_blockpatch_epd(dstepd, srcepd, dwn):
     pushpatchstack(dstepd)
     pushpatchstack(srcepd)
     pushpatchstack(dwn)
-    dws_top += 1
+    copydwn = c.EUDVariable()
+    endbranch, contpoint = c.Forward(), c.Forward()
+    c.SeqCompute(
+        [
+            (dws_top, c.Add, 1),
+            (copydwn, c.SetTo, 256),
+            (ut.EPD(endbranch) + 1, c.SetTo, contpoint),
+        ]
+    )
 
     # Swap contents btw dstepd, srcepd
     tmpbuffer = c.Db(1024)
 
-    if cs.EUDWhile()(dwn > 0):
-        copydwn = c.EUDVariable()
-        copydwn << 256
-        t.Trigger(dwn <= 256, copydwn.SetNumber(dwn))
-        dwn -= copydwn
+    if cs.EUDWhileNot()(dwn == 0):
+        endbranch << c.RawTrigger(
+            nextptr=0,
+            conditions=dwn <= 255,
+            actions=[
+                c.SetNextPtr(endbranch, dwn.GetVTable()),
+                dwn.SetDest(copydwn),
+                c.SetNextPtr(dwn.GetVTable(), contpoint),
+            ],
+        )
+        contpoint << c.RawTrigger(actions=dwn.SubtractNumber(256))
 
         f_repmovsd_epd(ut.EPD(tmpbuffer), dstepd, copydwn)
         f_repmovsd_epd(dstepd, srcepd, copydwn)
