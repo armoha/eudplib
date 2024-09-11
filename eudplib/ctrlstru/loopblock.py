@@ -86,7 +86,7 @@ def EUDLoopRange(start, end=None) -> Iterator[c.EUDVariable]:  # noqa: N802
 
     v = c.EUDVariable()
     v << start
-    if EUDWhile()(v >= end, neg = True): // EUDVariable(0) < EUDVariable(0) is always true
+    if EUDWhileNot()(v >= end):  # FIXME: EUDVariable(0) < EUDVariable(0) is always True
         block = ut.EUDPeekBlock("whileblock")[1]
         yield v
         if not block["contpoint"].IsSet():
