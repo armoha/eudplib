@@ -24,9 +24,9 @@ class Image(ConstType, EPDOffsetMap):
     useFullIscript = ArrayMember(0x66D4D8, Mk.BOOL)
     drawIfCloaked = ArrayMember(0x667718, Mk.BOOL)
     drawingFunction = ArrayMember(0x669E28, Mk.DRAWING_FUNCION)
-    # Remapping table is skipped because it doesn't work in SC:R
-    # FIXME: Add UnsupportedMember
+    # FIXME: Add UnsupportedMember?
     # remapping = ArrayMember(0x669A40, Mk.BYTE)
+    # Remapping table is skipped because it doesn't work in SC:R
     iscript = ArrayMember(0x66EC48, Mk.ISCRIPT)
     # shieldsOverlay = ArrayMember(0x66C538, Mk.DWORD)
     # attackOverlay = ArrayMember(0x66B1B0, Mk.DWORD)

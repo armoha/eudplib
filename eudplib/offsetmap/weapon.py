@@ -26,23 +26,24 @@ class TargetFlags(ArrayEnumMember):
     NonRobotic = Flag(0x020)
     Terrain = Flag(0x040)
     OrganicOrMechanical = Flag(0x080)
-    PlayerOwned = Flag(0x100)  # Consume
+    PlayerOwned = Flag(0x100)  #
+    "Can target your own unit, used by Consume"
 
 
 class Weapon(ConstType, EPDOffsetMap):
     __slots__ = ()
     label = ArrayMember(0x6572E0, Mk.STATTEXT)
     graphic = flingy = ArrayMember(0x656CA8, Mk.FLINGY)
-    # special attack is for reference only (unused)
     # specialAttack = ArrayMember(0x6573E8, Mk.BYTE)
+    # special attack is for reference only (unused)
     targetFlags = TargetFlags(0x657998, Mk.WORD)
     # can't use name 'range' because it's a python keyword
     minRange = ArrayMember(0x656A18, Mk.DWORD)
     maxRange = ArrayMember(0x657470, Mk.DWORD)
     upgrade = ArrayMember(0x6571D0, Mk.UPGRADE)
     damageType = ArrayMember(0x657258, Mk.DAMAGE_TYPE)
-    # Fly and follow target, appear on target unit, etc.
     behavior = ArrayMember(0x656670, Mk.WEAPON_BEHAVIOR)
+    "Fly and follow target, appear on target unit, etc."
     removeAfter = ArrayMember(0x657040, Mk.BYTE)
     explosionType = ArrayMember(0x6566F8, Mk.EXPLOSION_TYPE)
     splashInnerRadius = ArrayMember(0x656888, Mk.WORD)
@@ -51,7 +52,8 @@ class Weapon(ConstType, EPDOffsetMap):
     damage = ArrayMember(0x656EB0, Mk.WORD)
     damageBonus = ArrayMember(0x657678, Mk.WORD)
     cooldown = ArrayMember(0x656FB8, Mk.BYTE)
-    damageFactor = ArrayMember(0x6564E0, Mk.BYTE)  # aka 'missile count'
+    damageFactor = ArrayMember(0x6564E0, Mk.BYTE)
+    "aka 'missile count'"
     attackAngle = ArrayMember(0x656990, Mk.BYTE)
     launchSpin = ArrayMember(0x657888, Mk.BYTE)
     forwardOffset = graphicXOffset = ArrayMember(0x657910, Mk.BYTE)

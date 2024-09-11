@@ -47,8 +47,10 @@ class TrgPlayer(_Player, EPDOffsetMap):
     minimapColor = ArrayMember(0x581DD6, Mk.BYTE)
     remainingGamePause = ArrayMember(0x58D718, Mk.BYTE)  # length=8
     missionObjectives = ArrayMember(0x58D6C4, Mk.MAP_STRING, stride=4)
-    unitScore = ArrayMember(0x581E44, Mk.DWORD)  # Score for units produced
-    buildingScore = ArrayMember(0x582024, Mk.DWORD)  # Score for buildings produced
+    unitScore = ArrayMember(0x581E44, Mk.DWORD)
+    "Score for units produced"
+    buildingScore = ArrayMember(0x582024, Mk.DWORD)
+    "Score for buildings produced"
     killScore = ArrayMember(0x581F04, Mk.DWORD)
     razingScore = ArrayMember(0x582054, Mk.DWORD)
     customScore = ArrayMember(0x5822F4, Mk.DWORD)
@@ -155,12 +157,12 @@ class Sprite(ConstType, EPDOffsetMap):
     __slots__ = ()
     # Read only data skipped
     image = ArrayMember(0x666160, Mk.IMAGE)
-    # hpBarSize starts on Sprites.dat ID 130
     # hpBarSize = ArrayMember(0x665E50, Mk.BYTE)
+    # hpBarSize starts on Sprites.dat ID 130
     # unknownFlag = ArrayMember(0x666570, Mk.BYTE)
     isVisible = ArrayMember(0x665C48, Mk.BOOL)
-    # selectionCircle and selectionVerticalOffset start on Sprites.dat ID 130
     # selectionCircle = ArrayMember(0x665AC0, Mk.BYTE)
+    # selectionCircle and selectionVerticalOffset start on Sprites.dat ID 130
     # selectionVerticalOffset = ArrayMember(0x665FD8, Mk.BYTE)
 
     @classmethod
@@ -235,25 +237,25 @@ class UnitOrder(ConstType, EPDOffsetMap):
     __slots__ = ()
     label = ArrayMember(0x665280, Mk.STATTEXT)
     useWeaponTargeting = ArrayMember(0x664B00, Mk.BOOL)
-    # secondary order is for reference only (unused)
     # secondaryOrder = ArrayMember(0x665940, Mk.BOOL)
-    # non subunit is for reference only (unused)
+    # secondary order is for reference only (unused)
     # nonSubunit = ArrayMember(0x665A00, Mk.BOOL)
-    # when main unit receives the order, gives it to subunit as well
+    # non subunit is for reference only (unused)
     subunitInheritance = ArrayMember(0x664A40, Mk.BOOL)
-    # subunit can use is for reference only (unused)
+    "when main unit receives the order, gives it to subunit as well"
     # subunitCanUse = ArrayMember(0x6657C0, Mk.BOOL)
+    # subunit can use is for reference only (unused)
     canBeInterrupted = ArrayMember(0x665040, Mk.BOOL)
-    # if a movement-type order, sets/clears Lifted (0x20) cunit movement flag
     canBeLifted = ArrayMember(0x665100, Mk.BOOL)
+    "if a movement-type order, sets/clears Lifted (0x20) cunit movement flag"
     canBeQueued = ArrayMember(0x665700, Mk.BOOL)
-    # does not clear order target unit when frozen by lockdown/stasis/maelstrom
     disablingKeepsTarget = ArrayMember(0x6651C0, Mk.BOOL)
+    "does not clear order target unit when frozen by lockdown/stasis/maelstrom"
     canBeObstructed = ArrayMember(0x6654C0, Mk.BOOL)
-    # order can be interrupted by unit fleeing from hit reaction
     fleeable = ArrayMember(0x664C80, Mk.BOOL)
-    # require moving is for reference only (unused)
+    "order can be interrupted by unit fleeing from hit reaction"
     # requireMoving = ArrayMember(0x664BC0, Mk.BOOL)
+    # require moving is for reference only (unused)
     weapon = ArrayMember(0x665880, Mk.WEAPON)
     techUsed = ArrayMember(0x664E00, Mk.TECH)
     animation = ArrayMember(0x664D40, Mk.ANIMATION)

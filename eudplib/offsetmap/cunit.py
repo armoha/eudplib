@@ -32,8 +32,8 @@ class MovementFlags(StructEnumMember):
     StartingAttack = Flag(0x08)
     Moving = Flag(0x10)
     Lifted = Flag(0x20)
-    # unit decelerates when reaching the end of current path segment
     BrakeOnPathStep = Flag(0x40)
+    "unit decelerates when reaching the end of current path segment"
     AlwaysZero = Flag(0x80)
     HoverUnit = Flag(0xC1)
 
@@ -41,46 +41,51 @@ class MovementFlags(StructEnumMember):
 class StatusFlags(StructEnumMember):
     __slots__ = ()
     Completed = Flag(0x00000001)
-    GroundedBuilding = Flag(0x00000002)  # a building that is on the ground
+    GroundedBuilding = Flag(0x00000002)
+    "a building that is on the ground"
     InAir = Flag(0x00000004)
-    Disabled = Flag(0x00000008)  # Protoss Unpowered
+    Disabled = Flag(0x00000008)
+    "Protoss Unpowered"
     Burrowed = Flag(0x00000010)
     InBuilding = Flag(0x00000020)
     InTransport = Flag(0x00000040)
     CanBeChased = Flag(0x00000080)
     RequiresDetection = Flag(0x00000100)
     Cloaked = Flag(0x00000200)
-    # protoss unpowered buildings have this flag set
     DoodadStatesThing = Flag(0x00000400)
-    CloakingForFree = Flag(0x00000800)  # Requires no energy to cloak
+    "protoss unpowered buildings have this flag set"
+    CloakingForFree = Flag(0x00000800)
+    "Requires no energy to cloak"
     CanNotReceiveOrders = Flag(0x00001000)
-    NoBrkCodeStart = Flag(0x00002000)  # Unbreakable code section in iscript
+    NoBrkCodeStart = Flag(0x00002000)
+    "Unbreakable code section in iscript"
     UNKNOWN2 = Flag(0x00004000)
     CanNotAttack = Flag(0x00008000)
-    CanTurnAroundToAttack = Flag(0x00010000)  # canAttack? named IsAUnit in BWAPI
+    CanTurnAroundToAttack = Flag(0x00010000)
+    "canAttack? named IsAUnit in BWAPI"
     IsBuilding = Flag(0x00020000)
     IgnoreTileCollision = Flag(0x00040000)
     Unmovable = Flag(0x00080000)
-    IsNormal = Flag(0x00100000)  # 1 for "normal" units, 0 for hallucinated units
-    # if set, other units wont collide with the unit (like burrowed units)
+    IsNormal = Flag(0x00100000)
+    "0 for ignore terrain elevation while moving"
     NoCollide = Flag(0x00200000)
+    "if set, other units wont collide with the unit (like burrowed units)"
     UNKNOWN5 = Flag(0x00400000)
-    # if set, the unit wont collide with other units (like workers gathering)
     IsGathering = Flag(0x00800000)
-    # makes subunit play walking animation if base unit movement flag 2 is set
+    "if set, the unit wont collide with other units (like workers gathering)"
     SubunitWalking = Flag(0x01000000)
-    # makes subunit instantly follow base unit's facing direction
-    SubunitFollow = Flag(0x02000000)  # Turret related
+    "makes subunit play walking animation if base unit movement flag 2 is set"
+    SubunitFollow = Flag(0x02000000)
+    "makes subunit instantly follow base unit's facing direction. Turret related"
     Invincible = Flag(0x04000000)
-    # Set if the unit is currently holding position
     HoldingPosition = Flag(0x08000000)
+    "Set if the unit is currently holding position"
     SpeedUpgrade = Flag(0x10000000)
     CooldownUpgrade = Flag(0x20000000)
-    # 1 for hallucinated units, 0 for "normal" units
     IsHallucination = Flag(0x40000000)
-    # Set for when the unit is self-destructing
-    # (scarab, scourge, infested terran)
+    "1 for hallucinated units, 0 for 'normal' units"
     IsSelfDestructing = Flag(0x80000000)
+    "Set for when the unit is self-destructing (scarab, scourge, infested terran)"
 
 
 class PathingFlags(StructEnumMember):
@@ -95,36 +100,35 @@ T = TypeVar("T", bound="CUnit")
 
 class CUnit(EPDOffsetMap):
     __slots__ = ("_ptr",)
-    # TODO: add docstring for descriptor
     prev = StructMember(0x000, Mk.C_UNIT)
-    next = StructMember(0x004, Mk.C_UNIT)  # link
-    # displayed value is ceil(healthPoints/256)
+    next = StructMember(0x004, Mk.C_UNIT)
     hp = StructMember(0x008, Mk.DWORD)
+    "displayed value is ceil(healthPoints/256)"
     sprite = StructMember(0x00C, Mk.C_SPRITE)
     moveTargetPos = StructMember(0x010, Mk.POSITION)
     moveTargetX = StructMember(0x010, Mk.POSITION_X)
     moveTargetY = StructMember(0x012, Mk.POSITION_Y)
     moveTarget = moveTargetUnit = StructMember(0x014, Mk.C_UNIT)
-    # The next way point in the path the unit is following to get to
-    # its destination. Equal to moveToPos for air units since they
-    # don't need to navigate around buildings.
     nextMovementWaypoint = StructMember(0x018, Mk.POSITION)
-    # The desired position
+    """The next way point in the path the unit is following to get to its
+    destination. Equal to moveToPos for air units since they don't need to
+    navigate around buildings."""
     nextTargetWaypoint = StructMember(0x01C, Mk.POSITION)
+    "The desired position"
     movementFlags = MovementFlags(0x020, Mk.BYTE)
-    # current direction the unit is facing
     currentDirection1 = StructMember(0x021, Mk.BYTE)
+    "current direction the unit is facing"
     turnSpeed = turnRadius = StructMember(0x022, Mk.BYTE)  # flingy
-    # usually only differs from the currentDirection field for units that
-    # can accelerate and travel in a different direction than they are facing.
-    # For example Mutalisks can change the direction they are facing
-    # faster than then can change the direction they are moving.
     velocityDirection1 = StructMember(0x023, Mk.BYTE)
+    """usually only differs from the currentDirection field for units that
+    can accelerate and travel in a different direction than they are facing.
+    For example Mutalisks can change the direction they are facing
+    faster than then can change the direction they are moving."""
     flingyID = StructMember(0x024, Mk.FLINGY)
     unknown0x26 = StructMember(0x026, Mk.BYTE)
     flingyMovementType = StructMember(0x027, Mk.BYTE)
-    # Current position of the unit
     pos = StructMember(0x028, Mk.POSITION)
+    "Current position of the unit"
     posX = StructMember(0x028, Mk.POSITION_X)
     posY = StructMember(0x02A, Mk.POSITION_Y)
     haltX = StructMember(0x02C, Mk.DWORD)
@@ -136,13 +140,15 @@ class CUnit(EPDOffsetMap):
     currentVelocityY = StructMember(0x044, Mk.DWORD)
     acceleration = StructMember(0x048, Mk.WORD)
     currentDirection2 = StructMember(0x04A, Mk.BYTE)
-    velocityDirection2 = StructMember(0x04B, Mk.BYTE)  # pathing related
+    velocityDirection2 = StructMember(0x04B, Mk.BYTE)
+    "pathing related"
     owner = playerID = StructMember(0x04C, Mk.PLAYER)
     order = orderID = StructMember(0x04D, Mk.UNIT_ORDER)
     orderState = StructMember(0x04E, Mk.BYTE)
     orderSignal = StructMember(0x04F, Mk.BYTE)
     orderUnitType = StructMember(0x050, Mk.UNIT)
-    unknown0x52 = StructMember(0x052, Mk.WORD)  # 2-byte padding
+    unknown0x52 = StructMember(0x052, Mk.WORD)
+    "2-byte padding"
     cooldown = StructMember(0x054, Mk.DWORD)
     orderTimer = StructMember(0x054, Mk.BYTE)
     groundWeaponCooldown = gCooldown = StructMember(0x055, Mk.BYTE)
@@ -156,38 +162,39 @@ class CUnit(EPDOffsetMap):
     orderTargetUnit = StructMember(0x05C, Mk.C_UNIT)
     shield = StructMember(0x060, Mk.DWORD)
     unitType = unitID = StructMember(0x064, Mk.UNIT)
-    unknown0x66 = StructMember(0x066, Mk.WORD)  # 2-byte padding
+    unknown0x66 = StructMember(0x066, Mk.WORD)
+    "2-byte padding"
     prevPlayerUnit = StructMember(0x068, Mk.C_UNIT)
     nextPlayerUnit = StructMember(0x06C, Mk.C_UNIT)
     subUnit = StructMember(0x070, Mk.C_UNIT)
     orderQueueHead = UnsupportedMember(0x074, Mk.DWORD)  # COrder
     orderQueueTail = UnsupportedMember(0x078, Mk.DWORD)
     autoTargetUnit = StructMember(0x07C, Mk.C_UNIT)
-    # larva, in-transit, addons
     connectedUnit = StructMember(0x080, Mk.C_UNIT)
-    # may be count in addition to first since can be 2 when 3 orders are queued
+    "larva, in-transit, addons"
     orderQueueCount = StructMember(0x084, Mk.BYTE)
-    # Cycles down from from 8 to 0 (inclusive). See also 0x122.
+    "may be count in addition to first since can be 2 when 3 orders are queued"
     orderQueueTimer = StructMember(0x085, Mk.BYTE)
+    "Cycles down from from 8 to 0 (inclusive). See also 0x122."
     unknown0x86 = StructMember(0x086, Mk.BYTE)
-    # Prevent "Your forces are under attack." on every attack
     attackNotifyTimer = StructMember(0x087, Mk.BYTE)
-    # zerg buildings while morphing
+    "Prevent 'Your forces are under attack.' on every attack"
     prevUnitType = UnsupportedMember(0x088, Mk.UNIT)
+    "zerg buildings while morphing"
     lastEventTimer = UnsupportedMember(0x08A, Mk.BYTE)
-    # 17 = was completed (train, morph), 174 = was attacked
     lastEventColor = UnsupportedMember(0x08B, Mk.BYTE)
-    #  might have originally been RGB from lastEventColor
+    "17 = was completed (train, morph), 174 = was attacked"
     unknown0x8C = StructMember(0x08C, Mk.WORD)
+    "might have originally been RGB from lastEventColor"
     rankIncrease = StructMember(0x08E, Mk.BYTE)
     killCount = StructMember(0x08F, Mk.BYTE)
     lastAttackingPlayer = StructMember(0x090, Mk.PLAYER)
     secondaryOrderTimer = StructMember(0x091, Mk.BYTE)
     AIActionFlag = StructMember(0x092, Mk.BYTE)
-    # 2 = issued an order
-    # 3 = interrupted an order
-    # 4 = hide self before death (self-destruct?)
     userActionFlags = StructMember(0x093, Mk.BYTE)
+    """2 = issued an order,
+    3 = interrupted an order,
+    4 = hide self before death (self-destruct?)"""
     currentButtonSet = StructMember(0x094, Mk.WORD)
     isCloaked = StructMember(0x096, Mk.BOOL)
     movementState = StructMember(0x097, Mk.BYTE)
@@ -202,18 +209,20 @@ class CUnit(EPDOffsetMap):
     buildQueueSlot = StructMember(0x0A4, Mk.BYTE)
     uniquenessIdentifier = targetOrderSpecial = StructMember(0x0A5, Mk.BYTE)
     secondaryOrder = secondaryOrderID = StructMember(0x0A6, Mk.UNIT_ORDER)
-    # 0 means the building has the largest amount of fire/blood
     buildingOverlayState = StructMember(0x0A7, Mk.BYTE)
-    hpGain = StructMember(0x0A8, Mk.WORD)  # buildRepairHpGain
-    shieldGain = StructMember(0x0AA, Mk.WORD)  # Shield gain on construction
-    # Remaining bulding time; also used by powerups (flags)
-    # as the timer for returning to their original location.
+    "0 means the building has the largest amount of fire/blood"
+    hpGain = StructMember(0x0A8, Mk.WORD)
+    "buildRepairHpGain"
+    shieldGain = StructMember(0x0AA, Mk.WORD)
+    "Shield gain on construction"
     remainingBuildTime = StructMember(0x0AC, Mk.WORD)
-    #  The HP of the unit before it changed
-    # (example Drone->Hatchery, the Drone's HP will be stored here)
+    """Remaining bulding time; also used by powerups (flags)
+    as the timer for returning to their original location."""
     prevHp = StructMember(0x0AE, Mk.WORD)
-    # alphaID (StoredUnit)
+    """The HP of the unit before it changed
+    (example: Drone->Hatchery, the Drone's HP will be stored here)"""
     loadedUnit1 = UnsupportedMember(0x0B0, Mk.WORD)
+    "alphaID (StoredUnit)"
     loadedUnit2 = UnsupportedMember(0x0B2, Mk.WORD)
     loadedUnit3 = UnsupportedMember(0x0B4, Mk.WORD)
     loadedUnit4 = UnsupportedMember(0x0B6, Mk.WORD)
@@ -251,18 +260,19 @@ class CUnit(EPDOffsetMap):
     # resource -----------------------------------------------
     resourceAmount = StructMember(0x0D0, Mk.WORD)  # 0x0D0 union
     resourceIscript = StructMember(0x0D2, Mk.BYTE)
-    # it is byte but effectively bool; always set to 1 when beginning to harvest,
-    # but when finshed, it is    by 1 instead of set to 0
     gatherQueueCount = StructMember(0x0D3, Mk.BOOL)
-    # pointer to the next worker unit waiting in line to gather
+    """it is byte but effectively bool; always set to 1 when beginning to harvest,
+    but when finshed, it is    by 1 instead of set to 0"""
     nextGatherer = StructMember(0x0D4, Mk.C_UNIT)
+    "pointer to the next worker unit waiting in line to gather"
     resourceGroup = StructMember(0x0D8, Mk.BYTE)
     resourceBelongsToAI = StructMember(0x0D9, Mk.BOOL)
     # other buildings ----------------------------------------
-    nydusExit = StructMember(0x0D0, Mk.C_UNIT)  # connected nydus canal
-    # CThingy struct is same as CUnit but trimmed down to [prev, next, hp, sprite],
-    # with "hp" field used as unitID for fog thingies or otherwise unused
+    nydusExit = StructMember(0x0D0, Mk.C_UNIT)
+    "connected nydus canal"
     ghostNukeDot = StructMember(0x0D0, Mk.DWORD)  # FIXME: should be CThingy
+    """CThingy struct is same as CUnit but trimmed down to [prev, next, hp, sprite],
+    with "hp" field used as unitID for fog thingies or otherwise unused"""
     pylonAura = StructMember(0x0D0, Mk.C_SPRITE)
     # silo
     siloNuke = StructMember(0x0D0, Mk.C_UNIT)
@@ -283,32 +293,27 @@ class CUnit(EPDOffsetMap):
     targetResourceUnit = StructMember(0x0C8, Mk.C_UNIT)
     repairResourceLossTimer = StructMember(0x0CC, Mk.WORD)
     isCarryingSomething = StructMember(0x0CE, Mk.BOOL)
-    resourceCarryAmount = StructMember(0x0CF, Mk.BYTE)  # worker
+    resourceCarryAmount = StructMember(0x0CF, Mk.BYTE)
     harvestTarget = StructMember(0x0D0, Mk.C_UNIT)
     prevHarvestUnit = StructMember(0x0D4, Mk.C_UNIT)
-    # When there is a gather conflict
     nextHarvestUnit = StructMember(0x0D8, Mk.C_UNIT)
+    "When there is a gather conflict"
     # powerup ------------------------------------------------
     powerupOrigin = StructMember(0x0D0, Mk.POSITION)
     powerupOriginX = StructMember(0x0D0, Mk.POSITION_X)
-    powerupOriginY = StructMember(0x0D2, Mk.POSITION_Y)  # powerup
+    powerupOriginY = StructMember(0x0D2, Mk.POSITION_Y)
     powerupCarryingUnit = StructMember(0x0D4, Mk.C_UNIT)
     # \\\\\\\\\\\\\\\=================================// union
     statusFlags = StatusFlags(0x0DC, Mk.DWORD)
-    # Type of resource chunk carried by this worker.
-    # None = 0x00,
-    # Vespene = 0x01,
-    # Minerals = 0x02,
-    # GasOrMineral = 0x03,
-    # PowerUp = 0x04
     resourceType = StructMember(0x0E0, Mk.WORKER_CARRY_TYPE)
+    "Type of resource chunk carried by worker: (None, Gas, Ore, GasOrOre, PowerUp)"
     wireframeRandomizer = StructMember(0x0E1, Mk.BYTE)
     secondaryOrderState = StructMember(0x0E2, Mk.BYTE)
-    # Counts down from 15 to 0 when most orders are given,
-    # or when the unit moves after reaching a patrol location
     recentOrderTimer = StructMember(0x0E3, Mk.BYTE)
-    # which players can detect this unit (cloaked/burrowed)
+    """Counts down from 15 to 0 when most orders are given,
+    or when the unit moves after reaching a patrol location"""
     visibilityStatus = StructMember(0x0E4, Mk.DWORD)
+    "which players can detect this unit (cloaked/burrowed)"
     secondaryOrderPos = StructMember(0x0E8, Mk.POSITION)
     secondaryOrderX = StructMember(0x0E8, Mk.POSITION_X)
     secondaryOrderY = StructMember(0x0EA, Mk.POSITION_Y)
@@ -319,24 +324,24 @@ class CUnit(EPDOffsetMap):
     rallyX = StructMember(0x0F8, Mk.POSITION_X)
     rallyY = StructMember(0x0FA, Mk.POSITION_Y)
     rallyUnit = StructMember(0x0FC, Mk.C_UNIT)
-    prevPsiProvider = StructMember(0x0F8, Mk.C_UNIT)  # not supported?
+    prevPsiProvider = StructMember(0x0F8, Mk.C_UNIT)
     nextPsiProvider = StructMember(0x0FC, Mk.C_UNIT)
     path = UnsupportedMember(0x100, Mk.DWORD)
     pathingCollisionInterval = StructMember(0x104, Mk.BYTE)
     pathingFlags = PathingFlags(0x105, Mk.BYTE)
     unknown0x106 = StructMember(0x106, Mk.BYTE)
-    # 1 if a medic is currently healing this unit
     isBeingHealed = StructMember(0x107, Mk.BOOL)
-    # A rect that specifies the closest contour (collision) points
+    "1 if a medic is currently healing this unit"
     contourBoundsL = UnsupportedMember(0x108, Mk.WORD)
+    "A rect that specifies the closest contour (collision) points"
     contourBoundsU = UnsupportedMember(0x10A, Mk.WORD)
     contourBoundsR = UnsupportedMember(0x10C, Mk.WORD)
     contourBoundsB = UnsupportedMember(0x10E, Mk.WORD)
     contourBoundsLU = UnsupportedMember(0x108, Mk.DWORD)
     contourBoundsRB = UnsupportedMember(0x10C, Mk.DWORD)
-    # Hallucination, Dark Swarm, Disruption Web, Broodling
-    # (but not Scanner Sweep according to BWAPI)
     removeTimer = StructMember(0x110, Mk.WORD)
+    """Hallucination, Dark Swarm, Disruption Web, Broodling
+    (but not Scanner Sweep according to BWAPI)"""
     defensiveMatrixHp = StructMember(0x112, Mk.WORD)
     defensiveMatrixTimer = StructMember(0x114, Mk.BYTE)
     stimTimer = StructMember(0x115, Mk.BYTE)
@@ -346,20 +351,20 @@ class CUnit(EPDOffsetMap):
     stasisTimer = StructMember(0x119, Mk.BYTE)
     plagueTimer = StructMember(0x11A, Mk.BYTE)
     stormTimer = StructMember(0x11B, Mk.BYTE)
-    # Used to tell if a unit is under psi storm	(is "stormTimer" in BWAPI)
     isUnderStorm = StructMember(0x11B, Mk.BOOL)
+    "Used to tell if a unit is under psi storm"
     irradiatedBy = StructMember(0x11C, Mk.C_UNIT)
     irradiatePlayerID = StructMember(0x120, Mk.PLAYER)
-    # Each bit corresponds to the player who has parasited this unit
     parasiteFlags = StructMember(0x121, Mk.BYTE)
-    # counts/cycles up from 0 to 7 (inclusive). See also 0x85
+    "Each bit corresponds to the player who has parasited this unit"
     cycleCounter = StructMember(0x122, Mk.BYTE)
-    # Each bit corresponds to the player who has optical flared this unit
-    # like parasiteFlags, but is read as a bool for vision check
-    blindFlags = StructMember(0x123, Mk.BYTE)  # bool in BWAPI
+    "counts/cycles up from 0 to 7 (inclusive). See also 0x85"
+    blindFlags = StructMember(0x123, Mk.BYTE)
+    """Each bit corresponds to the player who has optical flared this unit,
+    like parasiteFlags, but is read as a bool for vision check"""
     maelstromTimer = StructMember(0x124, Mk.BYTE)
-    # Might be afterburner timer or ultralisk roar timer
     unusedTimer = StructMember(0x125, Mk.BYTE)
+    "Might be afterburner timer or ultralisk roar timer"
     acidSporeCount = StructMember(0x126, Mk.BYTE)
     acidSporeTime0 = StructMember(0x127, Mk.BYTE)
     acidSporeTime1 = StructMember(0x128, Mk.BYTE)
@@ -370,10 +375,11 @@ class CUnit(EPDOffsetMap):
     acidSporeTime6 = StructMember(0x12D, Mk.BYTE)
     acidSporeTime7 = StructMember(0x12E, Mk.BYTE)
     acidSporeTime8 = StructMember(0x12F, Mk.BYTE)
-    # Cycles between 0-12 for each bullet fired by this unit
-    # (if it uses a "Attack 3x3 area" weapon)
     offsetIndex3by3 = UnsupportedMember(0x130, Mk.WORD)
-    unknown0x132 = UnsupportedMember(0x132, Mk.WORD)  # padding
+    """Cycles between 0-12 for each bullet fired by this unit
+    (if it uses a 'Attack 3x3 area' weapon)"""
+    unknown0x132 = UnsupportedMember(0x132, Mk.WORD)
+    "padding"
     AI = UnsupportedMember(0x134, Mk.DWORD)
     airStrength = UnsupportedMember(0x138, Mk.WORD)
     groundStrength = UnsupportedMember(0x13A, Mk.WORD)
@@ -381,10 +387,11 @@ class CUnit(EPDOffsetMap):
     finderIndexRight = UnsupportedMember(0x140, Mk.DWORD)
     finderIndexTop = UnsupportedMember(0x144, Mk.DWORD)
     finderIndexBottom = UnsupportedMember(0x148, Mk.DWORD)
-    # updated only when air unit is being pushed
     repulseUnknown = StructMember(0x14C, Mk.BYTE)
+    "updated only when air unit is being pushed"
     repulseAngle = StructMember(0x14D, Mk.BYTE)
-    driftPos = StructMember(0x14E, Mk.WORD)  # (mapsizex / 1.5 max)
+    driftPos = StructMember(0x14E, Mk.WORD)
+    "(mapsizex / 1.5 max)"
     driftX = StructMember(0x14E, Mk.BYTE)
     driftY = StructMember(0x14F, Mk.BYTE)
 

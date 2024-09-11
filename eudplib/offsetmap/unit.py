@@ -25,8 +25,8 @@ class MovementFlags(ArrayEnumMember):
     StartingAttack = Flag(0x08)
     Moving = Flag(0x10)
     Lifted = Flag(0x20)
-    # unit decelerates when reaching the end of current path segment
     BrakeOnPathStep = Flag(0x40)
+    "unit decelerates when reaching the end of current path segment"
     AlwaysZero = Flag(0x80)
     HoverUnit = Flag(0xC1)
 
@@ -43,13 +43,15 @@ class GroupFlags(ArrayEnumMember):
     Neutral = Flag(0x80)
 
 
-# SpecialAbilityFlag in PyMS, UnitPrototypeFlags in bwapi, BaseProperty in GPTP
 class BaseProperty(ArrayEnumMember):
+    """SpecialAbilityFlag in PyMS, UnitPrototypeFlags in bwapi, BaseProperty in GPTP"""  # noqa: E501
+
     __slots__ = ()
     Building = Flag(0x00000001)
     Addon = Flag(0x00000002)
     Flyer = Flag(0x00000004)
-    Worker = Flag(0x00000008)  # resource_miner in PyMS
+    Worker = Flag(0x00000008)
+    "resource_miner in PyMS"
     Subunit = Flag(0x00000010)
     FlyingBuilding = Flag(0x00000020)
     Hero = Flag(0x00000040)
@@ -57,10 +59,12 @@ class BaseProperty(ArrayEnumMember):
     AnimatedIdle = Flag(0x00000100)
     Cloakable = Flag(0x00000200)
     TwoUnitsInOneEgg = Flag(0x00000400)
-    # NeutralAccessories in GPTP (prevents multi-select, set on all pickup items)
-    SingleEntity = Flag(0x00000800)
-    ResourceDepot = Flag(0x00001000)  # Place where resources are brought back
-    ResourceContainer = Flag(0x00002000)  # Resource Source
+    SingleEntity = Flag(0x00000800)  # NeutralAccessories in GPTP
+    "prevents multi-select, set on all pickup items"
+    ResourceDepot = Flag(0x00001000)
+    "Place where resources are brought back"
+    ResourceContainer = Flag(0x00002000)
+    "Resource Source"
     Robotic = Flag(0x00004000)
     Detector = Flag(0x00008000)
     Organic = Flag(0x00010000)
@@ -70,25 +74,28 @@ class BaseProperty(ArrayEnumMember):
     Burrowable = Flag(0x00100000)
     Spellcaster = Flag(0x00200000)
     PermanentCloak = Flag(0x00400000)
-    # NPCOrAccessories in GPTP (data disc, crystals, mineral chunks, gas tanks, etc.)
     PickupItem = Flag(0x00800000)
-    IgnoresSupplyCheck = Flag(0x01000000)  # MorphFromOtherUnit in GPTP
-    # Used to determine overlay for various spells and effects
+    "data disc, crystals, mineral chunks, gas tanks, etc."
+    IgnoresSupplyCheck = Flag(0x01000000)
+    "MorphFromOtherUnit in GPTP"
     MediumOverlay = Flag(0x02000000)
+    "Used to determine overlay for various spells and effects"
     LargeOverlay = Flag(0x04000000)
-    AutoAttackAndMove = Flag(0x08000000)  # battle_reactions in PyMS
-    CanAttack = Flag(0x10000000)  # full_auto_attack in PyMS
+    AutoAttackAndMove = Flag(0x08000000)
+    "battle_reactions in PyMS"
+    CanAttack = Flag(0x10000000)
+    "full_auto_attack in PyMS"
     Invincible = Flag(0x20000000)
     Mechanical = Flag(0x40000000)
-    # It can produce units directly (making buildings doesn't count)
     ProducesUnits = Flag(0x80000000)
+    "It can produce units directly (making buildings doesn't count)"
 
 
 class AvailabilityFlags(ArrayEnumMember):
     __slots__ = ()
     NonNeutral = Flag(0x001)
-    # set availability to be created by CreateUnit action
     UnitListing = Flag(0x002)
+    "set availability to be created by CreateUnit action"
     MissionBriefing = Flag(0x004)
     PlayerSettings = Flag(0x008)
     AllRaces = Flag(0x010)
@@ -103,8 +110,8 @@ class TrgUnit(ConstType, EPDOffsetMap):
     __slots__ = ()
     graphic = flingy = ArrayMember(0x6644F8, Mk.FLINGY)
     subUnit = ArrayMember(0x6607C0, Mk.UNIT)
-    # subunit2 is unused
     # subunit2 = ArrayMember(0x660C38, Mk.WORD)
+    # subunit2 is unused
     # infestationUnit is not implemented yet. (different beginning index)
     # SCBW_DATA(u16*,		InfestedUnitPartial,	unitsDat[3].address);
     # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
@@ -126,20 +133,20 @@ class TrgUnit(ConstType, EPDOffsetMap):
     maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
+    # ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL)
     # this is unrelated to strategic suicide mission; it's only checked with units
     # that have already been added to an attack wave, and looks like it prevents
     # those units from being counted as being missing from the attack group or
     # something like that. i'm not fully understanding its purpose yet and not seeing
     # much of a noticeable effect by ticking it on for regular military units
-    # ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL)
 
-    # dontBecomeGuard affects unit's eligibility for strategic suicide missions;
-    # basically if a unit has an AI ptr that is type 1 or 4, it will be picked up for
-    # strategic suicide. units with flag 2 set only have an AI assigned to them if
-    # they have the worker unitsdat property (becomes unitAI type 2), or has building
-    # unitsdat property and isn't geyser, or is unitid larva/egg/overlord (becomes
-    # unitAI type 3)
     dontBecomeGuard = ArrayMember(0x660178, Mk.BIT_1)
+    """dontBecomeGuard affects unit's eligibility for strategic suicide missions;
+    basically if a unit has an AI ptr that is type 1 or 4, it will be picked up for
+    strategic suicide. units with flag 2 set only have an AI assigned to them if
+    they have the worker unitsdat property (becomes unitAI type 2), or has building
+    unitsdat property and isn't geyser, or is unitid larva/egg/overlord (becomes
+    unitAI type 3)"""
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
@@ -155,10 +162,10 @@ class TrgUnit(ConstType, EPDOffsetMap):
     yesSoundStart = ArrayMember(0x663C10, Mk.SFXDATA_DAT)
     yesSoundEnd = ArrayMember(0x661440, Mk.SFXDATA_DAT)
     buildingDimensions = ArrayMember(0x662860, Mk.POSITION)
-    # AddonPlacement is not implemented yet because its beginning index isn't 0.
     # addonPlacement = ArrayMember(0x6626E0, Mk.POSITION)
-    # unitDimensions is not implemented yet.
+    # AddonPlacement is not implemented yet because its beginning index isn't 0.
     # unitBoundsLURB = ArrayMember(0x6617C8, 2 * Mk.POSITION)
+    # unitDimensions is not implemented yet.
     portrait = ArrayMember(0x662F88, Mk.PORTRAIT)
     mineralCost = ArrayMember(0x663888, Mk.WORD)
     gasCost = ArrayMember(0x65FD00, Mk.WORD)

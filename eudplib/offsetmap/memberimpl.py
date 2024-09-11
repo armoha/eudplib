@@ -17,8 +17,7 @@ from ..core import (
 )
 from ..core.rawtrigger.strdict import DefRankDict, DefSfxDataDict
 from ..core.rawtrigger.strenc import _EncodeAny
-from ..localize import _
-from ..utils import EPError, unProxy
+from ..utils import unProxy
 
 # from .. import utils as ut
 from .memberkind import BaseKind

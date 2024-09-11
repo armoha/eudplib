@@ -19,15 +19,18 @@ from .member import StructMember
 
 class CSpriteFlags(StructEnumMember):
     __slots__ = ()
-    DrawSelCircle = Flag(0x01)  # Draw selection circle
+    DrawSelCircle = Flag(0x01)
+    "Draw selection circle"
     AllySel1 = Flag(0x02)
     AllySel2 = Flag(0x04)
-    Selected = Flag(0x08)  # Draw HP bar, Selected
-    # sorts sprite elevation higher, so that subunits always appear above base unit
+    Selected = Flag(0x08)
+    "Draw HP bar, Selected"
     IsSubunit = Flag(0x10)
-    Hidden = Flag(0x20)  # Hidden
-    Burrowed = Flag(0x40)  # Burrowed
-    IscriptCode = Flag(0x80)  # Iscript unbreakable code section
+    "sorts sprite elevation higher, so that subunits always appear above base unit"
+    Hidden = Flag(0x20)
+    Burrowed = Flag(0x40)
+    IscriptCode = Flag(0x80)
+    "Iscript unbreakable code section"
 
 
 T = TypeVar("T", bound="CSprite")
@@ -39,13 +42,12 @@ class CSprite(EPDOffsetMap):
     prev = StructMember(0x00, Mk.C_SPRITE)
     next = StructMember(0x04, Mk.C_SPRITE)
     sprite = StructMember(0x08, Mk.SPRITE)
-    playerID = StructMember(0x0A, Mk.PLAYER)  # officially "creator"
-    # 0 <= selectionIndex <= 11.
-    # Index in the selection area at bottom of screen.
+    playerID = StructMember(0x0A, Mk.PLAYER)
+    "officially 'creator'"
     selectionIndex = StructMember(0x0B, Mk.BYTE)
-    # Player bits indicating the visibility for a player
-    # (not hidden by the fog-of-war)
+    "0 <= selectionIndex <= 11. Index in the selection area at bottom of screen."
     visibilityFlags = StructMember(0x0C, Mk.BYTE)
+    "Player bits indicating visibility for a player (not hidden by the fog-of-war)"
     elevationLevel = StructMember(0x0D, Mk.BYTE)
     flags = CSpriteFlags(0x0E, Mk.BYTE)
     selectionTimer = StructMember(0x0F, Mk.BYTE)
@@ -55,7 +57,8 @@ class CSprite(EPDOffsetMap):
     pos = StructMember(0x14, Mk.POSITION)
     posX = StructMember(0x14, Mk.POSITION_X)
     posY = StructMember(0x16, Mk.POSITION_Y)
-    mainGraphic = StructMember(0x18, Mk.DWORD)  # officially "pImagePrimary", CImage
+    mainGraphic = StructMember(0x18, Mk.DWORD)
+    "officially 'pImagePrimary', CImage"
     imageHead = StructMember(0x1C, Mk.DWORD)
     imageTail = StructMember(0x20, Mk.DWORD)
 
