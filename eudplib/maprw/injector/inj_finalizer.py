@@ -263,7 +263,7 @@ def create_inject_finalizer(
         if c.PushTriggerScope():
             tmcheckt << c.NextTrigger()
             f_getgametick(ret=curtime)
-            if cs.EUDIf()(curtime > lasttime):  # beware QueueAddTo (-)
+            if cs.EUDIfNot()(curtime <= lasttime):  # beware QueueAddTo (-)
                 c.VProc(curtime, curtime.SetDest(lasttime))
                 c.SetNextTrigger(root)
             cs.EUDEndIf()

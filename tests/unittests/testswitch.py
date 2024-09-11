@@ -58,7 +58,7 @@ def main():
     shuffle(random_numbers)
     ra = EUDArray(random_numbers)
     SetVariables([s, i], [0, 0])
-    if EUDWhile()(i < 32):
+    if EUDWhileNot()(i >= 32):
         x = branch(ra[i])
         SetVariables([i, s], [1, x], [Add, Add])
     EUDEndWhile()

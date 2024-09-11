@@ -12,7 +12,7 @@ def test_blockstru():
 
     # While
     i, j = EUDCreateVariables(2)
-    if EUDWhile()(i < 100):
+    if EUDWhileNot()(i >= 100):
         i += 1
         j += 3
     EUDEndWhile()

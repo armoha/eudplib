@@ -375,7 +375,7 @@ class StringBuffer(c.EUDStruct):
                 if cs.EUDElse()():
                     self.Display()
                 cs.EUDEndIf()
-            if cs.EUDElseIf()(line < 10):
+            if cs.EUDElseIfNot()(line >= 10):
                 self.DisplayAt(line)
             if cs.EUDElseIf()(line >= 0xFFFFFFF5):
                 if cs.EUDIf()(prevpos == -1):

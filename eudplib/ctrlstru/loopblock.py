@@ -72,7 +72,9 @@ def EUDEndLoopN() -> None:  # noqa: N802
         block["contpoint"] << c.NextTrigger()
 
     vardb = block["vardb"]
-    c.RawTrigger(nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1))
+    c.RawTrigger(
+        nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1)
+    )
     block["loopend"] << c.NextTrigger()
 
 
@@ -86,7 +88,7 @@ def EUDLoopRange(start, end=None) -> Iterator[c.EUDVariable]:  # noqa: N802
 
     v = c.EUDVariable()
     v << start
-    if EUDWhileNot()(v >= end):  # FIXME: EUDVariable(0) < EUDVariable(0) is always True
+    if EUDWhileNot()(v >= end):
         block = ut.EUDPeekBlock("whileblock")[1]
         yield v
         if not block["contpoint"].IsSet():
