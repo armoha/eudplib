@@ -597,49 +597,49 @@ class EUDVariable(VariableBase):
             return self.AtMost(other)
 
         except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.").format(err))
+            ep_warn(_("{}: Patching comparison condition.").format(err))
             traceback.print_stack()
-            t = EUDVariable()
-            SeqCompute(((t, bt.SetTo, self), (t, bt.Subtract, other)))
-            return t.Exactly(0)
+            condition = self.AtMost(0)
+            SeqCompute(((EPD(condition) + 2, bt.SetTo, other),))
+            return condition
 
     def __ge__(self, other) -> bt.Condition:  # type: ignore[override]
         try:
             return self.AtLeast(other)
 
         except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.").format(err))
+            ep_warn(_("{}: Patching comparison condition.").format(err))
             traceback.print_stack()
-            t = EUDVariable()
-            SeqCompute(((t, bt.SetTo, other), (t, bt.Subtract, self)))
-            return t.Exactly(0)
+            condition = self.AtLeast(0)
+            SeqCompute(((EPD(condition) + 2, bt.SetTo, other),))
+            return condition
 
     def __lt__(self, other) -> bt.Condition:  # type: ignore[override]
-        if isinstance(other, int):
-            if other <= 0:
-                ep_warn(_("No unsigned number can be leq than {}").format(other))
-                traceback.print_stack()
-                return bt.Never()  # No unsigned number is less than 0
-        if IsEUDVariable(other):
-            bitmask = Forward()
+        other = unProxy(other)
+        if isinstance(other, EUDVariable):
+            bitmask = Forward()  # u32: Location number or bitmask for the condition
             condition = bt.MemoryEPD(bitmask, bt.AtLeast, 1)
             bitmask << EPD(condition)
             SeqCompute(((bitmask, bt.SetTo, other), (bitmask, bt.Subtract, self)))
             return condition
+        if isinstance(other, int) and other <= 0:
+            ep_warn(_("No unsigned number can be leq than {}").format(other))
+            traceback.print_stack()
+            return bt.Never()  # No unsigned number is less than 0
         return self.AtMost(other - 1)
 
     def __gt__(self, other) -> bt.Condition:  # type: ignore[override]
-        if isinstance(other, int):
-            if other >= 0xFFFFFFFF:
-                ep_warn(_("No unsigned number can be greater than {}").format(other))
-                traceback.print_stack()
-                return bt.Never()  # No unsigned number is greater than 0xFFFFFFFF
-        if IsEUDVariable(other):
-            bitmask = Forward()
+        other = unProxy(other)
+        if isinstance(other, EUDVariable):
+            bitmask = Forward()  # u32: Location number or bitmask for the condition
             condition = bt.MemoryEPD(bitmask, bt.AtLeast, 1)
             bitmask << EPD(condition)
             SeqCompute(((bitmask, bt.SetTo, self), (bitmask, bt.Subtract, other)))
             return condition
+        if isinstance(other, int) and other >= 0xFFFFFFFF:
+            ep_warn(_("No unsigned number can be greater than {}").format(other))
+            traceback.print_stack()
+            return bt.Never()  # No unsigned number is greater than 0xFFFFFFFF
         return self.AtLeast(other + 1)
 
     # operator placeholders
