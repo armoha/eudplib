@@ -21,6 +21,8 @@ class BaseMember(metaclass=ABCMeta):
 
     offset: Final[int]
     kind: Final[type[BaseKind]]
+    __objclass__: type
+    __name__: str
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
         self.offset = offset  # type: ignore[misc]
@@ -29,6 +31,10 @@ class BaseMember(metaclass=ABCMeta):
 
     def _get_epd(self, instance):
         raise NotImplementedError
+
+    def __set_name__(self, owner, name):
+        self.__objclass__ = owner
+        self.__name__ = name
 
     @abstractmethod
     def __get__(self, instance, owner=None):
@@ -42,7 +48,7 @@ class BaseMember(metaclass=ABCMeta):
 class StructMember(BaseMember):
     """Struct field member"""
 
-    __slots__ = ("offset", "kind")
+    __slots__ = ("offset", "kind", "__objclass__", "__name__")
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
         super().__init__(offset, kind)
@@ -74,7 +80,7 @@ class StructMember(BaseMember):
 class ArrayMember(BaseMember):
     """Parallel array member"""
 
-    __slots__ = ("offset", "kind", "stride")
+    __slots__ = ("offset", "kind", "stride", "__objclass__", "__name__")
 
     def __init__(
         self, offset: int, kind: MemberKind, *, stride: int | None = None
@@ -127,15 +133,12 @@ class ArrayMember(BaseMember):
 class UnsupportedMember(BaseMember):
     """'Sorry, this EUD map is not supported' error is raised when it's accessed"""
 
-    __slots__ = ("offset", "kind", "name")
-
-    def __set_name__(self, owner, name) -> None:
-        self.name = name
+    __slots__ = ("offset", "kind", "__objclass__", "__name__")
 
     def __get__(self, instance, owner=None) -> "UnsupportedMember":
         if instance is None:
             return self
-        raise ut.EPError(_("Unsupported EUD: {}").format(self.name))
+        raise ut.EPError(_("Unsupported EUD: {}").format(self.__name__))
 
     def __set__(self, instance, value) -> NoReturn:
-        raise ut.EPError(_("Unsupported EUD: {}").format(self.name))
+        raise ut.EPError(_("Unsupported EUD: {}").format(self.__name__))

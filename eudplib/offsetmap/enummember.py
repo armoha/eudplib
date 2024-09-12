@@ -115,7 +115,7 @@ class EnumMember(ExprProxy):
 
 
 class StructEnumMember(BaseMember, EnumMember):
-    __slots__ = ("offset", "kind", "_instance")
+    __slots__ = ("offset", "kind", "_instance", "__objclass__", "__name__")
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
         self._instance = None  # FIXME
@@ -157,7 +157,7 @@ class StructEnumMember(BaseMember, EnumMember):
 
 
 class ArrayEnumMember(BaseMember, EnumMember):
-    __slots__ = ("offset", "kind", "stride", "_instance")
+    __slots__ = ("offset", "kind", "stride", "_instance", "__objclass__", "__name__")
 
     def __init__(
         self, offset: int, kind: MemberKind, *, stride: int | None = None
