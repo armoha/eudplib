@@ -138,7 +138,11 @@ class UnsupportedMember(BaseMember):
     def __get__(self, instance, owner=None) -> "UnsupportedMember":
         if instance is None:
             return self
-        raise ut.EPError(_("Unsupported EUD: {}").format(self.__name__))
+        raise ut.EPError(
+            _("Unsupported EUD: {}.{}").format(self.__objclass__, self.__name__)
+        )
 
     def __set__(self, instance, value) -> NoReturn:
-        raise ut.EPError(_("Unsupported EUD: {}").format(self.__name__))
+        raise ut.EPError(
+            _("Unsupported EUD: {}.{}").format(self.__objclass__, self.__name__)
+        )
