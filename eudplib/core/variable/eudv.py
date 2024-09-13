@@ -848,9 +848,7 @@ def SeqCompute(assignpairs):  # noqa: N802
 
         # Flush action set before proceeding
         if IsEUDVariable(src):
-            if src in dstvarset:
-                flush_pairs()
-            elif src in srcvarset:
+            if src in srcvarset:
                 flush_pairs()
             elif actioncount >= 64 - 3:
                 flush_pairs()
