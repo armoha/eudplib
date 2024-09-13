@@ -75,23 +75,23 @@ impl ObjAllocator {
 #[pymethods]
 impl ObjAllocator {
     #[allow(non_snake_case)]
-    fn WriteByte(&mut self, _number: &PyAny) {
+    fn WriteByte(&mut self, _number: &Bound<'_, PyAny>) {
         self.occup1();
     }
 
     #[allow(non_snake_case)]
-    fn WriteWord(&mut self, _number: &PyAny) {
+    fn WriteWord(&mut self, _number: &Bound<'_, PyAny>) {
         self.occup1();
         self.occup1();
     }
 
     #[allow(non_snake_case)]
-    fn WriteDword(&mut self, _number: &PyAny) {
+    fn WriteDword(&mut self, _number: &Bound<'_, PyAny>) {
         self.push(true);
     }
 
     #[allow(non_snake_case)]
-    fn WritePack(&mut self, structformat: &str, _arglist: &PyAny) {
+    fn WritePack(&mut self, structformat: &str, _arglist: &Bound<'_, PyAny>) {
         let ssize: u32 = structformat
             .bytes()
             .map(|x| match x {
@@ -111,7 +111,7 @@ impl ObjAllocator {
     }
 
     #[allow(non_snake_case)]
-    fn WriteBytes(&mut self, b: &PyBytes) -> PyResult<()> {
+    fn WriteBytes(&mut self, b: &Bound<'_, PyBytes>) -> PyResult<()> {
         let ssize = b.len()?;
 
         for _ in 0..(ssize >> 2) {
@@ -254,8 +254,8 @@ impl PayloadBuilder {
         }
     }
 
-    fn alloc_objects(&mut self, py: Python, found_objects: &PyDict) -> PyResult<()> {
-        let obja = PyCell::new(py, ObjAllocator::new())?;
+    fn alloc_objects(&mut self, py: Python, found_objects: &Bound<'_, PyDict>) -> PyResult<()> {
+        let obja = Bound::new(py, ObjAllocator::new())?;
         let mut dwoccupmap_list = Vec::with_capacity(found_objects.len());
         let bar = ProgressBar::new(found_objects.len() as u64);
         bar.println(" - Preprocessing objects..");
@@ -264,13 +264,13 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
-        let arg: &PyTuple = PyTuple::new(py, [obja]);
+        let arg = PyTuple::new_bound(py, [obja.clone()]);
         for (obj, _v) in found_objects.iter() {
             {
                 let mut obja = obja.borrow_mut();
                 obja.start_write();
             }
-            obj.call_method1(intern!(py, "WritePayload"), arg)?;
+            obj.call_method1(intern!(py, "WritePayload"), arg.clone())?;
             let dwoccupmap = {
                 let mut obja = obja.borrow_mut();
                 obja.end_write()
@@ -295,9 +295,9 @@ impl PayloadBuilder {
     fn construct_payload(
         &self,
         py: Python,
-        found_objects: &PyDict,
+        found_objects: &Bound<'_, PyDict>,
     ) -> PyResult<(Vec<u8>, Vec<usize>, Vec<usize>)> {
-        let pbuf = PyCell::new(py, PayloadBuffer::new(self.payload_size))?;
+        let pbuf = Bound::new(py, PayloadBuffer::new(self.payload_size))?;
         let bar = ProgressBar::new(found_objects.len() as u64);
         bar.println(" - Writing objects..");
         bar.set_style(
@@ -305,13 +305,13 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
-        let arg: &PyTuple = PyTuple::new(py, [pbuf]);
+        let arg = PyTuple::new_bound(py, [pbuf.clone()]);
         for (i, (obj, _v)) in found_objects.iter().enumerate() {
             {
                 let mut pbuf = pbuf.borrow_mut();
                 pbuf.start_write(self.alloctable[i] as usize);
             }
-            obj.call_method1(intern!(py, "WritePayload"), arg)?;
+            obj.call_method1(intern!(py, "WritePayload"), arg.clone())?;
             let written_bytes = {
                 let pbuf = pbuf.borrow();
                 pbuf.end_write()

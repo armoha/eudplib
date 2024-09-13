@@ -128,7 +128,7 @@ impl PyConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
                 slf.into_py(py)
             } else if rlocmode == 0 {
-                PyNone::get(py).into()
+                PyNone::get_bound(py).into_py(py)
             } else {
                 slf.0.baseobj.clone_ref(py)
             },
@@ -212,10 +212,10 @@ pub struct Forward {
 impl Forward {
     #[new]
     fn new(py: Python) -> (Self, PyConstExpr) {
-        let expr = ConstExpr::new(PyNone::get(py).into(), 0, 4);
+        let expr = ConstExpr::new(PyNone::get_bound(py).into_py(py), 0, 4);
         (
             Self {
-                expr: PyNone::get(py).into(),
+                expr: PyNone::get_bound(py).into_py(py),
             },
             PyConstExpr(expr),
         )
@@ -226,22 +226,21 @@ impl Forward {
         Ok(self.expr.clone())
     }
 
-    fn __lshift__(&mut self, py: Python, expr: PyObject) -> PyResult<PyObject> {
+    fn __lshift__(&mut self, py: Python, mut expr: Bound<'_, PyAny>) -> PyResult<PyObject> {
         if !self.expr.is_none(py) {
             return Err(PyAttributeError::new_err(
                 "Reforwarding without reset is not allowed",
             ));
         }
-        if expr.is_none(py) {
+        if expr.is_none() {
             return Err(PyValueError::new_err("Cannot forward to None"));
         }
-        let mut expr = expr.as_ref(py);
         let exprproxy = EXPRPROXY.get(py)?;
-        while expr.is_instance(exprproxy)? {
+        while expr.is_instance(&exprproxy)? {
             expr = expr.getattr(intern!(py, "_value"))?;
         }
         let expr: Py<PyAny> = if let Ok(offset) = expr.extract::<i32>() {
-            PyConstExpr(ConstExpr::new(PyNone::get(py).into(), offset, 0)).into_py(py)
+            PyConstExpr(ConstExpr::new(PyNone::get_bound(py).into_py(py), offset, 0)).into_py(py)
         } else {
             expr.into_py(py)
         };
@@ -256,7 +255,7 @@ impl Forward {
 
     #[allow(non_snake_case)]
     fn Reset(&mut self, py: Python) {
-        self.expr = PyNone::get(py).into()
+        self.expr = PyNone::get_bound(py).into_py(py)
     }
 
     #[allow(non_snake_case)]
@@ -273,44 +272,44 @@ impl Forward {
     fn __call__(
         &self,
         py: Python,
-        py_args: &PyTuple,
-        py_kwargs: Option<&PyDict>,
+        py_args: &Bound<'_, PyTuple>,
+        py_kwargs: Option<&Bound<'_, PyDict>>,
     ) -> PyResult<PyObject> {
-        self.expr.call(py, py_args, py_kwargs)
+        self.expr.call_bound(py, py_args, py_kwargs)
     }
 
-    fn __getattr__(&self, py: Python, name: &PyString) -> PyResult<PyObject> {
+    fn __getattr__(&self, py: Python, name: &Bound<'_, PyString>) -> PyResult<PyObject> {
         self.expr.getattr(py, name)
     }
 
-    fn __getitem__(&self, py: Python, name: &PyAny) -> PyResult<PyObject> {
-        Ok(self.expr.as_ref(py).get_item(name)?.into_py(py))
+    fn __getitem__(&self, py: Python, name: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+        Ok(self.expr.bind(py).get_item(name)?.into_py(py))
     }
 
-    fn __setitem__(&self, py: Python, name: &PyAny, newvalue: PyObject) -> PyResult<()> {
-        self.expr.as_ref(py).set_item(name, newvalue)
+    fn __setitem__(&self, py: Python, name: &Bound<'_, PyAny>, newvalue: Bound<'_, PyAny>) -> PyResult<()> {
+        self.expr.bind(py).set_item(name, newvalue)
     }
 }
 
 /// Evaluate expressions
 #[pyfunction]
 #[pyo3(name = "Evaluate")]
-pub fn evaluate(x: &PyAny) -> PyResult<PyRlocInt> {
+pub fn evaluate(x: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
     if let Ok(expr) = x.extract::<PyRlocInt>() {
         Ok(PyRlocInt(expr.0))
     } else if let Ok(expr) = x.extract::<i64>() {
         Ok(PyRlocInt(RlocInt::new(expr as i32, 0)))
     } else {
         let expr = x.call_method0(intern!(x.py(), "Evaluate"))?;
-        evaluate(expr)
+        evaluate(&expr)
     }
 }
 
 #[pyfunction]
 #[pyo3(name = "IsConstExpr")]
-pub fn is_constexpr(mut x: &PyAny) -> PyResult<bool> {
+pub fn is_constexpr(mut x: Bound<'_, PyAny>) -> PyResult<bool> {
     let exprproxy = EXPRPROXY.get(x.py())?;
-    while x.is_instance(exprproxy)? {
+    while x.is_instance(&exprproxy)? {
         x = x.getattr(intern!(x.py(), "_value"))?;
     }
     Ok(x.is_instance_of::<PyInt>()

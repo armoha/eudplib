@@ -113,7 +113,7 @@ impl PyRlocInt {
         self.__repr__()
     }
 
-    fn __add__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __add__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         let rlocint = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             RlocInt::new(
                 self.0.offset + rhs.0.offset,
@@ -129,11 +129,11 @@ impl PyRlocInt {
         Ok(PyRlocInt(rlocint))
     }
 
-    fn __radd__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __radd__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         self.__add__(rhs)
     }
 
-    fn __sub__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __sub__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         let rlocint = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             RlocInt::new(
                 self.0.offset - rhs.0.offset,
@@ -149,7 +149,7 @@ impl PyRlocInt {
         Ok(PyRlocInt(rlocint))
     }
 
-    fn __rsub__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __rsub__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         let rlocint = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             RlocInt::new(
                 rhs.0.offset - self.0.offset,
@@ -165,7 +165,7 @@ impl PyRlocInt {
         Ok(PyRlocInt(rlocint))
     }
 
-    fn __mul__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __mul__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         let rhs = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             if rhs.0.rlocmode != 0 {
                 return Err(PyTypeError::new_err(
@@ -186,11 +186,11 @@ impl PyRlocInt {
         )))
     }
 
-    fn __rmul__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __rmul__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         self.__mul__(rhs)
     }
 
-    fn __floordiv__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __floordiv__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         let rhs = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             if rhs.0.rlocmode != 0 {
                 return Err(PyTypeError::new_err("Cannot divide RlocInt with non-const"));
@@ -209,7 +209,7 @@ impl PyRlocInt {
         )))
     }
 
-    fn __and__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __and__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         if self.0.rlocmode != 0 && self.0.rlocmode != 4 {
             return Err(PyValueError::new_err(format!(
                 "unsupported rlocmode for &: '{}'",
@@ -238,11 +238,11 @@ impl PyRlocInt {
         Ok(PyRlocInt(rlocint))
     }
 
-    fn __rand__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __rand__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         self.__and__(rhs)
     }
 
-    fn __or__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __or__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         if self.0.rlocmode != 0 && self.0.rlocmode != 4 {
             return Err(PyValueError::new_err(format!(
                 "unsupported rlocmode for |: '{}'",
@@ -271,7 +271,7 @@ impl PyRlocInt {
         Ok(PyRlocInt(rlocint))
     }
 
-    fn __ror__(&self, rhs: &PyAny) -> PyResult<PyRlocInt> {
+    fn __ror__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         self.__and__(rhs)
     }
 
@@ -526,7 +526,7 @@ pub fn py_rlocint(offset: i64, rlocmode: i32) -> PyRlocInt {
 /// Convert int/RlocInt to rlocint
 #[pyfunction]
 #[pyo3(name = "toRlocInt")]
-pub fn to_rlocint(x: &PyAny) -> PyResult<PyRlocInt> {
+pub fn to_rlocint(x: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
     let expr = if let Ok(expr) = x.extract::<PyRlocInt>() {
         expr.0
     } else if let Ok(expr) = x.extract::<i64>() {

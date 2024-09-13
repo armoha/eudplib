@@ -1,7 +1,11 @@
+//! from https://github.com/pyca/cryptography/blob/main/src/rust/src/types.rs
+use pyo3::sync::GILOnceCell;
+use pyo3::prelude::*;
+
 pub(crate) struct LazyPyImport {
     module: &'static str,
     names: &'static [&'static str],
-    value: pyo3::sync::GILOnceCell<pyo3::PyObject>,
+    value: GILOnceCell<PyObject>,
 }
 
 impl LazyPyImport {
@@ -9,20 +13,20 @@ impl LazyPyImport {
         LazyPyImport {
             module,
             names,
-            value: pyo3::sync::GILOnceCell::new(),
+            value: GILOnceCell::new(),
         }
     }
 
-    pub(crate) fn get<'p>(&'p self, py: pyo3::Python<'p>) -> pyo3::PyResult<&'p pyo3::PyAny> {
-        self.value
-            .get_or_try_init(py, || {
-                let mut obj = py.import(self.module)?.as_ref();
-                for name in self.names {
-                    obj = obj.getattr(*name)?;
-                }
-                obj.extract()
-            })
-            .map(|p| p.as_ref(py))
+    pub(crate) fn get<'p>(&'p self, py: Python<'p>) -> PyResult<Bound<'p, PyAny>> {
+        let p = self.value.get_or_try_init(py, || {
+            let mut obj = py.import_bound(self.module)?.into_any();
+            for name in self.names {
+                obj = obj.getattr(*name)?;
+            }
+            Ok::<_, PyErr>(obj.unbind())
+        })?;
+
+        Ok(p.clone_ref(py).into_bound(py))
     }
 }
 

@@ -57,7 +57,7 @@ impl PayloadBuffer {
     }
 
     #[allow(non_snake_case)]
-    fn WriteDword(&mut self, number: &PyAny) -> PyResult<()> {
+    fn WriteDword(&mut self, number: &Bound<'_, PyAny>) -> PyResult<()> {
         let rlocint = evaluate(number)?;
         let rlocmode = rlocint.0.rlocmode;
         let offset = rlocint.0.offset;
@@ -84,7 +84,7 @@ impl PayloadBuffer {
     }
 
     #[allow(non_snake_case)]
-    fn WritePack(&mut self, structformat: &str, arglist: &PyList) -> PyResult<()> {
+    fn WritePack(&mut self, structformat: &str, arglist: &Bound<'_, PyList>) -> PyResult<()> {
         for (b, number) in structformat.bytes().zip(arglist.iter()) {
             let argsize = match b {
                 66 => 1, // 'B'
@@ -92,7 +92,7 @@ impl PayloadBuffer {
                 73 => 4, // 'I'
                 _ => panic!("Unknown struct format: {b}"),
             };
-            let rlocint = evaluate(number)?;
+            let rlocint = evaluate(&number)?;
             let rlocmode = rlocint.0.rlocmode;
             let offset = rlocint.0.offset;
 
@@ -137,11 +137,11 @@ impl PayloadBuffer {
 
     fn _write_trigger(
         &mut self,
-        prevptr: &PyAny,
-        nextptr: &PyAny,
-        conditions: &PyIterator,
-        actions: &PyIterator,
-        flags: &PyAny,
+        prevptr: &Bound<'_, PyAny>,
+        nextptr: &Bound<'_, PyAny>,
+        conditions: &Bound<'_, PyIterator>,
+        actions: &Bound<'_, PyIterator>,
+        flags: &Bound<'_, PyAny>,
     ) -> PyResult<()> {
         self.WriteDword(prevptr)?;
         self.WriteDword(nextptr)?;

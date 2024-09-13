@@ -27,7 +27,7 @@ pub struct PyEUDObject;
 impl PyEUDObject {
     #[new]
     fn new(py: Python) -> (Self, PyConstExpr) {
-        let expr = ConstExpr::new(PyNone::get(py).into(), 0, 4);
+        let expr = ConstExpr::new(PyNone::get_bound(py).into_py(py), 0, 4);
         (Self {}, PyConstExpr(expr))
     }
 
@@ -64,22 +64,22 @@ impl PyEUDObject {
     }
 
     #[allow(non_snake_case)]
-    fn CollectDependency(slf: Py<Self>, _pbuf: &PyAny) -> PyResult<()> {
+    fn CollectDependency(slf: Py<Self>, _pbuf: &Bound<'_, PyAny>) -> PyResult<()> {
         slf.call_method1(_pbuf.py(), intern!(_pbuf.py(), "WritePayload"), (_pbuf,))?;
         Ok(())
     }
 
     /// Write object
     #[allow(non_snake_case)]
-    fn WritePayload(&self, _pbuf: &PyAny) -> PyResult<()> {
+    fn WritePayload(&self, _pbuf: &Bound<'_, PyAny>) -> PyResult<()> {
         Err(PyNotImplementedError::new_err(
             "WritePayload must be overridden",
         ))
     }
 }
 
-pub(crate) fn create_submodule(py: Python<'_>) -> PyResult<&PyModule> {
-    let submod = PyModule::new(py, "eudobj")?;
+pub(crate) fn create_submodule(py: Python<'_>) -> PyResult<Bound<'_, PyModule>> {
+    let submod = PyModule::new_bound(py, "eudobj")?;
     submod.add_class::<PyEUDObject>()?;
 
     Ok(submod)

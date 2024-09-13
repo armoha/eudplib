@@ -9,6 +9,7 @@ use std::str;
 
 static LINENO_REGEX: GILOnceCell<Regex> = GILOnceCell::new();
 
+#[allow(dead_code)]
 fn print_entries(linetable_bytes: Vec<u8>) {
     let linetable_reader = LinetableReader {
         data: linetable_bytes,
@@ -26,7 +27,10 @@ fn print_entries(linetable_bytes: Vec<u8>) {
     }
 }
 
-/// Returns a Python 3.11+ co_linetable from data and co_positions
+/// generate_linetable(data, linetable, positions, /)
+/// --
+///
+/// Returns a Python 3.11+ co_linetable from data and co_positions.
 ///
 /// # Arguments
 ///
@@ -37,7 +41,7 @@ fn print_entries(linetable_bytes: Vec<u8>) {
 pub fn generate_linetable<'a>(
     data: &'a [u8],
     linetable: Vec<u8>,
-    positions: &'a PyIterator,
+    positions: &Bound<'a, PyIterator>,
 ) -> PyResult<Cow<'a, [u8]>> {
     let line_regex = LINENO_REGEX.get_or_init(positions.py(), || {
         Regex::new(r" *# \(Line (\d+)\)").unwrap()
@@ -59,7 +63,7 @@ pub fn generate_linetable<'a>(
     let epspy_lines: PyResult<Vec<u32>> = positions
         .iter()?
         .map(|i| {
-            i.and_then(PyAny::extract::<(u32, u32, u32, u32)>)
+            i.and_then(|ob: Bound<'_, PyAny>| <(u32, u32, u32, u32)>::extract_bound(&ob))
                 .map(|x| x.0)
         })
         .collect();
