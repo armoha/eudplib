@@ -5,9 +5,12 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 from .. import core as c
 from .. import trigger as tg
 from .. import utils as ut
+from ..core.variable import EUDLightBool, EUDVariable
 from .basicstru import EUDJumpIf, EUDJumpIfNot
 
 
@@ -18,7 +21,7 @@ class EUDSCAnd:
         c.PushTriggerScope()
         self.side_effect = c.NextTrigger()
         self.scope = ut.EUDGetLastBlock()
-        self.v: c.EUDLightBool | c.EUDVariable
+        self.v: EUDLightBool | EUDVariable
 
     def patch(self) -> None:
         self.const = False
@@ -28,19 +31,19 @@ class EUDSCAnd:
         except KeyError:
             is_conditional = False
         if is_conditional:
-            self.v = c.EUDLightBool()
+            self.v = EUDLightBool()
             self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.Clear())
             c.PopTriggerScope()
             c.RawTrigger(actions=self.v.Set())
         else:
-            self.v = c.EUDVariable()
+            self.v = EUDVariable()
             self.fb = c.RawTrigger(nextptr=self.jb, actions=self.v.SetNumber(0))
             c.PopTriggerScope()
             self.v << True
 
     def __call__(
         self, cond=None, *, neg=False
-    ) -> "EUDSCAnd | list | c.EUDLightBool | c.EUDVariable":
+    ) -> EUDSCAnd | list | EUDLightBool | EUDVariable:
         if cond is None:
             if self.const:
                 c.PopTriggerScope()
@@ -101,14 +104,14 @@ class EUDSCAnd:
 class EUDSCOr:
     def __init__(self) -> None:
         self.jb = c.Forward()
-        self.v = c.EUDLightBool()
+        self.v = EUDLightBool()
         c.RawTrigger(actions=self.v.Clear())
 
         if c.PushTriggerScope():
             self.tb = c.RawTrigger(nextptr=self.jb, actions=self.v.Set())
         c.PopTriggerScope()
 
-    def __call__(self, cond=None, *, neg=False) -> "EUDSCOr | c.EUDLightBool":
+    def __call__(self, cond=None, *, neg=False) -> EUDSCOr | EUDLightBool:
         if cond is None:
             self.jb << c.NextTrigger()
             return self.v

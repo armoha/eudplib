@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from typing_extensions import Self
@@ -141,7 +143,7 @@ class Action(ConstExpr):
         self.parenttrg: RawTrigger | None = None
         self.actindex: int | None = None
 
-    def __copy__(self) -> "Action":
+    def __copy__(self) -> Action:
         return self.__class__(*self.fields[:10], eudx=self.fields[11])  # type: ignore[arg-type]
 
     def disable(self) -> None:
@@ -233,7 +235,7 @@ class Action(ConstExpr):
 
         raise ut.EPError("\n".join(error))
 
-    def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:  # noqa: N802
+    def SetParentTrigger(self, trg: RawTrigger, index: int) -> None:  # noqa: N802
         if self.parenttrg is not None:
             raise ut.EPError(_("Actions cannot be shared by two triggers."))
         if trg is None:
@@ -244,7 +246,7 @@ class Action(ConstExpr):
         self.parenttrg = trg
         self.actindex = index
 
-    def Evaluate(self) -> "RlocInt_C":  # noqa: N802
+    def Evaluate(self) -> RlocInt_C:  # noqa: N802
         if self.parenttrg is None or self.actindex is None:
             # fmt: off
             err = _("Orphan action. This often happens when you try to do arithmetics with actions.")  # noqa: E501
@@ -252,10 +254,10 @@ class Action(ConstExpr):
             raise ut.EPError(err)
         return self.parenttrg.Evaluate() + 8 + 320 + 32 * self.actindex
 
-    def CollectDependency(self, pbuffer: "ObjCollector") -> None:  # noqa: N802
+    def CollectDependency(self, pbuffer: ObjCollector) -> None:  # noqa: N802
         for field in self.fields[:6]:
             if not isinstance(field, int):
                 pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
-    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
+    def WritePayload(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802
         pbuffer.WritePack("IIIIIIHBBBBH", self.fields)  # type: ignore[arg-type]

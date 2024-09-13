@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, NoReturn
 
 from typing_extensions import Self
@@ -98,7 +100,7 @@ class Condition(ConstExpr):
         self.parenttrg: RawTrigger | None = None
         self.condindex: int | None = None
 
-    def __copy__(self) -> "Condition":
+    def __copy__(self) -> Condition:
         return self.__class__(*self.fields[:8], eudx=self.fields[8])  # type: ignore[arg-type]
 
     def disable(self) -> None:
@@ -161,7 +163,7 @@ class Condition(ConstExpr):
 
         raise ut.EPError("\n".join(error))
 
-    def SetParentTrigger(self, trg: "RawTrigger", index: int) -> None:  # noqa: N802
+    def SetParentTrigger(self, trg: RawTrigger, index: int) -> None:  # noqa: N802
         if self.parenttrg is not None:
             raise ut.EPError(_("Condition cannot be shared by two triggers."))
         if trg is None:
@@ -172,18 +174,18 @@ class Condition(ConstExpr):
         self.parenttrg = trg
         self.condindex = index
 
-    def Evaluate(self) -> "RlocInt_C":  # noqa: N802
+    def Evaluate(self) -> RlocInt_C:  # noqa: N802
         if self.parenttrg is None or self.condindex is None:
             # fmt: off
             raise ut.EPError(_("Orphan condition. This often happens when you try to do arithmetics with conditions."))  # noqa: E501
             # fmt: on
         return self.parenttrg.Evaluate() + 8 + self.condindex * 20
 
-    def CollectDependency(self, pbuffer: "ObjCollector") -> None:  # noqa: N802
+    def CollectDependency(self, pbuffer: ObjCollector) -> None:  # noqa: N802
         for field in self.fields[:3]:
             pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
-    def WritePayload(self, pbuffer: "_PayloadBuffer") -> None:  # noqa: N802
+    def WritePayload(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802
         pbuffer.WritePack("IIIHBBBBH", self.fields)  # type: ignore[arg-type]
 
     def __bool__(self) -> NoReturn:

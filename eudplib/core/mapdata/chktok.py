@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 from eudplib import utils as ut
 from eudplib.localize import _
 
@@ -66,7 +68,7 @@ class CHK:
 
         return True
 
-    def clone(self) -> "CHK":
+    def clone(self) -> CHK:
         t = CHK()
         t.sections = dict(self.sections)
         return t

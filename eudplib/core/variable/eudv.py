@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 import sys
 import traceback
 from collections.abc import Iterator, Sequence
@@ -54,7 +56,7 @@ def process_dest(dest):
 def _is_rvalue(obj: object, refcount: int = 4) -> bool:
     if isinstance(obj, EUDVariable) and sys.getrefcount(obj) != refcount:
         return False
-    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.getValue(), 5):
+    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.getValue(), refcount + 1):
         return False
     return True
 
@@ -107,7 +109,7 @@ class VariableTriggerForward(ConstExpr):
 class EUDVariable(VariableBase):
     """Full variable."""
 
-    _addor: "EUDVariable"
+    _addor: EUDVariable
     __slots__ = ("_vartrigger", "_varact", "_rvalue")
 
     @overload
@@ -126,7 +128,7 @@ class EUDVariable(VariableBase):
     def __init__(
         self,
         initval_or_epd: int | ConstExpr,
-        modifier: "TrgModifier",
+        modifier: TrgModifier,
         initval: int | ConstExpr,
         /,
         *,
@@ -171,11 +173,11 @@ class EUDVariable(VariableBase):
         return id(self)
 
     # -------
-    def makeL(self) -> "EUDVariable":  # noqa: N802
+    def makeL(self) -> EUDVariable:  # noqa: N802
         self._rvalue = False
         return self
 
-    def makeR(self) -> "EUDVariable":  # noqa: N802
+    def makeR(self) -> EUDVariable:  # noqa: N802
         self._rvalue = True
         return self
 
@@ -185,46 +187,46 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def SetMask(self, value: "Dword") -> bt.Action:  # noqa: N802
+    def SetMask(self, value: Dword) -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getMaskAddr(), bt.SetTo, value)
 
-    def AddMask(self, value: "Dword") -> bt.Action:  # noqa: N802
+    def AddMask(self, value: Dword) -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getMaskAddr(), bt.Add, value)
 
-    def SubtractMask(self, value: "Dword") -> bt.Action:  # noqa: N802
+    def SubtractMask(self, value: Dword) -> bt.Action:  # noqa: N802
         return bt.SetMemory(self.getMaskAddr(), bt.Subtract, value)
 
     # -------
 
-    def SetMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+    def SetMaskX(self, value: Dword, mask: Dword) -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getMaskAddr(), bt.SetTo, value, mask)
 
-    def AddMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+    def AddMaskX(self, value: Dword, mask: Dword) -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getMaskAddr(), bt.Add, value, mask)
 
-    def SubtractMaskX(self, value: "Dword", mask: "Dword") -> bt.Action:  # noqa: N802
+    def SubtractMaskX(self, value: Dword, mask: Dword) -> bt.Action:  # noqa: N802
         return bt.SetMemoryX(self.getMaskAddr(), bt.Subtract, value, mask)
 
     # -------
 
-    def MaskAtLeast(self, value: "Dword") -> bt.Condition:  # noqa: N802
+    def MaskAtLeast(self, value: Dword) -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getMaskAddr(), bt.AtLeast, value)
 
-    def MaskAtMost(self, value: "Dword") -> bt.Condition:  # noqa: N802
+    def MaskAtMost(self, value: Dword) -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getMaskAddr(), bt.AtMost, value)
 
-    def MaskExactly(self, value: "Dword") -> bt.Condition:  # noqa: N802
+    def MaskExactly(self, value: Dword) -> bt.Condition:  # noqa: N802
         return bt.Memory(self.getMaskAddr(), bt.Exactly, value)
 
     # -------
 
-    def MaskAtLeastX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
+    def MaskAtLeastX(self, value: Dword, mask: Dword) -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getMaskAddr(), bt.AtLeast, value, mask)
 
-    def MaskAtMostX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
+    def MaskAtMostX(self, value: Dword, mask: Dword) -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getMaskAddr(), bt.AtMost, value, mask)
 
-    def MaskExactlyX(self, value: "Dword", mask: "Dword") -> bt.Condition:  # noqa: N802
+    def MaskExactlyX(self, value: Dword, mask: Dword) -> bt.Condition:  # noqa: N802
         return bt.MemoryX(self.getMaskAddr(), bt.Exactly, value, mask)
 
     # -------
@@ -243,15 +245,15 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def SetDestX(self, dest, mask: "Dword") -> bt.Action:  # noqa: N802
+    def SetDestX(self, dest, mask: Dword) -> bt.Action:  # noqa: N802
         dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.SetTo, dest, mask)
 
-    def AddDestX(self, dest, mask: "Dword") -> bt.Action:  # noqa: N802
+    def AddDestX(self, dest, mask: Dword) -> bt.Action:  # noqa: N802
         dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.Add, dest, mask)
 
-    def SubtractDestX(self, dest, mask: "Dword") -> bt.Action:  # noqa: N802
+    def SubtractDestX(self, dest, mask: Dword) -> bt.Action:  # noqa: N802
         dest = process_dest(dest)
         return bt.SetMemoryX(self.getDestAddr(), bt.Subtract, dest, mask)
 
@@ -280,19 +282,19 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def Assign(self, other: "Dword") -> "EUDVariable":  # noqa: N802
+    def Assign(self, other: Dword) -> EUDVariable:  # noqa: N802
         self.checkNonRValue()
         SeqCompute(((self, bt.SetTo, other),))
         return self
 
-    def __lshift__(self, other: "Dword") -> "EUDVariable":
+    def __lshift__(self, other: Dword) -> EUDVariable:
         return self.Assign(other)
 
-    def __iadd__(self, other: "Dword") -> "EUDVariable":
+    def __iadd__(self, other: Dword) -> EUDVariable:
         SeqCompute(((self, bt.Add, other),))
         return self
 
-    def __isub__(self, other: "Dword") -> "EUDVariable":
+    def __isub__(self, other: Dword) -> EUDVariable:
         if isinstance(other, int):
             self.__iadd__(-other)  # 1A
         else:
@@ -313,7 +315,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __add__(self, other: "Dword") -> "EUDVariable":
+    def __add__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__iadd__(other)
         if IsEUDVariable(other) and _is_rvalue(other):
@@ -322,14 +324,14 @@ class EUDVariable(VariableBase):
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
-    def __radd__(self, other: "Dword") -> "EUDVariable":
+    def __radd__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__iadd__(other)
         t = EUDVariable()
         SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
         return t.makeR()
 
-    def __sub__(self, other: "Dword") -> "EUDVariable":
+    def __sub__(self, other: Dword) -> EUDVariable:
         if IsEUDVariable(other) and _is_rvalue(other):
             rvalue_strict = _is_rvalue_strict
             if rvalue_strict:
@@ -368,7 +370,7 @@ class EUDVariable(VariableBase):
             )
         return t.makeR()
 
-    def __rsub__(self, other: "Dword") -> "EUDVariable":
+    def __rsub__(self, other: Dword) -> EUDVariable:
         is_eudvariable = IsEUDVariable(other)
         if _is_rvalue(self) and not is_eudvariable:
             bt.RawTrigger(  # -self += other
@@ -399,12 +401,12 @@ class EUDVariable(VariableBase):
             )
         return t.makeR()
 
-    def __neg__(self) -> "EUDVariable":
+    def __neg__(self) -> EUDVariable:
         if _is_rvalue(self):
             return self.ineg()
         return (0 - self).makeR()
 
-    def __invert__(self) -> "EUDVariable":
+    def __invert__(self) -> EUDVariable:
         if _is_rvalue(self):
             return self.iinvert()
         t = EUDVariable()
@@ -413,7 +415,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __ior__(self, other: "Dword") -> "EUDVariable":
+    def __ior__(self, other: Dword) -> EUDVariable:
         if IsEUDVariable(other):
             write = self.SetNumberX(0xFFFFFFFF, 0)
             SeqCompute([(EPD(write), bt.SetTo, other)])
@@ -422,7 +424,7 @@ class EUDVariable(VariableBase):
             super().__ior__(other)  # 1A
         return self
 
-    def __iand__(self, other: "Dword") -> "EUDVariable":
+    def __iand__(self, other: Dword) -> EUDVariable:
         if IsEUDVariable(other):
             write = self.SetNumberX(0, 0xFFFFFFFF)
             SeqCompute(
@@ -438,7 +440,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __and__(self, other: "Dword") -> "EUDVariable":
+    def __and__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__iand__(other)
         is_eudvariable = IsEUDVariable(other)
@@ -460,7 +462,7 @@ class EUDVariable(VariableBase):
             t &= other  # 1T 5A
         return t.makeR()
 
-    def __rand__(self, other: "Dword") -> "EUDVariable":
+    def __rand__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__iand__(other)
         t = EUDVariable()
@@ -479,7 +481,7 @@ class EUDVariable(VariableBase):
             t &= other  # 1T 5A
         return t.makeR()
 
-    def __or__(self, other: "Dword") -> "EUDVariable":
+    def __or__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__ior__(other)
         is_eudvariable = IsEUDVariable(other)
@@ -495,7 +497,7 @@ class EUDVariable(VariableBase):
             t |= other  # 1T 5A
         return t.makeR()
 
-    def __ror__(self, other: "Dword") -> "EUDVariable":
+    def __ror__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__ior__(other)
         t = EUDVariable()
@@ -510,7 +512,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __ixor__(self, other: "Dword") -> "EUDVariable":
+    def __ixor__(self, other: Dword) -> EUDVariable:
         if IsEUDVariable(other):
             VProc(
                 other,
@@ -527,7 +529,7 @@ class EUDVariable(VariableBase):
             super().__ixor__(other)  # 2A
         return self
 
-    def __xor__(self, other: "Dword") -> "EUDVariable":
+    def __xor__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__ixor__(other)
         is_eudvariable = IsEUDVariable(other)
@@ -552,7 +554,7 @@ class EUDVariable(VariableBase):
             t ^= other
         return t.makeR()
 
-    def __rxor__(self, other: "Dword") -> "EUDVariable":
+    def __rxor__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__ixor__(other)
         t = EUDVariable()

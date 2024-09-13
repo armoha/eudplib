@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 from collections.abc import Callable, Iterator
 from typing import Literal, overload
 
@@ -135,7 +137,7 @@ class _CPLoop:
     def __init__(self, parent: UnitGroup) -> None:
         self._parent = parent
 
-    def __iter__(self) -> "Iterator[_CpHelper]":
+    def __iter__(self) -> Iterator[_CpHelper]:
         loopstart, pos, check_death = Forward(), Forward(), Forward()
         trg, tpos, loopvar, varray, capacity = (
             self._parent.trg,
