@@ -837,7 +837,7 @@ expr(A) ::= SWITCH LPAREN expr(B) RPAREN. {
 }
 
 expr(A) ::= LOCATION LPAREN expr(B) RPAREN. {
-    B->data = "GetLocationIndex(" + B->data + ")";
+    B->data = "EncodeLocation(" + B->data + ")";
     A = mkTokenTemp(B);
 }
 

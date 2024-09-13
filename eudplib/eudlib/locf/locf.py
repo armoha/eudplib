@@ -350,6 +350,5 @@ def _setloc_epd(loc, epd):
 
 
 def f_setloc_epd(loc, epd) -> None:
-    if isinstance(loc, str):
-        loc = c.GetLocationIndex(loc)
+    loc = c.EncodeLocation(loc)
     _setloc_epd(loc * 5, epd)
