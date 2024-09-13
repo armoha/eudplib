@@ -6,7 +6,7 @@
 # file that should have been included as part of this package.
 
 from abc import ABCMeta, abstractmethod
-from typing import Final, NoReturn
+from typing import Final, NoReturn, Self
 
 from .. import core as c
 from .. import utils as ut
@@ -57,7 +57,7 @@ class StructMember(BaseMember):
         q, r = divmod(self.offset, 4)
         return instance._epd + q, r
 
-    def __get__(self, instance, owner=None) -> "c.EUDVariable | StructMember":
+    def __get__(self, instance, owner=None) -> c.EUDVariable | Self:
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
@@ -110,7 +110,7 @@ class ArrayMember(BaseMember):
             q, r = instance + instance, self.offset % 4
         return ut.EPD(self.offset) + q, r
 
-    def __get__(self, instance, owner=None) -> "c.EUDVariable | ArrayMember":
+    def __get__(self, instance, owner=None) -> c.EUDVariable | Self:
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
@@ -135,7 +135,7 @@ class UnsupportedMember(BaseMember):
 
     __slots__ = ("offset", "kind", "__objclass__", "__name__")
 
-    def __get__(self, instance, owner=None) -> "UnsupportedMember":
+    def __get__(self, instance, owner=None) -> Self:
         if instance is None:
             return self
         raise ut.EPError(

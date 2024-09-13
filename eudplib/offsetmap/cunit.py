@@ -7,7 +7,7 @@
 
 # ruff: noqa: N815
 from collections.abc import Iterator
-from typing import TypeVar, cast
+from typing import Self, cast
 
 from .. import core as c
 from .. import ctrlstru as cs
@@ -93,9 +93,6 @@ class PathingFlags(StructEnumMember):
     HasCollision = Flag(0x01)
     IsStacked = Flag(0x02)
     Decollide = Flag(0x04)
-
-
-T = TypeVar("T", bound="CUnit")
 
 
 class CUnit(EPDOffsetMap):
@@ -437,7 +434,7 @@ class CUnit(EPDOffsetMap):
         super().__init__(_epd)
 
     @classmethod
-    def from_ptr(cls: type[T], ptr: int_or_var) -> T:
+    def from_ptr(cls, ptr: int_or_var) -> Self:
         epd: int | c.EUDVariable
         u = unProxy(ptr)
         # check ptr
@@ -455,17 +452,21 @@ class CUnit(EPDOffsetMap):
         return cls(epd, ptr=u)
 
     @classmethod
-    def from_read(cls: type[T], epd) -> T:
+    def from_read(cls, epd) -> Self:
         from ..memio import f_cunitepdread_epd
 
         _ptr, _epd = f_cunitepdread_epd(epd)
         return cls(_epd, ptr=_ptr)
 
+    @classmethod
+    def from_next(cls) -> Self:
+        return cls.from_read(EPD(0x628438))
+
     @property
     def ptr(self) -> int | c.EUDVariable:
-        if self._ptr is not None:
-            return self._ptr
-        return _ptr_cache(cast(c.EUDVariable, self._epd))
+        if isinstance(self._epd, int):
+            return cast(int, self._ptr)  # FIXME
+        return _ptr_cache(self._epd)
 
     @staticmethod
     @c.EUDTypedFunc([None, None, TrgPlayer])
@@ -667,10 +668,6 @@ class CUnit(EPDOffsetMap):
         )
         f_setcurpl2cpcache()
         # return False
-
-    @classmethod
-    def from_next(cls: type[T]) -> "CUnit":
-        return CUnit.from_read(EPD(0x628438))
 
     def check_buildq(self, unit_type) -> c.Condition:
         unit = c.EncodeUnit(unit_type)

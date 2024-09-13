@@ -1,10 +1,13 @@
-from typing import Final
+from typing import TYPE_CHECKING, Final, Self
 
 from .. import core as c
 from .. import ctrlstru as cs
 from ..utils import EPD, ExprProxy, ep_assert
 from .member import BaseMember
 from .memberkind import MemberKind
+
+if TYPE_CHECKING:
+    from .epdoffsetmap import EPDOffsetMap
 
 
 class EnumMember(ExprProxy):
@@ -118,7 +121,7 @@ class StructEnumMember(BaseMember, EnumMember):
     __slots__ = ("offset", "kind", "_instance", "__objclass__", "__name__")
 
     def __init__(self, offset: int, kind: MemberKind) -> None:
-        self._instance = None  # FIXME
+        self._instance: EPDOffsetMap | None = None  # FIXME
         super().__init__(offset, kind)
         super(BaseMember, self).__init__()
 
@@ -128,12 +131,12 @@ class StructEnumMember(BaseMember, EnumMember):
             instance = self._instance
         return instance._epd + q, r
 
-    def __get__(self, instance, owner=None) -> "StructEnumMember":
+    def __get__(self, instance, owner=None) -> Self:
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
             return self
-        if isinstance(instance, EPDOffsetMap):
+        elif isinstance(instance, EPDOffsetMap):
             self._instance = instance
             # FIXME: fix reading value on every usages
             # example)
@@ -163,11 +166,11 @@ class ArrayEnumMember(BaseMember, EnumMember):
         self, offset: int, kind: MemberKind, *, stride: int | None = None
     ) -> None:
         ep_assert(offset % 4 == 0)
-        self._instance = None  # FIXME
+        self._instance: EPDOffsetMap | None = None  # FIXME
         super().__init__(offset, kind)
         super(BaseMember, self).__init__()
         if stride is None:
-            self.stride = self.kind.size()
+            self.stride: int = self.kind.size()
         else:
             ep_assert(self.kind.size() <= stride and stride in (1, 2, 4))
             self.stride = stride
@@ -188,7 +191,7 @@ class ArrayEnumMember(BaseMember, EnumMember):
             q, r = instance, 0
         return EPD(self.offset) + q, r
 
-    def __get__(self, instance, owner=None) -> "ArrayEnumMember":
+    def __get__(self, instance, owner=None) -> Self:
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
@@ -219,7 +222,7 @@ class Flag:
         ep_assert(mask != 0)
         self.mask = mask
 
-    def __get__(self, instance, owner=None) -> "Flag | c.EUDVariable":
+    def __get__(self, instance, owner=None) -> c.EUDVariable | Self:
         if instance is None:
             return self
         if isinstance(instance, StructEnumMember):
