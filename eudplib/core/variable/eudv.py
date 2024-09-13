@@ -22,7 +22,6 @@ from ...utils import (
     ExprProxy,
     FlattenList,
     List2Assignable,
-    _rand_lst,
     ep_assert,
     ep_warn,
     unProxy,
@@ -304,7 +303,7 @@ class EUDVariable(VariableBase):
                 addor = EUDVariable(0, bt.Add, 0)
                 EUDVariable._addor = addor
             SeqCompute(
-                [  # (~0 - other) + (self + 1)
+                [  # (self + 1) + (~0 - other)
                     (self, bt.Add, 1),
                     (addor, bt.SetTo, 0xFFFFFFFF),
                     (addor, bt.Subtract, other),
@@ -344,7 +343,7 @@ class EUDVariable(VariableBase):
                     other.AddNumber(1),
                     self.QueueAddTo(other),
                 ],
-            )  # 1T 7A
+            )  # 1T 7A, executes 2T 8A
             if rvalue_strict:
                 EP_SetRValueStrictMode(True)
             return other
@@ -804,7 +803,7 @@ def _seqcompute_sub(assignpairs, _srcdict):
         last_pairs = src, dst, mdt
 
     remove_duplicate_actions()
-    actionlist.extend(_rand_lst(non_const_actions))
+    actionlist.extend(non_const_actions)
     bt.RawTrigger(nextptr=nextptr, actions=actionlist)
 
     vt_nextptr << bt.NextTrigger()
