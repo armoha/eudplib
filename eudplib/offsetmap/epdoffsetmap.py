@@ -6,15 +6,11 @@
 # file that should have been included as part of this package.
 
 from abc import ABCMeta
-from typing import TYPE_CHECKING, ClassVar, cast
+from typing import ClassVar, cast
 
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
-
-if TYPE_CHECKING:
-    from .csprite import CSprite
-    from .cunit import CUnit
 
 
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
@@ -35,7 +31,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         EPDOffsetMap._cast = False
         super().__init__(epd)
 
-    def getepd(self, name: str) -> "c.EUDVariable | CUnit":
+    def getepd(self, name: str) -> c.EUDVariable:
         from .memberimpl import CSpriteKind, CUnitKind, IscriptKind, PositionKind
 
         member = type(self).__dict__[name]
@@ -51,9 +47,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
         return f_epdread_epd(epd)
 
-    def getdwepd(
-        self, name: str
-    ) -> tuple[c.EUDVariable, "c.EUDVariable | CUnit | CSprite"]:
+    def getdwepd(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
         from .memberimpl import CSpriteKind, CUnitKind, IscriptKind, PositionKind
 
         member = type(self).__dict__[name]
