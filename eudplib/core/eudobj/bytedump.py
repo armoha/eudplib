@@ -17,7 +17,7 @@ class Db(EUDObject):
     def __new__(cls, *args, **kwargs) -> Self:
         return super().__new__(cls)
 
-    def __init__(self, b: bytes | int | str) -> None:
+    def __init__(self, b: bytes | int | str, /) -> None:
         super().__init__()
         if isinstance(b, str):
             b = b.encode("UTF-8") + b"\0"

@@ -14,7 +14,7 @@ from .vbase import VariableBase
 class EUDLightVariable(VariableBase):
     __slots__ = ("_memaddr",)
 
-    def __init__(self, initvalue=0):
+    def __init__(self, initvalue=0, /):
         super().__init__()
         self._memaddr = Db(i2b4(initvalue))
 
