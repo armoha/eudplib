@@ -5,7 +5,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ...utils import i2b4
+from ...utils import EPD, i2b4
 from .. import rawtrigger as bt
 from ..eudobj import Db
 from .vbase import VariableBase
@@ -29,37 +29,46 @@ class EUDLightVariable(VariableBase):
 
 
 class EUDLightBool:
-    __slots__ = ("_basev", "_mask", "_memaddr")
-    _lv = EUDLightVariable()
-    _bit = 0
+    __slots__ = ("_mask", "_memaddr", "_memepd")
+    _init_true_lv = EUDLightVariable(0xFFFFFFFF)
+    _init_true_bit = 0
+    _init_false_lv = EUDLightVariable(0)
+    _init_false_bit = 0
 
-    def __init__(self):
-        if EUDLightBool._bit < 32:
-            self._basev = EUDLightBool._lv
-            self._mask = 1 << EUDLightBool._bit
-            EUDLightBool._bit += 1
+    def __init__(self, initval: bool = False, /):
+        if initval:
+            if EUDLightBool._init_true_bit >= 32:
+                EUDLightBool._init_true_lv = EUDLightVariable(0xFFFFFFFF)
+                EUDLightBool._init_true_bit = 0
+            lv = EUDLightBool._init_true_lv
+            bit = EUDLightBool._init_true_bit
+            EUDLightBool._init_true_bit += 1
         else:
-            lv = EUDLightVariable()
-            EUDLightBool._lv = lv
-            self._basev = lv
-            self._mask = 1
-            EUDLightBool._bit = 1
-        self._memaddr = self._basev._memaddr
+            if EUDLightBool._init_false_bit >= 32:
+                EUDLightBool._init_false_lv = EUDLightVariable(0)
+                EUDLightBool._init_false_bit = 0
+            lv = EUDLightBool._init_false_lv
+            bit = EUDLightBool._init_false_bit
+            EUDLightBool._init_false_bit += 1
+
+        self._mask = 1 << bit
+        self._memaddr = lv._memaddr
+        self._memepd = EPD(lv._memaddr)
 
     def getValueAddr(self):  # noqa: N802
         return self._memaddr
 
     def Set(self):  # noqa: N802
-        return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, self._mask, self._mask)
+        return bt.SetMemoryXEPD(self._memepd, bt.SetTo, self._mask, self._mask)
 
     def Clear(self):  # noqa: N802
-        return bt.SetMemoryX(self.getValueAddr(), bt.SetTo, 0, self._mask)
+        return bt.SetMemoryXEPD(self._memepd, bt.SetTo, 0, self._mask)
 
     def Toggle(self):  # noqa: N802
-        return bt.SetMemoryX(self.getValueAddr(), bt.Add, self._mask, self._mask)
+        return bt.SetMemoryXEPD(self._memepd, bt.Add, self._mask, self._mask)
 
     def IsSet(self):  # noqa: N802
-        return bt.MemoryX(self.getValueAddr(), bt.AtLeast, 1, self._mask)
+        return bt.MemoryXEPD(self._memepd, bt.AtLeast, 1, self._mask)
 
     def IsCleared(self):  # noqa: N802
-        return bt.MemoryX(self.getValueAddr(), bt.Exactly, 0, self._mask)
+        return bt.MemoryXEPD(self._memepd, bt.Exactly, 0, self._mask)
