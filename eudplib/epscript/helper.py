@@ -481,16 +481,10 @@ def _L2V(logic):  # noqa: N802, logic to value
 
 
 def _LVAR(vs):  # noqa: N802
-    import sys
-
     from ..core.variable.eudv import _yield_and_check_rvalue
 
     ret, ops = [], []
-    if sys.version_info >= (3, 11):
-        refcount = 3
-    else:
-        refcount = 4
-    for v, is_rvalue in _yield_and_check_rvalue(vs, refcount):
+    for v, is_rvalue in _yield_and_check_rvalue(vs, 1):
         if IsEUDVariable(v) and is_rvalue:
             ret.append(v.makeL())
         else:

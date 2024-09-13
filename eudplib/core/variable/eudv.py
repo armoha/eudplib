@@ -52,26 +52,30 @@ def process_dest(dest):
     return epd
 
 
-def _is_rvalue(obj: object, refcount: int = 4) -> bool:
-    if isinstance(obj, EUDVariable) and sys.getrefcount(obj) != refcount:
-        return False
-    if isinstance(obj, ExprProxy) and not _is_rvalue(obj.getValue(), refcount + 1):
-        return False
-    return True
-
-
 if sys.version_info >= (3, 11):
     _initial_refcount = 2
 else:
     _initial_refcount = 3
 
 
+def _is_rvalue(obj: object, refcount_bonus: int = 0, /) -> bool:
+    refcount = _initial_refcount + 2 + refcount_bonus
+    if isinstance(obj, EUDVariable) and sys.getrefcount(obj) != refcount:
+        return False
+    if isinstance(obj, ExprProxy) and not _is_rvalue(
+        obj.getValue(), refcount_bonus + 1
+    ):
+        return False
+    return True
+
+
 def _yield_and_check_rvalue(
-    obj: Any, refcount: int = _initial_refcount, is_rvalue: bool = True
+    obj: Any, refcount_bonus: int = 0, is_rvalue: bool = True
 ) -> Iterator[tuple[Any, bool]]:
+    refcount = _initial_refcount + refcount_bonus
     is_rvalue &= sys.getrefcount(obj) == refcount
     if isinstance(obj, ExprProxy):
-        yield from _yield_and_check_rvalue(obj.getValue(), 3, is_rvalue)
+        yield from _yield_and_check_rvalue(obj.getValue(), 1, is_rvalue)
     elif isinstance(obj, EUDVariable):
         yield obj, is_rvalue
     elif isinstance(obj, (bytes, str)) or hasattr(obj, "dont_flatten"):  # noqa: UP038
@@ -79,7 +83,7 @@ def _yield_and_check_rvalue(
     else:
         try:
             for subobj in obj:
-                yield from _yield_and_check_rvalue(subobj, 4, is_rvalue)
+                yield from _yield_and_check_rvalue(subobj, 2, is_rvalue)
         except TypeError:  # obj is not iterable
             yield obj, False
 
@@ -932,16 +936,11 @@ def NonSeqCompute(assignpairs):  # noqa: N802
 
 
 def SetVariables(srclist, dstlist, mdtlist=None) -> None:  # noqa: N802
-    if sys.version_info >= (3, 11):
-        srclist_refcount = 2
-        refcount = 3
-    else:
-        srclist_refcount = 3
-        refcount = 4
+    srclist_refcount = _initial_refcount
     errlist = []
     if sys.getrefcount(srclist) == srclist_refcount:
         nth = 0
-        for src, is_rvalue in _yield_and_check_rvalue(srclist, refcount):
+        for src, is_rvalue in _yield_and_check_rvalue(srclist, 1):
             if isinstance(src, EUDVariable) and is_rvalue:
                 errlist.append(EPError(_("src{} is RValue variable").format(nth)))
             nth += 1
