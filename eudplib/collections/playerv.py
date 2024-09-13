@@ -51,10 +51,11 @@ class PVariable(_EUDVArray8):
 
     def __setitem__(self, index, value) -> None:
         index = c.EncodePlayer(index)
-        if not c.IsEUDVariable(index):
+        if not isinstance(index, c.EUDVariable):
             return self.set(index, value)
-        if c.IsConstExpr(self):
-            if c.IsEUDVariable(value):
+        value = ut.unProxy(value)
+        if not c.IsEUDVariable(self):
+            if isinstance(value, c.EUDVariable):
                 self._pveudset(index, value)
             else:
                 a0 = c.Forward()
@@ -65,7 +66,7 @@ class PVariable(_EUDVArray8):
                         actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
                     )
                 c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
-        elif c.IsEUDVariable(value):
+        elif isinstance(value, c.EUDVariable):
             self._casteudset(index, value)
         else:
             a0 = c.Forward()

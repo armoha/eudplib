@@ -309,7 +309,7 @@ class EUDVariable(VariableBase):
                     (addor, bt.Subtract, other),
                     (self, None, addor),
                 ]
-            )
+            )  # 1T 7A, executes 3T 9A
         return self
 
     # -------
@@ -370,13 +370,14 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rsub__(self, other: Dword) -> EUDVariable:
-        is_eudvariable = IsEUDVariable(other)
+        unproxied = unProxy(other)
+        is_eudvariable = isinstance(unproxied, EUDVariable)
         if _is_rvalue(self) and not is_eudvariable:
             bt.RawTrigger(  # -self += other
                 actions=[
                     self.AddNumberX(0xFFFFFFFF, 0x55555555),
                     self.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
-                    self.AddNumber(other + 1),
+                    self.AddNumber(unproxied + 1),
                 ]
             )
             return self
@@ -387,7 +388,7 @@ class EUDVariable(VariableBase):
                     (t, bt.SetTo, 0xFFFFFFFF),
                     (t, bt.Subtract, self),
                     (t, bt.Add, 1),
-                    (t, bt.Add, other),
+                    (t, bt.Add, unproxied),
                 ]
             )
         else:
@@ -395,7 +396,7 @@ class EUDVariable(VariableBase):
                 [
                     (t, bt.SetTo, 0xFFFFFFFF),
                     (t, bt.Subtract, self),
-                    (t, bt.Add, other + 1),
+                    (t, bt.Add, unproxied + 1),
                 ]
             )
         return t.makeR()
@@ -415,26 +416,28 @@ class EUDVariable(VariableBase):
     # -------
 
     def __ior__(self, other: Dword) -> EUDVariable:
-        if IsEUDVariable(other):
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable):
             write = self.SetNumberX(0xFFFFFFFF, 0)
-            SeqCompute([(EPD(write), bt.SetTo, other)])
+            SeqCompute([(EPD(write), bt.SetTo, unproxied)])
             bt.RawTrigger(actions=write)  # 1T 5A
         else:
-            super().__ior__(other)  # 1A
+            super().__ior__(unproxied)  # 1A
         return self
 
     def __iand__(self, other: Dword) -> EUDVariable:
-        if IsEUDVariable(other):
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable):
             write = self.SetNumberX(0, 0xFFFFFFFF)
             SeqCompute(
                 [
                     (EPD(write), bt.SetTo, 0xFFFFFFFF),
-                    (EPD(write), bt.Subtract, other),
+                    (EPD(write), bt.Subtract, unproxied),
                 ]
             )
             bt.RawTrigger(actions=write)  # 1T 6A
         else:
-            super().__iand__(other)  # 1A
+            super().__iand__(unproxied)  # 1A
         return self
 
     # -------
@@ -465,19 +468,20 @@ class EUDVariable(VariableBase):
         if _is_rvalue(self):
             return self.__iand__(other)
         t = EUDVariable()
-        if IsEUDVariable(other):
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable):
             write = t.SetNumberX(0, 0xFFFFFFFF)
             SeqCompute(
                 [
                     (EPD(write), bt.SetTo, 0xFFFFFFFF),
                     (t, bt.SetTo, self),
-                    (EPD(write), bt.Subtract, other),
+                    (EPD(write), bt.Subtract, unproxied),
                 ]
             )
             bt.RawTrigger(actions=write)  # 2T 10A
         else:
             t << self
-            t &= other  # 1T 5A
+            t &= unproxied  # 1T 5A
         return t.makeR()
 
     def __or__(self, other: Dword) -> EUDVariable:
@@ -500,32 +504,34 @@ class EUDVariable(VariableBase):
         if _is_rvalue(self):
             return self.__ior__(other)
         t = EUDVariable()
-        if IsEUDVariable(other):
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable):
             write = t.SetNumberX(0xFFFFFFFF, 0)
-            SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, other)])
+            SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, unproxied)])
             bt.RawTrigger(actions=write)  # 2T 9A
         else:
             t << self
-            t |= other  # 1T 5A
+            t |= unproxied  # 1T 5A
         return t.makeR()
 
     # -------
 
     def __ixor__(self, other: Dword) -> EUDVariable:
-        if IsEUDVariable(other):
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable):
             VProc(
-                other,
+                unproxied,
                 [
-                    other.SetMask(0x55555555),
-                    *other.QueueAddTo(self),
+                    unproxied.SetMask(0x55555555),
+                    *unproxied.QueueAddTo(self),
                 ],
             )
-            VProc(other, other.SetMask(0xAAAAAAAA))  # 3T 8A
+            VProc(unproxied, unproxied.SetMask(0xAAAAAAAA))  # 3T 8A
             bt.RawTrigger(
-                actions=other.SetMask(0xFFFFFFFF)
+                actions=unproxied.SetMask(0xFFFFFFFF)
             )  # FIXME: restore to previous mask???
         else:
-            super().__ixor__(other)  # 2A
+            super().__ixor__(unproxied)  # 2A
         return self
 
     def __xor__(self, other: Dword) -> EUDVariable:
@@ -554,24 +560,25 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __rxor__(self, other: Dword) -> EUDVariable:
+        unproxied = unProxy(other)
         if _is_rvalue(self):
-            return self.__ixor__(other)
+            return self.__ixor__(unproxied)
         t = EUDVariable()
-        if IsEUDVariable(other):
+        if isinstance(unproxied, EUDVariable):
             SeqCompute(
                 [
-                    (EPD(other.getMaskAddr()), bt.SetTo, 0x55555555),
+                    (EPD(unproxied.getMaskAddr()), bt.SetTo, 0x55555555),
                     (t, bt.SetTo, self),
-                    (t, bt.Add, other),
+                    (t, bt.Add, unproxied),
                 ]
             )
-            VProc(other, other.SetMask(0xAAAAAAAA))
+            VProc(unproxied, unproxied.SetMask(0xAAAAAAAA))
             bt.RawTrigger(
-                actions=other.SetMask(0xFFFFFFFF)
+                actions=unproxied.SetMask(0xFFFFFFFF)
             )  # FIXME: restore to previous mask???
         else:
             t << self
-            t ^= other
+            t ^= unproxied
         return t.makeR()
 
     # -------
