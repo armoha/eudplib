@@ -59,6 +59,7 @@ include = ["*"]
 
 [[tool.setuptools-rust.ext-modules]]
 target = "eudplib._rust"
+path = "rust/Cargo.toml"
 rust-version = ">=1.63.0"
 
 [tool.mypy]
