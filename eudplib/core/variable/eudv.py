@@ -223,10 +223,8 @@ class EUDVariable(VariableBase):
             modifier is bt.SetTo or modifier is bt.Add or modifier is bt.Subtract,
             _("Unexpected modifier {}").format(modifier),
         )
-        modifier = bt.EncodeModifier(modifier) << 24
-        return bt.SetDeathsX(
-            EPD(self._varact + 24), bt.SetTo, modifier, 0, 0xFF000000
-        )
+        modtype = bt.EncodeModifier(modifier) << 24
+        return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modtype, 0, 0xFF000000)
 
     # -------
 
