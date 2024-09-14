@@ -13,7 +13,7 @@ from eudplib import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...localize import _
 from ...memio import f_getcurpl, f_setcurpl
-from ...offsetmap.scdata import Force1, Force2, Force3, Force4, TrgPlayer
+from ...offsetmap.scdata import TrgPlayer
 
 
 @_EUDPredefineReturn(2, 3)
@@ -51,10 +51,14 @@ def f_playerexist(player):
 def EUDLoopPlayer(  # noqa: N802
     ptype: str | None = "Human", force=None, race: str | None = None
 ) -> Iterator[TrgPlayer]:
-    def encode_force(f):
-        force_dict = {Force1: 0, Force2: 1, Force3: 2, Force4: 3}
-        if not isinstance(f, int) and f in force_dict:
-            return force_dict[f]
+    def encode_force(f) -> int:
+        if isinstance(f, TrgPlayer) and isinstance(f._value, int):
+            ut.ep_assert(18 <= f._value <= 21, _("{} is not force").format(f))
+            f = f._value
+        ut.ep_assert(isinstance(f, int), _("{} is not force").format(f))
+        if 18 <= f <= 21:
+            f -= 18
+        ut.ep_assert(0 <= f <= 3, _("{} is not force").format(f))
         return f
 
     plist = []
