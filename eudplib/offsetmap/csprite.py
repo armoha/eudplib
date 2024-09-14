@@ -70,7 +70,7 @@ class CSprite(EPDOffsetMap):
         if not isinstance(epd, CSprite):
             u, p = unProxy(epd), unProxy(ptr)
         else:
-            u, p = epd._epd, epd._ptr
+            u, p = epd._value, epd._ptr
 
         if isinstance(u, int):
             q, r = divmod(u - EPD(0x629D98), 9)  # check epd
@@ -133,4 +133,4 @@ class CSprite(EPDOffsetMap):
     def ptr(self) -> int | c.EUDVariable:
         if self._ptr is not None:
             return self._ptr
-        return _ptr_cache(cast(c.EUDVariable, self._epd))
+        return _ptr_cache(cast(c.EUDVariable, self._value))

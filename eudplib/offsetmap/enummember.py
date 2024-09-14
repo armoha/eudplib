@@ -129,7 +129,7 @@ class StructEnumMember(BaseMember, EnumMember):
         q, r = divmod(self.offset, 4)
         if instance is None:
             instance = self._instance
-        return instance._epd + q, r
+        return instance._value + q, r
 
     def __get__(self, instance, owner=None) -> Self:
         from .epdoffsetmap import EPDOffsetMap

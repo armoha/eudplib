@@ -72,7 +72,7 @@ def _yield_and_check_rvalue(
     obj: Any, refcount_bonus: int = 0, is_rvalue: bool = True
 ) -> Iterator[tuple[Any, bool]]:
     refcount = _initial_refcount + refcount_bonus
-    is_rvalue &= sys.getrefcount(obj) == refcount
+    is_rvalue &= sys.getrefcount(obj) <= refcount
     if isinstance(obj, ExprProxy):
         yield from _yield_and_check_rvalue(obj.getValue(), 1, is_rvalue)
     elif isinstance(obj, EUDVariable):
@@ -223,8 +223,8 @@ class EUDVariable(VariableBase):
             modifier is bt.SetTo or modifier is bt.Add or modifier is bt.Subtract,
             _("Unexpected modifier {}").format(modifier),
         )
-        modtype = bt.EncodeModifier(modifier) << 24
-        return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, modtype, 0, 0xFF000000)
+        mode = bt.EncodeModifier(modifier) << 24
+        return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, mode, 0, 0xFF000000)
 
     # -------
 

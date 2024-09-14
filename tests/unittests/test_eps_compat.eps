@@ -1,6 +1,7 @@
 import .BGM_eps_test;
 import .test_eps_stattext as stat;
 import py_math;
+import py_sys;
 var x = 1 << 4;
 EUDOnStart(function () { x += x; });
 object ParticleBag extends EUDStruct {
@@ -74,6 +75,16 @@ with expect_eperror():\n\
     const tc2 = GetTriggerCounter();
     var x9, y9, z9 = list(vlist[2], vlist[1], vlist[0]);
     ep_assert(tc2 + 1 == GetTriggerCounter(), "Wrongly elide var copy");
+
+    const tc3 = GetTriggerCounter();
+    var x10 = dwread_epd(0);
+    ep_assert(tc3 + 1 == GetTriggerCounter(), "Fail to elide var copy");
+
+    const foo = function () : TrgUnit { return 0; };
+    foo();  // create function body
+    const tc4 = GetTriggerCounter();
+    var baar = foo();
+    ep_assert(tc4 + 1 == GetTriggerCounter(), "Fail to elide var copy");
 
     cond.__lshift__(Memory(empty, AtLeast, 1));
     if (cond) { ret += 1 << 3; }

@@ -400,7 +400,7 @@ class CUnit(EPDOffsetMap):
         if not isinstance(epd, CUnit):
             u, p = unProxy(epd), unProxy(ptr)
         else:
-            u, p = epd._epd, epd._ptr
+            u, p = epd._value, epd._ptr
 
         if isinstance(u, int):
             q, r = divmod(u - EPD(0x59CCA8), 84)  # check epd
@@ -464,9 +464,9 @@ class CUnit(EPDOffsetMap):
 
     @property
     def ptr(self) -> int | c.EUDVariable:
-        if isinstance(self._epd, int):
+        if isinstance(self._value, int):
             return cast(int, self._ptr)  # FIXME
-        return _ptr_cache(self._epd)
+        return _ptr_cache(self._value)
 
     @staticmethod
     @c.EUDTypedFunc([None, None, TrgPlayer])
@@ -565,14 +565,14 @@ class CUnit(EPDOffsetMap):
     def check_status_flag(self, value, mask=None) -> c.Condition:
         if mask is None:
             mask = value
-        return c.MemoryXEPD(self._epd + 0x0DC // 4, c.Exactly, value, mask)
+        return c.MemoryXEPD(self._value + 0x0DC // 4, c.Exactly, value, mask)
 
     def set_status_flag(self, value, mask=None) -> None:
         from ..memio import f_maskwrite_epd
 
         if mask is None:
             mask = value
-        f_maskwrite_epd(self._epd + 0x0DC // 4, value, mask)
+        f_maskwrite_epd(self._value + 0x0DC // 4, value, mask)
 
     def clear_status_flag(self, mask) -> None:
         self.set_status_flag(0, mask)
@@ -738,8 +738,8 @@ class CUnit(EPDOffsetMap):
         if IsUnlimiterOn():
             raise EPError(_("Can't detect unit dying with [unlimiter]"))
         return (  # return (self.order == 0, self.sprite >= 1)
-            c.MemoryXEPD(self._epd + 0x4D // 4, c.Exactly, 0, 0xFF00),
-            c.MemoryEPD(self._epd + 0x0C // 4, c.AtLeast, 1),
+            c.MemoryXEPD(self._value + 0x4D // 4, c.Exactly, 0, 0xFF00),
+            c.MemoryEPD(self._value + 0x0C // 4, c.AtLeast, 1),
         )
 
     def is_completed(self) -> c.Condition:
@@ -763,7 +763,7 @@ class CUnit(EPDOffsetMap):
     def setloc(self, location) -> None:
         from ..eudlib.locf.locf import f_setloc_epd
 
-        f_setloc_epd(location, self._epd + 0x28 // 4)
+        f_setloc_epd(location, self._value + 0x28 // 4)
 
     def remove(self) -> None:
         self.userActionFlags = 4

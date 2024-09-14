@@ -14,7 +14,7 @@ from ..localize import _
 
 
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
-    __slots__ = ("_epd",)
+    __slots__ = ()
     _cast: ClassVar[bool] = False
 
     @classmethod
@@ -25,7 +25,6 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         return cls(_from, **kwargs)
 
     def __init__(self, epd: int | c.EUDVariable) -> None:
-        self._epd: int | c.EUDVariable = epd
         if isinstance(epd, c.EUDVariable) and not EPDOffsetMap._cast:
             epd = c.EUDVariable() << epd
         EPDOffsetMap._cast = False

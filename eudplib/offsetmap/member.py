@@ -55,7 +55,7 @@ class StructMember(BaseMember):
 
     def _get_epd(self, instance):
         q, r = divmod(self.offset, 4)
-        return instance._epd + q, r
+        return instance._value + q, r
 
     def __get__(self, instance, owner=None) -> c.EUDVariable | Self:
         from .epdoffsetmap import EPDOffsetMap
