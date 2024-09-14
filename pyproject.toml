@@ -15,9 +15,16 @@ authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},
 ]
+maintainers = [
+     {name = "Armoha", email = "kein0011@naver.com"},
+]
+dependencies = [
+    "typing_extensions"
+]
 description = "eudplib is a package which provides scripting for StarCraft Use Map Setting(UMS) to UMS map and tool developers."
 readme = "README.rst"
 license = {text = "MIT"}
+keywords = ["StarCraft", "EUD", "Trigger"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -52,8 +59,6 @@ include = ["*"]
 
 [[tool.setuptools-rust.ext-modules]]
 target = "eudplib._rust"
-path = "rust/Cargo.toml"
-py-limited-api = false
 rust-version = ">=1.63.0"
 
 [tool.mypy]
