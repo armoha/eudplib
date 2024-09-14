@@ -3,53 +3,56 @@ import gettext
 import locale
 import os
 import sys
-from types import TracebackType as _TracebackType
+from types import TracebackType
 from typing import Any
 
-_lc = os.environ.get("LANG")
-if _lc is None:
-    _lc, _e = locale.getdefaultlocale()
-_lang = None if _lc is None else (_lc,)
+# Determine locale from environment or default
+lc = os.environ.get("LANG")
+if lc is None:
+    lc, _e = locale.getdefaultlocale()
 
-_h = sys.excepthook
-_u = sys.unraisablehook
-_locale_path = os.path.dirname(__file__)
-_t = gettext.translation(
-    "eudplib", _locale_path, languages=_lang, fallback=True
-)
-if not isinstance(_t, gettext.GNUTranslations):
-    _locale_path = os.path.dirname(
-        os.path.dirname(os.path.dirname(_locale_path))
-    )
-    _t = gettext.translation(
-        "eudplib", _locale_path, languages=_lang, fallback=True
-    )
-_gt = _t.gettext
-_ = _gt
+lang = None if lc is None else (lc,)
+
+# Set up locale path and translation
+locale_path = os.path.dirname(__file__)
+t = gettext.translation("eudplib", locale_path, languages=lang, fallback=True)
+if not isinstance(t, gettext.GNUTranslations):
+    # Adjust locale_path if necessary
+    locale_path = os.path.dirname(os.path.dirname(os.path.dirname(locale_path)))
+    t = gettext.translation("eudplib", locale_path, languages=lang, fallback=True)
+
+# Set up gettext function
+_ = t.gettext
+
+# Preserve original hooks
+original_excepthook = sys.excepthook
+original_unraisablehook = sys.unraisablehook
 
 
-def _excepthook(
+def excepthook(
     type_: type[BaseException],
     value: BaseException,
-    traceback: _TracebackType | None,
-) -> Any:
-    # print("# FIXME: excepthook")
+    traceback: TracebackType | None,
+) -> None:
+    # Localize exception messages
     v = list(value.args)
     for i, s in enumerate(v):
-        v[i] = _gt(s)
+        if isinstance(s, str):
+            v[i] = _(s)
     value.args = tuple(v)
-    return _h(type_, value, traceback)
+    original_excepthook(type_, value, traceback)
 
 
-def _unraisablehook(unraisable) -> None:
-    # print("# FIXME: unraisablehook")
-    err_msg = unraisable.err_msg
+def unraisablehook(unraisable: Any) -> None:
+    # Localize unraisable error messages
+    err_msg = unraisable.err_msg or "Exception ignored in"
+    err_msg = _(err_msg)
     obj = unraisable.object
-    if err_msg is None:
-        err_msg = "Exception ignored in"
-    err_msg = _gt(err_msg)
     print(f"{err_msg}: {obj!r}")
 
 
-sys.excepthook = _excepthook
-sys.unraisablehook = _unraisablehook
+# Set custom hooks
+sys.excepthook = excepthook
+sys.unraisablehook = unraisablehook
+
+__all__ = ["_"]
