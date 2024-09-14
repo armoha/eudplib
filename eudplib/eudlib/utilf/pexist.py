@@ -70,7 +70,7 @@ def EUDLoopPlayer(  # noqa: N802
             and (not race or pinfo.racestr == race)
         ):
             plist.append(p)
-    ut.EUDCreateBlock("loopplayerblock", None)
+
     if not plist:
         e = []
         e.append(_("No player met condition for input map settings:"))
@@ -85,6 +85,7 @@ def EUDLoopPlayer(  # noqa: N802
         raise ut.EPError("".join(e))
     start, end = min(plist), max(plist)
 
+    ut.EUDCreateBlock("loopplayerblock", None)
     v = c.EUDVariable()
     v << start
     if cs.EUDWhile()(v <= end):
