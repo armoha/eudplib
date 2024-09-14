@@ -112,8 +112,8 @@ class TrgUnit(ConstType, EPDOffsetMap):
     subUnit = ArrayMember(0x6607C0, Mk.UNIT)
     # subunit2 = ArrayMember(0x660C38, Mk.WORD)
     # subunit2 is unused
-    # infestationUnit is not implemented yet. (different beginning index)
-    # SCBW_DATA(u16*,		InfestedUnitPartial,	unitsDat[3].address);
+    # infestationUnit is not implemented yet (different beginning index)
+    # SCBW_DATA(u16*, InfestedUnitPartial, unitsDat[3].address);
     # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
     # last valid id is UnitId::Special_OvermindCocoon
     constructionGraphic = ArrayMember(0x6610B0, Mk.IMAGE, stride=4)
@@ -132,65 +132,62 @@ class TrgUnit(ConstType, EPDOffsetMap):
     groundWeapon = ArrayMember(0x6636B8, Mk.WEAPON)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
-    """(read-only) Maximum number of hits given to ground targets.
+    """(read-only) Maximum number of hits this unit can deal to ground targets.
 
-    This is the maximum number of hits this unit can deal to a target with its
-    ground weapon. For example, Psi Blades has `damageFactor` = 1 while Zealot has
-    `maxGroundHits` = 2. If you're wondering why we have `damageFactor` and
-    `maxGroundHits`/`maxAirHits`, it's because a hit has a small chance of failing,
-    i.e. a Zealot attack might miss one or two of the Psi Blades attacks. The actual
-    number of attacks is determined by iscript.
+    This attribute represents the maximum number of hits this unit can inflict on a
+    target with its ground weapon. For example, the Psi Blades have a `damageFactor`
+    of 1, while the Zealot has a `maxGroundHits` of 2. The actual number of attacks
+    is determined by the iscript.
 
     유닛이 지상 무기로 대상을 타격할 수 있는 최대 명중 횟수입니다. 예를 들어,
     사이오닉 검의 `damageFactor`는 1이고 질럿의 `maxGroundHits`은 2입니다.
-    `damageFactor`와 `maxGroundHits`/`maxAirHits`가 둘 다 있는 이유는, 적게나마
-    적중이 실패할 확률이 있기 때문입니다. 사이오닉 검 공격이 한두 번 빗나갈 수 있다는
-    의미입니다. 실제 공격 횟수는 iscript에서 결정됩니다.
+    실제 공격 횟수는 iscript에서 결정됩니다.
     """
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
-    """(read-only) Maximum number of hits given to air targets.
+    """(read-only) Maximum number of hits this unit can deal to air targets.
 
-    This is the maximum number of hits this unit can deal to a target with its
-    air weapon. For example, Halo Rockets has `damageFactor` = 2 while Valkyrie has
-    `maxAirHits` = 4. The actual number of attacks is determined by iscript.
+    This attribute represents the maximum number of hits this unit can inflict on a
+    target with its air weapon. For example, Halo Rockets have a `damageFactor` of 2,
+    while the Valkyrie has a `maxAirHits` of 4. The actual number of attacks is
+    determined by the iscript.
 
     유닛이 공중 무기로 대상을 타격할 수 있는 최대 명중 횟수입니다. 예를 들어, 광륜
-    로켓의 `damageFactor`는 2이고 발키리의 `maxAirHits`은 4입니다. 실제 공격 횟수는
-    iscript에서 결정됩니다.
+    로켓의 `damageFactor`는 최대치인 2이고 발키리의 `maxAirHits`은 4입니다. 실제 공격
+    횟수는 iscript에서 결정됩니다.
     """
     ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL)
-    """Flag for unit's eligibility for `Strategic Suicide Missions`.
+    """Flag indicating whether the unit is excluded from Strategic Suicide Missions.
 
-    Disabling `ignoreStrategicSuicideMissions` has no noticeable effect. Enabling it
-    will exclude the unit from `Strategic Suicide Missions`. By default, both
-    `ignoreStrategicSuicideMissions` and `dontBecomeGuard` are turned on or off at
-    the same time.
+    When `ignoreStrategicSuicideMissions` is enabled, the unit will be excluded from
+    Strategic Suicide Missions. Disabling this flag does not have a noticeable effect
+    . By default, `ignoreStrategicSuicideMissions` and `dontBecomeGuard` are either
+    both enabled or both disabled for every unit.
 
-    `ignoreStrategicSuicideMissions`를 꺼도 눈에 띄는 효과는 없습니다. 키면 해당
-    유닛이 `Strategic Suicide Missions`에서 제외됩니다. 기본적으로
-    `ignoreStrategicSuicideMissions`'와 `dontBecomeGuard`는 동시에 켜져 있거나 꺼져
-    있습니다.
+    `ignoreStrategicSuicideMissions`가 활성화되면 해당 유닛이 Strategic Suicide
+    Missions에서 제외됩니다. 이 플래그를 비활성화해도 눈에 띄는 효과는 없습니다.
+    기본적으로 모든 유닛에서 `ignoreStrategicSuicideMissions`와 `dontBecomeGuard`는
+    둘 다 켜져있거나 둘 다 꺼져있습니다.
     """
     dontBecomeGuard = ArrayMember(0x660178, Mk.BIT_1)
-    """Flag for Guard AI and unit's eligibility for `Strategic Suicide Missions`.
+    """Flag to prevent unit from returning to original position when target disappears.
 
-    ## Enabling `dontBecomeGuard` will crash the game, especially if CPU owns unit!
-    ## `dontBecomeGuard`를 키면 특히 컴퓨터가 유닛을 조종할 때 게임이 팅깁니다!
+    Enabling `dontBecomeGuard` can cause game crashes, especially if the CPU controls
+    the unit. This flag prevents the unit from returning to its original position if
+    the target disappears, but does not affect units that already exist. It primarily
+    impacts units with AI ptr type 1 or 4, which are subject to Strategic Suicide
+    Missions. Units with this flag set will only be assigned AI if they have
+    `baseProperty.Worker` (becoming unitAI type 2), or if they have
+    `baseProperty.Building` and are not geysers, or are larva/egg/overlord (becoming
+    unitAI type 3).
 
-    Prevents unit from returning to their original position when the order target
-    disappears. Does not affect already existing units. Basically, if a unit has an
-    AI ptr that is type 1 or 4, it will be picked up for strategic suicide. Units
-    with `dontBecomeGuard` flag set will only be assigned an AI if they have
-    `baseProperty.Worker` (becomes unitAI type 2), or have the `baseProperty.
-    Building` and aren't geysers, or are larva/egg/overlord (becomes unitAI type 3).
-
-    명령 대상이 사라졌을 때 유닛이 원래 위치로 돌아가는 것을 방지합니다. 이미
-    존재하는 유닛에는 영향을 주지 않습니다. 기본적으로 `Strategic Suicide Missions`는
-    유닛의 AI ptr이 타입 1 또는 타입 3인 유닛에 실행됩니다. `dontBecomeGuard`가
-    설정된 유닛에 AI가 할당되는 경우: 유닛에 `baseProperty.Worker` 속성이 있거나
-    (유닛 AI 타입 2가 됨), `baseProperty.Building`이 있고 베스핀 간헐천이 아니거나,
-    유닛 종류가 라바/에그/오버로드인 경우 (유닛AI 타입 3이 됨).
-    """
+    `dontBecomeGuard`를 활성화하면 특히 CPU가 유닛을 제어할 때 게임이 크래시할 수
+    있습니다. 이 플래그는 명령 대상이 사라졌을 때 유닛이 원래 위치로 돌아가는 것을
+    방지합니다. 이미 존재하는 유닛에는 영향을 주지 않습니다. 이 플래그는 주로 AI ptr
+    타입 1 또는 4가 있는 유닛에 영향을 미치며, 이러한 유닛은 Strategic Suicide
+    Missions에 대상이 됩니다. 이 플래그가 설정된 유닛은 `baseProperty.Worker`가
+    있거나 (유닛 AI 타입 2가 됨), `baseProperty.Building`이 있고 베스핀 간헐천이
+    아니거나, 라바/에그/오버로드인 경우 (유닛AI 타입 3이 됨) AI가 할당됩니다.
+    """  # noqa: E501
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
