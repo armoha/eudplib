@@ -242,7 +242,9 @@ class TBL:
                 if i in unitdict:
                     if unit_name_encoding:
                         try:
-                            string = (string.decode(unit_name_encoding)).encode("utf-8")
+                            string = (string.decode(unit_name_encoding)).encode(
+                                "utf-8"
+                            )
                         except UnicodeDecodeError:
                             pass
                     unitmap.add_item(string, unitdict[i])
@@ -261,7 +263,9 @@ class TBL:
         self._loaded = True
 
     def AddString(self, string: str | bytes) -> int:  # noqa: N802
-        ut.ep_assert(not self._finalized, _("Can't add new string after finalization"))
+        ut.ep_assert(
+            not self._finalized, _("Can't add new string after finalization")
+        )
         # Starcraft: Remastered uses both utf-8 and multibyte encoding.
         if isinstance(string, str):
             try:
@@ -375,7 +379,9 @@ class TBL:
         return self._tbldata, self._stroffset
 
     def ForceAddString(self, string: str | bytes) -> int:  # noqa: N802
-        ut.ep_assert(not self._finalized, _("Can't add new string after finalization"))
+        ut.ep_assert(
+            not self._finalized, _("Can't add new string after finalization")
+        )
         string = ut.u2b(string)  # Starcraft uses multibyte encoding.
         if not isinstance(string, bytes):
             raise ut.EPError(_("Invalid type for string"))

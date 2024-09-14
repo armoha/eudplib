@@ -6,4 +6,6 @@
 
 from collections.abc import Iterator
 
-def generate_linetable(data: bytes, linetable: bytes, positions: Iterator) -> bytes: ...
+def generate_linetable(
+    data: bytes, linetable: bytes, positions: Iterator
+) -> bytes: ...

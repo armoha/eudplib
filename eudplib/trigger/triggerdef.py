@@ -12,7 +12,9 @@ from eudplib.localize import _
 from .. import core as c
 from .tpatcher import patch_action, patch_condition
 
-Conditions = c.Condition | bool | Iterable[c.Condition | bool | Iterable | None] | None
+Conditions = (
+    c.Condition | bool | Iterable[c.Condition | bool | Iterable | None] | None
+)
 Actions = c.Action | Iterable[c.Action | Iterable | None] | None
 
 

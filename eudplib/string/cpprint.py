@@ -291,7 +291,9 @@ def _eprint_init():
         _eprintln_print << c.RawTrigger(
             nextptr=0, actions=c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))
         )
-        _eprintln_eos << c.RawTrigger(actions=c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
+        _eprintln_eos << c.RawTrigger(
+            actions=c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0)
+        )
         f_setcurpl(prevcp)
     cs.EUDEndIf()
     _eprintln_end << c.RawTrigger(nextptr=0)

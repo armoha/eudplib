@@ -164,10 +164,14 @@ class NotImplementedMember(BaseMember):
         if instance is None:
             return self
         raise ut.EPError(
-            _("{} is not implemented for {}").format(self.__name__, self.__objclass__)
+            _("{} is not implemented for {}").format(
+                self.__name__, self.__objclass__
+            )
         )
 
     def __set__(self, instance, value) -> NoReturn:
         raise ut.EPError(
-            _("{} is not implemented for {}").format(self.__name__, self.__objclass__)
+            _("{} is not implemented for {}").format(
+                self.__name__, self.__objclass__
+            )
         )

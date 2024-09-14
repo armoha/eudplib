@@ -107,7 +107,9 @@ def f_wsubtract_epd(epd, subp, w):
         if subp == 3:
             return _wsubtracter(epd, subp, w)
         cs.DoActions(
-            c.SetDeathsX(epd, c.Subtract, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp))
+            c.SetDeathsX(
+                epd, c.Subtract, _lshift(w, 8 * subp), 0, 0xFFFF << (8 * subp)
+            )
         )
     else:
         _wsubtracter(epd, subp, w)
@@ -236,7 +238,9 @@ def _bsubtracter(epd, subp, b):
 def f_bsubtract_epd(epd, subp, b):
     if isinstance(subp, int) and isinstance(b, int):
         cs.DoActions(
-            c.SetDeathsX(epd, c.Subtract, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp))
+            c.SetDeathsX(
+                epd, c.Subtract, _lshift(b, 8 * subp), 0, 0xFF << (8 * subp)
+            )
         )
     else:
         _bsubtracter(epd, subp, b)
@@ -274,7 +278,9 @@ def _wread_epd(epd, subp):
 
 def f_wread_epd(epd, subp, *, ret=None):
     if isinstance(subp, int) and 0 <= subp <= 2:
-        return iotable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))(epd, ret=ret)
+        return iotable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))(
+            epd, ret=ret
+        )
 
     return _wread_epd(epd, subp, ret=ret)
 

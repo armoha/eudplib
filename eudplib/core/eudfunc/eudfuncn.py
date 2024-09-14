@@ -180,7 +180,8 @@ class EUDFuncN:
         ret = ut.FlattenList(ret)
         ut.ep_assert(
             len(ret) == self._retn,
-            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
+            _("Return number mismatch : ")
+            + "len(%s) != %d" % (repr(ret), self._retn),
         )
         next_ptr_assignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -189,7 +190,9 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                next_ptr_assignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
+                next_ptr_assignment.append(
+                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
+                )
 
         ev.SeqCompute(next_ptr_assignment)
         bt.SetNextTrigger(self._fstart)
@@ -223,7 +226,8 @@ class EUDFuncN:
         ret = ut.FlattenList(ret)
         ut.ep_assert(
             len(ret) == self._retn,
-            _("Return number mismatch : ") + "len(%s) != %d" % (repr(ret), self._retn),
+            _("Return number mismatch : ")
+            + "len(%s) != %d" % (repr(ret), self._retn),
         )
         next_ptr_assignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -232,7 +236,9 @@ class EUDFuncN:
                     retv = ut.EPD(retv.getValueAddr())
                 except AttributeError:
                     pass
-                next_ptr_assignment.append((ut.EPD(fret.getDestAddr()), bt.SetTo, retv))
+                next_ptr_assignment.append(
+                    (ut.EPD(fret.getDestAddr()), bt.SetTo, retv)
+                )
         var_assigns, const_assigns = list(), list()
         for farg, arg in zip(self._fargs, args):
             if ev.IsEUDVariable(arg):

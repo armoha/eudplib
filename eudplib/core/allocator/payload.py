@@ -161,7 +161,9 @@ def _collect_objects(root: "EUDObject | Forward") -> None:
         rootobj = next(iterobj)
         found_objects = _rand_lst(iterobj)
         found_objects.append(rootobj)
-        _found_objects_dict = {obj: i for i, obj in enumerate(reversed(found_objects))}
+        _found_objects_dict = {
+            obj: i for i, obj in enumerate(reversed(found_objects))
+        }
 
     # cleanup
     phase = 0

@@ -43,7 +43,9 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
                 epd.AddDest(16),
                 x.AddDest(16),
                 c.SetNextPtr(x.GetVTable(), settb),
-                c.SetMemory(x._varact + 24, c.Subtract, 0x02000000) if signed else [],
+                c.SetMemory(x._varact + 24, c.Subtract, 0x02000000)
+                if signed
+                else [],
             ],
         )
         settb << c.NextTrigger()
@@ -69,7 +71,9 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
                 epd.AddDest(16),
                 y.AddDest(16),
                 c.SetNextPtr(y.GetVTable(), setcoords),
-                c.SetMemory(y._varact + 24, c.Subtract, 0x02000000) if signed else [],
+                c.SetMemory(y._varact + 24, c.Subtract, 0x02000000)
+                if signed
+                else [],
             ],
         )
         setcoords << c.NextTrigger()

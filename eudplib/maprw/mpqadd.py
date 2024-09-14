@@ -64,7 +64,9 @@ def MPQAddFile(  # noqa: N802
     """
 
     ut.ep_assert(
-        isinstance(content, bytes) or isinstance(content, bytearray) or content is None,
+        isinstance(content, bytes)
+        or isinstance(content, bytearray)
+        or content is None,
         _("Invalid content type"),
     )
 

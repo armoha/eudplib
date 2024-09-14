@@ -42,7 +42,9 @@ def EUDLoopList(  # noqa: N802
     f_dwepdread_epd(epd, ret=[ptr, epd])
     cs.EUDEndWhile()
 
-    ut.ep_assert(ut.EUDPopBlock(blockname)[1] is header_offset, _("listloop mismatch"))
+    ut.ep_assert(
+        ut.EUDPopBlock(blockname)[1] is header_offset, _("listloop mismatch")
+    )
 
 
 def EUDLoopUnit() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N802

@@ -100,7 +100,9 @@ def _get(bitmask: int, shift: int) -> Callable | None:
     return None
 
 
-def _insert_or_get(bitmask: int, shift: int, ordering: str | None = None) -> Callable:
+def _insert_or_get(
+    bitmask: int, shift: int, ordering: str | None = None
+) -> Callable:
     readfn = _get(bitmask, shift)
     if readfn is None:
         return _insert(bitmask, shift, ordering)

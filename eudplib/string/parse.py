@@ -193,7 +193,9 @@ class _EUDParser(EUDByteReader):
 
             # [\da-zA-Z]+
             fin = c.Forward()
-            is_alphanumeric << c.RawTrigger(actions=c.SetNextPtr(fin, block["loopend"]))
+            is_alphanumeric << c.RawTrigger(
+                actions=c.SetNextPtr(fin, block["loopend"])
+            )
             c.RawTrigger(
                 conditions=[b >= ord("0"), b <= ord("9")],
                 actions=[
@@ -224,7 +226,9 @@ class _EUDParser(EUDByteReader):
             c.RawTrigger(
                 conditions=digits.AtLeastX(1, 1 << 30), actions=digits.AddNumber(-1)
             )
-            if cs.EUDIf()([number == cutoff, digits.AtLeastX(cutlim, (1 << 31) - 1)]):
+            if cs.EUDIf()(
+                [number == cutoff, digits.AtLeastX(cutlim, (1 << 31) - 1)]
+            ):
                 cs.DoActions(digits.SetNumberX(1 << 30, 1 << 30))
             if cs.EUDElse()():
                 cutoff += 1

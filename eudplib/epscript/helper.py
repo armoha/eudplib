@@ -54,7 +54,9 @@ def _RELIMP(path, mod_name, _cache={}):  # relative path import  # noqa: N802
         return _cache[abs_path]
 
     def py_module(mod_name, p):
-        spec = importlib.util.spec_from_file_location(mod_name, p / (mod_name + ".py"))
+        spec = importlib.util.spec_from_file_location(
+            mod_name, p / (mod_name + ".py")
+        )
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return module
@@ -273,7 +275,9 @@ class _ARRW:  # array write
 
     def __lshift__(self, r):
         isUnproxyInstance
-        if not IsEUDVariable(self.obj) and not isUnproxyInstance(self.obj, ConstExpr):
+        if not IsEUDVariable(self.obj) and not isUnproxyInstance(
+            self.obj, ConstExpr
+        ):
             # maybe Python collections
             ov = self.obj[self.index]
             if IsEUDVariable(ov):

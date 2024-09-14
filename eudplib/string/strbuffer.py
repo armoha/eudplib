@@ -99,7 +99,9 @@ class StringBuffer(c.EUDStruct):
 
         :type content: str, bytes, int
         """
-        if _from is None or (isinstance(_from, StringBuffer) and c.IsConstExpr(_from)):
+        if _from is None or (
+            isinstance(_from, StringBuffer) and c.IsConstExpr(_from)
+        ):
             if _from is None:
                 if content is None:
                     content = "\r" * 218

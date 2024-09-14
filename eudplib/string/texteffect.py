@@ -494,7 +494,9 @@ def TextFX_FadeOut(  # noqa: N802
                 start.SetDest(ut.EPD(0x6509B0)),
             ],
         )
-        f_setcurpl2cpcache([], c.SetDeathsX(CurrentPlayer, c.SetTo, color[-1], 0, 0xFF))
+        f_setcurpl2cpcache(
+            [], c.SetDeathsX(CurrentPlayer, c.SetTo, color[-1], 0, 0xFF)
+        )
         skip << c.NextTrigger()
     else:
         c.RawTrigger(conditions=ret.Exactly(1), actions=counter.AddNumber(1))

@@ -899,7 +899,9 @@ def SetVariables(srclist, dstlist, mdtlist=None) -> None:  # noqa: N802
         raise errlist[0]
     elif errlist:
         if sys.version_info >= (3, 11):
-            raise ExceptionGroup(_("Multiple error occurred on SetVariables:"), errlist)
+            raise ExceptionGroup(
+                _("Multiple error occurred on SetVariables:"), errlist
+            )
         else:
             raise EPError(_("Multiple error occurred on SetVariables:"), errlist)
 

@@ -16,7 +16,9 @@ def b2i2(b: Sequence[int], index: int = 0) -> int:
 
 
 def b2i4(b: Sequence[int], index: int = 0) -> int:
-    return b[index] | (b[index + 1] << 8) | (b[index + 2] << 16) | (b[index + 3] << 24)
+    return (
+        b[index] | (b[index + 1] << 8) | (b[index + 2] << 16) | (b[index + 3] << 24)
+    )
 
 
 def i2b1(i: int) -> bytes:

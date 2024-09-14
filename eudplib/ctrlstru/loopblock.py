@@ -71,7 +71,9 @@ def EUDEndLoopN() -> None:  # noqa: N802
         block["contpoint"] << c.NextTrigger()
 
     vardb = block["vardb"]
-    c.RawTrigger(nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1))
+    c.RawTrigger(
+        nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1)
+    )
     block["loopend"] << c.NextTrigger()
 
 

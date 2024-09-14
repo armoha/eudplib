@@ -80,7 +80,9 @@ class EUDXTypedFuncN(EUDTypedFuncN):
     def __init__(
         self, argn, callerfunc, bodyfunc, argtypes, rettypes, argmasks, *, traced
     ):
-        super().__init__(argn, callerfunc, bodyfunc, argtypes, rettypes, traced=traced)
+        super().__init__(
+            argn, callerfunc, bodyfunc, argtypes, rettypes, traced=traced
+        )
         self._argmasks = argmasks
 
     def _create_func_args(self):

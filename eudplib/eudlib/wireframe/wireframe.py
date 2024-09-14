@@ -213,7 +213,9 @@ def SetTranWire(unit, wireframe):  # noqa: N802
 @c.EUDTypedFunc([TrgUnit, TrgUnit])
 def SetGrpWire(unit, wireframe):  # noqa: N802
     InitialWireframe.init()
-    _set_wireframe(unit, wireframe, 130, grpwire, grpwire_default32, grpwire_default64)
+    _set_wireframe(
+        unit, wireframe, 130, grpwire, grpwire_default32, grpwire_default64
+    )
 
 
 @c.EUDTypedFunc([TrgUnit, TrgUnit])
