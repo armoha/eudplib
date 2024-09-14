@@ -74,11 +74,11 @@ def EUDLoopPlayer(  # noqa: N802
     if not plist:
         e = []
         e.append(_("No player met condition for input map settings:"))
-        if ptype:
-            e.append(_(" type {}").format(ptype))
-        if force:
+        if ptype is not None:
+            e.append(_(" ptype {}").format(ptype))
+        if force is not None:
             e.append(_(" force {}").format(force))
-        if race:
+        if race is not None:
             e.append(_(" race {}").format(race))
         e.append("\n")
         e.append(_("Check out whether Start Locations are placed correctly."))
