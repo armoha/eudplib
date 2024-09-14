@@ -19,7 +19,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     @classmethod
     def cast(cls, _from, **kwargs):
-        if type(_from) == cls:
+        if type(_from) is cls:
             return _from
         EPDOffsetMap._cast = True
         return cls(_from, **kwargs)

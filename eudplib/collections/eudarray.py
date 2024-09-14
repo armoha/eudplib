@@ -117,7 +117,7 @@ class EUDArray(ut.ExprProxy):
                 ),
             )
         # lazy calculate self._epd
-        if type(self._epd) == c.Forward:
+        if type(self._epd) is c.Forward:
             if c.PushTriggerScope():
                 nptr = self._epd.expr
                 self._epd.Reset()

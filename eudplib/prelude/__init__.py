@@ -118,7 +118,9 @@ from ..collections import (
     EUDArray, EUDDeque, EUDQueue, EUDStack,
     PVariable, UnitGroup
 )
-from ..offsetmap.cunit import CUnit, EUDLoopCUnit, EUDLoopNewCUnit, EUDLoopPlayerCUnit
+from ..offsetmap.cunit import (
+    CUnit, EUDLoopCUnit, EUDLoopNewCUnit, EUDLoopPlayerCUnit
+)
 from ..offsetmap.image import Image
 from ..offsetmap.unit import TrgUnit
 from ..offsetmap.weapon import Weapon
