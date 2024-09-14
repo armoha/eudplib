@@ -659,19 +659,9 @@ def IsEUDVariable(x: object) -> TypeGuard[EUDVariable]:  # noqa: N802
 # ---------
 
 
-@overload
-def VProc(v: EUDVariable, actions) -> bt.RawTrigger:
-    ...
-
-
-@overload
-def VProc(
-    v: Sequence[EUDVariable], actions
+def VProc(  # noqa: N802
+    v: EUDVariable | Sequence[EUDVariable], actions
 ) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
-    ...
-
-
-def VProc(v, actions) -> bt.RawTrigger | Sequence[bt.RawTrigger]:  # noqa: N802
     v = FlattenList(v)
     actions = FlattenList(actions)
     end = Forward()
