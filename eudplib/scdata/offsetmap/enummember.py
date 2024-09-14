@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Final, Self
 
-from .. import core as c
-from .. import ctrlstru as cs
-from ..utils import EPD, ExprProxy, ep_assert
+from ... import core as c
+from ... import ctrlstru as cs
+from ...utils import EPD, ExprProxy, ep_assert
 from .member import BaseMember
 from .memberkind import MemberKind
 
@@ -226,7 +226,7 @@ class Flag:
         if instance is None:
             return self
         if isinstance(instance, StructEnumMember):
-            from ..trigger import Trigger
+            from ...trigger import Trigger
 
             epd, subp = instance._get_epd()
             mask = self.mask << (8 * subp)
@@ -250,7 +250,7 @@ class Flag:
         raise AttributeError
 
     def __set__(self, instance, value) -> None:
-        from ..memio import f_maskwrite_epd
+        from ...memio import f_maskwrite_epd
 
         if isinstance(instance, StructEnumMember):
             epd, subp = instance._get_epd()

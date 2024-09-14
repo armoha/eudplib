@@ -19,6 +19,7 @@ from ...memio import (
     f_setcurpl2cpcache,
 )
 from ...memio import modcurpl as cp
+from ...scdata import CUnit
 from ...utils import EPD
 from .unlimiterflag import IsUnlimiterOn
 
@@ -225,3 +226,21 @@ def EUDLoopSprite() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N
     cs.EUDEndWhile()
 
     ut.EUDPopBlock("spriteloop")
+
+
+def EUDLoopNewCUnit(allowance: int = 2) -> Iterator[CUnit]:  # noqa: N802
+    for ptr, epd in EUDLoopNewUnit(allowance):
+        yield CUnit(epd, ptr=ptr)
+
+
+def EUDLoopCUnit() -> Iterator[CUnit]:  # noqa: N802
+    """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
+    1700개 유닛을 도는 방식으로 작동합니다.
+    """
+    for ptr, epd in EUDLoopUnit2():
+        yield CUnit(epd, ptr=ptr)
+
+
+def EUDLoopPlayerCUnit(player) -> Iterator[CUnit]:  # noqa: N802
+    for ptr, epd in EUDLoopPlayerUnit(player):
+        yield CUnit(epd, ptr=ptr)

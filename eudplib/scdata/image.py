@@ -10,9 +10,8 @@ from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeImage
 from ..localize import _
-from .epdoffsetmap import EPDOffsetMap
-from .member import ArrayMember
-from .memberkind import MemberKind as Mk
+from .offsetmap import ArrayMember, EPDOffsetMap
+from .offsetmap import MemberKind as Mk
 
 
 class Image(ConstType, EPDOffsetMap):

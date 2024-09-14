@@ -118,18 +118,10 @@ from ..collections import (
     EUDArray, EUDDeque, EUDQueue, EUDStack,
     PVariable, UnitGroup
 )
-from ..scdata.cunit import (
-    CUnit, EUDLoopCUnit, EUDLoopNewCUnit, EUDLoopPlayerCUnit
-)
-from ..scdata.image import Image
-from ..scdata.unit import TrgUnit
-from ..scdata.weapon import Weapon
-from ..scdata.scdata import (
-    Flingy,
-    Sprite,
-    Tech,
-    UnitOrder,
-    Upgrade,
+from ..scdata import (
+    TrgUnit, Weapon, UnitOrder, CUnit,
+    Flingy, Sprite, Image,
+    Upgrade, Tech,
     TrgPlayer,
     P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12,
     Force1, Force2, Force3, Force4, AllPlayers, CurrentPlayer,
@@ -144,6 +136,9 @@ from ..eudlib.mathf.lengthdir import f_lengthdir, f_lengthdir_256
 from ..eudlib.mathf.pow import f_pow
 from ..eudlib.mathf.sqrt import f_sqrt
 from ..eudlib.utilf.binsearch import EUDBinaryMax, EUDBinaryMin
+from ..eudlib.utilf.listloop import (
+    EUDLoopCUnit, EUDLoopNewCUnit, EUDLoopPlayerCUnit,
+)
 from ..eudlib.utilf.pexist import EUDLoopPlayer, f_playerexist
 from ..eudlib.utilf.random import f_dwrand, f_getseed, f_rand, f_randomize, f_srand
 from ..eudlib.utilf.userpl import (

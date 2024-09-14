@@ -10,10 +10,14 @@ from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeUnit
 from ..localize import _
-from .enummember import ArrayEnumMember, Flag
-from .epdoffsetmap import EPDOffsetMap
-from .member import ArrayMember, NotImplementedMember
-from .memberkind import MemberKind as Mk
+from .offsetmap import (
+    ArrayEnumMember,
+    ArrayMember,
+    EPDOffsetMap,
+    Flag,
+    NotImplementedMember,
+)
+from .offsetmap import MemberKind as Mk
 
 
 # FIXME: integrate with CUnit MovementFlags

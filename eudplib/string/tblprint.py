@@ -19,7 +19,7 @@ from ..memio import (
     f_setcurpl,
     f_wread_epd,
 )
-from ..scdata.scdata import CurrentPlayer
+from ..scdata import CurrentPlayer
 from .cpprint import f_cpstr_print
 from .eudprint import f_dbstr_print
 from .fmtprint import f_sprintf

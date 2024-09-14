@@ -7,7 +7,7 @@
 
 from typing import Literal
 
-from ..core import (
+from ...core import (
     EncodeIcon,
     EncodeIscript,
     EncodePortrait,
@@ -15,9 +15,9 @@ from ..core import (
     EncodeTBL,
     EUDVariable,
 )
-from ..core.rawtrigger.strdict import DefRankDict, DefSfxDataDict
-from ..core.rawtrigger.strenc import _EncodeAny
-from ..utils import unProxy
+from ...core.rawtrigger.strdict import DefRankDict, DefSfxDataDict
+from ...core.rawtrigger.strenc import _EncodeAny
+from ...utils import unProxy
 
 # from .. import utils as ut
 from .memberkind import BaseKind
@@ -32,25 +32,25 @@ class ByteKind(BaseKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio import f_bread_epd
+        from ...memio import f_bread_epd
 
         return f_bread_epd(epd, subp)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_bwrite_epd
+        from ...memio import f_bwrite_epd
 
         f_bwrite_epd(epd, subp, value)
 
     @classmethod
     def add_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_badd_epd
+        from ...memio import f_badd_epd
 
         f_badd_epd(epd, subp, value)
 
     @classmethod
     def subtract_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_bsubtract_epd
+        from ...memio import f_bsubtract_epd
 
         f_bsubtract_epd(epd, subp, value)
 
@@ -60,13 +60,13 @@ class Bit0Kind(ByteKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio.bwepdio import _bitread_epd
+        from ...memio.bwepdio import _bitread_epd
 
         return _bitread_epd(0x01)(epd, subp)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
-        from ..memio.bwepdio import _bitwrite_epd
+        from ...memio.bwepdio import _bitwrite_epd
 
         _bitwrite_epd(epd, subp, 0x01, value)
 
@@ -84,13 +84,13 @@ class Bit1Kind(ByteKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio.bwepdio import _bitread_epd
+        from ...memio.bwepdio import _bitread_epd
 
         return _bitread_epd(0x02)(epd, subp)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
-        from ..memio.bwepdio import _bitwrite_epd
+        from ...memio.bwepdio import _bitwrite_epd
 
         _bitwrite_epd(epd, subp, 0x02, value)
 
@@ -108,13 +108,13 @@ class PlayerKind(ByteKind):
 
     @classmethod
     def cast(cls, other):
-        from .scdata import TrgPlayer
+        from ..player import TrgPlayer
 
         return TrgPlayer.cast(other)
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio.specialized import _playerread_epd
+        from ...memio.specialized import _playerread_epd
 
         return _playerread_epd()[subp](epd)
 
@@ -124,7 +124,7 @@ class WeaponKind(ByteKind):
 
     @classmethod
     def cast(cls, other):
-        from .weapon import Weapon
+        from ..weapon import Weapon
 
         return Weapon.cast(other)
 
@@ -134,7 +134,7 @@ class UnitOrderKind(ByteKind):
 
     @classmethod
     def cast(cls, other):
-        from .scdata import UnitOrder
+        from ..unitorder import UnitOrder
 
         return UnitOrder.cast(other)
 
@@ -144,7 +144,7 @@ class UpgradeKind(ByteKind):
 
     @classmethod
     def cast(cls, other):
-        from .scdata import Upgrade
+        from ..upgrade import Upgrade
 
         return Upgrade.cast(other)
 
@@ -154,7 +154,7 @@ class TechKind(ByteKind):
 
     @classmethod
     def cast(cls, other):
-        from .scdata import Tech
+        from ..tech import Tech
 
         return Tech.cast(other)
 
@@ -418,25 +418,25 @@ class WordKind(BaseKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio import f_wread_epd
+        from ...memio import f_wread_epd
 
         return f_wread_epd(epd, subp)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_wwrite_epd
+        from ...memio import f_wwrite_epd
 
         f_wwrite_epd(epd, subp, value)
 
     @classmethod
     def add_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_wadd_epd
+        from ...memio import f_wadd_epd
 
         f_wadd_epd(epd, subp, value)
 
     @classmethod
     def subtract_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_wsubtract_epd
+        from ...memio import f_wsubtract_epd
 
         f_wsubtract_epd(epd, subp, value)
 
@@ -446,7 +446,7 @@ class PositionXKind(WordKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio.specialized import _mapxread_epd
+        from ...memio.specialized import _mapxread_epd
 
         return _mapxread_epd()[subp // 2](epd)
 
@@ -456,7 +456,7 @@ class PositionYKind(WordKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio.specialized import _mapyread_epd
+        from ...memio.specialized import _mapyread_epd
 
         return _mapyread_epd()[subp // 2](epd)
 
@@ -466,13 +466,13 @@ class UnitKind(WordKind):
 
     @classmethod
     def cast(cls, other):
-        from .unit import TrgUnit
+        from ..unit import TrgUnit
 
         return TrgUnit.cast(other)
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio import f_bread_epd
+        from ...memio import f_bread_epd
 
         return f_bread_epd(epd, subp)
 
@@ -482,7 +482,7 @@ class FlingyKind(ByteKind):  # size of Flingy is byte in units.dat / word in CUn
 
     @classmethod
     def cast(cls, other):
-        from .scdata import Flingy
+        from ..flingy import Flingy
 
         return Flingy.cast(other)
 
@@ -492,7 +492,7 @@ class SpriteKind(WordKind):
 
     @classmethod
     def cast(cls, other):
-        from .scdata import Sprite
+        from ..sprite import Sprite
 
         return Sprite.cast(other)
 
@@ -502,7 +502,7 @@ class ImageKind(WordKind):
 
     @classmethod
     def cast(cls, other):
-        from .image import Image
+        from ..image import Image
 
         return Image.cast(other)
 
@@ -577,25 +577,25 @@ class DwordKind(BaseKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio import f_dwread_epd
+        from ...memio import f_dwread_epd
 
         return f_dwread_epd(epd)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_dwwrite_epd
+        from ...memio import f_dwwrite_epd
 
         f_dwwrite_epd(epd, value)
 
     @classmethod
     def add_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_dwadd_epd
+        from ...memio import f_dwadd_epd
 
         f_dwadd_epd(epd, value)
 
     @classmethod
     def subtract_epd(cls, epd, subp, value) -> None:
-        from ..memio import f_dwsubtract_epd
+        from ...memio import f_dwsubtract_epd
 
         f_dwsubtract_epd(epd, value)
 
@@ -605,8 +605,8 @@ class PositionKind(DwordKind):
 
     @classmethod
     def read_epd(cls, epd, subp) -> EUDVariable:
-        from ..memio import f_maskread_epd
-        from ..memio.specialized import _map_xy_mask
+        from ...memio import f_maskread_epd
+        from ...memio.specialized import _map_xy_mask
 
         return f_maskread_epd(epd, (lambda x, y: x + 65536 * y)(*_map_xy_mask()))
 
@@ -616,7 +616,7 @@ class CUnitKind(DwordKind):
 
     @classmethod
     def read_epd(cls, epd, subp):
-        from .cunit import CUnit
+        from ..cunit import CUnit
 
         return CUnit.from_read(epd)
 
@@ -626,7 +626,7 @@ class CSpriteKind(DwordKind):
 
     @classmethod
     def read_epd(cls, epd, subp):
-        from .csprite import CSprite
+        from ..csprite import CSprite
 
         return CSprite.from_read(epd)
 

@@ -73,43 +73,43 @@ from ..core.rawtrigger.strenc import (
     EncodeSwitch,
     EncodeUnit,
 )
-from ..scdata.scdata import P1 as P1
-from ..scdata.scdata import P2 as P2
-from ..scdata.scdata import P3 as P3
-from ..scdata.scdata import P4 as P4
-from ..scdata.scdata import P5 as P5
-from ..scdata.scdata import P6 as P6
-from ..scdata.scdata import P7 as P7
-from ..scdata.scdata import P8 as P8
-from ..scdata.scdata import P9 as P9
-from ..scdata.scdata import P10 as P10
-from ..scdata.scdata import P11 as P11
-from ..scdata.scdata import P12 as P12
-from ..scdata.scdata import Allies as Allies
-from ..scdata.scdata import AllPlayers as AllPlayers
-from ..scdata.scdata import CurrentPlayer as CurrentPlayer
-from ..scdata.scdata import Foes as Foes
-from ..scdata.scdata import Force1 as Force1
-from ..scdata.scdata import Force2 as Force2
-from ..scdata.scdata import Force3 as Force3
-from ..scdata.scdata import Force4 as Force4
-from ..scdata.scdata import NeutralPlayers as NeutralPlayers
-from ..scdata.scdata import (
+from ..scdata.player import P1 as P1
+from ..scdata.player import P2 as P2
+from ..scdata.player import P3 as P3
+from ..scdata.player import P4 as P4
+from ..scdata.player import P5 as P5
+from ..scdata.player import P6 as P6
+from ..scdata.player import P7 as P7
+from ..scdata.player import P8 as P8
+from ..scdata.player import P9 as P9
+from ..scdata.player import P10 as P10
+from ..scdata.player import P11 as P11
+from ..scdata.player import P12 as P12
+from ..scdata.player import Allies as Allies
+from ..scdata.player import AllPlayers as AllPlayers
+from ..scdata.player import CurrentPlayer as CurrentPlayer
+from ..scdata.player import Foes as Foes
+from ..scdata.player import Force1 as Force1
+from ..scdata.player import Force2 as Force2
+from ..scdata.player import Force3 as Force3
+from ..scdata.player import Force4 as Force4
+from ..scdata.player import NeutralPlayers as NeutralPlayers
+from ..scdata.player import (
     NonAlliedVictoryPlayers as NonAlliedVictoryPlayers,
 )
-from ..scdata.scdata import Player1 as Player1
-from ..scdata.scdata import Player2 as Player2
-from ..scdata.scdata import Player3 as Player3
-from ..scdata.scdata import Player4 as Player4
-from ..scdata.scdata import Player5 as Player5
-from ..scdata.scdata import Player6 as Player6
-from ..scdata.scdata import Player7 as Player7
-from ..scdata.scdata import Player8 as Player8
-from ..scdata.scdata import Player9 as Player9
-from ..scdata.scdata import Player10 as Player10
-from ..scdata.scdata import Player11 as Player11
-from ..scdata.scdata import Player12 as Player12
-from ..scdata.scdata import TrgPlayer
+from ..scdata.player import Player1 as Player1
+from ..scdata.player import Player2 as Player2
+from ..scdata.player import Player3 as Player3
+from ..scdata.player import Player4 as Player4
+from ..scdata.player import Player5 as Player5
+from ..scdata.player import Player6 as Player6
+from ..scdata.player import Player7 as Player7
+from ..scdata.player import Player8 as Player8
+from ..scdata.player import Player9 as Player9
+from ..scdata.player import Player10 as Player10
+from ..scdata.player import Player11 as Player11
+from ..scdata.player import Player12 as Player12
+from ..scdata.player import TrgPlayer
 from ..utils import EPD, FlattenList, ep_assert
 
 """

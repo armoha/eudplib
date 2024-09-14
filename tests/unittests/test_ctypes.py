@@ -1,5 +1,5 @@
 from helper import *
-from eudplib.scdata import EPDOffsetMap, StructMember, MemberKind
+from eudplib.scdata.offsetmap import EPDOffsetMap, StructMember, MemberKind
 
 
 class T(EPDOffsetMap):

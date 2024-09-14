@@ -12,7 +12,7 @@ from eudplib import ctrlstru as cs
 from eudplib import utils as ut
 
 from ...memio import f_bread_epd, f_dwread_epd
-from ...scdata.scdata import TrgPlayer
+from ...scdata import TrgPlayer
 
 _userp: TrgPlayer = TrgPlayer.cast(c.EUDVariable())
 _userp_fws: set[tuple] = set()

@@ -21,7 +21,7 @@ from ..memio import (
     f_setcurpl,
     f_wread_epd,
 )
-from ..scdata.scdata import CurrentPlayer, TrgPlayer
+from ..scdata import CurrentPlayer, TrgPlayer
 from ..trigger import Trigger
 from .cpprint import f_cpstr_print
 from .eudprint import epd2s, f_dbstr_print, ptr2s

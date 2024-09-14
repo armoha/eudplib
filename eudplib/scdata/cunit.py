@@ -6,21 +6,24 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
-from collections.abc import Iterator
 from typing import Self, cast
 
 from .. import core as c
 from .. import ctrlstru as cs
 from ..core.eudfunc.eudf import _EUDPredefineReturn
-from ..eudlib.utilf.listloop import EUDLoopNewUnit, EUDLoopPlayerUnit, EUDLoopUnit2
 from ..localize import _
 from ..utils import EPD, EPError, unProxy
 from .csprite import int_or_var
-from .enummember import Flag, StructEnumMember
-from .epdoffsetmap import EPDOffsetMap, _epd_cache, _ptr_cache
-from .member import StructMember, UnsupportedMember
-from .memberkind import MemberKind as Mk
-from .scdata import CurrentPlayer, TrgPlayer
+from .offsetmap import (
+    EPDOffsetMap,
+    Flag,
+    StructEnumMember,
+    StructMember,
+    UnsupportedMember,
+)
+from .offsetmap import MemberKind as Mk
+from .offsetmap.epdoffsetmap import _epd_cache, _ptr_cache
+from .player import CurrentPlayer, TrgPlayer
 from .unit import TrgUnit
 
 
@@ -771,21 +774,3 @@ class CUnit(EPDOffsetMap):
 
 
 EPDCUnitMap = CUnit
-
-
-def EUDLoopNewCUnit(allowance: int = 2) -> Iterator[CUnit]:  # noqa: N802
-    for ptr, epd in EUDLoopNewUnit(allowance):
-        yield CUnit(epd, ptr=ptr)
-
-
-def EUDLoopCUnit() -> Iterator[CUnit]:  # noqa: N802
-    """EUDLoopUnit보다 약간? 빠릅니다. 유닛 리스트를 따라가지 않고
-    1700개 유닛을 도는 방식으로 작동합니다.
-    """
-    for ptr, epd in EUDLoopUnit2():
-        yield CUnit(epd, ptr=ptr)
-
-
-def EUDLoopPlayerCUnit(player) -> Iterator[CUnit]:  # noqa: N802
-    for ptr, epd in EUDLoopPlayerUnit(player):
-        yield CUnit(epd, ptr=ptr)

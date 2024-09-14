@@ -10,10 +10,8 @@ from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeWeapon
 from ..localize import _
-from .enummember import ArrayEnumMember, Flag
-from .epdoffsetmap import EPDOffsetMap
-from .member import ArrayMember
-from .memberkind import MemberKind as Mk
+from .offsetmap import ArrayEnumMember, ArrayMember, EPDOffsetMap, Flag
+from .offsetmap import MemberKind as Mk
 
 
 class TargetFlags(ArrayEnumMember):

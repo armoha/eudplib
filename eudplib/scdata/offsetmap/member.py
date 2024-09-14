@@ -8,9 +8,9 @@
 from abc import ABCMeta, abstractmethod
 from typing import Final, NoReturn, Self
 
-from .. import core as c
-from .. import utils as ut
-from ..localize import _
+from ... import core as c
+from ... import utils as ut
+from ...localize import _
 from .memberkind import BaseKind, MemberKind
 
 

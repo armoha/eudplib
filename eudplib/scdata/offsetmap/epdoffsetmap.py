@@ -8,9 +8,9 @@
 from abc import ABCMeta
 from typing import ClassVar, cast
 
-from .. import core as c
-from .. import utils as ut
-from ..localize import _
+from ... import core as c
+from ... import utils as ut
+from ...localize import _
 
 
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
@@ -42,7 +42,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         if kind in (PositionKind, IscriptKind):
             raise ut.EPError(_("Only dword can be read as epd"))
 
-        from ..memio import f_epdread_epd
+        from ...memio import f_epdread_epd
 
         return f_epdread_epd(epd)
 
@@ -59,7 +59,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         if kind in (PositionKind, IscriptKind):
             raise ut.EPError(_("Only dword can be read as epd"))
 
-        from ..memio import f_dwepdread_epd
+        from ...memio import f_dwepdread_epd
 
         return f_dwepdread_epd(epd)
 
@@ -72,7 +72,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         if kind in (CUnitKind, CSpriteKind, IscriptKind):
             raise ut.EPError(_("Only dword can be read as position"))
 
-        from ..memio import f_posread_epd
+        from ...memio import f_posread_epd
 
         return f_posread_epd(member._get_epd(self)[0])
 

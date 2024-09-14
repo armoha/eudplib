@@ -11,10 +11,14 @@ from typing import TypeAlias, TypeVar, cast
 from .. import core as c
 from ..localize import _
 from ..utils import EPD, EPError, ExprProxy, unProxy
-from .enummember import Flag, StructEnumMember
-from .epdoffsetmap import EPDOffsetMap, _epd_cache, _ptr_cache
-from .member import MemberKind as Mk
-from .member import StructMember
+from .offsetmap import (
+    EPDOffsetMap,
+    Flag,
+    StructEnumMember,
+    StructMember,
+)
+from .offsetmap import MemberKind as Mk
+from .offsetmap.epdoffsetmap import _epd_cache, _ptr_cache
 
 
 class CSpriteFlags(StructEnumMember):
