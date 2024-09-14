@@ -53,7 +53,7 @@ class PVariable(_EUDVArray8):
         if not isinstance(index, c.EUDVariable):
             return self.set(index, value)
         value = ut.unProxy(value)
-        if not c.IsEUDVariable(self):
+        if not c.IsEUDVariable(self._value):
             if isinstance(value, c.EUDVariable):
                 self._pveudset(index, value)
             else:

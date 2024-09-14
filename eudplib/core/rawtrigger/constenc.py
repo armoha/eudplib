@@ -62,7 +62,7 @@ class TrgCount(ConstType):
     __slots__ = ()
 
     def __str__(self):
-        if self._value is 0:  # noqa: F632
+        if isinstance(self._value, int) and self._value == 0:
             return "All"
         return super().__str__()
 
