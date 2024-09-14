@@ -218,7 +218,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def SetModifier(self, modifier) -> bt.Action:  # noqa: N802
+    def SetModifier(self, modifier: TrgModifier) -> bt.Action:  # noqa: N802
         ep_assert(
             modifier is bt.SetTo or modifier is bt.Add or modifier is bt.Subtract,
             _("Unexpected modifier {}").format(modifier),
