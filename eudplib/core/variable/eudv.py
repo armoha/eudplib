@@ -11,7 +11,7 @@ import sys
 import traceback
 from collections.abc import Iterator, Sequence
 from itertools import pairwise
-from typing import TYPE_CHECKING, Any, TypeGuard, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeGuard
 
 from typing_extensions import Self
 
@@ -29,14 +29,13 @@ from ...utils import (
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, Forward
 from .vbase import VariableBase
-from .vbuf import get_current_custom_varbuffer, get_current_varbuffer
+from .vbuf import get_current_varbuffer
 
 if TYPE_CHECKING:
     from ..rawtrigger.constenc import Dword, TrgModifier
 
 
 _is_rvalue_strict = False
-T = TypeVar("T", int, ConstExpr, ExprProxy[int] | ExprProxy[ConstExpr])
 
 
 def EP_SetRValueStrictMode(mode: bool) -> None:  # noqa: N802
@@ -98,10 +97,7 @@ class VariableTriggerForward(ConstExpr):
         self._initval = initval
 
     def Evaluate(self):  # noqa: N802
-        if isinstance(self._initval, tuple):
-            evb = get_current_custom_varbuffer()
-        else:
-            evb = get_current_varbuffer()
+        evb = get_current_varbuffer()
         try:
             return evb._vdict[self].Evaluate()
         except KeyError:
@@ -115,49 +111,9 @@ class EUDVariable(VariableBase):
     _addor: EUDVariable
     __slots__ = ("_vartrigger", "_varact", "_rvalue")
 
-    @overload
-    def __init__(
-        self,
-        initval_or_epd: int | ConstExpr = 0,
-        modifier: None = None,
-        initval: None = None,
-        /,
-        *,
-        nextptr: None = None,
-    ) -> None:
-        ...
-
-    @overload
-    def __init__(
-        self,
-        initval_or_epd: int | ConstExpr,
-        modifier: TrgModifier,
-        initval: int | ConstExpr,
-        /,
-        *,
-        nextptr: ConstExpr | None = None,
-    ) -> None:
-        ...
-
-    def __init__(
-        self, initval_or_epd=0, modifier=None, initval=None, /, *, nextptr=None
-    ) -> None:
-        if modifier is None and initval is None and nextptr is None:
-            initial_pair = initval_or_epd
-        else:
-            ep_assert(modifier and initval is not None)
-            if nextptr is None:
-                nextptr = 0
-            # bitmask, player, #, modifier, nextptr
-            initial_pair = (
-                0xFFFFFFFF,
-                process_dest(initval_or_epd),
-                initval,
-                ((bt.EncodeModifier(modifier) & 0xFF) << 24) | 0x2D0000,
-                nextptr,
-            )
-        self._vartrigger = VariableTriggerForward(initial_pair)
-        self._varact: ConstExpr = self._vartrigger + (8 + 320)  # type: ignore[assignment]
+    def __init__(self, initval=0) -> None:
+        self._vartrigger = VariableTriggerForward(initval)
+        self._varact = self._vartrigger + (8 + 320)
         self._rvalue = False
 
     def GetVTable(self) -> ConstExpr:  # noqa: N802

@@ -137,7 +137,7 @@ class EUDFuncN:
             self._fargs = []
             for initvals in self._arginits:
                 if initvals[3] is None:
-                    argv = ev.EUDVariable(*initvals[:3])
+                    argv = ev.EUDXVariable(*initvals[:3])
                 else:
                     argv = ev.EUDXVariable(*initvals)
                 self._fargs.append(argv)

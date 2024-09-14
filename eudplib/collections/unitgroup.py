@@ -19,6 +19,7 @@ from ..core import (
     DeathsX,
     EUDVariable,
     EUDVArray,
+    EUDXVariable,
     Exactly,
     Forward,
     IsEUDVariable,
@@ -96,7 +97,7 @@ class UnitGroup:
 
     def __init__(self, capacity: int) -> None:
         self.capacity = capacity
-        self.loopvar = EUDVariable(EPD(0x6509B0), SetTo, 0)
+        self.loopvar = EUDXVariable(EPD(0x6509B0), SetTo, 0)
         varray = EUDVArray(capacity)(
             dest=self.loopvar, nextptr=self.loopvar.GetVTable()
         )

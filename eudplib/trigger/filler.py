@@ -11,13 +11,13 @@ from .. import core as c
 from .. import utils as ut
 from ..core import ConstExpr, EUDVariable, RlocInt_C
 from ..core.eudfunc.eudf import _EUDPredefineParam
-from ..core.rawtrigger.constenc import TrgModifier
+from ..core.rawtrigger.constenc import SetTo, TrgModifier
 
-_lowordfilter = c.EUDXVariable(0, 0xFFFF)
-_lsbytefilter = c.EUDXVariable(0, 0xFF)
-_lobytefilter = c.EUDXVariable(0, 0xFF00)
-_hibytefilter = c.EUDXVariable(0, 0xFF0000)
-_msbytefilter = c.EUDXVariable(0, 0xFF000000)
+_lowordfilter = c.EUDXVariable(0, SetTo, 0, 0xFFFF)
+_lsbytefilter = c.EUDXVariable(0, SetTo, 0, 0xFF)
+_lobytefilter = c.EUDXVariable(0, SetTo, 0, 0xFF00)
+_hibytefilter = c.EUDXVariable(0, SetTo, 0, 0xFF0000)
+_msbytefilter = c.EUDXVariable(0, SetTo, 0, 0xFF000000)
 
 Constant: TypeAlias = ConstExpr | int | RlocInt_C
 _fillers_use_seqcompute: list[

@@ -41,7 +41,7 @@ def f_atan2(y, x):
 
     # Check x/y order
     if cs.EUDIf()(y >= x):
-        z = c.EUDVariable(0, c.SetTo, 0)
+        z = c.EUDXVariable(0, c.SetTo, 0)
         # Swap x, y so that y <= x
         c.SeqCompute(
             [
@@ -179,7 +179,7 @@ def f_atan2_256(y, x):
 
     # Check x/y order
     if cs.EUDIf()(y >= x):
-        z = c.EUDVariable(0, c.SetTo, 0)
+        z = c.EUDXVariable(0, c.SetTo, 0)
         # Swap x, y so that y <= x
         c.SeqCompute(
             [

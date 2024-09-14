@@ -5,58 +5,40 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ...localize import _
-from ...utils import EPError
+from typing_extensions import Self
+
 from .. import rawtrigger as bt
-from .eudv import EUDVariable, VariableTriggerForward, process_dest
+from ..allocator import ConstExpr
+from .eudv import EUDVariable, process_dest
+from .vbuf import get_current_custom_varbuffer
+
+
+# Unused variable don't need to be allocated.
+class XVariableTriggerForward(ConstExpr):
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls, None)
+
+    def __init__(self, initval) -> None:
+        super().__init__()
+        self._initval = initval
+
+    def Evaluate(self):  # noqa: N802
+        evb = get_current_custom_varbuffer()
+        try:
+            return evb._vdict[self].Evaluate()
+        except KeyError:
+            vt = evb.create_vartrigger(self, self._initval)
+            return vt.Evaluate()
 
 
 class EUDXVariable(EUDVariable):
     __slots__ = ()
 
-    def __init__(
-        self, _initval=0, modifier=None, /, initval=None, mask=None, *, nextptr=0
-    ):
-        # bitmask, player, #, modifier, nextptr
-        # value (positional)
-        if modifier is None and initval is None and mask is None:
-            args = (0xFFFFFFFF, 0, _initval, 0x072D0000, nextptr)
-        # value (keyword)
-        elif modifier is None and mask is None:
-            args = (
-                0xFFFFFFFF,
-                process_dest(_initval),
-                initval,
-                0x072D0000,
-                nextptr,
-            )
-        # value, bitmask (positional)
-        elif initval is None and mask is None:
-            args = (modifier, 0, _initval, 0x072D0000, nextptr)
-        # value, bitmask (keyword)
-        elif modifier is None and initval is None:
-            args = (mask, 0, _initval, 0x072D0000, nextptr)
-        # value, bitmask, mask=bitmask (mixed)
-        elif initval is None:
-            raise EPError(
-                _("Ambiguous bitmask."),
-                "\nUse EUDXVariable(initval, mask) or\
- EUDXVariable(player, modifier, initval, mask)",
-            )
-        # value, initval=value, mask=bitmask (mixed)
-        # 3 positional args or value, modifier, initval=value
-        elif modifier is None or mask is None:
-            raise EPError(
-                _("Ambiguous initval."),
-                "\nUse EUDXVariable(initval, mask) or\
- EUDXVariable(player, modifier, initval, mask)",
-            )
-        else:
-            if mask is None:
-                mask = 0xFFFFFFFF
-            modifier = ((bt.EncodeModifier(modifier) & 0xFF) << 24) + 0x2D0000
-            args = (mask, process_dest(_initval), initval, modifier, nextptr)
+    def __init__(self, epd, modtype, initval, mask=0xFFFFFFFF, /, *, nextptr=0):
+        dest = process_dest(epd)
+        modifier = ((bt.EncodeModifier(modtype) & 0xFF) << 24) + 0x2D0000
+        args = (mask, dest, initval, modifier, nextptr)
 
-        self._vartrigger = VariableTriggerForward(args)
+        self._vartrigger = XVariableTriggerForward(args)
         self._varact = self._vartrigger + (8 + 320)
         self._rvalue = False

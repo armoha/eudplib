@@ -3,15 +3,23 @@ from helper import *
 
 @TestInstance
 def test_xvdefval():
-    a = EUDXVariable(5, 19)
-    test_equality("XVariable with default value", a, 5)
-    test_assert("XVariable with default flag", [Deaths(EPD(a._varact), Exactly, 19, 0)])
+    a = EUDXVariable(0, SetTo, 5, 19)
+    test_equality(
+        "XVariable with default values",
+        [
+            f_dwread(a.getDestAddr()),
+            f_dwread(a._varact + 24),
+            a,
+            f_dwread(a.getMaskAddr()),
+        ],
+        [0, 0x072D0000, 5, 19],
+    )
 
 
 @TestInstance
 def test_xvmixedtrg():
     # VMixed actions
-    a = EUDXVariable()
+    a = EUDXVariable(0, SetTo, 0)
 
     a << 0
     DoActions(SetDeaths(a, SetTo, EPD(a), 0))

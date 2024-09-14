@@ -77,7 +77,7 @@ def PName(x):  # noqa: N802
 class FixedText:
     def __init__(self, actions_on_exit=[]):
         self._actions_on_exit = ut.FlattenList([actions_on_exit])
-        self._txtptr = c.EUDVariable(ut.EPD(0x640B58), c.SetTo, 0)
+        self._txtptr = c.EUDXVariable(ut.EPD(0x640B58), c.SetTo, 0)
 
     def __enter__(self):
         f_gettextptr(ret=[self._txtptr])

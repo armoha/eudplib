@@ -21,7 +21,7 @@ def EUDQueue(capacity):  # noqa: N802
     class _EUDQueue:
         def __init__(self):
             ret = c.EUDVariable()
-            pop = c.EUDVariable(ret, c.SetTo, 0)
+            pop = c.EUDXVariable(ret, c.SetTo, 0)
             queue = EUDVArray(capacity)(
                 dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable()
             )
@@ -256,7 +256,7 @@ def EUDDeque(capacity):  # noqa: N802
     class _EUDDeque:
         def __init__(self):
             ret = c.EUDVariable()
-            pop = c.EUDVariable(ret, c.SetTo, 0)
+            pop = c.EUDXVariable(ret, c.SetTo, 0)
             deque = EUDVArray(capacity)(
                 dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable()
             )
