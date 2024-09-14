@@ -24,9 +24,9 @@ from .memberkind import MemberKind as Mk
 
 class TrgPlayer(_Player, EPDOffsetMap):
     """
-    PlayerData is special in the sense that it is not directly related to game data;
+    TrgPlayer is special in the sense that it is not directly related to game data;
     rather, it is intended to deal with various game state specific to players.
-    e.g. the amount of gas a player has, can be accessed via PlayerData.
+    e.g. the amount of gas a player has, can be accessed via TrgPlayer.
     """
 
     __slots__ = ()
