@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefSfxDataDict = {
     "zerg/drone/zdrerr00.wav": 1,
     "misc/buzz.wav": 2,

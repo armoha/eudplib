@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -65,9 +64,7 @@ def MPQAddFile(  # noqa: N802
     """
 
     ut.ep_assert(
-        isinstance(content, bytes)
-        or isinstance(content, bytearray)
-        or content is None,
+        isinstance(content, bytes) or isinstance(content, bytearray) or content is None,
         _("Invalid content type"),
     )
 
@@ -110,9 +107,7 @@ def _update_mpq(mpqw: MPQ) -> None:
                 ret = mpqw.PutFile(fname, content)
             if not ret:
                 ut.ep_eprint(
-                    _("Failed adding file {} to mpq: May be duplicate").format(
-                        fname
-                    )
+                    _("Failed adding file {} to mpq: May be duplicate").format(fname)
                 )
                 raise ctypes.WinError(ctypes.get_last_error())
 

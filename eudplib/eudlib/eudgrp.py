@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -49,9 +48,7 @@ class EUDGrp(c.EUDObject):
 
         for i in range(fn):
             fhoffset = 6 + 8 * i
-            xoff, yoff, w, h, lto = struct.unpack(
-                "<BBBBI", b[fhoffset : fhoffset + 8]
-            )
+            xoff, yoff, w, h, lto = struct.unpack("<BBBBI", b[fhoffset : fhoffset + 8])
             buf.WriteByte(xoff)
             buf.WriteByte(yoff)
             buf.WriteByte(w)

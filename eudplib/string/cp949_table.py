@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # ruff: noqa: E501
 
 cp949_table = [

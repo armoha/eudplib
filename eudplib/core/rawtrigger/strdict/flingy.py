@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefFlingyDict: dict[str, int] = {
     "Scourge": 0,
     "Broodling": 1,

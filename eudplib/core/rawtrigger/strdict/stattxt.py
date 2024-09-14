@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefStatTextDict: dict[str, int] = {
     # unit names
     "Terran Marine": 1,

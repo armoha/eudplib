@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from ...utils import EPD
 from ..allocator import Forward
 from ..rawtrigger import Add, SetTo

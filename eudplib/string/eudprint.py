@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014-2019 by trgk, Armoha.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),

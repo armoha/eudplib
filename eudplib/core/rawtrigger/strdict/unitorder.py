@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefUnitOrderDict: dict[str, int] = {
     # Causes the unit to die. Normal units run the death iscript animation.
     "Die": 0,

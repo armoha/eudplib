@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -83,9 +82,7 @@ class CHK:
         import random
 
         fake_name = random.sample(fake_section, 1)
-        blist.append(
-            fake_name[0] + ut.i2b4(random.randint(0, 0xFFFFFFFF) | 0x80000000)
-        )
+        blist.append(fake_name[0] + ut.i2b4(random.randint(0, 0xFFFFFFFF) | 0x80000000))
         return b"".join(blist)
 
     def enumsection(self) -> list[bytes]:

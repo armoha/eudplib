@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -34,9 +33,7 @@ def EUDTypedFunc(argtypes, rettypes=None, *, traced=False):  # noqa: N802
             args = _apply_types(argtypes, args)
             return fdecl_func(*args)
 
-        ret = EUDTypedFuncN(
-            argn, caller, fdecl_func, argtypes, rettypes, traced=traced
-        )
+        ret = EUDTypedFuncN(argn, caller, fdecl_func, argtypes, rettypes, traced=traced)
         functools.update_wrapper(ret, fdecl_func)
         return ret
 

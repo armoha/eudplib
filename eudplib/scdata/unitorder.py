@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2024 by zzt (Defender).
 # All rights reserved.
 # This file is part of EUD python library (eudplib),

@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -91,9 +90,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
                 # Statically generate with EUDFuncN
                 self._check_valid_function(_from)
                 f_idcstart, f_idcend = _create_indirect_caller(_from)
-                super().__init__(
-                    _from=EUDVArray(2)([f_idcstart, ut.EPD(f_idcend + 4)])
-                )
+                super().__init__(_from=EUDVArray(2)([f_idcstart, ut.EPD(f_idcend + 4)]))
             else:
                 # Cast from EUDVariable or ConstExpr
                 super().__init__(_from=_from)
@@ -103,9 +100,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
             return cls(_from=_from)
 
         def _check_valid_function(self, f):
-            ut.ep_assert(
-                isinstance(f, EUDFuncN), _("{} is not an EUDFuncN").format(f)
-            )
+            ut.ep_assert(isinstance(f, EUDFuncN), _("{} is not an EUDFuncN").format(f))
             if not f._fstart:
                 f._create_func_body()
 
@@ -113,9 +108,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
             f_retn = f._retn
             ut.ep_assert(
                 argn == f_argn,
-                _("Function requires {} arguments (Expected {})").format(
-                    f_argn, argn
-                ),
+                _("Function requires {} arguments (Expected {})").format(f_argn, argn),
             )
             ut.ep_assert(
                 retn == f_retn,

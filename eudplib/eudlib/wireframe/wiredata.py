@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from ...utils import ep_assert
 
 # ruff: noqa: E501

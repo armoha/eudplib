@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefWeaponDict: dict[str, int] = {
     "Gauss Rifle": 0,
     "Gauss Rifle (Raynor)": 1,

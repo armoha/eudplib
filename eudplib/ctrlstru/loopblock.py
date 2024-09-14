@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -72,9 +71,7 @@ def EUDEndLoopN() -> None:  # noqa: N802
         block["contpoint"] << c.NextTrigger()
 
     vardb = block["vardb"]
-    c.RawTrigger(
-        nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1)
-    )
+    c.RawTrigger(nextptr=block["loopstart"], actions=c.SetMemory(vardb, c.Subtract, 1))
     block["loopend"] << c.NextTrigger()
 
 

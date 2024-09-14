@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefImageDict: dict[str, int] = {
     "Scourge": 0,
     "Scourge Shadow": 1,

@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -118,13 +117,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
         def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None) -> None:
             # Initialization from value
             if _from is not None:
-                if IsConstExpr(_from):
-                    baseobj = _from
-
-                # Initialization by variable reference
-                else:
-                    baseobj = EUDVariable()
-                    baseobj << _from
+                baseobj = _from
 
             else:
                 # Int -> interpret as sequence of 0s
@@ -777,9 +770,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=GetCPCache().GetVTable(),
                     actions=[
                         trg["ret"]
-                        << bt.SetDeathsX(
-                            13, bt.Add, 0, 0, 0x55555555
-                        ),  # CurrentPlayer
+                        << bt.SetDeathsX(13, bt.Add, 0, 0, 0x55555555),  # CurrentPlayer
                         bt.SetDeathsX(13, bt.Add, 0, 0, 0xAAAAAAAA),  # CurrentPlayer
                         GetCPCache().SetDest(EPD(0x6509B0)),
                     ],
@@ -877,9 +868,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...ctrlstru import EUDNot
 
-                return EUDNot(
-                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val)
-                )
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val))
             raise AttributeError
 
         def leitem(self, i, val) -> bt.Condition:
@@ -899,9 +888,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...ctrlstru import EUDNot
 
-                return EUDNot(
-                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val)
-                )
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val))
             raise AttributeError
 
         def gtitem(self, i, val):
@@ -909,9 +896,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...ctrlstru import EUDNot
 
-                return EUDNot(
-                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val)
-                )
+                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val))
             raise AttributeError
 
     return _EUDVArray

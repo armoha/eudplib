@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -81,9 +80,7 @@ class EUDXTypedFuncN(EUDTypedFuncN):
     def __init__(
         self, argn, callerfunc, bodyfunc, argtypes, rettypes, argmasks, *, traced
     ):
-        super().__init__(
-            argn, callerfunc, bodyfunc, argtypes, rettypes, traced=traced
-        )
+        super().__init__(argn, callerfunc, bodyfunc, argtypes, rettypes, traced=traced)
         self._argmasks = argmasks
 
     def _create_func_args(self):

@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 from ..collections.eudarray import EUDArray
 from ..core import EUDFunc
 from ..ctrlstru import (

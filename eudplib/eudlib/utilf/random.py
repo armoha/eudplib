@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -55,9 +54,7 @@ def f_randomize():
                 n.SubtractNumber(1),
             ],
         )
-        c.RawTrigger(
-            conditions=c.Switch("Switch 1", c.Set), actions=_seed.AddNumber(1)
-        )
+        c.RawTrigger(conditions=c.Switch("Switch 1", c.Set), actions=_seed.AddNumber(1))
     cs.EUDEndWhile()
 
     end << c.RawTrigger(actions=c.SetSwitch("Switch 1", c.Set))

@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 # Print possible path to each states
 
 import re

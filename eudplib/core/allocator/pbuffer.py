@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -7,9 +6,7 @@
 
 
 class Payload:
-    def __init__(
-        self, data: bytes, prttable: list[int], orttable: list[int]
-    ) -> None:
+    def __init__(self, data: bytes, prttable: list[int], orttable: list[int]) -> None:
         self.data = data
         self.prttable = prttable
         self.orttable = orttable

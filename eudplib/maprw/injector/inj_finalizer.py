@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -269,9 +268,7 @@ def create_inject_finalizer(
             cs.EUDEndIf()
 
             # Set current player to 1.
-            c.RawTrigger(
-                nextptr=0x80000000, actions=c.SetMemory(0x6509B0, c.SetTo, 0)
-            )
+            c.RawTrigger(nextptr=0x80000000, actions=c.SetMemory(0x6509B0, c.SetTo, 0))
         c.PopTriggerScope()
 
         # lasttime << curtime

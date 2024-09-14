@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefTechDict: dict[str, int] = {
     "Stim Packs": 0,
     "Lockdown": 1,

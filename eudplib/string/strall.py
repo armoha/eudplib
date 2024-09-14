@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from .. import core as c
 from .. import utils as ut
 from ..core.eudfunc import EUDFullFunc

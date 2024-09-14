@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import gettext
 import locale
 import os

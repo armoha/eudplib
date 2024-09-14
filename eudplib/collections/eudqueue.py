@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2022 by Armoha.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -435,9 +434,7 @@ def EUDDeque(capacity):  # noqa: N802
                     ],
                 )
                 wrap_tail << c.RawTrigger(
-                    conditions=Memory(
-                        appendleft_act + 16, c.AtMost, EPD(deque) + 87
-                    ),
+                    conditions=Memory(appendleft_act + 16, c.AtMost, EPD(deque) + 87),
                     actions=[
                         SetMemory(appendleft_act + 16, Add, 18 * capacity),
                         SetMemory(jumpleft + 4, Add, 72 * capacity),

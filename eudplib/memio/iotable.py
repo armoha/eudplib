@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2024 by Armoha.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -101,9 +100,7 @@ def _get(bitmask: int, shift: int) -> Callable | None:
     return None
 
 
-def _insert_or_get(
-    bitmask: int, shift: int, ordering: str | None = None
-) -> Callable:
+def _insert_or_get(bitmask: int, shift: int, ordering: str | None = None) -> Callable:
     readfn = _get(bitmask, shift)
     if readfn is None:
         return _insert(bitmask, shift, ordering)

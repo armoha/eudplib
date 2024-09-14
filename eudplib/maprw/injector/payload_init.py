@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from collections.abc import ByteString
 
 from eudplib import utils as ut

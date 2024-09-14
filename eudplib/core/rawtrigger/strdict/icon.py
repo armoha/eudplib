@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefIconDict: dict[str, int] = {
     "Marine": 0,
     "Ghost": 1,

@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -126,9 +125,7 @@ def _qgc_alphaids(packet_id, n, arr_epd):
                         c.SetDeaths(CurrentPlayer, c.Subtract, 336 << i, 0),
                         c.SetMemory(restore_arr + 20, c.Add, 336 << i),
                         c.SetMemoryEPD(cp2ui_quantity, c.Add, 84 << i),
-                        b0.AddNumber(1 << i)
-                        if i < 8
-                        else b1.AddNumber(1 << (i - 8)),
+                        b0.AddNumber(1 << i) if i < 8 else b1.AddNumber(1 << (i - 8)),
                     ],
                 )
             c.RawTrigger(

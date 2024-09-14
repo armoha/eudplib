@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from dataclasses import dataclass
 
 

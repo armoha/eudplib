@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from typing import Literal
 
 from typing_extensions import Self

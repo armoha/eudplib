@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2014 by trgk.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -33,9 +32,7 @@ def f_playerexist(player):
         if cs.EUDSwitchCase()(p):
             c.RawTrigger(
                 nextptr=block["swend"],
-                conditions=c.Memory(
-                    pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)
-                ),
+                conditions=c.Memory(pts + p * 12 + 8, c.Exactly, ~(pts + p * 12 + 4)),
                 actions=ret.SetNumber(0),
             )
 

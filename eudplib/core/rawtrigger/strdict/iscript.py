@@ -1,4 +1,3 @@
-#!/usr/bin/python
 DefIscriptDict: dict[str, int] = {
     "Scourge": 0,
     "Unknown1": 1,

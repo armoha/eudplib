@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2019 by Armoha.
 # All rights reserved.
 # This file is part of EUD python library (eudplib),
@@ -59,12 +58,8 @@ class EUDVArrayReader:
         else:
             return [
                 c.SetNextPtr(self._trg, varr_ptr),
-                c.SetMemory(
-                    self._trg + 328 + 16, c.SetTo, varr_epd + 328 // 4 + 4
-                ),
-                c.SetMemory(
-                    self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())
-                ),
+                c.SetMemory(self._trg + 328 + 16, c.SetTo, varr_epd + 328 // 4 + 4),
+                c.SetMemory(self._trg + 328 + 20, c.SetTo, ut.EPD(eudv.getValueAddr())),
                 c.SetMemory(self._trg + 360 + 16, c.SetTo, varr_epd + 1),
             ]
 
