@@ -5,7 +5,7 @@ use pyo3::intern;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyInt, PyNone, PyString, PyTuple};
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub(crate) struct ConstExpr {
     baseobj: PyObject,
     offset: i32,
@@ -23,7 +23,6 @@ impl ConstExpr {
 }
 
 /// Class for general expression with rlocints.
-#[derive(Clone)]
 #[pyclass(
     frozen,
     subclass,
@@ -185,9 +184,9 @@ impl PyConstExpr {
         ))
     }
 
-    fn __neg__(&self) -> Self {
+    fn __neg__(&self, py: Python) -> Self {
         Self(ConstExpr {
-            baseobj: self.0.baseobj.clone(),
+            baseobj: self.0.baseobj.clone_ref(py),
             offset: -self.0.offset,
             rlocmode: -self.0.rlocmode,
         })
@@ -222,8 +221,8 @@ impl Forward {
     }
 
     #[getter]
-    fn get_expr(&self) -> PyResult<PyObject> {
-        Ok(self.expr.clone())
+    fn get_expr(&self, py: Python) -> PyResult<PyObject> {
+        Ok(self.expr.clone_ref(py))
     }
 
     fn __lshift__(&mut self, py: Python, mut expr: Bound<'_, PyAny>) -> PyResult<PyObject> {
@@ -244,7 +243,7 @@ impl Forward {
         } else {
             expr.into_py(py)
         };
-        self.expr = expr.clone();
+        self.expr = expr.clone_ref(py);
         Ok(expr)
     }
 

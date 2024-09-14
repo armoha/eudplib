@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-pyo3 = { version = "0.21.0", features = ["abi3"] }
+pyo3 = { version = "0.22.0", features = ["abi3"] }
 indicatif = "0.17.7"
 regex = { version = "1.10.3", features = [] }
 
