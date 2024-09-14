@@ -449,23 +449,24 @@ class EUDVariable(VariableBase):
     def __and__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__iand__(other)
-        is_eudvariable = IsEUDVariable(other)
-        if is_eudvariable and _is_rvalue(other):
-            return other.__iand__(self)
+        is_rvalue = _is_rvalue(other)
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable) and is_rvalue:
+            return unproxied.__iand__(self)
         t = EUDVariable()
-        if is_eudvariable:
+        if isinstance(unproxied, EUDVariable):
             write = t.SetNumberX(0, 0xFFFFFFFF)
             SeqCompute(
                 [
                     (EPD(write), bt.SetTo, 0xFFFFFFFF),
                     (t, bt.SetTo, self),
-                    (EPD(write), bt.Subtract, other),
+                    (EPD(write), bt.Subtract, unproxied),
                 ]
             )
             bt.RawTrigger(actions=write)  # 2T 10A
         else:
             t << self
-            t &= other  # 1T 5A
+            t &= unproxied  # 1T 5A
         return t.makeR()
 
     def __rand__(self, other: Dword) -> EUDVariable:
@@ -491,17 +492,18 @@ class EUDVariable(VariableBase):
     def __or__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__ior__(other)
-        is_eudvariable = IsEUDVariable(other)
-        if is_eudvariable and _is_rvalue(other):
-            return other.__ior__(self)
+        is_rvalue = _is_rvalue(other)
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable) and is_rvalue:
+            return unproxied.__ior__(self)
         t = EUDVariable()
-        if is_eudvariable:
+        if isinstance(unproxied, EUDVariable):
             write = t.SetNumberX(0xFFFFFFFF, 0)
-            SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, other)])
+            SeqCompute([(t, bt.SetTo, self), (EPD(write), bt.SetTo, unproxied)])
             bt.RawTrigger(actions=write)  # 2T 9A
         else:
             t << self
-            t |= other  # 1T 5A
+            t |= unproxied  # 1T 5A
         return t.makeR()
 
     def __ror__(self, other: Dword) -> EUDVariable:
@@ -541,26 +543,27 @@ class EUDVariable(VariableBase):
     def __xor__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__ixor__(other)
-        is_eudvariable = IsEUDVariable(other)
-        if is_eudvariable and _is_rvalue(other):
-            return other.__ixor__(self)
+        is_rvalue = _is_rvalue(other)
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable) and is_rvalue:
+            return unproxied.__ixor__(self)
         t = EUDVariable()
-        if is_eudvariable:
+        if isinstance(unproxied, EUDVariable):
             VProc(
-                [self, other],
+                [self, unproxied],
                 [
-                    other.SetMask(0x55555555),
+                    unproxied.SetMask(0x55555555),
                     self.QueueAssignTo(t),
-                    other.QueueAddTo(t),
+                    unproxied.QueueAddTo(t),
                 ],
             )
-            VProc(other, other.SetMask(0xAAAAAAAA))
+            VProc(unproxied, unproxied.SetMask(0xAAAAAAAA))
             bt.RawTrigger(
-                actions=other.SetMask(0xFFFFFFFF)
+                actions=unproxied.SetMask(0xFFFFFFFF)
             )  # FIXME: restore to previous mask???
         else:
             t << self
-            t ^= other
+            t ^= unproxied
         return t.makeR()
 
     def __rxor__(self, other: Dword) -> EUDVariable:
