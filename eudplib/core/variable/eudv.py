@@ -321,10 +321,12 @@ class EUDVariable(VariableBase):
     def __add__(self, other: Dword) -> EUDVariable:
         if _is_rvalue(self):
             return self.__iadd__(other)
-        if IsEUDVariable(other) and _is_rvalue(other):
-            return other.__iadd__(self)
+        is_rvalue = _is_rvalue(other)
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable) and is_rvalue:
+            return unproxied.__iadd__(self)
         t = EUDVariable()
-        SeqCompute([(t, bt.SetTo, other), (t, bt.Add, self)])
+        SeqCompute([(t, bt.SetTo, unproxied), (t, bt.Add, self)])
         return t.makeR()
 
     def __radd__(self, other: Dword) -> EUDVariable:
@@ -335,30 +337,32 @@ class EUDVariable(VariableBase):
         return t.makeR()
 
     def __sub__(self, other: Dword) -> EUDVariable:
-        if IsEUDVariable(other) and _is_rvalue(other):
+        is_rvalue = _is_rvalue(other)
+        unproxied = unProxy(other)
+        if isinstance(unproxied, EUDVariable) and is_rvalue:
             rvalue_strict = _is_rvalue_strict
             if rvalue_strict:
                 EP_SetRValueStrictMode(False)
             VProc(
                 self,  # -other += self
                 [
-                    other.AddNumberX(0xFFFFFFFF, 0x55555555),
-                    other.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
-                    other.AddNumber(1),
-                    self.QueueAddTo(other),
+                    unproxied.AddNumberX(0xFFFFFFFF, 0x55555555),
+                    unproxied.AddNumberX(0xFFFFFFFF, 0xAAAAAAAA),
+                    unproxied.AddNumber(1),
+                    self.QueueAddTo(unproxied),
                 ],
             )  # 1T 7A, executes 2T 8A
             if rvalue_strict:
                 EP_SetRValueStrictMode(True)
-            return other
+            return unproxied
         if _is_rvalue(self):
-            return self.__isub__(other)
+            return self.__isub__(unproxied)
         t = EUDVariable()
         # FIXME: unsupported EUD error after EUDStruct.free() with IsConstExpr
-        if isinstance(other, int):
+        if isinstance(unproxied, int):
             SeqCompute(
                 [
-                    (t, bt.SetTo, -other),
+                    (t, bt.SetTo, -unproxied),
                     (t, bt.Add, self),
                 ]
             )
@@ -366,7 +370,7 @@ class EUDVariable(VariableBase):
             SeqCompute(
                 [
                     (t, bt.SetTo, 0xFFFFFFFF),
-                    (t, bt.Subtract, other),
+                    (t, bt.Subtract, unproxied),
                     (t, bt.Add, 1),
                     (t, bt.Add, self),
                 ]
