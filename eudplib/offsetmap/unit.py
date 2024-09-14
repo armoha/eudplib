@@ -12,7 +12,7 @@ from ..core.rawtrigger.strenc import EncodeUnit
 from ..localize import _
 from .enummember import ArrayEnumMember, Flag
 from .epdoffsetmap import EPDOffsetMap
-from .member import ArrayMember
+from .member import ArrayMember, NotImplementedMember
 from .memberkind import MemberKind as Mk
 
 
@@ -130,23 +130,67 @@ class TrgUnit(ConstType, EPDOffsetMap):
     attackUnitOrder = ArrayMember(0x663320, Mk.UNIT_ORDER)
     attackMoveOrder = ArrayMember(0x663A50, Mk.UNIT_ORDER)
     groundWeapon = ArrayMember(0x6636B8, Mk.WEAPON)
-    maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
-    maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
-    # ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL)
-    # this is unrelated to strategic suicide mission; it's only checked with units
-    # that have already been added to an attack wave, and looks like it prevents
-    # those units from being counted as being missing from the attack group or
-    # something like that. i'm not fully understanding its purpose yet and not seeing
-    # much of a noticeable effect by ticking it on for regular military units
+    maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
+    """(read-only) Maximum number of hits given to ground targets.
 
+    This is the maximum number of hits this unit can deal to a target with its
+    ground weapon. For example, Psi Blades has `damageFactor` = 1 while Zealot has
+    `maxGroundHits` = 2. If you're wondering why we have `damageFactor` and
+    `maxGroundHits`/`maxAirHits`, it's because a hit has a small chance of failing,
+    i.e. a Zealot attack might miss one or two of the Psi Blades attacks. The actual
+    number of attacks is determined by iscript.
+
+    유닛이 지상 무기로 대상을 타격할 수 있는 최대 명중 횟수입니다. 예를 들어,
+    사이오닉 검의 `damageFactor`는 1이고 질럿의 `maxGroundHits`은 2입니다.
+    `damageFactor`와 `maxGroundHits`/`maxAirHits`가 둘 다 있는 이유는, 적게나마
+    적중이 실패할 확률이 있기 때문입니다. 사이오닉 검 공격이 한두 번 빗나갈 수 있다는
+    의미입니다. 실제 공격 횟수는 iscript에서 결정됩니다.
+    """
+    maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
+    """(read-only) Maximum number of hits given to air targets.
+
+    This is the maximum number of hits this unit can deal to a target with its
+    air weapon. For example, Halo Rockets has `damageFactor` = 2 while Valkyrie has
+    `maxAirHits` = 4. The actual number of attacks is determined by iscript.
+
+    유닛이 공중 무기로 대상을 타격할 수 있는 최대 명중 횟수입니다. 예를 들어, 광륜
+    로켓의 `damageFactor`는 2이고 발키리의 `maxAirHits`은 4입니다. 실제 공격 횟수는
+    iscript에서 결정됩니다.
+    """
+    ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL)
+    """Flag for unit's eligibility for `Strategic Suicide Missions`.
+
+    Disabling `ignoreStrategicSuicideMissions` has no noticeable effect. Enabling it
+    will exclude the unit from `Strategic Suicide Missions`. By default, both
+    `ignoreStrategicSuicideMissions` and `dontBecomeGuard` are turned on or off at
+    the same time.
+
+    `ignoreStrategicSuicideMissions`를 꺼도 눈에 띄는 효과는 없습니다. 키면 해당
+    유닛이 `Strategic Suicide Missions`에서 제외됩니다. 기본적으로
+    `ignoreStrategicSuicideMissions`'와 `dontBecomeGuard`는 동시에 켜져 있거나 꺼져
+    있습니다.
+    """
     dontBecomeGuard = ArrayMember(0x660178, Mk.BIT_1)
-    """dontBecomeGuard affects unit's eligibility for strategic suicide missions;
-    basically if a unit has an AI ptr that is type 1 or 4, it will be picked up for
-    strategic suicide. units with flag 2 set only have an AI assigned to them if
-    they have the worker unitsdat property (becomes unitAI type 2), or has building
-    unitsdat property and isn't geyser, or is unitid larva/egg/overlord (becomes
-    unitAI type 3)"""
+    """Flag for Guard AI and unit's eligibility for `Strategic Suicide Missions`.
+
+    ## Enabling `dontBecomeGuard` will crash the game, especially if CPU owns unit!
+    ## `dontBecomeGuard`를 키면 특히 컴퓨터가 유닛을 조종할 때 게임이 팅깁니다!
+
+    Prevents unit from returning to their original position when the order target
+    disappears. Does not affect already existing units. Basically, if a unit has an
+    AI ptr that is type 1 or 4, it will be picked up for strategic suicide. Units
+    with `dontBecomeGuard` flag set will only be assigned an AI if they have
+    `baseProperty.Worker` (becomes unitAI type 2), or have the `baseProperty.
+    Building` and aren't geysers, or are larva/egg/overlord (becomes unitAI type 3).
+
+    명령 대상이 사라졌을 때 유닛이 원래 위치로 돌아가는 것을 방지합니다. 이미
+    존재하는 유닛에는 영향을 주지 않습니다. 기본적으로 `Strategic Suicide Missions`는
+    유닛의 AI ptr이 타입 1 또는 타입 3인 유닛에 실행됩니다. `dontBecomeGuard`가
+    설정된 유닛에 AI가 할당되는 경우: 유닛에 `baseProperty.Worker` 속성이 있거나
+    (유닛 AI 타입 2가 됨), `baseProperty.Building`이 있고 베스핀 간헐천이 아니거나,
+    유닛 종류가 라바/에그/오버로드인 경우 (유닛AI 타입 3이 됨).
+    """
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
@@ -162,10 +206,10 @@ class TrgUnit(ConstType, EPDOffsetMap):
     yesSoundStart = ArrayMember(0x663C10, Mk.SFXDATA_DAT)
     yesSoundEnd = ArrayMember(0x661440, Mk.SFXDATA_DAT)
     buildingDimensions = ArrayMember(0x662860, Mk.POSITION)
-    # addonPlacement = ArrayMember(0x6626E0, Mk.POSITION)
-    # AddonPlacement is not implemented yet because its beginning index isn't 0.
-    # unitBoundsLURB = ArrayMember(0x6617C8, 2 * Mk.POSITION)
-    # unitDimensions is not implemented yet.
+    addonPlacement = NotImplementedMember(0x6626E0, Mk.POSITION)
+    """AddonPlacement is not implemented yet because its beginning index isn't 0."""
+    # unitBoundsLURB = NotImplementedMember(0x6617C8, 2 * Mk.POSITION)
+    # """unitDimensions is not implemented yet."""
     portrait = ArrayMember(0x662F88, Mk.PORTRAIT)
     mineralCost = ArrayMember(0x663888, Mk.WORD)
     gasCost = ArrayMember(0x65FD00, Mk.WORD)

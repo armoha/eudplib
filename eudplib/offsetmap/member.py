@@ -15,7 +15,7 @@ from .memberkind import BaseKind, MemberKind
 
 
 class BaseMember(metaclass=ABCMeta):
-    """Base descriptor class for EPDOffsetMap"""
+    """Base descriptor class/mixin for EPDOffsetMap"""
 
     __slots__ = ()
 
@@ -110,7 +110,7 @@ class ArrayMember(BaseMember):
             q, r = instance + instance, self.offset % 4
         return ut.EPD(self.offset) + q, r
 
-    def __get__(self, instance, owner=None) -> c.EUDVariable | Self:
+    def __get__(self, instance, owner=None):
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
@@ -131,7 +131,11 @@ class ArrayMember(BaseMember):
 
 
 class UnsupportedMember(BaseMember):
-    """'Sorry, this EUD map is not supported' error is raised when it's accessed"""
+    """
+    'Sorry, this EUD map is not supported' error is raised when it's accessed.
+
+    '이 EUD 지도는 스타크래프트 리마스터와 호환되지 않습니다.' 오류가 발생합니다.
+    """
 
     __slots__ = ("offset", "kind", "__objclass__", "__name__")
 
@@ -139,10 +143,36 @@ class UnsupportedMember(BaseMember):
         if instance is None:
             return self
         raise ut.EPError(
-            _("Unsupported EUD: {}.{}").format(self.__objclass__, self.__name__)
+            _(
+                "StarCraft: Remastered does not support {}.{} "
+                "and causes in-game errors."
+            ).format(self.__objclass__, self.__name__)
         )
 
     def __set__(self, instance, value) -> NoReturn:
         raise ut.EPError(
-            _("Unsupported EUD: {}.{}").format(self.__objclass__, self.__name__)
+            _(
+                "StarCraft: Remastered does not support {}.{} "
+                "and causes in-game errors."
+            ).format(self.__objclass__, self.__name__)
+        )
+
+
+class NotImplementedMember(BaseMember):
+    __slots__ = ("offset", "kind", "__objclass__", "__name__")
+
+    def __get__(self, instance, owner=None) -> Self:
+        if instance is None:
+            return self
+        raise ut.EPError(
+            _("{} is not implemented for {}").format(
+                self.__name__, self.__objclass__
+            )
+        )
+
+    def __set__(self, instance, value) -> NoReturn:
+        raise ut.EPError(
+            _("{} is not implemented for {}").format(
+                self.__name__, self.__objclass__
+            )
         )
