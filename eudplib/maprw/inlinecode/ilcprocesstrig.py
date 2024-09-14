@@ -12,7 +12,7 @@ from ...core.mapdata.chktok import CHK
 from ...core.rawtrigger import SetTo
 from ...offsetmap.scdata import AllPlayers
 from ...trigtrg import trigtrg as tt
-from .btInliner import (
+from .btinliner import (
     get_executing_players,
     get_trigger_size,
     inline_codify_binary_trigger,
