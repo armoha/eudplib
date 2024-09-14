@@ -41,9 +41,7 @@ def EUDQueue(capacity):  # noqa: N802
             )
             c.RawTrigger(
                 conditions=self._length.AtLeast(1),
-                actions=c.SetMemoryX(
-                    iter_start + 2404, c.SetTo, 1 << 24, 255 << 24
-                ),
+                actions=c.SetMemoryX(iter_start + 2404, c.SetTo, 1 << 24, 255 << 24),
             )
             iter_start << c.RawTrigger(
                 nextptr=0,  # by iter_init
@@ -55,9 +53,7 @@ def EUDQueue(capacity):  # noqa: N802
             iter_jump << c.RawTrigger(
                 nextptr=0,  # by iter_init, iter_contpoint
                 actions=[
-                    c.SetNextPtr(
-                        pop.GetVTable(), 0
-                    ),  # yield_point by __iter__ call
+                    c.SetNextPtr(pop.GetVTable(), 0),  # yield_point by __iter__ call
                     SetMemory(iter_start + 16, Add, 18),
                     SetMemory(iter_jump + 4, Add, 72),
                     c.SetMemoryX(iter_start + 2376, c.SetTo, 0, 1),
@@ -277,9 +273,7 @@ def EUDDeque(capacity):  # noqa: N802
             )
             c.RawTrigger(
                 conditions=self._length.AtLeast(1),
-                actions=c.SetMemoryX(
-                    iter_start + 2404, c.SetTo, 1 << 24, 255 << 24
-                ),
+                actions=c.SetMemoryX(iter_start + 2404, c.SetTo, 1 << 24, 255 << 24),
             )
             iter_start << c.RawTrigger(
                 nextptr=0,  # by iter_init
@@ -291,9 +285,7 @@ def EUDDeque(capacity):  # noqa: N802
             iter_jump << c.RawTrigger(
                 nextptr=0,  # by iter_init, iter_contpoint
                 actions=[
-                    c.SetNextPtr(
-                        pop.GetVTable(), 0
-                    ),  # yield_point by __iter__ call
+                    c.SetNextPtr(pop.GetVTable(), 0),  # yield_point by __iter__ call
                     SetMemory(iter_start + 16, Add, 18),
                     SetMemory(iter_jump + 4, Add, 72),
                     c.SetMemoryX(iter_start + 2376, c.SetTo, 0, 1),
@@ -504,9 +496,7 @@ def EUDDeque(capacity):  # noqa: N802
                         SetMemory(iter_init + 348, c.SetTo, EPD(deque) + 87),
                         SetMemory(iter_init + 380, c.SetTo, deque - 72),
                         SetMemory(append_act + 16, c.SetTo, EPD(deque) + 87),
-                        SetMemory(
-                            appendleft_act + 16, c.SetTo, EPD(deque) + 87
-                        ),
+                        SetMemory(appendleft_act + 16, c.SetTo, EPD(deque) + 87),
                         self._length.SetNumber(0),
                     ]
                 )
