@@ -14,7 +14,7 @@ from eudplib.core.mapdata.stringmap import get_string_section_name
 from eudplib.localize import _
 
 from ..memio import f_dwread_epd, f_wread_epd
-from ..offsetmap.scdata import CurrentPlayer
+from ..scdata.scdata import CurrentPlayer
 
 _STR_ADDRESS = 0x191943C8
 

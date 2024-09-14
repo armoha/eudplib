@@ -15,7 +15,7 @@ from ..ctrlstru import (
     EUDSwitchCase,
     EUDSwitchDefault,
 )
-from ..offsetmap.scdata import AllPlayers
+from ..scdata.scdata import AllPlayers
 from ..utils import EPD, ExprProxy, ep_assert
 from .cpprint import f_raise_CCMU
 

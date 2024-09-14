@@ -13,7 +13,7 @@ from ..core.mapdata.stringmap import ForceAddString
 from ..eudlib.utilf.userpl import IsUserCP, f_getuserplayerid
 from ..localize import _
 from ..memio import f_getcurpl, f_setcurpl
-from ..offsetmap.scdata import CurrentPlayer
+from ..scdata.scdata import CurrentPlayer
 from .cpprint import FixedText, f_cpstr_print, f_gettextptr
 from .cpstr import GetMapStringAddr
 from .fmtprint import _format_args

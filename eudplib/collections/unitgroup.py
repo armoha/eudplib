@@ -41,7 +41,7 @@ from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
 from ..ctrlstru.loopblock import _unsafe_whilenot
 from ..localize import _
 from ..memio.modcurpl import f_setcurpl2cpcache
-from ..offsetmap.scdata import CurrentPlayer
+from ..scdata.scdata import CurrentPlayer
 from ..utils import EPD, EPError, EUDPeekBlock, ep_assert
 
 _assign_helper = EUDVariable()

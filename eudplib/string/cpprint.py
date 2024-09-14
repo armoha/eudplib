@@ -21,7 +21,7 @@ from ..memio import (
     f_setcurpl,
 )
 from ..memio.rwcommon import br1
-from ..offsetmap.scdata import CurrentPlayer, TrgPlayer
+from ..scdata.scdata import CurrentPlayer, TrgPlayer
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s

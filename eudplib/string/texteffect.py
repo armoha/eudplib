@@ -12,7 +12,7 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 from ..memio import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from ..memio.rwcommon import br1
-from ..offsetmap.scdata import CurrentPlayer
+from ..scdata.scdata import CurrentPlayer
 from .cpprint import cw, f_cpstr_print
 from .eudprint import epd2s, ptr2s
 

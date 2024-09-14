@@ -118,13 +118,13 @@ from ..collections import (
     EUDArray, EUDDeque, EUDQueue, EUDStack,
     PVariable, UnitGroup
 )
-from ..offsetmap.cunit import (
+from ..scdata.cunit import (
     CUnit, EUDLoopCUnit, EUDLoopNewCUnit, EUDLoopPlayerCUnit
 )
-from ..offsetmap.image import Image
-from ..offsetmap.unit import TrgUnit
-from ..offsetmap.weapon import Weapon
-from ..offsetmap.scdata import (
+from ..scdata.image import Image
+from ..scdata.unit import TrgUnit
+from ..scdata.weapon import Weapon
+from ..scdata.scdata import (
     Flingy,
     Sprite,
     Tech,
