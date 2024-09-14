@@ -20,6 +20,8 @@ def test_function_lvalue():
 
 @TestInstance
 def test_rvalue():
+    from eudplib.core.variable.evcommon import _addor
+
     v1 = EUDVariable(0)
 
     trg = NextTrigger()
@@ -53,7 +55,7 @@ def test_rvalue():
         [v4, nptr, f_dwread(trg + 344), f_dwread(trg + 348), f_dwread(trg + 4)],
         [
             5,
-            EUDVariable._addor.GetVTable(),
+            _addor.GetVTable(),
             EPD(v4.getValueAddr()),
             1,
             v2.GetVTable(),

@@ -257,11 +257,8 @@ class EUDVariable(VariableBase):
         if isinstance(other, int):
             self.__iadd__(-other)  # 1A
         else:
-            try:
-                addor = EUDVariable._addor
-            except AttributeError:
-                addor = EUDVariable(0, bt.Add, 0)
-                EUDVariable._addor = addor
+            from .evcommon import _addor as addor
+
             SeqCompute(
                 [  # (self + 1) + (~0 - other)
                     (self, bt.Add, 1),
