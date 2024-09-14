@@ -5,6 +5,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from collections.abc import Iterable
+
 from ... import utils as ut
 from ...localize import _
 from ..rawtrigger.consttype import ConstType
@@ -13,6 +15,8 @@ from .vararray import EUDVArray
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
+    _fields_: Iterable[str | tuple]
+
     def __init__(self, *args, _from=None, _static_initval=None, **kwargs) -> None:
         super().__setattr__("_initialized", False)
         fieldcount = len(self._fielddict)
