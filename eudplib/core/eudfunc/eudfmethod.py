@@ -14,7 +14,7 @@ from ...localize import _
 from .. import variable as ev
 from ..eudstruct.eudstruct import EUDStruct
 from ..eudstruct.selftype import _set_selftype, selftype
-from .eudtypedfuncn import EUDTypedFuncN, _apply_types
+from .eudtypedfuncn import EUDTypedFuncN, _apply_types_to_fargs
 
 _mth_classtype: dict[Callable, type] = {}
 
@@ -41,7 +41,7 @@ def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):  # noqa: N802
         def generic_caller(self, *args):
             _set_selftype(_mth_classtype[method])
             self = selftype.cast(self)
-            args = _apply_types(argtypes, args)
+            args = _apply_types_to_fargs(argtypes, args)
             _set_selftype(None)
             return method(self, *args)
 
@@ -67,7 +67,7 @@ def EUDTypedMethod(argtypes, rettypes=None, *, traced=False):  # noqa: N802
                 if self not in constexpr_callmap:
 
                     def caller(*args):
-                        args = _apply_types(argtypes, args)
+                        args = _apply_types_to_fargs(argtypes, args)
                         return method(self, *args)
 
                     constexpr_callmap[self] = EUDTypedFuncN(

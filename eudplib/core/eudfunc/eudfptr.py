@@ -12,7 +12,7 @@ from .. import rawtrigger as rt
 from ..eudstruct import EUDStruct, EUDVArray
 from ..variable import EUDVariable, SetVariables, VProc
 from .eudfuncn import EUDFuncN
-from .eudtypedfuncn import _apply_types
+from .eudtypedfuncn import _apply_types, _apply_types_to_fargs
 
 #
 # Common argument / returns storage
@@ -144,7 +144,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
         def __call__(self, *args):
             """Call target function with given arguments"""
 
-            args = _apply_types(argtypes, args)
+            args = _apply_types_to_fargs(argtypes, args)
 
             if argn:
                 arg_storage = _get_arg_storage(argn)

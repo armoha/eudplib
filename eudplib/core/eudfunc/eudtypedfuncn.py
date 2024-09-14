@@ -48,6 +48,35 @@ def _apply_types(typesdecl, varlist):
     return rets
 
 
+def _apply_types_to_fargs(typesdecl, varlist):
+    if typesdecl is None:
+        return varlist
+
+    rets = []
+    # FIXME: armoha/euddraft#34
+    if len(varlist) == len(typesdecl) + 1:
+        rets.append(varlist[0])
+        varlist = varlist[1:]
+    ut.ep_assert(
+        len(varlist) == len(typesdecl),
+        _("Different number of variables({}) from type declarations({})").format(
+            len(varlist), len(typesdecl)
+        )
+        + f"argtypes: {typesdecl}, args: {varlist}",
+    )
+
+    for vartype, var in zip(typesdecl, varlist):
+        if vartype == ev.EUDVariable or vartype is None:
+            rets.append(var)
+        else:
+            try:
+                rets.append(vartype.__to_eudfarg(var))
+            except AttributeError:
+                rets.append(vartype.cast(var))
+
+    return rets
+
+
 class EUDTypedFuncN(EUDFuncN):
 
     """
@@ -63,7 +92,7 @@ class EUDTypedFuncN(EUDFuncN):
     def __call__(self, *args, ret=None):
         # This layer is necessary for function to accept non-EUDVariable object
         # as argument. For instance, EUDFuncN.
-        args = _apply_types(self._argtypes, args)
+        args = _apply_types_to_fargs(self._argtypes, args)
         rets = super().__call__(*args, ret=ret)
 
         # Cast returns to rettypes before caller code.
@@ -109,7 +138,7 @@ class EUDFullFuncN(EUDFuncN):
     def __call__(self, *args, ret=None):
         # This layer is necessary for function to accept non-EUDVariable object
         # as argument. For instance, EUDFuncN.
-        args = _apply_types(self._argtypes, args)
+        args = _apply_types_to_fargs(self._argtypes, args)
         rets = super().__call__(*args, ret=ret)
 
         # Cast returns to rettypes before caller code.

@@ -96,6 +96,12 @@ class EUDArray(ut.ExprProxy):
 
         super().__init__(data_obj)
 
+    def __to_eudfarg(self):
+        if c.IsEUDVariable(self) and type(self._epd) is c.Forward:
+            return self
+        else:
+            return self._epd + 0x80000000
+
     def fmt(self, formatter):
         if isinstance(self.length, int):
             formatter.write_str("[")
