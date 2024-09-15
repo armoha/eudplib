@@ -277,12 +277,12 @@ class CUnit(EPDOffsetMap):
     siloNuke = StructMember(0x0D0, Mk.C_UNIT)
     siloReady = StructMember(0x0D4, Mk.BOOL)
     # hatchery
+    hatcheryHarvestLT = StructMember(0x0D0, Mk.DWORD)
+    hatcheryHarvestRB = StructMember(0x0D4, Mk.DWORD)
     hatcheryHarvestL = StructMember(0x0D0, Mk.WORD)
-    hatcheryHarvestU = StructMember(0x0D2, Mk.WORD)
+    hatcheryHarvestT = StructMember(0x0D2, Mk.WORD)
     hatcheryHarvestR = StructMember(0x0D4, Mk.WORD)
     hatcheryHarvestB = StructMember(0x0D6, Mk.WORD)
-    hatcheryHarvestLU = StructMember(0x0D0, Mk.DWORD)
-    hatcheryHarvestRB = StructMember(0x0D4, Mk.DWORD)
     # ==============================================/ building
     # worker -------------------------------------------------
     powerup = StructMember(0x0C0, Mk.C_UNIT)
@@ -331,13 +331,13 @@ class CUnit(EPDOffsetMap):
     unknown0x106 = StructMember(0x106, Mk.BYTE)
     isBeingHealed = StructMember(0x107, Mk.BOOL)
     "1 if a medic is currently healing this unit"
-    contourBoundsL = UnsupportedMember(0x108, Mk.WORD)
+    contourBoundsLT = UnsupportedMember(0x108, Mk.DWORD)
     "A rect that specifies the closest contour (collision) points"
-    contourBoundsU = UnsupportedMember(0x10A, Mk.WORD)
+    contourBoundsRB = UnsupportedMember(0x10C, Mk.DWORD)
+    contourBoundsL = UnsupportedMember(0x108, Mk.WORD)
+    contourBoundsT = UnsupportedMember(0x10A, Mk.WORD)
     contourBoundsR = UnsupportedMember(0x10C, Mk.WORD)
     contourBoundsB = UnsupportedMember(0x10E, Mk.WORD)
-    contourBoundsLU = UnsupportedMember(0x108, Mk.DWORD)
-    contourBoundsRB = UnsupportedMember(0x10C, Mk.DWORD)
     removeTimer = StructMember(0x110, Mk.WORD)
     """Hallucination, Dark Swarm, Disruption Web, Broodling
     (but not Scanner Sweep according to BWAPI)"""
