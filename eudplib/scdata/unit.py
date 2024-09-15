@@ -21,7 +21,7 @@ from .offsetmap import MemberKind as Mk
 
 # FIXME: integrate with CUnit MovementFlags
 class MovementFlags(ArrayEnumMember):
-    """Flags that enable/disable certain movement."""
+    """u8: Flags that enable/disable certain movement."""
 
     __slots__ = ()
     OrderedAtLeastOnce = Flag(0x01)
@@ -118,16 +118,23 @@ class AvailabilityFlags(ArrayEnumMember):
 class TrgUnit(ConstType, EPDOffsetMap):
     __slots__ = ()
     graphic = flingy = ArrayMember(0x6644F8, Mk.FLINGY)
+    "Flingy: Flingy of unit. 유닛의 비행정보."
     subUnit = ArrayMember(0x6607C0, Mk.UNIT)
+    "TrgUnit: Subunit of unit. 유닛의 부가유닛"
     # subunit2 = ArrayMember(0x660C38, Mk.WORD)
-    # subunit2 is unused
+    # subunit2 is unused. 유닛의 두번째 부가유닛. 사용되지 않습니다.
     # infestationUnit is not implemented yet (different beginning index)
     # SCBW_DATA(u16*, InfestedUnitPartial, unitsDat[3].address);
     # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
     # last valid id is UnitId::Special_OvermindCocoon
+    # 퀸이 감염 시켰을 경우 바뀌는 대상 유닛. 106-201 (건물)에만 존재합니다.
     constructionGraphic = ArrayMember(0x6610B0, Mk.IMAGE, stride=4)
+    """Image: Sets the graphic when the unit is built.
+
+    유닛이 건설될 때의 그래픽을 설정합니다.
+    """
     startDirection = ArrayMember(0x6605F0, Mk.BYTE)
-    """byte: Direction unit will face after it is created.
+    """u8: Direction unit will face after it is created.
 
     Values start at 0 (the unit will face the top of the screen) and go on clockwise
     through subsequent turning stages until 31 (unit will face a little left from the
@@ -147,8 +154,25 @@ class TrgUnit(ConstType, EPDOffsetMap):
     중인 테란 및 저그 건물은 보호막을 재생하지 않습니다.
     """
     maxShield = ArrayMember(0x660E00, Mk.WORD)
+    "u16: Shield amount of unit. 유닛의 최대 실드량."
     maxHp = ArrayMember(0x662350, Mk.DWORD)
+    """i32: Max hit point of unit.
+
+    Values above '10000' are allowed in the game, but no numbers are displayed.
+
+    유닛의 체력. '10000' 이상의 값은 게임에서 허용되지만 수치가 표시되지 않습니다.
+    """
     elevation = ArrayMember(0x663150, Mk.BYTE)
+    """u8: The unit's visible height.
+
+    When set to Air (12 <= elevation <= 18), allows the unit to pass over impassable
+    terrain or other ground units. The higher the value, sorts sprite elevation
+    higher and appear above other units.
+
+    유닛의 표시 높이. 공중으로 설정할 경우 (12 <= 높이 <= 18) 통과 불가 지형이나 다른
+    지상 유닛 위로 지나다닐 수 있습니다. 값이 높을수록 지형이나 다른 유닛보다 위에
+    표시됩니다.
+    """
     movementFlags = MovementFlags(0x660FC8, Mk.BYTE)
     rank = ArrayMember(0x663DD0, Mk.RANK)
     computerIdleOrder = ArrayMember(0x662EA0, Mk.UNIT_ORDER)
@@ -159,7 +183,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     groundWeapon = ArrayMember(0x6636B8, Mk.WEAPON)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
-    """byte: (UNUSED) Maximum number of hits this unit can deal to ground targets.
+    """u8: (UNUSED) Maximum number of hits this unit can deal to ground targets.
 
     This attribute represents the maximum number of hits this unit can inflict on a
     target with its ground weapon. For example, the Psi Blades have a `damageFactor`
@@ -171,7 +195,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     실제 공격 횟수는 iscript에서 결정됩니다.
     """
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
-    """byte: (UNUSED) Maximum number of hits this unit can deal to air targets.
+    """u8: (UNUSED) Maximum number of hits this unit can deal to air targets.
 
     This attribute represents the maximum number of hits this unit can inflict on a
     target with its air weapon. For example, Halo Rockets have a `damageFactor` of 2,
@@ -220,7 +244,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     sightRange = ArrayMember(0x663238, Mk.BYTE)
     armorUpgrade = ArrayMember(0x6635D0, Mk.UPGRADE)
     sizeType = ArrayMember(0x662180, Mk.UNIT_SIZE)
-    """byte: Size classification of the unit.
+    """u8: Size classification of the unit.
 
     Defines the size of unit as one of four types: `"Small"`, `"Medium"`, `"Large"`,
     or `"Independent"`. This size affects the damage calculation for various damage
