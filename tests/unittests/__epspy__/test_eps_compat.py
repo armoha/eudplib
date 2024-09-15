@@ -4,9 +4,15 @@ from eudplib.core.eudfunc import EUDTraceLog, EUDTracedFunc, EUDTracedTypedFunc,
 from eudplib.epscript.helper import _RELIMP, _IGVA, _CGFW, _ARR, _VARR, _SRET, _SV, _ATTW, _ARRW, _ATTC, _ARRC, _L2V, _LVAR, _LSH, _ALL
 # (Line 1) import .BGM_eps_test;
 # (Line 2) import .test_eps_stattext as stat;
-BGM_eps_test = _RELIMP(".", "BGM_eps_test")
+try:
+    BGM_eps_test = _RELIMP(".", "BGM_eps_test")
+except ImportError:
+    from . import BGM_eps_test
 # (Line 3) import py_math;
-stat = _RELIMP(".", "test_eps_stattext")
+try:
+    stat = _RELIMP(".", "test_eps_stattext")
+except ImportError:
+    from . import test_eps_stattext as stat
 import math
 # (Line 4) import py_sys;
 import sys

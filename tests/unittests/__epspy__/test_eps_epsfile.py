@@ -2,67 +2,67 @@
 from eudplib import *
 from eudplib.core.eudfunc import EUDTraceLog, EUDTracedFunc, EUDTracedTypedFunc, EUDTracedMethod, EUDTracedTypedMethod
 from eudplib.epscript.helper import _RELIMP, _IGVA, _CGFW, _ARR, _VARR, _SRET, _SV, _ATTW, _ARRW, _ATTC, _ARRC, _L2V, _LVAR, _LSH, _ALL
-# (Line 1) import .test_eps_misc.f_switch_test;
-# (Line 2) import .test_eps_misc.f_test_array;
-f_switch_test = _RELIMP(".test_eps_misc", "f_switch_test")
-# (Line 3) import .test_eps_misc.f_test_all_actions;
-f_test_array = _RELIMP(".test_eps_misc", "f_test_array")
-# (Line 5) import py_warnings;
-f_test_all_actions = _RELIMP(".test_eps_misc", "f_test_all_actions")
+# (Line 1) import .test_eps_misc;
+# (Line 3) import py_warnings;
+try:
+    test_eps_misc = _RELIMP(".", "test_eps_misc")
+except ImportError:
+    from . import test_eps_misc
 import warnings
-# (Line 6) import .test_eps_misc as misc;
-# (Line 7) import .report.C240903;
-misc = _RELIMP(".", "test_eps_misc")
-# (Line 8) function square(x) : None;
-C240903 = _RELIMP(".report", "C240903")
-# (Line 10) const a = [
-# (Line 11) square(1),
-# (Line 12) square(2),
-# (Line 13) square(3),
-# (Line 14) square(4),
-# (Line 15) square(5)
-# (Line 16) ];
+# (Line 4) import .report.C240903;
+# (Line 6) function square(x) : None;
+try:
+    C240903 = _RELIMP(".report", "C240903")
+except ImportError:
+    from .report import C240903
+# (Line 8) const a = [
+# (Line 9) square(1),
+# (Line 10) square(2),
+# (Line 11) square(3),
+# (Line 12) square(4),
+# (Line 13) square(5)
+# (Line 14) ];
 a = _CGFW(lambda: [_ARR(FlattenList([f_square(1), f_square(2), f_square(3), f_square(4), f_square(5)]))], 1)[0]
-# (Line 18) function testLineno() {
+# (Line 16) function testLineno() {
 @EUDFunc
 def f_testLineno():
-    # (Line 19) const foo = py_eval("warnings.warn");
+    # (Line 17) const foo = py_eval("warnings.warn");
     foo = eval("warnings.warn")
-    # (Line 20) foo("ㅇㅅㅇ");
+    # (Line 18) foo("ㅇㅅㅇ");
     foo("ㅇㅅㅇ")
-    # (Line 21) }
-    # (Line 23) function square(x) {
+    # (Line 19) }
+    # (Line 21) function square(x) {
 
 @EUDFunc
 def f_square(x):
-    # (Line 24) testLineno();
+    # (Line 22) testLineno();
     f_testLineno()
-    # (Line 25) const z = EUDArray(5);
+    # (Line 23) const z = EUDArray(5);
     z = EUDArray(5)
-    # (Line 26) return x * x; // + z.k;
+    # (Line 24) return x * x; // + z.k;
     EUDReturn(x * x)
-    # (Line 27) }
-    # (Line 29) const receives = py_eval('[PVariable() for _ in range(8)]');
+    # (Line 25) }
+    # (Line 27) const receives = py_eval('[PVariable() for _ in range(8)]');
 
 receives = _CGFW(lambda: [eval('[PVariable() for _ in range(8)]')], 1)[0]
-# (Line 30) const attack_gwpID = 4;
+# (Line 28) const attack_gwpID = 4;
 attack_gwpID = _CGFW(lambda: [4], 1)[0]
-# (Line 31) function constv_thing() {
+# (Line 29) function constv_thing() {
 @EUDFunc
 def f_constv_thing():
-    # (Line 32) foreach(i, pvar: py_enumerate(receives)) {}
+    # (Line 30) foreach(i, pvar: py_enumerate(receives)) {}
     for i, pvar in enumerate(receives):
-        # (Line 33) SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
+        # (Line 31) SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
         pass
 
-    # (Line 34) return a[0] + a[1] + a[2] + a[3] + a[4];
+    # (Line 32) return a[0] + a[1] + a[2] + a[3] + a[4];
     DoActions(SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID // 4, Add, _LSH(100,(attack_gwpID % 4 * 8)), _LSH(0xFF,(attack_gwpID % 4 * 8))))
     EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
-    # (Line 35) }
-    # (Line 37) function test_reported() {
+    # (Line 33) }
+    # (Line 35) function test_reported() {
 
 @EUDFunc
 def f_test_reported():
-    # (Line 38) return C240903.updateUnitNameAndRank();
+    # (Line 36) return C240903.updateUnitNameAndRank();
     EUDReturn(C240903.f_updateUnitNameAndRank())
-    # (Line 39) }
+    # (Line 37) }

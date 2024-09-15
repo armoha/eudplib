@@ -17,10 +17,8 @@ from .test_eps_cunit import f_test_cunit1, f_test_cunit2
 from .test_eps_epsfile import (
     f_constv_thing,
     f_square,
-    f_switch_test,
-    f_test_array,
-    f_test_all_actions,
     f_test_reported,
+    test_eps_misc,
 )
 from .test_eps_object import (
     f_test_eudmethods,
@@ -34,20 +32,20 @@ from .test_eps_object import (
 def test_epscript():
     test_equality("epScript compile 1", f_square(4), 16)
     test_equality("epScript compile 2", f_constv_thing(), 55)
-    a = f_switch_test()
+    a = test_eps_misc.f_switch_test()
     test_equality(
         "epScript switch",
         [a[0], a[1], a[2], a[3], a[4], a[5]],
         [1239, 1243, 1246, 1256, 1258, 1260],
     )
-    test_equality("epScript array", f_test_array(), 23)
+    test_equality("epScript array", test_eps_misc.f_test_array(), 23)
     v = f_test_write()
     test_equality(
         "epScript array write",
         v[1:],
         [v[0]] * (len(v) - 1),
     )
-    f_test_all_actions()
+    test_eps_misc.f_test_all_actions()
     c = f_test_compare()
     test_equality(
         "epScript array compare",

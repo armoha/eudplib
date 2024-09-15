@@ -91,17 +91,50 @@ def _RELIMP(path, mod_name, _cache={}):  # relative path import  # noqa: N802
     return module
 
 
+def _RELIMP(path, mod_name):  # noqa: N802
+    """relative path import"""
+    import importlib
+    import inspect
+    import pathlib
+    import sys
+
+    abs_path = pathlib.Path(inspect.getabsfile(inspect.currentframe().f_back))
+    pathsplit = path.split(".")
+    if len(path) + 1 == len(pathsplit):  # path == '.' * len(path)
+        pathsplit = pathsplit[1:]
+    for s in pathsplit:
+        if s == "":
+            abs_path = abs_path.parent
+        else:
+            abs_path = abs_path / s
+
+    abs_path = abs_path / mod_name
+    abs_import = None
+    # test if relative import can be converted to absolute import
+    for parent in sys.path:
+        try:
+            abs_import = abs_path.relative_to(parent)
+        except ValueError:
+            continue
+        else:
+            break
+    if abs_import is None:
+        raise ImportError("attempted relative import beyond top-level package")
+    else:
+        return importlib.import_module(str(abs_import).replace("\\", "."))
+
+
 def _IGVA(var_count, expr_list_gen):  # noqa: N802
     try:
         var_list = List2Assignable([EUDVariable(x) for x in expr_list_gen()])
     except (TriggerScopeError, NameError):
         var_list = EUDCreateVariables(var_count)
 
-        def _() -> None:
+        def _init_global_var() -> None:
             expr_list = expr_list_gen()
             SetVariables(var_list, expr_list)
 
-        EUDOnStart(_)
+        EUDOnStart(_init_global_var)
     return var_list
 
 
@@ -113,22 +146,22 @@ def _CGFW(exprf, retn):  # noqa: N802
     except NameError:
         rets = [ExprProxy(None) for _ in range(retn)]
 
-        def _():
+        def _init_global_const():
             vals = exprf()
             for ret, val in zip(rets, vals):
                 ret._value = val
 
-        EUDOnStart(_)
+        EUDOnStart(_init_global_const)
     end = Forward()
     SetNextTrigger(end)
     PopTriggerScope()
 
-    def _():
+    def _init():
         nonlocal end
         SetNextTrigger(start)
         end << NextTrigger()
 
-    EUDOnStart(_)
+    EUDOnStart(_init)
     return rets
 
 

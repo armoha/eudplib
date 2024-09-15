@@ -128,7 +128,16 @@ relimp_chunk ::= relimp_path(A) AS NAME(B) SEMICOLON. {
         throw_error(6754, "Importing already-declared module " + B->data, B->line);
     }
 
+    ps->gen << "try:\n";
+    ps->gen.indent();
     ps->gen << B->data << " = _RELIMP(\"" << impPath << "\", \"" << impModname << "\")" << std::endl;
+    ps->gen.unindent(false);
+    ps->gen << "except ImportError:\n";
+    ps->gen.indent();
+    if(!impPath.empty()) ps->gen << "from " << impPath << " ";
+    ps->gen << "import " << impModname << " as " << B->data << std::endl;
+    ps->gen.unindent(false);
+
     delete A; delete B;
 }
 relimp_chunk ::= relimp_path(A) SEMICOLON. {
@@ -150,7 +159,16 @@ relimp_chunk ::= relimp_path(A) SEMICOLON. {
         throw_error(6754, "Importing already-declared module " + impModname, A->line);
     }
 
+    ps->gen << "try:\n";
+    ps->gen.indent();
     ps->gen << impModname << " = _RELIMP(\"" << impPath << "\", \"" << impModname << "\")" << std::endl;
+    ps->gen.unindent(false);
+    ps->gen << "except ImportError:\n";
+    ps->gen.indent();
+    if(!impPath.empty()) ps->gen << "from " << impPath << " ";
+    ps->gen << "import " << impModname << std::endl;
+    ps->gen.unindent(false);
+
     delete A;
 }
 
