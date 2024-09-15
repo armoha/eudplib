@@ -60,14 +60,13 @@ pub fn generate_linetable<'a>(
     // co_positions is iterator of (int, int, int, int)
     // = (start_line, end_line, start_column, end_column)
     // TODO: use epScript column as well for richer error message
-    let epspy_lines: PyResult<Vec<u32>> = positions
+    let epspy_lines: Vec<u32> = positions
         .iter()?
         .map(|i| {
             i.and_then(|ob: Bound<'_, PyAny>| <(u32, u32, u32, u32)>::extract_bound(&ob))
-                .map(|x| x.0)
+                .map(|x| x.0).unwrap_or(u32::MAX)
         })
         .collect();
-    let epspy_lines = epspy_lines?;
 
     let linetable_reader = LinetableReader::new(linetable);
     let mut linetable_writer = LinetableWriter::new();
