@@ -159,7 +159,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     groundWeapon = ArrayMember(0x6636B8, Mk.WEAPON)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
-    """byte: (read-only) Maximum number of hits this unit can deal to ground targets.
+    """byte: (UNUSED) Maximum number of hits this unit can deal to ground targets.
 
     This attribute represents the maximum number of hits this unit can inflict on a
     target with its ground weapon. For example, the Psi Blades have a `damageFactor`
@@ -171,7 +171,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     실제 공격 횟수는 iscript에서 결정됩니다.
     """
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
-    """byte: (read-only) Maximum number of hits this unit can deal to air targets.
+    """byte: (UNUSED) Maximum number of hits this unit can deal to air targets.
 
     This attribute represents the maximum number of hits this unit can inflict on a
     target with its air weapon. For example, Halo Rockets have a `damageFactor` of 2,
