@@ -208,8 +208,12 @@ class TrgUnit(ConstType, EPDOffsetMap):
     buildingDimensions = ArrayMember(0x662860, Mk.POSITION)
     addonPlacement = NotImplementedMember(0x6626E0, Mk.POSITION)
     """AddonPlacement is not implemented yet because its beginning index isn't 0."""
-    # unitBoundsLURB = NotImplementedMember(0x6617C8, 2 * Mk.POSITION)
-    # """unitDimensions is not implemented yet."""
+    unitBoundsLT = ArrayMember(0x6617C8, Mk.POSITION, stride=8)
+    unitBoundsRB = ArrayMember(0x6617CC, Mk.POSITION, stride=8)
+    unitBoundsL = ArrayMember(0x6617C8, Mk.POSITION_X, stride=8)
+    unitBoundsT = ArrayMember(0x6617CA, Mk.POSITION_Y, stride=8)
+    unitBoundsR = ArrayMember(0x6617CC, Mk.POSITION_X, stride=8)
+    unitBoundsB = ArrayMember(0x6617CE, Mk.POSITION_Y, stride=8)
     portrait = ArrayMember(0x662F88, Mk.PORTRAIT)
     mineralCost = ArrayMember(0x663888, Mk.WORD)
     gasCost = ArrayMember(0x65FD00, Mk.WORD)
