@@ -27,6 +27,8 @@ from .unit import TrgUnit
 
 
 class MovementFlags(StructEnumMember):
+    """Flags that enable/disable certain movement."""
+
     __slots__ = ()
     OrderedAtLeastOnce = Flag(0x01)
     Accelerating = Flag(0x02)

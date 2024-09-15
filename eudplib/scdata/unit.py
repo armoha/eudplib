@@ -21,6 +21,8 @@ from .offsetmap import MemberKind as Mk
 
 # FIXME: integrate with CUnit MovementFlags
 class MovementFlags(ArrayEnumMember):
+    """Flags that enable/disable certain movement."""
+
     __slots__ = ()
     OrderedAtLeastOnce = Flag(0x01)
     Accelerating = Flag(0x02)
@@ -37,8 +39,11 @@ class MovementFlags(ArrayEnumMember):
 class GroupFlags(ArrayEnumMember):
     __slots__ = ()
     Zerg = Flag(0x01)
+    """Uses underlings, can build on creep"""
     Terran = Flag(0x02)
+    """Uses Supply, has sublabel, buildings will burn"""
     Protoss = Flag(0x04)
+    """Uses Psi"""
     Men = Flag(0x08)
     Building = Flag(0x10)
     Factory = Flag(0x20)
@@ -67,7 +72,7 @@ class BaseProperty(ArrayEnumMember):
     ResourceDepot = Flag(0x00001000)
     "Place where resources are brought back"
     ResourceContainer = Flag(0x00002000)
-    "Resource Source"
+    "Resource Source. Can be selected by `ModifyUnitResourceAmount` action."
     Robotic = Flag(0x00004000)
     Detector = Flag(0x00008000)
     Organic = Flag(0x00010000)
@@ -76,6 +81,7 @@ class BaseProperty(ArrayEnumMember):
     RequiresPsi = Flag(0x00080000)
     Burrowable = Flag(0x00100000)
     Spellcaster = Flag(0x00200000)
+    "Can be selected by `ModifyUnitEnergy` action"
     PermanentCloak = Flag(0x00400000)
     PickupItem = Flag(0x00800000)
     "data disc, crystals, mineral chunks, gas tanks, etc."
@@ -120,8 +126,26 @@ class TrgUnit(ConstType, EPDOffsetMap):
     # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
     # last valid id is UnitId::Special_OvermindCocoon
     constructionGraphic = ArrayMember(0x6610B0, Mk.IMAGE, stride=4)
-    startDirection = ArrayMember(0x6605F0, Mk.BYTE)  # 0~31, 32
+    startDirection = ArrayMember(0x6605F0, Mk.BYTE)
+    """byte: Direction unit will face after it is created.
+
+    Values start at 0 (the unit will face the top of the screen) and go on clockwise
+    through subsequent turning stages until 31 (unit will face a little left from the
+    complete turn). Value of 32 means unit will face a random direction.
+
+    유닛이 생성된 후 향하게 될 방향입니다. 값은 0(위쪽)에서 시작하여 이후 시계
+    방향으로 31(위쪽에서 약간 왼쪽)까지 증가합니다. 값이 32이면 랜덤 방향을 향하게
+    됩니다.
+    """
     hasShield = ArrayMember(0x6647B0, Mk.BOOL)
+    """bool: Flag indicating if the unit's shields are enabled.
+
+    When enabled, the unit's shields can be modified with `ModifyUnitShields` action.
+    Note that Terran and Zerg buildings under construction do not regenerate shields.
+
+    활성화하면 `ModifyUnitShields` 액션으로 유닛의 보호막을 수정할 수 있습니다. 건설
+    중인 테란 및 저그 건물은 보호막을 재생하지 않습니다.
+    """
     maxShield = ArrayMember(0x660E00, Mk.WORD)
     maxHp = ArrayMember(0x662350, Mk.DWORD)
     elevation = ArrayMember(0x663150, Mk.BYTE)
@@ -135,7 +159,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     groundWeapon = ArrayMember(0x6636B8, Mk.WEAPON)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
     maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
-    """(read-only) Maximum number of hits this unit can deal to ground targets.
+    """byte: (read-only) Maximum number of hits this unit can deal to ground targets.
 
     This attribute represents the maximum number of hits this unit can inflict on a
     target with its ground weapon. For example, the Psi Blades have a `damageFactor`
@@ -147,7 +171,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     실제 공격 횟수는 iscript에서 결정됩니다.
     """
     maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
-    """(read-only) Maximum number of hits this unit can deal to air targets.
+    """byte: (read-only) Maximum number of hits this unit can deal to air targets.
 
     This attribute represents the maximum number of hits this unit can inflict on a
     target with its air weapon. For example, Halo Rockets have a `damageFactor` of 2,
@@ -159,7 +183,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     횟수는 iscript에서 결정됩니다.
     """
     ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL)
-    """Flag indicating whether the unit is excluded from Strategic Suicide Missions.
+    """bool: Flag indicating if the unit is excluded from Strategic Suicide Missions.
 
     When `ignoreStrategicSuicideMissions` is enabled, the unit will be excluded from
     Strategic Suicide Missions. Disabling this flag does not have a noticeable effect
@@ -172,7 +196,7 @@ class TrgUnit(ConstType, EPDOffsetMap):
     둘 다 켜져있거나 둘 다 꺼져있습니다.
     """
     dontBecomeGuard = ArrayMember(0x660178, Mk.BIT_1)
-    """Flag to prevent unit from returning to original position when target disappears.
+    """bool: Flag to prevent unit from returning to original position.
 
     Enabling `dontBecomeGuard` can cause game crashes, especially if the CPU controls
     the unit. This flag prevents the unit from returning to its original position if
@@ -190,12 +214,24 @@ class TrgUnit(ConstType, EPDOffsetMap):
     Missions에 대상이 됩니다. 이 플래그가 설정된 유닛은 `baseProperty.Worker`가
     있거나 (유닛 AI 타입 2가 됨), `baseProperty.Building`이 있고 베스핀 간헐천이
     아니거나, 라바/에그/오버로드인 경우 (유닛AI 타입 3이 됨) AI가 할당됩니다.
-    """  # noqa: E501
+    """
     baseProperty = BaseProperty(0x664080, Mk.DWORD)
     seekRange = ArrayMember(0x662DB8, Mk.BYTE)
     sightRange = ArrayMember(0x663238, Mk.BYTE)
     armorUpgrade = ArrayMember(0x6635D0, Mk.UPGRADE)
     sizeType = ArrayMember(0x662180, Mk.UNIT_SIZE)
+    """byte: Size classification of the unit.
+
+    Defines the size of unit as one of four types: `"Small"`, `"Medium"`, `"Large"`,
+    or `"Independent"`. This size affects the damage calculation for various damage
+    types. Damage multipliers for weapon damage types against each unit size are
+    located at memory address `0x515B84`.
+
+    유닛의 크기를 네 가지 타입 중 하나로 정의합니다: `"Small"`, `"Medium"`,
+    `"Large"`, `"Independent"`. 방어 타입은 무기 타입에 따른 대미지 계산에 영향을
+    줍니다. 각 무기 타입마다 방어 타입에 대한 대미지 비율은 메모리 주소 `0x515B84`에
+    있습니다.
+    """
     armor = ArrayMember(0x65FEC8, Mk.BYTE)
     rightClickAction = ArrayMember(0x662098, Mk.RCLICK_ACTION)
     readySound = ArrayMember(0x661FC0, Mk.SFXDATA_DAT)
@@ -206,6 +242,23 @@ class TrgUnit(ConstType, EPDOffsetMap):
     yesSoundStart = ArrayMember(0x663C10, Mk.SFXDATA_DAT)
     yesSoundEnd = ArrayMember(0x661440, Mk.SFXDATA_DAT)
     buildingDimensions = ArrayMember(0x662860, Mk.POSITION)
+    """Position: Dimensions for building placement and visibility.
+
+    This dimension is used when determining if units with the Building flag can fit
+    in the available spaace. Units without the Building flag will rely on their
+    collision dimensions instead. Setting to 0x0 will make the unit invisible: It
+    won't appear on screen and minimap, can't be selected by the mouse, and can't be
+    targetted by other units. `Bring` condition will not locate it. Setting this to
+    a size of 31x31 or smaller will allow buildings to be built on any terrain,
+    including water and cliffs, although the placement mechanics are a little wonky.
+
+    건물 플래그가 있는 유닛이 공간에 들어갈 수 있는지 여부를 결정할 때 사용됩니다.
+    건물 플래그가 없는 유닛은 대신 유닛 크기에 의존합니다. 0x0으로 설정하면 유닛이
+    보이지 않게 됩니다: 화면과 미니맵에 나타나지 않고 마우스로 선택할 수 없으며 다른
+    유닛이 타겟팅할 수 없습니다. `Bring` 조건은 유닛을 찾지 못합니다. 이 크기를 31x31
+    이하로 설정하면 배치 메커니즘이 약간 불안정하지만 물과 절벽을 포함한 모든 지형에
+    건물을 지을 수 있습니다.
+    """
     addonPlacement = NotImplementedMember(0x6626E0, Mk.POSITION)
     """AddonPlacement is not implemented yet because its beginning index isn't 0."""
     unitBoundsLT = ArrayMember(0x6617C8, Mk.POSITION, stride=8)
@@ -227,6 +280,14 @@ class TrgUnit(ConstType, EPDOffsetMap):
     buildScore = ArrayMember(0x663408, Mk.WORD)
     killScore = ArrayMember(0x663EB8, Mk.WORD)
     nameString = ArrayMember(0x660260, Mk.MAP_STRING)
+    """TrgString: Map string id for the unit's name.
+
+    When this property is non-zero, the unit's name is read from the strings in
+    the currently loaded map (CHK) rather than from the `stat_txt.tbl` file.
+
+    이 속성이 0이 아닌 경우, 유닛의 이름은 `stat_txt.tbl` 파일 대신 현재 로드된
+    맵(CHK) 내의 문자열에서 읽어옵니다.
+    """
     broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)  # bool?
     availabilityFlags = AvailabilityFlags(0x661518, Mk.WORD)
 
