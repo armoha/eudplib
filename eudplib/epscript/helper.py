@@ -29,65 +29,6 @@ from ..utils import (
 )
 
 
-def _RELIMP(path, mod_name, _cache={}):  # relative path import  # noqa: N802
-    import importlib.util
-    import inspect
-    import pathlib
-
-    from .epsimp import EPSLoader
-
-    p = pathlib.Path(inspect.getabsfile(inspect.currentframe().f_back))
-    pathsplit = path.split(".")
-    if len(path) + 1 == len(pathsplit):  # path == '.' * len(path)
-        pathsplit = pathsplit[1:]
-    for s in pathsplit:
-        if s == "":
-            p = p.parent
-        else:
-            p = p / s
-
-    abs_path = p / mod_name
-    if abs_path in _cache:
-        return _cache[abs_path]
-
-    def py_module(mod_name, p):
-        spec = importlib.util.spec_from_file_location(
-            mod_name, p / (mod_name + ".py")
-        )
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
-
-    def eps_module(mod_name, p):
-        loader = EPSLoader(mod_name, str(p / (mod_name + ".eps")))
-        spec = importlib.util.spec_from_loader(mod_name, loader)
-        module = loader.create_module(spec)
-        loader.exec_module(module)
-        return module
-
-    try:
-        module = py_module(mod_name, p)
-    except FileNotFoundError:
-        try:
-            module = eps_module(mod_name, p)
-        except FileNotFoundError:
-            item_name = mod_name
-            mod_name = p.name
-            p = p.parent
-            abs_path = p / mod_name
-            if abs_path in _cache:
-                module = _cache[abs_path]
-            else:
-                try:
-                    module = py_module(mod_name, p)
-                except FileNotFoundError:
-                    module = eps_module(mod_name, p)
-                _cache[abs_path] = module
-            return getattr(module, item_name)
-    _cache[abs_path] = module
-    return module
-
-
 def _RELIMP(path, mod_name):  # noqa: N802
     """relative path import"""
     import importlib
