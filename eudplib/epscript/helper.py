@@ -3,7 +3,6 @@ from types import ModuleType
 from ..collections import EUDArray
 from ..core import (
     ConstExpr,
-    EUDCreateVariables,
     EUDVariable,
     EUDVArray,
     Forward,
@@ -14,7 +13,6 @@ from ..core import (
     SeqCompute,
     SetNextTrigger,
     SetTo,
-    SetVariables,
     f_bitlshift,
 )
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf
@@ -25,7 +23,6 @@ from ..utils import (
     ExprProxy,
     FlattenList,
     List2Assignable,
-    TriggerScopeError,
     ep_assert,
     ep_warn,
     isUnproxyInstance,
@@ -124,18 +121,68 @@ def _RELIMP(path, mod_name):  # noqa: N802
         return importlib.import_module(str(abs_import).replace("\\", "."))
 
 
-def _IGVA(var_count, expr_list_gen):  # noqa: N802
-    try:
-        var_list = List2Assignable([EUDVariable(x) for x in expr_list_gen()])
-    except (TriggerScopeError, NameError):
-        var_list = EUDCreateVariables(var_count)
+def _TYGV(types, expr_list_gen):  # noqa: N802
+    PushTriggerScope()
+    init_start = NextTrigger()
+    values = expr_list_gen()
+    var_list = []
+    for ty, value in zip(types, values):
+        is_eudvar = IsEUDVariable(value)
+        is_untyped = ty is None or issubclass(ty, EUDVariable)
+        if not is_untyped:
+            value = ty.cast(value)
+        if not is_eudvar:
+            value = EUDVariable(value)
+            if not is_untyped:
+                value = ty.cast(value)
+        var_list.append(value)
+    nptr = Forward()
+    SetNextTrigger(nptr)
+    PopTriggerScope()
 
-        def _init_global_var() -> None:
-            expr_list = expr_list_gen()
-            SetVariables(var_list, expr_list)
+    def _init_global_var() -> None:
+        nonlocal nptr
+        SetNextTrigger(init_start)
+        nptr << NextTrigger()
 
-        EUDOnStart(_init_global_var)
-    return var_list
+    EUDOnStart(_init_global_var)
+    return List2Assignable(var_list)
+
+
+def _TYSV(types, vs):  # noqa: N802
+    var_list = []
+    for ty, v in zip(types, vs):
+        is_untyped = ty is None or issubclass(ty, EUDVariable)
+        if not is_untyped:
+            v = ty.cast(v)
+        value = EUDVariable(v)
+        if not is_untyped:
+            value = ty.cast(value)
+        var_list.append(value)
+    return List2Assignable(var_list)
+
+
+def _TYLV(types, vs):  # noqa: N802
+    from ..core.variable.eudv import _yield_and_check_rvalue
+
+    ret, ops = [], []
+    for ty, v_and_is_rvalue in zip(types, _yield_and_check_rvalue(vs, 1)):
+        is_untyped = ty is None or issubclass(ty, EUDVariable)
+        v, is_rvalue = v_and_is_rvalue
+        is_eudvar = IsEUDVariable(v)
+        if is_eudvar and is_rvalue:
+            nv = v.makeL()
+        else:
+            if not is_untyped:
+                v = ty.cast(v)
+            nv = EUDVariable()
+            ops.append((nv, SetTo, v))
+        if not is_untyped:
+            nv = ty.cast(nv)
+        ret.append(nv)
+    if ops:
+        SeqCompute(ops)
+    return List2Assignable(ret)
 
 
 def _CGFW(exprf, retn):  # noqa: N802
@@ -510,22 +557,6 @@ def _L2V(logic):  # noqa: N802, logic to value
         ret << 0
     EUDEndIf()
     return ret
-
-
-def _LVAR(vs):  # noqa: N802
-    from ..core.variable.eudv import _yield_and_check_rvalue
-
-    ret, ops = [], []
-    for v, is_rvalue in _yield_and_check_rvalue(vs, 1):
-        if IsEUDVariable(v) and is_rvalue:
-            ret.append(v.makeL())
-        else:
-            nv = EUDVariable()
-            ret.append(nv)
-            ops.append((nv, SetTo, v))
-    if ops:
-        SeqCompute(ops)
-    return List2Assignable(ret)
 
 
 def _LSH(lhs, r):  # noqa: N802
