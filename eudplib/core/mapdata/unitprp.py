@@ -7,7 +7,7 @@
 from ctypes import LittleEndianStructure, c_byte, c_uint, c_ushort
 from struct import pack, unpack_from
 
-from eudplib import utils as ut
+from ... import utils as ut
 
 
 class UnitProperty(LittleEndianStructure):

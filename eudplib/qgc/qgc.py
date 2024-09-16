@@ -4,10 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
-from eudplib.utils import EPD, ep_assert
-
+from .. import core as c
+from .. import ctrlstru as cs
 from ..memio import (
     EUDByteWriter,
     f_dwread_epd,
@@ -15,6 +13,7 @@ from ..memio import (
     f_setcurpl2cpcache,
 )
 from ..scdata import CurrentPlayer, TrgUnit
+from ..utils import EPD, ep_assert
 
 _PROV_MAXBUFFER = 0x57F0D8
 _cmdqlen = c.EUDVariable()

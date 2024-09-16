@@ -6,11 +6,10 @@
 
 from collections.abc import Iterator
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
-from eudplib import utils as ut
-from eudplib.localize import _
-
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
+from ...localize import _
 from ...memio import (
     f_bread_cp,
     f_cunitepdread_epd,

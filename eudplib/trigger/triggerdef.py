@@ -6,10 +6,9 @@
 
 from collections.abc import Iterable
 
-from eudplib import utils as ut
-from eudplib.localize import _
-
 from .. import core as c
+from .. import utils as ut
+from ..localize import _
 from .tpatcher import patch_action, patch_condition
 
 Conditions = (

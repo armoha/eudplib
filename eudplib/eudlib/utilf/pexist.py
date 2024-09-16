@@ -5,10 +5,9 @@
 # file that should have been included as part of this package.
 from collections.abc import Iterator
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
-from eudplib import utils as ut
-
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...localize import _
 from ...memio import f_getcurpl, f_setcurpl

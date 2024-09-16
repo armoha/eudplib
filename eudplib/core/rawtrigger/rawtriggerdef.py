@@ -10,10 +10,9 @@ from typing import Literal, TypeAlias, overload
 
 from typing_extensions import Self
 
-from eudplib import utils as ut
-from eudplib.localize import _
-
+from ... import utils as ut
 from ...bindings._rust import allocator as alc
+from ...localize import _
 from ..allocator import ConstExpr, IsConstExpr
 from ..allocator.payload import ObjCollector
 from ..eudobj import EUDObject

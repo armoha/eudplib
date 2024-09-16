@@ -5,9 +5,8 @@
 # file that should have been included as part of this package.
 from typing import Any
 
-from eudplib.utils import ep_warn
-
 from ..localize import _
+from ..utils import ep_warn
 
 _objns: dict[str, Any] = {}
 

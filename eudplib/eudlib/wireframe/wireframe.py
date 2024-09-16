@@ -1,15 +1,13 @@
 from typing import ClassVar
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
-from eudplib import utils as ut
-from eudplib.maprw.injector.mainloop import (
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
+from ...collections.eudarray import EUDArray
+from ...maprw.injector.mainloop import (
     eud_onstart2,
     has_already_started,
 )
-from eudplib.scdata import CurrentPlayer, TrgUnit
-
-from ...collections.eudarray import EUDArray
 from ...memio import (
     f_dwread_cp,
     f_epdread_epd,
@@ -17,6 +15,7 @@ from ...memio import (
     f_repmovsd_epd,
     f_setcurpl2cpcache,
 )
+from ...scdata import CurrentPlayer, TrgUnit
 from . import wiredata as wd
 
 is64bit = c.EUDLightBool()

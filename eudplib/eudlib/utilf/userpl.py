@@ -6,10 +6,9 @@
 
 from typing_extensions import Self
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
-from eudplib import utils as ut
-
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from ...memio import f_bread_epd, f_dwread_epd
 from ...scdata import TrgPlayer
 

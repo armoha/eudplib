@@ -4,7 +4,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from eudplib.core.mapdata.chktok import CHK
+from .chktok import CHK
 
 
 class PlayerInfo:
@@ -59,6 +59,6 @@ def init_player_info(chkt: CHK) -> None:
 
 
 def GetPlayerInfo(player) -> PlayerInfo:  # noqa: N802
-    from eudplib.core.rawtrigger.constenc import EncodePlayer
+    from ..rawtrigger.constenc import EncodePlayer
 
     return _playerinfo[EncodePlayer(player)]

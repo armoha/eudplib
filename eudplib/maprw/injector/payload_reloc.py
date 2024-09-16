@@ -4,10 +4,9 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from eudplib import utils as ut
-
 from ... import core as c
 from ... import ctrlstru as cs
+from ... import utils as ut
 from ...core.allocator.pbuffer import Payload
 from ...memio import f_dwread_epd
 

@@ -6,10 +6,9 @@
 
 import string
 
-from eudplib import core as c
-from eudplib import utils as ut
-from eudplib.localize import _
-
+from .. import core as c
+from .. import utils as ut
+from ..localize import _
 from .cpprint import PColor, PName, eprint_all, f_cpstr_print, f_eprintln
 from .dbstr import DBString
 from .eudprint import epd2s, f_dbstr_print, hptr, ptr2s

@@ -10,9 +10,8 @@ from typing import TYPE_CHECKING
 
 from typing_extensions import Self
 
-from eudplib import utils as ut
-from eudplib.localize import _
-
+from ... import utils as ut
+from ...localize import _
 from ..allocator import ConstExpr, IsConstExpr
 from .consttype import Byte, Dword, Word
 

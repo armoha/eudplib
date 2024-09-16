@@ -4,8 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from eudplib import core as c
-from eudplib import utils as ut
+from .. import core as c
+from .. import utils as ut
 
 
 class EUDVArrayReader:

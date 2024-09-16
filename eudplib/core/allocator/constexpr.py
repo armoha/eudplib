@@ -6,8 +6,7 @@
 
 from typing import TypeAlias
 
-from eudplib.bindings._rust import allocator as al
-
+from ...bindings._rust import allocator as al
 from ...utils import ExprProxy
 from .rlocint import RlocInt_C
 

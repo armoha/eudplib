@@ -6,8 +6,6 @@
 
 from typing import Literal, overload
 
-from eudplib.localize import _
-
 from .. import core as c
 from ..core import (
     Action,
@@ -18,6 +16,7 @@ from ..core import (
     EUDVariable,
     Forward,
 )
+from ..localize import _
 from ..utils import EPD, EPError, ExprProxy, ep_warn, unProxy
 from .filler import (
     _filldw,

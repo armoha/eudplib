@@ -6,8 +6,7 @@
 
 from typing_extensions import Self
 
-from eudplib.core.allocator.payload import ObjCollector
-
+from ...core.allocator.payload import ObjCollector
 from .allocator import ConstExpr, ObjAllocator, PayloadBuffer, RlocInt_C
 
 class EUDObject(ConstExpr):

@@ -1,7 +1,6 @@
 from collections.abc import ByteString
 
-from eudplib import utils as ut
-
+from ... import utils as ut
 from ...core.allocator.pbuffer import Payload
 from ...core.mapdata.chktok import CHK
 from ...core.mapdata.stringmap import get_string_map, get_string_section_name

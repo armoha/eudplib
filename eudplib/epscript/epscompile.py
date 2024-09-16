@@ -7,7 +7,7 @@
 import platform
 from ctypes import CDLL, c_char_p, c_int, c_void_p
 
-from eudplib.utils import find_data_file, u2b
+from ..utils import find_data_file, u2b
 
 _libfile = {
     "Linux": "libepScriptLib.so",  # Linux

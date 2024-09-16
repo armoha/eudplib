@@ -8,9 +8,8 @@ import difflib
 from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, TypeAlias, overload
 
-from eudplib import utils as ut
-from eudplib.localize import _
-
+from ... import utils as ut
+from ...localize import _
 from ...utils import ExprProxy
 from ..mapdata import (
     GetLocationIndex,

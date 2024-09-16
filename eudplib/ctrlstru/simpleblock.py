@@ -6,10 +6,9 @@
 
 from typing import Literal, TypedDict
 
-from eudplib import utils as ut
-from eudplib.localize import _
-
 from .. import core as c
+from .. import utils as ut
+from ..localize import _
 from .basicstru import EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 

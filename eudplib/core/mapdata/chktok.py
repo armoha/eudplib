@@ -6,8 +6,8 @@
 
 from __future__ import annotations
 
-from eudplib import utils as ut
-from eudplib.localize import _
+from ... import utils as ut
+from ...localize import _
 
 """
 General CHK class.

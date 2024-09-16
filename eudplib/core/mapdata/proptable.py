@@ -5,9 +5,8 @@
 # file that should have been included as part of this package.
 
 
-from eudplib import utils as ut
-from eudplib.localize import _
-
+from ... import utils as ut
+from ...localize import _
 from .chktok import CHK
 from .unitprp import UnitProperty, property_key
 

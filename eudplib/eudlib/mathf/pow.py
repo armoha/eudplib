@@ -4,8 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
+from ... import core as c
+from ... import ctrlstru as cs
 
 
 @c.EUDFunc

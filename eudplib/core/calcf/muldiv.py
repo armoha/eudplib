@@ -7,8 +7,7 @@
 import math
 from collections.abc import Callable
 
-from eudplib import utils as ut
-
+from ... import utils as ut
 from ...localize import _
 from .. import allocator as ac
 from .. import rawtrigger as rt

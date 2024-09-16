@@ -10,10 +10,9 @@ import sys
 import types
 from importlib.machinery import FileFinder, SourceFileLoader
 
-from eudplib.bindings._rust import epscript
-from eudplib.localize import _
-from eudplib.utils import EPError
-
+from ..bindings._rust import epscript
+from ..localize import _
+from ..utils import EPError
 from .epscompile import epsCompile
 
 lineno_regex = re.compile(b" *# \\(Line (\\d+)\\) (.+)")

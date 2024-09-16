@@ -7,11 +7,10 @@
 from itertools import chain, combinations
 from typing import Literal
 
-from eudplib import utils as ut
-from eudplib.localize import _
-
 from .. import core as c
 from .. import trigger as tg
+from .. import utils as ut
+from ..localize import _
 from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 from .jumptable import JumpTriggerForward

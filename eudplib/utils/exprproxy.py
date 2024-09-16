@@ -7,7 +7,7 @@
 import types
 from typing import Generic, TypeAlias, TypeGuard, TypeVar, overload
 
-from eudplib.localize import _
+from ..localize import _
 
 T_co = TypeVar("T_co", covariant=True)
 

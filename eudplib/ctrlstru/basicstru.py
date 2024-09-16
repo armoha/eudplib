@@ -7,10 +7,9 @@
 from collections.abc import Callable
 from typing import Any
 
-from eudplib import utils as ut
-
 from .. import core as c
 from .. import trigger as tg
+from .. import utils as ut
 from ..localize import _
 
 

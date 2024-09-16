@@ -4,10 +4,10 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
-from eudplib import utils as ut
-from eudplib.localize import _
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
+from ...localize import _
 
 
 def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:  # noqa: N802

@@ -20,8 +20,8 @@ from ctypes import (
 )
 from tempfile import NamedTemporaryFile
 
-from eudplib.localize import _
-from eudplib.utils import EPError, b2u, b2utf8, find_data_file, u2b, u2utf8
+from ...localize import _
+from ...utils import EPError, b2u, b2utf8, find_data_file, u2b, u2utf8
 
 # Constants
 MPQ_FILE_COMPRESS = 0x00000200

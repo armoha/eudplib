@@ -7,10 +7,9 @@
 import time
 from typing import TYPE_CHECKING, TypeAlias
 
-from eudplib.bindings._rust import allocator
-from eudplib.localize import _
-from eudplib.utils import EPError, _rand_lst, ep_assert
-
+from ...bindings._rust import allocator
+from ...localize import _
+from ...utils import EPError, _rand_lst, ep_assert
 from .constexpr import Evaluable, Evaluate, Forward
 from .pbuffer import Payload
 from .rlocint import RlocInt, RlocInt_C

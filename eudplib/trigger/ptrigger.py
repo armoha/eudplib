@@ -7,9 +7,8 @@
 from collections.abc import Iterable
 from typing import TypeAlias
 
-from eudplib import utils as ut
-
 from .. import core as c
+from .. import utils as ut
 from ..core.mapdata.playerinfo import PlayerInfo
 from ..core.rawtrigger.constenc import _Player
 from .triggerdef import Actions, Conditions, Trigger

@@ -6,9 +6,8 @@
 
 from collections.abc import Iterable, Sequence
 
-from eudplib import utils as ut
-
 from .. import core as c
+from .. import utils as ut
 from ..core import Condition, ConstExpr
 from ..core.rawtrigger.rawtriggerdef import _Action
 from .tpatcher import _Condition, patch_condition

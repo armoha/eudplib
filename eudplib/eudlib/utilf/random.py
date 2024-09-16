@@ -6,10 +6,9 @@
 
 # This code uses simple LCG algorithm.
 
-from eudplib import core as c
-from eudplib import ctrlstru as cs
-from eudplib import utils as ut
-
+from ... import core as c
+from ... import ctrlstru as cs
+from ... import utils as ut
 from ...memio import f_wread_epd
 
 _seed: c.EUDVariable = c.EUDVariable()

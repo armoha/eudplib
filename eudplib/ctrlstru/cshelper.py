@@ -8,7 +8,7 @@
 from collections.abc import Callable
 from typing import NoReturn
 
-from eudplib.localize import _
+from ..localize import _
 
 
 class CtrlStruOpener:
