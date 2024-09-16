@@ -6,8 +6,10 @@
 
 from typing_extensions import Self
 
-from eudplib import core as c
-from eudplib import utils as ut
+from .. import core as c
+from .. import utils as ut
+from ..ctrlstru import DoActions
+from .strcommon import temp_string_id
 
 
 class DBString(ut.ExprProxy):
@@ -40,23 +42,21 @@ class DBString(ut.ExprProxy):
 
         :returns: Memory address of DBString content.
         """
-        return self + 8
+        return self
 
-    @c.EUDMethod
     def Display(self):  # noqa: N802
-        from .strbuffer import GetGlobalStringBuffer
+        strid = temp_string_id()
+        DoActions(
+            c.SetMemory(0x191943C8 + 4 * strid, c.SetTo, self - 0x191943C8),
+            c.DisplayText(strid),
+        )
 
-        gsb = GetGlobalStringBuffer()
-        gsb.printf("{:t}", ut.EPD(self) + 1)
-
-    @c.EUDMethod
     def Play(self):  # noqa: N802
-        from .strbuffer import GetGlobalStringBuffer
-
-        gsb = GetGlobalStringBuffer()
-        gsb.insert(0)
-        gsb.appendf("{:t}", ut.EPD(self) + 1)
-        gsb.Play()
+        strid = temp_string_id()
+        DoActions(
+            c.SetMemory(0x191943C8 + 4 * strid, c.SetTo, self - 0x191943C8),
+            c.PlayWAV(strid),
+        )
 
 
 class DBStringData(c.EUDObject):
@@ -82,9 +82,8 @@ class DBStringData(c.EUDObject):
             self.content = ut.u2utf8(content)
 
     def GetDataSize(self):  # noqa: N802
-        return len(self.content) + 9
+        return len(self.content) + 1
 
     def WritePayload(self, pbuf):  # noqa: N802
-        pbuf.WriteBytes(b"\x01\x00\x00\x00\x08\x00\x00\x00")
         pbuf.WriteBytes(self.content)
         pbuf.WriteByte(0)
