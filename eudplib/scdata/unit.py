@@ -175,10 +175,49 @@ class TrgUnit(ConstType, EPDOffsetMap):
     """
     movementFlags = MovementFlags(0x660FC8, Mk.BYTE)
     rank = ArrayMember(0x663DD0, Mk.RANK)
+    """u16: Stat text id offset for unit rank, starting from [1302] Recruit.
+
+    Sets the rank of the unit. Unit status text is prioritized in the following order
+    (1) Hallucination (2) Buildings that are Disabled, Lockdown, Stasis, or Maelstrom
+    (3) Acid Spores (4) Blind (5) Parasite (6) Detector (7) Rank. For a rank to be
+    visible, it must have no `Building` and `SingleEntity` flags in `baseProperty`,
+    and not be a Civilian or Spider Mine. Gantrithor, Battlecruiser, Norad II, and
+    Hyperion must use their default names (`nameString` must be 0) to use the
+    Tassadar/Admiral rank as fixed. Other units must only have `Terran` enabled in
+    their race flags in `groupFlags` to see their ranks.
+
+    유닛의 계급을 설정합니다. 유닛 상태 텍스트의 우선순위는 다음과 같습니다:
+    (1) 할루시네이션 (2) 디시블, 락다운, 스테이시스, 마엘스트롬에 걸린 건물
+    (3) 애시드 스포어 (4) 블라인드 (5) 패러사이트 (6) 디텍터 (7) 계급. 계급이
+    보이려면 `baseProperty`에 `Building`과 `SingleEntity` 플래그가 없어야하고,
+    시민이나 스파이더 마인이 아니어야 합니다. 간트리서, 배틀크루저, 노라드 II,
+    히페리온은 기본 이름을 사용해야 (`nameString`이 0이어야) 태사다르/제독 계급을
+    고정으로 사용합니다. 이 외의 유닛은 `groupFlags`의 종족 플래그에서 `Terran`만
+    활성화해야 계급이 보입니다.
+    """
     computerIdleOrder = ArrayMember(0x662EA0, Mk.UNIT_ORDER)
+    """UnitOrder: An order issued when unit owned by computer is doing nothing.
+
+    컴퓨터의 유닛이 아무것도 하고있지 않을 때 내려지는 명령.
+    """
     humanIdleOrder = ArrayMember(0x662268, Mk.UNIT_ORDER)
+    """UnitOrder: An order issued when unit owned by huamn is doing nothing
+
+    사람의 유닛이 아무것도 하고있지 않을 때 내려지는 명령.
+    """
     returnToIdleOrder = ArrayMember(0x664898, Mk.UNIT_ORDER)
+    """UnitOrder: An order issued when unit return to idle state.
+
+    유닛이 이전 명령을 수행한 후 아무것도 하지 않는 상태로 돌아가는 명령.
+    """
     attackUnitOrder = ArrayMember(0x663320, Mk.UNIT_ORDER)
+    """UnitOrder: An order performed when a unit is ordered to attack.
+
+    Also performed by right-clicking if the target is an enemy.
+
+    유닛이 대상을 공격하라고 명령 받았을 때 수행하는 명령. 대상이 적이면 우클릭으로도
+    수행합니다.
+    """
     attackMoveOrder = ArrayMember(0x663A50, Mk.UNIT_ORDER)
     groundWeapon = ArrayMember(0x6636B8, Mk.WEAPON)
     airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
