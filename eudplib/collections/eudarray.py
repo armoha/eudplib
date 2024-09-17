@@ -20,6 +20,8 @@ class EUDArrayData(c.EUDObject):
     Structure for storing multiple values.
     """
 
+    __slots__ = ("_datas", "_arrlen")
+
     dont_flatten = True
 
     def __new__(cls, *args, **kwargs) -> Self:
