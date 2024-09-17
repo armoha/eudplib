@@ -12,8 +12,8 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 from ..core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ..core.eudfunc.eudtypedfuncn import EUDTypedFuncN
-from . import iotable
 from . import modcurpl as cp
+from . import readtable
 
 
 @functools.cache
@@ -156,8 +156,8 @@ def f_readgen_cp(
 
 
 def f_maskread_epd(targetplayer, mask, *, _fdict={}, **kwargs):
-    if iotable._is_consecutive(mask):
-        return iotable._insert_or_get(mask, 0)(targetplayer, **kwargs)
+    if readtable._is_consecutive(mask):
+        return readtable._insert_or_get(mask, 0)(targetplayer, **kwargs)
 
     if mask not in _fdict:
         _fdict[mask] = f_readgen_epd(mask, (0, lambda x: x))

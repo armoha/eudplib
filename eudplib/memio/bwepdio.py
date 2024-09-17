@@ -9,8 +9,8 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 from . import cpmemio as cpm
 from . import dwepdio as dwm
-from . import iotable
 from . import modcurpl as cp
+from . import readtable
 
 # Helper functions
 
@@ -278,7 +278,7 @@ def _wread_epd(epd, subp):
 
 def f_wread_epd(epd, subp, *, ret=None):
     if isinstance(subp, int) and 0 <= subp <= 2:
-        return iotable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))(
+        return readtable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))(
             epd, ret=ret
         )
 
@@ -306,7 +306,7 @@ def _bread_epd(epd, subp) -> c.EUDVariable:
 
 def f_bread_epd(epd, subp, *, ret=None):
     if isinstance(subp, int) and 0 <= subp <= 3:
-        return iotable._insert_or_get(0xFF << (8 * subp), -(8 * subp))(epd, ret=ret)
+        return readtable._insert_or_get(0xFF << (8 * subp), -(8 * subp))(epd, ret=ret)
 
     return _bread_epd(epd, subp, ret=ret)
 

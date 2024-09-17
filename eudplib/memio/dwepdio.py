@@ -12,8 +12,8 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 from ..core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ..localize import _
-from . import iotable
 from . import modcurpl as cp
+from . import readtable
 
 
 @_EUDPredefineReturn(2)
@@ -45,7 +45,7 @@ def f_dwepdread_epd(targetplayer):
 
 
 def f_dwread_epd(targetplayer, *, ret=None):
-    return iotable._get(0xFFFFFFFF, 0)(targetplayer, ret=ret)
+    return readtable._get(0xFFFFFFFF, 0)(targetplayer, ret=ret)
 
 
 @_EUDPredefineReturn(1)
