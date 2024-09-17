@@ -21,10 +21,10 @@ class TrgPlayer(_Player, EPDOffsetMap):
     """
 
     __slots__ = ()
-    mineral = ArrayMember(0x57F0F0, Mk.DWORD)
+    mineral = ore = ArrayMember(0x57F0F0, Mk.DWORD)
     gas = ArrayMember(0x57F120, Mk.DWORD)
     cumulativeGas = ArrayMember(0x57F150, Mk.DWORD)
-    cumulativeMineral = ArrayMember(0x57F180, Mk.DWORD)
+    cumulativeMineral = cumulativeOre = ArrayMember(0x57F180, Mk.DWORD)
     zergControlAvailable = ArrayMember(0x582144, Mk.DWORD)
     zergControlUsed = ArrayMember(0x582174, Mk.DWORD)
     zergControlMax = ArrayMember(0x5821A4, Mk.DWORD)
