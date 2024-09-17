@@ -104,12 +104,18 @@ class UnitGroup:
         self.trg = EUDVariable(self.varray + 72 * capacity)
         self.pos = EUDVariable(EPD(self.varray) + 87 + 18 * capacity)
         self.cploop = _CPLoop(self)
+        self._length = EUDVariable(0)
+
+    @property  # FIXME: eudplib code can mutate length
+    def length(self):
+        return self._length
 
     def add(self, unit_epd) -> None:
         if IsEUDVariable(unit_epd):
             # Occupy 2T, Run 4T 10A
             SeqCompute(
                 [
+                    (self._length, Add, 1),
                     (self.trg, Add, -72),
                     (self.pos, Add, -18),
                     (unit_epd, Add, 0x4C // 4),
@@ -124,6 +130,7 @@ class UnitGroup:
             global _assign_helper
             SeqCompute(
                 [
+                    (self._length, Add, 1),
                     (self.trg, Subtract, 72),
                     (self.pos, Subtract, 18),
                     (_assign_helper, SetTo, unit_epd + 0x4C // 4),
@@ -186,6 +193,7 @@ class _CPLoop:
             pos << remove_start + 328 + 32 * 2 + 20
             remove_end << RawTrigger(
                 actions=[
+                    self._parent._length.SubtractNumber(1),
                     trg.AddNumber(72),
                     tpos.AddNumber(18),
                     loopvar.SetDest(EPD(0x6509B0)),
