@@ -117,7 +117,7 @@ class AvailabilityFlags(ArrayEnumMember):
 
 class TrgUnit(ConstType, EPDOffsetMap):
     __slots__ = ()
-    graphic = flingy = ArrayMember(0x6644F8, Mk.FLINGY)
+    flingy = ArrayMember(0x6644F8, Mk.FLINGY)
     "Flingy: Flingy of unit. 유닛의 비행정보."
     subUnit = ArrayMember(0x6607C0, Mk.UNIT)
     "TrgUnit: Subunit of unit. 유닛의 부가유닛"

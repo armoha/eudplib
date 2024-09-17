@@ -30,7 +30,7 @@ class TargetFlags(ArrayEnumMember):
 class Weapon(ConstType, EPDOffsetMap):
     __slots__ = ()
     label = ArrayMember(0x6572E0, Mk.STATTEXT)
-    graphic = flingy = ArrayMember(0x656CA8, Mk.FLINGY)
+    flingy = ArrayMember(0x656CA8, Mk.FLINGY)
     # specialAttack = ArrayMember(0x6573E8, Mk.BYTE)
     # special attack is for reference only (unused)
     targetFlags = TargetFlags(0x657998, Mk.WORD)
