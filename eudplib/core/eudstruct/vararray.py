@@ -109,8 +109,9 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
         if not isinstance(index, int) or 0 <= index < size:
             return
         e = _(
-            "index out of bounds: the length of EUDVArray is {} but the index is {}"
-        )  # noqa: E501
+            "index out of bounds: the length of EUDVArray is {}"
+            " but the index is {}"
+        )
         raise EPError(e.format(size, index))
 
     class _EUDVArray(ExprProxy):
