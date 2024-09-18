@@ -10,73 +10,87 @@ from .. import core as c
 from .. import utils as ut
 from . import modcurpl as cp
 
-_table: dict[int, dict[str, dict[int, list[c.RawTrigger]]]] = {}
+consecutive_table: dict[int, dict[int, dict[int, c.RawTrigger]]] = {}
 
 c.PushTriggerScope()
-_writeact = c.SetDeaths(0, c.SetTo, 0, 0)
-_readend = cp.f_setcurpl2cpcache(
-    [],
-    [
-        _writeact,
-        c.SetMemory(_writeact + 20, c.SetTo, 0),
+copy_ret = c.SetDeaths(0, c.SetTo, 0, 0)
+read_end_common = c.RawTrigger(
+    nextptr=0,
+    actions=[
+        copy_ret,
+        c.SetMemory(copy_ret + 20, c.SetTo, 0),
     ],
 )
 c.PopTriggerScope()
 
 
 def _is_consecutive(n: int) -> bool:
-    if n == 0:
-        return False
     # right shift by index of least significant bit (remove trailing zeros)
     n >>= (n & -n).bit_length() - 1
     return (n & (n + 1)) == 0
 
 
-def _guess_ordering(bitmask: int, shift: int) -> str:
+def guess_ordering(bitmask: int, shift: int) -> bool:
     lsb_index = (bitmask & -bitmask).bit_length() - 1
     if lsb_index == -shift:
-        ordering = "decreasing"
+        return True
     elif shift == 0:
-        ordering = "increasing"
+        return False
     else:
-        ordering = "decreasing"
-    return ordering
+        return True
 
 
-def _insert(bitmask: int, shift: int, ordering: str | None = None) -> Callable:
+def signed_shift(a: int, b: int):
+    if b >= 0:
+        return a << b
+    else:
+        return a >> -b
+
+
+def _insert(bitmask: int, shift: int, is_decreasing: bool | None = None) -> Callable:
     ut.ep_assert(_is_consecutive(bitmask))
-    ut.ep_assert(ordering in ("increasing", "decreasing", None))
-    if ordering is None:
-        ordering = _guess_ordering(bitmask, shift)
+    ut.ep_assert(is_decreasing in (True, False, None))
+    if is_decreasing is None:
+        is_decreasing: bool = guess_ordering(bitmask, shift)
 
-    msb_index = bitmask.bit_length() - 1
+    msb_index: int = bitmask.bit_length() - 1
     lsb_index = (bitmask & -bitmask).bit_length() - 1
-    if ordering == "increasing":
-        bit_range = range(lsb_index, msb_index + 1)
+    if is_decreasing:
+        startswith, endswith = msb_index, lsb_index
     else:
-        bit_range = range(msb_index, lsb_index - 1, -1)
+        startswith, endswith = lsb_index, msb_index
 
-    def signed_shift(a: int, b: int):
-        if b >= 0:
-            return a << b
-        else:
-            return a >> -b
+    try:
+        shift_table = consecutive_table[shift]
+    except KeyError:
+        shift_table = {}
+        consecutive_table[shift] = shift_table
+    try:
+        trig_table = shift_table[endswith]
+    except KeyError:
+        trig_table = {}
+        shift_table[endswith] = trig_table
+    try:
+        start_trig = trig_table[startswith]
+    except KeyError:
+        c.PushTriggerScope()
+        step = 1 if is_decreasing else -1
+        for x in range(endswith, startswith + step, step):
+            if x not in trig_table:
+                trig = c.RawTrigger(
+                    nextptr=read_end_common
+                    if x == endswith
+                    else trig_table[x - step],
+                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 1 << x),
+                    actions=c.SetMemory(
+                        copy_ret + 20, c.Add, signed_shift(1, x + shift)
+                    ),
+                )
+                trig_table[x] = trig
+        c.PopTriggerScope()
+        start_trig = trig_table[startswith]
 
-    c.PushTriggerScope()
-    _readtrig = [
-        c.RawTrigger(
-            conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 1 << x),
-            actions=c.SetMemory(_writeact + 20, c.Add, signed_shift(1, x + shift)),
-        )
-        for x in bit_range
-    ]
-    c.SetNextTrigger(_readend)
-    c.PopTriggerScope()
-
-    if bitmask not in _table:
-        _table[bitmask] = {"increasing": {}, "decreasing": {}}
-    _table[bitmask][ordering][shift] = _readtrig
-    return _caller(_readtrig[0])
+    return _epd_caller(start_trig)
 
 
 def _get(bitmask: int, shift: int) -> Callable | None:
@@ -84,33 +98,26 @@ def _get(bitmask: int, shift: int) -> Callable | None:
     msb_index = bitmask.bit_length() - 1
     lsb_index = (bitmask & -bitmask).bit_length() - 1
 
-    for key in _table:
-        if key & bitmask != bitmask:
-            continue
-        key_msb_index = key.bit_length() - 1
-        key_lsb_index = (key & -key).bit_length() - 1
-        if key_lsb_index == lsb_index:
-            table = _table[key]["decreasing"]
-            if shift in table:
-                return _caller(table[shift][key_msb_index - msb_index])
-        elif key_msb_index == msb_index:
-            table = _table[key]["increasing"]
-            if shift in table:
-                return _caller(table[shift][lsb_index - key_lsb_index])
-
-    return None
+    shift_table = consecutive_table[shift]
+    try:
+        trig_table = shift_table[lsb_index]
+    except KeyError:
+        trig_table = shift_table[msb_index]
+        return _epd_caller(trig_table[lsb_index])
+    else:
+        return _epd_caller(trig_table[msb_index])
 
 
 def _insert_or_get(
-    bitmask: int, shift: int, ordering: str | None = None
+    bitmask: int, shift: int, ordering: bool | None = None
 ) -> Callable:
-    readfn = _get(bitmask, shift)
-    if readfn is None:
+    try:
+        return _get(bitmask, shift)
+    except KeyError:
         return _insert(bitmask, shift, ordering)
-    return readfn
 
 
-def _caller(readtrg: c.RawTrigger) -> Callable:
+def _epd_caller(readtrg: c.RawTrigger) -> Callable:
     def f(epd, *, ret=None):
         if ret is None:
             ret = c.EUDVariable()
@@ -126,8 +133,8 @@ def _caller(readtrg: c.RawTrigger) -> Callable:
         c.NonSeqCompute(
             [
                 (ut.EPD(0x6509B0), c.SetTo, epd),
-                (ut.EPD(_readend) + 87 + 8 * 3, c.SetTo, nexttrg),
-                (ut.EPD(_writeact) + 4, c.SetTo, retepd),
+                (ut.EPD(read_end_common) + 87 + 8 * 3, c.SetTo, nexttrg),
+                (ut.EPD(copy_ret) + 4, c.SetTo, retepd),
             ]
         )
         c.SetNextTrigger(readtrg)
@@ -138,5 +145,5 @@ def _caller(readtrg: c.RawTrigger) -> Callable:
     return f
 
 
-_insert(0xFFFFFFFF, 0, "decreasing")
-_insert(0xFFFFFF00, 0, "increasing")
+_insert(0xFFFFFFFF, 0, True)
+_insert(0xFFFFFF00, 0, False)
