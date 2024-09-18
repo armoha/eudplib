@@ -7,10 +7,13 @@
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
+from ..core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from . import cpmemio as cpm
 from . import dwepdio as dwm
 from . import modcurpl as cp
 from . import readtable
+
+cpcache = c.curpl.GetCPCache()
 
 # Helper functions
 
@@ -249,64 +252,97 @@ def f_bsubtract_epd(epd, subp, b):
 # -----------------------------
 
 
+@_EUDPredefineReturn(1, 2)
+@_EUDPredefineParam(cp.CP, 1)
 @c.EUDFunc
-def _wread_epd(epd, subp):
-    w = c.EUDVariable()
-    c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), w.SetNumber(0)])
+def _wread_epd(epd, subp) -> c.EUDVariable:
+    w = _wread_epd._frets[0]
+    fend = c.Forward()
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(3)):
+    block = ut.EUDGetLastBlockOfName("swblock")[1]
+    block["_actions"].extend(
+        [
+            c.SetNextPtr(readtable.read_end_common, block["swend"]),
+            c.SetMemory(readtable.copy_ret + 16, c.SetTo, ut.EPD(w.getValueAddr())),
+            c.SetNextPtr(cpcache.GetVTable(), fend),
+            cpcache.SetDest(ut.EPD(0x6509B0)),
+        ]
+    )
+    for i in range(3):
         if cs.EUDSwitchCase()(i):
-            for j in ut._rand_lst(range(8 * i, 8 * i + 16)):
-                c.RawTrigger(
-                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
-                    actions=w.AddNumber(2 ** (j - 8 * i)),
-                )
-
-            cs.EUDBreak()
+            readtrg = readtable._insert_or_get(0xFFFF << (8 * i), -(8 * i))
+            c.SetNextTrigger(readtrg)
 
     # Things gets complicated on this case.
     # We won't hand-optimize this case. This is a very, very rare case
     if cs.EUDSwitchCase()(3):
-        b0 = cpm.f_bread_cp(0, 3)
-        b1 = cpm.f_bread_cp(1, 0)
-        w << b0 + b1 * 256
+        readtrg = readtable._insert_or_get(0xFF000000, -24)
+        trg2, trg3 = c.Forward(), c.Forward()
+        c.RawTrigger(
+            nextptr=readtrg,
+            actions=c.SetNextPtr(readtable.read_end_common, trg2),
+        )
+        readtrg = readtable._insert_or_get(0xFF, 8)
+        trg2 << c.RawTrigger(
+            nextptr=readtrg,
+            actions=[
+                c.SetMemory(0x6509B0, c.Add, 1),
+                c.SetMemoryX(readtable.copy_ret + 24, c.SetTo, 8 << 24, 0xFF000000),
+                c.SetNextPtr(readtable.read_end_common, trg3),
+            ],
+        )
+        trg3 << c.RawTrigger(
+            actions=c.SetMemoryX(
+                readtable.copy_ret + 24, c.SetTo, 7 << 24, 0xFF000000
+            )
+        )
 
     cs.EUDEndSwitch()
-    cp.f_setcurpl2cpcache()
-    return w
+    c.SetNextTrigger(cpcache.GetVTable())
+    fend << c.NextTrigger()
+    # return w
 
 
 def f_wread_epd(epd, subp, *, ret=None):
     if isinstance(subp, int) and 0 <= subp <= 2:
-        return readtable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))(
-            epd, ret=ret
-        )
+        return readtable._epd_caller(
+            readtable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))
+        )(epd, ret=ret)
 
     return _wread_epd(epd, subp, ret=ret)
 
 
+@_EUDPredefineReturn(1, 2)
+@_EUDPredefineParam(cp.CP, 1)
 @c.EUDFunc
 def _bread_epd(epd, subp) -> c.EUDVariable:
-    b = c.EUDVariable()
-    c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), b.SetNumber(0)])
+    b = _bread_epd._frets[0]
+    fend = c.Forward()
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(4)):
+    block = ut.EUDGetLastBlockOfName("swblock")[1]
+    block["_actions"].extend(
+        [
+            c.SetNextPtr(readtable.read_end_common, block["swend"]),
+            c.SetMemory(readtable.copy_ret + 16, c.SetTo, ut.EPD(b.getValueAddr())),
+            c.SetNextPtr(cpcache.GetVTable(), fend),
+            cpcache.SetDest(ut.EPD(0x6509B0)),
+        ]
+    )
+    for i in range(4):
         if cs.EUDSwitchCase()(i):
-            for j in ut._rand_lst(range(8 * i, 8 * i + 8)):
-                c.RawTrigger(
-                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
-                    actions=b.AddNumber(2 ** (j - 8 * i)),
-                )
-
-            cs.EUDBreak()
+            readtrg = readtable._insert_or_get(0xFF << (8 * i), -(8 * i))
+            c.SetNextTrigger(readtrg)
     cs.EUDEndSwitch()
-    cp.f_setcurpl2cpcache()
-    return b
+    c.SetNextTrigger(cpcache.GetVTable())
+    fend << c.NextTrigger()
+    # return b
 
 
 def f_bread_epd(epd, subp, *, ret=None):
     if isinstance(subp, int) and 0 <= subp <= 3:
-        return readtable._insert_or_get(0xFF << (8 * subp), -(8 * subp))(epd, ret=ret)
+        return readtable._epd_caller(
+            readtable._insert_or_get(0xFF << (8 * subp), -(8 * subp))
+        )(epd, ret=ret)
 
     return _bread_epd(epd, subp, ret=ret)
 

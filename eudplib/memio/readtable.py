@@ -10,6 +10,7 @@ from .. import core as c
 from .. import utils as ut
 from . import modcurpl as cp
 
+cpcache = c.curpl.GetCPCache()
 consecutive_table: dict[int, dict[int, dict[int, c.RawTrigger]]] = {}
 
 c.PushTriggerScope()
@@ -47,7 +48,9 @@ def signed_shift(a: int, b: int):
         return a >> -b
 
 
-def _insert(bitmask: int, shift: int, is_decreasing: bool | None = None) -> Callable:
+def _insert(
+    bitmask: int, shift: int, is_decreasing: bool | None = None
+) -> c.RawTrigger:
     ut.ep_assert(_is_consecutive(bitmask))
     ut.ep_assert(is_decreasing in (True, False, None))
     if is_decreasing is None:
@@ -90,10 +93,10 @@ def _insert(bitmask: int, shift: int, is_decreasing: bool | None = None) -> Call
         c.PopTriggerScope()
         start_trig = trig_table[startswith]
 
-    return _epd_caller(start_trig)
+    return start_trig
 
 
-def _get(bitmask: int, shift: int) -> Callable | None:
+def _get(bitmask: int, shift: int) -> c.RawTrigger:
     ut.ep_assert(_is_consecutive(bitmask))
     msb_index = bitmask.bit_length() - 1
     lsb_index = (bitmask & -bitmask).bit_length() - 1
@@ -103,21 +106,49 @@ def _get(bitmask: int, shift: int) -> Callable | None:
         trig_table = shift_table[lsb_index]
     except KeyError:
         trig_table = shift_table[msb_index]
-        return _epd_caller(trig_table[lsb_index])
+        return trig_table[lsb_index]
     else:
-        return _epd_caller(trig_table[msb_index])
+        return trig_table[msb_index]
 
 
 def _insert_or_get(
-    bitmask: int, shift: int, ordering: bool | None = None
-) -> Callable:
+    bitmask: int, shift: int, is_decreasing: bool | None = None
+) -> c.RawTrigger:
     try:
         return _get(bitmask, shift)
     except KeyError:
-        return _insert(bitmask, shift, ordering)
+        return _insert(bitmask, shift, is_decreasing)
 
 
-def _epd_caller(readtrg: c.RawTrigger) -> Callable:
+def _cp_caller(readtrg: c.RawTrigger, *, _operations=None) -> Callable:
+    def f(*, ret=None):
+        if ret is None:
+            ret = c.EUDVariable()
+            ret.makeR()
+        else:
+            ret = ret[0]
+        if c.IsEUDVariable(ret):
+            retepd = ut.EPD(ret.getValueAddr())
+        else:
+            retepd = ret
+
+        nexttrg = c.Forward()
+        operations = [
+            (ut.EPD(read_end_common) + 1, c.SetTo, nexttrg),
+            (ut.EPD(copy_ret) + 4, c.SetTo, retepd),
+        ]
+        if _operations:
+            operations.extend(_operations)
+        c.NonSeqCompute(operations)
+        c.SetNextTrigger(readtrg)
+        nexttrg << c.NextTrigger()
+
+        return ret
+
+    return f
+
+
+def _epd_caller(readtrg: c.RawTrigger, *, _operations=None) -> Callable:
     def f(epd, *, ret=None):
         if ret is None:
             ret = c.EUDVariable()
@@ -130,13 +161,16 @@ def _epd_caller(readtrg: c.RawTrigger) -> Callable:
             retepd = ret
 
         nexttrg = c.Forward()
-        c.NonSeqCompute(
-            [
-                (ut.EPD(0x6509B0), c.SetTo, epd),
-                (ut.EPD(read_end_common) + 87 + 8 * 3, c.SetTo, nexttrg),
-                (ut.EPD(copy_ret) + 4, c.SetTo, retepd),
-            ]
-        )
+        operations = [
+            (ut.EPD(read_end_common) + 1, c.SetTo, cpcache.GetVTable()),
+            (ut.EPD(cpcache.GetVTable()) + 1, c.SetTo, nexttrg),
+            (ut.EPD(cpcache.getDestAddr()), c.SetTo, ut.EPD(0x6509B0)),
+            (ut.EPD(copy_ret) + 4, c.SetTo, retepd),
+            (ut.EPD(0x6509B0), c.SetTo, epd),
+        ]
+        if _operations:
+            operations.extend(_operations)
+        c.NonSeqCompute(operations)
         c.SetNextTrigger(readtrg)
         nexttrg << c.NextTrigger()
 

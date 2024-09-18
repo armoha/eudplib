@@ -15,6 +15,8 @@ from .basicstru import EUDJump, EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 from .jumptable import JumpTriggerForward
 
+cpcache = c.curpl.GetCPCache()
+
 
 def _is_switch_blockid(idf) -> bool:
     return idf == "swblock"
@@ -215,7 +217,6 @@ def EUDEndSwitch() -> None:  # noqa: N802
         cmpplayer = epd
         if c.IsEUDVariable(epd):
             cmpplayer = 13  # CurrentPlayer
-            cpcache = c.curpl.GetCPCache()
             c.VProc(
                 epd,
                 [
@@ -243,7 +244,6 @@ def EUDEndSwitch() -> None:  # noqa: N802
     elif c.IsEUDVariable(epd):
         # use binary search with CP trick
         cmpplayer = 13  # CurrentPlayer
-        cpcache = c.curpl.GetCPCache()
         c.VProc(
             epd,
             [

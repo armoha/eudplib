@@ -7,10 +7,10 @@
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
-from ..core.eudfunc.eudf import _EUDPredefineReturn
-from ..core.variable.evcommon import _ev
+from ..core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from . import dwepdio as dwm
 from . import modcurpl as cp
+from . import readtable
 
 
 @_EUDPredefineReturn(2)
@@ -41,84 +41,109 @@ def f_dwepdread_cp(cpo, **kwargs):
     return ptr, epd
 
 
-def f_dwread_cp(cpo, **kwargs):
-    ret = kwargs.get("ret")
-    if ret is not None:
-        ret.append(_ev[4])
-    return f_dwepdread_cp(cpo, **kwargs)[0]
+def f_dwread_cp(cpo, *, ret=None):
+    if not (isinstance(cpo, int) and cpo == 0):
+        cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
+    ptr = readtable._cp_caller(readtable._get(0xFFFFFFFF, 0))(ret=ret)
+    if not (isinstance(cpo, int) and cpo == 0):
+        cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
+    return ptr
 
 
-def f_epdread_cp(cpo, **kwargs):
-    ret = kwargs.get("ret")
-    if ret is not None:
-        ret.insert(0, _ev[4])
-    return f_dwepdread_cp(cpo, **kwargs)[1]
+def f_epdread_cp(cpo, *, ret=None):
+    if not (isinstance(cpo, int) and cpo == 0):
+        cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
+    ptr = readtable._cp_caller(
+        readtable._get(0xFFFFFFFC, -2, True),
+        _operations=[(ut.EPD(readtable.copy_ret) + 5, c.SetTo, ut.EPD(0))],
+    )(ret=ret)
+    if not (isinstance(cpo, int) and cpo == 0):
+        cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
+    return ptr
 
 
-@_EUDPredefineReturn(1)
+@_EUDPredefineReturn(1, 2)
+@_EUDPredefineParam(1)
 @c.EUDFunc
 def _wreader(subp):
     w = _wreader._frets[0]
-    w << 0
     cs.EUDSwitch(subp)
-    for bits in ut._rand_lst(range(3)):
-        if cs.EUDSwitchCase()(bits):
-            byte = 8 * bits
-            for power in ut._rand_lst(range(byte, byte + 16)):
-                c.RawTrigger(
-                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**power),
-                    actions=w.AddNumber(2 ** (power - byte)),
-                )
-            cs.EUDBreak()
+    block = ut.EUDGetLastBlockOfName("swblock")[1]
+    setnptr = c.SetNextPtr(readtable.read_end_common, block["swend"])
+    setdest = c.SetMemory(readtable.copy_ret + 16, c.SetTo, ut.EPD(w.getValueAddr()))
+    block["_actions"].extend([setnptr, setdest])
+    for i in range(3):
+        if cs.EUDSwitchCase()(i):
+            readtrg = readtable._insert_or_get(0xFFFF << (8 * i), -(8 * i))
+            c.SetNextTrigger(readtrg)
+
     if cs.EUDSwitchCase()(3):
-        for power in ut._rand_lst(range(24, 32)):
-            c.RawTrigger(
-                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**power),
-                actions=w.AddNumber(2 ** (power - 24)),
-            )
-        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-        for power in ut._rand_lst(range(8)):
-            c.RawTrigger(
-                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**power),
-                actions=w.AddNumber(2 ** (power + 8)),
-            )
-        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, -1))
-        cs.EUDBreak()
+        readtrg = readtable._insert_or_get(0xFF000000, -24)
+        trg2, trg3 = c.Forward(), c.Forward()
+        c.RawTrigger(
+            nextptr=readtrg,
+            actions=c.SetNextPtr(readtable.read_end_common, trg2),
+        )
+        readtrg = readtable._insert_or_get(0xFF, 8)
+        trg2 << c.RawTrigger(
+            nextptr=readtrg,
+            actions=[
+                c.SetMemory(0x6509B0, c.Add, 1),
+                c.SetMemoryX(readtable.copy_ret + 24, c.SetTo, 8 << 24, 0xFF000000),
+                c.SetNextPtr(readtable.read_end_common, trg3),
+            ],
+        )
+        trg3 << c.RawTrigger(
+            actions=[
+                c.SetMemoryX(readtable.copy_ret + 24, c.SetTo, 7 << 24, 0xFF000000),
+                c.SetMemory(0x6509B0, c.Add, -1),
+            ]
+        )
     cs.EUDEndSwitch()
     # return w
 
 
-def f_wread_cp(cpo, subp, **kwargs):
+def f_wread_cp(cpo, subp, *, ret=None):
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    w = _wreader(subp, **kwargs)
+    if isinstance(subp, int) and 0 <= subp <= 2:
+        w = readtable._cp_caller(
+            readtable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))
+        )(ret=ret)
+    else:
+        w = _wreader(subp, ret=ret)
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
     return w
 
 
+@_EUDPredefineReturn(1, 2)
+@_EUDPredefineParam(1)
 @c.EUDFunc
 def _breader(subp):
-    b = c.EUDVariable()
-    b << 0
+    b = _breader._frets[0]
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(4)):
+    block = ut.EUDGetLastBlockOfName("swblock")[1]
+    setnptr = c.SetNextPtr(readtable.read_end_common, block["swend"])
+    setdest = c.SetMemory(readtable.copy_ret + 16, c.SetTo, ut.EPD(b.getValueAddr()))
+    block["_actions"].extend([setnptr, setdest])
+    for i in range(4):
         if cs.EUDSwitchCase()(i):
-            for j in ut._rand_lst(range(8 * i, 8 * i + 8)):
-                c.RawTrigger(
-                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
-                    actions=b.AddNumber(2 ** (j - 8 * i)),
-                )
-
-            cs.EUDBreak()
+            readtrg = readtable._insert_or_get(0xFF << (8 * i), -(8 * i))
+            c.SetNextTrigger(readtrg)
     cs.EUDEndSwitch()
-    return b
+    # return b
 
 
-def f_bread_cp(cpo, subp, **kwargs):
+def f_bread_cp(cpo, subp, *, ret=None):
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    b = _breader(subp, **kwargs)
+    if isinstance(subp, int) and 0 <= subp <= 3:
+        b = readtable._cp_caller(
+            readtable._insert_or_get(0xFF << (8 * subp), -(8 * subp))
+        )(ret=ret)
+    else:
+        b = _breader(subp, rete=ret)
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
     return b

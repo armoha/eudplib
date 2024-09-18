@@ -30,6 +30,8 @@ from ..variable.vbuf import (
     get_current_varbuffer,
 )
 
+cpcache: EUDVariable = GetCPCache()
+
 
 @functools.cache
 def eudvarray_data(size):
@@ -504,7 +506,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     return bt.SetMemoryXEPD(cp, mod, value, mask)
 
                 trg["end"] << bt.RawTrigger(
-                    nextptr=GetCPCache().GetVTable(),
+                    nextptr=cpcache.GetVTable(),
                     actions=[
                         [
                             itemw(bt.SetTo, 0, (mask >> 1) << (k + 1)),
@@ -514,7 +516,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     ]
                     + [
                         itemw(bt.SetTo, 0, mask >> 1),
-                        GetCPCache().SetDest(EPD(0x6509B0)),
+                        cpcache.SetDest(EPD(0x6509B0)),
                     ],
                 )
 
@@ -529,7 +531,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
                         *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
-                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                        bt.SetNextPtr(cpcache.GetVTable(), nptr),
                     ],
                 )
             else:
@@ -539,7 +541,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
                         *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
-                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                        bt.SetNextPtr(cpcache.GetVTable(), nptr),
                     ],
                 )
             nptr << bt.NextTrigger()
@@ -568,10 +570,10 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     return bt.SetMemoryXEPD(cp, bt.Subtract, value, mask)
 
                 trg["end"] << bt.RawTrigger(
-                    nextptr=GetCPCache().GetVTable(),
+                    nextptr=cpcache.GetVTable(),
                     actions=[
                         bt.SetMemoryXEPD(cp, bt.SetTo, 0, mask >> 1),
-                        GetCPCache().SetDest(EPD(0x6509B0)),
+                        cpcache.SetDest(EPD(0x6509B0)),
                     ]
                     + [sub((mask >> 1) << k, mask << k) for k in range(32 - n)],
                 )
@@ -587,7 +589,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetNextPtr(self._epd.GetVTable(), i.GetVTable()),
                         *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
-                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                        bt.SetNextPtr(cpcache.GetVTable(), nptr),
                     ],
                 )
             else:
@@ -597,7 +599,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
                         *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
-                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                        bt.SetNextPtr(cpcache.GetVTable(), nptr),
                     ],
                 )
             nptr << bt.NextTrigger()
@@ -770,14 +772,14 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         actions=bt.SetMemory(0x6509B0, bt.Add, 18 * (2**t)),
                     )
                 trg["end"] << bt.RawTrigger(
-                    nextptr=GetCPCache().GetVTable(),
+                    nextptr=cpcache.GetVTable(),
                     actions=[
                         trg["ret"]
                         << bt.SetDeathsX(
                             13, bt.Add, 0, 0, 0x55555555
                         ),  # CurrentPlayer
                         bt.SetDeathsX(13, bt.Add, 0, 0, 0xAAAAAAAA),  # CurrentPlayer
-                        GetCPCache().SetDest(EPD(0x6509B0)),
+                        cpcache.SetDest(EPD(0x6509B0)),
                     ],
                 )
 
@@ -792,7 +794,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetNextPtr(self._epd.GetVTable(), val.GetVTable()),
                         *val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), trg2),
-                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                        bt.SetNextPtr(cpcache.GetVTable(), nptr),
                     ],
                 )
                 trg2 << bt.RawTrigger(
@@ -815,7 +817,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, val),
                         *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
-                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                        bt.SetNextPtr(cpcache.GetVTable(), nptr),
                     ],
                 )
             elif IsEUDVariable(val):
@@ -825,7 +827,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetMemory(0x6509B0, bt.SetTo, self._epd + 87),
                         *val.QueueAssignTo(EPD(bitstrg["ret"]) + 5),
                         bt.SetNextPtr(val.GetVTable(), trg2),
-                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                        bt.SetNextPtr(cpcache.GetVTable(), nptr),
                     ],
                 )
                 trg2 << bt.RawTrigger(
@@ -846,7 +848,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                         bt.SetMemory(bitstrg["ret"] + 52, bt.SetTo, val),
                         *i.QueueAssignTo(_index),
                         bt.SetNextPtr(i.GetVTable(), bitstrg[bits]),
-                        bt.SetNextPtr(GetCPCache().GetVTable(), nptr),
+                        bt.SetNextPtr(cpcache.GetVTable(), nptr),
                     ],
                 )
             nptr << bt.NextTrigger()

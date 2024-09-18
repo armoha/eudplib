@@ -11,12 +11,12 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 
 CP = 13
+cpcache = c.curpl.GetCPCache()
+cpcond = c.curpl.cpcache_match_cond()
 
 
 def f_setcurpl(cp, *, actions=[], set_modifier=True):
     if c.IsEUDVariable(cp):
-        cpcond = c.curpl.cpcache_match_cond()
-        cpcache = c.curpl.GetCPCache()
         c.VProc(
             cp,
             actions + cp.QueueAssignTo(cpcache)
@@ -35,7 +35,6 @@ def f_setcurpl(cp, *, actions=[], set_modifier=True):
 
 
 def f_setcurpl2cpcache(v=[], actions=[]):
-    cpcache = c.curpl.GetCPCache()
     v = ut.FlattenList(v)
     actions = ut.FlattenList(actions)
     trg = c.VProc([*v, cpcache], [*actions, cpcache.SetDest(ut.EPD(0x6509B0))])
@@ -48,8 +47,6 @@ def f_setcurpl2cpcache(v=[], actions=[]):
 def _f_updatecpcache():
     from .s import SetMemoryC
 
-    cpcond = c.curpl.cpcache_match_cond()
-    cpcache = c.curpl.GetCPCache()
     c.RawTrigger(actions=SetMemoryC(cpcache.getValueAddr(), c.SetTo, 0))
     for i in ut._rand_lst(range(32)):
         u = random.randint(234, 65535)
@@ -69,8 +66,6 @@ def f_getcurpl():
     that value if the value is valid. Otherwise, update the current player
     cache and return it.
     """
-    cpcond = c.curpl.cpcache_match_cond()
-    cpcache = c.curpl.GetCPCache()
     if cs.EUDIfNot()(cpcond):
         _f_updatecpcache()
     cs.EUDEndIf()
@@ -85,8 +80,6 @@ def f_addcurpl(cp):
     so this function add to that value.
     """
     if c.IsEUDVariable(cp):
-        cpcond = c.curpl.cpcache_match_cond()
-        cpcache = c.curpl.GetCPCache()
         c.VProc(cp, cp.QueueAddTo(cpcache))
         c.VProc(cp, cp.SetDest(ut.EPD(cpcond) + 2))
         c.VProc(cp, cp.SetDest(ut.EPD(0x6509B0)))

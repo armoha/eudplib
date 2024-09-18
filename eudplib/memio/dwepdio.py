@@ -45,29 +45,16 @@ def f_dwepdread_epd(targetplayer):
 
 
 def f_dwread_epd(targetplayer, *, ret=None):
-    return readtable._get(0xFFFFFFFF, 0)(targetplayer, ret=ret)
+    return readtable._epd_caller(readtable._get(0xFFFFFFFF, 0))(
+        targetplayer, ret=ret
+    )
 
 
-@_EUDPredefineReturn(1)
-@_EUDPredefineParam(cp.CP)
-@c.EUDFunc
-def f_epdread_epd(targetplayer):
-    ptr = f_epdread_epd._frets[0]
-    u = random.randint(234, 65535)
-    acts = [
-        ptr.SetNumber(ut.EPD(0)),
-        c.SetMemory(0x6509B0, c.Add, -12 * u),
-    ]
-    cs.DoActions(ut._rand_lst(acts))
-    for i in ut._rand_lst(range(2, 32)):
-        c.RawTrigger(
-            conditions=c.DeathsX(cp.CP, c.AtLeast, 1, u, 2**i),
-            actions=ptr.AddNumber(2 ** (i - 2)),
-        )
-
-    cp.f_setcurpl2cpcache()
-
-    # return ptr
+def f_epdread_epd(targetplayer, *, ret=None):
+    return readtable._epd_caller(
+        readtable._insert_or_get(0xFFFFFFFC, -2, True),
+        _operations=[(ut.EPD(readtable.copy_ret) + 5, c.SetTo, ut.EPD(0))],
+    )(targetplayer, ret=ret)
 
 
 # Special flag reading functions
