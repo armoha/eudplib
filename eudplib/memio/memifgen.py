@@ -74,6 +74,41 @@ def f_readgen_epd(
     initvals = tuple(arg[0] for arg in args)
     vals = tuple(tuple(arg[1](i) for i in ut.bits(mask)) for arg in args)
 
+    if (
+        _check_empty is False
+        and len(initvals) == 1
+        and initvals[0] == 0
+        and readtable._is_consecutive(mask)
+    ):
+        maybe_shift = vals[0]
+        bits = ut.bits(mask)
+        bit0 = bits.__next__()
+        shift0 = maybe_shift[0]
+        can_be_lshift = bit0 < shift0
+        if can_be_lshift:
+            coefficient, rem = divmod(shift0, bit0)
+        else:
+            coefficient, rem = divmod(bit0, shift0)
+        if rem == 0 and coefficient & (coefficient - 1) == 0 and coefficient != 0:
+            is_readtable = 1
+            for bit, shift in zip(bits, maybe_shift[1:]):
+                if can_be_lshift:
+                    if bit * coefficient != shift:
+                        break
+                elif shift * coefficient != bit:
+                    break
+                is_readtable += 1
+            if is_readtable == len(maybe_shift):
+                signed_shift = coefficient.bit_length() - 1
+                if not can_be_lshift:
+                    signed_shift = -signed_shift
+                readerfunc = readtable._epd_caller(
+                    readtable._insert_or_get(mask, signed_shift)
+                )
+                if docstring:
+                    readerfunc.__doc__ = docstring
+                return readerfunc
+
     readerfunc = _read_epd_func(mask, initvals, *vals, _check_empty=_check_empty)
     if docstring:
         readerfunc.__doc__ = docstring
@@ -148,6 +183,41 @@ def f_readgen_cp(
     mask = mask & 0xFFFFFFFF
     initvals = tuple(arg[0] for arg in args)
     vals = tuple(tuple(arg[1](i) for i in ut.bits(mask)) for arg in args)
+
+    if (
+        _check_empty is False
+        and len(initvals) == 1
+        and initvals[0] == 0
+        and readtable._is_consecutive(mask)
+    ):
+        maybe_shift = vals[0]
+        bits = ut.bits(mask)
+        bit0 = bits.__next__()
+        shift0 = maybe_shift[0]
+        can_be_lshift = bit0 < shift0
+        if can_be_lshift:
+            coefficient, rem = divmod(shift0, bit0)
+        else:
+            coefficient, rem = divmod(bit0, shift0)
+        if rem == 0 and coefficient & (coefficient - 1) == 0 and coefficient != 0:
+            is_readtable = 1
+            for bit, shift in zip(bits, maybe_shift[1:]):
+                if can_be_lshift:
+                    if bit * coefficient != shift:
+                        break
+                elif shift * coefficient != bit:
+                    break
+                is_readtable += 1
+            if is_readtable == len(maybe_shift):
+                signed_shift = coefficient.bit_length() - 1
+                if not can_be_lshift:
+                    signed_shift = -signed_shift
+                readerfunc = readtable._cp_caller(
+                    readtable._insert_or_get(mask, signed_shift)
+                )
+                if docstring:
+                    readerfunc.__doc__ = docstring
+                return readerfunc
 
     readerfunc = _read_cp_func(mask, initvals, *vals, _check_empty=_check_empty)
     if docstring:
