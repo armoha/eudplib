@@ -3,10 +3,10 @@ requires = [
     # First version of setuptools to support pyproject.toml configuration
     "setuptools>=61.0.0",
     "wheel",
-    "setuptools-rust",
+    "setuptools-rust>=1.7.0",
     "typing_extensions"
 ]
-
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "eudplib"
@@ -40,7 +40,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Games/Entertainment :: Real Time Strategy",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10, <3.12"
 
 [project.urls]
 homepage = "https://github.com/armoha/eudplib/"
@@ -57,9 +57,14 @@ package-dir = {"" = "eudplib"}
 where = ["eudplib"]
 include = ["*"]
 
+[tool.setuptools.dynamic]
+version = {attr = "eudplib.__version__"}
+
 [[tool.setuptools-rust.ext-modules]]
-target = "eudplib._rust"
+target = "eudplib.bindings._rust"
 path = "rust/Cargo.toml"
+py-limited-api = "auto"
+binding = "PyO3"  # Default value, can be omitted
 rust-version = ">=1.63.0"
 
 [tool.mypy]
@@ -99,6 +104,10 @@ exclude_lines = [
 lint.select = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
 line-length = 85
 exclude = ["pybind11"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/unittests/__epspy__/**.py" = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
+"tests/unittests/report/__epspy__/**.py" = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
 
 [tool.ruff.lint.isort]
 known-first-party = ["eudplib", "tests"]
