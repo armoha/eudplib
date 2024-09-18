@@ -113,8 +113,8 @@ class CSprite(EPDOffsetMap):
         u = unProxy(ptr)
         # check ptr
         if isinstance(u, int):
-            q, r = divmod(u - 0x59CCA8, 336)
-            if r == 0 and 0 <= q < 1700:
+            q, r = divmod(u - 0x629D98, 36)
+            if r == 0 and 0 <= q < 2500:
                 epd = EPD(u)
             else:
                 raise EPError(_("Invalid input for CSprite: {}").format(ptr))
@@ -134,6 +134,8 @@ class CSprite(EPDOffsetMap):
 
     @property
     def ptr(self) -> int | c.EUDVariable:
-        if self._ptr is not None:
-            return self._ptr
-        return _ptr_cache(cast(c.EUDVariable, self._value))
+        if isinstance(self._value, int):
+            return cast(int, self._ptr)  # FIXME
+        if self._ptr is None:
+            self._ptr = c.EUDVariable()
+        return _ptr_cache(self._value, self._ptr)
