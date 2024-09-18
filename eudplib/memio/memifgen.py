@@ -10,10 +10,13 @@ from collections.abc import Callable
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
+from ..core.curpl import GetCPCache
 from ..core.eudfunc.eudf import _EUDPredefineParam, _EUDPredefineReturn
 from ..core.eudfunc.eudtypedfuncn import EUDTypedFuncN
 from . import modcurpl as cp
 from . import readtable
+
+cpcache = GetCPCache()
 
 
 @functools.cache
@@ -64,6 +67,32 @@ def _read_epd_func(
     return readerfunc
 
 
+@functools.cache
+def _readtable_epd_func(mask: int, shift: int) -> EUDTypedFuncN:
+    @_EUDPredefineReturn(1)
+    @_EUDPredefineParam(cp.CP)
+    @c.EUDFunc
+    def readerfunc(targetplayer):
+        ret = readerfunc._frets[0]
+        readtrg = readtable._insert_or_get(mask, shift)
+        nexttrg = c.Forward()
+        c.RawTrigger(
+            nextptr=readtrg,
+            actions=[
+                c.SetNextPtr(readtable.read_end_common, cpcache.GetVTable()),
+                c.SetNextPtr(cpcache.GetVTable(), nexttrg),
+                cpcache.SetDest(ut.EPD(0x6509B0)),
+                c.SetMemory(
+                    readtable.copy_ret + 16, c.SetTo, ut.EPD(ret.getValueAddr())
+                ),
+            ],
+        )
+        nexttrg << c.NextTrigger()
+        # return ret
+
+    return readerfunc
+
+
 def f_readgen_epd(
     mask: int,
     *args: tuple[int, Callable[[int], int]],
@@ -102,9 +131,7 @@ def f_readgen_epd(
                 signed_shift = coefficient.bit_length() - 1
                 if not can_be_lshift:
                     signed_shift = -signed_shift
-                readerfunc = readtable._epd_caller(
-                    readtable._insert_or_get(mask, signed_shift)
-                )
+                readerfunc = _readtable_epd_func(mask, signed_shift)
                 if docstring:
                     readerfunc.__doc__ = docstring
                 return readerfunc

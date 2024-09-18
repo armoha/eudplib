@@ -55,7 +55,7 @@ def _insert(
     ut.ep_assert(_is_consecutive(bitmask))
     ut.ep_assert(is_decreasing in (True, False, None))
     if is_decreasing is None:
-        is_decreasing: bool = guess_ordering(bitmask, shift)
+        is_decreasing = guess_ordering(bitmask, shift)
 
     msb_index: int = bitmask.bit_length() - 1
     lsb_index = (bitmask & -bitmask).bit_length() - 1

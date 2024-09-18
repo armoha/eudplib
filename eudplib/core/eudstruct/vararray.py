@@ -6,6 +6,7 @@
 
 import functools
 from collections.abc import Iterator
+from itertools import chain
 from math import log2
 from typing import ClassVar, NoReturn
 
@@ -507,17 +508,21 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
 
                 trg["end"] << bt.RawTrigger(
                     nextptr=cpcache.GetVTable(),
-                    actions=[
-                        [
-                            itemw(bt.SetTo, 0, (mask >> 1) << (k + 1)),
-                            itemw(bt.Add, (mask >> 1) << k, mask << k),
-                        ]
-                        for k in reversed(range(32 - n))
-                    ]
-                    + [
-                        itemw(bt.SetTo, 0, mask >> 1),
-                        cpcache.SetDest(EPD(0x6509B0)),
-                    ],
+                    actions=list(
+                        chain(
+                            *[
+                                [
+                                    itemw(bt.SetTo, 0, (mask >> 1) << (k + 1)),
+                                    itemw(bt.Add, (mask >> 1) << k, mask << k),
+                                ]
+                                for k in reversed(range(32 - n))
+                            ],
+                            [
+                                itemw(bt.SetTo, 0, mask >> 1),
+                                cpcache.SetDest(EPD(0x6509B0)),
+                            ],
+                        )
+                    ),
                 )
 
             bits = max((size - 1).bit_length() - 1, 0)

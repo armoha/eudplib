@@ -5,11 +5,12 @@
 # file that should have been included as part of this package.
 
 
+from ..utils import EPD
 from .allocator import Forward
 from .rawtrigger import Add, EncodePlayer, Exactly, Memory, SetMemory, SetTo
-from .variable import EUDVariable
+from .variable import EUDXVariable
 
-_curpl_var = EUDVariable()
+_curpl_var = EUDXVariable(EPD(0x6509B0), SetTo, 0)
 _curpl_checkcond = Forward()
 
 

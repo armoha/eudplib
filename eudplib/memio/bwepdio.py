@@ -255,7 +255,7 @@ def f_bsubtract_epd(epd, subp, b):
 @_EUDPredefineReturn(1, 2)
 @_EUDPredefineParam(cp.CP, 1)
 @c.EUDFunc
-def _wread_epd(epd, subp) -> c.EUDVariable:
+def _wread_epd(epd, subp):
     w = _wread_epd._frets[0]
     fend = c.Forward()
     cs.EUDSwitch(subp)
@@ -315,7 +315,7 @@ def f_wread_epd(epd, subp, *, ret=None):
 @_EUDPredefineReturn(1, 2)
 @_EUDPredefineParam(cp.CP, 1)
 @c.EUDFunc
-def _bread_epd(epd, subp) -> c.EUDVariable:
+def _bread_epd(epd, subp):
     b = _bread_epd._frets[0]
     fend = c.Forward()
     cs.EUDSwitch(subp)
