@@ -204,8 +204,8 @@ c.RawTrigger(
 c.PopTriggerScope()
 
 
-def _epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
-    epd = c.EUDVariable(0)
+def _epd_cache(ptr: c.EUDVariable, ret=None) -> c.EUDVariable:
+    epd = ret if ret else c.EUDVariable(0)
     is_ptr_equal = ptr.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))
     check << c.RawTrigger(
@@ -226,8 +226,8 @@ def _epd_cache(ptr: c.EUDVariable) -> c.EUDVariable:
     return epd
 
 
-def _ptr_cache(epd: c.EUDVariable) -> c.EUDVariable:
-    ptr = c.EUDVariable(0)
+def _ptr_cache(epd: c.EUDVariable, ret=None) -> c.EUDVariable:
+    ptr = ret if ret else c.EUDVariable(0)
     is_epd_equal = epd.Exactly(0)
     check, update, skip, end = (c.Forward() for _ in range(4))
     check << c.RawTrigger(

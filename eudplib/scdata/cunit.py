@@ -470,7 +470,9 @@ class CUnit(EPDOffsetMap):
     def ptr(self) -> int | c.EUDVariable:
         if isinstance(self._value, int):
             return cast(int, self._ptr)  # FIXME
-        return _ptr_cache(self._value)
+        if self._ptr is None:
+            self._ptr = c.EUDVariable()
+        return _ptr_cache(self._value, self._ptr)
 
     @staticmethod
     @c.EUDTypedFunc([None, None, TrgPlayer])
