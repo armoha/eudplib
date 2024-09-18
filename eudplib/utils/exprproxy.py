@@ -8,6 +8,7 @@ import types
 from typing import Generic, TypeAlias, TypeGuard, TypeVar, overload
 
 from ..localize import _
+from .eperror import EPError
 
 T_co = TypeVar("T_co", covariant=True)
 
@@ -59,7 +60,11 @@ class ExprProxy(Generic[T_co]):
     # Proxy arithmetic operators
 
     def __lshift__(self, k):
-        return self._value << k
+        from ..core import EUDVariable
+
+        if not isinstance(self._value, EUDVariable):
+            raise EPError(_("Can't assign to constant expression"))
+        return self._value << type(self).cast(k)
 
     def __rlshift__(self, k):
         return k << self._value
