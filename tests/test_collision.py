@@ -142,9 +142,9 @@ class CircleObj(EUDStruct):
                 para_length = -para_length
 
                 # calculate veldiff back
-                new_veldiff = (posdiff.mul(para_length).add(posdiff_perpend.mul(perp_length))).div(
-                    posdiff_length * posdiff_length
-                )
+                new_veldiff = (
+                    posdiff.mul(para_length).add(posdiff_perpend.mul(perp_length))
+                ).div(posdiff_length * posdiff_length)
                 new_veldiff.copyto(veldiff)
 
                 veldiff_d2 = veldiff.div(2)

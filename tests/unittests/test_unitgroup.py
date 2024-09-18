@@ -24,7 +24,9 @@ def test_unitgroup():
         unit.move_cp(0x4C // 4)  # NO-OP
         f_dwadd_epd(EPD(0x6509B0), EPD(k) - 19)
         f_dwwrite_cp(0, 1)
-    test_equality("Basic UnitGroup test", [k[i] for i in range(7)], [0, 0, 1, 1, 0, 0, 1])
+    test_equality(
+        "Basic UnitGroup test", [k[i] for i in range(7)], [0, 0, 1, 1, 0, 0, 1]
+    )
 
     g.add(4)
     g.add(EUDVariable(0))
@@ -46,7 +48,9 @@ def test_unitgroup():
         f_dwwrite_cp(0, 2)
         unit.remove()  # this call is mandatory.
     indexes = (0, 2, 3, 4, 6)
-    result = [1 if i in indexes else 3 if (i - 19) in indexes else 0 for i in range(26)]
+    result = [
+        1 if i in indexes else 3 if (i - 19) in indexes else 0 for i in range(26)
+    ]
     test_equality("UnitGroup dying test", [m[i] for i in range(26)], result)
 
     count = EUDVariable()

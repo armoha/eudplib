@@ -13,7 +13,9 @@ def test_atan2():
 
     # Value of atan2 may vary by 1 due to rounding error.
     # Here we check similarity.
-    test_assert("atan2 test", [atanarray[angle] - angle + 1 <= 2 for angle in range(360)])
+    test_assert(
+        "atan2 test", [atanarray[angle] - angle + 1 <= 2 for angle in range(360)]
+    )
 
     atan256array = EUDArray(256)
     for angle in EUDLoopRange(256):
@@ -24,7 +26,10 @@ def test_atan2():
 
     # Value of atan2 may vary by 1 due to rounding error.
     # Here we check similarity.
-    test_assert("atan2_256 test", [atan256array[angle] - angle + 1 <= 2 for angle in range(256)])
+    test_assert(
+        "atan2_256 test",
+        [atan256array[angle] - angle + 1 <= 2 for angle in range(256)],
+    )
 
 
 @TestInstance
@@ -66,12 +71,18 @@ def test_signed_div():
             )
 
             EP_SetRValueStrictMode(False)
-            test_equality(f"div_floor({s}, {t}) = {divmod(a, b)}", f_div_floor(x, y), divmod(a, b))
+            test_equality(
+                f"div_floor({s}, {t}) = {divmod(a, b)}",
+                f_div_floor(x, y),
+                divmod(a, b),
+            )
 
             # https://github.com/rust-lang/rust/blob/91eb6f9acfcfde6832d547959ad2d95b1ac0b5dc/library/core/src/num/int_macros.rs#L2115-L2130
             r = r + abs(b) if r < 0 else r
             q = (a - r) // b
-            test_equality(f"div_euclid({s}, {t}) = {(q, r)})", f_div_euclid(x, y), [q, r])
+            test_equality(
+                f"div_euclid({s}, {t}) = {(q, r)})", f_div_euclid(x, y), [q, r]
+            )
             EP_SetRValueStrictMode(True)
 
 

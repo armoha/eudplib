@@ -98,9 +98,7 @@ def test_array():
         else:
             k[i] &= EUDVariable(mask)
         expect[i] &= mask
-    test_equality(
-        f"array cn[i] &= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array cn[i] &= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     mask = randint(0, 0xFFFFFFFF)
     for i in range(9):
@@ -109,9 +107,7 @@ def test_array():
         else:
             k[i] |= EUDVariable(mask)
         expect[i] |= mask
-    test_equality(
-        f"array cn[i] |= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array cn[i] |= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     mask = randint(0, 0xFFFFFFFF)
     for i in range(9):
@@ -120,9 +116,7 @@ def test_array():
         else:
             k[i] ^= EUDVariable(mask)
         expect[i] ^= mask
-    test_equality(
-        f"array cn[i] ^= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array cn[i] ^= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     # casted array test
 
@@ -204,9 +198,7 @@ def test_array():
         else:
             a[i] &= EUDVariable(mask)
         expect[i] &= mask
-    test_equality(
-        f"array ev[i] &= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array ev[i] &= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     mask = randint(0, 0xFFFFFFFF)
     for i in range(9):
@@ -215,9 +207,7 @@ def test_array():
         else:
             a[i] |= EUDVariable(mask)
         expect[i] |= mask
-    test_equality(
-        f"array ev[i] |= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array ev[i] |= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     mask = randint(0, 0xFFFFFFFF)
     for i in range(9):
@@ -226,9 +216,7 @@ def test_array():
         else:
             a[i] ^= EUDVariable(mask)
         expect[i] ^= mask
-    test_equality(
-        f"array ev[i] ^= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array ev[i] ^= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     # casted array with variable index test
 
@@ -249,9 +237,7 @@ def test_array():
     for i in range(9):
         expect[i] -= 2 ** (10 - i)
         expect[i] = expect[i] & 0xFFFFFFFF
-    test_equality(
-        "array ev[ev] -= 2**(10-i)", [a[i] for i in range(9)], expect
-    )
+    test_equality("array ev[ev] -= 2**(10-i)", [a[i] for i in range(9)], expect)
 
     for i in EUDLoopRange(9):
         a[i] *= 3 * (i + 1)
@@ -301,26 +287,20 @@ def test_array():
         a[i] &= mask
     for i in range(9):
         expect[i] &= mask
-    test_equality(
-        f"array ev[ev] &= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array ev[ev] &= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     mask = randint(0, 0xFFFFFFFF)
     for i in EUDLoopRange(9):
         a[i] |= mask
     for i in range(9):
         expect[i] |= mask
-    test_equality(
-        f"array ev[ev] |= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array ev[ev] |= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     mask = randint(0, 0xFFFFFFFF)
     for i in EUDLoopRange(9):
         a[i] ^= mask
     for i in range(9):
         expect[i] ^= mask
-    test_equality(
-        f"array ev[ev] ^= 0x{mask:X}", [a[i] for i in range(9)], expect
-    )
+    test_equality(f"array ev[ev] ^= 0x{mask:X}", [a[i] for i in range(9)], expect)
 
     EP_SetRValueStrictMode(True)

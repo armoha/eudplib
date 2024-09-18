@@ -9,7 +9,9 @@ def test_cpmemio():
 
     # Normal reading
     ptr, epd = f_dwepdread_cp(0)
-    test_equality("f_dwread_cp with cpo=0", [ptr, 0x58A364 + 4 * epd], [0x1234, 0x1234])
+    test_equality(
+        "f_dwread_cp with cpo=0", [ptr, 0x58A364 + 4 * epd], [0x1234, 0x1234]
+    )
 
     a, b, c = (f_dwread_cp(0), f_dwread_cp(1), f_dwread_cp(2))
 
