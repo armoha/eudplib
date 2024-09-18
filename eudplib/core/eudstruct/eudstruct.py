@@ -14,11 +14,12 @@ from .vararray import EUDVArray
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
+    __slots__ = ("_initialized",)
     _fields_: Iterable[str | tuple]
 
     def __init__(self, *args, _from=None, _static_initval=None, **kwargs) -> None:
         super().__setattr__("_initialized", False)
-        fieldcount = len(self._fielddict)
+        fieldcount = len(type(self)._fielddict)
 
         if _from is not None:
             super().__init__(EUDVArray(fieldcount).cast(_from))
@@ -135,6 +136,15 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
                 raise ut.EPError(_("Unknown field name {}").format(name))
         else:
             super().__setattr__(name, value)
+
+    def __getitem__(self, name):
+        raise TypeError(f"'{type(self)}' object is not subscriptable")
+
+    def __setitem__(self, name, newvalue):
+        raise TypeError(f"'{type(self)}' object does not support item assignment")
+
+    def __iter__(self):
+        raise TypeError(f"'{type(self)}' object is not iterable")
 
     # Utilities
 

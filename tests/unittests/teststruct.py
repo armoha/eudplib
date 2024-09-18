@@ -129,10 +129,17 @@ def test_invalid_struct():
     with expect_eperror():
         a = TestStruct()
         a << 5
+    with expect_error(TypeError):
+        TestStruct()[0]
+    with expect_error(TypeError):
+        TestStruct()[0] = 0
+    with expect_error(TypeError):
+        for _ in TestStruct():
+            pass
 
 
 @TestInstance
-def test_cast_0_to_struft():
+def test_cast_0_to_struct():
     a = TestStruct.cast(0)
     test_equality("nullptr casting", a, 0)
 
