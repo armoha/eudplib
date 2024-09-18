@@ -4,7 +4,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ...utils import EPD, _rand_lst
+from ...utils import EPD, _rand_lst, unProxy
 from .. import allocator as ac
 from .. import rawtrigger as rt
 from .. import variable as ev
@@ -143,13 +143,14 @@ def _f_bitlshift(a, b):
 
 def f_bitlshift(a, b, _fdict={}, **kwargs):
     """Calculate a << b"""
-    if not ev.IsEUDVariable(a) and not ev.IsEUDVariable(b):
+    a, b = unProxy(a), unProxy(b)
+    if not isinstance(a, ev.EUDVariable) and not isinstance(b, ev.EUDVariable):
         if "ret" in kwargs:
             SeqCompute((kwargs["ret"][0], rt.SetTo, a << b))
             return kwargs["ret"][0]
         return a << b
     ret = kwargs["ret"][0] if "ret" in kwargs else ev.EUDVariable()
-    if ev.IsEUDVariable(a) and not ev.IsEUDVariable(b):
+    if isinstance(a, ev.EUDVariable) and not isinstance(b, ev.EUDVariable):
         if b == 0:
             if a is ret:
                 return a
@@ -199,13 +200,14 @@ def f_bitlshift(a, b, _fdict={}, **kwargs):
 
 def f_bitrshift(a, b, **kwargs):
     """Calculate a >> b"""
-    if not ev.IsEUDVariable(a) and not ev.IsEUDVariable(b):
+    a, b = unProxy(a), unProxy(b)
+    if not isinstance(a, ev.EUDVariable) and not isinstance(b, ev.EUDVariable):
         if "ret" in kwargs:
             SeqCompute((kwargs["ret"][0], rt.SetTo, a >> b))
             return kwargs["ret"][0]
         return a >> b
     ret = kwargs["ret"][0] if "ret" in kwargs else ev.EUDVariable()
-    if ev.IsEUDVariable(a) and not ev.IsEUDVariable(b):
+    if isinstance(a, ev.EUDVariable) and not isinstance(b, ev.EUDVariable):
         if b == 0:
             if a is ret:
                 return a
