@@ -42,24 +42,14 @@ def f_dwepdread_cp(cpo, **kwargs):
 
 
 def f_dwread_cp(cpo, *, ret=None):
-    if not (isinstance(cpo, int) and cpo == 0):
-        cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    ptr = readtable._cp_caller(readtable._get(0xFFFFFFFF, 0))(ret=ret)
-    if not (isinstance(cpo, int) and cpo == 0):
-        cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
-    return ptr
+    return readtable._cp_caller(readtable._get(0xFFFFFFFF, 0))(cpo, ret=ret)
 
 
 def f_epdread_cp(cpo, *, ret=None):
-    if not (isinstance(cpo, int) and cpo == 0):
-        cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    ptr = readtable._cp_caller(
+    return readtable._cp_caller(
         readtable._get(0xFFFFFFFC, -2, True),
         _operations=[(ut.EPD(readtable.copy_ret) + 5, c.SetTo, ut.EPD(0))],
-    )(ret=ret)
-    if not (isinstance(cpo, int) and cpo == 0):
-        cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
-    return ptr
+    )(cpo, ret=ret)
 
 
 @_EUDPredefineReturn(1, 2)
@@ -104,14 +94,14 @@ def _wreader(subp):
 
 
 def f_wread_cp(cpo, subp, *, ret=None):
+    if isinstance(subp, int) and 0 <= subp <= 2:
+        return readtable._cp_caller(
+            readtable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))
+        )(cpo, ret=ret)
+
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    if isinstance(subp, int) and 0 <= subp <= 2:
-        w = readtable._cp_caller(
-            readtable._insert_or_get(0xFFFF << (8 * subp), -(8 * subp))
-        )(ret=ret)
-    else:
-        w = _wreader(subp, ret=ret)
+    w = _wreader(subp, ret=ret)
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
     return w
@@ -136,14 +126,14 @@ def _breader(subp):
 
 
 def f_bread_cp(cpo, subp, *, ret=None):
+    if isinstance(subp, int) and 0 <= subp <= 3:
+        return readtable._cp_caller(
+            readtable._insert_or_get(0xFF << (8 * subp), -(8 * subp))
+        )(cpo, ret=ret)
+
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
-    if isinstance(subp, int) and 0 <= subp <= 3:
-        b = readtable._cp_caller(
-            readtable._insert_or_get(0xFF << (8 * subp), -(8 * subp))
-        )(ret=ret)
-    else:
-        b = _breader(subp, rete=ret)
+    b = _breader(subp, rete=ret)
     if not (isinstance(cpo, int) and cpo == 0):
         cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
     return b

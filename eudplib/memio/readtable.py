@@ -7,6 +7,7 @@
 from collections.abc import Callable
 
 from .. import core as c
+from .. import ctrlstru as cs
 from .. import utils as ut
 from . import modcurpl as cp
 
@@ -121,7 +122,7 @@ def _insert_or_get(
 
 
 def _cp_caller(readtrg: c.RawTrigger, *, _operations=None) -> Callable:
-    def f(*, ret=None):
+    def f(cpo=0, *, ret=None):
         if ret is None:
             ret = c.EUDVariable()
             ret.makeR()
@@ -131,6 +132,9 @@ def _cp_caller(readtrg: c.RawTrigger, *, _operations=None) -> Callable:
             retepd = ut.EPD(ret.getValueAddr())
         else:
             retepd = ret
+
+        if not (isinstance(cpo, int) and cpo == 0):
+            cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
 
         nexttrg = c.Forward()
         operations = [
@@ -142,6 +146,9 @@ def _cp_caller(readtrg: c.RawTrigger, *, _operations=None) -> Callable:
         c.NonSeqCompute(operations)
         c.SetNextTrigger(readtrg)
         nexttrg << c.NextTrigger()
+
+        if not (isinstance(cpo, int) and cpo == 0):
+            cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpo))
 
         return ret
 

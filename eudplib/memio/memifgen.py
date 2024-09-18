@@ -166,15 +166,10 @@ def f_maskread_epd(targetplayer, mask, *, _fdict={}, **kwargs):
     return _fdict[mask](targetplayer, **kwargs)
 
 
-def f_maskread_cp(cpoffset, mask, *, _fdict={}, **kwargs):
+def f_maskread_cp(cpo, mask, *, _fdict={}, **kwargs):
     if readtable._is_consecutive(mask):
-        if not (isinstance(cpoffset, int) and cpoffset == 0):
-            cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpoffset))
-        ret = readtable._cp_caller(readtable._insert_or_get(mask, 0))(**kwargs)
-        if not (isinstance(cpoffset, int) and cpoffset == 0):
-            cs.DoActions(c.SetMemory(0x6509B0, c.Add, -cpoffset))
-        return ret
+        return readtable._cp_caller(readtable._insert_or_get(mask, 0))(cpo, **kwargs)
 
     if mask not in _fdict:
         _fdict[mask] = f_readgen_cp(mask, (0, lambda x: x))
-    return _fdict[mask](cpoffset, **kwargs)
+    return _fdict[mask](cpo, **kwargs)
