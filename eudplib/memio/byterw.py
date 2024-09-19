@@ -25,23 +25,15 @@ class EUDByteReader:
 
     # -------
 
-    def seekepd(self, epdoffset):
+    def seekepd(self, epdoffset, *, subp=0, operation=False):
         """Seek EUDByteReader to specific epd player address"""
-        if c.IsEUDVariable(epdoffset):
-            return c.VProc(
-                epdoffset,
-                [
-                    *epdoffset.QueueAssignTo(EPD(self._read) + 87),
-                    c.SetNextPtr(self._read, self._case[0]),
-                ],
-            )
-        else:
-            return c.RawTrigger(
-                actions=[
-                    c.SetMemory(self._read + 348, c.SetTo, epdoffset),
-                    c.SetNextPtr(self._read, self._case[0]),
-                ]
-            )
+        operations = [
+            (EPD(self._read) + 1, c.SetTo, self._case[subp]),
+            (EPD(self._read) + 87, c.SetTo, epdoffset),
+        ]
+        if operation:
+            return operations
+        c.NonSeqCompute(operations)
 
     @c.EUDMethod
     def _seekoffset(self, offset):
@@ -58,18 +50,20 @@ class EUDByteReader:
                 actions=c.SetNextPtr(self._read, self._case[i]),
             )
 
-    def seekoffset(self, offset):
+    def seekoffset(self, offset, *, operation=False):
         """Seek EUDByteReader to specific address"""
         if c.IsEUDVariable(offset):
+            if operation:
+                raise EPError(_("offset is EUDVariable"))
             return self._seekoffset(offset)
-        else:
-            q, r = divmod(offset, 4)
-            return c.RawTrigger(
-                actions=[
-                    c.SetMemory(self._read + 348, c.SetTo, q - (0x58A364 // 4)),
-                    c.SetNextPtr(self._read, self._case[r]),
-                ]
-            )
+        q, r = divmod(offset, 4)
+        operations = [
+            (EPD(self._read) + 87, c.SetTo, q - (0x58A364 // 4)),
+            (EPD(self._read) + 1, c.SetTo, self._case[r]),
+        ]
+        if operation:
+            return operations
+        c.NonSeqCompute(operations)
 
     # -------
 
@@ -133,30 +127,36 @@ class EUDByteWriter:
 
     # -------
 
-    def seekepd(self, epdoffset):
+    def seekepd(self, epdoffset, *, subp=0, operation=False):
         """Seek EUDByteWriter to specific epd player address"""
-        if c.IsEUDVariable(epdoffset):
-            c.VProc(
-                epdoffset,
-                [
-                    *epdoffset.QueueAssignTo(EPD(self._write + 344)),
-                    self._suboffset.SetNumber(0),
-                ],
-            )
-        else:
-            c.RawTrigger(
-                actions=[
-                    c.SetMemory(self._write + 344, c.SetTo, epdoffset),
-                    self._suboffset.SetNumber(0),
-                ]
-            )
+        operations = [
+            (self._suboffset, c.SetTo, subp),
+            (EPD(self._write) + 86, c.SetTo, epdoffset),
+        ]
+        if operation:
+            return operations
+        c.NonSeqCompute(operations)
 
     @c.EUDMethod
-    def seekoffset(self, offset):
-        """Seek EUDByteWriter to specific address"""
+    def _seekoffset(self, offset):
         # convert offset to epd offset & suboffset
         c.f_div(offset, 4, ret=[EPD(self._write + 344), self._suboffset])
         c.RawTrigger(actions=c.SetMemory(self._write + 344, c.Add, -(0x58A364 // 4)))
+
+    def seekoffset(self, offset, *, operation=False):
+        """Seek EUDByteWriter to specific address"""
+        if c.IsEUDVariable(offset):
+            if operation:
+                raise EPError(_("offset is EUDVariable"))
+            return self._seekoffset(offset)
+        q, r = divmod(offset, 4)
+        operations = [
+            (EPD(self._write) + 86, c.SetTo, q - (0x58A364 // 4)),
+            (self._suboffset, c.SetTo, r),
+        ]
+        if operation:
+            return operations
+        c.NonSeqCompute(operations)
 
     # -------
 
