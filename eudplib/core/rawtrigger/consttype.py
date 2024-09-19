@@ -7,6 +7,8 @@
 from abc import ABCMeta
 from typing import TYPE_CHECKING, TypeAlias, TypeVar
 
+from typing_extensions import Self
+
 from ...localize import _
 from ...utils import EPError, ExprProxy
 
@@ -31,6 +33,75 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
                 _('[Warning] "{}" is not a {}').format(_from, cls.__name__)
             )
         return cls(_from)
+
+    def _check_assign(self, other) -> None:
+        from ..variable import EUDVariable
+
+        if not isinstance(self._value, EUDVariable):
+            raise EPError(_("Can't assign {} to constant expression").format(other))
+        if type(other) is ExprProxy:
+            other = other._value
+        if isinstance(other, type(self)):
+            return
+        if isinstance(other, int | EUDVariable):
+            return
+        else:
+            raise EPError(_("Can't assign {} to {}").format(other, self))
+
+    def Assign(self, other) -> Self:  # noqa: N802
+        self._check_assign(other)
+        self._value.Assign(other)
+        return self
+
+    def __iadd__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__iadd__(other)
+        return self
+
+    def __isub__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__isub__(other)
+        return self
+
+    def __ior__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__ior__(other)
+        return self
+
+    def __iand__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__iand__(other)
+        return self
+
+    def __ixor__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__ixor__(other)
+        return self
+
+    def __imul__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__imul__(other)
+        return self
+
+    def __ifloordiv__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__ifloordiv__(other)
+        return self
+
+    def __imod__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__imod__(other)
+        return self
+
+    def __ilshift__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__ilshift__(other)
+        return self
+
+    def __irshift__(self, other) -> Self:
+        self._check_assign(other)
+        self._value.__irshift__(other)
+        return self
 
 
 # return types

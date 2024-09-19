@@ -59,7 +59,7 @@ def test_scdata():
         EUDVariable(80 * 256),
     )
     ghost -= 1
-    ep_assert(not isinstance(ghost, TrgUnit), "losing type on in-place operations")
+    ep_assert(isinstance(ghost, TrgUnit), "preserve type after in-place operations")
 
     zealot_data = TrgUnit("Protoss Zealot")
 
