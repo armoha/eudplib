@@ -50,7 +50,7 @@ function updateUnitNameAndRank() {
     /* TEST */
     setcurpl(getuserplayerid());
     DisplayText(NAME_STR);
-    const tests = "Ticket 1, Ore 3, Gas 5\0", "{}\0".format($U("Terran Academy"));
-    return memcmp(namePtr, Db(tests[0]), py_len(tests[0].encode("utf-8"))),
-        memcmp(rankPtr, Db(tests[1]), py_len(tests[1].encode("utf-8")));
+    const tests = "Ticket 1, Ore 3, Gas 5", "{}".format($U("Terran Academy"));
+    return memcmp(namePtr, Db(tests[0]), py_len(tests[0].encode("utf-8")) + 1),
+        memcmp(rankPtr, Db(tests[1]), py_len(tests[1].encode("utf-8")) + 1);
 }

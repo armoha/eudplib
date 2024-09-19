@@ -830,7 +830,7 @@ eudplib의 핵심 개념 중 하나가 변수와 함수의 개념입니다.
 스트링 관련
 -------------------
 
-* DBString(content)
+* DBString(content: str | bytes | int)
     스트링 테이블을 쓰지 않는 스트링입니다.
 
     - GetDisplayActions() : DoActions에 넣을 수 있는 액션입니다. 이걸 쓰면

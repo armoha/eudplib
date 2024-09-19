@@ -9,6 +9,7 @@ from typing_extensions import Self
 from .. import core as c
 from .. import utils as ut
 from ..ctrlstru import DoActions
+from ..localize import _
 from .strcommon import temp_string_id
 
 
@@ -80,6 +81,12 @@ class DBStringData(c.EUDObject):
             self.content = bytes(content)
         else:
             self.content = ut.u2utf8(content)
+            if 0 in self.content:
+                raise ut.EPError(
+                    _("no nul bytes allowed in the middle of {}").format(
+                        self.__class__
+                    )
+                )
 
     def GetDataSize(self):  # noqa: N802
         return len(self.content) + 1

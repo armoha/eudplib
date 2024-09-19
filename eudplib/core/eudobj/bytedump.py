@@ -6,6 +6,8 @@
 
 from typing_extensions import Self
 
+from ...localize import _
+from ...utils import EPError
 from ..allocator.payload import _PayloadBuffer
 from .eudobj import EUDObject
 
@@ -19,7 +21,14 @@ class Db(EUDObject):
     def __init__(self, b: bytes | int | str, /) -> None:
         super().__init__()
         if isinstance(b, str):
-            b = b.encode("UTF-8") + b"\0"
+            b = b.encode("UTF-8")
+            if 0 in b:
+                raise EPError(
+                    _("no nul bytes allowed in the middle of {}").format(
+                        self.__class__
+                    )
+                )
+            b += b"\0"
         self.content: bytes = bytes(b)
 
     def GetDataSize(self) -> int:  # noqa: N802

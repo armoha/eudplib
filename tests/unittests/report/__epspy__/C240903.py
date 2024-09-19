@@ -93,10 +93,10 @@ def f_updateUnitNameAndRank():
     EUDEndExecuteOnce()
     f_setcurpl(f_getuserplayerid())
     # (Line 52) DisplayText(NAME_STR);
-    # (Line 53) const tests = "Ticket 1, Ore 3, Gas 5\0", "{}\0".format($U("Terran Academy"));
+    # (Line 53) const tests = "Ticket 1, Ore 3, Gas 5", "{}".format($U("Terran Academy"));
     DoActions(DisplayText(NAME_STR))
-    tests = "Ticket 1, Ore 3, Gas 5\0", "{}\0".format(EncodeUnit("Terran Academy"))
-    # (Line 54) return memcmp(namePtr, Db(tests[0]), py_len(tests[0].encode("utf-8"))),
-    # (Line 55) memcmp(rankPtr, Db(tests[1]), py_len(tests[1].encode("utf-8")));
-    EUDReturn(f_memcmp(namePtr, Db(tests[0]), len(tests[0].encode("utf-8"))), f_memcmp(rankPtr, Db(tests[1]), len(tests[1].encode("utf-8"))))
+    tests = "Ticket 1, Ore 3, Gas 5", "{}".format(EncodeUnit("Terran Academy"))
+    # (Line 54) return memcmp(namePtr, Db(tests[0]), py_len(tests[0].encode("utf-8")) + 1),
+    # (Line 55) memcmp(rankPtr, Db(tests[1]), py_len(tests[1].encode("utf-8")) + 1);
+    EUDReturn(f_memcmp(namePtr, Db(tests[0]), len(tests[0].encode("utf-8")) + 1), f_memcmp(rankPtr, Db(tests[1]), len(tests[1].encode("utf-8")) + 1))
     # (Line 56) }
