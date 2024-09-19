@@ -131,11 +131,11 @@ class EUDVariable(VariableBase):
         return id(self)
 
     # -------
-    def makeL(self) -> EUDVariable:  # noqa: N802
+    def makeL(self) -> Self:  # noqa: N802
         self._rvalue = False
         return self
 
-    def makeR(self) -> EUDVariable:  # noqa: N802
+    def makeR(self) -> Self:  # noqa: N802
         self._rvalue = True
         return self
 
@@ -238,19 +238,19 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def Assign(self, other: Dword) -> EUDVariable:  # noqa: N802
+    def Assign(self, other: Dword) -> Self:  # noqa: N802
         self.checkNonRValue()
         SeqCompute(((self, bt.SetTo, other),))
         return self
 
-    def __lshift__(self, other: Dword) -> EUDVariable:
+    def __lshift__(self, other: Dword) -> Self:
         return self.Assign(other)
 
-    def __iadd__(self, other: Dword) -> EUDVariable:
+    def __iadd__(self, other: Dword) -> Self:
         SeqCompute(((self, bt.Add, other),))
         return self
 
-    def __isub__(self, other: Dword) -> EUDVariable:
+    def __isub__(self, other: Dword) -> Self:
         if isinstance(other, int):
             self.__iadd__(-other)  # 1A
         else:
@@ -373,7 +373,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __ior__(self, other: Dword) -> EUDVariable:
+    def __ior__(self, other: Dword) -> Self:
         unproxied = unProxy(other)
         if isinstance(unproxied, EUDVariable):
             write = self.SetNumberX(0xFFFFFFFF, 0)
@@ -383,7 +383,7 @@ class EUDVariable(VariableBase):
             super().__ior__(unproxied)  # 1A
         return self
 
-    def __iand__(self, other: Dword) -> EUDVariable:
+    def __iand__(self, other: Dword) -> Self:
         unproxied = unProxy(other)
         if isinstance(unproxied, EUDVariable):
             write = self.SetNumberX(0, 0xFFFFFFFF)
@@ -476,7 +476,7 @@ class EUDVariable(VariableBase):
 
     # -------
 
-    def __ixor__(self, other: Dword) -> EUDVariable:
+    def __ixor__(self, other: Dword) -> Self:
         unproxied = unProxy(other)
         if isinstance(unproxied, EUDVariable):
             VProc(

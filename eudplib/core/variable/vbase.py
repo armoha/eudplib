@@ -5,15 +5,15 @@
 # file that should have been included as part of this package.
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Literal, TypeVar, overload
+from typing import TYPE_CHECKING, Literal, overload
+
+from typing_extensions import Self
 
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, IsConstExpr
 
 if TYPE_CHECKING:
     from ..rawtrigger.constenc import Dword
-
-Self = TypeVar("Self", bound="VariableBase")
 
 
 class VariableBase(metaclass=ABCMeta):
