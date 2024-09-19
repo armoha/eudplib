@@ -11,8 +11,10 @@ _sys.path.insert(
 
 from eudplib import *
 from eudplib.collections.eudarray import _use_ptr_array
+from eudplib.utils.etc import _allow_epd_on_epd
 from eudplib.eudlib.utilf.datadumper import _add_datadumper
 
+_allow_epd_on_epd(False)
 _testFailed = EUDLightVariable()
 _testNum = EUDVariable()
 _failedNum = EUDVariable()

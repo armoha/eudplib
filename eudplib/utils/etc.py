@@ -17,19 +17,19 @@ from .eperror import EPError, ep_warn
 from .exprproxy import unProxy
 
 T = TypeVar("T")
-_allow_epd_on_epd = True
+_epd_on_epd = True
 
 
-def _epd_on_epd(b: bool) -> None:
-    global _allow_epd_on_epd
-    _allow_epd_on_epd = b
+def _allow_epd_on_epd(b: bool) -> None:
+    global _epd_on_epd
+    _epd_on_epd = b
 
 
 def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
     if c.IsConstExpr(p):
         p = unProxy(p)
         if isinstance(p, c.ConstExpr) and p._is_epd():
-            if _allow_epd_on_epd:
+            if _epd_on_epd:
                 ep_warn(_("EPD on EPD value of ConstExpr is no-op"))
             else:
                 raise EPError(_("EPD on EPD value of ConstExpr is no-op"))
