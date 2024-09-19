@@ -1,5 +1,5 @@
 # TEST HELPER
-
+import functools
 import os as _os
 import random as _random
 import sys as _sys
@@ -10,12 +10,17 @@ _sys.path.insert(
 
 
 from eudplib import *
+from eudplib.collections.eudarray import _use_ptr_array
 from eudplib.eudlib.utilf.datadumper import _add_datadumper
 
 _testFailed = EUDLightVariable()
-_failedTest = EUDArray(1024)
 _testNum = EUDVariable()
 _failedNum = EUDVariable()
+
+
+@functools.cache
+def _failedTest():
+    return EUDArray(1024)
 
 
 ###############################################################
@@ -46,7 +51,7 @@ def test_assert(testname, condition):
     if EUDElse()():
         f_simpleprint("\x08 - [FAIL]", testname)
         failedTestDb = Db(testname)
-        _failedTest[_failedNum] = failedTestDb
+        _failedTest()[_failedNum] = failedTestDb
         _testFailed << 1
         test_wait(24)
     EUDEndIf()
@@ -73,7 +78,7 @@ def test_equality(testname, real, expt):
         f_simpleprint(" \x03   - \x04 Output   : ", *real)
         f_simpleprint(" \x03   - \x04 Expected : ", *expt)
         failedTestDb = Db(testname)
-        _failedTest[_failedNum] = failedTestDb
+        _failedTest()[_failedNum] = failedTestDb
         _failedNum += 1
         test_wait(24)
     EUDEndIf()

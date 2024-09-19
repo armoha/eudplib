@@ -4,6 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+import functools
+
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
@@ -12,21 +14,28 @@ from ...memio import f_dwread_epd, f_repmovsd_epd
 
 _patch_max = 8192
 
-patchstack = EUDArray(3 * _patch_max)
 dws_top, ps_top = c.EUDVariable(), c.EUDVariable()
-dwstack = EUDArray(_patch_max)
+
+@functools.cache
+def patchstack():
+    return EUDArray(3 * _patch_max)
+
+
+@functools.cache
+def dwstack():
+    return EUDArray(_patch_max)
 
 
 def pushpatchstack(value: c.EUDVariable | int) -> None:
     global ps_top
-    patchstack[ps_top] = value
+    patchstack()[ps_top] = value
     ps_top += 1
 
 
 def poppatchstack() -> c.EUDVariable:
     global ps_top
     ps_top -= 1
-    return patchstack[ps_top]
+    return patchstack()[ps_top]
 
 
 @c.EUDFunc
@@ -34,10 +43,10 @@ def f_dwpatch_epd(dstepd, value):
     global dws_top
 
     prev_value = f_dwread_epd(dstepd)
-    if dwstack._value._is_epd():
-        dws_pos = dwstack + dws_top
+    if dwstack()._value._is_epd():
+        dws_pos = dwstack() + dws_top
     else:
-        dws_pos = ut.EPD(dwstack) + dws_top
+        dws_pos = ut.EPD(dwstack()) + dws_top
     c.VProc(
         [dstepd, value, dws_pos, prev_value],
         [

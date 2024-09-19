@@ -12,7 +12,7 @@ if DoCoverageTest:
     cov = coverage.Coverage()
     cov.start()
 
-
+# helper._use_ptr_array()
 helper.EP_SetRValueStrictMode(True)
 
 from unittests import (

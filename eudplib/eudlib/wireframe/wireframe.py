@@ -1,3 +1,4 @@
+import functools
 from typing import ClassVar
 
 from ... import core as c
@@ -20,12 +21,36 @@ from . import wiredata as wd
 
 is64bit = c.EUDLightBool()
 tranwire, grpwire, wirefram = c.EUDCreateVariables(3)
-tranwire_default32 = EUDArray(wd.TranWire32)
-grpwire_default32 = EUDArray(wd.GrpWire32)
-wirefram_default32 = EUDArray(wd.Wirefram32)
-tranwire_default64 = EUDArray(wd.TranWire64)
-grpwire_default64 = EUDArray(wd.GrpWire64)
-wirefram_default64 = EUDArray(wd.Wirefram64)
+
+
+@functools.cache
+def tranwire_default32():
+    return EUDArray(wd.TranWire32)
+
+
+@functools.cache
+def grpwire_default32():
+    return EUDArray(wd.GrpWire32)
+
+
+@functools.cache
+def wirefram_default32():
+    return EUDArray(wd.Wirefram32)
+
+
+@functools.cache
+def tranwire_default64():
+    return EUDArray(wd.TranWire64)
+
+
+@functools.cache
+def grpwire_default64():
+    return EUDArray(wd.GrpWire64)
+
+
+@functools.cache
+def wirefram_default64():
+    return EUDArray(wd.Wirefram64)
 
 
 class InitialWireframe:
@@ -77,9 +102,9 @@ class InitialWireframe:
                     init = default
                 return init if init._is_epd() else ut.EPD(init)
 
-            tranwire_init = create_init64(cls._tranwires, tranwire_default64, 106)
-            grpwire_init = create_init64(cls._grpwires, grpwire_default64, 131)
-            wirefram_init = create_init64(cls._wireframs, wirefram_default64, 228)
+            tranwire_init = create_init64(cls._tranwires, tranwire_default64(), 106)
+            grpwire_init = create_init64(cls._grpwires, grpwire_default64(), 131)
+            wirefram_init = create_init64(cls._wireframs, wirefram_default64(), 228)
 
             f_repmovsd_epd(tranwire, tranwire_init, len(wd.TranWire64))
             f_repmovsd_epd(grpwire, grpwire_init, len(wd.GrpWire64))
@@ -205,7 +230,7 @@ def _set_wireframe(unit, wireframe, size, ptr, default32, default64):
 def SetTranWire(unit, wireframe):  # noqa: N802
     InitialWireframe.init()
     _set_wireframe(
-        unit, wireframe, 105, tranwire, tranwire_default32, tranwire_default64
+        unit, wireframe, 105, tranwire, tranwire_default32(), tranwire_default64()
     )
 
 
@@ -213,7 +238,7 @@ def SetTranWire(unit, wireframe):  # noqa: N802
 def SetGrpWire(unit, wireframe):  # noqa: N802
     InitialWireframe.init()
     _set_wireframe(
-        unit, wireframe, 130, grpwire, grpwire_default32, grpwire_default64
+        unit, wireframe, 130, grpwire, grpwire_default32(), grpwire_default64()
     )
 
 
@@ -221,7 +246,7 @@ def SetGrpWire(unit, wireframe):  # noqa: N802
 def SetWirefram(unit, wireframe):  # noqa: N802
     InitialWireframe.init()
     _set_wireframe(
-        unit, wireframe, 227, wirefram, wirefram_default32, wirefram_default64
+        unit, wireframe, 227, wirefram, wirefram_default32(), wirefram_default64()
     )
 
 
