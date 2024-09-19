@@ -9,6 +9,7 @@ def test_unitloop():
 
 @TestInstance
 def test_unitgroup():
+    get_epd = lambda x: x if x._value._is_epd() else EPD(x)
     g = UnitGroup(1000)
     g.add(3)
     g.add(EUDVariable(2))
@@ -22,7 +23,7 @@ def test_unitgroup():
         EUDEndIf()
         # NOTE: Should we guarantee that first offset is always 0x4C?
         unit.move_cp(0x4C // 4)  # NO-OP
-        f_dwadd_epd(EPD(0x6509B0), EPD(k) - 19)
+        f_dwadd_epd(EPD(0x6509B0), get_epd(k) - 19)
         f_dwwrite_cp(0, 1)
     test_equality(
         "Basic UnitGroup test", [k[i] for i in range(7)], [0, 0, 1, 1, 0, 0, 1]
@@ -32,7 +33,7 @@ def test_unitgroup():
     g.add(EUDVariable(0))
     m = EUDArray(7 + 19)
     for unit in g.cploop:
-        f_dwadd_epd(EPD(0x6509B0), EPD(m))
+        f_dwadd_epd(EPD(0x6509B0), get_epd(m))
         for dead in unit.dying:
             f_dwwrite_cp(0, 3)
             dead.move_cp(0)
@@ -42,7 +43,7 @@ def test_unitgroup():
 
     for unit in g.cploop:
         # NEVER run since all units were already removed from group 'g'
-        f_dwadd_epd(EPD(0x6509B0), EPD(m))
+        f_dwadd_epd(EPD(0x6509B0), get_epd(m))
         f_dwwrite_cp(0, 2)
         unit.move_cp(0)
         f_dwwrite_cp(0, 2)

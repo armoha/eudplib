@@ -397,9 +397,9 @@ def f_test_deque():
     # (Line 192) return List2Assignable(ret);
     EUDReturn(List2Assignable(ret))
     # (Line 193) }
-    # (Line 194) function test_alias() {
+    # (Line 194) function test_alias(): EUDArray {
 
-@EUDFunc
+@EUDTypedFunc([], [EUDArray])
 def f_test_alias():
     # (Line 195) const a = EUDArray(10);
     a = EUDArray(10)
@@ -411,9 +411,9 @@ def f_test_alias():
         # (Line 197) a[i] = i;
         _ARRW(a, i) << (i)
         # (Line 198) }
-        # (Line 199) return EPD(a);
+        # (Line 199) return a;
         EUDSetContinuePoint()
         _t2()
     EUDEndWhile()
-    EUDReturn(EPD(a))
+    EUDReturn(a)
     # (Line 200) }

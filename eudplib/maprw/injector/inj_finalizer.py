@@ -243,8 +243,16 @@ def create_inject_finalizer(
                     c.SetMemory(pts + player * 12 + 8, c.SetTo, tstart),
                     c.SetMemory(pts + player * 12 + 4, c.SetTo, tre),
                     # Cache dlist start & end
-                    prevtstart.SetDest(ut.EPD(orig_tstart) + player),
-                    prevtend.SetDest(ut.EPD(orig_tend) + player),
+                    prevtstart.SetDest(
+                        orig_tstart + player
+                        if orig_tstart._is_epd()
+                        else ut.EPD(orig_tstart) + player
+                    ),
+                    prevtend.SetDest(
+                        orig_tend + player
+                        if orig_tend._is_epd()
+                        else ut.EPD(orig_tend) + player
+                    ),
                     prevtend_epd.AddNumber(1),
                     prevtend_epd.SetDest(ut.EPD(link_trs) + 4),
                 ]

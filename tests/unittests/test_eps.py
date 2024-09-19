@@ -76,10 +76,10 @@ def test_epscript():
         chr(14 + i % 4) + str(x) for i, x in enumerate(cases)
     )
     test_equality("epScript EUDDeque %s" % testname, f_test_deque(), cases)
-    arr_epd = f_test_alias()
+    arr = f_test_alias()
     test_equality(
         "epScript array alias write a[i] = i",
-        [f_dwread_epd(arr_epd + i) for i in range(10)],
+        [arr[i] for i in range(10)],
         list(range(10)),
     )
 

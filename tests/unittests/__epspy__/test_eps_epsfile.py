@@ -37,32 +37,30 @@ def f_testLineno():
 def f_square(x):
     # (Line 22) testLineno();
     f_testLineno()
-    # (Line 23) const z = EUDArray(5);
-    z = EUDArray(5)
-    # (Line 24) return x * x; // + z.k;
+    # (Line 23) return x * x; // + z.k;
     EUDReturn(x * x)
-    # (Line 25) }
-    # (Line 27) const receives = py_eval('[PVariable() for _ in range(8)]');
+    # (Line 24) }
+    # (Line 26) const receives = py_eval('[PVariable() for _ in range(8)]');
 
 receives = _CGFW(lambda: [eval('[PVariable() for _ in range(8)]')], 1)[0]
-# (Line 28) const attack_gwpID = 4;
+# (Line 27) const attack_gwpID = 4;
 attack_gwpID = _CGFW(lambda: [4], 1)[0]
-# (Line 29) function constv_thing() {
+# (Line 28) function constv_thing() {
 @EUDFunc
 def f_constv_thing():
-    # (Line 30) foreach(i, pvar: py_enumerate(receives)) {}
+    # (Line 29) foreach(i, pvar: py_enumerate(receives)) {}
     for i, pvar in enumerate(receives):
-        # (Line 31) SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
+        # (Line 30) SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
         pass
 
-    # (Line 32) return a[0] + a[1] + a[2] + a[3] + a[4];
+    # (Line 31) return a[0] + a[1] + a[2] + a[3] + a[4];
     DoActions(SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID // 4, Add, _LSH(100,(attack_gwpID % 4 * 8)), _LSH(0xFF,(attack_gwpID % 4 * 8))))
     EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
-    # (Line 33) }
-    # (Line 35) function test_reported() {
+    # (Line 32) }
+    # (Line 34) function test_reported() {
 
 @EUDFunc
 def f_test_reported():
-    # (Line 36) return C240903.updateUnitNameAndRank();
+    # (Line 35) return C240903.updateUnitNameAndRank();
     EUDReturn(C240903.f_updateUnitNameAndRank())
-    # (Line 37) }
+    # (Line 36) }

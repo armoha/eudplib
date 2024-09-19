@@ -75,7 +75,7 @@ class InitialWireframe:
                     )
                 else:
                     init = default
-                return ut.EPD(init)
+                return init if init._is_epd() else ut.EPD(init)
 
             tranwire_init = create_init64(cls._tranwires, tranwire_default64, 106)
             grpwire_init = create_init64(cls._grpwires, grpwire_default64, 131)

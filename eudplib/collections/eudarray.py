@@ -15,6 +15,16 @@ from ..localize import _
 from ..memio import f_dwread_epd, f_dwwrite_epd
 from ..utils import EPError
 
+_eudarray_has_instance = False
+_ptr_array = False
+
+
+def _use_ptr_array():
+    global _ptr_array
+    if _eudarray_has_instance:
+        raise ut.EPError(_("EUDArray is already instantiated"))
+    _ptr_array = True
+
 
 class EUDArrayData(c.EUDObject):
     """
@@ -29,6 +39,8 @@ class EUDArrayData(c.EUDObject):
         return super().__new__(cls)
 
     def __init__(self, arr) -> None:
+        global _eudarray_has_instance
+        _eudarray_has_instance = True
         super().__init__()
 
         if isinstance(arr, int):
@@ -71,59 +83,73 @@ def _get_epd(ptr):
 
 
 class EUDArray(ut.ExprProxy):
+    __slots__ = ("length", "_epd")
     dont_flatten = True
 
     def __init__(self, initval=None, *, _from=None) -> None:
+        global _eudarray_has_instance
+        _eudarray_has_instance = True
         self.length: int | None
         if _from is not None:
             data_obj = _from
             try:
                 self.length = _from._arrlen
             except AttributeError:
-                self.length = None
-            try:
-                self._epd = _from._epd
-            except AttributeError:
-                if c.IsEUDVariable(_from):
-                    self._epd = c.Forward()
-                    c.SetNextTrigger(self._epd)
-                    self._epd << c.NextTrigger()
-                else:
-                    self._epd = ut.EPD(_from)
+                try:
+                    self.length = _from.length
+                except AttributeError:
+                    self.length = None
+            if _ptr_array:
+                try:
+                    self._epd = _from._epd
+                except AttributeError:
+                    if c.IsEUDVariable(_from):
+                        self._epd = c.Forward()
+                        c.SetNextTrigger(self._epd)
+                        self._epd << c.NextTrigger()
+                    else:
+                        self._epd = ut.EPD(_from)
 
         else:
             data_obj = EUDArrayData(initval)
             self.length = data_obj._arrlen
-            self._epd = ut.EPD(data_obj)
+            if not _ptr_array:
+                data_obj = ut.EPD(data_obj)
+            if _ptr_array:
+                self._epd = ut.EPD(data_obj)
+        if not _ptr_array:
+            self._epd = data_obj
 
         super().__init__(data_obj)
-
-    def fmt(self, formatter):
-        if isinstance(self.length, int):
-            formatter.write_str("[")
-            for i in range(self.length):
-                formatter.write_fmt("{}" if i == 0 else ", {}", self[i])
-            formatter.write_str("]")
-        else:
-            formatter.write_fmt("[ptr=0x{:X}]", self)
 
     def Assign(self, other) -> Self:  # noqa: N802
         if not isinstance(self._value, c.EUDVariable):
             raise EPError(_("Can't assign {} to constant expression").format(other))
         if isinstance(other, type(self)):
-            self._lazy_init_epd()
-            other._lazy_init_epd()
-            c.SetVariables([self._value, self._epd], [other, other._epd])
+            if _ptr_array:
+                self._lazy_init_epd()
+                other._lazy_init_epd()
+                c.SetVariables([self._value, self._epd], [other, other._epd])
+            else:
+                c.SetVariables(self._value, other._value)
         elif isinstance(other, int) and other == 0:
-            self._lazy_init_epd()
-            c.SetVariables([self._value, self._epd], [0, 0])
+            if _ptr_array:
+                self._lazy_init_epd()
+                c.SetVariables([self._value, self._epd], [0, 0])
+            else:
+                c.SetVariables(self._value, 0)
+        elif isinstance(other, c.ConstExpr):
+            if _ptr_array and other._is_aligned_ptr():
+                c.SetVariables([self._value, self._epd], [other, ut.EPD(other)])
+            elif not _ptr_array and other._is_epd():
+                c.SetVariables(self._value, other)
         else:
             raise EPError(_("Can't assign {} to {}").format(other, self))
         return self
 
     def _lazy_init_epd(self) -> None:
         # lazy calculate self._epd
-        if type(self._epd) is c.Forward:
+        if _ptr_array and type(self._epd) is c.Forward:
             if c.PushTriggerScope():
                 nptr = self._epd.expr
                 self._epd.Reset()

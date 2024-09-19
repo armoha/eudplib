@@ -34,7 +34,10 @@ def f_dwpatch_epd(dstepd, value):
     global dws_top
 
     prev_value = f_dwread_epd(dstepd)
-    dws_pos = ut.EPD(dwstack) + dws_top
+    if dwstack._value._is_epd():
+        dws_pos = dwstack + dws_top
+    else:
+        dws_pos = ut.EPD(dwstack) + dws_top
     c.VProc(
         [dstepd, value, dws_pos, prev_value],
         [

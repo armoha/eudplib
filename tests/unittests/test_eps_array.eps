@@ -191,10 +191,10 @@ function test_deque() {
     ret.append(sum);
     return List2Assignable(ret);
 }
-function test_alias() {
+function test_alias(): EUDArray {
     const a = EUDArray(10);
     for(var i = 0 ; i < a.length ; i++) {
         a[i] = i;
     }
-    return EPD(a);
+    return a;
 }
