@@ -10,9 +10,9 @@ from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
 from ..memio import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
-from ..memio.rwcommon import br1
+from ..memio.rwcommon import br1, cw
 from ..scdata import CurrentPlayer
-from .cpprint import cw, f_cpstr_print
+from .cpprint import f_cpstr_print
 from .eudprint import epd2s, ptr2s
 
 color_codes = list(range(1, 32))

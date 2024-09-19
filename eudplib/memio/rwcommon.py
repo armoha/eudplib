@@ -4,12 +4,14 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from . import byterw as bm
+from .byterw import EUDByteReader, EUDByteStream, EUDByteWriter
+from .cpbyterw import CPByteWriter
 
-br1 = bm.EUDByteReader()
-br2 = bm.EUDByteReader()
+cw = CPByteWriter()
+br1 = EUDByteReader()
+br2 = EUDByteReader()
 # br3 = bm.EUDByteReader()
-bw1 = bm.EUDByteWriter()
+bw1 = EUDByteWriter()
 # bw2 = bm.EUDByteWriter()
 # bw3 = bm.EUDByteWriter()
-bs1 = bm.EUDByteStream()
+bs1 = EUDByteStream()

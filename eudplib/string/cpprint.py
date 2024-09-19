@@ -12,19 +12,17 @@ from .. import utils as ut
 from ..collections.eudarray import EUDArray
 from ..eudlib.utilf.userpl import IsUserCP
 from ..memio import (
-    CPByteWriter,
     f_bread_epd,
     f_cunitread_epd,
     f_getcurpl,
     f_setcurpl,
 )
-from ..memio.rwcommon import br1
+from ..memio.rwcommon import br1, cw
 from ..scdata import CurrentPlayer, TrgPlayer
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
 from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
 
-cw = CPByteWriter()
 prevcp = c.EUDVariable()
 
 
@@ -111,7 +109,6 @@ def f_getnextchatdst():
 
 @c.EUDFunc
 def _addstr_cp():
-    b = c.EUDVariable()
     if cs.EUDInfLoop()():
         b = br1.readbyte()
         cs.EUDBreakIf(b == 0)
