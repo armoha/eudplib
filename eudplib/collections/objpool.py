@@ -101,7 +101,6 @@ def SetGlobalPoolFieldN(fieldn: int) -> None:  # noqa: N802
         _global_pool.pool is None, "Global object pool is already initialized."
     )
     _global_pool.max_fieldn = fieldn
-    _global_pool.max_object_num = 8 * 32768 // fieldn
 
 
 def get_global_pool() -> ObjPool:
