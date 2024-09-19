@@ -9,7 +9,7 @@ from typing import TypeAlias, TypeVar, cast
 
 from .. import core as c
 from ..localize import _
-from ..utils import EPD, EPError, ExprProxy, unProxy
+from ..utils import EPD, EPError, ExprProxy, classproperty, unProxy
 from .offsetmap import (
     EPDOffsetMap,
     Flag,
@@ -64,6 +64,10 @@ class CSprite(EPDOffsetMap):
     "officially 'pImagePrimary', CImage"
     imageHead = StructMember(0x1C, Mk.DWORD)
     imageTail = StructMember(0x20, Mk.DWORD)
+
+    @classproperty
+    def range(self):
+        return (EPD(0x629D98), EPD(0x629D98) + 9 * 2499, 9)
 
     def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
         """EPD Constructor of CSprite. Use CSprite.from_ptr(ptr) for ptr value"""

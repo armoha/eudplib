@@ -27,6 +27,10 @@ class Tech(ConstType, EPDOffsetMap):
     researched = ArrayMember(0x656350, Mk.BYTE)  # UNUSED?
     broodWarFlag = ArrayMember(0x6564B4, Mk.BYTE)  # bool?
 
+    @ut.classproperty
+    def range(self):
+        return (0, 43, 1)
+
     @classmethod
     def cast(cls, s):
         if isinstance(s, cls):

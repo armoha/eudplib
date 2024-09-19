@@ -25,6 +25,10 @@ class Sprite(ConstType, EPDOffsetMap):
     # selectionCircle and selectionVerticalOffset start on Sprites.dat ID 130
     # selectionVerticalOffset = ArrayMember(0x665FD8, Mk.BYTE)
 
+    @ut.classproperty
+    def range(self):
+        return (0, 516, 1)
+
     @classmethod
     def cast(cls, s):
         if isinstance(s, cls):

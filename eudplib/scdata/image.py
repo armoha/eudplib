@@ -33,6 +33,10 @@ class Image(ConstType, EPDOffsetMap):
     # landingDustOverlay = ArrayMember(0x666778, Mk.DWORD)
     # liftOffDustOverlay = ArrayMember(0x66D8C0, Mk.DWORD)
 
+    @ut.classproperty
+    def range(self):
+        return (0, 998, 1)
+
     @classmethod
     def cast(cls, s):
         if isinstance(s, cls):

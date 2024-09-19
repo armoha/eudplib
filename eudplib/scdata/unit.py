@@ -354,6 +354,10 @@ class TrgUnit(ConstType, EPDOffsetMap):
     broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)  # bool?
     availabilityFlags = AvailabilityFlags(0x661518, Mk.WORD)
 
+    @ut.classproperty
+    def range(self):
+        return (0, 227, 1)
+
     @classmethod
     def cast(cls, s):
         if isinstance(s, cls):

@@ -4,7 +4,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import ClassVar, cast
 
 from ... import core as c
@@ -15,6 +15,11 @@ from ...localize import _
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     __slots__ = ()
     _cast: ClassVar[bool] = False
+
+    @ut.classproperty
+    @abstractmethod
+    def range(self) -> tuple[int, int, int]:
+        ...
 
     @classmethod
     def cast(cls, _from, **kwargs):

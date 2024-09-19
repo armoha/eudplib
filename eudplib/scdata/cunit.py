@@ -11,7 +11,7 @@ from .. import core as c
 from .. import ctrlstru as cs
 from ..core.eudfunc.eudf import _EUDPredefineReturn
 from ..localize import _
-from ..utils import EPD, EPError, unProxy
+from ..utils import EPD, EPError, classproperty, unProxy
 from .csprite import int_or_var
 from .offsetmap import (
     EPDOffsetMap,
@@ -395,6 +395,10 @@ class CUnit(EPDOffsetMap):
     "(mapsizex / 1.5 max)"
     driftX = StructMember(0x14E, Mk.BYTE)
     driftY = StructMember(0x14F, Mk.BYTE)
+
+    @classproperty
+    def range(self):
+        return (EPD(0x59CCA8), EPD(0x59CCA8) + 84 * 1699, 84)
 
     def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
         """EPD Constructor of CUnit. Use CUnit.from_ptr(ptr) for ptr value"""

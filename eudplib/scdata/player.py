@@ -81,6 +81,10 @@ class TrgPlayer(_Player, EPDOffsetMap):
     # 0x6D1181 Replay Header - Player Colors: Read Only length=8
     # 0x6D11A1 Replay Header - Player Force Data: Read Only length=8
 
+    @ut.classproperty
+    def range(self):
+        return (0, 11, 1)
+
     @classmethod
     def cast(cls, other):
         if isinstance(other, cls):

@@ -43,6 +43,10 @@ class UnitOrder(ConstType, EPDOffsetMap):
     requirementOffset = ArrayMember(0x665580, Mk.WORD)
     obscuredOrder = ArrayMember(0x665400, Mk.UNIT_ORDER)
 
+    @ut.classproperty
+    def range(self):
+        return (0, 188, 1)
+
     @classmethod
     def cast(cls, s):
         if isinstance(s, cls):

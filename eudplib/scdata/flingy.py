@@ -23,6 +23,10 @@ class Flingy(ConstType, EPDOffsetMap):
     # unused = ArrayMember(0x6CA240, Mk.BYTE)
     movementControl = ArrayMember(0x6C9858, Mk.MOVEMENT_CONTROL)
 
+    @ut.classproperty
+    def range(self):
+        return (0, 208, 1)
+
     @classmethod
     def cast(cls, s):
         if isinstance(s, cls):

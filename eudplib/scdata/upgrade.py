@@ -28,6 +28,10 @@ class Upgrade(ConstType, EPDOffsetMap):
     maxLevel = ArrayMember(0x655700, Mk.BYTE)
     broodWarFlag = ArrayMember(0x655B3C, Mk.BYTE)  # bool?
 
+    @ut.classproperty
+    def range(self):
+        return (0, 60, 1)
+
     @classmethod
     def cast(cls, s):
         if isinstance(s, cls):

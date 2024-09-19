@@ -58,6 +58,10 @@ class Weapon(ConstType, EPDOffsetMap):
     targetErrorMessage = ArrayMember(0x656568, Mk.STATTEXT)
     icon = ArrayMember(0x656780, Mk.ICON)
 
+    @ut.classproperty
+    def range(self):
+        return (0, 129, 1)
+
     @classmethod
     def cast(cls, s):
         if isinstance(s, cls):
