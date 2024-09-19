@@ -15,7 +15,7 @@ from .cpprint import (
 )
 from .cpstr import GetMapStringAddr
 from .cputf8 import f_cp949_to_utf8_cpy
-from .eudprint import epd2s, f_dbstr_print, hptr, ptr2s
+from .eudprint import f_dbstr_print
 from .fmtprint import f_eprintAll, f_eprintf, f_sprintf, f_sprintf_cp
 from .locale import LocalLocale
 from .parse import f_parse
@@ -29,6 +29,7 @@ from .strbuffer import (
     f_println,
     f_simpleprint,
 )
+from .strcommon import epd2s, hptr, ptr2s
 from .strfunc import f_strcmp, f_strcpy, f_strlen, f_strlen_epd, f_strnstr
 from .tblprint import (
     GetTBLAddr,
@@ -50,10 +51,7 @@ __all__ = [
     "f_raise_CCMU",
     "GetMapStringAddr",
     "f_cp949_to_utf8_cpy",
-    "epd2s",
     "f_dbstr_print",
-    "hptr",
-    "ptr2s",
     "f_eprintAll",
     "f_eprintf",
     "f_sprintf",
@@ -73,6 +71,9 @@ __all__ = [
     "f_printAt",
     "f_println",
     "f_simpleprint",
+    "epd2s",
+    "hptr",
+    "ptr2s",
     "f_strcmp",
     "f_strcpy",
     "f_strlen",

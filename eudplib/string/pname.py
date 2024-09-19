@@ -23,8 +23,9 @@ from ..memio import (
 from ..scdata import CurrentPlayer, TrgPlayer
 from ..trigger import Trigger
 from .cpprint import f_cpstr_print
-from .eudprint import epd2s, f_dbstr_print, ptr2s
+from .eudprint import f_dbstr_print
 from .fmtprint import _format_args
+from .strcommon import epd2s, ptr2s
 from .strfunc import f_strlen_epd
 
 PLVarUnit, PLVarMask = ceil((0x58F500 - 0x58A364) / 48), 0

@@ -9,6 +9,7 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 from ..memio.rwcommon import br1, bw1
 from .dbstr import DBString
+from .strcommon import epd2s, hptr, ptr2s
 
 _conststr_dict = dict()
 _str_jump, _str_eos, _str_dst = c.Forward(), c.Forward(), c.Forward()
@@ -213,21 +214,6 @@ def _omit_eos(*args):
         c.SetNextPtr(_dw_jump, _dw_eos) if dw else [],
         c.SetNextPtr(_ptr_jump, _ptr_eos) if ptr else [],
     )
-
-
-class ptr2s:  # noqa: N801
-    def __init__(self, value):
-        self._value = value
-
-
-class epd2s:  # noqa: N801
-    def __init__(self, value):
-        self._value = value
-
-
-class hptr:  # noqa: N801
-    def __init__(self, value):
-        self._value = value
 
 
 def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):  # noqa: N803

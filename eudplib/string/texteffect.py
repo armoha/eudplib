@@ -13,7 +13,7 @@ from ..memio import f_getcurpl, f_setcurpl, f_setcurpl2cpcache
 from ..memio.rwcommon import br1, cw
 from ..scdata import CurrentPlayer
 from .cpprint import f_cpstr_print
-from .eudprint import epd2s, ptr2s
+from .strcommon import epd2s, ptr2s
 
 color_codes = list(range(1, 32))
 color_codes.remove(0x9)  # tab

@@ -18,6 +18,7 @@ from ..ctrlstru import (
 from ..scdata import AllPlayers
 from ..utils import EPD, ExprProxy, ep_assert
 from .cpprint import f_raise_CCMU
+from .strcommon import epd2s
 
 LOCALES = (
     "enUS",  # [1] English
@@ -73,8 +74,6 @@ class _LocalLocale(ExprProxy):
         EUDEndSwitch()
 
     def fmt(self):
-        from .eudprint import epd2s
-
         return epd2s(_LocalLocale._fmt(self))
 
 

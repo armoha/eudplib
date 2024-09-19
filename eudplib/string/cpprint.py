@@ -21,7 +21,8 @@ from ..memio.rwcommon import br1, cw
 from ..scdata import CurrentPlayer, TrgPlayer
 from .cpstr import CPString, _s2b
 from .dbstr import DBString
-from .eudprint import _conststr_dict, epd2s, hptr, ptr2s
+from .eudprint import _conststr_dict
+from .strcommon import epd2s, hptr, ptr2s
 
 prevcp = c.EUDVariable()
 

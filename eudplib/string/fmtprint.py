@@ -11,7 +11,8 @@ from .. import utils as ut
 from ..localize import _
 from .cpprint import PColor, PName, eprint_all, f_cpstr_print, f_eprintln
 from .dbstr import DBString
-from .eudprint import epd2s, f_dbstr_print, hptr, ptr2s
+from .eudprint import f_dbstr_print
+from .strcommon import epd2s, hptr, ptr2s
 
 
 class _EUDFormatter(string.Formatter):

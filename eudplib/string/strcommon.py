@@ -14,3 +14,18 @@ def temp_string_id():
     if _strcommon is None:
         _strcommon = ForceAddString("")
     return _strcommon
+
+
+class ptr2s:  # noqa: N801
+    def __init__(self, value):
+        self._value = value
+
+
+class epd2s:  # noqa: N801
+    def __init__(self, value):
+        self._value = value
+
+
+class hptr:  # noqa: N801
+    def __init__(self, value):
+        self._value = value
