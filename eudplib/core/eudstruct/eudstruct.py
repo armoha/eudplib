@@ -6,8 +6,11 @@
 
 from collections.abc import Iterable
 
+from typing_extensions import Self
+
 from ... import utils as ut
 from ...localize import _
+from ...utils import EPError
 from ..rawtrigger.consttype import ConstType
 from .structarr import _EUDStructMetaclass
 from .vararray import EUDVArray
@@ -86,6 +89,19 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
             EUDStruct.__init__(obj, _from=_from)
             return obj
 
+    def Assign(self, other) -> Self:  # noqa: N802
+        from ..variable import EUDVariable, SetVariables
+
+        if not isinstance(self._value, EUDVariable):
+            raise EPError(_("Can't assign {} to constant expression").format(other))
+        if isinstance(other, type(self)):
+            SetVariables([self._value, self._epd], [other, other._epd])
+        elif isinstance(other, int) and other == 0:
+            SetVariables([self._value, self._epd], [0, 0])
+        else:
+            raise EPError(_("Can't assign {} to {}").format(other, self))
+        return self
+
     # Initializer
 
     def copy(self):
@@ -96,7 +112,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
         return inst
 
     def setall(self, values):
-        self.fill(values, assert_expected_values_len=len(self._fielddict))
+        self._value.fill(values, assert_expected_values_len=len(self._fielddict))
 
     def copyto(self, inst):
         """Copy struct to other instance"""

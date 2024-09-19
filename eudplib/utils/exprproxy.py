@@ -59,12 +59,19 @@ class ExprProxy(Generic[T_co]):
 
     # Proxy arithmetic operators
 
-    def __lshift__(self, k):
+    def Assign(self, other):  # noqa: N802
         from ..core import EUDVariable
 
         if not isinstance(self._value, EUDVariable):
-            raise EPError(_("Can't assign to constant expression"))
-        return self._value << type(self).cast(k)
+            raise EPError(_("Can't assign {} to constant expression").format(other))
+        try:
+            other = type(self).cast(other)
+        except (AttributeError, TypeError):
+            pass
+        return self._value << type(self).cast(other)
+
+    def __lshift__(self, other):
+        return self.Assign(other)
 
     def __rlshift__(self, k):
         return k << self._value

@@ -23,6 +23,7 @@ from ..variable import (
     EUDVariable,
     IsEUDVariable,
     SeqCompute,
+    SetVariables,
     VProc,
 )
 from ..variable.eudv import process_dest
@@ -136,6 +137,19 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
             super().__init__(baseobj)
             self._epd = EPD(self)
             self._basetype = basetype
+
+        def Assign(self, other) -> Self:  # noqa: N802
+            if not isinstance(self._value, EUDVariable):
+                raise EPError(
+                    _("Can't assign {} to constant expression").format(other)
+                )
+            if isinstance(other, type(self)):
+                SetVariables([self._value, self._epd], [other, other._epd])
+            elif isinstance(other, int) and other == 0:
+                SetVariables([self._value, self._epd], [0, 0])
+            else:
+                raise EPError(_("Can't assign {} to {}").format(other, self))
+            return self
 
         def get(self, i, **kwargs):
             if IsEUDVariable(i):

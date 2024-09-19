@@ -13,6 +13,7 @@ from ..core.inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
 from ..ctrlstru import EUDElse, EUDEndIf, EUDIf, EUDNot
 from ..localize import _
 from ..memio import f_dwread_epd, f_dwwrite_epd
+from ..utils import EPError
 
 
 class EUDArrayData(c.EUDObject):
@@ -106,6 +107,31 @@ class EUDArray(ut.ExprProxy):
         else:
             formatter.write_fmt("[ptr=0x{:X}]", self)
 
+    def Assign(self, other) -> Self:  # noqa: N802
+        if not isinstance(self._value, c.EUDVariable):
+            raise EPError(_("Can't assign {} to constant expression").format(other))
+        if isinstance(other, type(self)):
+            self._lazy_init_epd()
+            other._lazy_init_epd()
+            c.SetVariables([self._value, self._epd], [other, other._epd])
+        elif isinstance(other, int) and other == 0:
+            self._lazy_init_epd()
+            c.SetVariables([self._value, self._epd], [0, 0])
+        else:
+            raise EPError(_("Can't assign {} to {}").format(other, self))
+        return self
+
+    def _lazy_init_epd(self) -> None:
+        # lazy calculate self._epd
+        if type(self._epd) is c.Forward:
+            if c.PushTriggerScope():
+                nptr = self._epd.expr
+                self._epd.Reset()
+                self._epd << c.NextTrigger()
+                self._epd = _get_epd(self)
+                c.SetNextTrigger(nptr)
+            c.PopTriggerScope()
+
     def _bound_check(self, index: object) -> None:
         index = ut.unProxy(index)
         if isinstance(index, int) and self.length is not None:
@@ -117,15 +143,7 @@ class EUDArray(ut.ExprProxy):
                     self.length, index
                 ),
             )
-        # lazy calculate self._epd
-        if type(self._epd) is c.Forward:
-            if c.PushTriggerScope():
-                nptr = self._epd.expr
-                self._epd.Reset()
-                self._epd << c.NextTrigger()
-                self._epd = _get_epd(self)
-                c.SetNextTrigger(nptr)
-            c.PopTriggerScope()
+        self._lazy_init_epd()
 
     def get(self, key) -> c.EUDVariable:
         self._bound_check(key)
