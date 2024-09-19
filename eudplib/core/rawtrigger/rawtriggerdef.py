@@ -49,8 +49,8 @@ def Disabled(arg: Condition | Action) -> Condition | Action:  # noqa: N802
 
 
 Trigger: TypeAlias = ConstExpr | int | None
-_Condition: TypeAlias = Condition | bool | Sequence[Condition | bool]
-_Action: TypeAlias = Action | Sequence[Action]
+_Condition: TypeAlias = Condition | bool | Sequence[Condition | bool | Sequence]
+_Action: TypeAlias = Action | Sequence[Action | Sequence]
 
 
 class RawTrigger(EUDObject):

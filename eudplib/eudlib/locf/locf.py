@@ -4,6 +4,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from collections.abc import Callable
 from typing import Literal, overload
 
 from ... import core as c
@@ -16,9 +17,9 @@ from ...memio import modcurpl as cp
 _loct = ut.EPD(0x58DC60) - 5
 
 
-def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
+def _locfgen2(mod1, mod2, mod3, mod4, signed=False) -> Callable:
     @c.EUDFunc
-    def _locf(epd, x, y):
+    def _locf(epd, x, y) -> None:
         act = c.Forward()
 
         c.VProc(
@@ -89,9 +90,9 @@ def _locfgen2(mod1, mod2, mod3, mod4, signed=False):
     return _locf
 
 
-def _locfgen4(mod1, mod2, mod3, mod4, signed=False):
+def _locfgen4(mod1, mod2, mod3, mod4, signed=False) -> Callable:
     @c.EUDFunc
-    def _locf(epd, left, t, r, b):
+    def _locf(epd, left, t, r, b) -> None:
         act = c.Forward()
 
         c.VProc(
