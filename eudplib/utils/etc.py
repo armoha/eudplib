@@ -12,12 +12,27 @@ from collections.abc import Iterable, Iterator, Sequence
 from typing import Any, TypeVar, overload
 
 from .. import core as c
+from ..localize import _
+from .eperror import EPError, ep_warn
+from .exprproxy import unProxy
 
 T = TypeVar("T")
+_allow_epd_on_epd = True
+
+
+def _epd_on_epd(b: bool) -> None:
+    global _allow_epd_on_epd
+    _allow_epd_on_epd = b
 
 
 def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
     if c.IsConstExpr(p):
+        p = unProxy(p)
+        if isinstance(p, c.ConstExpr) and p._is_epd():
+            if _allow_epd_on_epd:
+                ep_warn(_("EPD on EPD value of ConstExpr is no-op"))
+            else:
+                raise EPError(_("EPD on EPD value of ConstExpr is no-op"))
         epd = (p + (-0x58A364)) // 4
         if "ret" in kwargs:
             c.SeqCompute([(kwargs["ret"][0], c.SetTo, epd)])
@@ -69,9 +84,6 @@ def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
         c.SetNextTrigger(ftrg)
         nexttrg << c.NextTrigger()
         return ret
-
-    from ..localize import _
-    from .eperror import EPError
 
     raise EPError(_("Invalid input for EPD: {}").format(p))
 
