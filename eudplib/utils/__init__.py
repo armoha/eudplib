@@ -30,6 +30,7 @@ from .etc import (
     SCMD2Text,
     _rand_lst,
     cachedfunc,
+    classproperty,
     find_data_file,
 )
 from .exprproxy import ExprProxy, isUnproxyInstance, unProxy
@@ -63,6 +64,7 @@ __all__ = [
     "SCMD2Text",
     "_rand_lst",
     "cachedfunc",
+    "classproperty",
     "find_data_file",
     "ExprProxy",
     "isUnproxyInstance",
