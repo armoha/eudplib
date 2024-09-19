@@ -11,6 +11,7 @@ from .. import ctrlstru as cs
 from .. import utils as ut
 from ..collections.eudarray import EUDArray
 from ..eudlib.utilf.userpl import IsUserCP
+from ..localize import _
 from ..memio import (
     f_bread_epd,
     f_cunitread_epd,
@@ -19,10 +20,9 @@ from ..memio import (
 )
 from ..memio.rwcommon import br1, cw
 from ..scdata import CurrentPlayer, TrgPlayer
-from .cpstr import CPString, _s2b
-from .dbstr import DBString
-from .eudprint import _conststr_dict
-from .strcommon import epd2s, hptr, ptr2s
+from .cpstr import CPString
+from .dbstr import DBStringData
+from .strcommon import _obfus, epd2s, hptr, ptr2s
 
 prevcp = c.EUDVariable()
 
@@ -214,39 +214,35 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
     :param args: Things to print
 
     """
-    args = ut.FlattenList(args)
-    for arg in args:
+    for arg in ut.FlattenIter(args):
         try:
             arg = arg.fmt()
         except AttributeError:
             pass
-        if ut.isUnproxyInstance(arg, str):
-            arg = arg.encode(encoding)
-        elif ut.isUnproxyInstance(arg, int):
-            arg = ut.u2utf8(str(arg & 0xFFFFFFFF))
-        if ut.isUnproxyInstance(arg, bytes):
-            key = _s2b(arg)
-            if key not in _conststr_dict:
-                _conststr_dict[key] = c.Db(arg + b"\0")
-            arg = _conststr_dict[key]
-        if ut.isUnproxyInstance(arg, CPString):
-            arg.Display()
-        elif ut.isUnproxyInstance(arg, c.Db):
-            f_cpstr_addstr_epd(ut.EPD(arg))
-        elif ut.isUnproxyInstance(arg, ptr2s):
-            f_cpstr_addstr(arg._value)
-        elif ut.isUnproxyInstance(arg, epd2s):
-            f_cpstr_addstr_epd(arg._value)
-        elif ut.isUnproxyInstance(arg, DBString):
-            f_cpstr_addstr_epd(ut.EPD(arg.GetStringMemoryAddr()))
-        elif c.IsEUDVariable(arg) or c.IsConstExpr(arg):
-            f_cpstr_adddw(arg)
-        elif ut.isUnproxyInstance(arg, hptr):
-            f_cpstr_addptr(arg._value)
+        x = ut.unProxy(arg)
+        if isinstance(x, str):
+            x = x.encode(encoding)
+        elif isinstance(x, int):
+            x = str(x & 0xFFFFFFFF).encode(encoding)
+        if isinstance(x, bytes):
+            if x == b"":
+                continue
+            _obfus.cp_print(x)
+        elif isinstance(x, CPString):
+            x.Display()
+        elif isinstance(x, c.Db | DBStringData):
+            f_cpstr_addstr_epd(ut.EPD(x))
+        elif isinstance(x, ptr2s):
+            f_cpstr_addstr(x._value)
+        elif isinstance(x, epd2s):
+            f_cpstr_addstr_epd(x._value)
+        elif isinstance(x, hptr):
+            f_cpstr_addptr(x._value)
+        elif isinstance(x, c.EUDVariable | c.ConstExpr):
+            f_cpstr_adddw(x)
         else:
-            raise ut.EPError(
-                f"Object with unknown parameter type {type(arg)} given to f_cpprint."
-            )
+            e = _("Object with unknown parameter type {} given to {}")
+            raise ut.EPError(e.format(arg, "f_cpstr_print"))
     if EOS:
         cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
 
