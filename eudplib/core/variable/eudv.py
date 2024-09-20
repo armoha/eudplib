@@ -655,22 +655,24 @@ def IsEUDVariable(x: object) -> TypeGuard[EUDVariable]:  # noqa: N802
 
 def VProc(  # noqa: N802
     v: EUDVariable | Sequence[EUDVariable], actions
-) -> bt.RawTrigger | Sequence[bt.RawTrigger]:
+) -> bt.RawTrigger:
     v = FlattenList(v)
     actions = FlattenList(actions)
     end = Forward()
-    triggers = list()
+    first_trigger = None
 
     for cv, nv in pairwise(v):
         actions.append(bt.SetNextPtr(cv.GetVTable(), nv.GetVTable()))
     actions.append(bt.SetNextPtr(v[-1].GetVTable(), end))
 
     for i in range(0, len(actions), 64):
-        triggers.append(bt.RawTrigger(actions=actions[i : i + 64]))
+        trigger = bt.RawTrigger(actions=actions[i : i + 64])
+        if first_trigger is None:
+            first_trigger = trigger
     bt.SetNextTrigger(v[0].GetVTable())
     end << bt.NextTrigger()
 
-    return List2Assignable(triggers)
+    return first_trigger  # type: ignore[return-value]
 
 
 # From vbuffer.py
