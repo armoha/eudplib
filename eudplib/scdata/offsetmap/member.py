@@ -4,12 +4,16 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from typing import Final, NoReturn, Self
 
 from ... import core as c
 from ... import utils as ut
 from ...localize import _
+from ...memio import muldiv4table
+from .epdoffsetmap import EPDOffsetMap
 from .memberkind import BaseKind, MemberKind
 
 
@@ -52,11 +56,11 @@ class StructMember(BaseMember):
     def __init__(self, offset: int, kind: MemberKind) -> None:
         super().__init__(offset, kind)
 
-    def _get_epd(self, instance):
+    def _get_epd(self, instance: EPDOffsetMap):
         q, r = divmod(self.offset, 4)
         return instance._value + q, r
 
-    def __get__(self, instance, owner=None) -> c.EUDVariable | Self:
+    def __get__(self, instance: EPDOffsetMap | None, owner=None):
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
@@ -66,7 +70,7 @@ class StructMember(BaseMember):
             return self.kind.cast(self.kind.read_epd(epd, subp))
         raise AttributeError
 
-    def __set__(self, instance, value) -> None:
+    def __set__(self, instance: EPDOffsetMap, value) -> None:
         from .epdoffsetmap import EPDOffsetMap
 
         if isinstance(instance, EPDOffsetMap):
@@ -91,25 +95,77 @@ class ArrayMember(BaseMember):
             ut.ep_assert(self.kind.size() <= stride and stride in (1, 2, 4, 8))
             self.stride = stride
 
-    def _get_epd(self, instance):
-        # TODO: lazy calculate division
-        if self.offset % 4 != 0 and self.stride in (1, 2):
-            instance = instance + self.offset % 4
-        if self.stride == 1:
-            q, r = c.f_div(instance, 4)
-        elif self.stride == 2:
-            q, r = c.f_div(instance, 2)
-            if c.IsEUDVariable(r):
-                c.RawTrigger(conditions=r.Exactly(1), actions=r.SetNumber(2))
-            elif r == 1:
-                r = 2
-        elif self.stride == 4:
-            q, r = instance, self.offset % 4
-        else:
-            q, r = instance + instance, self.offset % 4
-        return ut.EPD(self.offset) + q, r
+    def _get_epd(
+        self, instance: EPDOffsetMap
+    ) -> tuple[int | c.EUDVariable, int | c.EUDVariable]:
+        value = instance._value
+        if not isinstance(value, c.EUDVariable):
+            epd, subp = divmod(self.offset + value * self.stride, 4)
+            return ut.EPD(0) + epd, subp
+        if self.stride == 4:
+            return ut.EPD(self.offset) + value, self.offset % 4
 
-    def __get__(self, instance, owner=None):
+        # lazy calculate multiplication & division
+        try:
+            stride_dict = EPDOffsetMap._stride_dict[value]
+        except KeyError:
+            # See EPDOffsetMap.__init__
+            stride_dict = {}
+            maxvalue = (1 << type(instance).range[1].bit_length()) - 1
+            ut.ep_assert(maxvalue < 1024, _("Reference type can't have ArrayMember"))
+            EPDOffsetMap._update[value] = (c.Forward(), c.Forward(), c.Forward())
+            EPDOffsetMap._maxvalue[value] = maxvalue
+            EPDOffsetMap._stride_key[value] = frozenset(())
+            EPDOffsetMap._stride_dict[value] = stride_dict
+
+        maxvalue = EPDOffsetMap._maxvalue[value]
+        update_start, update_restore, update_end = EPDOffsetMap._update[value]
+        if self.stride not in stride_dict or maxvalue < type(instance).range[1]:
+            q = c.EUDVariable()
+            r: int | c.EUDVariable = 0 if self.stride % 4 == 0 else c.EUDVariable()
+            stride_dict[self.stride] = (q, r)
+            strides = frozenset(stride_dict.keys())
+            EPDOffsetMap._stride_key[value] = strides
+            bit_index = type(instance).range[1].bit_length()
+            maxvalue = (1 << bit_index) - 1
+            EPDOffsetMap._maxvalue[value] = maxvalue
+
+            derived_vars = []
+            for stride in sorted(stride_dict.keys()):
+                variables = stride_dict[stride]
+                if stride % 4 == 0:
+                    derived_vars.append(variables[0])
+                else:
+                    derived_vars.extend(variables)  # type: ignore[arg-type]
+
+            update_start.Reset()
+            update_restore.Reset()
+            update_end.Reset()
+            upd = muldiv4table._caller(bit_index - 1, strides)(value, *derived_vars)
+            update_start << upd[0]
+            update_restore << upd[1]
+            varcount = muldiv4table.varcount_dict[strides]
+            read_end = muldiv4table.muldiv_end_table[varcount]
+            update_end << read_end
+        else:
+            q, r = stride_dict[self.stride]
+
+        nexttrg = c.Forward()
+        c.RawTrigger(
+            nextptr=update_start,
+            actions=[
+                c.SetNextPtr(update_start, update_restore),
+                c.SetMemory(update_start + 348, c.SetTo, nexttrg),
+                c.SetNextPtr(update_end, nexttrg),
+            ],
+        )
+        nexttrg << c.NextTrigger()
+
+        epd = ut.EPD(self.offset) + q
+        subp = r if self.offset % 4 == 0 else self.offset % 4 + r
+        return epd, subp
+
+    def __get__(self, instance: EPDOffsetMap | None, owner=None):
         from .epdoffsetmap import EPDOffsetMap
 
         if instance is None:
@@ -119,7 +175,7 @@ class ArrayMember(BaseMember):
             return self.kind.cast(self.kind.read_epd(epd, subp))
         raise AttributeError
 
-    def __set__(self, instance, value) -> None:
+    def __set__(self, instance: EPDOffsetMap, value) -> None:
         from .epdoffsetmap import EPDOffsetMap
 
         if isinstance(instance, EPDOffsetMap):

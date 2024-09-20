@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Final, Self
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ...utils import EPD, ExprProxy, ep_assert
-from .member import BaseMember
+from ...utils import ExprProxy, ep_assert
+from .member import ArrayMember, BaseMember
 from .memberkind import MemberKind
 
 if TYPE_CHECKING:
@@ -182,20 +182,9 @@ class ArrayEnumMember(BaseMember, EnumMember):
             self.stride = stride
 
     def _get_epd(self, instance=None):
-        # TODO: lazy calculate division
         if instance is None:
             instance = self._instance
-        if self.stride == 1:
-            q, r = c.f_div(instance, 4)
-        elif self.stride == 2:
-            q, r = c.f_div(instance, 2)  # TODO: new function for subp 0, 2
-            if c.IsEUDVariable(r):
-                c.RawTrigger(conditions=r.Exactly(1), actions=r.SetNumber(2))
-            elif r == 1:
-                r = 2
-        else:
-            q, r = instance, 0
-        return EPD(self.offset) + q, r
+        return ArrayMember._get_epd(self, instance)
 
     def __get__(self, instance, owner=None) -> Self:
         from .epdoffsetmap import EPDOffsetMap

@@ -15,6 +15,14 @@ from ...localize import _
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     __slots__ = ()
     _cast: ClassVar[bool] = False
+    _update: ClassVar[
+        dict[c.EUDVariable, tuple[c.Forward, c.Forward, c.Forward]]
+    ] = {}
+    _maxvalue: ClassVar[dict[c.EUDVariable, int]] = {}
+    _stride_key: ClassVar[dict[c.EUDVariable, frozenset[int]]] = {}
+    _stride_dict: ClassVar[
+        dict[c.EUDVariable, dict[int, tuple[c.EUDVariable, c.EUDVariable | int]]]
+    ] = {}
 
     @ut.classproperty
     @abstractmethod
@@ -31,6 +39,18 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     def __init__(self, epd: int | c.EUDVariable) -> None:
         if isinstance(epd, c.EUDVariable) and not EPDOffsetMap._cast:
             epd = c.EUDVariable() << epd
+            # To ellide var copy of rvalue variable (rvalue optimization),
+            # variable is not added in dict to not increment refcount.
+            #
+            # example)
+            # const foo = function (): TrgUnit { return 0; };
+            # var x = foo();  // this should not copy variable.
+            #
+            # if epd not in EPDOffsetMap._update:
+            #     EPDOffsetMap._update[epd] = (c.Forward(), c.Forward(), c.Forward())
+            #     EPDOffsetMap._maxvalue[epd] = 0
+            #     EPDOffsetMap._stride_key[epd] = frozenset(())
+            #     EPDOffsetMap._stride_dict[epd] = {}
         EPDOffsetMap._cast = False
         super().__init__(epd)
 

@@ -1,6 +1,6 @@
 # Test added by zzt (Defender)
 
-from helper import *  # noqa: F403
+from helper import *
 
 
 @TestInstance
@@ -208,7 +208,7 @@ def test_scdata():
     test_equality("P2.unitColor = 234", P2.unitColor, 234)
 
 
-@TestInstance  # noqa: F405
+@TestInstance
 def test_scdata_reference():
     goliath_cunit = CUnit.from_next()
     DoActions(CreateUnit(1, "Terran Goliath", "Anywhere", P8))
@@ -221,7 +221,7 @@ def test_scdata_reference():
     DoActions(RemoveUnit("Terran Goliath", P8))
 
 
-@TestInstance  # noqa: F405
+@TestInstance
 def test_scdata_caching():
     ptr = EUDVariable()
 
@@ -244,3 +244,19 @@ def test_scdata_caching():
     ptr << 0
     epds.append(foo())
     test_equality("caching tests", epds, [1, 0, 2, 0])
+
+
+@TestInstance
+def test_scdata_value_range_extension():
+    v = EUDVariable(0x17)  # 23
+
+    p = TrgPlayer.cast(v)
+    P12.cumulativeMineral = 9999  # 0x57F1AC = 0x57F150 + 0x17 * 4
+    test_equality("TrgPlayer with bitmask 0xFF", p.cumulativeGas, 9999)
+
+    u = TrgUnit.cast(v)
+    # TrgUnit usage will extend bitmask of `v` from 0xF to 0xFF
+    # and this applies retroactively to every usages of `v`
+    test_equality("TrgUnit with bitmask 0xFF", u.gasCost, 200)
+
+    P12.cumulativeMineral = 0

@@ -12,6 +12,7 @@ from .. import utils as ut
 from . import modcurpl as cp
 
 cpcache = c.curpl.GetCPCache()
+# consecutive_table[shift][endswith][startswith]
 consecutive_table: dict[int, dict[int, dict[int, c.RawTrigger]]] = {}
 
 c.PushTriggerScope()
