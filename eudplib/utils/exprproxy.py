@@ -68,7 +68,8 @@ class ExprProxy(Generic[T_co]):
             other = type(self).cast(other)
         except (AttributeError, TypeError):
             pass
-        return self._value << type(self).cast(other)
+        self._value.Assign(other)
+        return self
 
     def __lshift__(self, other):
         return self.Assign(other)
