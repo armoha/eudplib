@@ -33,11 +33,11 @@ def _branch_sub(
     brtrg << c.RawTrigger(
         nextptr=onfalse, conditions=conditions, actions=c.SetNextPtr(brtrg, tjtrg)
     )
+    actions: _Action = c.SetNextPtr(brtrg, onfalse)
     if _actions:
-        actions = ut.FlattenList(_actions)
-    else:
-        actions = []
-    actions.append(c.SetNextPtr(brtrg, onfalse))
+        _actions = ut.FlattenList(_actions)
+        _actions.append(actions)
+        actions = _actions
     tjtrg << c.RawTrigger(nextptr=ontrue, actions=actions)
 
 

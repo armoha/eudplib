@@ -9,6 +9,7 @@ from typing import Literal, TypedDict
 from .. import core as c
 from .. import utils as ut
 from ..localize import _
+from ..trigger import EUDBranch
 from .basicstru import EUDJumpIf, EUDJumpIfNot
 from .cshelper import CtrlStruOpener
 
@@ -142,7 +143,9 @@ def EUDExecuteOnce() -> CtrlStruOpener:  # noqa: N802
                     c.SetNextPtr(block["blockstart"], block["blockend"]),
                     c.SetMemory(block["blockstart"] + 2376, c.SetTo, 8),
                 ]
-                EUDJumpIfNot(conditions, block["blockend"], _actions=skip)
+                ontrue = c.Forward()
+                EUDBranch(conditions, ontrue, block["blockend"], _actions=skip)
+                ontrue << c.NextTrigger()
         block["conditional"] = False
         return True
 

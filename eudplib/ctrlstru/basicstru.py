@@ -30,15 +30,15 @@ def EUDJump(nextptr, *, must_use=True) -> None:  # noqa: N802
         c.SetNextTrigger(nextptr)
 
 
-def EUDJumpIf(conditions, ontrue, *, _actions=None) -> None:  # noqa: N802
+def EUDJumpIf(conditions, ontrue) -> None:  # noqa: N802
     onfalse = c.Forward()
-    tg.EUDBranch(conditions, ontrue, onfalse, _actions=_actions)
+    tg.EUDBranch(conditions, ontrue, onfalse)
     onfalse << c.NextTrigger()
 
 
-def EUDJumpIfNot(conditions, onfalse, *, _actions=None) -> None:  # noqa: N802
+def EUDJumpIfNot(conditions, onfalse) -> None:  # noqa: N802
     ontrue = c.Forward()
-    tg.EUDBranch(conditions, ontrue, onfalse, _actions=_actions)
+    tg.EUDBranch(conditions, ontrue, onfalse)
     ontrue << c.NextTrigger()
 
 
