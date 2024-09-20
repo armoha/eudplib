@@ -162,7 +162,15 @@ class ArrayMember(BaseMember):
         nexttrg << c.NextTrigger()
 
         epd = ut.EPD(self.offset) + q
-        subp = r if self.offset % 4 == 0 else self.offset % 4 + r
+        if self.offset % 4 == 0:
+            subp = r
+        else:
+            subp = self.offset % 4 + r
+            if self.offset % 4 + (4 - self.stride) % 4 >= 4:
+                c.RawTrigger(
+                    conditions=subp.AtLeast(4),
+                    actions=[subp.SubtractNumber(4), epd.AddNumber(1)],
+                )
         return epd, subp
 
     def __get__(self, instance: EPDOffsetMap | None, owner=None):

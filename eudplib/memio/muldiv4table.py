@@ -78,11 +78,33 @@ def _insert(msb_index: int, strides: frozenset[int]) -> c.RawTrigger:
                 if k % 4 != 0:
                     append(r)
 
-            trig = c.RawTrigger(
-                nextptr=read_end if x == 0 else stride_table[x - 1],
-                conditions=lv.AtLeastX(1, 1 << x),
-                actions=actions,
-            )
+            if x != 0:
+                trig = c.RawTrigger(
+                    nextptr=stride_table[x - 1],
+                    conditions=lv.AtLeastX(1, 1 << x),
+                    actions=actions,
+                )
+            else:
+                trig = c.RawTrigger(
+                    conditions=lv.AtLeastX(1, 1 << x), actions=actions
+                )
+                # carry 4 subp -> 1 epd
+                index = 0
+                for k in sorted(strides):
+                    if k % 4 == 0:
+                        index += 1
+                        continue
+                    if k % 4 != 3:
+                        dst = read_act + 32 * index
+                        c.RawTrigger(
+                            conditions=c.Memory(dst + 32, c.AtLeast, 4),
+                            actions=[
+                                c.SetMemory(dst + 32, c.Subtract, 4),
+                                c.SetMemory(dst, c.Add, 1),
+                            ],
+                        )
+                    index += 2
+                c.SetNextTrigger(read_end)
             stride_table[x] = trig
         c.PopTriggerScope()
         trigger = stride_table[msb_index]

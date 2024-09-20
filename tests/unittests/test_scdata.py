@@ -207,6 +207,9 @@ def test_scdata():
     P2.unitColor = 234
     test_equality("P2.unitColor = 234", P2.unitColor, 234)
 
+    P1.unitColor = 111
+    P2.unitColor = 165
+
 
 @TestInstance
 def test_scdata_reference():
@@ -223,6 +226,9 @@ def test_scdata_reference():
 
 @TestInstance
 def test_scdata_caching():
+    from eudplib.memio import muldiv4table
+    from eudplib.scdata.offsetmap import EPDOffsetMap
+
     ptr = EUDVariable()
 
     @EUDFunc
@@ -245,6 +251,34 @@ def test_scdata_caching():
     epds.append(foo())
     test_equality("caching tests", epds, [1, 0, 2, 0])
 
+    p = TrgPlayer.cast(EUDVariable())
+    v = p._value
+    p << P8
+    P8.minimapColor = 128
+    color = p.minimapColor
+    update_start, update_restore, update_end = EPDOffsetMap._update[v]
+    test_equality("P8.minimapColor = 128", color, 128)
+    test_equality("Cache invalidation", f_dwread(update_start + 4), update_restore)
+
+    P8.unitColor = 178
+    test_equality("P8.unitColor = 178", p.unitColor, 178)
+    test_equality(
+        "Reuse cached values",
+        f_dwread(update_start + 4),
+        f_dwread(update_start + 348),
+    )
+
+    u = TrgUnit.cast(v)
+    u << "Alan Schezar"
+    test_equality("Alan Schezar.timeCost", u.timeCost, 1200)
+    test_equality("Cache invalidation", f_dwread(update_start + 4), update_restore)
+    test_equality(
+        "varcount", EUDVariable(update_end), muldiv4table.muldiv_end_table[5]
+    )
+
+    P8.unitColor = 135
+    P8.minimapColor = 135
+
 
 @TestInstance
 def test_scdata_value_range_extension():
@@ -260,3 +294,15 @@ def test_scdata_value_range_extension():
     test_equality("TrgUnit with bitmask 0xFF", u.gasCost, 200)
 
     P12.cumulativeMineral = 0
+
+
+@TestInstance
+def test_scdata_var():
+    p = TrgPlayer.cast(EUDVariable(4))
+    test_equality("P5 Color = 156", [p.minimapColor, p.unitColor], [156, 156])
+    p += 1
+    test_equality("P6 Color = 19", [p.minimapColor, p.unitColor], [19, 19])
+    p += 1
+    test_equality("P7 Color = 84", [p.minimapColor, p.unitColor], [84, 84])
+    p += 1
+    test_equality("P8 Color = 135", [p.minimapColor, p.unitColor], [135, 135])
