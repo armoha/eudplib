@@ -4,7 +4,6 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-
 import random
 from typing import Any
 
