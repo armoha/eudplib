@@ -43,13 +43,14 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
             other = other._value
         if isinstance(other, type(self)):
             return
-        if isinstance(other, int | EUDVariable):
+        if isinstance(other, int | EUDVariable | str):
             return
         else:
             raise EPError(_("Can't assign {} to {}").format(other, self))
 
     def Assign(self, other) -> Self:  # noqa: N802
         self._check_assign(other)
+        other = type(self).cast(other)
         self._value.Assign(other)
         return self
 
