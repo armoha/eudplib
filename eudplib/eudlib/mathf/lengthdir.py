@@ -10,6 +10,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...memio import f_dwread_epd
+from ...memio.rwcommon import lv
 
 
 @c.EUDFunc
@@ -34,7 +35,7 @@ def f_lengthdir(length, angle):
     cs.EUDEndIf()
 
     # sign of cos, sin
-    sign = c.EUDLightVariable()
+    sign = lv
     tableangle = c.EUDVariable()
 
     # get cos, sin from table
@@ -127,7 +128,7 @@ def f_lengthdir_256(length, angle):
     cs.DoActions(angle.AddNumber(192), angle.SetNumberX(0, ~255))
 
     # sign of cos, sin
-    sign = c.EUDLightVariable()
+    sign = lv
     tableangle = c.EUDVariable()
 
     # get cos, sin from table

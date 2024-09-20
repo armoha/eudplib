@@ -6,8 +6,9 @@
 import functools
 
 from ... import core as c
+from ...memio.rwcommon import lv
 
-_signflag = c.EUDLightVariable()
+_signflag = lv
 
 
 def f_div_towards_zero(

@@ -4,9 +4,11 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from ..core.eudstruct.vararray import _index
 from .byterw import EUDByteReader, EUDByteStream, EUDByteWriter
 from .cpbyterw import CPByteWriter
 
+lv = _index
 cw = CPByteWriter()
 br1 = EUDByteReader()
 br2 = EUDByteReader()

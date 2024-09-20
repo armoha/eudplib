@@ -10,6 +10,7 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...memio import f_wread_epd
+from ...memio.rwcommon import lv
 
 _seed: c.EUDVariable = c.EUDVariable()
 
@@ -30,7 +31,7 @@ def f_randomize():
 
     # Store switch 1
     end = c.Forward()
-    n = c.EUDLightVariable()
+    n = lv
     c.RawTrigger(
         actions=[
             _seed.SetNumber(0),
