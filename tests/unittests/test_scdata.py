@@ -332,6 +332,10 @@ def test_scdata_current_upgrade():
         u = "var" if IsEUDVariable(upgrade) else "const"
         p = "var" if IsEUDVariable(player) else "const"
         f_bwrite(ptr, lv)
-        test_equality(f"Upgrade({u})[TrgPlayer({p})]", upgrade[player], lv)
+        test_equality(f"lv = Upgrade({u})[TrgPlayer({p})]", upgrade[player], lv)
+
+        lv = randint(1, 255)
+        upgrade[player] = lv
+        test_equality(f"Upgrade({u})[TrgPlayer({p})] = lv", f_bread(ptr), lv)
 
     f_bwrite(ptr, 0)

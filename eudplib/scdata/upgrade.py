@@ -46,7 +46,7 @@ class Upgrade(EPDOffsetMap, ConstType):
     def __init__(self, initval) -> None:
         super().__init__(c.EncodeUpgrade(initval))
 
-    def __getitem__(self, player: TrgPlayer | int) -> c.EUDVariable:
+    def _current_upgrade_epd_subp(self, player: TrgPlayer | int):
         r: c.EUDVariable
         sc_researched = 0x58D2B0
         bw_researched = 0x58F32C
@@ -127,9 +127,11 @@ class Upgrade(EPDOffsetMap, ConstType):
                 end << c.NextTrigger()
             # (case 2) player is const, upgrade is const
             elif u < 46:
-                return memio.f_bread(sc_researched + u + p * 46)
+                quotient, remainder = divmod(sc_researched + u + p * 46, 4)
+                return quotient + ut.EPD(0), remainder
             else:
-                return memio.f_bread(bw_researched + u - 46 + p * 15)
+                quotient, remainder = divmod(bw_researched + u - 46 + p * 15, 4)
+                return quotient + ut.EPD(0), remainder
 
         elif isinstance(u, c.EUDVariable):
             # (case 3) player is var, upgrade is var
@@ -246,4 +248,12 @@ class Upgrade(EPDOffsetMap, ConstType):
                     actions=[subp.SubtractNumber(4), epd.AddNumber(1)],
                 )
 
+        return epd, subp
+
+    def __getitem__(self, player: TrgPlayer | int) -> c.EUDVariable:
+        epd, subp = self._current_upgrade_epd_subp(player)
         return memio.f_bread_epd(epd, subp)
+
+    def __setitem__(self, player: TrgPlayer | int, level) -> None:
+        epd, subp = self._current_upgrade_epd_subp(player)
+        memio.f_bwrite_epd(epd, subp, level)
