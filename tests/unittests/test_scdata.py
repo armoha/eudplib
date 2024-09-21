@@ -276,6 +276,16 @@ def test_scdata_caching():
         "varcount", EUDVariable(update_end), muldiv4table.muldiv_end_table[5]
     )
 
+    # += 1 is specialized to update cached values
+    u += 1
+    f_simpleprint("VAL:", u, ", CACHE_COND:", f_dwread(update_start + 16))
+    test_equality("Alan Schezar += 1; .flingy", u.flingy, Flingy("Goliath Turret"))
+    test_equality(
+        "Reuse cached values",
+        f_dwread(update_start + 4),
+        f_dwread(update_start + 348),
+    )
+
     P8.unitColor = 135
     P8.minimapColor = 135
 

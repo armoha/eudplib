@@ -13,7 +13,7 @@ from .offsetmap import ArrayMember, EPDOffsetMap
 from .offsetmap import MemberKind as Mk
 
 
-class Sprite(ConstType, EPDOffsetMap):
+class Sprite(EPDOffsetMap, ConstType):
     __slots__ = ()
     # Read only data skipped
     image = ArrayMember(0x666160, Mk.IMAGE)

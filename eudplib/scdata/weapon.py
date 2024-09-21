@@ -27,7 +27,7 @@ class TargetFlags(ArrayEnumMember):
     "Can target your own unit, used by Consume"
 
 
-class Weapon(ConstType, EPDOffsetMap):
+class Weapon(EPDOffsetMap, ConstType):
     __slots__ = ()
     label = ArrayMember(0x6572E0, Mk.STATTEXT)
     flingy = ArrayMember(0x656CA8, Mk.FLINGY)

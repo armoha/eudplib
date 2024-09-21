@@ -115,7 +115,7 @@ class AvailabilityFlags(ArrayEnumMember):
     BroodWarOnly = Flag(0x200)
 
 
-class TrgUnit(ConstType, EPDOffsetMap):
+class TrgUnit(EPDOffsetMap, ConstType):
     __slots__ = ()
     flingy = ArrayMember(0x6644F8, Mk.FLINGY)
     "Flingy: Flingy of unit. 유닛의 비행정보."

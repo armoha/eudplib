@@ -13,7 +13,7 @@ from .offsetmap import ArrayMember, EPDOffsetMap
 from .offsetmap import MemberKind as Mk
 
 
-class UnitOrder(ConstType, EPDOffsetMap):
+class UnitOrder(EPDOffsetMap, ConstType):
     __slots__ = ()
     label = ArrayMember(0x665280, Mk.STATTEXT)
     useWeaponTargeting = ArrayMember(0x664B00, Mk.BOOL)

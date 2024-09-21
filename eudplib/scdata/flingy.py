@@ -13,7 +13,7 @@ from .offsetmap import ArrayMember, EPDOffsetMap
 from .offsetmap import MemberKind as Mk
 
 
-class Flingy(ConstType, EPDOffsetMap):
+class Flingy(EPDOffsetMap, ConstType):
     __slots__ = ()
     sprite = ArrayMember(0x6CA318, Mk.SPRITE)
     topSpeed = ArrayMember(0x6C9EF8, Mk.DWORD)

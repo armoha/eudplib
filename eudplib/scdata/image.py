@@ -13,7 +13,7 @@ from .offsetmap import ArrayMember, EPDOffsetMap
 from .offsetmap import MemberKind as Mk
 
 
-class Image(ConstType, EPDOffsetMap):
+class Image(EPDOffsetMap, ConstType):
     __slots__ = ()
     # Read only data skipped
     # grpFile = ArrayMember(0x668AA0, Mk.DWORD)

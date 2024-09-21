@@ -13,7 +13,7 @@ from .offsetmap import ArrayMember, EPDOffsetMap
 from .offsetmap import MemberKind as Mk
 
 
-class Upgrade(ConstType, EPDOffsetMap):
+class Upgrade(EPDOffsetMap, ConstType):
     __slots__ = ()
     mineralCostBase = ArrayMember(0x655740, Mk.WORD)
     mineralCostFactor = ArrayMember(0x6559C0, Mk.WORD)

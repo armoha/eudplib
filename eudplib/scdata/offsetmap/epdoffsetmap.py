@@ -24,6 +24,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     _stride_dict: ClassVar[
         dict[c.EUDVariable, dict[int, tuple[c.EUDVariable, c.EUDVariable | int]]]
     ] = {}
+    _advance: ClassVar[dict[c.EUDVariable, tuple[c.Forward, c.Forward]]] = {}
 
     @ut.classproperty
     @abstractmethod
@@ -61,22 +62,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         c.EUDVariable, int | c.EUDVariable, tuple[c.Forward, c.Forward, c.Forward]
     ]:
         value = self._value
-        ut.ep_assert(isinstance(value, c.EUDVariable))
         # lazy calculate multiplication & division
-        try:
-            stride_dict = EPDOffsetMap._stride_dict[value]
-        except KeyError:
-            # See EPDOffsetMap.__init__
-            stride_dict = {}
-            maxvalue = (1 << type(self).range[1].bit_length()) - 1
-            ut.ep_assert(maxvalue < 1024, _("Reference type can't have ArrayMember"))
-            EPDOffsetMap._update[value] = (c.Forward(), c.Forward(), c.Forward())
-            EPDOffsetMap._maxvalue[value] = maxvalue
-            EPDOffsetMap._stride_key[value] = frozenset(())
-            EPDOffsetMap._stride_dict[value] = stride_dict
-        else:
-            maxvalue = EPDOffsetMap._maxvalue[value]
-
+        stride_dict, maxvalue = self._get_stride_dict_and_maxvalue()
         update_start, update_restore, update_end = EPDOffsetMap._update[value]
         if stride not in stride_dict or maxvalue < type(self).range[1]:
             q = c.EUDVariable()
@@ -105,10 +92,93 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             varcount = muldiv4table.varcount_dict[strides]
             read_end = muldiv4table.muldiv_end_table[varcount]
             update_end << read_end
+
+            c.PushTriggerScope()
+            add_carry, add_end = None, None
+            start_actions = [
+                value.AddNumber(1),
+                c.SetMemory(update_start + 16, c.Add, 1),
+            ]
+            for k in sorted(stride_dict.keys()):
+                epd, subp = stride_dict[k]
+                quotient, remainder = divmod(k, 4)
+                if quotient:
+                    start_actions.append(epd.AddNumber(quotient))
+                if remainder:
+                    if not isinstance(subp, c.EUDVariable):
+                        assert False
+                    start_actions.append(subp.AddNumber(remainder))
+                    add_end = c.RawTrigger(
+                        conditions=subp.AtLeast(4),
+                        actions=[subp.SubtractNumber(4), epd.AddNumber(1)],
+                    )
+                    if add_carry is None:
+                        add_carry = add_end
+            c.PopTriggerScope()
+            c.PushTriggerScope()
+            if add_carry:
+                add_start = c.RawTrigger(nextptr=add_carry, actions=start_actions)
+            else:
+                add_start = add_end = c.RawTrigger(nextptr=0, actions=start_actions)
+            c.PopTriggerScope()
+
+            advance_start, advance_end = EPDOffsetMap._advance[value]
+            advance_start.Reset()
+            advance_end.Reset()
+            advance_start << add_start
+            advance_end << add_end
         else:
             q, r = stride_dict[stride]
 
         return q, r, (update_start, update_restore, update_end)
+
+    def _get_stride_dict_and_maxvalue(
+        self,
+    ) -> tuple[dict[int, tuple[c.EUDVariable, c.EUDVariable | int]], int]:
+        value = self._value
+        ut.ep_assert(isinstance(value, c.EUDVariable))
+        try:
+            stride_dict = EPDOffsetMap._stride_dict[value]
+        except KeyError:
+            # See EPDOffsetMap.__init__
+            stride_dict = {}
+            maxvalue = (1 << type(self).range[1].bit_length()) - 1
+            ut.ep_assert(maxvalue < 1024, _("Reference type can't have ArrayMember"))
+            EPDOffsetMap._update[value] = (c.Forward(), c.Forward(), c.Forward())
+            EPDOffsetMap._maxvalue[value] = maxvalue
+            EPDOffsetMap._stride_key[value] = frozenset(())
+            EPDOffsetMap._stride_dict[value] = stride_dict
+            c.PushTriggerScope()
+            advance_trg = c.RawTrigger(nextptr=0, actions=value.AddNumber(1))
+            advance_start, advance_end = c.Forward(), c.Forward()
+            advance_start << advance_end << advance_trg
+            c.PopTriggerScope()
+            EPDOffsetMap._advance[value] = (advance_start, advance_end)
+        else:
+            maxvalue = EPDOffsetMap._maxvalue[value]
+        return stride_dict, maxvalue
+
+    def _advance_trg(self) -> tuple[c.Forward, c.Forward]:
+        value = self._value
+        self._get_stride_dict_and_maxvalue()
+        return EPDOffsetMap._advance[value]
+
+    def __iadd__(self, other):
+        from ...core.rawtrigger.consttype import ConstType
+
+        if (
+            isinstance(self, ConstType)  # FIXME: should be 'hasArrayMember'
+            and isinstance(self._value, c.EUDVariable)
+            and isinstance(other, int)
+            and other == 1
+        ):
+            add_start, add_end = self._advance_trg()
+            nexttrg = c.Forward()
+            c.RawTrigger(nextptr=add_start, actions=c.SetNextPtr(add_end, nexttrg))
+            nexttrg << c.NextTrigger()
+        else:
+            super().__iadd__(other)
+        return self
 
     def getepd(self, name: str) -> c.EUDVariable:
         from .memberimpl import CSpriteKind, CUnitKind, IscriptKind, PositionKind

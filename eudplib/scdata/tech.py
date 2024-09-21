@@ -13,7 +13,7 @@ from .offsetmap import ArrayMember, EPDOffsetMap
 from .offsetmap import MemberKind as Mk
 
 
-class Tech(ConstType, EPDOffsetMap):
+class Tech(EPDOffsetMap, ConstType):
     __slots__ = ()
     mineralCost = ArrayMember(0x656248, Mk.WORD)
     gasCost = ArrayMember(0x6561F0, Mk.WORD)

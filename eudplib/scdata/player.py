@@ -13,7 +13,7 @@ from .offsetmap import ArrayMember, EPDOffsetMap
 from .offsetmap import MemberKind as Mk
 
 
-class TrgPlayer(_Player, EPDOffsetMap):
+class TrgPlayer(EPDOffsetMap, _Player):
     """
     TrgPlayer is special in the sense that it is not directly related to game data;
     rather, it is intended to deal with various game state specific to players.
