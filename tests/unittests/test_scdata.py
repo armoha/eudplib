@@ -1,4 +1,5 @@
 # Test added by zzt (Defender)
+from random import randint
 
 from helper import *
 
@@ -318,3 +319,19 @@ def test_scdata_var():
     test_equality("P8 Color = 135", [p.minimapColor, p.unitColor], [135, 135])
     p += 1
     test_equality("P9 Color = 185", [p.minimapColor, p.unitColor], [185, 185])
+
+
+@TestInstance
+def test_scdata_current_upgrade():
+    upgrade_id = EncodeUpgrade("Protoss Plasma Shields")
+    upgrades = [Upgrade(upgrade_id), Upgrade(EUDVariable(upgrade_id))]
+    players = [P11, TrgPlayer(EUDVariable(10))]
+    ptr = 0x58D2B0 + upgrade_id + 46 * 10
+    for upgrade, player in zip(upgrades, players):
+        lv = randint(1, 255)
+        u = "var" if IsEUDVariable(upgrade) else "const"
+        p = "var" if IsEUDVariable(player) else "const"
+        f_bwrite(ptr, lv)
+        test_equality(f"Upgrade({u})[TrgPlayer({p})]", upgrade[player], lv)
+
+    f_bwrite(ptr, 0)
