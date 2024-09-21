@@ -347,6 +347,33 @@ def f_bread_epd(epd, subp, *, ret=None):
     return _bread_epd(epd, subp, ret=ret)
 
 
+@_EUDPredefineReturn(1, 2)
+@_EUDPredefineParam(cp.CP, 1)
+@c.EUDFunc
+def _boolread_epd(epd, subp):
+    b = _boolread_epd._frets[0]
+    fend = c.Forward()
+    cs.EUDSwitch(subp)
+    block = ut.EUDGetLastBlockOfName("swblock")[1]
+    block["_actions"].extend(
+        [
+            b.SetNumber(0),
+            c.SetNextPtr(cpcache.GetVTable(), fend),
+            cpcache.SetDest(ut.EPD(0x6509B0)),
+        ]
+    )
+    for i in ut._rand_lst(range(4)):
+        if cs.EUDSwitchCase()(i):
+            c.RawTrigger(
+                conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 0xFF << (8 * i)),
+                actions=b.SetNumber(1),
+            )
+            c.SetNextTrigger(cpcache.GetVTable())
+    cs.EUDEndSwitch()
+    fend << c.NextTrigger()
+    # return b
+
+
 def f_maskwrite_epd(epd, value, mask) -> None:
     cs.DoActions(c.SetDeathsX(epd, c.SetTo, value, 0, mask))
 

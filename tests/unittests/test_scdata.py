@@ -323,19 +323,40 @@ def test_scdata_var():
 
 @TestInstance
 def test_scdata_current_upgrade():
-    upgrade_id = EncodeUpgrade("Protoss Plasma Shields")
-    upgrades = [Upgrade(upgrade_id), Upgrade(EUDVariable(upgrade_id))]
-    players = [P11, TrgPlayer(EUDVariable(10))]
-    ptr = 0x58D2B0 + upgrade_id + 46 * 10
-    for upgrade, player in zip(upgrades, players):
-        lv = randint(1, 255)
-        u = "var" if IsEUDVariable(upgrade) else "const"
-        p = "var" if IsEUDVariable(player) else "const"
-        f_bwrite(ptr, lv)
-        test_equality(f"lv = Upgrade({u})[TrgPlayer({p})]", upgrade[player], lv)
+    for upgrade_id in (Upgrade("Protoss Plasma Shields"), Upgrade("Charon Booster")):
+        upgrades = [Upgrade(upgrade_id), Upgrade(EUDVariable(upgrade_id))]
+        players = [P11, TrgPlayer(EUDVariable(10))]
+        if upgrade_id < 46:
+            ptr = 0x58D2B0 + upgrade_id + 46 * 10
+        else:
+            ptr = 0x58F32C + upgrade_id - 46 + 15 * 10
+        for upgrade, player in zip(upgrades, players):
+            lv = randint(1, 255)
+            u = "var" if IsEUDVariable(upgrade) else "const"
+            p = "var" if IsEUDVariable(player) else "const"
+            f_bwrite(ptr, lv)
+            test_equality(f"lv = Upgrade({u})[TrgPlayer({p})]", upgrade[player], lv)
 
-        lv = randint(1, 255)
-        upgrade[player] = lv
-        test_equality(f"Upgrade({u})[TrgPlayer({p})] = lv", f_bread(ptr), lv)
+            lv = randint(1, 255)
+            upgrade[player] = lv
+            test_equality(f"Upgrade({u})[TrgPlayer({p})] = lv", f_bread(ptr), lv)
 
-    f_bwrite(ptr, 0)
+        f_bwrite(ptr, 0)
+
+    for tech_id in (Tech("Burrowing"), Tech("Feedback")):
+        techs = [Tech(tech_id), Tech(EUDVariable(tech_id))]
+        players = [P12, TrgPlayer(EUDVariable(11))]
+        if tech_id < 24:
+            ptr = 0x58CF44 + tech_id + 24 * 11
+        else:
+            ptr = 0x58F140 + tech_id - 24 + 20 * 11
+        for tech, player in zip(techs, players):
+            lv = 1
+            u = "var" if IsEUDVariable(tech) else "const"
+            p = "var" if IsEUDVariable(player) else "const"
+            f_bwrite(ptr, lv)
+            test_equality(f"lv = Tech({u})[TrgPlayer({p})]", tech[player], lv)
+
+            lv = 0
+            tech[player] = lv
+            test_equality(f"Tech({u})[TrgPlayer({p})] = lv", f_bread(ptr), lv)
