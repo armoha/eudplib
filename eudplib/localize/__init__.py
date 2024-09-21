@@ -43,7 +43,7 @@ def excepthook(
     v = list(value.args)
     for i, s in enumerate(v):
         if isinstance(s, str):
-            v[i] = _(s)
+            v[i] = t.gettext(s)
     value.args = tuple(v)
     original_excepthook(type_, value, traceback)
 
@@ -51,7 +51,7 @@ def excepthook(
 def unraisablehook(unraisable: Any) -> None:
     # Localize unraisable error messages
     err_msg = unraisable.err_msg or "Exception ignored in"
-    err_msg = _(err_msg)
+    err_msg = t.gettext(err_msg)
     obj = unraisable.object
     print(f"{err_msg}: {obj!r}")
 
