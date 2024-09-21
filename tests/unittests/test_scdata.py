@@ -306,3 +306,5 @@ def test_scdata_var():
     test_equality("P7 Color = 84", [p.minimapColor, p.unitColor], [84, 84])
     p += 1
     test_equality("P8 Color = 135", [p.minimapColor, p.unitColor], [135, 135])
+    p += 1
+    test_equality("P9 Color = 185", [p.minimapColor, p.unitColor], [185, 185])
