@@ -16,7 +16,7 @@ from ...core import (
 )
 from ...core.rawtrigger.strdict import DefRankDict, DefSfxDataDict
 from ...core.rawtrigger.strenc import _EncodeAny
-from ...utils import unProxy
+from ...utils import ep_assert, unProxy
 
 # from .. import utils as ut
 from .memberkind import BaseKind
@@ -578,24 +578,28 @@ class DwordKind(BaseKind):
     def read_epd(cls, epd, subp) -> EUDVariable:
         from ...memio import f_dwread_epd
 
+        ep_assert(isinstance(subp, int) and subp == 0)
         return f_dwread_epd(epd)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
         from ...memio import f_dwwrite_epd
 
+        ep_assert(isinstance(subp, int) and subp == 0)
         f_dwwrite_epd(epd, value)
 
     @classmethod
     def add_epd(cls, epd, subp, value) -> None:
         from ...memio import f_dwadd_epd
 
+        ep_assert(isinstance(subp, int) and subp == 0)
         f_dwadd_epd(epd, value)
 
     @classmethod
     def subtract_epd(cls, epd, subp, value) -> None:
         from ...memio import f_dwsubtract_epd
 
+        ep_assert(isinstance(subp, int) and subp == 0)
         f_dwsubtract_epd(epd, value)
 
 
@@ -607,6 +611,7 @@ class PositionKind(DwordKind):
         from ...memio import f_maskread_epd
         from ...memio.specialized import _map_xy_mask
 
+        ep_assert(isinstance(subp, int) and subp == 0)
         return f_maskread_epd(epd, (lambda x, y: x + 65536 * y)(*_map_xy_mask()))
 
 
@@ -617,6 +622,7 @@ class CUnitKind(DwordKind):
     def read_epd(cls, epd, subp):
         from ..cunit import CUnit
 
+        ep_assert(isinstance(subp, int) and subp == 0)
         return CUnit.from_read(epd)
 
 
@@ -627,6 +633,7 @@ class CSpriteKind(DwordKind):
     def read_epd(cls, epd, subp):
         from ..csprite import CSprite
 
+        ep_assert(isinstance(subp, int) and subp == 0)
         return CSprite.from_read(epd)
 
 
