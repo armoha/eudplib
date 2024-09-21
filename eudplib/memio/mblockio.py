@@ -7,75 +7,45 @@
 from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
-from ..core.eudfunc import EUDFullFunc
-from . import cpmemio as cm
-from . import modcurpl as cp
+from ..core.eudfunc.eudf import _EUDPredefineParam
+from . import readtable
 
-_cpmoda = c.Forward()
-_cpadda = c.Forward()
+cpcache = c.curpl.GetCPCache()
+_copydwn = c.Forward()
+_check_copydwn = c.Memory(_copydwn, c.Exactly, 0)
+_copydwn << _check_copydwn + 0
+_read_end = readtable.read_end_common
 
 
-@EUDFullFunc(
-    [(ut.EPD(_cpmoda), c.Add, 0, None), (ut.EPD(0x6509B0), c.SetTo, 0, None)],
-    [None, None, None],
-)
+@_EUDPredefineParam((ut.EPD(_read_end) + 86, ut.EPD(0x6509B0), ut.EPD(_copydwn)))
+@c.EUDFunc
 def f_repmovsd_epd(dstepdp, srcepdp, copydwn):
-    global _cpmoda
-
-    c.VProc([dstepdp, srcepdp], c.SetMemory(_cpmoda, c.SetTo, -1))
-
-    if cs.EUDWhileNot()(copydwn == 0):
-        cpmod = cm.f_dwread_cp(0)
-        _cpmoda << cpmod.getDestAddr()
-
-        c.VProc(
-            cpmod,
-            [
-                cpmod.AddDest(1),
-                c.SetMemory(0x6509B0, c.Add, 1),
-                copydwn.SubtractNumber(1),
-            ],
-        )
-
-    cs.EUDEndWhile()
-
-    cp.f_setcurpl2cpcache()
-
-
-@EUDFullFunc(
-    [(ut.EPD(_cpadda), c.Add, 0, None), (ut.EPD(0x6509B0), c.SetTo, 0, None)],
-    [None, None, None],
-)
-def _repaddsd_epd(dstepdp, srcepdp, copydwn):
-    global _cpadda
-
-    c.VProc(
-        [dstepdp, srcepdp],
-        [
-            c.SetMemory(_cpadda, c.SetTo, -1),
-            # TODO: set Add modifier in compile-time
-            c.SetMemoryX(
-                _cpadda + 8, c.SetTo, c.EncodeModifier(c.Add) << 24, 0xFF000000
-            ),
+    dwread_cp_start = readtable._get(0xFFFFFFFF, 0)
+    loopstart, contpoint, loopend, funcend = (c.Forward() for _ in range(4))
+    c.RawTrigger(
+        actions=[
+            c.SetNextPtr(loopstart, dwread_cp_start),
+            c.SetNextPtr(_read_end, contpoint),
+            cpcache.SetDest(ut.EPD(0x6509B0)),
+            c.SetNextPtr(cpcache.GetVTable(), funcend),
+        ]
+    )
+    loopstart << c.RawTrigger(
+        nextptr=dwread_cp_start,
+        conditions=_check_copydwn,
+        actions=c.SetNextPtr(loopstart, loopend),
+    )
+    contpoint << c.RawTrigger(
+        nextptr=loopstart,
+        actions=[
+            c.SetMemory(_read_end + 344, c.Add, 1),
+            c.SetMemory(0x6509B0, c.Add, 1),
+            c.SetMemory(_copydwn, c.Subtract, 1),
         ],
     )
 
-    if cs.EUDWhileNot()(copydwn == 0):
-        cpadd = cm.f_dwread_cp(0)
-        _cpadda << cpadd.getDestAddr()
-
-        c.VProc(
-            cpadd,
-            [
-                cpadd.AddDest(1),
-                c.SetMemory(0x6509B0, c.Add, 1),
-                copydwn.SubtractNumber(1),
-            ],
-        )
-
-    cs.EUDEndWhile()
-
-    cp.f_setcurpl2cpcache()
+    loopend << cpcache.GetVTable()
+    funcend << c.NextTrigger()
 
 
 @c.EUDFunc

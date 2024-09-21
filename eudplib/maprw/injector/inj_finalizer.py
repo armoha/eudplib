@@ -12,7 +12,6 @@ from ... import memio as mi
 from ... import utils as ut
 from ...core.mapdata.chktok import CHK
 from ...eudlib.utilf.gametick import f_getgametick
-from ...memio.mblockio import _repaddsd_epd
 from ...scdata import CurrentPlayer
 from ...trigtrg import runtrigtrg as rtt
 from ..inlinecode.ilcprocesstrig import _get_inline_code_list
@@ -190,8 +189,23 @@ def create_inject_finalizer(
             mrgndata_db = c.Db(mrgndata)
             mi.f_repmovsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
         else:
+            from ...memio.mblockio import _copydwn, _read_end
+
             mrgndata_db = c.Db(mrgndata)
-            _repaddsd_epd(ut.EPD(mrgn), ut.EPD(mrgndata_db), len(mrgndata) // 4)
+            nexttrg = c.Forward()
+            c.RawTrigger(
+                nextptr=mi.f_repmovsd_epd._fstart,
+                actions=[
+                    c.SetMemory(_read_end + 344, c.SetTo, ut.EPD(mrgn)),
+                    c.SetMemoryX(_read_end + 352, c.SetTo, 8 << 24, 0xFF000000),
+                    c.SetMemory(0x6509B0, c.SetTo, ut.EPD(mrgndata_db)),
+                    c.SetMemory(_copydwn, c.SetTo, len(mrgndata) // 4),
+                    c.SetMemory(mi.f_repmovsd_epd._nptr, c.SetTo, nexttrg),
+                ],
+            )
+            nexttrg << c.RawTrigger(
+                actions=c.SetMemoryX(_read_end + 352, c.SetTo, 7 << 24, 0xFF000000)
+            )
 
         # Flip TRIG properties
         i = c.EUDVariable()
