@@ -10,6 +10,7 @@ from typing import ClassVar, cast
 from ... import core as c
 from ... import utils as ut
 from ...localize import _
+from ...memio import muldiv4table
 
 
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
@@ -53,6 +54,61 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             #     EPDOffsetMap._stride_dict[epd] = {}
         EPDOffsetMap._cast = False
         super().__init__(epd)
+
+    def _get_stride_cache(
+        self, stride: int
+    ) -> tuple[
+        c.EUDVariable, int | c.EUDVariable, tuple[c.Forward, c.Forward, c.Forward]
+    ]:
+        value = self._value
+        ut.ep_assert(isinstance(value, c.EUDVariable))
+        # lazy calculate multiplication & division
+        try:
+            stride_dict = EPDOffsetMap._stride_dict[value]
+        except KeyError:
+            # See EPDOffsetMap.__init__
+            stride_dict = {}
+            maxvalue = (1 << type(self).range[1].bit_length()) - 1
+            ut.ep_assert(maxvalue < 1024, _("Reference type can't have ArrayMember"))
+            EPDOffsetMap._update[value] = (c.Forward(), c.Forward(), c.Forward())
+            EPDOffsetMap._maxvalue[value] = maxvalue
+            EPDOffsetMap._stride_key[value] = frozenset(())
+            EPDOffsetMap._stride_dict[value] = stride_dict
+        else:
+            maxvalue = EPDOffsetMap._maxvalue[value]
+
+        update_start, update_restore, update_end = EPDOffsetMap._update[value]
+        if stride not in stride_dict or maxvalue < type(self).range[1]:
+            q = c.EUDVariable()
+            r: int | c.EUDVariable = 0 if stride % 4 == 0 else c.EUDVariable()
+            stride_dict[stride] = (q, r)
+            strides = frozenset(stride_dict.keys())
+            EPDOffsetMap._stride_key[value] = strides
+            bit_index = type(self).range[1].bit_length()
+            maxvalue = (1 << bit_index) - 1
+            EPDOffsetMap._maxvalue[value] = maxvalue
+
+            derived_vars = []
+            for stride in sorted(stride_dict.keys()):
+                variables = stride_dict[stride]
+                if stride % 4 == 0:
+                    derived_vars.append(variables[0])
+                else:
+                    derived_vars.extend(variables)  # type: ignore[arg-type]
+
+            update_start.Reset()
+            update_restore.Reset()
+            update_end.Reset()
+            upd = muldiv4table._caller(bit_index - 1, strides)(value, *derived_vars)
+            update_start << upd[0]
+            update_restore << upd[1]
+            varcount = muldiv4table.varcount_dict[strides]
+            read_end = muldiv4table.muldiv_end_table[varcount]
+            update_end << read_end
+        else:
+            q, r = stride_dict[stride]
+
+        return q, r, (update_start, update_restore, update_end)
 
     def getepd(self, name: str) -> c.EUDVariable:
         from .memberimpl import CSpriteKind, CUnitKind, IscriptKind, PositionKind
