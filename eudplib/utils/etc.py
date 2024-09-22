@@ -31,9 +31,11 @@ def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
         if isinstance(p, c.ConstExpr) and p._is_epd():
             if _epd_on_epd:
                 ep_warn(_("EPD on EPD value of ConstExpr is no-op"))
+                epd = p
             else:
                 raise EPError(_("EPD on EPD value of ConstExpr is no-op"))
-        epd = (p + (-0x58A364)) // 4
+        else:
+            epd = (p + (-0x58A364)) // 4
         if "ret" in kwargs:
             c.SeqCompute([(kwargs["ret"][0], c.SetTo, epd)])
             return kwargs["ret"][0]
