@@ -51,7 +51,7 @@ class EUDFuncN:
 
         if isinstance(argn, int):
             self._argn = argn
-            self._arginits = [(0, bt.SetTo, 0, None)] * argn
+            self._arginits = None
         elif all(
             isinstance(initvals, tuple) and len(initvals) == 4 for initvals in argn
         ):
@@ -133,13 +133,13 @@ class EUDFuncN:
 
     def _create_func_args(self):
         if self._fargs is None:
-            self._fargs = []
-            for initvals in self._arginits:
-                if initvals[3] is None:
-                    argv = ev.EUDXVariable(*initvals[:3])
-                else:
+            if self._arginits is None:
+                self._fargs = [ev.EUDVariable() for _ in range(self._argn)]
+            else:
+                self._fargs = []
+                for initvals in self._arginits:
                     argv = ev.EUDXVariable(*initvals)
-                self._fargs.append(argv)
+                    self._fargs.append(argv)
 
     def _add_return(self, retv, needjump):
         retv = ut.FlattenList(retv)
