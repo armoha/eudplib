@@ -64,8 +64,14 @@ def _RELIMP(path, mod_name):  # noqa: N802
             break
     if abs_import is None:
         raise ImportError("attempted relative import beyond top-level package")
-    else:
+    try:
         return importlib.import_module(str(abs_import).replace("\\", "."))
+    except ImportError:
+        module = importlib.import_module(str(abs_import.parent).replace("\\", "."))
+        try:
+            return getattr(module, mod_name)
+        except AttributeError as err:
+            raise ImportError from err
 
 
 def _TYGV(types, expr_list_gen):  # noqa: N802
@@ -302,9 +308,7 @@ class _ARRW:  # array write
 
     def __lshift__(self, r):
         isUnproxyInstance
-        if not IsEUDVariable(self.obj) and not isUnproxyInstance(
-            self.obj, ConstExpr
-        ):
+        if not IsEUDVariable(self.obj) and not isUnproxyInstance(self.obj, ConstExpr):
             # maybe Python collections
             ov = self.obj[self.index]
             if IsEUDVariable(ov):

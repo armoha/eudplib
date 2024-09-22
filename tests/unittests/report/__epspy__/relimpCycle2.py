@@ -3,7 +3,9 @@ from eudplib import *
 from eudplib.core.eudfunc import EUDTraceLog, EUDTracedFunc, EUDTracedTypedFunc, EUDTracedMethod, EUDTracedTypedMethod
 from eudplib.epscript.helper import _RELIMP, _TYGV, _TYSV, _TYLV, _CGFW, _ARR, _VARR, _SRET, _SV, _ATTW, _ARRW, _ATTC, _ARRC, _L2V, _LSH, _ALL
 # (Line 1) import .relimpCycle1;
+# (Line 2) var B: Upgrade = "Terran Infantry Weapons";
 try:
     relimpCycle1 = _RELIMP(".", "relimpCycle1")
 except ImportError:
     from . import relimpCycle1
+B = _TYGV([Upgrade], lambda: ["Terran Infantry Weapons"])

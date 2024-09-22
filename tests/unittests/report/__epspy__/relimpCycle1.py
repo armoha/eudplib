@@ -2,8 +2,8 @@
 from eudplib import *
 from eudplib.core.eudfunc import EUDTraceLog, EUDTracedFunc, EUDTracedTypedFunc, EUDTracedMethod, EUDTracedTypedMethod
 from eudplib.epscript.helper import _RELIMP, _TYGV, _TYSV, _TYLV, _CGFW, _ARR, _VARR, _SRET, _SV, _ATTW, _ARRW, _ATTC, _ARRC, _L2V, _LSH, _ALL
-# (Line 1) import .relimpCycle2;
+# (Line 1) import .relimpCycle2.B;
 try:
-    relimpCycle2 = _RELIMP(".", "relimpCycle2")
+    B = _RELIMP(".relimpCycle2", "B")
 except ImportError:
-    from . import relimpCycle2
+    from .relimpCycle2 import B
