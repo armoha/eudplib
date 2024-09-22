@@ -127,7 +127,10 @@ def _caller(msb_index: int, strides: frozenset[int]) -> Callable:
     def f(
         var: c.EUDVariable, *derived_vars: c.EUDVariable
     ) -> tuple[c.RawTrigger, c.RawTrigger]:
-        ut.ep_assert(len(derived_vars) == varcount)
+        ut.ep_assert(
+            len(derived_vars) == varcount,
+            f"varcount mismatched: len({derived_vars}) != {varcount}",
+        )
         c.PushTriggerScope()
         _jump_trg = c.Forward()
         jump_trg = c.RawTrigger(

@@ -157,7 +157,7 @@ def _EUDPredefineReturn(*frets):  # noqa: N802
     3. Don't modify Dest in function body!
     4. No EUDFunc call in function body!
     """
-    ut.ep_assert(frets)
+    ut.ep_assert(frets, "empty function return")
     if len(frets) <= 2 and all(isinstance(ret, int) for ret in frets):
         while len(_ev) < max(frets):
             _ev.append(EUDVariable())

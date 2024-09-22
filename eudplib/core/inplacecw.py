@@ -274,7 +274,7 @@ def ixor(a, b, v):
 
 
 def ilshift(a, b, n):
-    ep_assert(isinstance(n, int))
+    ep_assert(isinstance(n, int), "left shift amount should be constant")
     if n == 0:
         return
     mask = (1 << (n + 1)) - 1
@@ -296,7 +296,7 @@ def ilshift(a, b, n):
 
 
 def irshift(a, b, n):
-    ep_assert(isinstance(n, int))
+    ep_assert(isinstance(n, int), "right shift amount should be constant")
     if n == 0:
         return
     mask = (1 << (n + 1)) - 1

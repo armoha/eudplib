@@ -52,7 +52,10 @@ class _LocalLocale(ExprProxy):
 
     def __eq__(self, other):
         if isinstance(other, str):
-            ep_assert(other in LOCALES)
+            ep_assert(
+                other in LOCALES,
+                f"Invalid locale: {other}\nAvailable locales: {LOCALES}",
+            )
             other = 1 + LOCALES.index(other)
         return super().__eq__(other)
 

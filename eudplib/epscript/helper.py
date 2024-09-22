@@ -516,6 +516,6 @@ def _LSH(lhs, r):  # noqa: N802
 def _ALL(actions):  # noqa: N802
     from ..trigger.tpatcher import actpt, apply_patch_table
 
-    ep_assert(len(actions) == 2)
+    ep_assert(len(actions) == 2, f"Invalid AllPlayers action: {actions}")
     apply_patch_table(EPD(actions[1]), actions[1], actpt)
     f_setcurpl2cpcache([], actions)

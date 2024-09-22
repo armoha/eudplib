@@ -171,14 +171,15 @@ class ArrayEnumMember(BaseMember, EnumMember):
     def __init__(
         self, offset: int, kind: MemberKind, *, stride: int | None = None
     ) -> None:
-        ep_assert(offset % 4 == 0)
         self._instance: EPDOffsetMap | None = None  # FIXME
         super().__init__(offset, kind)
         super(BaseMember, self).__init__()
         if stride is None:
             self.stride: int = self.kind.size()
         else:
-            ep_assert(self.kind.size() <= stride and stride in (1, 2, 4))
+            ep_assert(
+                self.kind.size() <= stride, "stride is greater than member size"
+            )
             self.stride = stride
 
     def _get_epd(self, instance=None):
@@ -214,7 +215,7 @@ class Flag:
     mask: Final[int]
 
     def __init__(self, mask: int) -> None:
-        ep_assert(mask != 0)
+        ep_assert(0 < mask <= 0xFFFFFFFF, f"Invalid bitmask: {mask}")
         self.mask = mask
 
     def __get__(self, instance, owner=None) -> c.EUDVariable | Self:

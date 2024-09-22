@@ -16,7 +16,10 @@ from ..utils import EPD, EUDCreateBlock, EUDPopBlock, ep_assert
 @functools.cache
 def EUDQueue(capacity):  # noqa: N802
     """A single-ended queue implemented with a fixed-size variable array."""
-    ep_assert(isinstance(capacity, int) and capacity > 0)
+    ep_assert(
+        isinstance(capacity, int) and capacity > 0,
+        "capacity of EUDQueue should be greater than 0",
+    )
 
     class _EUDQueue:
         def __init__(self):  # TODO: support initval
@@ -247,7 +250,10 @@ def EUDQueue(capacity):  # noqa: N802
 @functools.cache
 def EUDDeque(capacity):  # noqa: N802
     """A double-ended queue implemented with a fixed-size variable array."""
-    ep_assert(isinstance(capacity, int) and capacity > 0)
+    ep_assert(
+        isinstance(capacity, int) and capacity > 0,
+        "capacity of EUDDeque should be greater than 0",
+    )
 
     class _EUDDeque:
         def __init__(self):  # TODO: support initval

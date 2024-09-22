@@ -26,10 +26,8 @@ def EUDBinaryMax(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:  # noqa: N802
         function will return maxv.
     """
     if isinstance(minv, int) and isinstance(maxv, int):
-        ut.ep_assert(minv <= maxv)
+        ut.ep_assert(0 <= minv <= maxv, _("maxv must be greater than minv"))
         r = maxv - minv
-        if r <= 0:
-            raise ut.EPError(_("maxv must be greater than minv"))
     else:
         r = None
 
@@ -70,10 +68,8 @@ def EUDBinaryMin(cond, minv=0, maxv=0xFFFFFFFF) -> c.EUDVariable:  # noqa: N802
         function will return maxv.
     """
     if isinstance(minv, int) and isinstance(maxv, int):
-        ut.ep_assert(minv <= maxv)
+        ut.ep_assert(0 <= minv <= maxv, _("maxv must be greater than minv"))
         r = maxv - minv
-        if r <= 0:
-            raise ut.EPError(_("maxv must be greater than minv"))
     else:
         r = None
 

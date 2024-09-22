@@ -149,7 +149,9 @@ def f_bwrite_epd(epd, subp, b) -> None:
 
 
 def _bitwrite_epd(epd, subp, bit, b) -> None:
-    ut.ep_assert(isinstance(bit, int) and bit.bit_count() == 1)
+    ut.ep_assert(
+        isinstance(bit, int) and bit.bit_count() == 1, f"bit_count is not 1: {bit}"
+    )
     if isinstance(subp, int):
         bit <<= 8 * subp
         if c.IsEUDVariable(b):
@@ -379,7 +381,9 @@ def f_maskwrite_epd(epd, value, mask) -> None:
 
 
 def _bitread_epd(bit):
-    ut.ep_assert(bit.bit_count() == 1)
+    ut.ep_assert(
+        isinstance(bit, int) and bit.bit_count() == 1, f"bit_count is not 1: {bit}"
+    )
     f = getattr(_bitread_epd, "f", None)
     if f is None:
         f = {}

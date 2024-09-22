@@ -27,7 +27,7 @@ def test_rvalue():
     trg = NextTrigger()
     trg_count = GetTriggerCounter()
     v2 = v1 + 1 + EUDVariable(2) + 3 + EUDVariable(4) + 5
-    ep_assert(trg_count + 5 == GetTriggerCounter())
+    ep_assert(trg_count + 5 == GetTriggerCounter(), "Failed to optimize rvalue")
     test_equality(
         "rvalue reuse test: self, __add__",
         [v2, f_dwread(trg + 344)],

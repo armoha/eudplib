@@ -578,28 +578,28 @@ class DwordKind(BaseKind):
     def read_epd(cls, epd, subp) -> EUDVariable:
         from ...memio import f_dwread_epd
 
-        ep_assert(isinstance(subp, int) and subp == 0)
+        ep_assert(isinstance(subp, int) and subp == 0, "malaligned dword member")
         return f_dwread_epd(epd)
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
         from ...memio import f_dwwrite_epd
 
-        ep_assert(isinstance(subp, int) and subp == 0)
+        ep_assert(isinstance(subp, int) and subp == 0, "malaligned dword member")
         f_dwwrite_epd(epd, value)
 
     @classmethod
     def add_epd(cls, epd, subp, value) -> None:
         from ...memio import f_dwadd_epd
 
-        ep_assert(isinstance(subp, int) and subp == 0)
+        ep_assert(isinstance(subp, int) and subp == 0, "malaligned dword member")
         f_dwadd_epd(epd, value)
 
     @classmethod
     def subtract_epd(cls, epd, subp, value) -> None:
         from ...memio import f_dwsubtract_epd
 
-        ep_assert(isinstance(subp, int) and subp == 0)
+        ep_assert(isinstance(subp, int) and subp == 0, "malaligned dword member")
         f_dwsubtract_epd(epd, value)
 
 
@@ -622,7 +622,7 @@ class CUnitKind(DwordKind):
     def read_epd(cls, epd, subp):
         from ..cunit import CUnit
 
-        ep_assert(isinstance(subp, int) and subp == 0)
+        ep_assert(isinstance(subp, int) and subp == 0, "malaligned CUnit member")
         return CUnit.from_read(epd)
 
 
@@ -633,7 +633,7 @@ class CSpriteKind(DwordKind):
     def read_epd(cls, epd, subp):
         from ..csprite import CSprite
 
-        ep_assert(isinstance(subp, int) and subp == 0)
+        ep_assert(isinstance(subp, int) and subp == 0, "malaligned CSprite member")
         return CSprite.from_read(epd)
 
 

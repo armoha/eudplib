@@ -191,7 +191,9 @@ class Condition(ConstExpr):
 
     def negate(self) -> None:
         condtype = self.fields[5]
-        ut.ep_assert(isinstance(condtype, int))
+        ut.ep_assert(
+            isinstance(condtype, int), f"Invalid condition type: {condtype}"
+        )
         comparison_set = (1, 2, 3, 4, 5, 12, 14, 15, 21)
         always_set = (0, 22)
         never_set = (13, 23)
@@ -205,7 +207,10 @@ class Condition(ConstExpr):
             bring_or_command = (2, 3)
             comparison = self.fields[4]
             amount = self.fields[2]
-            ut.ep_assert(isinstance(comparison, int) and isinstance(amount, int))
+            ut.ep_assert(
+                isinstance(comparison, int), f"Invalid comparison: {comparison}"
+            )
+            ut.ep_assert(isinstance(amount, int), f"Invalid amount: {amount}")
             amount &= 0xFFFFFFFF  # type: ignore[operator]
             if comparison == 10 and amount == 0:
                 self.fields[4] = 0

@@ -35,7 +35,7 @@ def _get_cmdqlen():
 
 
 def _set_cmdqlen(new_len):
-    ep_assert(c.IsEUDVariable(new_len))
+    ep_assert(c.IsEUDVariable(new_len), "new command queue length can't be constant")
     c.VProc(
         [new_len, _cmdqlen],
         [

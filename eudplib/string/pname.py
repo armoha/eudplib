@@ -43,7 +43,8 @@ def _get_player_lightvar() -> tuple[int, int]:
 
 
 def compare_sequence(src: int, seq: str) -> list[c.Condition]:
-    ut.ep_assert(isinstance(src, int) and isinstance(seq, str))
+    ut.ep_assert(isinstance(src, int), f"Invalid address: {src}")
+    ut.ep_assert(isinstance(seq, str), f"Invalid string: {seq}")
     seq += "\0"
     ret = []
     val, mask = 0, 0

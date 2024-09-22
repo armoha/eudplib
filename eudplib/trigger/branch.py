@@ -26,7 +26,7 @@ def _branch_sub(
     - type(conditions) is list
     - len(conditions) <= 16
     """
-    ut.ep_assert(len(conditions) <= 16)
+    ut.ep_assert(len(conditions) <= 16, "conditions count > 16")
 
     brtrg = c.Forward()
     tjtrg = c.Forward()

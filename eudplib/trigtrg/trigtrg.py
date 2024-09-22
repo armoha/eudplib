@@ -221,11 +221,11 @@ def Trigger(  # noqa: N802
     conditions = FlattenList(conditions)
     actions = FlattenList(actions)
 
-    ep_assert(isinstance(players, list))
-    ep_assert(isinstance(conditions, list))
-    ep_assert(isinstance(actions, list))
-    ep_assert(len(conditions) <= 16)
-    ep_assert(len(actions) <= 64)
+    ep_assert(isinstance(players, list), f"players is not list: {players}")
+    ep_assert(isinstance(conditions, list), f"conditions is not list: {conditions}")
+    ep_assert(isinstance(actions, list), f"actions is not list: {actions}")
+    ep_assert(len(conditions) <= 16, f"16 < len(conditions): {len(conditions)}")
+    ep_assert(len(actions) <= 64, f"64 < len(actions): {len(actions)}")
     peff = bytearray(28)
     for p in players:
         peff[EncodePlayer(p)] = 1
@@ -240,7 +240,7 @@ def Trigger(  # noqa: N802
             bytes(peff),
         ]
     )
-    ep_assert(len(b) == 2400)
+    ep_assert(len(b) == 2400, f"len(trigger) != 2400: {len(b)}")
     return b
 
 

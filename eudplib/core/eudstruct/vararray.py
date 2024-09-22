@@ -99,7 +99,7 @@ class _EUDVArray(ExprProxy):
     def __init__(
         self, initvar=None, *, _from=None, _size: int, _basetype: type | None
     ) -> None:
-        ep_assert(0 <= _size < 2**28)
+        ep_assert(0 <= _size < 2**28, f"Invalid EUDVArray capacity: {_size}")
         self._size = _size
         self._basetype = _basetype
 
@@ -156,7 +156,9 @@ class _EUDVArray(ExprProxy):
             convert_start = _index_for_get[size_msb]
             _index_dst = _get_index + 344
             if IsEUDVariable(self._value):
-                ep_assert(self._value is not index)
+                ep_assert(
+                    self._value is not index, "EUDVArray.ptr and index are alias"
+                )
                 # index copy to lv -> self.ptr -> _convert_index -> self
                 bt.RawTrigger(
                     nextptr=index.GetVTable(),
@@ -223,10 +225,41 @@ class _EUDVArray(ExprProxy):
             )
             return
 
-        ep_assert(index is not value)
+        nexttrg = Forward()
+        size_msb = self._size.bit_length() - 1
+        convert_start = _index_for_set[size_msb]
+
+        # index and name alias
+        if isinstance(index, EUDVariable) and index is value:
+            if isinstance(self._epd, EUDVariable):
+                VProc(
+                    [self._epd, index],
+                    [
+                        bt.SetMemory(_set_index + 344, bt.SetTo, 87),
+                        *self._epd.QueueAddTo(EPD(_set_index + 344)),
+                        *index.QueueAssignTo(EPD(_set_index) + 87),
+                    ],
+                )
+            else:
+                VProc(
+                    index,
+                    [
+                        bt.SetMemory(_set_index + 344, bt.SetTo, 87 + self._epd),
+                        *index.QueueAssignTo(EPD(_set_index) + 87),
+                    ],
+                )
+            bt.RawTrigger(
+                nextptr=index.GetVTable(),
+                actions=[
+                    bt.SetNextPtr(index.GetVTable(), convert_start),
+                    bt.SetNextPtr(_set_index, nexttrg),
+                    *index.QueueAssignTo(_lv),
+                ],
+            )
+            nexttrg << bt.NextTrigger()
+            return
 
         # execution order: self._epd -> value -> index(->_convert_index)
-        nexttrg = Forward()
         vv = []
         first_next_triggger = None
 
@@ -257,14 +290,15 @@ class _EUDVArray(ExprProxy):
         actions.append(bt.SetMemory(write_dest, bt.SetTo, sum(const_dest)))
 
         if isinstance(self._epd, EUDVariable):
-            ep_assert(self._epd is not value)
+            ep_assert(
+                self._epd is not value,
+                "EUDVArray._epd and __setitem__ value are aliased",
+            )
             if len(vv) == 1:
                 actions.append(bt.SetNextPtr(self._epd.GetVTable(), writing_trigger))
             actions.extend(self._epd.QueueAddTo(EPD(write_dest)))
 
         if isinstance(index, EUDVariable):
-            size_msb = self._size.bit_length() - 1
-            convert_start = _index_for_set[size_msb]
             actions.append(
                 (
                     bt.SetNextPtr(index.GetVTable(), convert_start),

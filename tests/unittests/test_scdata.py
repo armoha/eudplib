@@ -37,8 +37,8 @@ def test_scdata():
         trigcount == GetTriggerCounter(),
         f"Trigger count mismatch: {trigcount} != {GetTriggerCounter()}",
     )
-    ep_assert(one is not ghost._value)
-    ep_assert(one is ghost_cast._value)
+    ep_assert(one is not ghost._value, "New instance should not alias")
+    ep_assert(one is ghost_cast._value, "cast should alias")
     one << 2
     test_equality(
         "TrgUnit(eudvar).maxHp, check robustness to variable change",

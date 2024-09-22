@@ -85,7 +85,7 @@ class EUDFuncN:
         self._fend = ac.Forward()
 
         # Prevent double compilication
-        ut.ep_assert(self._fstart is None)
+        ut.ep_assert(self._fstart is None, "EUDFuncN was already compiled")
 
         # Initialize new namespace
         f_bsm = BlockStruManager()

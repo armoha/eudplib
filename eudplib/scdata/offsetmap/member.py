@@ -91,7 +91,9 @@ class ArrayMember(BaseMember):
         if stride is None:
             self.stride: int = self.kind.size()
         else:
-            ut.ep_assert(self.kind.size() <= stride and stride in (1, 2, 4, 8))
+            ut.ep_assert(
+                self.kind.size() <= stride, "stride is greater than member size"
+            )
             self.stride = stride
 
     def _get_epd(

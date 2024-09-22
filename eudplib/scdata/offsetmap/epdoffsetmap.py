@@ -136,7 +136,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         self,
     ) -> tuple[dict[int, tuple[c.EUDVariable, c.EUDVariable | int]], int]:
         value = self._value
-        ut.ep_assert(isinstance(value, c.EUDVariable))
+        ut.ep_assert(isinstance(value, c.EUDVariable), "constant EPDOffsetMap")
         try:
             stride_dict = EPDOffsetMap._stride_dict[value]
         except KeyError:

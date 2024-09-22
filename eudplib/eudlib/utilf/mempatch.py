@@ -16,6 +16,7 @@ _patch_max = 8192
 
 dws_top, ps_top = c.EUDVariable(), c.EUDVariable()
 
+
 @functools.cache
 def patchstack():
     return EUDArray(3 * _patch_max)

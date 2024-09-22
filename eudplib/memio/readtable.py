@@ -53,8 +53,12 @@ def signed_shift(a: int, b: int):
 def _insert(
     bitmask: int, shift: int, is_decreasing: bool | None = None
 ) -> c.RawTrigger:
-    ut.ep_assert(_is_consecutive(bitmask))
-    ut.ep_assert(is_decreasing in (True, False, None))
+    ut.ep_assert(
+        _is_consecutive(bitmask), f"Not a consecutive bit pattern: {bitmask:x}"
+    )
+    ut.ep_assert(
+        is_decreasing in (True, False, None), f"Invalid ordering: {is_decreasing}"
+    )
     if is_decreasing is None:
         is_decreasing = guess_ordering(bitmask, shift)
 
@@ -99,7 +103,9 @@ def _insert(
 
 
 def _get(bitmask: int, shift: int) -> c.RawTrigger:
-    ut.ep_assert(_is_consecutive(bitmask))
+    ut.ep_assert(
+        _is_consecutive(bitmask), f"Not a consecutive bit pattern: {bitmask:x}"
+    )
     msb_index = bitmask.bit_length() - 1
     lsb_index = (bitmask & -bitmask).bit_length() - 1
 
