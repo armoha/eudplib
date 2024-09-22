@@ -7,7 +7,7 @@
 from ...localize import _
 from ...utils import EPError, ExprProxy
 from .selftype import selftype
-from .vararray import EUDVArray
+from .vararray import _InternalVArray
 
 
 class _EUDStructMetaclass(type):
@@ -51,11 +51,11 @@ class EUDStructArray(ExprProxy, metaclass=_EUDStructMetaclass):
         if _from is None:
             if initvar is None:
                 initvals = [0] * _times
-                super().__init__(EUDVArray(_times, _basetype)(initvals))
+                super().__init__(_InternalVArray(_times, _basetype)(initvals))
             else:
-                super().__init__(EUDVArray(_times, _basetype)(initvar))
+                super().__init__(_InternalVArray(_times, _basetype)(initvar))
         else:
-            super().__init__(EUDVArray(_times, _basetype).cast(_from))
+            super().__init__(_InternalVArray(_times, _basetype).cast(_from))
 
         self._initialized = True
         self._times = _times

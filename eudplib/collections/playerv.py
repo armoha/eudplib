@@ -4,85 +4,16 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from typing import Any
-
 from .. import core as c
-from .. import ctrlstru as cs
-from .. import utils as ut
-
-_EUDVArray8: Any = c.EUDVArray(8)  # FIXME : Unsupported dynamic base class
+from ..core.eudstruct.vararray import _EUDVArray
 
 
-class PVariable(_EUDVArray8):
-    def _casteudset(self, index: c.EUDVariable, value: c.EUDVariable) -> None:
-        nptr = c.Forward()
-        c.VProc(
-            self._epd,
-            [
-                value.SetDest(348 // 4),
-                *self._epd.QueueAddTo(ut.EPD(value.getDestAddr())),
-                c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
-                c.SetNextPtr(value.GetVTable(), nptr),
-            ],
-        )
-        for k in range(3):
-            c.RawTrigger(
-                conditions=index.AtLeastX(1, 2**k),
-                actions=value.AddDest(18 * (2**k)),
-            )
-        c.SetNextTrigger(value.GetVTable())
-        nptr << c.NextTrigger()
-
-    def _pveudset(self, index: c.EUDVariable, value: c.EUDVariable) -> None:
-        nptr = c.Forward()
-        cs.DoActions(
-            value.SetDest(self._epd + 348 // 4),
-            c.SetMemory(value._varact + 24, c.SetTo, 0x072D0000),
-            c.SetNextPtr(value.GetVTable(), nptr),
-        )
-        for k in range(3):
-            c.RawTrigger(
-                conditions=index.AtLeastX(1, 2**k),
-                actions=value.AddDest(18 * (2**k)),
-            )
-        c.SetNextTrigger(value.GetVTable())
-        nptr << c.NextTrigger()
-
-    def __setitem__(self, index, value) -> None:
-        index = c.EncodePlayer(index)
-        if not isinstance(index, c.EUDVariable):
-            return self.set(index, value)
-        value = ut.unProxy(value)
-        if not c.IsEUDVariable(self._value):
-            if isinstance(value, c.EUDVariable):
-                self._pveudset(index, value)
-            else:
-                a0 = c.Forward()
-                cs.DoActions(c.SetMemory(a0 + 16, c.SetTo, self._epd + 348 // 4))
-                for k in range(2, -1, -1):
-                    c.RawTrigger(
-                        conditions=index.AtLeastX(1, 2**k),
-                        actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
-                    )
-                c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
-        elif isinstance(value, c.EUDVariable):
-            self._casteudset(index, value)
-        else:
-            a0 = c.Forward()
-            c.VProc(
-                self._epd,
-                [
-                    c.SetMemory(a0 + 16, c.SetTo, 348 // 4),
-                    *self._epd.QueueAddTo(ut.EPD(a0 + 16)),
-                ],
-            )
-            for k in range(3):
-                c.RawTrigger(
-                    conditions=index.AtLeastX(1, 2**k),
-                    actions=c.SetMemory(a0 + 16, c.Add, 18 * (2**k)),
-                )
-            c.RawTrigger(actions=[a0 << c.SetDeaths(0, c.SetTo, value, 0)])
+class PVariable(_EUDVArray):
+    def __init__(self, initvars=None, *, _from=None) -> None:
+        super().__init__(initvars, _from=_from, _size=8, _basetype=None)
 
     def __getitem__(self, i):
-        i = c.EncodePlayer(i)
-        return super().__getitem__(i)
+        return super().__getitem__(c.EncodePlayer(i))
+
+    def __setitem__(self, i, value) -> None:
+        super().__setitem__(c.EncodePlayer(i), value)

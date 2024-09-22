@@ -27,55 +27,273 @@ from ..variable import (
     VProc,
 )
 from ..variable.eudv import process_dest
-from ..variable.vbuf import (
-    get_current_custom_varbuffer,
-    get_current_varbuffer,
-)
+from ..variable.vbuf import get_current_custom_varbuffer
 
 cpcache: EUDVariable = GetCPCache()
 
 
-@functools.cache
-def eudvarray_data(size):
-    ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
+class _EUDVArrayData(ConstExpr):
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls, None)
 
-    class _EUDVArrayData(ConstExpr):
-        def __new__(cls, *args, **kwargs) -> Self:
-            return super().__new__(cls, None)
+    def __init__(
+        self,
+        initvar: list[tuple[ConstExpr | int, ConstExpr | int, ConstExpr | int]],
+    ) -> None:
+        super().__init__()
+        init = []
+        for i, items in enumerate(initvar):
+            dest, value, nextptr = items
+            ep_assert(IsConstExpr(value), _("Invalid item #{}").format(repr(i)))
+            init.append((0xFFFFFFFF, process_dest(dest), value, 0x072D0000, nextptr))
+        self._init = init
 
-        def __init__(self, initvars, *, dest=0, nextptr=0) -> None:
-            super().__init__()
-            ep_assert(
-                len(initvars) == size,
-                _("{} items expected, got {}").format(size, len(initvars)),
-            )
-            for i, item in enumerate(initvars):
-                ep_assert(IsConstExpr(item), _("Invalid item #{}").format(repr(i)))
-            if not all(isinstance(x, int) and x == 0 for x in (dest, nextptr)):
-                ep_assert(IsConstExpr(nextptr), _("nextptr should be ConstExpr"))
-                initvars = [
-                    (
-                        0xFFFFFFFF,
-                        process_dest(dest),
-                        initvar,
-                        0x072D0000,
-                        nextptr,
-                    )
-                    for initvar in initvars
-                ]
-            self._initvars = initvars
+    def Evaluate(self):  # noqa: N802
+        evb = get_current_custom_varbuffer()
+        if self not in evb._vdict:
+            evb.create_vartriggers(self, self._init)
 
-        def Evaluate(self):  # noqa: N802
-            if all(isinstance(var, tuple) for var in self._initvars):
-                evb = get_current_custom_varbuffer()
+        return evb._vdict[self].Evaluate()
+
+
+bt.PushTriggerScope()
+_getter = bt.RawTrigger(nextptr=0, actions=bt.SetMemoryEPD(0, bt.SetTo, 0))
+_getter_dst = EPD(_getter) + 86  # this and nextptr are set by __getitem__
+_getter_val = EPD(_getter) + 87  # this is set by inner triggers of _EUDVArray
+
+_lv = EUDLightVariable()
+_convert_index = bt.SetMemoryEPD(0, bt.Add, 0)
+_get_index = bt.RawTrigger(
+    nextptr=0,
+    actions=[_convert_index, bt.SetMemory(_convert_index + 20, bt.SetTo, 0)],
+)
+_index_for_get: list[bt.RawTrigger] = []
+for i in range(28):
+    _index_for_get.append(
+        bt.RawTrigger(
+            nextptr=_get_index if i == 0 else _index_for_get[i - 1],
+            conditions=_lv.AtLeastX(1, 1 << i),
+            actions=bt.SetMemory(_convert_index + 20, bt.Add, 72 << i),
+        )
+    )
+
+_convert_index = bt.SetMemoryEPD(0, bt.SetTo, 0)
+_set_index = bt.RawTrigger(nextptr=0, actions=_convert_index)
+_index_for_set: list[bt.RawTrigger] = []
+for i in range(28):
+    _index_for_set.append(
+        bt.RawTrigger(
+            nextptr=_set_index if i == 0 else _index_for_set[i - 1],
+            conditions=_lv.AtLeastX(1, 1 << i),
+            actions=bt.SetMemory(_convert_index + 16, bt.Add, 18 << i),
+        )
+    )
+bt.PopTriggerScope()
+
+
+class _EUDVArray(ExprProxy):
+    dont_flatten = True
+
+    def __init__(
+        self, initvar=None, *, _from=None, _size: int, _basetype: type | None
+    ) -> None:
+        ep_assert(0 <= _size < 2**28)
+        self._size = _size
+        self._basetype = _basetype
+
+        # Initialization from value
+        if _from is not None:
+            baseobj = _from
+
+        else:
+            # Int -> interpret as sequence of 0s
+            if initvar is None:
+                initvar = [0] * _size
+
+            if not isinstance(initvar[0], tuple):
+                init = [(_getter_val, x, _getter) for x in initvar]
             else:
-                evb = get_current_varbuffer()
-            if self not in evb._vdict:
-                evb.create_vartriggers(self, self._initvars)
+                init = initvar
 
-            return evb._vdict[self].Evaluate()
+            # For python iterables
+            baseobj = _EUDVArrayData(init)
 
-    return _EUDVArrayData
+        super().__init__(baseobj)
+        self._epd = EPD(self)
+
+    def _bound_check(self, index: object) -> None:
+        if isinstance(index, int) and not (0 <= index < self._size):
+            e = _(
+                "index out of bounds: the length of EUDVArray is {}"
+                " but the index is {}"
+            )
+            raise EPError(e.format(self._size, index))
+
+    def __getitem__(self, i):
+        return self.get(i)
+
+    def __setitem__(self, i, value) -> None:
+        self.set(i, value)
+
+    def get(self, i, **kwargs):
+        ret = kwargs["ret"][0] if "ret" in kwargs else EUDVariable()
+        try:
+            dst = EPD(ret.getValueAddr())
+        except AttributeError:
+            dst = ret
+
+        index = unProxy(i)
+        self._bound_check(index)
+        nexttrg = Forward()
+
+        if isinstance(index, EUDVariable):
+            size_msb = self._size.bit_length() - 1
+            convert_start = _index_for_get[size_msb]
+            _index_dst = _get_index + 344
+            if IsEUDVariable(self._value):
+                ep_assert(self._value is not index)
+                # index copy to lv -> self.ptr -> _convert_index -> self
+                bt.RawTrigger(
+                    nextptr=index.GetVTable(),
+                    actions=[
+                        bt.SetNextPtr(index.GetVTable(), self._value.GetVTable()),
+                        index.QueueAssignTo(_lv),
+                        bt.SetNextPtr(self._value.GetVTable(), convert_start),
+                        self._value.QueueAssignTo(EPD(_get_index) + 1),
+                        bt.SetMemory(_index_dst, bt.SetTo, EPD(_get_index) + 1),
+                        bt.SetNextPtr(_getter, nexttrg),
+                        bt.SetMemoryEPD(_getter_dst, bt.SetTo, dst),
+                    ],
+                )
+            else:
+                # index copy to lv -> _convert_index -> self
+                bt.RawTrigger(
+                    nextptr=index.GetVTable(),
+                    actions=[
+                        bt.SetNextPtr(index.GetVTable(), convert_start),
+                        index.QueueAssignTo(_lv),
+                        bt.SetNextPtr(_get_index, self._value),
+                        bt.SetMemory(_index_dst, bt.SetTo, EPD(_get_index) + 1),
+                        bt.SetNextPtr(_getter, nexttrg),
+                        bt.SetMemoryEPD(_getter_dst, bt.SetTo, dst),
+                    ],
+                )
+
+        else:
+            if IsEUDVariable(self._value):
+                bt.RawTrigger(
+                    nextptr=self._value.GetVTable(),
+                    actions=[
+                        bt.SetNextPtr(self._value.GetVTable(), 72 * index),
+                        self._value.QueueAddTo(EPD(self._value.GetVTable()) + 1),
+                        bt.SetNextPtr(_getter, nexttrg),
+                        bt.SetMemoryEPD(_getter_dst, bt.SetTo, dst),
+                    ],
+                )
+            else:
+                bt.RawTrigger(
+                    nextptr=self._value + 72 * index,
+                    actions=[
+                        bt.SetNextPtr(_getter, nexttrg),
+                        bt.SetMemoryEPD(_getter_dst, bt.SetTo, dst),
+                    ],
+                )
+
+        nexttrg << bt.NextTrigger()
+        if self._basetype:
+            ret = self._basetype.cast(ret)
+        return ret
+
+    def set(self, i, value, **kwargs):
+        if self._basetype:
+            value = self._basetype.cast(value)
+
+        index = unProxy(i)
+        self._bound_check(index)
+
+        if all(not isinstance(v, EUDVariable) for v in (self._epd, index, value)):
+            bt.RawTrigger(
+                actions=bt.SetMemoryEPD(87 + self._epd + 18 * index, bt.SetTo, value)
+            )
+            return
+
+        ep_assert(index is not value)
+
+        # execution order: self._epd -> value -> index(->_convert_index)
+        nexttrg = Forward()
+        vv = []
+        first_next_triggger = None
+
+        writing_trigger = _set_index
+        write_dest = _set_index + 344
+        if isinstance(value, EUDVariable) and not isinstance(index, EUDVariable):
+            writing_trigger = value.GetVTable()
+            write_dest = value.getDestAddr()
+
+        actions = [bt.SetNextPtr(writing_trigger, nexttrg)]
+
+        for v in (self._epd, value, index):
+            if isinstance(v, EUDVariable):
+                vv.append(v)
+                if first_next_triggger is None:
+                    first_next_triggger = v.GetVTable()
+
+        # nextptr
+        for i in range(len(vv) - 1):
+            actions.append(bt.SetNextPtr(vv[i].GetVTable(), vv[i + 1].GetVTable()))
+
+        # dest
+        const_dest = [87]
+        if not isinstance(self._epd, EUDVariable):
+            const_dest.append(self._epd)
+        if not isinstance(index, EUDVariable):
+            const_dest.append(18 * index)
+        actions.append(bt.SetMemory(write_dest, bt.SetTo, sum(const_dest)))
+
+        if isinstance(self._epd, EUDVariable):
+            ep_assert(self._epd is not value)
+            if len(vv) == 1:
+                actions.append(bt.SetNextPtr(self._epd.GetVTable(), writing_trigger))
+            actions.extend(self._epd.QueueAddTo(EPD(write_dest)))
+
+        if isinstance(index, EUDVariable):
+            size_msb = self._size.bit_length() - 1
+            convert_start = _index_for_set[size_msb]
+            actions.append(
+                (
+                    bt.SetNextPtr(index.GetVTable(), convert_start),
+                    *index.QueueAssignTo(_lv),
+                )
+            )
+
+        # value
+        if isinstance(value, EUDVariable):
+            if writing_trigger is value.GetVTable():
+                actions.append(value.SetModifier(bt.SetTo))
+            else:
+                actions.extend(value.QueueAssignTo(EPD(_set_index) + 87))
+        else:
+            actions.append(bt.SetMemory(_set_index + 348, bt.SetTo, value))
+
+        bt.RawTrigger(nextptr=first_next_triggger, actions=actions)
+        nexttrg << bt.NextTrigger()
+
+
+class EUDVArray:
+    def __init__(self, size, basetype: type | None = None):
+        self._size = size
+        self._basetype = basetype
+
+    def __call__(self, initvar=None, *, _from=None) -> _EUDVArray:
+        return _EUDVArray(
+            initvar=initvar,
+            _from=_from,
+            _size=self._size,
+            _basetype=self._basetype,
+        )
+
+    def cast(self, _from):
+        return self(_from=_from)
 
 
 _index = EUDLightVariable()
@@ -105,7 +323,7 @@ class BitsTrg:
 
 
 @functools.cache
-def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
+def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
     ep_assert(isinstance(size, int) and size < 2**28, "invalid size")
 
     def _bound_check(index: object) -> None:
@@ -118,7 +336,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
         )
         raise EPError(e.format(size, index))
 
-    class _EUDVArray(ExprProxy):
+    class _VArray(ExprProxy):
         dont_flatten = True
 
         def __init__(self, initvars=None, *, dest=0, nextptr=0, _from=None) -> None:
@@ -132,7 +350,7 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                     initvars = [0] * size
 
                 # For python iterables
-                baseobj = eudvarray_data(size)(initvars, dest=dest, nextptr=nextptr)
+                baseobj = _EUDVArrayData([(dest, x, nextptr) for x in initvars])
 
             super().__init__(baseobj)
             self._epd = EPD(self)
@@ -931,4 +1149,4 @@ def EUDVArray(size: int, basetype: type | None = None):  # noqa: N802
                 )
             raise AttributeError
 
-    return _EUDVArray
+    return _VArray

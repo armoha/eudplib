@@ -13,7 +13,7 @@ from ...localize import _
 from ...utils import EPError
 from ..rawtrigger.consttype import ConstType
 from .structarr import _EUDStructMetaclass
-from .vararray import EUDVArray
+from .vararray import _InternalVArray
 
 
 class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
@@ -25,12 +25,12 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
         fieldcount = len(type(self)._fielddict)
 
         if _from is not None:
-            super().__init__(EUDVArray(fieldcount).cast(_from))
+            super().__init__(_InternalVArray(fieldcount).cast(_from))
             self._initialized = True
         else:
             if _static_initval is None:  # hacky way...
                 _static_initval = [0] * fieldcount
-            super().__init__(EUDVArray(fieldcount)(_static_initval))
+            super().__init__(_InternalVArray(fieldcount)(_static_initval))
             self._initialized = True
             self.constructor_static(*args, **kwargs)
 
@@ -97,7 +97,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
         if isinstance(other, type(self)):
             SetVariables([self._value, self._epd], [other, other._epd])
         elif isinstance(other, int) and other == 0:
-            SetVariables([self._value, self._epd], [0, 0])
+            SetVariables([self._value, self._epd], [0, ut.EPD(0)])
         else:
             raise EPError(_("Can't assign {} to {}").format(other, self))
         return self
@@ -123,7 +123,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
 
     def getfield(self, name):
         attrid, attrtype = self._fielddict[name]
-        attr = self.get(attrid)
+        attr = self._value.get(attrid)
         if attrtype:
             return attrtype.cast(attr)
         else:
@@ -133,7 +133,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
         attrid, attrtype = self._fielddict[name]
         if isinstance(attrtype, ConstType):
             value = attrtype.cast(value)
-        self.set(attrid, value)
+        self._value.set(attrid, value)
 
     def __getattr__(self, name):
         try:

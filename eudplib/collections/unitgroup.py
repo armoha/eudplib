@@ -17,7 +17,6 @@ from ..core import (
     Deaths,
     DeathsX,
     EUDVariable,
-    EUDVArray,
     EUDXVariable,
     Exactly,
     Forward,
@@ -36,6 +35,7 @@ from ..core import (
     Subtract,
     VProc,
 )
+from ..core.eudstruct.vararray import _InternalVArray
 from ..ctrlstru import DoActions, EUDEndWhile, EUDSetContinuePoint
 from ..ctrlstru.loopblock import _unsafe_whilenot
 from ..localize import _
@@ -97,7 +97,7 @@ class UnitGroup:
     def __init__(self, capacity: int) -> None:
         self.capacity = capacity
         self.loopvar = EUDXVariable(EPD(0x6509B0), SetTo, 0)
-        varray = EUDVArray(capacity)(
+        varray = _InternalVArray(capacity)(
             dest=self.loopvar, nextptr=self.loopvar.GetVTable()
         )
         self.varray = varray

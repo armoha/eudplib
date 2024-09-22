@@ -7,8 +7,9 @@
 import functools
 
 from .. import core as c
-from ..core import Add, EUDVArray, Memory, SetMemory
+from ..core import Add, Memory, SetMemory
 from ..core.eudfunc.eudf import _EUDPredefineParam
+from ..core.eudstruct.vararray import _InternalVArray
 from ..utils import EPD, EUDCreateBlock, EUDPopBlock, ep_assert
 
 
@@ -18,10 +19,10 @@ def EUDQueue(capacity):  # noqa: N802
     ep_assert(isinstance(capacity, int) and capacity > 0)
 
     class _EUDQueue:
-        def __init__(self):
+        def __init__(self):  # TODO: support initval
             ret = c.EUDVariable()
             pop = c.EUDXVariable(ret, c.SetTo, 0)
-            queue = EUDVArray(capacity)(
+            queue = _InternalVArray(capacity)(
                 dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable()
             )
             append_act = SetMemory(queue + 348, c.SetTo, 0)
@@ -249,10 +250,10 @@ def EUDDeque(capacity):  # noqa: N802
     ep_assert(isinstance(capacity, int) and capacity > 0)
 
     class _EUDDeque:
-        def __init__(self):
+        def __init__(self):  # TODO: support initval
             ret = c.EUDVariable()
             pop = c.EUDXVariable(ret, c.SetTo, 0)
-            deque = EUDVArray(capacity)(
+            deque = _InternalVArray(capacity)(
                 dest=EPD(pop.getValueAddr()), nextptr=pop.GetVTable()
             )
             append_act = SetMemory(deque + 348, c.SetTo, 0)

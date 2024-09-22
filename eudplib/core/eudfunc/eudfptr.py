@@ -8,7 +8,8 @@ from ... import utils as ut
 from ...localize import _
 from .. import allocator as ac
 from .. import rawtrigger as rt
-from ..eudstruct import EUDStruct, EUDVArray
+from ..eudstruct import EUDStruct
+from ..eudstruct.vararray import _InternalVArray
 from ..variable import EUDVariable, SetVariables, VProc
 from .eudfuncn import EUDFuncN
 from .eudtypedfuncn import _apply_types
@@ -91,7 +92,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
                 self._check_valid_function(_from)
                 f_idcstart, f_idcend = _create_indirect_caller(_from)
                 super().__init__(
-                    _from=EUDVArray(2)([f_idcstart, ut.EPD(f_idcend + 4)])
+                    _from=_InternalVArray(2)([f_idcstart, ut.EPD(f_idcend + 4)])
                 )
             else:
                 # Cast from EUDVariable or ConstExpr
