@@ -3,6 +3,9 @@ import time
 import helper
 import profile_tool
 
+# ruff: noqa: I001
+# fmt: off
+
 start_time = time.time()
 DoCoverageTest = False
 
@@ -16,53 +19,55 @@ if DoCoverageTest:
 helper.EP_SetRValueStrictMode(True)
 
 from unittests import (
-    test_arithmetics,
-    test_ctypes,
-    test_dbstring,
-    test_dict_typo,
-    test_eps,
-    test_fmtprint,
-    test_locf,
-    test_lvalue,
-    test_once,
-    test_parse,
-    test_pexists,
-    test_scdata,
-    test_sq_from_1var,
-    test_trace,
-    test_unitgroup,
-    testarray,
-    testbinsearch,
-    testbitwise,
     testblockstru,
-    testcondition,
-    testcpmemio,
     testcurpl,
-    testdwmemio,
-    testfptr,
-    testlistloopcompiles,
-    testmapdatahelper,
-    testmath,
-    testmultiret,
-    testoperator,
     testpatch,
-    testpool,
-    testpoolfptr,
-    testprint,
+    testarray,
     testptrigger,
+    testoperator,
     testptrjump,
-    testptrmemio,
-    testpvariable,
-    testshortcircuit,
-    teststack,
-    teststrfunc,
-    teststruct,
+    testfptr,
+    testprint,
     testswitch,
-    testtypedf,
-    testvarray,
     testvartrg,
     testxvartrg,
+    testmultiret,
+    testvarray,
+    testpvariable,
+    teststruct,
+    teststrfunc,
+    testmath,
+    testbinsearch,
+    testbitwise,
+    teststack,
+    testdwmemio,
+    testcpmemio,
+    testptrmemio,
+    testtypedf,
+    testpool,
+    testpoolfptr,
+    test_lvalue,
+    test_sq_from_1var,
+    test_eps,
+    testshortcircuit,
+    testlistloopcompiles,
+    testmapdatahelper,
+    test_trace,
+    test_pexists,
+    test_dbstring,
+    test_ctypes,
+    test_dict_typo,
+
+    test_arithmetics,
+    test_fmtprint,
+    test_locf,
+    test_once,
+    test_parse,
+    test_scdata,
+    test_unitgroup,
+    testcondition,
 )
+# fmt: on
 
 helper.CompressPayload(True)
 helper.ShufflePayload(False)
