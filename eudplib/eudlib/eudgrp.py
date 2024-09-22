@@ -24,7 +24,8 @@ class EUDGrp(c.EUDObject):
     def __init__(self, content) -> None:
         super().__init__()
         if isinstance(content, str):
-            content = open(content, "rb").read()
+            with open(content, "rb") as file:
+                content = file.read()
         self._content = content
 
     def Evaluate(self):  # noqa: N802
@@ -48,9 +49,7 @@ class EUDGrp(c.EUDObject):
 
         for i in range(fn):
             fhoffset = 6 + 8 * i
-            xoff, yoff, w, h, lto = struct.unpack(
-                "<BBBBI", b[fhoffset : fhoffset + 8]
-            )
+            xoff, yoff, w, h, lto = struct.unpack("<BBBBI", b[fhoffset : fhoffset + 8])
             buf.WriteByte(xoff)
             buf.WriteByte(yoff)
             buf.WriteByte(w)

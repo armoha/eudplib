@@ -335,7 +335,7 @@ class MPQ:
 
 _init_mpq_library()
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # FIXME: replace this to pytest
     mr = MPQ()
     mr.Open("basemap.scx")
     a = mr.Extract("staredit\\scenario.chk")
