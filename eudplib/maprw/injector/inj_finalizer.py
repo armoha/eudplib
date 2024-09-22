@@ -183,6 +183,10 @@ def create_inject_finalizer(
             ],
         )
 
+        c.PushTriggerScope()
+        mi.f_repmovsd_epd(0, 0, 0)
+        c.PopTriggerScope()
+
         # revert mrgndata
         if mrgndata is None:
             mrgndata = chkt.getsection("MRGN")[: 2408 + 836]
@@ -290,9 +294,7 @@ def create_inject_finalizer(
             cs.EUDEndIf()
 
             # Set current player to 1.
-            c.RawTrigger(
-                nextptr=0x80000000, actions=c.SetMemory(0x6509B0, c.SetTo, 0)
-            )
+            c.RawTrigger(nextptr=0x80000000, actions=c.SetMemory(0x6509B0, c.SetTo, 0))
         c.PopTriggerScope()
 
         # lasttime << curtime
