@@ -262,19 +262,15 @@ fdef_header ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_retty
         if(isPyKeyword(argname)) {
             throw_error(6756, "Name collision with Python keyword " + argname, args->line);
         }
+        if(!ps->closure.defVariable(argname)) {
+            throw_error(196, ("Redeclaration of variable \'" + argname + "\'"), args->line);
+        }
+        argnames.push_back(argname);
         if(typeToken == nullptr) {
-            if(!ps->closure.defVariable(argname)) {
-                throw_error(196, ("Redeclaration of variable \'" + argname + "\'"), args->line);
-            }
-            argnames.push_back(argname);
             argtypes.push_back("None");
         }
         else {
             isTypedFunction = true;
-            if(!ps->closure.defConstant(argname)) {
-                throw_error(7714, ("Redeclaration of typed constant \'" + argname + "\'"), args->line);
-            }
-            argnames.push_back(argname);
             argtypes.push_back(typeToken->data);
         }
     });
@@ -412,19 +408,15 @@ method_header(H) ::= FUNCTION NAME(name) LPAREN typedNameList(args) RPAREN fdef_
         if(isPyKeyword(argname)) {
             throw_error(6756, "Name collision with Python keyword " + argname, args->line);
         }
+        if(!ps->closure.defVariable(argname)) {
+            throw_error(2656, ("Redeclaration of variable \'" + argname + "\'"), args->line);
+        }
+        argnames.push_back(argname);
         if(typeToken == nullptr) {
-            if(!ps->closure.defVariable(argname)) {
-                throw_error(2656, ("Redeclaration of variable \'" + argname + "\'"), args->line);
-            }
-            argnames.push_back(argname);
             argtypes.push_back("None");
         }
         else {
             isTypedFunction = true;
-            if(!ps->closure.defConstant(argname)) {
-                throw_error(9788, ("Redeclaration of typed constant \'" + argname + "\'"), args->line);
-            }
-            argnames.push_back(argname);
             argtypes.push_back(typeToken->data);
         }
     });
@@ -678,19 +670,15 @@ lambdaExprStart(A) ::= FUNCTION LPAREN typedNameList(args) RPAREN fdef_rettypes(
         if(isPyKeyword(argname)) {
             throw_error(6756, "Name collision with Python keyword " + argname, args->line);
         }
+        if(!ps->closure.defVariable(argname)) {
+            throw_error(196, ("Redeclaration of variable \'" + argname + "\'"), args->line);
+        }
+        argnames.push_back(argname);
         if(typeToken == nullptr) {
-            if(!ps->closure.defVariable(argname)) {
-                throw_error(196, ("Redeclaration of variable \'" + argname + "\'"), args->line);
-            }
-            argnames.push_back(argname);
             argtypes.push_back("None");
         }
         else {
             isTypedFunction = true;
-            if(!ps->closure.defConstant(argname)) {
-                throw_error(7714, ("Redeclaration of typed constant \'" + argname + "\'"), args->line);
-            }
-            argnames.push_back(argname);
             argtypes.push_back(typeToken->data);
         }
     });
