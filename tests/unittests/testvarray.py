@@ -63,6 +63,16 @@ def test_varray():
         test_equality("".join(testname), varr[index], 135)
         varr[index] = 0
 
+    for varr in varrs:
+        index = indices[1]
+        varr[index] = index
+        if IsEUDVariable(varr):
+            testname = "V[x] = x aliased write"
+        else:
+            testname = "C[x] = x aliased write"
+        test_equality("".join(testname), varr[index], 1)
+        varr[index] = 0
+
     arr = EUDArray(4)
     index = EUDVariable()
     index << 0
