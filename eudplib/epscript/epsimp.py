@@ -111,13 +111,14 @@ class EPSLoader(SourceFileLoader):
     def get_data(self, path):
         """Return the data from path as raw bytes."""
         global is_scdb_map
-        file_data = open(path, "rb").read()
-        if path.endswith(".pyc") or path.endswith(".pyo"):
-            return file_data
-        if "SCDB.eps" in os.path.relpath(path):
-            is_scdb_map = True
-        print(_('[epScript] Compiling "{}"...').format(os.path.relpath(path)))
-        compiled = epsCompile(path, file_data)
+        with open(path, "rb") as file:
+            file_data = file.read()
+            if path.endswith(".pyc") or path.endswith(".pyo"):
+                return file_data
+            if "SCDB.eps" in os.path.relpath(path):
+                is_scdb_map = True
+            print(_('[epScript] Compiling "{}"...').format(os.path.relpath(path)))
+            compiled = epsCompile(path, file_data)
         if compiled is None:
             raise EPError(_(" - Compiled failed for {}").format(path))
         dirname, filename = os.path.split(path)
