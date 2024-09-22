@@ -27,36 +27,43 @@ from . import wiredata as wd
 
 is64bit = c.EUDLightBool()
 tranwire, grpwire, wirefram = c.EUDCreateVariables(3)
+defaultwire = {}
 
 
-@functools.cache
 def tranwire_default32():
-    return EUDArray(wd.TranWire32)
+    if "TranWire32" not in defaultwire:
+        defaultwire["TranWire32"] = EUDArray(wd.TranWire32)
+    return defaultwire["TranWire32"], wd.TranWire32
 
 
-@functools.cache
 def grpwire_default32():
-    return EUDArray(wd.GrpWire32)
+    if "GrpWire32" not in defaultwire:
+        defaultwire["GrpWire32"] = EUDArray(wd.GrpWire32)
+    return defaultwire["GrpWire32"], wd.GrpWire32
 
 
-@functools.cache
 def wirefram_default32():
-    return EUDArray(wd.Wirefram32)
+    if "Wirefram32" not in defaultwire:
+        defaultwire["Wirefram32"] = EUDArray(wd.Wirefram32)
+    return defaultwire["Wirefram32"], wd.Wirefram32
 
 
-@functools.cache
 def tranwire_default64():
-    return EUDArray(wd.TranWire64)
+    if "TranWire64" not in defaultwire:
+        defaultwire["TranWire64"] = EUDArray(wd.TranWire64)
+    return defaultwire["TranWire64"], wd.TranWire64
 
 
-@functools.cache
 def grpwire_default64():
-    return EUDArray(wd.GrpWire64)
+    if "GrpWire64" not in defaultwire:
+        defaultwire["GrpWire64"] = EUDArray(wd.GrpWire64)
+    return defaultwire["GrpWire64"], wd.GrpWire64
 
 
-@functools.cache
 def wirefram_default64():
-    return EUDArray(wd.Wirefram64)
+    if "Wirefram64" not in defaultwire:
+        defaultwire["Wirefram64"] = EUDArray(wd.Wirefram64)
+    return defaultwire["Wirefram64"], wd.Wirefram64
 
 
 class InitialWireframe:
@@ -87,7 +94,7 @@ class InitialWireframe:
 
             def create_init64(src, default, size):
                 if src:
-                    data = default._datas
+                    data = default[1]
                     init = [ut.i2b2(data[0])]
                     for n in range(size):
                         x = 2 * src[n] if n in src else 2 * n
@@ -105,7 +112,7 @@ class InitialWireframe:
                         f"Size mismatch: {len(init.content)}",
                     )
                 else:
-                    init = default
+                    init = default[0]
                 return init if init._is_epd() else ut.EPD(init)
 
             tranwire_init = create_init64(cls._tranwires, tranwire_default64(), 106)
@@ -194,6 +201,12 @@ class InitialWireframe:
 
 
 def _set_wireframe(unit, wireframe, size, ptr, default32, default64):
+    default32 = default32[0]
+    default64 = default64[0]
+    if not default32._is_epd():
+        default32 = ut.EPD(default32)
+    if not default64._is_epd():
+        default64 = ut.EPD(default64)
     if cs.EUDIf()([unit <= size, wireframe <= size]):
         c.VProc(
             [unit, wireframe, ptr],
@@ -201,12 +214,12 @@ def _set_wireframe(unit, wireframe, size, ptr, default32, default64):
                 unit.QueueAddTo(unit),
                 wireframe.QueueAddTo(wireframe),
                 ptr.QueueAddTo(unit),
-                c.SetMemory(0x6509B0, c.SetTo, ut.EPD(default32)),
+                c.SetMemory(0x6509B0, c.SetTo, default32),
             ],
         )
         c.RawTrigger(
             conditions=is64bit.IsSet(),
-            actions=c.SetMemory(0x6509B0, c.SetTo, ut.EPD(default64)),
+            actions=c.SetMemory(0x6509B0, c.SetTo, default64),
         )
         actions = [
             c.SetMemory(0x6509B0, c.SetTo, 0),
