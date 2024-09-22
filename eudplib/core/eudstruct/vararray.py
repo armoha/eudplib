@@ -4,6 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 import functools
 from collections.abc import Iterator
 from itertools import chain
@@ -13,7 +15,7 @@ from typing import ClassVar, NoReturn
 from typing_extensions import Self
 
 from ...localize import _
-from ...utils import EPD, EPError, ExprProxy, ep_assert, unProxy
+from ...utils import EPD, EPError, EUDPeekBlock, ExprProxy, ep_assert, unProxy
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr, Forward, IsConstExpr
 from ..curpl import GetCPCache
@@ -134,6 +136,9 @@ class _EUDVArray(ExprProxy):
 
     def __setitem__(self, i, value) -> None:
         self.set(i, value)
+
+    def __iter__(self):
+        yield from _VArrayIterator(self)
 
     def get(self, i, **kwargs):
         ret = kwargs["ret"][0] if "ret" in kwargs else EUDVariable()
@@ -277,6 +282,54 @@ class _EUDVArray(ExprProxy):
 
         bt.RawTrigger(nextptr=first_next_triggger, actions=actions)
         nexttrg << bt.NextTrigger()
+
+
+class _VArrayIterator:
+    def __init__(self, varray: _EUDVArray):
+        self._varray = varray
+        self._size = varray._size
+
+    def __iter__(self):
+        from ... import ctrlstru as cs
+
+        counter = EUDLightVariable()
+        item = EUDVariable()
+        loopstart, loopbody = Forward(), Forward()
+        if IsEUDVariable(self._varray):
+            VProc(
+                self._varray,
+                [
+                    counter.SetNumber(self._size),
+                    self._varray.QueueAssignTo(EPD(loopstart) + 1),
+                    bt.SetNextPtr(_getter, loopbody),
+                    bt.SetMemoryEPD(_getter_dst, bt.SetTo, EPD(item.getValueAddr())),
+                ],
+            )
+        else:
+            bt.RawTrigger(
+                actions=[
+                    counter.SetNumber(self._size),
+                    bt.SetNextPtr(loopstart, self._varray),
+                    bt.SetNextPtr(_getter, loopbody),
+                    bt.SetMemoryEPD(_getter_dst, bt.SetTo, EPD(item.getValueAddr())),
+                ]
+            )
+        counter << self._size
+        if cs.EUDWhileNot()(counter == 0):
+            block = EUDPeekBlock("whileblock")[1]
+            loopstart << block["loopstart"]
+            loopbody << bt.NextTrigger()
+            yield item
+            cs.EUDSetContinuePoint()
+            bt.RawTrigger(
+                actions=[
+                    counter.SubtractNumber(1),
+                    bt.SetMemory(loopstart + 4, bt.Add, 72),
+                    bt.SetNextPtr(_getter, loopbody),  # needed for nested loop
+                    bt.SetMemoryEPD(_getter_dst, bt.SetTo, EPD(item.getValueAddr())),
+                ]
+            )
+        cs.EUDEndWhile()
 
 
 class EUDVArray:

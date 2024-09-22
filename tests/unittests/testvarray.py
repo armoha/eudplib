@@ -62,3 +62,29 @@ def test_varray():
         testname.append("V" if IsEUDVariable(value) else "C")
         test_equality("".join(testname), varr[index], 135)
         varr[index] = 0
+
+    arr = EUDArray(4)
+    index = EUDVariable()
+    index << 0
+    varr = EUDVArray(4)([4, 3, 5, 8])
+    for v in varr:
+        arr[index] = v
+        index += 1
+
+    test_equality(
+        "iter(const EUDVArray)", [arr[0], arr[1], arr[2], arr[3]], [4, 3, 5, 8]
+    )
+
+    arr[0] = 0
+    arr[1] = 0
+    arr[2] = 0
+    arr[3] = 0
+    index << 0
+    varr = EUDVArray(4).cast(EUDVariable(varr))
+    for v in varr:
+        arr[index] = v
+        index += 1
+
+    test_equality(
+        "iter(var EUDVArray)", [arr[0], arr[1], arr[2], arr[3]], [4, 3, 5, 8]
+    )
