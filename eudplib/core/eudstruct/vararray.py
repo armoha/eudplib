@@ -214,6 +214,7 @@ class _EUDVArray(ExprProxy):
             value = self._basetype.cast(value)
 
         index = unProxy(i)
+        value = unProxy(value)
         self._bound_check(index)
 
         if all(not isinstance(v, EUDVariable) for v in (self._epd, index, value)):
