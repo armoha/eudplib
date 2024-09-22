@@ -7,6 +7,8 @@ a_initials = ExprProxy([5] * 10)
 
 @TestInstance
 def test_varray():
+    zero_sized_varray = EUDVArray(0)()
+
     a = EUDVArray(len(a_initials))(a_initials)
     for i in range(8):
         a[i] = 2**i
