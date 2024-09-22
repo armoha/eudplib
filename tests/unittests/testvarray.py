@@ -1,3 +1,5 @@
+import itertools
+
 from helper import *
 
 a_initials = ExprProxy([5] * 10)
@@ -46,3 +48,17 @@ def test_varray():
         v_sum2 += c[i] * i
 
     test_equality("VArray test5", [v_sum2, a[9]], [2252, 5])
+
+    varrs = (EUDVArray(2)(), EUDVArray(2).cast(EUDVariable(EUDVArray(2)())))
+    indices = (1, EUDVariable(1))
+    values = (135, EUDVariable(135))
+    for varr, index, value in itertools.product(varrs, indices, values):
+        varr[index] = value
+        testname = []
+        testname.append("V" if IsEUDVariable(varr) else "C")
+        testname.append("[")
+        testname.append("V" if IsEUDVariable(index) else "C")
+        testname.append("] = ")
+        testname.append("V" if IsEUDVariable(value) else "C")
+        test_equality("".join(testname), varr[index], 135)
+        varr[index] = 0
