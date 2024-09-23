@@ -46,7 +46,12 @@ class _EUDVArrayData(ConstExpr):
         init = []
         for i, items in enumerate(initvar):
             dest, value, nextptr = items
-            ep_assert(IsConstExpr(value), _("Invalid item #{}").format(repr(i)))
+            value = unProxy(value)
+            if not isinstance(value, (int, ConstExpr)):  # noqa: UP038
+                raise EPError(_("Invalid item #{}: {}").format(i, items))
+            nextptr = unProxy(nextptr)
+            if not isinstance(nextptr, (int, ConstExpr)):  # noqa: UP038
+                raise EPError(_("Invalid item #{}: {}").format(i, items))
             init.append((0xFFFFFFFF, process_dest(dest), value, 0x072D0000, nextptr))
         self._init = init
 
@@ -156,7 +161,9 @@ class _EUDVArray(ExprProxy):
             convert_start = _index_for_get[size_msb]
             _index_dst = _get_index + 344
             if IsEUDVariable(self._value):
-                ep_assert(self._value is not index, "EUDVArray.ptr and index are alias")
+                ep_assert(
+                    self._value is not index, "EUDVArray.ptr and index are alias"
+                )
                 # index copy to lv -> self.ptr -> _convert_index -> self
                 bt.RawTrigger(
                     nextptr=index.GetVTable(),
@@ -417,7 +424,8 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
         if not isinstance(index, int) or 0 <= index < size:
             return
         e = _(
-            "index out of bounds: the length of EUDVArray is {}" " but the index is {}"
+            "index out of bounds: the length of EUDVArray is {}"
+            " but the index is {}"
         )
         raise EPError(e.format(size, index))
 
@@ -443,7 +451,9 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
 
         def Assign(self, other) -> Self:  # noqa: N802
             if not isinstance(self._value, EUDVariable):
-                raise EPError(_("Can't assign {} to constant expression").format(other))
+                raise EPError(
+                    _("Can't assign {} to constant expression").format(other)
+                )
             if isinstance(other, type(self)):
                 SetVariables([self._value, self._epd], [other, other._epd])
             elif isinstance(other, int) and other == 0:
@@ -1095,7 +1105,9 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
                     nextptr=cpcache.GetVTable(),
                     actions=[
                         trg["ret"]
-                        << bt.SetDeathsX(13, bt.Add, 0, 0, 0x55555555),  # CurrentPlayer
+                        << bt.SetDeathsX(
+                            13, bt.Add, 0, 0, 0x55555555
+                        ),  # CurrentPlayer
                         bt.SetDeathsX(13, bt.Add, 0, 0, 0xAAAAAAAA),  # CurrentPlayer
                         cpcache.SetDest(EPD(0x6509B0)),
                     ],
@@ -1193,7 +1205,9 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...ctrlstru import EUDNot
 
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val))
+                return EUDNot(
+                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.Exactly, val)
+                )
             raise AttributeError
 
         def leitem(self, i, val) -> bt.Condition:
@@ -1213,7 +1227,9 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...ctrlstru import EUDNot
 
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val))
+                return EUDNot(
+                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtLeast, val)
+                )
             raise AttributeError
 
         def gtitem(self, i, val):
@@ -1221,7 +1237,9 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
             if not IsEUDVariable(i):
                 from ...ctrlstru import EUDNot
 
-                return EUDNot(bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val))
+                return EUDNot(
+                    bt.MemoryEPD(self._epd + (18 * i + 87), bt.AtMost, val)
+                )
             raise AttributeError
 
     return _VArray

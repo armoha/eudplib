@@ -6,6 +6,8 @@
 
 from typing_extensions import Self
 
+from ...localize import _
+from ...utils import EPError, unProxy
 from .. import rawtrigger as bt
 from ..allocator import ConstExpr
 from .eudv import EUDVariable, process_dest
@@ -36,6 +38,24 @@ class EUDXVariable(EUDVariable):
     def __init__(self, epd, modtype, initval, mask=0xFFFFFFFF, /, *, nextptr=0):
         dest = process_dest(epd)
         modifier = ((bt.EncodeModifier(modtype) & 0xFF) << 24) + 0x2D0000
+        if not isinstance(initval, int | ConstExpr):
+            unproxied = unProxy(initval)
+            if not isinstance(unproxied, (int, ConstExpr)):  # noqa: UP038
+                raise EPError(_("Invalid initval: {}").format(initval))
+            else:
+                initval = unproxied
+        if not isinstance(nextptr, int | ConstExpr):
+            unproxied = unProxy(nextptr)
+            if not isinstance(unproxied, (int, ConstExpr)):  # noqa: UP038
+                raise EPError(_("Invalid nextptr: {}").format(nextptr))
+            else:
+                nextptr = unproxied
+        if not isinstance(mask, int | ConstExpr):
+            unproxied = unProxy(mask)
+            if not isinstance(unproxied, (int, ConstExpr)):  # noqa: UP038
+                raise EPError(_("Invalid mask: {}").format(mask))
+            else:
+                mask = unproxied
         args = (mask, dest, initval, modifier, nextptr)
 
         self._vartrigger = XVariableTriggerForward(args)

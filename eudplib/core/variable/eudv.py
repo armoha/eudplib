@@ -42,11 +42,13 @@ def EP_SetRValueStrictMode(mode: bool) -> None:  # noqa: N802
     _is_rvalue_strict = mode
 
 
-def process_dest(dest):
+def process_dest(dest) -> int | ConstExpr:
     epd = unProxy(dest)
     if isinstance(epd, VariableBase):
         epd.checkNonRValue()
         return EPD(epd.getValueAddr())
+    if not isinstance(epd, int | ConstExpr):
+        raise EPError(_("Invalid dest: {}").format(dest))
     return epd
 
 
@@ -111,6 +113,12 @@ class EUDVariable(VariableBase):
     __slots__ = ("_vartrigger", "_varact", "_rvalue")
 
     def __init__(self, initval=0) -> None:
+        if not isinstance(initval, (int, ConstExpr)):  # noqa: UP038
+            unproxied = unProxy(initval)
+            if not isinstance(unproxied, (int, ConstExpr)):  # noqa: UP038
+                raise EPError(_("Invalid initval: {}").format(initval))
+            else:
+                initval = unproxied
         self._vartrigger = VariableTriggerForward(initval)
         self._varact = self._vartrigger + (8 + 320)
         self._rvalue = False
