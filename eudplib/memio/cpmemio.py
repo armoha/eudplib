@@ -47,7 +47,7 @@ def f_dwread_cp(cpo, *, ret=None):
 
 def f_epdread_cp(cpo, *, ret=None):
     return readtable._cp_caller(
-        readtable._get(0xFFFFFFFC, -2, True),
+        readtable._get(0xFFFFFFFC, -2),
         _operations=[(ut.EPD(readtable.copy_ret) + 5, c.SetTo, ut.EPD(0))],
     )(cpo, ret=ret)
 
