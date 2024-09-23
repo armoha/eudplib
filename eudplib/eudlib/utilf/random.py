@@ -9,7 +9,7 @@
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
-from ...memio import f_wread_epd
+from ...core.eudfunc.eudf import _EUDPredefineReturn
 from ...memio.rwcommon import lv
 
 _seed: c.EUDVariable = c.EUDVariable()
@@ -62,13 +62,20 @@ def f_randomize():
     end << c.RawTrigger(actions=c.SetSwitch("Switch 1", c.Set))
 
 
+@_EUDPredefineReturn(1, 2)
 @c.EUDFunc
 def f_rand():
     global _seed
+    ret = f_rand._frets[0]
     c.f_mul(_seed, 1103515245, ret=[_seed])
-    _seed += 12345
+    mask = (1 << (16 + 1)) - 1
+    actions = [ret.SetNumberX(0, mask >> 1)]  # lowest n bits
+    actions.extend(
+        ret.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(32 - 16)
+    )
+    cs.DoActions(_seed.AddNumber(12345), ret.AddNumber(12345), *actions)
     # Only HIWORD is returned
-    return f_wread_epd(ut.EPD(_seed.getValueAddr()), 2)
+    # return ret
 
 
 @c.EUDFunc
