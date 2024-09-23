@@ -76,7 +76,6 @@ def _wadder(epd, subp, w):
 
 
 def f_wadd_epd(epd, subp, w):
-    ut.ep_assert(isinstance(subp, int) and 0 <= subp <= 2)
     if isinstance(subp, int) and isinstance(w, int):
         if subp == 3:
             return _wadder(epd, subp, w)
@@ -105,7 +104,6 @@ def _wsubtracter(epd, subp, w):
 
 
 def f_wsubtract_epd(epd, subp, w):
-    ut.ep_assert(isinstance(subp, int) and 0 <= subp <= 2)
     if isinstance(subp, int) and isinstance(w, int):
         if subp == 3:
             return _wsubtracter(epd, subp, w)
