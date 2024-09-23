@@ -81,7 +81,8 @@ class FixedText:
         return self._txtptr
 
     def __exit__(self, exc_type, exc_value, traceback):
-        c.VProc(self._txtptr, self._actions_on_exit)
+        c.VProc(self._txtptr, [])
+        cs.DoActions(self._actions_on_exit)
 
 
 @c.EUDFunc

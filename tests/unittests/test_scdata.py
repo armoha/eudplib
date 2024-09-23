@@ -9,6 +9,7 @@ def test_scdata():
     # FIXME
     # with expect_eperror():
     #     TrgUnit(233)
+    TrgUnit("Terran Vulture").groundWeapon.damage += 3
     marine = TrgUnit("Terran Marine")
     marine = TrgUnit(marine)  # copy inner value
     marine = TrgUnit.cast(marine)  # share reference
