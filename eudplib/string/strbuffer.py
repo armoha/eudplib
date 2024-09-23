@@ -29,8 +29,8 @@ _display_text = c.DisplayText(0)
 
 @EUDFullFunc(
     [
-        (ut.EPD(0x640B58), c.Add, 0, None),
-        (ut.EPD(_display_text) + 1, c.SetTo, 0, None),
+        (ut.EPD(0x640B58), c.Add, 0),
+        (ut.EPD(_display_text) + 1, c.SetTo, 0),
     ],
     [None, c.TrgString],
 )

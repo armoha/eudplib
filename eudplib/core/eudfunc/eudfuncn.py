@@ -53,7 +53,8 @@ class EUDFuncN:
             self._argn = argn
             self._arginits = None
         elif all(
-            isinstance(initvals, tuple) and len(initvals) == 4 for initvals in argn
+            isinstance(initvals, tuple) and 3 <= len(initvals) <= 4
+            for initvals in argn
         ):
             self._argn = len(argn)
             self._arginits = argn
