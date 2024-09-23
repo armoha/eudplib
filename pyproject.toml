@@ -51,11 +51,10 @@ changelog = "https://github.com/armoha/euddraft/CHANGELOG.md"
 
 [tool.setuptools]
 zip-safe = false
-package-dir = {"" = "eudplib"}
 
 [tool.setuptools.packages.find]
-where = ["eudplib"]
-include = ["*"]
+include = ["eudplib*"]  # flat layout
+namespaces = false
 
 [tool.setuptools.dynamic]
 version = {attr = "eudplib.__version__"}
