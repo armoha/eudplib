@@ -59,7 +59,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
 
     chkt.optimize()
     rawchk = chkt.savechk()
-    print(f"Output scenario.chk : {len(rawchk) / 1000000:.3}MB")
+    print(f"\nOutput scenario.chk : {len(rawchk) / 1000000:.3f}MB")
     mw = mpqapi.MPQ()
 
     if sector_size and isinstance(sector_size, int):
