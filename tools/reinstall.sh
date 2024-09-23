@@ -2,5 +2,5 @@
 
 cd ..
 pip3 uninstall eudplib
-python3 setup.py install
+python3 -m pip install .
 cd tools
