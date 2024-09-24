@@ -82,7 +82,7 @@ def _TYGV(types, expr_list_gen):  # noqa: N802
     for ty, value in zip(types, values):
         is_eudvar = IsEUDVariable(value)
         is_untyped = ty is None or issubclass(ty, EUDVariable)
-        if not is_untyped:
+        if not is_untyped and not (type(value) is int and value == 0):  # noqa: E721
             value = ty.cast(value)
         if not is_eudvar:
             value = EUDVariable(value)
@@ -308,7 +308,9 @@ class _ARRW:  # array write
 
     def __lshift__(self, r):
         isUnproxyInstance
-        if not IsEUDVariable(self.obj) and not isUnproxyInstance(self.obj, ConstExpr):
+        if not IsEUDVariable(self.obj) and not isUnproxyInstance(
+            self.obj, ConstExpr
+        ):
             # maybe Python collections
             ov = self.obj[self.index]
             if IsEUDVariable(ov):
