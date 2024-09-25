@@ -1,5 +1,6 @@
 var x: CUnit = 0;
 function test_cunit1() {
+    x = 0;
     const get_epd = py_eval("lambda x: x if x._value._is_epd() else EPD(x)");
     const cspritePtr = 0x629D98 + 36 * 1;  // Sprite Table
     const sp = [0x2468ACE0, 0x13579BDF, 0xFEDCBA98, 0x76543210];
