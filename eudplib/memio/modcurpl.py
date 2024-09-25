@@ -43,7 +43,6 @@ def f_setcurpl2cpcache(v=[], actions=[]):
 
 
 # This function initializes _curpl_checkcond, so should be called at least once
-@c.EUDFunc
 def _f_updatecpcache():
     from .s import SetMemoryC
 
