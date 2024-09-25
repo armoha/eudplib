@@ -4,6 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 import time
 from typing import TYPE_CHECKING, TypeAlias
 
@@ -17,9 +19,9 @@ from .rlocint import RlocInt, RlocInt_C
 if TYPE_CHECKING:
     from ..eudobj import EUDObject
 
-_found_objects_dict: "dict[EUDObject, int]" = {}
-_untraversed_objects: "list[EUDObject]" = []
-_dynamic_objects_set: "set[EUDObject]" = set()
+_found_objects_dict: dict[EUDObject, int] = {}
+_untraversed_objects: list[EUDObject] = []
+_dynamic_objects_set: set[EUDObject] = set()
 _payload_builder = allocator.PayloadBuilder()
 
 PHASE_COLLECTING = 1
@@ -111,7 +113,7 @@ class ObjCollector:
         pass
 
 
-def _collect_objects(root: "EUDObject | Forward") -> None:
+def _collect_objects(root: EUDObject | Forward) -> None:
     global phase
     global _found_objects_dict
     global _dynamic_objects_set
@@ -216,7 +218,7 @@ _register_after_collecting_callback = (
 )
 
 
-def CreatePayload(root: "EUDObject | Forward") -> Payload:  # noqa: N802
+def CreatePayload(root: EUDObject | Forward) -> Payload:  # noqa: N802
     from ..rawtrigger.rawtriggerdef import RawTrigger
 
     # Call callbacks
@@ -233,7 +235,7 @@ _PayloadBuffer: TypeAlias = allocator.ObjAllocator | allocator.PayloadBuffer
 defri: RlocInt_C = RlocInt(0, 4)
 
 
-def GetObjectAddr(obj: "EUDObject") -> RlocInt_C:  # noqa: N802
+def GetObjectAddr(obj: EUDObject) -> RlocInt_C:  # noqa: N802
     global _payload_builder
     global _found_objects_dict
     global _untraversed_objects

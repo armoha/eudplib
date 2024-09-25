@@ -7,6 +7,8 @@
 String table manager. Internally used in eudplib.
 """
 
+from __future__ import annotations
+
 from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING, Literal
 
@@ -58,7 +60,7 @@ class TBL:
     def __init__(
         self,
         content: bytes | None = None,
-        init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap] | None" = None,
+        init_chkt: tuple[CHK, StringIdMap, StringIdMap, StringIdMap] | None = None,
         *,
         load_entry: Literal[2, 4] = 2,
         save_entry: Literal[2, 4] = 4,
@@ -128,7 +130,7 @@ class TBL:
     def load_tbl_with_chk(
         self,
         content: bytes,
-        init_chkt: "tuple[CHK, StringIdMap, StringIdMap, StringIdMap]",
+        init_chkt: tuple[CHK, StringIdMap, StringIdMap, StringIdMap],
     ) -> None:
         # ut.ep_assert(not self._loaded, "String data are already loaded")
         self._datatb.clear()

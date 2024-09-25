@@ -4,6 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 import functools
 from collections.abc import Iterator
 from typing import TYPE_CHECKING
@@ -69,25 +71,25 @@ def _alloc_trigtrigger_link() -> tuple[EUDArray, EUDArray, EUDArray]:
     return EUDArray(8), EUDArray(8), EUDArray(_runner_end)
 
 
-def GetFirstTrigTrigger(player: "Player") -> EUDVariable:  # noqa: N802
+def GetFirstTrigTrigger(player: Player) -> EUDVariable:  # noqa: N802
     """Get dlist start of trig-trigger for player"""
     player = c.EncodePlayer(player)
     orig_tstart, _orig_tend, _runner_end_array = _alloc_trigtrigger_link()
     return orig_tstart[player]
 
 
-def GetLastTrigTrigger(player: "Player") -> EUDVariable:  # noqa: N802
+def GetLastTrigTrigger(player: Player) -> EUDVariable:  # noqa: N802
     """Get dlist end of trig-trigger for player"""
     player = c.EncodePlayer(player)
     _orig_tstart, orig_tend, _runner_end_array = _alloc_trigtrigger_link()
     return orig_tend[player]
 
 
-def TrigTriggerBegin(player: "Player") -> EUDVariable:  # noqa: N802
+def TrigTriggerBegin(player: Player) -> EUDVariable:  # noqa: N802
     return GetFirstTrigTrigger(player)
 
 
-def TrigTriggerEnd(player: "Player") -> c.Forward | EUDVariable:  # noqa: N802
+def TrigTriggerEnd(player: Player) -> c.Forward | EUDVariable:  # noqa: N802
     _orig_tstart, _orig_tend, runner_end_array = _alloc_trigtrigger_link()
     player = c.EncodePlayer(player)
     if isinstance(player, int):

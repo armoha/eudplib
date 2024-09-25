@@ -13,7 +13,7 @@ _uprpdict: dict[bytes, int] = {}
 _uprptable: list[bytes] = []
 
 
-def init_property_map(chkt: "CHK") -> None:
+def init_property_map(chkt: CHK) -> None:
     global _prptable, _uprpdict
     _uprpdict.clear()
     _uprptable.clear()
@@ -58,6 +58,6 @@ def GetPropertyIndex(prop: UnitProperty | bytes) -> int:  # noqa: N802
         return uprpindex + 1  # SC counts unit properties from 1.
 
 
-def apply_property_map(chkt: "CHK") -> None:
+def apply_property_map(chkt: CHK) -> None:
     uprpdata = b"".join([uprpdata or bytes(20) for uprpdata in _uprptable])
     chkt.setsection("UPRP", uprpdata)

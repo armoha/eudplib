@@ -4,6 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 from collections import deque
 from typing import TYPE_CHECKING, Literal
 
@@ -54,7 +56,7 @@ class EUDVarBuffer(EUDObject):
     def GetDataSize(self) -> int:  # noqa: N802
         return 2404 + 72 * (len(self._initvals) - 1)
 
-    def CollectDependency(self, emitbuffer: "ObjCollector") -> None:  # noqa: N802
+    def CollectDependency(self, emitbuffer: ObjCollector) -> None:  # noqa: N802
         for initval in self._initvals:
             if not isinstance(initval, int):
                 emitbuffer.WriteDword(initval)
@@ -162,7 +164,7 @@ class EUDCustomVarBuffer(EUDObject):
     def GetDataSize(self):  # noqa: N802
         return 2404 + 72 * (len(self._actnptr_pairs) + len(self._5acts) - 1)
 
-    def CollectDependency(self, emitbuffer: "ObjCollector"):  # noqa: N802
+    def CollectDependency(self, emitbuffer: ObjCollector):  # noqa: N802
         for initval in self._5nptrs:
             if not isinstance(initval, int):
                 emitbuffer.WriteDword(initval)
