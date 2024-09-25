@@ -330,7 +330,7 @@ def _bread_epd(epd, subp):
     )
     for i in range(4):
         if cs.EUDSwitchCase()(i):
-            readtrg = readtable._insert_or_get(0xFF << (8 * i), -(8 * i))
+            readtrg = readtable._get(0xFF << (8 * i), -(8 * i))
             c.SetNextTrigger(readtrg)
     cs.EUDEndSwitch()
     c.SetNextTrigger(cpcache.GetVTable())
@@ -341,7 +341,7 @@ def _bread_epd(epd, subp):
 def f_bread_epd(epd, subp, *, ret=None):
     if isinstance(subp, int) and 0 <= subp <= 3:
         return readtable._epd_caller(
-            readtable._insert_or_get(0xFF << (8 * subp), -(8 * subp))
+            readtable._get(0xFF << (8 * subp), -(8 * subp))
         )(epd, ret=ret)
 
     return _bread_epd(epd, subp, ret=ret)

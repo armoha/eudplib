@@ -195,3 +195,9 @@ def _epd_caller(readtrg: c.RawTrigger, *, _operations=None) -> Callable:
 
 _insert(0xFFFFFFFF, 0, True)
 _insert(0xFFFFFF00, 0, False)
+_br = (
+    _get(0xFF, 0),
+    _insert(0x0000FF00, -8, True),
+    _insert(0x00FF0000, -16, True),
+    _insert(0xFF000000, -24, True),
+)

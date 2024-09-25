@@ -10,17 +10,31 @@ from ..core.variable.evcommon import _ev
 from ..localize import _
 from ..utils import EPD, EPError, _rand_lst
 from . import modcurpl as cp
+from . import readtable
+
+cpcache = c.curpl.GetCPCache()
 
 
 class EUDByteReader:
     """Read byte by byte."""
 
     def __init__(self):
-        self._read = c.Forward()
-        self._case = [c.Forward() for _ in range(4)]
-
         c.PushTriggerScope()
-        self.readbyte()  # Prevent Forward not initialized error
+        case = (c.Forward(), c.Forward(), c.Forward(), c.Forward())
+        self._read = c.RawTrigger(
+            nextptr=case[0], actions=c.SetMemory(0x6509B0, c.SetTo, 0)
+        )
+        self._case = tuple(
+            case[i]
+            << c.RawTrigger(
+                nextptr=readtable._br[i],
+                actions=[
+                    c.SetNextPtr(self._read, case[(i + 1) % 4]),
+                    c.SetMemory(self._read + 348, c.Add, 1) if i == 3 else [],
+                ],
+            )
+            for i in range(4)
+        )
         c.PopTriggerScope()
 
     # -------
@@ -67,37 +81,29 @@ class EUDByteReader:
 
     # -------
 
-    @c.EUDMethod
-    def readbyte(self):
+    def readbyte(self, *, ret=None):
         """Read byte from current address. EUDByteReader will advance by 1 byte.
 
         :returns: Read byte
         """
-        ret = _ev[4]
+        if ret is None:
+            ret = c.EUDVariable()
+        try:
+            retepd = EPD(ret.getValueAddr())
+        except AttributeError:
+            retepd = ret
 
-        self._read << c.RawTrigger(
-            nextptr=self._case[0],
-            actions=[c.SetMemory(0x6509B0, c.SetTo, 0), ret.SetNumber(0)],
+        nexttrg = c.Forward()
+        c.RawTrigger(
+            nextptr=self._read,
+            actions=[
+                c.SetNextPtr(readtable.read_end_common, cpcache.GetVTable()),
+                c.SetNextPtr(cpcache.GetVTable(), nexttrg),
+                cpcache.SetDest(EPD(0x6509B0)),
+                c.SetMemory(readtable.read_end_common + 344, c.SetTo, retepd),
+            ],
         )
-
-        end = c.Forward()
-        for i in range(4):
-            self._case[i] << c.NextTrigger()
-            for j in _rand_lst(range(8)):
-                c.RawTrigger(
-                    conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2 ** (j + 8 * i)),
-                    actions=ret.AddNumber(2**j),
-                )
-            c.RawTrigger(
-                nextptr=end,
-                actions=[
-                    c.SetNextPtr(self._read, self._case[(i + 1) % 4]),
-                    c.SetMemory(self._read + 348, c.Add, 1) if i == 3 else [],
-                ],
-            )
-
-        end << c.NextTrigger()
-        cp.f_setcurpl2cpcache()
+        nexttrg << c.NextTrigger()
         return ret
 
 
