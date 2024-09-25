@@ -10,6 +10,7 @@ from .. import core as c
 from .. import ctrlstru as cs
 from .. import utils as ut
 from ..collections.eudarray import EUDArray
+from ..core.eudfunc.eudf import _EUDPredefineParam
 from ..eudlib.utilf.userpl import IsUserCP
 from ..localize import _
 from ..memio import (
@@ -248,23 +249,20 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
         cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
 
 
+create_unit = c.Forward()
+
+
+@_EUDPredefineParam((ut.EPD(create_unit + 328 + 32 + 16),))
 @c.EUDTypedFunc([TrgPlayer])
 def f_raise_CCMU(player):  # noqa: N802
-    if cs.EUDIf()(c.Memory(0x628438, c.AtLeast, 0x59CCA8)):
-        orignextptr = f_cunitread_epd(ut.EPD(0x628438))
-        print_error = c.Forward()
-        c.VProc(player, player.SetDest(ut.EPD(print_error + 16)))
-        c.VProc(
-            orignextptr,  # restores 0x628438
-            [
-                c.SetMemory(0x628438, c.SetTo, 0),
-                print_error << c.CreateUnit(1, 0, 64, 0),
-                orignextptr.SetDest(ut.EPD(0x628438)),
-            ],
-        )
-    if cs.EUDElse()():
-        cs.DoActions(c.CreateUnit(1, 0, 64, player))
-    cs.EUDEndIf()
+    f_cunitread_epd(ut.EPD(0x628438), ret=[ut.EPD(create_unit + 328 + 32 * 2 + 20)])
+    create_unit << c.RawTrigger(
+        actions=[
+            c.SetMemory(0x628438, c.SetTo, 0),
+            c.CreateUnit(1, 0, 64, 0),
+            c.SetMemory(0x628438, c.SetTo, 0),
+        ]
+    )
 
 
 _eprintln_template = c.Forward()
@@ -285,7 +283,9 @@ def _eprint_init():
         _eprintln_print << c.RawTrigger(
             nextptr=0, actions=c.SetCurrentPlayer(ut.EPD(0x640B60 + 218 * 12))
         )
-        _eprintln_eos << c.RawTrigger(actions=c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
+        _eprintln_eos << c.RawTrigger(
+            actions=c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0)
+        )
         f_setcurpl(prevcp)
     cs.EUDEndIf()
     _eprintln_end << c.RawTrigger(nextptr=0)
