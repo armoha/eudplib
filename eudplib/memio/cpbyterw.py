@@ -65,8 +65,8 @@ class CPByteWriter:
         cs.DoActions(
             *c.AddCurrentPlayer(1),
             self._suboffset.SetNumber(0),
-            self._b[0].SetNumber(ut.b2i1(b"\r")),
-            self._b[1].SetNumber(ut.b2i1(b"\r")),
-            self._b[2].SetNumber(ut.b2i1(b"\r")),
-            self._b[3].SetNumber(ut.b2i1(b"\r")),
+            self._b[0].SetNumber(b"\r"[0]),
+            self._b[1].SetNumber(b"\r"[0]),
+            self._b[2].SetNumber(b"\r"[0]),
+            self._b[3].SetNumber(b"\r"[0]),
         )

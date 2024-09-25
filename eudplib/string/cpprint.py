@@ -82,8 +82,8 @@ class FixedText:
         return self._txtptr
 
     def __exit__(self, exc_type, exc_value, traceback):
-        c.VProc(self._txtptr, [])
         cs.DoActions(self._actions_on_exit)
+        c.VProc(self._txtptr, [])
 
 
 @c.EUDFunc
@@ -229,8 +229,9 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
         if isinstance(x, bytes):
             if x == b"":
                 continue
-            _obfus.cp_print(x)
-        elif isinstance(x, CPString):
+            x = c.Db(x)
+            # _obfus.cp_print(x)
+        if isinstance(x, CPString):
             x.Display()
         elif isinstance(x, c.Db | DBStringData):
             f_cpstr_addstr_epd(ut.EPD(x))

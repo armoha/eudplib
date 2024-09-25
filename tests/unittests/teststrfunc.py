@@ -43,13 +43,13 @@ def test_strbuffer():
     )
 
     s2 = StringBuffer(1023)
-    s2Addr = GetMapStringAddr(s2.StringIndex)
+    s2addr = GetMapStringAddr(s2.StringIndex)
 
     test_assert(
         "StringBuffer uniqueness test",
         [
             s1.StringIndex != s2.StringIndex,
-            GetMapStringAddr(s1.StringIndex) != s2Addr,
+            GetMapStringAddr(s1.StringIndex) != s2addr,
         ],
     )
 
@@ -61,7 +61,7 @@ def test_strbuffer():
     test_equality(
         "PName test",
         [
-            f_memcmp(s2Addr, username, unamelen),
+            f_memcmp(s2addr, username, unamelen),
             f_memcmp(0x640B60 + 218 * 6, username, unamelen),
         ],
         [0, 0],
@@ -121,6 +121,21 @@ def test_strbuffer():
         [f_bread(0x640B60 + i) for i in range(len("Never say never\r\0"))],
         b"Never say never\r\0",
     )
+
+    f_setcurpl(userid)
+    hammo = StringBuffer.cast(EUDVariable(StringBuffer()))
+    for i in range(11):
+        f_dwwrite(0x640B58, 0)
+        hammo.insert(0)
+        hammo.appendf("\x13hammo")
+        hammo.DisplayAt(i)
+        chatptr = f_dwread(0x640B58)
+        test_equality(
+            f"StringBuffer.DisplayAt({i}) test",
+            [f_bread(0x640B60 + 218 * i + x) for x in range(len("\x13hammo\r\r\0"))],
+            b"\x13hammo\r\r\0",
+        )
+        test_equality(f"StringBuffer.DisplayAt({i}) chatptr test", chatptr, 0)
 
     s2.fadeIn("abc", line=10)
     s2.fadeIn("abc", line=EUDVariable(-1))
