@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eudplib"
-version = "0.78.3"
+version = "0.78.4"
 authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},

@@ -229,9 +229,8 @@ def f_cpstr_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
         if isinstance(x, bytes):
             if x == b"":
                 continue
-            x = c.Db(x)
-            # _obfus.cp_print(x)
-        if isinstance(x, CPString):
+            _obfus.cp_print(x)
+        elif isinstance(x, CPString):
             x.Display()
         elif isinstance(x, c.Db | DBStringData):
             f_cpstr_addstr_epd(ut.EPD(x))
