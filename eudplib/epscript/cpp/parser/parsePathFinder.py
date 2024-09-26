@@ -5,7 +5,8 @@ import re
 re_state = re.compile(r"^State (\d+):$")
 re_shift = re.compile(r"^ +(\w+) shift  (\d+)$")
 
-lines = open("epparser.out").readlines()
+with open("epparser.out") as file:
+    lines = file.readlines()
 
 # Get graph
 graph: dict[int, list[tuple[str, int]]] = {}

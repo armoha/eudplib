@@ -14,9 +14,8 @@ if DoCoverageTest:
 helper.LoadMap("outputmap/basemap/basemap_wireframe.scx")
 helper.EP_SetRValueStrictMode(True)
 
-helper._add_datadumper(
-    open("outputmap/basemap/RequireData", "rb").read(), [0x58D740], set(["copy"])
-)
+with open("outputmap/basemap/RequireData", "rb") as reqfile:
+    helper._add_datadumper(reqfile.read(), [0x58D740], set(["copy"]))
 
 helper.CompressPayload(True)
 helper.ShufflePayload(False)

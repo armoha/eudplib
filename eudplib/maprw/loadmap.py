@@ -22,7 +22,8 @@ def LoadMap(fname: str) -> None:  # noqa: N802
     if not os.path.isfile(fname):
         raise FileNotFoundError(_("input path is not a map file"))
     try:
-        rawfile = open(fname, "rb").read()
+        with open(fname, "rb") as file:
+            rawfile = file.read()
     except FileNotFoundError:
         ep_eprint(_("input map does not exist"))
         raise

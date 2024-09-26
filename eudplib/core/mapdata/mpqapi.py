@@ -346,7 +346,9 @@ if __name__ == "__main__":  # FIXME: replace this to pytest
 
     if os.path.exists("test.scx"):
         os.unlink("test.scx")
-    open("test.scx", "wb").write(open("basemap.scx", "rb").read())
+    with open("basemap.scx", "rb") as input_file:
+        with open("test.scx", "wb") as output_file:
+            output_file.write(input_file.read())
 
     mr.Open("test.scx")
     a = mr.Extract("staredit\\scenario.chk")

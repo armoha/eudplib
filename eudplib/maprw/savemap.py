@@ -85,17 +85,16 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
     else:
         # Process by modifying existing mpqfile
         try:
-            file = open(fname, "wb")
+            with open(fname, "wb") as file:
+                file.write(mapdata.GetRawFile())
         except PermissionError:
             ep_eprint(
-                _("You lacks permission to get access rights for output map"),
-                _("Try to turn off antivirus or StarCraft"),
+                _("You lack permission to access the output map"),
+                _("Try turning off antivirus or StarCraft"),
                 sep="\n",
             )
             raise
-        else:
-            file.write(mapdata.GetRawFile())
-            file.close()
+
         if not mw.Open(fname):
             raise EPError(_("Fail to access output map ({})").format(GetLastError()))
 

@@ -80,7 +80,8 @@ def f():
 from eudplib.string.tblprint import _AddStatText
 
 
-_AddStatText(open("unittests/custom_txt.tbl", "rb").read())
+with open("unittests/custom_txt.tbl", "rb") as tblfile:
+    _AddStatText(tblfile.read())
 
 
 # profile_tool.profile(f, "profile.json")

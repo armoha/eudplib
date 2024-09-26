@@ -19,7 +19,8 @@ section_header_charr = ["=", "-", "'", "~", "^"]
 
 # Get list of already documented items
 print("Getting list of currently documented structures")
-rstinputs = open("api.rst", "r", encoding="utf-8").read().split("\n")
+with open("api.rst", "r", encoding="utf-8") as doc_file:
+    rstinputs = doc_file.read().split("\n")
 documented_functions = set()
 
 func_regex = re.compile(r"-   \*\*(.+)?\*\*")
