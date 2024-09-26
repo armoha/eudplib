@@ -121,7 +121,7 @@ def _flip_prop(trigepd: c.EUDVariable) -> None:
     Also, dispatch inline codes
     """
 
-    if cs.EUDWhileNot()([trigepd >= 0x3FD56E6E, trigepd <= 0x3FD56E86]):
+    if cs.EUDWhileNot()([0x3FD56E6E <= trigepd, trigepd <= 0x3FD56E86]):
         # trigepd's nextptr may change during flipping process, so
         # we get it now.
         trigepd += 1
@@ -136,23 +136,28 @@ def _flip_prop(trigepd: c.EUDVariable) -> None:
             ],
         )
 
-        c.RawTrigger(actions=c.SetDeathsX(CurrentPlayer, c.Add, 8, u, 8))
-        """
-        if cs.EUDIf()(c.Deaths(CurrentPlayer, c.Exactly, 4, u)):  # Preserved
-            # Disable now
-            cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 8, u))
-        if cs.EUDElse()():
-            cs.DoActions(c.SetDeaths(CurrentPlayer, c.Subtract, 8, u))
-        cs.EUDEndIf()
-        """
+        # Toggle Preserved Flag
+        is_inline_code, start_dispatch, set_trigepd = (c.Forward() for _ in range(3))
+        c.RawTrigger(
+            actions=[
+                c.SetDeathsX(CurrentPlayer, c.Add, 8, u, 8),
+                c.SetNextPtr(is_inline_code, set_trigepd),
+            ]
+        )
 
         # Dispatch inline code
-        if cs.EUDIf()(c.Deaths(CurrentPlayer, c.Exactly, 0x10000000, u)):
-            # Preserve
-            cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 4, u))
-            _dispatch_inline_code(nexttrig, trigepd, prop)
-        cs.EUDEndIf()
+        is_inline_code << c.RawTrigger(
+            nextptr=set_trigepd,
+            conditions=c.Deaths(CurrentPlayer, c.Exactly, 0x10000000, u),
+            actions=[
+                c.SetNextPtr(is_inline_code, start_dispatch),
+                c.SetDeaths(CurrentPlayer, c.SetTo, 4, u),  # Preserve
+            ],
+        )
+        start_dispatch << c.NextTrigger()
+        _dispatch_inline_code(nexttrig, trigepd, prop)
 
+        set_trigepd << c.NextTrigger()
         trigepd << nexttrigepd
 
     cs.EUDEndWhile()
@@ -212,11 +217,10 @@ def create_inject_finalizer(
             )
 
         # Flip TRIG properties
-        i = c.EUDVariable()
-        if cs.EUDWhile()(i <= 3 * 7):
-            i += ut.EPD(pts + 8)
+        i = c.EUDVariable(ut.EPD(pts + 8))
+        if cs.EUDWhileNot()(i >= ut.EPD(pts + 8) + 3 * 7 + 1):
             _flip_prop(mi.f_epdread_epd(i))
-            i += 3 - ut.EPD(pts + 8)
+            i += 3
         cs.EUDEndWhile()
 
         # Create payload for each players & Link them with pts
@@ -294,7 +298,9 @@ def create_inject_finalizer(
             cs.EUDEndIf()
 
             # Set current player to 1.
-            c.RawTrigger(nextptr=0x80000000, actions=c.SetMemory(0x6509B0, c.SetTo, 0))
+            c.RawTrigger(
+                nextptr=0x80000000, actions=c.SetMemory(0x6509B0, c.SetTo, 0)
+            )
         c.PopTriggerScope()
 
         # lasttime << curtime
