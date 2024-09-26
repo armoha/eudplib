@@ -164,12 +164,22 @@ class VariableBase(metaclass=ABCMeta):
         bt.RawTrigger(actions=actions)
         return self
 
-    def __irshift__(self: Self, n: int) -> Self:
+    @overload
+    def __irshift__(self: Self, n: int, *, action: Literal[False] = False) -> Self:
+        ...
+
+    @overload
+    def __irshift__(self: Self, n: int, *, action: Literal[True]) -> list[bt.Action]:
+        ...
+
+    def __irshift__(self: Self, n: int, *, action=False):
         mask = (1 << (n + 1)) - 1
         actions = [self.SetNumberX(0, mask >> 1)]  # lowest n bits
         actions.extend(
             self.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(32 - n)
         )
+        if action:
+            return actions
         bt.RawTrigger(actions=actions)
         return self
 

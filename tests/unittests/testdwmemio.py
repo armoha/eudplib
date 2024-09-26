@@ -68,11 +68,13 @@ def test_dwmemio():
     f_setcurpl(Player1)
     test_assert("f_dwwrite works", Memory(a, Exactly, 1222))
 
+    f_srand(0)
+    test_equality("f_rand works", [f_rand(), f_getseed()], [0, 12345])
+    test_equality("f_dwrand works", [f_dwrand(), f_getseed()], [0xD3DCA704, 0xA70427DF])
+
     EP_SetRValueStrictMode(False)
     f_randomize()
     EP_SetRValueStrictMode(True)
-    f_rand()
-    f_dwrand()
 
     # Fixes https://cafe.naver.com/edac/81090
     SetKills(CurrentPlayer, SetTo, 0, 0)

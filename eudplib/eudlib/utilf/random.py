@@ -10,9 +10,10 @@ from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineReturn
+from ...core.variable.vbase import VariableBase
 from ...memio.rwcommon import lv
 
-_seed: c.EUDVariable = c.EUDVariable()
+_seed = c.EUDVariable()
 
 
 def f_getseed() -> c.EUDVariable:
@@ -62,18 +63,13 @@ def f_randomize():
     end << c.RawTrigger(actions=c.SetSwitch("Switch 1", c.Set))
 
 
-@_EUDPredefineReturn(1, 2)
+@_EUDPredefineReturn(2, 3)
 @c.EUDFunc
 def f_rand():
-    global _seed
     ret = f_rand._frets[0]
     c.f_mul(_seed, 1103515245, ret=[_seed])
-    mask = (1 << (16 + 1)) - 1
-    actions = [ret.SetNumberX(0, mask >> 1)]  # lowest n bits
-    actions.extend(
-        ret.SubtractNumberX((mask >> 1) << t, mask << t) for t in range(32 - 16)
-    )
-    cs.DoActions(_seed.AddNumber(12345), ret.AddNumber(12345), *actions)
+    c.VProc(_seed, [_seed.AddNumber(12345), _seed.QueueAssignTo(ret)])
+    cs.DoActions(*VariableBase.__irshift__(ret, 16, action=True))
     # Only HIWORD is returned
     # return ret
 
