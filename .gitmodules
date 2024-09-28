@@ -1,4 +1,7 @@
 [submodule "pybind11"]
-	path = eudplib/epscript/cpp/pybind11
+	path = src/epscript/pybind11
 	url = https://github.com/pybind/pybind11
     branch = stable
+[submodule "StormLib"]
+	path = src/StormLib
+	url = https://github.com/ladislav-zezula/StormLib

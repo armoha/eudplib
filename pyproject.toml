@@ -1,25 +1,23 @@
 [build-system]
+# These requirements must be kept sync with the requirements in
+# ./.github/requirements/build-requirements.{in,txt}
 requires = [
-    # First version of setuptools to support pyproject.toml configuration
-    "setuptools>=61.0.0",
-    "wheel",
-    "setuptools-rust>=1.7.0",
-    "typing_extensions"
+    "maturin>=1,<2",
+
+    # Must be kept in sync with `project.dependencies`
+    "typing_extensions",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "maturin"
 
 [project]
 name = "eudplib"
-version = "0.78.4"
+version = "0.79.0"
 authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},
 ]
 maintainers = [
      {name = "Armoha", email = "kein0011@naver.com"},
-]
-dependencies = [
-    "typing_extensions"
 ]
 description = "eudplib is a package which provides scripting for StarCraft Use Map Setting(UMS) to UMS map and tool developers."
 readme = "README.rst"
@@ -41,30 +39,57 @@ classifiers = [
     "Topic :: Games/Entertainment :: Real Time Strategy",
 ]
 requires-python = ">=3.10, <3.12"
+dependencies = [
+    # Must be kept in sync with `build-system.requires`
+    "typing_extensions"
+]
 
 [project.urls]
 homepage = "https://github.com/armoha/eudplib/"
-documentation = "https://github.com/armoha/eudplib/blob/main/docs/funclist.txt"
+documentation = "https://github.com/armoha/euddraft/wiki"
 source = "https://github.com/armoha/eudplib/"
-issues = "https://github.com/armoha/eudplib/issues"
-changelog = "https://github.com/armoha/euddraft/CHANGELOG.md"
+issues = "https://github.com/armoha/euddraft/issues"
+changelog = "https://github.com/armoha/euddraft/blob/master/CHANGELOG.md"
 
-[tool.setuptools]
-zip-safe = false
+[tool.maturin]
+python-source = "src"
+python-packages = ["eudplib"]
+manifest-path = "src/rust/Cargo.toml"
+module-name = "eudplib.bindings._rust"
+locked = true
+sdist-generator = "git"
+features = ["pyo3/abi3-py310"]
+include = [
+    "LICENSE",
 
-[tool.setuptools.packages.find]
-include = ["eudplib*"]  # flat layout
-namespaces = false
+    "docs/**/*",
 
-[tool.setuptools.dynamic]
-version = {attr = "eudplib.__version__"}
+    "src/epscript/**/*.py",
+    "src/epscript/**/*.c",
+    "src/epscript/**/*.h",
+    "src/epscript/**/*.cpp",
+    "src/epscript/**/*.hpp",
+    "src/epscript/**/*.txt",
 
-[[tool.setuptools-rust.ext-modules]]
-target = "eudplib.bindings._rust"
-path = "rust/Cargo.toml"
-py-limited-api = "auto"
-binding = "PyO3"  # Default value, can be omitted
-rust-version = ">=1.63.0"
+    "src/rust/**/Cargo.toml",
+    "src/rust/**/Cargo.lock",
+    "src/rust/**/*.rs",
+
+    "tests/**/*.py",
+    "tests/**/*.eps",
+    "tests/**/*.bat",
+    "tests/**/*.tbl",
+    "tests/outputmap/basemap/*.scx",
+    "tests/outputmap/basemap/RequireData",
+]
+exclude = [
+    "src/epscript/build/**/*",
+    "src/rust/target/**/*",
+    "tools/**/*",
+    ".github/**/*",
+    "ci-constraints-requirements.txt",
+    "mypy.ini",
+]
 
 [tool.mypy]
 show_error_codes = true
