@@ -599,41 +599,47 @@ class CUnit(EPDOffsetMap):
     @c.EUDTypedFunc([None, TrgUnit])
     def _check_buildq(unit, unit_type):
         from ..memio import f_setcurpl2cpcache
-        from ..trigger import Trigger
 
         ret = CUnit._check_buildq._frets[0]
+
+        check_bq0 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)
         c.VProc(
-            unit,
+            [unit, unit_type],
             [
                 ret.SetNumber(0),
                 c.SetMemory(0x6509B0, c.SetTo, 0x98 // 4),
                 unit.QueueAddTo(EPD(0x6509B0)),
+                unit_type.SetDest(EPD(check_bq0) + 2),
             ],
         )
-        Trigger(
-            c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
-            ret.SetNumber(1),
-        )
+        c.RawTrigger(conditions=check_bq0, actions=ret.SetNumber(1))
         if cs.EUDIfNot()(ret == 1):
+            check_bq1 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000)
+            check_bq2 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)
             unit65536 = unit_type * 65536  # Does not change CurrentPlayer
-            Trigger(
-                c.DeathsX(CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
-                ret.SetNumber(1),
+            c.VProc(
+                [unit65536, unit_type],
+                [
+                    unit65536.SetDest(EPD(check_bq1) + 2),
+                    unit_type.SetDest(EPD(check_bq2) + 2),
+                ],
             )
+            c.RawTrigger(conditions=check_bq1, actions=ret.SetNumber(1))
+
+            check_bq3 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000)
+            check_bq4 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)
+            c.VProc(
+                [unit65536, unit_type],
+                [
+                    c.SetMemory(0x6509B0, c.Add, 1),
+                    unit65536.SetDest(EPD(check_bq3) + 2),
+                    unit_type.SetDest(EPD(check_bq4) + 2),
+                ],
+            )
+            c.RawTrigger(conditions=check_bq2, actions=ret.SetNumber(1))
+            c.RawTrigger(conditions=check_bq3, actions=ret.SetNumber(1))
             c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-            Trigger(
-                c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
-                ret.SetNumber(1),
-            )
-            Trigger(
-                c.DeathsX(CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
-                ret.SetNumber(1),
-            )
-            c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-            Trigger(
-                c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
-                ret.SetNumber(1),
-            )
+            c.RawTrigger(conditions=check_bq4, actions=ret.SetNumber(1))
         cs.EUDEndIf()
         f_setcurpl2cpcache()
         # return False
@@ -643,39 +649,43 @@ class CUnit(EPDOffsetMap):
     @c.EUDTypedFunc([None, TrgUnit, None])
     def _check_buildq_const(unit, unit_type, unit65536):
         from ..memio import f_setcurpl2cpcache
-        from ..trigger import Trigger
 
         ret = CUnit._check_buildq_const._frets[0]
+
+        check_bq0 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)
+        check_bq1 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000)
         c.VProc(
-            unit,
+            [unit, unit_type, unit65536],
             [
                 ret.SetNumber(0),
                 c.SetMemory(0x6509B0, c.SetTo, 0x98 // 4),
                 unit.QueueAddTo(EPD(0x6509B0)),
+                unit_type.SetDest(EPD(check_bq0) + 2),
+                unit65536.SetDest(EPD(check_bq1) + 2),
             ],
         )
-        Trigger(
-            c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
-            ret.SetNumber(1),
+        c.RawTrigger(conditions=check_bq0, actions=ret.SetNumber(1))
+        c.RawTrigger(conditions=check_bq1, actions=ret.SetNumber(1))
+
+        check_bq2 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)
+        check_bq3 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF0000)
+        c.VProc(
+            [unit_type, unit65536],
+            [
+                c.SetMemory(0x6509B0, c.Add, 1),
+                unit_type.SetDest(EPD(check_bq2) + 2),
+                unit65536.SetDest(EPD(check_bq3) + 2),
+            ],
         )
-        Trigger(
-            c.DeathsX(CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
-            ret.SetNumber(1),
+        c.RawTrigger(conditions=check_bq2, actions=ret.SetNumber(1))
+        c.RawTrigger(conditions=check_bq3, actions=ret.SetNumber(1))
+
+        check_bq4 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)
+        c.VProc(
+            unit_type,
+            [c.SetMemory(0x6509B0, c.Add, 1), unit_type.SetDest(EPD(check_bq4) + 2)],
         )
-        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-        Trigger(
-            c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
-            ret.SetNumber(1),
-        )
-        Trigger(
-            c.DeathsX(CurrentPlayer, c.Exactly, unit65536, 0, 0xFFFF0000),
-            ret.SetNumber(1),
-        )
-        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.Add, 1))
-        Trigger(
-            c.DeathsX(CurrentPlayer, c.Exactly, unit_type, 0, 0xFFFF),
-            ret.SetNumber(1),
-        )
+        c.RawTrigger(conditions=check_bq4, actions=ret.SetNumber(1))
         f_setcurpl2cpcache()
         # return False
 
