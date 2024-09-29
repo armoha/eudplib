@@ -89,16 +89,21 @@ def _TYGV(types, expr_list_gen):  # noqa: N802
             if not is_untyped:
                 value = ty.cast(value)
         var_list.append(value)
-    nptr = Forward()
-    SetNextTrigger(nptr)
+
+    if init_start.IsSet():
+        nptr = Forward()
+        SetNextTrigger(nptr)
+
+        def _init_global_var() -> None:
+            nonlocal nptr
+            SetNextTrigger(init_start)
+            nptr << NextTrigger()
+
+        if init_start.IsSet():
+            EUDOnStart(_init_global_var)
+
     PopTriggerScope()
 
-    def _init_global_var() -> None:
-        nonlocal nptr
-        SetNextTrigger(init_start)
-        nptr << NextTrigger()
-
-    EUDOnStart(_init_global_var)
     return List2Assignable(var_list)
 
 
@@ -152,16 +157,19 @@ def _CGFW(exprf, retn):  # noqa: N802
                 ret._value = val
 
         EUDOnStart(_init_global_const)
-    end = Forward()
-    SetNextTrigger(end)
+    if start.IsSet():
+        end = Forward()
+        SetNextTrigger(end)
+
+        def _init():
+            nonlocal end
+            SetNextTrigger(start)
+            end << NextTrigger()
+
+        EUDOnStart(_init)
+
     PopTriggerScope()
 
-    def _init():
-        nonlocal end
-        SetNextTrigger(start)
-        end << NextTrigger()
-
-    EUDOnStart(_init)
     return rets
 
 
