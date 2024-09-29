@@ -1,0 +1,10 @@
+[package]
+name = "eudplib-stormlib"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+

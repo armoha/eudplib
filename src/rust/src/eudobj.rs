@@ -78,9 +78,9 @@ impl PyEUDObject {
     }
 }
 
-pub(crate) fn create_submodule(py: Python<'_>) -> PyResult<Bound<'_, PyModule>> {
-    let submod = PyModule::new_bound(py, "eudobj")?;
-    submod.add_class::<PyEUDObject>()?;
-
-    Ok(submod)
+#[pymodule]
+#[pyo3(name = "eudobj")]
+pub(crate) mod eudobj_mod {
+    #[pymodule_export]
+    use super::PyEUDObject;
 }

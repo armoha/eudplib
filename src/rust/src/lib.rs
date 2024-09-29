@@ -1,15 +1,21 @@
 mod allocator;
 mod epscript;
 mod eudobj;
+mod stormlib;
 mod types;
 
 use pyo3::prelude::*;
 
-
 #[pymodule]
-fn _rust(py: pyo3::Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_submodule(&allocator::create_submodule(py)?)?;
-    m.add_submodule(&epscript::create_submodule(py)?)?;
-    m.add_submodule(&eudobj::create_submodule(py)?)?;
-    Ok(())
+mod _rust {
+    use pyo3::types::PyModuleMethods;
+
+    #[pymodule_export]
+    use crate::allocator::allocator_mod;
+    #[pymodule_export]
+    use crate::epscript::epscript_mod;
+    #[pymodule_export]
+    use crate::stormlib::stormlib_mod;
+    #[pymodule_export]
+    use crate::eudobj::eudobj_mod;
 }

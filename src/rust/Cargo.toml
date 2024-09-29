@@ -1,15 +1,25 @@
-[package]
-name = "eudplib-rust"
+[workspace.package]
 version = "0.1.0"
 authors = ["Armoha <kein0011@naver.com>"]
 edition = "2021"
 publish = false
-rust-version = "1.63.0"
+# This specifies the MSRV
+rust-version = "1.65.0"
+
+[package]
+name = "eudplib-rust"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+publish.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-pyo3 = { version = "0.22.0", features = ["abi3"] }
+pyo3 = { version = "0.22.3", features = ["abi3"] }
 indicatif = "0.17.7"
 regex = { version = "1.10.3", features = [] }
+eudplib-epscript = { path = "eudplib-epscript" }
+eudplib-stormlib = { path = "eudplib-stormlib" }
 
 [features]
 # See https://github.com/PyO3/pyo3/issues/340
@@ -21,4 +31,10 @@ name = "eudplib_rust"
 crate-type = ["cdylib"]
 
 [profile.release]
-overflow-checks = false
+overflow-checks = true
+
+[workspace]
+members = [
+    "eudplib-epscript",
+    "eudplib-stormlib",
+]

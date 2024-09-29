@@ -1,0 +1,12 @@
+[package]
+name = "eudplib-epscript"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+pyo3 = { version = "0.22.3", features = ["abi3"] }
+indicatif = "0.17.7"
+regex = { version = "1.10.3", features = [] }
