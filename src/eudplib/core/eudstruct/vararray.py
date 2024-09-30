@@ -129,9 +129,7 @@ class _EUDVArray(ExprProxy):
                 init = [(_getter_val, 0, _getter)] * _size
             else:
                 init = [
-                    (_getter_val, x, _getter)
-                    if isinstance(x, ConstExpr | int)
-                    else x
+                    x if isinstance(x, tuple) else (_getter_val, x, _getter)
                     for x in initvar
                 ]
 
