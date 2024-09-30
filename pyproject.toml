@@ -74,6 +74,7 @@ include = [
     "src/rust/**/Cargo.toml",
     "src/rust/**/Cargo.lock",
     "src/rust/**/*.rs",
+    "src/rust/stormlib-rs/deps/StormLib/**/*",
 
     "tests/**/*.py",
     "tests/**/*.eps",

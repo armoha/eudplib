@@ -72,7 +72,7 @@ impl PyMPQ {
             let mut file = input.open_file(archived_file)?;
             let mut tmpfile = tempfile::NamedTempFile::new()?;
             tmpfile.write_all(&file.read_all()?)?;
-            output.add_file(tmpfile.path(), archived_file, true);
+            output.add_file(tmpfile.path(), archived_file, true)?;
         }
         Ok(Self(output))
     }
