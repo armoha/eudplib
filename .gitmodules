@@ -1,7 +1,7 @@
 [submodule "pybind11"]
-	path = src/epscript/pybind11
-	url = https://github.com/pybind/pybind11
+    path = src/epscript/pybind11
+    url = https://github.com/pybind/pybind11
     branch = stable
-[submodule "StormLib"]
-	path = src/StormLib
-	url = https://github.com/ladislav-zezula/StormLib
+[submodule "src/rust/stormlib-rs"]
+	path = src/rust/stormlib-rs
+	url = https://github.com/wc3tools/stormlib-rs

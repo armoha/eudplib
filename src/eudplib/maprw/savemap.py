@@ -6,13 +6,15 @@
 
 import binascii
 import os
+import tempfile
 from collections.abc import Callable
 
+from ..bindings._rust import mpqapi
 from ..core import RegisterCreatePayloadCallback
 from ..core.eudfunc.trace.tracetool import _get_trace_map, _reset_trace_map
-from ..core.mapdata import fixmapdata, mapdata, mpqapi
+from ..core.mapdata import fixmapdata, mapdata
 from ..localize import _
-from ..utils import EPError, ep_assert, ep_eprint
+from ..utils import EPError
 from .injector.apply_injector import apply_injector
 from .injector.mainloop import main_starter
 from .inlinecode.ilcprocesstrig import _preprocess_inline_code
@@ -36,14 +38,12 @@ def get_trace_map() -> None:
 RegisterCreatePayloadCallback(get_trace_map)
 
 
-def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: N802
+def SaveMap(fname: str, rootf: Callable, *, sector_size: int | None = None) -> None:  # noqa: N802
     """Save output map with root function.
 
     :param fname: Path for output map.
     :param rootf: Main entry function.
     """
-    from ctypes import GetLastError
-
     print(_("Saving to {}...").format(fname))
     chkt = mapdata.GetChkTokenized()
 
@@ -60,49 +60,64 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size=None) -> None:  # noqa: 
     chkt.optimize()
     rawchk = chkt.savechk()
     print(f"\nOutput scenario.chk : {len(rawchk) / 1000000:.3f}MB")
-    mw = mpqapi.MPQ()
+    if sector_size is not None and isinstance(sector_size, int):
+        from .loadmap import _load_map_path
 
-    if sector_size and isinstance(sector_size, int):
-        if os.path.isfile(fname):
-            e = _("You lacks permission to get access rights for output map")
-            try:
-                os.remove(fname)
-            except PermissionError:
-                ep_eprint(
-                    e,
-                    _("Try to turn off antivirus or StarCraft"),
-                    sep="\n",
+        if _load_map_path is None:
+            raise EPError(_("Must use LoadMap first"))
+
+        try:
+            mw = mpqapi.MPQ.clone_with_sector_size(
+                _load_map_path, fname, sector_size
+            )
+        except PermissionError as e:
+            raise EPError(
+                _(
+                    "You lack permission to access the output map"
+                    "\n"
+                    "Try turning off antivirus or StarCraft"
                 )
-                raise
-        if not mw.Create(fname, sector_size=sector_size):
-            raise EPError(_("Fail to access output map ({})").format(GetLastError()))
-        for n, f in mapdata.IterListFiles():
-            if f:
-                ep_assert(
-                    mw.PutFile(n, f),
-                    _("Fail to export input map data to output map"),
-                )
+            ) from e
+        except Exception as e:
+            raise EPError(_("Fail to access output map")) from e
+
     else:
         # Process by modifying existing mpqfile
         try:
             with open(fname, "wb") as file:
                 file.write(mapdata.GetRawFile())
-        except PermissionError:
-            ep_eprint(
-                _("You lack permission to access the output map"),
-                _("Try turning off antivirus or StarCraft"),
-                sep="\n",
-            )
-            raise
+        except PermissionError as e:
+            raise EPError(
+                _(
+                    "You lack permission to access the output map"
+                    "\n"
+                    "Try turning off antivirus or StarCraft"
+                )
+            ) from e
+        except Exception as e:
+            raise EPError(_("Fail to access output map")) from e
 
-        if not mw.Open(fname):
-            raise EPError(_("Fail to access output map ({})").format(GetLastError()))
+        try:
+            mw = mpqapi.MPQ.open(fname)
+        except Exception as e:
+            raise EPError(_("Fail to access output map")) from e
 
-    if not mw.PutFile("staredit\\scenario.chk", rawchk):
-        raise EPError(_("Fail to add scenario.chk"))
+    f = tempfile.NamedTemporaryFile(delete=False)
+    f.write(bytes(rawchk))
+    chk_path = f.name
+    print(chk_path)
+    f.close()
+    try:
+        mw.add_file("staredit\\scenario.chk", chk_path)
+    except Exception as e:
+        raise EPError(_("Fail to add scenario.chk")) from e
+    os.unlink(chk_path)
+
     _update_mpq(mw)
-    ep_assert(mw.Compact(), _("Fail to compact MPQ"))
-    mw.Close()
+    try:
+        mw.compact()
+    except Exception as e:
+        raise EPError(_("Fail to compact MPQ")) from e
 
     if trace_map:
         trace_fname = fname + ".epmap"

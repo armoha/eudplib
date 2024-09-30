@@ -3,22 +3,22 @@
 # This file is part of EUD python library (eudplib),
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
-
-import ctypes
+import os
+from tempfile import NamedTemporaryFile
 
 from .. import utils as ut
-from ..core.mapdata.mpqapi import MPQ
+from ..bindings._rust import mpqapi
 from ..localize import _
 
-_addedFiles: dict[bytes, tuple[str, bytes | None, bool]] = {}  # noqa: N816
+_addedFiles: dict[bytes, tuple[str, str | bytes | bytearray | None, bool]] = {}  # noqa: N816
 
 
-def update_filelist_by_listfile(mpqr: MPQ) -> None:
+def update_filelist_by_listfile(mpqr: mpqapi.MPQ) -> None:
     """Use listfile to get list of already existing files."""
 
     _addedFiles.clear()
 
-    flist = mpqr.EnumFiles()
+    flist = mpqr.get_file_names_from_listfile()
 
     # no listfile -> add default listfile
     if not flist:
@@ -48,12 +48,12 @@ def MPQCheckFile(fname: str) -> bytes:  # noqa: N802
 
 
 def MPQAddFile(  # noqa: N802
-    fname: str, content: bytes | None, is_wav: bool = False
+    fname: str, path_or_content: str | bytes | bytearray | None, is_wav: bool = False
 ) -> None:
     """Add file/wave to output map.
 
     :param fname: Desired filename in mpq
-    :param content: Content to put inside.
+    :param path_or_content: File path or content to put inside.
     :param is_wav: Is file wave file? Wave file can be lossy compressed if this
         flag is set to True.
 
@@ -63,59 +63,62 @@ def MPQAddFile(  # noqa: N802
         them may be catched at _update_mpq(internal) function.
     """
 
-    ut.ep_assert(
-        isinstance(content, bytes)
-        or isinstance(content, bytearray)
-        or content is None,
-        _("Invalid content type"),
-    )
+    if not (
+        isinstance(path_or_content, str | bytes | bytearray)
+        or path_or_content is None
+    ):
+        raise ut.EPError(_("Invalid content type: {}").format(path_or_content))
 
     # make fname case_insensitive
     fname_key = MPQCheckFile(fname)
 
-    _addedFiles[fname_key] = (fname, content, is_wav)
+    _addedFiles[fname_key] = (fname, path_or_content, is_wav)
 
 
-def MPQAddWave(fname: str, content: bytes | None) -> None:  # noqa: N802
+def MPQAddWave(fname: str, path_or_content: str | bytes | bytearray | None) -> None:  # noqa: N802
     """Add wave to output map.
 
     :param fname: Desired filename in mpq
-    :param content: Content to put inside.
+    :param path_or_content: File path or content to put inside.
 
     .. note:: See `MPQAddFile` for more info
     """
-    MPQAddFile(fname, content, True)
+    MPQAddFile(fname, path_or_content, True)
 
 
-def _update_mpq(mpqw: MPQ) -> None:
+def _update_mpq(mpqw: mpqapi.MPQ) -> None:
     """Really append additional mpq file to mpq file.
 
     `MPQAddFile` queues addition, and _update_mpq really adds them.
     """
 
-    count = mpqw.GetMaxFileCount()
+    count = mpqw.get_max_file_count()
     if count < len(_addedFiles):  # need to increase max file count
         max_count = max(1024, 1 << (len(_addedFiles)).bit_length())
-        is_increased = mpqw.SetMaxFileCount(max_count)
-        if not is_increased:
-            raise ctypes.WinError(ctypes.get_last_error())
+        try:
+            mpqw.set_max_file_count(max_count)
+        except Exception as e:
+            raise ut.EPError(_("Failed to increase max file limit")) from e
 
-    for fname, content, is_wav in _addedFiles.values():
-        if content is not None:
-            ret: int | None
-            if is_wav:
-                ret = mpqw.PutWave(fname, content)
-            else:
-                ret = mpqw.PutFile(fname, content)
-            if not ret:
-                ut.ep_eprint(
-                    _("Failed adding file {} to mpq: May be duplicate").format(fname)
-                )
-                raise ctypes.WinError(ctypes.get_last_error())
+    for fname, path_or_content, is_wav in _addedFiles.values():
+        if path_or_content is None:
+            continue
 
+        if isinstance(path_or_content, str):
+            file_path = path_or_content
+        else:
+            # Create temporary file
+            f = NamedTemporaryFile(delete=False)
+            f.write(bytes(path_or_content))
+            file_path = f.name
+            f.close()
 
-def _get_addedFiles() -> set[str]:  # noqa: N802
-    ret = set(fname for fname, content, is_wav in _addedFiles.values())
-    ret.add("staredit\\scenario.chk")
-    ret.add("(listfile)")
-    return ret
+        try:
+            mpqw.add_file(fname, file_path)
+        except Exception as e:
+            raise ut.EPError(
+                _("Failed adding file {} to mpq: May be duplicate").format(fname)
+            ) from e
+
+        if not isinstance(path_or_content, str):
+            os.unlink(file_path)

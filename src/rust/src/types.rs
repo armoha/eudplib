@@ -1,6 +1,6 @@
 //! from https://github.com/pyca/cryptography/blob/main/src/rust/src/types.rs
-use pyo3::sync::GILOnceCell;
 use pyo3::prelude::*;
+use pyo3::sync::GILOnceCell;
 
 pub(crate) struct LazyPyImport {
     module: &'static str,

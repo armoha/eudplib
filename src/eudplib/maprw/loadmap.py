@@ -6,10 +6,13 @@
 
 import os
 
-from ..core.mapdata import chktok, mapdata, mpqapi
+from ..bindings._rust import mpqapi
+from ..core.mapdata import chktok, mapdata
 from ..localize import _
-from ..utils import EPError, ep_assert, ep_eprint
+from ..utils import EPError, ep_eprint
 from .mpqadd import update_filelist_by_listfile
+
+_load_map_path = None
 
 
 def LoadMap(fname: str) -> None:  # noqa: N802
@@ -17,6 +20,7 @@ def LoadMap(fname: str) -> None:  # noqa: N802
 
     :param fname: Path for basemap.
     """
+    global _load_map_path
 
     print(_("Loading map {}").format(fname))
     if not os.path.isfile(fname):
@@ -34,16 +38,20 @@ def LoadMap(fname: str) -> None:  # noqa: N802
             sep="\n",
         )
         raise
-    mpqr = mpqapi.MPQ()
-    ep_assert(mpqr.Open(fname), _("Fail to open input map"))
-    chkt = chktok.CHK()
-    b = mpqr.Extract("staredit\\scenario.chk")
+    try:
+        mpqr = mpqapi.MPQ.open(fname)
+    except Exception as e:
+        raise EPError(_("Fail to open input map")) from e
+
+    try:
+        b = mpqr.extract_file("staredit\\scenario.chk")
+    except Exception as e:
+        raise EPError(_("Fail to extract scenario.chk, maybe invalid scx")) from e
     if not b:
         raise EPError(_("Fail to extract scenario.chk, maybe invalid scx"))
+    chkt = chktok.CHK()
     chkt.loadchk(b)
     mapdata.init_map_data(chkt, rawfile)
     update_filelist_by_listfile(mpqr)
-    for f in mpqr.EnumFiles():
-        if f and f not in ("staredit\\scenario.chk", "(listfile)"):
-            mapdata.AddListFiles(f, mpqr.Extract(f))
-    mpqr.Close()
+    del mpqr
+    _load_map_path = fname

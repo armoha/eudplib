@@ -18,8 +18,10 @@ rust-version.workspace = true
 pyo3 = { version = "0.22.3", features = ["abi3"] }
 indicatif = "0.17.7"
 regex = { version = "1.10.3", features = [] }
+tempfile = "3"
 eudplib-epscript = { path = "eudplib-epscript" }
 eudplib-stormlib = { path = "eudplib-stormlib" }
+stormlib-sys = { path = "stormlib-rs/crates/stormlib-sys" }
 
 [features]
 # See https://github.com/PyO3/pyo3/issues/340

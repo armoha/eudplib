@@ -1,8 +1,8 @@
-use std::borrow::Cow;
 use pyo3::prelude::*;
 use pyo3::sync::GILOnceCell;
 use pyo3::types::PyIterator;
 use regex::Regex;
+use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::iter::Iterator;
 use std::str;
@@ -50,9 +50,13 @@ pub fn generate_linetable<'a>(
         .lines()
         .enumerate()
         .filter_map(|(index, line)| {
-            line_regex
-                .captures(line)
-                .and_then(|c| c.get(1)?.as_str().parse().ok().map(|x| (1 + index as u32, x)))
+            line_regex.captures(line).and_then(|c| {
+                c.get(1)?
+                    .as_str()
+                    .parse()
+                    .ok()
+                    .map(|x| (1 + index as u32, x))
+            })
         })
         .collect();
     eps_linemap.insert(0, 0);
@@ -64,7 +68,8 @@ pub fn generate_linetable<'a>(
         .iter()?
         .map(|i| {
             i.and_then(|ob: Bound<'_, PyAny>| <(u32, u32, u32, u32)>::extract_bound(&ob))
-                .map(|x| x.0).unwrap_or(u32::MAX)
+                .map(|x| x.0)
+                .unwrap_or(u32::MAX)
         })
         .collect();
 

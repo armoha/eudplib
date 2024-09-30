@@ -4,8 +4,6 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from collections.abc import Iterator
-
 from ...localize import _
 from ...utils import EPError
 from .chktok import CHK
@@ -17,15 +15,13 @@ _inited: bool = False
 _chkt: CHK | None = None
 _origchkt: CHK | None = None
 _rawfile: bytes | None = None
-_listfiles: list[tuple[str, bytes | None]] = []
 
 
 def init_map_data(chkt: CHK, rawfile: bytes) -> None:
-    global _inited, _origchkt, _chkt, _rawfile, _listfiles
+    global _inited, _origchkt, _chkt, _rawfile
     _chkt = chkt
     _origchkt = chkt.clone()
     _rawfile = rawfile
-    _listfiles = []
 
     init_stringmaps(chkt)
     init_property_map(chkt)
@@ -38,10 +34,6 @@ def update_map_data() -> None:
         raise EPError(_("Must use LoadMap first"))
     apply_string_map(_chkt)
     apply_property_map(_chkt)
-
-
-def AddListFiles(n: str, f: bytes | None) -> None:  # noqa: N802
-    _listfiles.append((n, f))
 
 
 def IsMapdataInitialized() -> bool:  # noqa: N802
@@ -65,7 +57,3 @@ def GetRawFile() -> bytes:  # noqa: N802
     if _rawfile is None:
         raise EPError(_("Must use LoadMap first"))
     return _rawfile
-
-
-def IterListFiles() -> Iterator[tuple[str, bytes | None]]:  # noqa: N802
-    yield from _listfiles

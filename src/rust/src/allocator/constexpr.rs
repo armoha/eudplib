@@ -142,7 +142,11 @@ impl PyConstExpr {
 
     fn __floordiv__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<Self> {
         if slf.0.rlocmode != 0 && slf.0.rlocmode % rhs != 0 {
-            return Err(PyValueError::new_err(format!("Address not divisible: {} ÷ {}", slf.__str__(), rhs)));
+            return Err(PyValueError::new_err(format!(
+                "Address not divisible: {} ÷ {}",
+                slf.__str__(),
+                rhs
+            )));
         }
         let offset = DivFloor::div_floor(&slf.0.offset, rhs);
         let rlocmode = DivFloor::div_floor(&slf.0.rlocmode, rhs);
@@ -159,14 +163,22 @@ impl PyConstExpr {
 
     fn __mod__(&self, rhs: i32) -> PyResult<i32> {
         if self.0.rlocmode != 4 || 4 % rhs != 0 {
-            return Err(PyValueError::new_err(format!("Address not divisible: {} ÷ {}", self.__str__(), rhs)));
+            return Err(PyValueError::new_err(format!(
+                "Address not divisible: {} ÷ {}",
+                self.__str__(),
+                rhs
+            )));
         }
         Ok(DivFloor::rem_floor(&self.0.offset, rhs))
     }
 
     fn __divmod__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<(Self, i32)> {
         if slf.0.rlocmode != 4 || 4 % rhs != 0 {
-            return Err(PyValueError::new_err(format!("Address not divisible: {} ÷ {}", slf.__str__(), rhs)));
+            return Err(PyValueError::new_err(format!(
+                "Address not divisible: {} ÷ {}",
+                slf.__str__(),
+                rhs
+            )));
         }
         let (offset, modulo) = slf.0.offset.divrem_floor(rhs);
         let rlocmode = slf.0.rlocmode / rhs;
@@ -285,7 +297,12 @@ impl Forward {
         Ok(self.expr.bind(py).get_item(name)?.into_py(py))
     }
 
-    fn __setitem__(&self, py: Python, name: &Bound<'_, PyAny>, newvalue: Bound<'_, PyAny>) -> PyResult<()> {
+    fn __setitem__(
+        &self,
+        py: Python,
+        name: &Bound<'_, PyAny>,
+        newvalue: Bound<'_, PyAny>,
+    ) -> PyResult<()> {
         self.expr.bind(py).set_item(name, newvalue)
     }
 }
