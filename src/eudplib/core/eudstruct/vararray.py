@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 import functools
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from itertools import chain
 from math import log2
 from typing import ClassVar, NoReturn
@@ -40,7 +40,7 @@ class _EUDVArrayData(ConstExpr):
 
     def __init__(
         self,
-        initvar: list[tuple[ConstExpr | int, ConstExpr | int, ConstExpr | int]],
+        initvar: Sequence[tuple[ConstExpr | int, ConstExpr | int, ConstExpr | int]],
     ) -> None:
         super().__init__()
         init = []
@@ -65,8 +65,9 @@ class _EUDVArrayData(ConstExpr):
 
 bt.PushTriggerScope()
 _getter = bt.RawTrigger(nextptr=0, actions=bt.SetMemoryEPD(0, bt.SetTo, 0))
-_getter_dst = EPD(_getter) + 86  # this and nextptr are set by __getitem__
-_getter_val = EPD(_getter) + 87  # this is set by inner triggers of _EUDVArray
+_getter_dst: ConstExpr = EPD(_getter) + 86  # this and nextptr are set by __getitem__
+# this is set by inner triggers of _EUDVArray
+_getter_val: ConstExpr = EPD(_getter) + 87
 
 _lv = EUDLightVariable()
 _convert_index = bt.SetMemoryEPD(0, bt.Add, 0)
@@ -102,7 +103,17 @@ class _EUDVArray(ExprProxy):
     dont_flatten = True
 
     def __init__(
-        self, initvar=None, *, _from=None, _size: int, _basetype: type | None
+        self,
+        initvar: Sequence[
+            ConstExpr
+            | int
+            | tuple[ConstExpr | int, ConstExpr | int, ConstExpr | int]
+        ]
+        | None = None,
+        *,
+        _from=None,
+        _size: int,
+        _basetype: type | None,
     ) -> None:
         ep_assert(0 <= _size < 2**28, f"Invalid EUDVArray capacity: {_size}")
         self._size = _size
@@ -113,14 +124,16 @@ class _EUDVArray(ExprProxy):
             baseobj = _from
 
         else:
-            # Int -> interpret as sequence of 0s
+            init: Sequence[tuple[ConstExpr | int, ConstExpr | int, ConstExpr | int]]
             if initvar is None:
-                initvar = [0] * _size
-
-            if len(initvar) >= 1 and not isinstance(initvar[0], tuple):
-                init = [(_getter_val, x, _getter) for x in initvar]
+                init = [(_getter_val, 0, _getter)] * _size
             else:
-                init = initvar
+                init = [
+                    (_getter_val, x, _getter)
+                    if isinstance(x, ConstExpr | int)
+                    else x
+                    for x in initvar
+                ]
 
             # For python iterables
             baseobj = _EUDVArrayData(init)
@@ -373,11 +386,13 @@ class _VArrayIterator:
 
 
 class EUDVArray:
-    def __init__(self, size, basetype: type | None = None):
+    def __init__(self, size: int, basetype: type | None = None):
         self._size = size
         self._basetype = basetype
 
-    def __call__(self, initvar=None, *, _from=None) -> _EUDVArray:
+    def __call__(
+        self, initvar: Sequence[int | ConstExpr] | None = None, *, _from=None
+    ) -> _EUDVArray:
         return _EUDVArray(
             initvar=initvar,
             _from=_from,

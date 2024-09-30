@@ -45,7 +45,8 @@ def EP_SetRValueStrictMode(mode: bool) -> None:  # noqa: N802
 def process_dest(dest) -> int | ConstExpr:
     epd = unProxy(dest)
     if isinstance(epd, VariableBase):
-        epd.checkNonRValue()
+        if isinstance(epd, EUDVariable):
+            epd.checkNonRValue()
         return EPD(epd.getValueAddr())
     if not isinstance(epd, int | ConstExpr):
         raise EPError(_("Invalid dest: {}").format(dest))

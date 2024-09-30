@@ -69,7 +69,7 @@ def f_rand():
     ret = f_rand._frets[0]
     c.f_mul(_seed, 1103515245, ret=[_seed])
     c.VProc(_seed, [_seed.AddNumber(12345), _seed.QueueAssignTo(ret)])
-    cs.DoActions(*VariableBase.__irshift__(ret, 16, action=True))
+    ret >>= 16
     # Only HIWORD is returned
     # return ret
 

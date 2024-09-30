@@ -28,6 +28,7 @@ def _allow_epd_on_epd(b: bool) -> None:
 def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
     if c.IsConstExpr(p):
         p = unProxy(p)
+        epd: c.ConstExpr | int
         if isinstance(p, c.ConstExpr) and p._is_epd():
             if _epd_on_epd:
                 ep_warn(_("EPD on EPD value of ConstExpr is no-op"))
