@@ -66,18 +66,24 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size: int | None = None) -> N
         if _load_map_path is None:
             raise EPError(_("Must use LoadMap first"))
 
+        # need to remove old file first because SFileCreateArchive2 does
+        # not overwrite file and instead raise ERROR_ALREADY_EXISTS error
+        if os.path.isfile(fname):
+            try:
+                os.remove(fname)
+            except PermissionError as e:
+                raise EPError(
+                    _(
+                        "You lack permission to access the output map"
+                        "\n"
+                        "Try turning off antivirus or StarCraft"
+                    )
+                ) from e
+
         try:
             mw = mpqapi.MPQ.clone_with_sector_size(
                 _load_map_path, fname, sector_size
             )
-        except PermissionError as e:
-            raise EPError(
-                _(
-                    "You lack permission to access the output map"
-                    "\n"
-                    "Try turning off antivirus or StarCraft"
-                )
-            ) from e
         except Exception as e:
             raise EPError(_("Fail to access output map")) from e
 
