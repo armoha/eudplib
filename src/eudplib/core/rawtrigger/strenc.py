@@ -135,21 +135,21 @@ __Arg: TypeAlias = "str | bytes | int | EUDVariable | ExprProxy[str | bytes | in
 
 
 @overload
-def EncodeAIScript(ais: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeAIScript(ais: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeAIScript(ais: T, issueError: bool = False) -> T:  # noqa: N803
+def EncodeAIScript(ais: T) -> T:
     ...
 
 
 @overload
-def EncodeAIScript(ais: _ExprProxy, issueError: bool = False) -> _Dword:  # noqa: N803
+def EncodeAIScript(ais: _ExprProxy) -> _Dword:
     ...
 
 
-def EncodeAIScript(ais: _Arg, issueError: bool = False) -> _Dword:  # noqa: N803, N802
+def EncodeAIScript(ais: _Arg) -> _Dword:  # noqa: N802
     ai = ut.unProxy(ais)
 
     if isinstance(ai, str):
@@ -220,287 +220,287 @@ def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: _Arg) -> _Dword:  
 
 
 @overload
-def EncodeLocation(loc: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeLocation(loc: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeLocation(loc: T, issueError: bool = False) -> T:  # noqa: N803
+def EncodeLocation(loc: T) -> T:
     ...
 
 
 @overload
-def EncodeLocation(loc: _ExprProxy, issueError: bool = False) -> _Dword:  # noqa: N803
+def EncodeLocation(loc: _ExprProxy) -> _Dword:
     ...
 
 
-def EncodeLocation(loc: _Arg, issueError: bool = False) -> _Dword:  # noqa: N803, N802
+def EncodeLocation(loc: _Arg) -> _Dword:  # noqa: N802
     return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc)
 
 
 @overload
-def EncodeString(s: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeString(s: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeString(s: T, issueError: bool = False) -> T:  # noqa: N803
+def EncodeString(s: T) -> T:
     ...
 
 
 @overload
-def EncodeString(s: _ExprProxy, issueError: bool = False) -> _Dword:  # noqa: N803
+def EncodeString(s: _ExprProxy) -> _Dword:
     ...
 
 
-def EncodeString(s: _Arg, issueError: bool = False) -> _Dword:  # noqa: N803, N802
+def EncodeString(s: _Arg) -> _Dword:  # noqa: N802
     _def_string_dict: dict[str, int] = {}
     return _EncodeAny("MapString", GetStringIndex, _def_string_dict, s)
 
 
 @overload
-def EncodeSwitch(sw: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeSwitch(sw: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeSwitch(sw: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeSwitch(sw: U) -> U:
     ...
 
 
 @overload
-def EncodeSwitch(sw: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
+def EncodeSwitch(sw: __ExprProxy) -> _Byte:
     ...
 
 
-def EncodeSwitch(sw: __Arg, issueError: bool = False) -> _Byte:  # noqa: N803, N802
+def EncodeSwitch(sw: __Arg) -> _Byte:  # noqa: N802
     return _EncodeAny("switch", GetSwitchIndex, DefSwitchDict, sw)  # type: ignore[return-value]
 
 
 @overload
-def EncodeUnit(u: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeUnit(u: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeUnit(u: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeUnit(u: U) -> U:
     ...
 
 
 @overload
-def EncodeUnit(u: __ExprProxy, issueError: bool = False) -> _Word:  # noqa: N803
+def EncodeUnit(u: __ExprProxy) -> _Word:
     ...
 
 
-def EncodeUnit(u: __Arg, issueError: bool = False) -> _Word:  # noqa: N803, N802
+def EncodeUnit(u: __Arg) -> _Word:  # noqa: N802
     return _EncodeAny("unit", GetUnitIndex, DefUnitDict, u)  # type: ignore[return-value]
 
 
 @overload
-def EncodeTBL(t: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeTBL(t: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeTBL(t: T, issueError: bool = False) -> T:  # noqa: N803
+def EncodeTBL(t: T) -> T:
     ...
 
 
 @overload
-def EncodeTBL(t: _ExprProxy, issueError: bool = False) -> _Dword:  # noqa: N803
+def EncodeTBL(t: _ExprProxy) -> _Dword:
     ...
 
 
-def EncodeTBL(t: _Arg, issueError: bool = False) -> _Dword:  # noqa: N803, N802
+def EncodeTBL(t: _Arg) -> _Dword:  # noqa: N802
     # TODO: handle custom stat_txt.tbl
     return _EncodeAny("stat_txt.tbl", lambda s: {}[s], DefStatTextDict, t)
 
 
 @overload
-def EncodeFlingy(flingy: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeFlingy(flingy: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeFlingy(flingy: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeFlingy(flingy: U) -> U:
     ...
 
 
 @overload
-def EncodeFlingy(flingy: __ExprProxy, issueError: bool = False) -> _Word:  # noqa: N803
+def EncodeFlingy(flingy: __ExprProxy) -> _Word:
     ...
 
 
-def EncodeFlingy(flingy: __Arg, issueError: bool = False) -> _Word:  # noqa: N803, N802
+def EncodeFlingy(flingy: __Arg) -> _Word:  # noqa: N802
     return _EncodeAny("flingy", lambda s: {}[s], DefFlingyDict, flingy)  # type: ignore[return-value]
 
 
 @overload
-def EncodeIcon(icon: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeIcon(icon: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeIcon(icon: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeIcon(icon: U) -> U:
     ...
 
 
 @overload
-def EncodeIcon(icon: __ExprProxy, issueError: bool = False) -> _Word:  # noqa: N803
+def EncodeIcon(icon: __ExprProxy) -> _Word:
     ...
 
 
-def EncodeIcon(icon: __Arg, issueError: bool = False) -> _Word:  # noqa: N803, N802
+def EncodeIcon(icon: __Arg) -> _Word:  # noqa: N802
     return _EncodeAny("icon", lambda s: {}[s], DefIconDict, icon)  # type: ignore[return-value]
 
 
 @overload
-def EncodeSprite(sprite: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeSprite(sprite: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeSprite(sprite: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeSprite(sprite: U) -> U:
     ...
 
 
 @overload
-def EncodeSprite(sprite: __ExprProxy, issueError: bool = False) -> _Word:  # noqa: N803
+def EncodeSprite(sprite: __ExprProxy) -> _Word:
     ...
 
 
-def EncodeSprite(sprite: __Arg, issueError: bool = False) -> _Word:  # noqa: N803, N802
+def EncodeSprite(sprite: __Arg) -> _Word:  # noqa: N802
     return _EncodeAny("sprite", lambda s: {}[s], DefSpriteDict, sprite)  # type: ignore[return-value]
 
 
 @overload
-def EncodeImage(image: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeImage(image: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeImage(image: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeImage(image: U) -> U:
     ...
 
 
 @overload
-def EncodeImage(image: __ExprProxy, issueError: bool = False) -> _Word:  # noqa: N803
+def EncodeImage(image: __ExprProxy) -> _Word:
     ...
 
 
-def EncodeImage(image: __Arg, issueError: bool = False) -> _Word:  # noqa: N803, N802
+def EncodeImage(image: __Arg) -> _Word:  # noqa: N802
     return _EncodeAny("image", lambda s: {}[s], DefImageDict, image)  # type: ignore[return-value]
 
 
 @overload
-def EncodeIscript(iscript: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeIscript(iscript: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeIscript(iscript: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeIscript(iscript: U) -> U:
     ...
 
 
 @overload
-def EncodeIscript(iscript: __ExprProxy, issueError: bool = False) -> _Word:  # noqa: N803
+def EncodeIscript(iscript: __ExprProxy) -> _Word:
     ...
 
 
-def EncodeIscript(iscript: __Arg, issueError: bool = False) -> _Word:  # noqa: N803, N802
+def EncodeIscript(iscript: __Arg) -> _Word:  # noqa: N802
     return _EncodeAny("iscript", lambda s: {}[s], DefIscriptDict, iscript)  # type: ignore[return-value]
 
 
 @overload
-def EncodeUnitOrder(order: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeUnitOrder(order: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeUnitOrder(order: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeUnitOrder(order: U) -> U:
     ...
 
 
 @overload
-def EncodeUnitOrder(order: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
+def EncodeUnitOrder(order: __ExprProxy) -> _Byte:
     ...
 
 
-def EncodeUnitOrder(order: __Arg, issueError: bool = False) -> _Byte:  # noqa: N803, N802
+def EncodeUnitOrder(order: __Arg) -> _Byte:  # noqa: N802
     return _EncodeAny("UnitOrder", lambda s: {}[s], DefUnitOrderDict, order)  # type: ignore[return-value]
 
 
 @overload
-def EncodeWeapon(weapon: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeWeapon(weapon: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeWeapon(weapon: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeWeapon(weapon: U) -> U:
     ...
 
 
 @overload
-def EncodeWeapon(weapon: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
+def EncodeWeapon(weapon: __ExprProxy) -> _Byte:
     ...
 
 
-def EncodeWeapon(weapon: __Arg, issueError: bool = False) -> _Byte:  # noqa: N803, N802
+def EncodeWeapon(weapon: __Arg) -> _Byte:  # noqa: N802
     return _EncodeAny("weapon", lambda s: {}[s], DefWeaponDict, weapon)  # type: ignore[return-value]
 
 
 @overload
-def EncodeTech(tech: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeTech(tech: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeTech(tech: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeTech(tech: U) -> U:
     ...
 
 
 @overload
-def EncodeTech(tech: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
+def EncodeTech(tech: __ExprProxy) -> _Byte:
     ...
 
 
-def EncodeTech(tech: __Arg, issueError: bool = False) -> _Byte:  # noqa: N803, N802
+def EncodeTech(tech: __Arg) -> _Byte:  # noqa: N802
     return _EncodeAny("tech", lambda s: {}[s], DefTechDict, tech)  # type: ignore[return-value]
 
 
 @overload
-def EncodeUpgrade(upgrade: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodeUpgrade(upgrade: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodeUpgrade(upgrade: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodeUpgrade(upgrade: U) -> U:
     ...
 
 
 @overload
-def EncodeUpgrade(upgrade: __ExprProxy, issueError: bool = False) -> _Byte:  # noqa: N803
+def EncodeUpgrade(upgrade: __ExprProxy) -> _Byte:
     ...
 
 
-def EncodeUpgrade(upgrade: __Arg, issueError: bool = False) -> _Byte:  # noqa: N803, N802
+def EncodeUpgrade(upgrade: __Arg) -> _Byte:  # noqa: N802
     return _EncodeAny("upgrade", lambda s: {}[s], DefUpgradeDict, upgrade)  # type: ignore[return-value]
 
 
 @overload
-def EncodePortrait(portrait: str | bytes, issueError: bool = False) -> int:  # noqa: N803
+def EncodePortrait(portrait: str | bytes) -> int:
     ...
 
 
 @overload
-def EncodePortrait(portrait: U, issueError: bool = False) -> U:  # noqa: N803
+def EncodePortrait(portrait: U) -> U:
     ...
 
 
 @overload
-def EncodePortrait(portrait: __ExprProxy, issueError: bool = False) -> _Word:  # noqa: N803
+def EncodePortrait(portrait: __ExprProxy) -> _Word:
     ...
 
 
-def EncodePortrait(portrait: __Arg, issueError: bool = False) -> _Word:  # noqa: N803, N802
+def EncodePortrait(portrait: __Arg) -> _Word:  # noqa: N802
     return _EncodeAny("portrait", lambda s: {}[s], DefPortraitDict, portrait)  # type: ignore[return-value]
