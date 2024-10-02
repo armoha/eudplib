@@ -374,8 +374,8 @@ msgstr "부정 조건을 구할 수 없습니다"
 #: src/eudplib\scdata\sprite.py:37 src/eudplib\scdata\tech.py:41
 #: src/eudplib\scdata\unit.py:366 src/eudplib\scdata\unitorder.py:55
 #: src/eudplib\scdata\upgrade.py:42 src/eudplib\scdata\weapon.py:70
-msgid "[Warning] \"{}\" is not a {}"
-msgstr "[경고] \"{}\"는 {}가 아닙니다"
+msgid "\"{}\" is not a {}"
+msgstr "\"{}\"는 {}가 아닙니다"
 
 #: src/eudplib\core\rawtrigger\rawtriggerdef.py:117
 msgid "Too many conditions"

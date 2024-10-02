@@ -30,7 +30,7 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
             return _from
         if isinstance(_from, ConstType):
             raise EPError(
-                _('[Warning] "{}" is not a {}').format(_from, cls.__name__)
+                _('"{}" is not a {}').format(_from, cls.__name__)
             )
         return cls(_from)
 

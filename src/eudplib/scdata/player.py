@@ -91,7 +91,7 @@ class TrgPlayer(EPDOffsetMap, _Player):
             return other
         if isinstance(other, ConstType):
             raise ut.EPError(
-                _('[Warning] "{}" is not a {}').format(other, cls.__name__)
+                _('"{}" is not a {}').format(other, cls.__name__)
             )
         EPDOffsetMap._cast = True
         return cls(other)

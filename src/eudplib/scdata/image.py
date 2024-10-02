@@ -42,7 +42,7 @@ class Image(EPDOffsetMap, ConstType):
         if isinstance(s, cls):
             return s
         if isinstance(s, ConstType):
-            raise ut.EPError(_('[Warning] "{}" is not a {}').format(s, cls.__name__))
+            raise ut.EPError(_('"{}" is not a {}').format(s, cls.__name__))
         EPDOffsetMap._cast = True
         return cls(s)
 

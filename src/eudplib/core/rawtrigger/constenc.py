@@ -254,9 +254,7 @@ def _EncodeConst(t: type[ConstType], s: _ExprProxy, u: str | None = None) -> _Dw
 
 def _EncodeConst(t: type[ConstType], s: _Arg, u: str | None = None) -> _Dword:  # noqa: N802
     if isinstance(s, ConstType) and not isinstance(s, t):
-        raise EPError(
-            _('[Warning] "{}" is not a {}').format(s, u if u else t.__name__)
-        )
+        raise EPError(_('"{}" is not a {}').format(s, u if u else t.__name__))
     return unProxy(s)  # type: ignore [return-value]
 
 

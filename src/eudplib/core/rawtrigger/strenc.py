@@ -174,7 +174,7 @@ def EncodeAIScript(ais: _Arg, issueError: bool = False) -> _Dword:  # noqa: N803
         raise ut.EPError(sl)
 
     if isinstance(ai, ConstType):
-        raise ut.EPError(_('[Warning] "{}" is not a {}').format(ais, "AIScript"))
+        raise ut.EPError(_('"{}" is not a {}').format(ais, "AIScript"))
     assert not isinstance(ai, ExprProxy), "unreachable"
     return ai
 
@@ -211,10 +211,10 @@ def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: _Arg) -> _Dword:  
                 for match in difflib.get_close_matches(u, dl.keys()):
                     sl += "\n" + _(" - Suggestion: {}").format(match)
                 raise ut.EPError(sl)
-            raise ut.EPError(_('[Warning] "{}" is not a {}').format(u, t))
+            raise ut.EPError(_('"{}" is not a {}').format(u, t))
 
     elif isinstance(u, ConstType):
-        raise ut.EPError(_('[Warning] "{}" is not a {}').format(u, t))
+        raise ut.EPError(_('"{}" is not a {}').format(u, t))
     assert not isinstance(u, ExprProxy), "unreachable"
     return u
 
