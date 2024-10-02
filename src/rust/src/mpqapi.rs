@@ -1,6 +1,8 @@
 use eudplib_stormlib::{Archive, OpenArchiveFlags};
+use pyo3::exceptions::PyOSError;
 use pyo3::prelude::*;
 use std::borrow::Cow;
+use std::fs;
 use std::io::Write;
 use tempfile;
 
@@ -64,15 +66,24 @@ impl PyMPQ {
         output_path: &str,
         sector_size: u32,
     ) -> PyResult<Self> {
-        let mut input = Archive::open(input_path, OpenArchiveFlags::MPQ_OPEN_NO_ATTRIBUTES)?;
+        let mut input = Archive::open(input_path, OpenArchiveFlags::empty())?;
         let file_count = input.get_max_file_count();
-        let mut output = Archive::create(output_path, sector_size, file_count)?;
         let listfile = String::from_utf8(input.open_file("(listfile)")?.read_all()?)?;
+        let mut output = Archive::create(output_path, sector_size, file_count)?;
         for archived_file in listfile.lines() {
-            let mut file = input.open_file(archived_file)?;
-            let mut tmpfile = tempfile::NamedTempFile::new()?;
-            tmpfile.write_all(&file.read_all()?)?;
-            output.add_file(tmpfile.path(), archived_file, true)?;
+            let temp_path = {
+                let mut file = input.open_file(archived_file)?;
+                let mut tmpfile = tempfile::NamedTempFile::with_prefix("tmp")?;
+                tmpfile.write_all(&file.read_all()?)?;
+                tmpfile.into_temp_path().keep().map_err(|e| {
+                    PyOSError::new_err(format!(
+                        "Persisting a temporary file path fails: {:?}",
+                        e.path
+                    ))
+                })?
+            };
+            output.add_file(&temp_path, &archived_file, true)?;
+            fs::remove_file(temp_path)?;
         }
         Ok(Self(output))
     }

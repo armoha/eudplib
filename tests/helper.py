@@ -207,7 +207,7 @@ def _testmain():
 
 def test_runall(testname):
     LoadMap("outputmap/basemap/basemap_strx.scx")
-    SaveMap("outputmap/test_%s.scx" % testname, _testmain)
+    SaveMap("outputmap/test_%s.scx" % testname, _testmain, sector_size=15)
     print(f"eudplib version {eudplibVersion()}")
 
 
