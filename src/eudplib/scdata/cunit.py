@@ -187,7 +187,7 @@ class CUnit(EPDOffsetMap):
     "17 = was completed (train, morph), 174 = was attacked"
     unknown0x8C = StructMember(0x08C, Mk.WORD)
     "might have originally been RGB from lastEventColor"
-    rankIncrease = StructMember(0x08E, Mk.BYTE)
+    rankIncrease = StructMember(0x08E, Mk.RANK)
     killCount = StructMember(0x08F, Mk.BYTE)
     lastAttackingPlayer = StructMember(0x090, Mk.PLAYER)
     secondaryOrderTimer = StructMember(0x091, Mk.BYTE)
