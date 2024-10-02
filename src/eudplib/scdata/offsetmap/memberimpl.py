@@ -408,6 +408,19 @@ class WorkerCarryTypeKind(ByteKind):
         )
 
 
+class RankKind(ByteKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        return _EncodeAny(
+            "rank",
+            lambda s: {}[s],
+            DefRankDict,
+            other,
+        )
+
+
 class WordKind(BaseKind):
     __slots__ = ()
 
@@ -512,19 +525,6 @@ class StatTextKind(WordKind):
     @classmethod
     def cast(cls, other):
         return EncodeTBL(other)
-
-
-class RankKind(WordKind):
-    __slots__ = ()
-
-    @classmethod
-    def cast(cls, other):
-        return _EncodeAny(
-            "rank",
-            lambda s: {}[s],
-            DefRankDict,
-            other,
-        )
 
 
 class SfxDataKind(WordKind):

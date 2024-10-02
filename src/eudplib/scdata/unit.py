@@ -175,7 +175,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     """
     movementFlags = MovementFlags(0x660FC8, Mk.BYTE)
     rank = ArrayMember(0x663DD0, Mk.RANK)
-    """u16: Stat text id offset for unit rank, starting from [1302] Recruit.
+    """u8: Stat text id offset for unit rank, starting from [1302] Recruit.
 
     Sets the rank of the unit. Unit status text is prioritized in the following order
     (1) Hallucination (2) Buildings that are Disabled, Lockdown, Stasis, or Maelstrom
