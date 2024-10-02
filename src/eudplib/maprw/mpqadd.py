@@ -67,7 +67,9 @@ def MPQAddFile(  # noqa: N802
         isinstance(path_or_content, str | bytes | bytearray)
         or path_or_content is None
     ):
-        raise ut.EPError(_("Invalid content type: {}").format(path_or_content))
+        raise ut.EPError(
+            _("Invalid file path or content: {}").format(path_or_content)
+        )
 
     # make fname case_insensitive
     fname_key = MPQCheckFile(fname)
