@@ -10,10 +10,6 @@ from ..mapdata import UnitProperty
 from .action import Action
 from .constenc import (
     Add,
-    AllyStatus,
-    Byte,
-    Count,
-    Dword,
     EncodeAllyStatus,
     EncodeCount,
     EncodeModifier,
@@ -24,26 +20,32 @@ from .constenc import (
     EncodeResource,
     EncodeScore,
     EncodeSwitchAction,
-    Modifier,
-    Player,
-    PropState,
-    Resource,
-    Score,
-    SwitchAction,
 )
-from .constenc import Order as _Order
+from .consttype import Byte, Dword
 from .strenc import (
-    AIScript,
     EncodeAIScript,
     EncodeLocation,
     EncodeString,
     EncodeSwitch,
     EncodeUnit,
+)
+from .typehint import (
+    AIScriptAtLocation,
+    AIScriptWithoutLocation,
+    AllyStatus,
+    Count,
     Location,
+    Modifier,
+    Player,
+    PropState,
+    Resource,
+    Score,
     String,
     Switch,
+    SwitchAction,
     Unit,
 )
+from .typehint import Order as _Order
 
 
 def Victory() -> Action:  # noqa: N802
@@ -252,7 +254,7 @@ def SetCountdownTimer(time_modifier: Modifier, time: Dword) -> Action:  # noqa: 
     return Action(0, 0, 0, time, 0, 0, 0, 14, modifier, 4)
 
 
-def RunAIScript(script: AIScript) -> Action:  # noqa: N802
+def RunAIScript(script: AIScriptWithoutLocation) -> Action:  # noqa: N802
     """Execute AI script script.
 
     This instructs the specified computer-controlled players to use a certain
@@ -264,7 +266,7 @@ def RunAIScript(script: AIScript) -> Action:  # noqa: N802
     return Action(0, 0, 0, 0, 0, script, 0, 15, 0, 4)
 
 
-def RunAIScriptAt(script: AIScript, where: Location) -> Action:  # noqa: N802
+def RunAIScriptAt(script: AIScriptAtLocation, where: Location) -> Action:  # noqa: N802
     """Execute AI script script at location.
 
     Identical to [Run AI Script](#link_action_runaiscript) but specifies

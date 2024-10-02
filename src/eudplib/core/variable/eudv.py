@@ -31,7 +31,8 @@ from .vbase import VariableBase
 from .vbuf import get_current_varbuffer
 
 if TYPE_CHECKING:
-    from ..rawtrigger.constenc import Dword, TrgModifier
+    from ..rawtrigger.constenc import TrgModifier
+    from ..rawtrigger.consttype import Dword
 
 
 _is_rvalue_strict = False

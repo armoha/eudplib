@@ -7,21 +7,18 @@
 from ...utils import EPD
 from .condition import Condition
 from .constenc import (
-    Comparison,
-    Dword,
     EncodeComparison,
     EncodePlayer,
     EncodeResource,
     EncodeScore,
     EncodeSwitchState,
     Kills,  # for __calls__ binding
-    Player,
-    Resource,
-    SwitchState,
 )
-from .constenc import Score as _Score
-from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit, Location, Unit
-from .strenc import Switch as _Switch
+from .consttype import Dword
+from .strenc import EncodeLocation, EncodeSwitch, EncodeUnit
+from .typehint import Comparison, Location, Player, Resource, SwitchState, Unit
+from .typehint import Score as _Score
+from .typehint import Switch as _Switch
 
 
 def CountdownTimer(comparison: Comparison, time: Dword) -> Condition:  # noqa: N802

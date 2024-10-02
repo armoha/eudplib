@@ -17,7 +17,7 @@ from ..mapdata import (
     GetSwitchIndex,
     GetUnitIndex,
 )
-from .consttype import Byte, ConstType, Dword, T, U, Word, _Byte, _Dword, _Word
+from .consttype import ConstType, T, U, _Byte, _Dword, _Word
 from .strdict import (
     DefAIScriptDict,
     DefFlingyDict,
@@ -106,24 +106,6 @@ class Portrait(ConstType):
     def cast(cls, s):
         return EncodePortrait(s)
 
-
-Unit: TypeAlias = "str | Word | bytes"
-Location: TypeAlias = "str | Dword | bytes"
-String: TypeAlias = "str | Dword | bytes"
-AIScript: TypeAlias = "str | Dword | bytes"
-Switch: TypeAlias = "str | Byte | bytes"  # Byte in Condition, Dword in Action
-
-_StatText: TypeAlias = "str | Dword | bytes"
-_Flingy: TypeAlias = "str | Word | bytes"
-_Icon: TypeAlias = "str | Word | bytes"
-_Image: TypeAlias = "str | Word | bytes"
-_Iscript: TypeAlias = "str | Word | bytes"
-_Portrait: TypeAlias = "str | Word | bytes"
-_Sprite: TypeAlias = "str | Word | bytes"
-_Tech: TypeAlias = "str | Byte | bytes"
-_UnitOrder: TypeAlias = "str | Byte | bytes"
-_Upgrade: TypeAlias = "str | Byte | bytes"
-_Weapon: TypeAlias = "str | Byte | bytes"
 
 # argument types
 _ExprProxy: TypeAlias = (

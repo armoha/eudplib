@@ -5,16 +5,14 @@
 # file that should have been included as part of this package.
 
 from collections.abc import Callable
-from typing import TypeAlias, overload
+from typing import overload
 
 from ...localize import _
 from ...utils import EPError, ExprProxy, unProxy
 from .. import variable as ev
 from ..mapdata import GetPropertyIndex, UnitProperty
 from .consttype import (
-    Byte,
     ConstType,
-    Dword,
     T,
     U,
     __Arg,
@@ -38,7 +36,6 @@ class TrgAllyStatus(ConstType):
             return super().__str__()
 
 
-AllyStatus: TypeAlias = "TrgAllyStatus | Byte"
 Enemy, Ally, AlliedVictory = TrgAllyStatus(0), TrgAllyStatus(1), TrgAllyStatus(2)
 AllyStatusDict: dict[ConstType, int] = {Enemy: 0, Ally: 1, AlliedVictory: 2}
 
@@ -53,7 +50,6 @@ class TrgComparison(ConstType):
             return super().__str__()
 
 
-Comparison: TypeAlias = "TrgComparison | Byte"
 AtLeast, AtMost, Exactly = TrgComparison(0), TrgComparison(1), TrgComparison(10)
 ComparisonDict: dict[ConstType, int] = {AtLeast: 0, AtMost: 1, Exactly: 10}
 
@@ -67,7 +63,6 @@ class TrgCount(ConstType):
         return super().__str__()
 
 
-Count: TypeAlias = "TrgCount | Byte"
 All = TrgCount(0)
 
 
@@ -82,7 +77,6 @@ class TrgModifier(ConstType):
 
 
 
-Modifier: TypeAlias = "TrgModifier | Byte"
 SetTo, Add, Subtract = TrgModifier(7), TrgModifier(8), TrgModifier(9)
 ModifierDict: dict[ConstType, int] = {SetTo: 7, Add: 8, Subtract: 9}
 
@@ -97,7 +91,6 @@ class TrgOrder(ConstType):
             return super().__str__()
 
 
-Order: TypeAlias = "TrgOrder | Byte"
 Move, Patrol, Attack = TrgOrder(0), TrgOrder(1), TrgOrder(2)
 OrderDict: dict[ConstType, int] = {Move: 0, Patrol: 1, Attack: 2}
 
@@ -121,7 +114,6 @@ class _Player(ConstType):
             return super().__str__()
 
 
-Player: TypeAlias = "_Player | Dword"
 PlayerDict: dict[ConstType, int] = {}  # update in offsetmap.scdata
 
 
@@ -175,9 +167,6 @@ class _Set(TrgSwitchState, TrgSwitchAction):
         super().__init__(4)  # 2 or 4
 
 
-PropState: TypeAlias = "TrgPropState | Byte"
-SwitchState: TypeAlias = "TrgSwitchState | Byte"
-SwitchAction: TypeAlias = "TrgSwitchAction | Byte"
 Enable, Disable, Toggle = TrgPropState(4), TrgPropState(5), _Toggle()
 Set, Clear, Random = _Set(), TrgSwitchAction(5), TrgSwitchAction(11)
 Cleared = TrgSwitchState(3)
@@ -196,7 +185,6 @@ class TrgResource(ConstType):
             return super().__str__()
 
 
-Resource: TypeAlias = "TrgResource | Byte"
 Ore, Gas, OreAndGas = TrgResource(0), TrgResource(1), TrgResource(2)
 ResourceDict: dict[ConstType, int] = {Ore: 0, Gas: 1, OreAndGas: 2}
 
@@ -225,7 +213,6 @@ class _Kills(TrgScore):
         return self._internalf(a, b, c, d)
 
 
-Score: TypeAlias = "TrgScore | Byte"
 Total, Units, Buildings, UnitsAndBuildings = TrgScore(0), TrgScore(1), TrgScore(2), TrgScore(3)  # noqa: E501
 # Name 'Kills' is used for both condition type and score type.
 # To resolve conflict, we initialize Kills differently from others.
@@ -253,9 +240,13 @@ def _EncodeConst(t: type[ConstType], s: _ExprProxy, u: str | None = None) -> _Dw
 
 
 def _EncodeConst(t: type[ConstType], s: _Arg, u: str | None = None) -> _Dword:  # noqa: N802
-    if isinstance(s, ConstType) and not isinstance(s, t):
+    while isinstance(s, ExprProxy) and not isinstance(s, ConstType):
+        s = s._value
+    if isinstance(s, ConstType):
+        if isinstance(s, t):
+            return unProxy(s)
         raise EPError(_('"{}" is not a {}').format(s, u if u else t.__name__))
-    return unProxy(s)  # type: ignore [return-value]
+    return s
 
 
 @overload

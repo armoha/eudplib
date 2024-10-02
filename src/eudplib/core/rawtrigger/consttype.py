@@ -16,9 +16,11 @@ if TYPE_CHECKING:
     from ..allocator import ConstExpr
     from ..variable import EUDVariable
 
-Dword: TypeAlias = "int | EUDVariable | ConstExpr | ExprProxy[int] | ExprProxy[EUDVariable] | ExprProxy[ConstExpr]"  # noqa: E501
-Word: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
-Byte: TypeAlias = "int | EUDVariable | ExprProxy[int] | ExprProxy[EUDVariable]"
+Dword: TypeAlias = (
+    "int | EUDVariable | ConstExpr | ExprProxy[int | EUDVariable | ConstExpr]"
+)
+Word: TypeAlias = "int | EUDVariable | ExprProxy[int | EUDVariable]"
+Byte: TypeAlias = "int | EUDVariable | ExprProxy[int | EUDVariable]"
 
 
 class ConstType(ExprProxy, metaclass=ABCMeta):
@@ -29,9 +31,7 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
         if isinstance(_from, cls):
             return _from
         if isinstance(_from, ConstType):
-            raise EPError(
-                _('"{}" is not a {}').format(_from, cls.__name__)
-            )
+            raise EPError(_('"{}" is not a {}').format(_from, cls.__name__))
         return cls(_from)
 
     def _check_assign(self, other) -> None:
@@ -114,8 +114,8 @@ _Byte: TypeAlias = "int | EUDVariable"
 T = TypeVar("T", int, "EUDVariable", "ConstExpr")
 U = TypeVar("U", int, "EUDVariable")
 _ExprProxy: TypeAlias = (
-    "ExprProxy[ConstType | int | EUDVariable | ConstExpr | ExprProxy]"
+    "ExprProxy[ConstType | int | EUDVariable | ConstExpr | _ExprProxy]"
 )
-_Arg: TypeAlias = "ConstType | int | EUDVariable | ConstExpr | ExprProxy[ConstType | int | EUDVariable | ConstExpr | ExprProxy]"  # noqa: E501
-__ExprProxy: TypeAlias = "ExprProxy[ConstType | int | EUDVariable | ExprProxy]"
-__Arg: TypeAlias = "ConstType | int | EUDVariable | ExprProxy[ConstType | int | EUDVariable | ExprProxy]"  # noqa: E501
+_Arg: TypeAlias = "ConstType | int | EUDVariable | ConstExpr | ExprProxy[_Arg]"
+__ExprProxy: TypeAlias = "ExprProxy[ConstType | int | EUDVariable | __ExprProxy]"
+__Arg: TypeAlias = "ConstType | int | EUDVariable | ExprProxy[__Arg]"

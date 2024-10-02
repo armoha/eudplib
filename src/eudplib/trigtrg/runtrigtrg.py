@@ -16,7 +16,7 @@ from ..core import EUDVariable
 from ..ctrlstru import EUDEndIf, EUDIfNot, EUDJumpIf
 
 if TYPE_CHECKING:
-    from ..core.rawtrigger.constenc import Player
+    from ..core.rawtrigger.typehint import Player
 
 _runner_start: list[c.Forward] = [c.Forward() for _ in range(8)]
 _runner_end: list[c.Forward] = [c.Forward() for _ in range(8)]

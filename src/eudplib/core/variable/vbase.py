@@ -15,7 +15,7 @@ from .. import rawtrigger as bt
 from ..allocator import ConstExpr, IsConstExpr
 
 if TYPE_CHECKING:
-    from ..rawtrigger.constenc import Dword
+    from ..rawtrigger.consttype import Dword
 
 
 class VariableBase(metaclass=ABCMeta):
