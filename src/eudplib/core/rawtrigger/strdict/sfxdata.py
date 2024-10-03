@@ -1,6 +1,7 @@
 from typing import Literal, TypeAlias
 
 DefSfxDataDict = {
+    "none": 0,
     "zerg/drone/zdrerr00.wav": 1,
     "misc/buzz.wav": 2,
     "misc/perror.wav": 3,
@@ -1147,6 +1148,7 @@ DefSfxDataDict = {
 }
 
 DefaultSfxData: TypeAlias = Literal[
+    "None",
     "zerg/drone/zdrerr00.wav",
     "misc/buzz.wav",
     "misc/perror.wav",
