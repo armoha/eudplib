@@ -196,7 +196,7 @@ class CUnit(EPDOffsetMap):
     """2 = issued an order,
     3 = interrupted an order,
     4 = hide self before death (self-destruct?)"""
-    currentButtonSet = StructMember(0x094, Mk.WORD)
+    currentButtonSet = StructMember(0x094, Mk.UNIT)
     isCloaked = StructMember(0x096, Mk.BOOL)
     movementState = StructMember(0x097, Mk.BYTE)
     buildQueue1 = StructMember(0x098, Mk.UNIT)
