@@ -24,7 +24,7 @@ def EUDJump(nextptr, *, must_use=True) -> None:  # noqa: N802
     if c.IsEUDVariable(nextptr):
         c.RawTrigger(
             nextptr=nextptr.GetVTable(),
-            actions=nextptr.QueueAssignTo(ut.EPD(nextptr.GetVTable) + 1),
+            actions=nextptr.QueueAssignTo(ut.EPD(nextptr.GetVTable()) + 1),
         )
     else:
         c.SetNextTrigger(nextptr)
