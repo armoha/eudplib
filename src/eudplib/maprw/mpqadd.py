@@ -17,10 +17,12 @@ def update_filelist_by_listfile(mpqr: mpqapi.MPQ) -> None:
     """Use listfile to get list of already existing files."""
 
     _addedFiles.clear()
-
-    flist = mpqr.get_file_names_from_listfile()
-
+    try:
+        flist = mpqr.get_file_names_from_listfile()
     # no listfile -> add default listfile
+    except Exception:
+        flist = ["staredit\\scenario.chk", "(listfile)"]
+
     if not flist:
         flist = ["staredit\\scenario.chk", "(listfile)"]
 
