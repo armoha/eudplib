@@ -9,7 +9,7 @@ from .. import core as c
 from .. import memio
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
-from ..core.rawtrigger.typehint import Upgrade as _Upgrade
+from ..core.rawtrigger.typehint import _Upgrade
 from ..localize import _
 from .offsetmap import (
     ByteMember,

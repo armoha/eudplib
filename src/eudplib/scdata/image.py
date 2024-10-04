@@ -8,7 +8,7 @@
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeImage
-from ..core.rawtrigger.typehint import Image as _Image
+from ..core.rawtrigger.typehint import _Image
 from ..localize import _
 from .offsetmap import BoolMember, DrawingFunctionMember, EPDOffsetMap, IscriptMember
 

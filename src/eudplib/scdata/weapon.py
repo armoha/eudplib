@@ -8,7 +8,7 @@
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeWeapon
-from ..core.rawtrigger.typehint import Weapon as _Weapon
+from ..core.rawtrigger.typehint import _Weapon
 from ..localize import _
 from .offsetmap import (
     ByteMember,

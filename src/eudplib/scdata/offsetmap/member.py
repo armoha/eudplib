@@ -59,22 +59,22 @@ from .memberkind import (
 if TYPE_CHECKING:
     from ...core.rawtrigger.typehint import (
         ButtonSet,
-        Icon,
-        Iscript,
-        Portrait,
         Rank,
         SfxData,
-        StatText,
         String,
         Unit,
+        _Flingy,
+        _Icon,
+        _Image,
+        _Iscript,
+        _Portrait,
+        _Sprite,
+        _StatText,
+        _Tech,
+        _UnitOrder,
+        _Upgrade,
+        _Weapon,
     )
-    from ...core.rawtrigger.typehint import Flingy as _Flingy
-    from ...core.rawtrigger.typehint import Image as _Image
-    from ...core.rawtrigger.typehint import Sprite as _Sprite
-    from ...core.rawtrigger.typehint import Tech as _Tech
-    from ...core.rawtrigger.typehint import UnitOrder as _UnitOrder
-    from ...core.rawtrigger.typehint import Upgrade as _Upgrade
-    from ...core.rawtrigger.typehint import Weapon as _Weapon
     from ..csprite import CSprite
     from ..cunit import CUnit
     from ..flingy import Flingy
@@ -1032,7 +1032,7 @@ class StatTextMember(BaseMember):
     def __get__(self, instance, owner):
         return super().__get__(instance, owner)
 
-    def __set__(self, instance: EPDOffsetMap, value: StatText) -> None:
+    def __set__(self, instance: EPDOffsetMap, value: _StatText) -> None:
         super().__set__(instance, value)
 
 
@@ -1080,7 +1080,7 @@ class PortraitMember(BaseMember):
     def __get__(self, instance, owner):
         return super().__get__(instance, owner)
 
-    def __set__(self, instance: EPDOffsetMap, value: Portrait) -> None:
+    def __set__(self, instance: EPDOffsetMap, value: _Portrait) -> None:
         super().__set__(instance, value)
 
 
@@ -1104,7 +1104,7 @@ class IconMember(BaseMember):
     def __get__(self, instance, owner):
         return super().__get__(instance, owner)
 
-    def __set__(self, instance: EPDOffsetMap, value: Icon) -> None:
+    def __set__(self, instance: EPDOffsetMap, value: _Icon) -> None:
         super().__set__(instance, value)
 
 
@@ -1256,5 +1256,5 @@ class IscriptMember(BaseMember):
     def __get__(self, instance, owner):
         return super().__get__(instance, owner)
 
-    def __set__(self, instance: EPDOffsetMap, value: Iscript) -> None:
+    def __set__(self, instance: EPDOffsetMap, value: _Iscript) -> None:
         super().__set__(instance, value)

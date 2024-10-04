@@ -8,7 +8,7 @@
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeFlingy
-from ..core.rawtrigger.typehint import Flingy as _Flingy
+from ..core.rawtrigger.typehint import _Flingy
 from ..localize import _
 from .offsetmap import (
     ByteMember,

@@ -38,26 +38,28 @@ from .strdict import (
 )
 
 if TYPE_CHECKING:
-    from ...scdata import Flingy as _Flingy
-    from ...scdata import Image as _Image
-    from ...scdata import Sprite as _Sprite
-    from ...scdata import Tech as _Tech
-    from ...scdata import TrgUnit
-    from ...scdata import UnitOrder as _UnitOrder
-    from ...scdata import Upgrade as _Upgrade
-    from ...scdata import Weapon as _Weapon
+    from ...scdata import (
+        Flingy,
+        Image,
+        Sprite,
+        Tech,
+        TrgUnit,
+        UnitOrder,
+        Upgrade,
+        Weapon,
+    )
 
 AllyStatus: TypeAlias = "TrgAllyStatus | Byte | ExprProxy[AllyStatus]"
 Comparison: TypeAlias = "TrgComparison | Byte | ExprProxy[Comparison]"
 Count: TypeAlias = "TrgCount | Byte | ExprProxy[Count]"
 Modifier: TypeAlias = "TrgModifier | Byte | ExprProxy[Modifier]"
-Order: TypeAlias = "TrgOrder | Byte | ExprProxy[Order]"
+_Order: TypeAlias = "TrgOrder | Byte | ExprProxy[_Order]"
 PropState: TypeAlias = "TrgPropState | Byte | ExprProxy[PropState]"
 Resource: TypeAlias = "TrgResource | Byte | ExprProxy[Resource]"
-Score: TypeAlias = "TrgScore | Byte | ExprProxy[Score]"
+_Score: TypeAlias = "TrgScore | Byte | ExprProxy[_Score]"
 SwitchAction: TypeAlias = "TrgSwitchAction | Byte | ExprProxy[SwitchAction]"
 SwitchState: TypeAlias = "TrgSwitchState | Byte | ExprProxy[SwitchState]"
-TrgProperty: TypeAlias = "UnitProperty | bytes | ExprProxy[TrgProperty]"
+_UnitProperty: TypeAlias = "UnitProperty | bytes | ExprProxy[_UnitProperty]"
 
 AIScriptAtLocation: TypeAlias = (
     DefaultAIScriptAtLocation | str | bytes | Dword | ExprProxy["AIScriptAtLocation"]
@@ -71,25 +73,25 @@ AIScriptWithoutLocation: TypeAlias = """(
     | ExprProxy[AIScriptWithoutLocation]
 )"""
 ButtonSet: TypeAlias = "DefaultButtonSet | Word | ExprProxy[ButtonSet]"
-Icon: TypeAlias = "DefaultIcon | Word | ExprProxy[Icon]"
-Iscript: TypeAlias = "DefaultIscript | Dword | ExprProxy[Iscript]"
-Portrait: TypeAlias = "DefaultPortrait | Word | ExprProxy[Portrait]"
+_Icon: TypeAlias = "DefaultIcon | Word | ExprProxy[_Icon]"
+_Iscript: TypeAlias = "DefaultIscript | Dword | ExprProxy[_Iscript]"
+_Portrait: TypeAlias = "DefaultPortrait | Word | ExprProxy[_Portrait]"
 Rank: TypeAlias = "DefaultRank | Byte | ExprProxy[Rank]"
 SfxData: TypeAlias = "DefaultSfxData | str | Word | ExprProxy[SfxData]"
 """sfxdata.dat entries are case-insensitive"""
-StatText: TypeAlias = "DefaultStatText | str | Word | ExprProxy[StatText]"
+_StatText: TypeAlias = "DefaultStatText | Word | ExprProxy[_StatText]"
 
-Flingy: TypeAlias = "DefaultFlingy | _Flingy | Byte | ExprProxy[Flingy]"
-Image: TypeAlias = "DefaultImage | _Image | Word | ExprProxy[Image]"
+_Flingy: TypeAlias = "DefaultFlingy | Flingy | Byte | ExprProxy[_Flingy]"
+_Image: TypeAlias = "DefaultImage | Image | Word | ExprProxy[_Image]"
 Player: TypeAlias = "_Player | Dword | ExprProxy[Player]"
-Sprite: TypeAlias = "DefaultSprite | _Sprite | Word | ExprProxy[Sprite]"
-Tech: TypeAlias = "DefaultTech | _Tech | Byte | ExprProxy[Tech]"
+_Sprite: TypeAlias = "DefaultSprite | Sprite | Word | ExprProxy[_Sprite]"
+_Tech: TypeAlias = "DefaultTech | Tech | Byte | ExprProxy[_Tech]"
 Unit: TypeAlias = "DefaultUnit | TrgUnit | Word | ExprProxy[Unit]"
-UnitOrder: TypeAlias = "DefaultUnitOrder | _UnitOrder | Byte | ExprProxy[UnitOrder]"
-Upgrade: TypeAlias = "DefaultUpgrade | _Upgrade | Byte | ExprProxy[Upgrade]"
-Weapon: TypeAlias = "DefaultWeapon | _Weapon | Byte | ExprProxy[Weapon]"
+_UnitOrder: TypeAlias = "DefaultUnitOrder | UnitOrder | Byte | ExprProxy[_UnitOrder]"
+_Upgrade: TypeAlias = "DefaultUpgrade | Upgrade | Byte | ExprProxy[_Upgrade]"
+_Weapon: TypeAlias = "DefaultWeapon | Weapon | Byte | ExprProxy[_Weapon]"
 
-Location: TypeAlias = "str | Dword | bytes | ExprProxy[Location]"
+Location: TypeAlias = "str | Byte | bytes | ExprProxy[Location]"
 String: TypeAlias = "str | Word | bytes | ExprProxy[String]"
-Switch: TypeAlias = "str | Byte | bytes | ExprProxy[Switch]"
+_Switch: TypeAlias = "str | Byte | bytes | ExprProxy[_Switch]"
 """Byte in Condition, Dword in Action"""

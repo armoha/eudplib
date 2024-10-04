@@ -208,17 +208,17 @@ def EncodeLocation(loc: str | bytes) -> int:
 
 
 @overload
-def EncodeLocation(loc: T) -> T:
+def EncodeLocation(loc: U) -> U:
     ...
 
 
 @overload
-def EncodeLocation(loc: _ExprProxy) -> _Dword:
+def EncodeLocation(loc: __ExprProxy) -> _Word:
     ...
 
 
-def EncodeLocation(loc: _Arg) -> _Dword:  # noqa: N802
-    return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc)
+def EncodeLocation(loc: __Arg) -> _Word:  # noqa: N802
+    return _EncodeAny("location", GetLocationIndex, DefLocationDict, loc)  # type: ignore[return-value]
 
 
 @overload

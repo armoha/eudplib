@@ -8,7 +8,7 @@
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeUnitOrder
-from ..core.rawtrigger.typehint import UnitOrder as _UnitOrder
+from ..core.rawtrigger.typehint import _UnitOrder
 from ..localize import _
 from .offsetmap import (
     AnimationMember,

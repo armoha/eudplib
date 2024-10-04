@@ -39,13 +39,13 @@ from .typehint import (
     Player,
     PropState,
     Resource,
-    Score,
     String,
-    Switch,
     SwitchAction,
     Unit,
+    _Order,
+    _Score,
+    _Switch,
 )
-from .typehint import Order as _Order
 
 
 def Victory() -> Action:  # noqa: N802
@@ -224,7 +224,7 @@ def SetMissionObjectives(text: String) -> Action:  # noqa: N802
     return Action(0, text, 0, 0, 0, 0, 0, 12, 0, 4)
 
 
-def SetSwitch(switch: Switch, state: SwitchAction) -> Action:  # noqa: N802
+def SetSwitch(switch: _Switch, state: SwitchAction) -> Action:  # noqa: N802
     """Set switch.
 
     The set switch action can be used to:
@@ -325,7 +325,7 @@ def LeaderBoardKills(unit: Unit, label: String) -> Action:  # noqa: N802
     return Action(0, label, 0, 0, 0, 0, unit, 20, 0, 20)
 
 
-def LeaderBoardScore(ScoreType: Score, label: String) -> Action:  # noqa: N803, N802
+def LeaderBoardScore(ScoreType: _Score, label: String) -> Action:  # noqa: N803, N802
     """Show Leader Board for most points. Display label: label
 
     This will display the Leader Board to all players based on who has
@@ -410,7 +410,7 @@ def SetScore(  # noqa: N802
     player: Player,
     modifier: Modifier,
     amount: Dword,
-    ScoreType: Score,  # noqa: N803
+    ScoreType: _Score,  # noqa: N803
 ) -> Action:
     """Modify score for player: Set quantity points.
 
@@ -538,7 +538,7 @@ def LeaderBoardGoalKills(goal: Dword, unit: Unit, label: String) -> Action:  # n
 
 def LeaderBoardGoalScore(  # noqa: N802
     goal: Dword,
-    ScoreType: Score,  # noqa: N803
+    ScoreType: _Score,  # noqa: N803
     label: String,
 ) -> Action:
     """Show Leader Board for player closest to number points.
