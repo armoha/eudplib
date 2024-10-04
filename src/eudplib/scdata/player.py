@@ -23,6 +23,7 @@ class TrgPlayer(EPDOffsetMap, _Player):
 
     __slots__ = ()
     mineral: ClassVar = DwordMember("array", 0x57F0F0)
+    ore = mineral
     gas: ClassVar = DwordMember("array", 0x57F120)
     cumulativeGas: ClassVar = DwordMember("array", 0x57F150)
     cumulativeMineral: ClassVar = DwordMember("array", 0x57F180)
