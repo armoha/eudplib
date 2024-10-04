@@ -45,7 +45,7 @@ class EnumMember(BaseMember, ExprProxy):
     def _get_epd(self, instance=None):
         if instance is None:
             instance = self._instance
-        return super()._get_epd(self, instance)
+        return super()._get_epd(instance)
 
     def __get__(
         self, instance: EPDOffsetMap | None, owner: type[EPDOffsetMap]
