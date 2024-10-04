@@ -8,6 +8,7 @@
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeFlingy
+from ..core.rawtrigger.typehint import Flingy as _Flingy
 from ..localize import _
 from .offsetmap import (
     ByteMember,
@@ -34,13 +35,10 @@ class Flingy(EPDOffsetMap, ConstType):
         return (0, 208, 1)
 
     @classmethod
-    def cast(cls, s):
-        if isinstance(s, cls):
-            return s
-        if isinstance(s, ConstType):
-            raise ut.EPError(_('"{}" is not a {}').format(s, cls.__name__))
-        EPDOffsetMap._cast = True
-        return cls(s)
+    def cast(cls, _from: _Flingy):
+        if isinstance(_from, ConstType) and not isinstance(_from, cls):
+            raise ut.EPError(_('"{}" is not a {}').format(_from, cls.__name__))
+        return super().cast(_from)
 
-    def __init__(self, initval) -> None:
+    def __init__(self, initval: _Flingy) -> None:
         super().__init__(EncodeFlingy(initval))

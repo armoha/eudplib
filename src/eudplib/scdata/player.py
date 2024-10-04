@@ -85,13 +85,10 @@ class TrgPlayer(EPDOffsetMap, _Player):
         return (0, 11, 1)
 
     @classmethod
-    def cast(cls, other):
-        if isinstance(other, cls):
-            return other
-        if isinstance(other, ConstType):
-            raise ut.EPError(_('"{}" is not a {}').format(other, cls.__name__))
-        EPDOffsetMap._cast = True
-        return cls(other)
+    def cast(cls, _from):
+        if isinstance(_from, ConstType) and not isinstance(_from, cls):
+            raise ut.EPError(_('"{}" is not a {}').format(_from, cls.__name__))
+        return super().cast(_from)
 
     def __init__(self, initval) -> None:
         super().__init__(EncodePlayer(initval))

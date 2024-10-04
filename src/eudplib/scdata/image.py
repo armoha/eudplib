@@ -8,6 +8,7 @@
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeImage
+from ..core.rawtrigger.typehint import Image as _Image
 from ..localize import _
 from .offsetmap import BoolMember, DrawingFunctionMember, EPDOffsetMap, IscriptMember
 
@@ -37,13 +38,10 @@ class Image(EPDOffsetMap, ConstType):
         return (0, 998, 1)
 
     @classmethod
-    def cast(cls, s):
-        if isinstance(s, cls):
-            return s
-        if isinstance(s, ConstType):
-            raise ut.EPError(_('"{}" is not a {}').format(s, cls.__name__))
-        EPDOffsetMap._cast = True
-        return cls(s)
+    def cast(cls, _from: _Image):
+        if isinstance(_from, ConstType) and not isinstance(_from, cls):
+            raise ut.EPError(_('"{}" is not a {}').format(_from, cls.__name__))
+        return super().cast(_from)
 
-    def __init__(self, initval) -> None:
+    def __init__(self, initval: _Image) -> None:
         super().__init__(EncodeImage(initval))

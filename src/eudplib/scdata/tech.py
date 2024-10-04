@@ -9,6 +9,7 @@ from .. import core as c
 from .. import memio
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
+from ..core.rawtrigger.typehint import Tech as _Tech
 from ..localize import _
 from .offsetmap import (
     ByteMember,
@@ -40,15 +41,12 @@ class Tech(EPDOffsetMap, ConstType):
         return (0, 43, 1)
 
     @classmethod
-    def cast(cls, s):
-        if isinstance(s, cls):
-            return s
-        if isinstance(s, ConstType):
-            raise ut.EPError(_('"{}" is not a {}').format(s, cls.__name__))
-        EPDOffsetMap._cast = True
-        return cls(s)
+    def cast(cls, _from: _Tech):
+        if isinstance(_from, ConstType) and not isinstance(_from, cls):
+            raise ut.EPError(_('"{}" is not a {}').format(_from, cls.__name__))
+        return super().cast(_from)
 
-    def __init__(self, initval) -> None:
+    def __init__(self, initval: _Tech) -> None:
         super().__init__(c.EncodeTech(initval))
 
     def _current_tech_epd_subp(self, player: TrgPlayer | int):
