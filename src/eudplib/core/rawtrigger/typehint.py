@@ -20,6 +20,7 @@ from .consttype import Byte, Dword, Word
 from .strdict import (
     DefaultAIScriptAtLocation,
     DefaultAIScriptWithoutLocation,
+    DefaultButtonSet,
     DefaultFlingy,
     DefaultIcon,
     DefaultImage,
@@ -69,6 +70,7 @@ AIScriptWithoutLocation: TypeAlias = """(
     | Dword
     | ExprProxy[AIScriptWithoutLocation]
 )"""
+ButtonSet: TypeAlias = "DefaultButtonSet | Word | ExprProxy[ButtonSet]"
 Icon: TypeAlias = "DefaultIcon | Word | ExprProxy[Icon]"
 Iscript: TypeAlias = "DefaultIscript | Dword | ExprProxy[Iscript]"
 Portrait: TypeAlias = "DefaultPortrait | Word | ExprProxy[Portrait]"

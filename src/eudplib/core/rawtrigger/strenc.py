@@ -20,6 +20,7 @@ from ..mapdata import (
 from .consttype import ConstType, T, U, _Byte, _Dword, _Word
 from .strdict import (
     DefAIScriptDict,
+    DefButtonSetDict,
     DefFlingyDict,
     DefIconDict,
     DefImageDict,
@@ -486,3 +487,22 @@ def EncodePortrait(portrait: __ExprProxy) -> _Word:
 
 def EncodePortrait(portrait: __Arg) -> _Word:  # noqa: N802
     return _EncodeAny("portrait", lambda s: {}[s], DefPortraitDict, portrait)  # type: ignore[return-value]
+
+
+@overload
+def EncodeButtonSet(buttonset: str | bytes) -> int:
+    ...
+
+
+@overload
+def EncodeButtonSet(buttonset: U) -> U:
+    ...
+
+
+@overload
+def EncodeButtonSet(buttonset: __ExprProxy) -> _Word:
+    ...
+
+
+def EncodeButtonSet(buttonset: __Arg) -> _Word:  # noqa: N802
+    return _EncodeAny("buttonset", lambda s: {}[s], DefButtonSetDict, buttonset)  # type: ignore[return-value]

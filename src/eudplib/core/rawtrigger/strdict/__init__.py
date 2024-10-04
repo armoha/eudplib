@@ -4,6 +4,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from .buttonset import DefaultButtonSet, DefButtonSetDict
 from .flingy import DefaultFlingy, DefFlingyDict
 from .icon import DefaultIcon, DefIconDict
 from .image import DefaultImage, DefImageDict
@@ -27,6 +28,8 @@ from .upgrade import DefaultUpgrade, DefUpgradeDict
 from .weapon import DefaultWeapon, DefWeaponDict
 
 __all__ = [
+    "DefaultButtonSet",
+    "DefButtonSetDict",
     "DefaultFlingy",
     "DefFlingyDict",
     "DefaultIcon",

@@ -8,6 +8,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Literal
 
 from ...core import (
+    EncodeButtonSet,
     EncodeIcon,
     EncodeIscript,
     EncodePortrait,
@@ -452,6 +453,18 @@ class RankKind(ByteKind):
         )
 
 
+class FlingyKind(ByteKind):
+    """size of Flingy is byte in units.dat / word in CUnit"""
+
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        from ..flingy import Flingy
+
+        return Flingy.cast(other)
+
+
 class WordKind(BaseKind):
     __slots__ = ()
 
@@ -520,16 +533,6 @@ class UnitKind(WordKind):
         return f_bread_epd(epd, subp)
 
 
-class FlingyKind(ByteKind):  # size of Flingy is byte in units.dat / word in CUnit
-    __slots__ = ()
-
-    @classmethod
-    def cast(cls, other):
-        from ..flingy import Flingy
-
-        return Flingy.cast(other)
-
-
 class SpriteKind(WordKind):
     __slots__ = ()
 
@@ -596,6 +599,14 @@ class MapStringKind(WordKind):
     @classmethod
     def cast(cls, other):
         return EncodeString(other)
+
+
+class ButtonSetKind(WordKind):
+    __slots__ = ()
+
+    @classmethod
+    def cast(cls, other):
+        return EncodeButtonSet(other)
 
 
 class DwordKind(BaseKind):

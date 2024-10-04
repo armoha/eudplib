@@ -20,6 +20,7 @@ from .memberkind import (
     BaseKind,
     Bit0Kind,
     Bit1Kind,
+    ButtonSetKind,
     ByteKind,
     CSpriteKind,
     CUnitKind,
@@ -56,8 +57,8 @@ from .memberkind import (
 )
 
 if TYPE_CHECKING:
-    from ...core.rawtrigger.typehint import Flingy as _Flingy
     from ...core.rawtrigger.typehint import (
+        ButtonSet,
         Icon,
         Iscript,
         Portrait,
@@ -67,6 +68,7 @@ if TYPE_CHECKING:
         String,
         Unit,
     )
+    from ...core.rawtrigger.typehint import Flingy as _Flingy
     from ...core.rawtrigger.typehint import Image as _Image
     from ...core.rawtrigger.typehint import Sprite as _Sprite
     from ...core.rawtrigger.typehint import Tech as _Tech
@@ -202,9 +204,9 @@ class UnsupportedMember(BaseMember):
         *,
         stride: int | None = None,
     ) -> None:
-        self.layout = layout
-        self.offset = offset
-        self.stride = 0 if stride is None else stride
+        self.layout = layout  # type: ignore[misc]
+        self.offset = offset  # type: ignore[misc]
+        self.stride = 0 if stride is None else stride  # type: ignore[misc]
 
     @overload
     def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
@@ -247,9 +249,9 @@ class NotImplementedMember(BaseMember):
         *,
         stride: int | None = None,
     ) -> None:
-        self.layout = layout
-        self.offset = offset
-        self.stride = 0 if stride is None else stride
+        self.layout = layout  # type: ignore[misc]
+        self.offset = offset  # type: ignore[misc]
+        self.stride = 0 if stride is None else stride  # type: ignore[misc]
 
     @overload
     def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
@@ -859,6 +861,28 @@ class RankMember(BaseMember):
         super().__set__(instance, value)
 
 
+class FlingyMember(BaseMember):
+    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+
+    @property
+    def kind(self):
+        return FlingyKind
+
+    @overload
+    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
+        ...
+
+    @overload
+    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> Flingy:
+        ...
+
+    def __get__(self, instance, owner):
+        return super().__get__(instance, owner)
+
+    def __set__(self, instance: EPDOffsetMap, value: _Flingy) -> None:
+        super().__set__(instance, value)
+
+
 class WordMember(BaseMember):
     __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
 
@@ -941,28 +965,6 @@ class UnitMember(BaseMember):
         return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: Unit) -> None:
-        super().__set__(instance, value)
-
-
-class FlingyMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
-
-    @property
-    def kind(self):
-        return FlingyKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> Flingy:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-    def __set__(self, instance: EPDOffsetMap, value: _Flingy) -> None:
         super().__set__(instance, value)
 
 
@@ -1127,6 +1129,30 @@ class MapStringMember(BaseMember):
         return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: String) -> None:
+        super().__set__(instance, value)
+
+
+class ButtonSetMember(BaseMember):
+    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+
+    @property
+    def kind(self):
+        return ButtonSetKind
+
+    @overload
+    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
+        ...
+
+    @overload
+    def __get__(
+        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
+    ) -> EUDVariable:
+        ...
+
+    def __get__(self, instance, owner):
+        return super().__get__(instance, owner)
+
+    def __set__(self, instance: EPDOffsetMap, value: ButtonSet) -> None:
         super().__set__(instance, value)
 
 

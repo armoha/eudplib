@@ -159,6 +159,7 @@ from .stockcond import (
 )
 from .strenc import (
     EncodeAIScript,
+    EncodeButtonSet,
     EncodeFlingy,
     EncodeIcon,
     EncodeImage,
@@ -342,6 +343,7 @@ __all__ = [
     "Score",
     "Switch",
     "EncodeAIScript",
+    "EncodeButtonSet",
     "EncodeFlingy",
     "EncodeIcon",
     "EncodeImage",

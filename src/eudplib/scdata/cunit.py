@@ -15,6 +15,7 @@ from ..utils import EPD, EPError, classproperty, unProxy
 from .csprite import int_or_var
 from .offsetmap import (
     BoolMember,
+    ButtonSetMember,
     ByteEnumMember,
     ByteMember,
     CSpriteMember,
@@ -196,7 +197,7 @@ class CUnit(EPDOffsetMap):
     """2 = issued an order,
     3 = interrupted an order,
     4 = hide self before death (self-destruct?)"""
-    currentButtonSet = UnitMember("struct", 0x094)
+    currentButtonSet = ButtonSetMember("struct", 0x094)
     isCloaked = BoolMember("struct", 0x096)
     movementState = ByteMember("struct", 0x097)
     buildQueue1 = UnitMember("struct", 0x098)
