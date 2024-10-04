@@ -150,6 +150,3 @@ class CSprite(EPDOffsetMap):
         if self._ptr is None:
             self._ptr = c.EUDVariable()
         return _ptr_cache(self._value, self._ptr)
-
-s = CSprite(0)
-s.flags.IscriptCode = True
