@@ -10,7 +10,8 @@ from typing import Final, Literal, Self, overload
 from ... import core as c
 from ... import ctrlstru as cs
 from ...core import EUDVariable
-from ...utils import ExprProxy, ep_assert
+from ...localize import _
+from ...utils import EPError, ExprProxy, ep_assert, unProxy
 from .epdoffsetmap import EPDOffsetMap
 from .member import BaseMember
 from .memberkind import BaseKind, ByteKind, DwordKind, WordKind
@@ -194,7 +195,7 @@ class DwordEnumMember(EnumMember):
 
 
 class Flag:
-    __slots__ = ("mask",)
+    __slots__ = ("mask", "__objclass__", "__name__")
 
     mask: Final[int]
 
@@ -240,27 +241,32 @@ class Flag:
     def __set__(self, instance: EnumMember, value) -> None:
         from ...memio import f_maskwrite_epd
 
-        if instance.layout == "struct":
-            epd, subp = instance._get_epd()
-            mask = self.mask << (8 * subp)
-            f_maskwrite_epd(epd, ~0, mask)
-            if cs.EUDIfNot()(value):
-                f_maskwrite_epd(epd, 0, mask)
-            cs.EUDEndIf()
-            return
-        elif instance.layout == "array":
-            # FIXME: replace to efficent implementation
-            # while subp is always int for StructMember,
-            # subp can be EUDVariable or int for ArrayMember
-            epd, subp = instance._get_epd()
-            mask = self.mask << (8 * subp)
-            f_maskwrite_epd(epd, ~0, mask)
-            if cs.EUDIfNot()(value):
-                f_maskwrite_epd(epd, 0, mask)
-            cs.EUDEndIf()
-            return
+        # FIXME: replace to efficent implementation
+        # while subp is always int for StructMember,
+        # subp can be EUDVariable or int for ArrayMember
+        epd, subp = instance._get_epd()
+        mask = self.mask << (8 * subp)
 
-        raise AttributeError
+        unproxied = unProxy(value)
+        if isinstance(unproxied, EUDVariable):
+            f_maskwrite_epd(epd, ~0, mask)
+            if cs.EUDIfNot()(value):
+                f_maskwrite_epd(epd, 0, mask)
+            cs.EUDEndIf()
+        elif unproxied in [0, False]:
+            f_maskwrite_epd(epd, 0, mask)
+        elif unproxied in [1, True]:
+            f_maskwrite_epd(epd, ~0, mask)
+        else:
+            raise EPError(
+                _("Can't assign {} to {}").format(
+                    value, f"{self.__objclass__}.{self.__name__}"
+                )
+            )
+
+    def __set_name__(self, owner: type[EnumMember], name: str) -> None:
+        self.__objclass__ = owner
+        self.__name__ = name
 
 
 class MovementFlags(ByteEnumMember):
