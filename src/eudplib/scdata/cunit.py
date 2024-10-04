@@ -101,311 +101,343 @@ class PathingFlags(ByteEnumMember):
 
 
 class CUnit(EPDOffsetMap):
-    __slots__ = ("_ptr",)
-    prev: ClassVar = CUnitMember("struct", 0x000)
-    next: ClassVar = CUnitMember("struct", 0x004)
-    hp: ClassVar = DwordMember("struct", 0x008)
+    __slots__ = "_ptr"
+    prev: ClassVar[CUnitMember] = CUnitMember("struct", 0x000)
+    next: ClassVar[CUnitMember] = CUnitMember("struct", 0x004)
+    hp: ClassVar[DwordMember] = DwordMember("struct", 0x008)
     "displayed value is ceil(healthPoints/256)"
-    sprite: ClassVar = CSpriteMember("struct", 0x00C)
-    moveTargetPos: ClassVar = PositionMember("struct", 0x010)
-    moveTargetX: ClassVar = PositionXMember("struct", 0x010)
-    moveTargetY: ClassVar = PositionYMember("struct", 0x012)
-    moveTarget: ClassVar = CUnitMember("struct", 0x014)
+    sprite: ClassVar[CSpriteMember] = CSpriteMember("struct", 0x00C)
+    moveTargetPos: ClassVar[PositionMember] = PositionMember("struct", 0x010)
+    moveTargetX: ClassVar[PositionXMember] = PositionXMember("struct", 0x010)
+    moveTargetY: ClassVar[PositionYMember] = PositionYMember("struct", 0x012)
+    moveTarget: ClassVar[CUnitMember] = CUnitMember("struct", 0x014)
     moveTargetUnit = moveTarget
-    nextMovementWaypoint: ClassVar = PositionMember("struct", 0x018)
+    nextMovementWaypoint: ClassVar[PositionMember] = PositionMember("struct", 0x018)
     """The next way point in the path the unit is following to get to its
     destination. Equal to moveToPos for air units since they don't need to
     navigate around buildings."""
-    nextTargetWaypoint: ClassVar = PositionMember("struct", 0x01C)
+    nextTargetWaypoint: ClassVar[PositionMember] = PositionMember("struct", 0x01C)
     "The desired position"
     movementFlags = MovementFlags("struct", 0x020)
-    currentDirection1: ClassVar = ByteMember("struct", 0x021)
+    currentDirection1: ClassVar[ByteMember] = ByteMember("struct", 0x021)
     "current direction the unit is facing"
-    turnSpeed: ClassVar = ByteMember("struct", 0x022)  # flingy
+    turnSpeed: ClassVar[ByteMember] = ByteMember("struct", 0x022)  # flingy
     turnRadius = turnSpeed
-    velocityDirection1: ClassVar = ByteMember("struct", 0x023)
+    velocityDirection1: ClassVar[ByteMember] = ByteMember("struct", 0x023)
     """usually only differs from the currentDirection field for units that
     can accelerate and travel in a different direction than they are facing.
     For example Mutalisks can change the direction they are facing
     faster than then can change the direction they are moving."""
-    flingyID: ClassVar = FlingyMember("struct", 0x024)
-    unknown0x26: ClassVar = ByteMember("struct", 0x026)
-    flingyMovementType: ClassVar = ByteMember("struct", 0x027)
-    pos: ClassVar = PositionMember("struct", 0x028)
+    flingyID: ClassVar[FlingyMember] = FlingyMember("struct", 0x024)
+    unknown0x26: ClassVar[ByteMember] = ByteMember("struct", 0x026)
+    flingyMovementType: ClassVar[ByteMember] = ByteMember("struct", 0x027)
+    pos: ClassVar[PositionMember] = PositionMember("struct", 0x028)
     "Current position of the unit"
-    posX: ClassVar = PositionXMember("struct", 0x028)
-    posY: ClassVar = PositionYMember("struct", 0x02A)
-    haltX: ClassVar = DwordMember("struct", 0x02C)
-    haltY: ClassVar = DwordMember("struct", 0x030)
-    topSpeed: ClassVar = DwordMember("struct", 0x034)
-    currentSpeed1: ClassVar = DwordMember("struct", 0x038)
-    currentSpeed2: ClassVar = DwordMember("struct", 0x03C)
-    currentVelocityX: ClassVar = DwordMember("struct", 0x040)
-    currentVelocityY: ClassVar = DwordMember("struct", 0x044)
-    acceleration: ClassVar = WordMember("struct", 0x048)
-    currentDirection2: ClassVar = ByteMember("struct", 0x04A)
-    velocityDirection2: ClassVar = ByteMember("struct", 0x04B)
+    posX: ClassVar[PositionXMember] = PositionXMember("struct", 0x028)
+    posY: ClassVar[PositionYMember] = PositionYMember("struct", 0x02A)
+    haltX: ClassVar[DwordMember] = DwordMember("struct", 0x02C)
+    haltY: ClassVar[DwordMember] = DwordMember("struct", 0x030)
+    topSpeed: ClassVar[DwordMember] = DwordMember("struct", 0x034)
+    currentSpeed1: ClassVar[DwordMember] = DwordMember("struct", 0x038)
+    currentSpeed2: ClassVar[DwordMember] = DwordMember("struct", 0x03C)
+    currentVelocityX: ClassVar[DwordMember] = DwordMember("struct", 0x040)
+    currentVelocityY: ClassVar[DwordMember] = DwordMember("struct", 0x044)
+    acceleration: ClassVar[WordMember] = WordMember("struct", 0x048)
+    currentDirection2: ClassVar[ByteMember] = ByteMember("struct", 0x04A)
+    velocityDirection2: ClassVar[ByteMember] = ByteMember("struct", 0x04B)
     "pathing related"
-    owner: ClassVar = PlayerMember("struct", 0x04C)
+    owner: ClassVar[PlayerMember] = PlayerMember("struct", 0x04C)
     playerID = owner
-    order: ClassVar = UnitOrderMember("struct", 0x04D)
-    orderID: ClassVar = UnitOrderMember("struct", 0x04D)
-    orderState: ClassVar = ByteMember("struct", 0x04E)
-    orderSignal: ClassVar = ByteMember("struct", 0x04F)
-    orderUnitType: ClassVar = UnitMember("struct", 0x050)
-    unknown0x52: ClassVar = WordMember("struct", 0x052)
+    order: ClassVar[UnitOrderMember] = UnitOrderMember("struct", 0x04D)
+    orderID: ClassVar[UnitOrderMember] = UnitOrderMember("struct", 0x04D)
+    orderState: ClassVar[ByteMember] = ByteMember("struct", 0x04E)
+    orderSignal: ClassVar[ByteMember] = ByteMember("struct", 0x04F)
+    orderUnitType: ClassVar[UnitMember] = UnitMember("struct", 0x050)
+    unknown0x52: ClassVar[WordMember] = WordMember("struct", 0x052)
     "2-byte padding"
-    cooldown: ClassVar = DwordMember("struct", 0x054)
-    orderTimer: ClassVar = ByteMember("struct", 0x054)
-    groundWeaponCooldown: ClassVar = ByteMember("struct", 0x055)
+    cooldown: ClassVar[DwordMember] = DwordMember("struct", 0x054)
+    orderTimer: ClassVar[ByteMember] = ByteMember("struct", 0x054)
+    groundWeaponCooldown: ClassVar[ByteMember] = ByteMember("struct", 0x055)
     gCooldown = groundWeaponCooldown
-    airWeaponCooldown: ClassVar = ByteMember("struct", 0x056)
+    airWeaponCooldown: ClassVar[ByteMember] = ByteMember("struct", 0x056)
     aCooldown = airWeaponCooldown
-    spellCooldown: ClassVar = ByteMember("struct", 0x057)
+    spellCooldown: ClassVar[ByteMember] = ByteMember("struct", 0x057)
     # ActionFocus
-    orderTargetXY: ClassVar = PositionMember("struct", 0x058)
+    orderTargetXY: ClassVar[PositionMember] = PositionMember("struct", 0x058)
     orderTargetPos = orderTargetXY
-    orderTargetX: ClassVar = PositionXMember("struct", 0x058)
-    orderTargetY: ClassVar = PositionYMember("struct", 0x05A)
-    orderTarget: ClassVar = CUnitMember("struct", 0x05C)
-    orderTargetUnit: ClassVar = CUnitMember("struct", 0x05C)
-    shield: ClassVar = DwordMember("struct", 0x060)
-    unitType: ClassVar = UnitMember("struct", 0x064)
+    orderTargetX: ClassVar[PositionXMember] = PositionXMember("struct", 0x058)
+    orderTargetY: ClassVar[PositionYMember] = PositionYMember("struct", 0x05A)
+    orderTarget: ClassVar[CUnitMember] = CUnitMember("struct", 0x05C)
+    orderTargetUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x05C)
+    shield: ClassVar[DwordMember] = DwordMember("struct", 0x060)
+    unitType: ClassVar[UnitMember] = UnitMember("struct", 0x064)
     unitID = unitType
-    unknown0x66: ClassVar = WordMember("struct", 0x066)
+    unknown0x66: ClassVar[WordMember] = WordMember("struct", 0x066)
     "2-byte padding"
-    prevPlayerUnit: ClassVar = CUnitMember("struct", 0x068)
-    nextPlayerUnit: ClassVar = CUnitMember("struct", 0x06C)
-    subUnit: ClassVar = CUnitMember("struct", 0x070)
-    orderQueueHead: ClassVar = UnsupportedMember("struct", 0x074)  # COrder
-    orderQueueTail: ClassVar = UnsupportedMember("struct", 0x078)  # COrder
-    autoTargetUnit: ClassVar = CUnitMember("struct", 0x07C)
-    connectedUnit: ClassVar = CUnitMember("struct", 0x080)
+    prevPlayerUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x068)
+    nextPlayerUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x06C)
+    subUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x070)
+    orderQueueHead: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x074)
+    """COrder"""
+    orderQueueTail: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x078)
+    """COrder"""
+    autoTargetUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x07C)
+    connectedUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x080)
     "larva, in-transit, addons"
-    orderQueueCount: ClassVar = ByteMember("struct", 0x084)
+    orderQueueCount: ClassVar[ByteMember] = ByteMember("struct", 0x084)
     "may be count in addition to first since can be 2 when 3 orders are queued"
-    orderQueueTimer: ClassVar = ByteMember("struct", 0x085)
+    orderQueueTimer: ClassVar[ByteMember] = ByteMember("struct", 0x085)
     "Cycles down from from 8 to 0 (inclusive). See also 0x122."
-    unknown0x86: ClassVar = ByteMember("struct", 0x086)
-    attackNotifyTimer: ClassVar = ByteMember("struct", 0x087)
+    unknown0x86: ClassVar[ByteMember] = ByteMember("struct", 0x086)
+    attackNotifyTimer: ClassVar[ByteMember] = ByteMember("struct", 0x087)
     "Prevent 'Your forces are under attack.' on every attack"
-    prevUnitType: ClassVar = UnsupportedMember("struct", 0x088)  # Unit
-    "zerg buildings while morphing"
-    lastEventTimer: ClassVar = UnsupportedMember("struct", 0x08A)  # Byte
-    lastEventColor: ClassVar = UnsupportedMember("struct", 0x08B)  # Byte
-    "17 = was completed (train, morph), 174 = was attacked"
-    unknown0x8C: ClassVar = WordMember("struct", 0x08C)
+    prevUnitType: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x088)
+    "Unit. Zerg buildings while morphing"
+    lastEventTimer: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x08A)
+    """Byte"""
+    lastEventColor: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x08B)
+    "Byte. 17 = was completed (train, morph), 174 = was attacked"
+    unknown0x8C: ClassVar[WordMember] = WordMember("struct", 0x08C)
     "might have originally been RGB from lastEventColor"
-    rankIncrease: ClassVar = ByteMember("struct", 0x08E)
-    killCount: ClassVar = ByteMember("struct", 0x08F)
-    lastAttackingPlayer: ClassVar = PlayerMember("struct", 0x090)
-    secondaryOrderTimer: ClassVar = ByteMember("struct", 0x091)
-    AIActionFlag: ClassVar = ByteMember("struct", 0x092)
-    userActionFlags: ClassVar = ByteMember("struct", 0x093)
+    rankIncrease: ClassVar[ByteMember] = ByteMember("struct", 0x08E)
+    killCount: ClassVar[ByteMember] = ByteMember("struct", 0x08F)
+    lastAttackingPlayer: ClassVar[PlayerMember] = PlayerMember("struct", 0x090)
+    secondaryOrderTimer: ClassVar[ByteMember] = ByteMember("struct", 0x091)
+    AIActionFlag: ClassVar[ByteMember] = ByteMember("struct", 0x092)
+    userActionFlags: ClassVar[ByteMember] = ByteMember("struct", 0x093)
     """2 = issued an order,
     3 = interrupted an order,
     4 = hide self before death (self-destruct?)"""
-    currentButtonSet: ClassVar = ButtonSetMember("struct", 0x094)
-    isCloaked: ClassVar = BoolMember("struct", 0x096)
-    movementState: ClassVar = ByteMember("struct", 0x097)
-    buildQueue1: ClassVar = UnitMember("struct", 0x098)
-    buildQueue2: ClassVar = UnitMember("struct", 0x09A)
-    buildQueue3: ClassVar = UnitMember("struct", 0x09C)
-    buildQueue4: ClassVar = UnitMember("struct", 0x09E)
-    buildQueue5: ClassVar = UnitMember("struct", 0x0A0)
-    buildQueue12: ClassVar = DwordMember("struct", 0x098)
-    buildQueue34: ClassVar = DwordMember("struct", 0x09C)
-    energy: ClassVar = WordMember("struct", 0x0A2)
-    buildQueueSlot: ClassVar = ByteMember("struct", 0x0A4)
-    uniquenessIdentifier: ClassVar = ByteMember("struct", 0x0A5)
+    currentButtonSet: ClassVar[ButtonSetMember] = ButtonSetMember("struct", 0x094)
+    isCloaked: ClassVar[BoolMember] = BoolMember("struct", 0x096)
+    movementState: ClassVar[ByteMember] = ByteMember("struct", 0x097)
+    buildQueue1: ClassVar[UnitMember] = UnitMember("struct", 0x098)
+    buildQueue2: ClassVar[UnitMember] = UnitMember("struct", 0x09A)
+    buildQueue3: ClassVar[UnitMember] = UnitMember("struct", 0x09C)
+    buildQueue4: ClassVar[UnitMember] = UnitMember("struct", 0x09E)
+    buildQueue5: ClassVar[UnitMember] = UnitMember("struct", 0x0A0)
+    buildQueue12: ClassVar[DwordMember] = DwordMember("struct", 0x098)
+    buildQueue34: ClassVar[DwordMember] = DwordMember("struct", 0x09C)
+    energy: ClassVar[WordMember] = WordMember("struct", 0x0A2)
+    buildQueueSlot: ClassVar[ByteMember] = ByteMember("struct", 0x0A4)
+    uniquenessIdentifier: ClassVar[ByteMember] = ByteMember("struct", 0x0A5)
     targetOrderSpecial = uniquenessIdentifier
-    secondaryOrder: ClassVar = UnitOrderMember("struct", 0x0A6)
+    secondaryOrder: ClassVar[UnitOrderMember] = UnitOrderMember("struct", 0x0A6)
     secondaryOrderID = secondaryOrder
-    buildingOverlayState: ClassVar = ByteMember("struct", 0x0A7)
+    buildingOverlayState: ClassVar[ByteMember] = ByteMember("struct", 0x0A7)
     "0 means the building has the largest amount of fire/blood"
-    hpGain: ClassVar = WordMember("struct", 0x0A8)
+    hpGain: ClassVar[WordMember] = WordMember("struct", 0x0A8)
     "buildRepairHpGain"
-    shieldGain: ClassVar = WordMember("struct", 0x0AA)
+    shieldGain: ClassVar[WordMember] = WordMember("struct", 0x0AA)
     "Shield gain on construction"
-    remainingBuildTime: ClassVar = WordMember("struct", 0x0AC)
+    remainingBuildTime: ClassVar[WordMember] = WordMember("struct", 0x0AC)
     """Remaining bulding time; also used by powerups (flags)
     as the timer for returning to their original location."""
-    prevHp: ClassVar = WordMember("struct", 0x0AE)
+    prevHp: ClassVar[WordMember] = WordMember("struct", 0x0AE)
     """The HP of the unit before it changed
     (example: Drone->Hatchery, the Drone's HP will be stored here)"""
-    loadedUnit1: ClassVar = UnsupportedMember("struct", 0x0B0)  # Word
-    "alphaID (StoredUnit)"
-    loadedUnit2: ClassVar = UnsupportedMember("struct", 0x0B2)  # Word
-    loadedUnit3: ClassVar = UnsupportedMember("struct", 0x0B4)  # Word
-    loadedUnit4: ClassVar = UnsupportedMember("struct", 0x0B6)  # Word
-    loadedUnit5: ClassVar = UnsupportedMember("struct", 0x0B8)  # Word
-    loadedUnit6: ClassVar = UnsupportedMember("struct", 0x0BA)  # Word
-    loadedUnit7: ClassVar = UnsupportedMember("struct", 0x0BC)  # Word
-    loadedUnit8: ClassVar = UnsupportedMember("struct", 0x0BE)  # Word
+    loadedUnit1: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x0B0)
+    "Word. alphaID (StoredUnit)"
+    loadedUnit2: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x0B2)
+    "Word. alphaID (StoredUnit)"
+    loadedUnit3: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x0B4)
+    "Word. alphaID (StoredUnit)"
+    loadedUnit4: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x0B6)
+    "Word. alphaID (StoredUnit)"
+    loadedUnit5: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x0B8)
+    "Word. alphaID (StoredUnit)"
+    loadedUnit6: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x0BA)
+    "Word. alphaID (StoredUnit)"
+    loadedUnit7: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x0BC)
+    "Word. alphaID (StoredUnit)"
+    loadedUnit8: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x0BE)
+    "Word. alphaID (StoredUnit)"
     # union (0xC0 ~ 0xCF) //==================================
-    spiderMineCount: ClassVar = ByteMember("struct", 0x0C0)  # vulture
+    spiderMineCount: ClassVar[ByteMember] = ByteMember("struct", 0x0C0)  # vulture
     # carrier, reaver ----------------------------------------
-    inHangarChild: ClassVar = CUnitMember("struct", 0x0C0)
-    outHangarChild: ClassVar = CUnitMember("struct", 0x0C4)
-    inHangarCount: ClassVar = ByteMember("struct", 0x0C8)
-    outHangarCount: ClassVar = ByteMember("struct", 0x0C9)
+    inHangarChild: ClassVar[CUnitMember] = CUnitMember("struct", 0x0C0)
+    outHangarChild: ClassVar[CUnitMember] = CUnitMember("struct", 0x0C4)
+    inHangarCount: ClassVar[ByteMember] = ByteMember("struct", 0x0C8)
+    outHangarCount: ClassVar[ByteMember] = ByteMember("struct", 0x0C9)
     # interceptor, scarab ------------------------------------
-    parent: ClassVar = CUnitMember("struct", 0x0C0)
-    prevFighter: ClassVar = CUnitMember("struct", 0x0C4)
-    nextFighter: ClassVar = CUnitMember("struct", 0x0C8)
-    isOutsideHangar: ClassVar = BoolMember("struct", 0x0CC)
+    parent: ClassVar[CUnitMember] = CUnitMember("struct", 0x0C0)
+    prevFighter: ClassVar[CUnitMember] = CUnitMember("struct", 0x0C4)
+    nextFighter: ClassVar[CUnitMember] = CUnitMember("struct", 0x0C8)
+    isOutsideHangar: ClassVar[BoolMember] = BoolMember("struct", 0x0CC)
     # beacon -------------------------------------------------
-    beaconUnknown0xC0: ClassVar = DwordMember("struct", 0x0C0)
-    beaconUnknown0xC4: ClassVar = DwordMember("struct", 0x0C4)
-    flagSpawnFrame: ClassVar = DwordMember("struct", 0x0C8)  # beacon
+    beaconUnknown0xC0: ClassVar[DwordMember] = DwordMember("struct", 0x0C0)
+    beaconUnknown0xC4: ClassVar[DwordMember] = DwordMember("struct", 0x0C4)
+    flagSpawnFrame: ClassVar[DwordMember] = DwordMember("struct", 0x0C8)  # beacon
     # building /==============================================
-    addon: ClassVar = CUnitMember("struct", 0x0C0)
-    addonBuildType: ClassVar = UnitMember("struct", 0x0C4)
-    upgradeResearchTime: ClassVar = WordMember("struct", 0x0C6)
-    techType: ClassVar = TechMember("struct", 0x0C8)
-    upgradeType: ClassVar = UpgradeMember("struct", 0x0C9)
-    larvaTimer: ClassVar = ByteMember("struct", 0x0CA)
-    landingTimer: ClassVar = ByteMember("struct", 0x0CB)
-    creepTimer: ClassVar = ByteMember("struct", 0x0CC)
-    upgradeLevel: ClassVar = ByteMember("struct", 0x0CD)
+    addon: ClassVar[CUnitMember] = CUnitMember("struct", 0x0C0)
+    addonBuildType: ClassVar[UnitMember] = UnitMember("struct", 0x0C4)
+    upgradeResearchTime: ClassVar[WordMember] = WordMember("struct", 0x0C6)
+    techType: ClassVar[TechMember] = TechMember("struct", 0x0C8)
+    upgradeType: ClassVar[UpgradeMember] = UpgradeMember("struct", 0x0C9)
+    larvaTimer: ClassVar[ByteMember] = ByteMember("struct", 0x0CA)
+    landingTimer: ClassVar[ByteMember] = ByteMember("struct", 0x0CB)
+    creepTimer: ClassVar[ByteMember] = ByteMember("struct", 0x0CC)
+    upgradeLevel: ClassVar[ByteMember] = ByteMember("struct", 0x0CD)
     # padding0xCE
     # resource -----------------------------------------------
-    resourceAmount: ClassVar = WordMember("struct", 0x0D0)  # 0x0D0 union
-    resourceIscript: ClassVar = ByteMember("struct", 0x0D2)
-    gatherQueueCount: ClassVar = BoolMember("struct", 0x0D3)
+    resourceAmount: ClassVar[WordMember] = WordMember("struct", 0x0D0)  # 0x0D0 union
+    resourceIscript: ClassVar[ByteMember] = ByteMember("struct", 0x0D2)
+    gatherQueueCount: ClassVar[BoolMember] = BoolMember("struct", 0x0D3)
     """it is byte but effectively bool; always set to 1 when beginning to harvest,
     but when finshed, it is    by 1 instead of set to 0"""
-    nextGatherer: ClassVar = CUnitMember("struct", 0x0D4)
+    nextGatherer: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D4)
     "pointer to the next worker unit waiting in line to gather"
-    resourceGroup: ClassVar = ByteMember("struct", 0x0D8)
-    resourceBelongsToAI: ClassVar = BoolMember("struct", 0x0D9)
+    resourceGroup: ClassVar[ByteMember] = ByteMember("struct", 0x0D8)
+    resourceBelongsToAI: ClassVar[BoolMember] = BoolMember("struct", 0x0D9)
     # other buildings ----------------------------------------
-    nydusExit: ClassVar = CUnitMember("struct", 0x0D0)
+    nydusExit: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D0)
     "connected nydus canal"
-    ghostNukeDot: ClassVar = DwordMember("struct", 0x0D0)  # FIXME: should be CThingy
+    # FIXME: should be CThingy
+    ghostNukeDot: ClassVar[DwordMember] = DwordMember("struct", 0x0D0)
     """CThingy struct is same as CUnit but trimmed down to [prev, next, hp, sprite],
     with "hp" field used as unitID for fog thingies or otherwise unused"""
-    pylonAura: ClassVar = CSpriteMember("struct", 0x0D0)
+    pylonAura: ClassVar[CSpriteMember] = CSpriteMember("struct", 0x0D0)
     # silo
-    siloNuke: ClassVar = CUnitMember("struct", 0x0D0)
-    siloReady: ClassVar = BoolMember("struct", 0x0D4)
+    siloNuke: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D0)
+    siloReady: ClassVar[BoolMember] = BoolMember("struct", 0x0D4)
     # hatchery
-    hatcheryHarvestLT: ClassVar = DwordMember("struct", 0x0D0)
-    hatcheryHarvestRB: ClassVar = DwordMember("struct", 0x0D4)
-    hatcheryHarvestL: ClassVar = WordMember("struct", 0x0D0)
-    hatcheryHarvestT: ClassVar = WordMember("struct", 0x0D2)
-    hatcheryHarvestR: ClassVar = WordMember("struct", 0x0D4)
-    hatcheryHarvestB: ClassVar = WordMember("struct", 0x0D6)
+    hatcheryHarvestLT: ClassVar[DwordMember] = DwordMember("struct", 0x0D0)
+    hatcheryHarvestRB: ClassVar[DwordMember] = DwordMember("struct", 0x0D4)
+    hatcheryHarvestL: ClassVar[WordMember] = WordMember("struct", 0x0D0)
+    hatcheryHarvestT: ClassVar[WordMember] = WordMember("struct", 0x0D2)
+    hatcheryHarvestR: ClassVar[WordMember] = WordMember("struct", 0x0D4)
+    hatcheryHarvestB: ClassVar[WordMember] = WordMember("struct", 0x0D6)
     # ==============================================/ building
     # worker -------------------------------------------------
-    powerup: ClassVar = CUnitMember("struct", 0x0C0)
-    targetResourcePos: ClassVar = PositionMember("struct", 0x0C4)
-    targetResourceX: ClassVar = PositionXMember("struct", 0x0C4)
-    targetResourceY: ClassVar = PositionYMember("struct", 0x0C6)
-    targetResourceUnit: ClassVar = CUnitMember("struct", 0x0C8)
-    repairResourceLossTimer: ClassVar = WordMember("struct", 0x0CC)
-    isCarryingSomething: ClassVar = BoolMember("struct", 0x0CE)
-    resourceCarryAmount: ClassVar = ByteMember("struct", 0x0CF)
-    harvestTarget: ClassVar = CUnitMember("struct", 0x0D0)
-    prevHarvestUnit: ClassVar = CUnitMember("struct", 0x0D4)
-    nextHarvestUnit: ClassVar = CUnitMember("struct", 0x0D8)
+    powerup: ClassVar[CUnitMember] = CUnitMember("struct", 0x0C0)
+    targetResourcePos: ClassVar[PositionMember] = PositionMember("struct", 0x0C4)
+    targetResourceX: ClassVar[PositionXMember] = PositionXMember("struct", 0x0C4)
+    targetResourceY: ClassVar[PositionYMember] = PositionYMember("struct", 0x0C6)
+    targetResourceUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x0C8)
+    repairResourceLossTimer: ClassVar[WordMember] = WordMember("struct", 0x0CC)
+    isCarryingSomething: ClassVar[BoolMember] = BoolMember("struct", 0x0CE)
+    resourceCarryAmount: ClassVar[ByteMember] = ByteMember("struct", 0x0CF)
+    harvestTarget: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D0)
+    prevHarvestUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D4)
+    nextHarvestUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D8)
     "When there is a gather conflict"
     # powerup ------------------------------------------------
-    powerupOrigin: ClassVar = PositionMember("struct", 0x0D0)
-    powerupOriginX: ClassVar = PositionXMember("struct", 0x0D0)
-    powerupOriginY: ClassVar = PositionYMember("struct", 0x0D2)
-    powerupCarryingUnit: ClassVar = CUnitMember("struct", 0x0D4)
+    powerupOrigin: ClassVar[PositionMember] = PositionMember("struct", 0x0D0)
+    powerupOriginX: ClassVar[PositionXMember] = PositionXMember("struct", 0x0D0)
+    powerupOriginY: ClassVar[PositionYMember] = PositionYMember("struct", 0x0D2)
+    powerupCarryingUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D4)
     # \\\\\\\\\\\\\\\=================================// union
     statusFlags = StatusFlags("struct", 0x0DC)
-    resourceType: ClassVar = WorkerCarryTypeMember("struct", 0x0E0)
+    resourceType: ClassVar[WorkerCarryTypeMember] = WorkerCarryTypeMember(
+        "struct", 0x0E0
+    )
     "Type of resource chunk carried by worker: (None, Gas, Ore, GasOrOre, PowerUp)"
-    wireframeRandomizer: ClassVar = ByteMember("struct", 0x0E1)
-    secondaryOrderState: ClassVar = ByteMember("struct", 0x0E2)
-    recentOrderTimer: ClassVar = ByteMember("struct", 0x0E3)
+    wireframeRandomizer: ClassVar[ByteMember] = ByteMember("struct", 0x0E1)
+    secondaryOrderState: ClassVar[ByteMember] = ByteMember("struct", 0x0E2)
+    recentOrderTimer: ClassVar[ByteMember] = ByteMember("struct", 0x0E3)
     """Counts down from 15 to 0 when most orders are given,
     or when the unit moves after reaching a patrol location"""
-    visibilityStatus: ClassVar = DwordMember("struct", 0x0E4)
+    visibilityStatus: ClassVar[DwordMember] = DwordMember("struct", 0x0E4)
     "which players can detect this unit (cloaked/burrowed)"
-    secondaryOrderPos: ClassVar = PositionMember("struct", 0x0E8)
-    secondaryOrderX: ClassVar = PositionXMember("struct", 0x0E8)
-    secondaryOrderY: ClassVar = PositionYMember("struct", 0x0EA)
-    currentBuildUnit: ClassVar = CUnitMember("struct", 0x0EC)
-    prevBurrowedUnit: ClassVar = UnsupportedMember("struct", 0x0F0)  # CUnit
-    nextBurrowedUnit: ClassVar = UnsupportedMember("struct", 0x0F4)  # CUnit
-    rallyPos: ClassVar = PositionMember("struct", 0x0F8)
-    rallyX: ClassVar = PositionXMember("struct", 0x0F8)
-    rallyY: ClassVar = PositionYMember("struct", 0x0FA)
-    rallyUnit: ClassVar = CUnitMember("struct", 0x0FC)
-    prevPsiProvider: ClassVar = CUnitMember("struct", 0x0F8)
-    nextPsiProvider: ClassVar = CUnitMember("struct", 0x0FC)
-    path: ClassVar = UnsupportedMember("struct", 0x100)  # Dword
-    pathingCollisionInterval: ClassVar = ByteMember("struct", 0x104)
+    secondaryOrderPos: ClassVar[PositionMember] = PositionMember("struct", 0x0E8)
+    secondaryOrderX: ClassVar[PositionXMember] = PositionXMember("struct", 0x0E8)
+    secondaryOrderY: ClassVar[PositionYMember] = PositionYMember("struct", 0x0EA)
+    currentBuildUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x0EC)
+    prevBurrowedUnit: ClassVar[UnsupportedMember] = UnsupportedMember(
+        "struct", 0x0F0
+    )  # CUnit
+    nextBurrowedUnit: ClassVar[UnsupportedMember] = UnsupportedMember(
+        "struct", 0x0F4
+    )  # CUnit
+    rallyPos: ClassVar[PositionMember] = PositionMember("struct", 0x0F8)
+    rallyX: ClassVar[PositionXMember] = PositionXMember("struct", 0x0F8)
+    rallyY: ClassVar[PositionYMember] = PositionYMember("struct", 0x0FA)
+    rallyUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x0FC)
+    prevPsiProvider: ClassVar[CUnitMember] = CUnitMember("struct", 0x0F8)
+    nextPsiProvider: ClassVar[CUnitMember] = CUnitMember("struct", 0x0FC)
+    path: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x100)  # Dword
+    pathingCollisionInterval: ClassVar[ByteMember] = ByteMember("struct", 0x104)
     pathingFlags = PathingFlags("struct", 0x105)
-    unknown0x106: ClassVar = ByteMember("struct", 0x106)
-    isBeingHealed: ClassVar = BoolMember("struct", 0x107)
+    unknown0x106: ClassVar[ByteMember] = ByteMember("struct", 0x106)
+    isBeingHealed: ClassVar[BoolMember] = BoolMember("struct", 0x107)
     "1 if a medic is currently healing this unit"
-    contourBoundsLT: ClassVar = UnsupportedMember("struct", 0x108)  # Dword
+    contourBoundsLT: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x108)
+    """Dword"""
     "A rect that specifies the closest contour (collision) points"
-    contourBoundsRB: ClassVar = UnsupportedMember("struct", 0x10C)  # Dword
-    contourBoundsL: ClassVar = UnsupportedMember("struct", 0x108)  # Word
-    contourBoundsT: ClassVar = UnsupportedMember("struct", 0x10A)  # Word
-    contourBoundsR: ClassVar = UnsupportedMember("struct", 0x10C)  # Word
-    contourBoundsB: ClassVar = UnsupportedMember("struct", 0x10E)  # Word
-    removeTimer: ClassVar = WordMember("struct", 0x110)
+    contourBoundsRB: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x10C)
+    """Dword"""
+    contourBoundsL: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x108)
+    """Word"""
+    contourBoundsT: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x10A)
+    """Word"""
+    contourBoundsR: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x10C)
+    """Word"""
+    contourBoundsB: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x10E)
+    """Word"""
+    removeTimer: ClassVar[WordMember] = WordMember("struct", 0x110)
     """Hallucination, Dark Swarm, Disruption Web, Broodling
     (but not Scanner Sweep according to BWAPI)"""
-    defensiveMatrixHp: ClassVar = WordMember("struct", 0x112)
-    defensiveMatrixTimer: ClassVar = ByteMember("struct", 0x114)
-    stimTimer: ClassVar = ByteMember("struct", 0x115)
-    ensnareTimer: ClassVar = ByteMember("struct", 0x116)
-    lockdownTimer: ClassVar = ByteMember("struct", 0x117)
-    irradiateTimer: ClassVar = ByteMember("struct", 0x118)
-    stasisTimer: ClassVar = ByteMember("struct", 0x119)
-    plagueTimer: ClassVar = ByteMember("struct", 0x11A)
-    stormTimer: ClassVar = ByteMember("struct", 0x11B)
-    isUnderStorm: ClassVar = BoolMember("struct", 0x11B)
+    defensiveMatrixHp: ClassVar[WordMember] = WordMember("struct", 0x112)
+    defensiveMatrixTimer: ClassVar[ByteMember] = ByteMember("struct", 0x114)
+    stimTimer: ClassVar[ByteMember] = ByteMember("struct", 0x115)
+    ensnareTimer: ClassVar[ByteMember] = ByteMember("struct", 0x116)
+    lockdownTimer: ClassVar[ByteMember] = ByteMember("struct", 0x117)
+    irradiateTimer: ClassVar[ByteMember] = ByteMember("struct", 0x118)
+    stasisTimer: ClassVar[ByteMember] = ByteMember("struct", 0x119)
+    plagueTimer: ClassVar[ByteMember] = ByteMember("struct", 0x11A)
+    stormTimer: ClassVar[ByteMember] = ByteMember("struct", 0x11B)
+    isUnderStorm: ClassVar[BoolMember] = BoolMember("struct", 0x11B)
     "Used to tell if a unit is under psi storm"
-    irradiatedBy: ClassVar = CUnitMember("struct", 0x11C)
-    irradiatePlayerID: ClassVar = PlayerMember("struct", 0x120)
-    parasiteFlags: ClassVar = ByteMember("struct", 0x121)
+    irradiatedBy: ClassVar[CUnitMember] = CUnitMember("struct", 0x11C)
+    irradiatePlayerID: ClassVar[PlayerMember] = PlayerMember("struct", 0x120)
+    parasiteFlags: ClassVar[ByteMember] = ByteMember("struct", 0x121)
     "Each bit corresponds to the player who has parasited this unit"
-    cycleCounter: ClassVar = ByteMember("struct", 0x122)
+    cycleCounter: ClassVar[ByteMember] = ByteMember("struct", 0x122)
     "counts/cycles up from 0 to 7 (inclusive). See also 0x85"
-    blindFlags: ClassVar = ByteMember("struct", 0x123)
+    blindFlags: ClassVar[ByteMember] = ByteMember("struct", 0x123)
     """Each bit corresponds to the player who has optical flared this unit,
     like parasiteFlags, but is read as a bool for vision check"""
-    maelstromTimer: ClassVar = ByteMember("struct", 0x124)
-    unusedTimer: ClassVar = ByteMember("struct", 0x125)
+    maelstromTimer: ClassVar[ByteMember] = ByteMember("struct", 0x124)
+    unusedTimer: ClassVar[ByteMember] = ByteMember("struct", 0x125)
     "Might be afterburner timer or ultralisk roar timer"
-    acidSporeCount: ClassVar = ByteMember("struct", 0x126)
-    acidSporeTime0: ClassVar = ByteMember("struct", 0x127)
-    acidSporeTime1: ClassVar = ByteMember("struct", 0x128)
-    acidSporeTime2: ClassVar = ByteMember("struct", 0x129)
-    acidSporeTime3: ClassVar = ByteMember("struct", 0x12A)
-    acidSporeTime4: ClassVar = ByteMember("struct", 0x12B)
-    acidSporeTime5: ClassVar = ByteMember("struct", 0x12C)
-    acidSporeTime6: ClassVar = ByteMember("struct", 0x12D)
-    acidSporeTime7: ClassVar = ByteMember("struct", 0x12E)
-    acidSporeTime8: ClassVar = ByteMember("struct", 0x12F)
-    offsetIndex3by3: ClassVar = UnsupportedMember("struct", 0x130)  # Word
+    acidSporeCount: ClassVar[ByteMember] = ByteMember("struct", 0x126)
+    acidSporeTime0: ClassVar[ByteMember] = ByteMember("struct", 0x127)
+    acidSporeTime1: ClassVar[ByteMember] = ByteMember("struct", 0x128)
+    acidSporeTime2: ClassVar[ByteMember] = ByteMember("struct", 0x129)
+    acidSporeTime3: ClassVar[ByteMember] = ByteMember("struct", 0x12A)
+    acidSporeTime4: ClassVar[ByteMember] = ByteMember("struct", 0x12B)
+    acidSporeTime5: ClassVar[ByteMember] = ByteMember("struct", 0x12C)
+    acidSporeTime6: ClassVar[ByteMember] = ByteMember("struct", 0x12D)
+    acidSporeTime7: ClassVar[ByteMember] = ByteMember("struct", 0x12E)
+    acidSporeTime8: ClassVar[ByteMember] = ByteMember("struct", 0x12F)
+    offsetIndex3by3: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x130)
+    """Word"""
     """Cycles between 0-12 for each bullet fired by this unit
     (if it uses a 'Attack 3x3 area' weapon)"""
-    unknown0x132: ClassVar = UnsupportedMember("struct", 0x132)  # Word
-    "padding"
-    AI: ClassVar = UnsupportedMember("struct", 0x134)  # Dword
-    airStrength: ClassVar = UnsupportedMember("struct", 0x138)  # Word
-    groundStrength: ClassVar = UnsupportedMember("struct", 0x13A)  # Word
-    finderIndexLeft: ClassVar = UnsupportedMember("struct", 0x13C)  # Dword
-    finderIndexRight: ClassVar = UnsupportedMember("struct", 0x140)  # Dword
-    finderIndexTop: ClassVar = UnsupportedMember("struct", 0x144)  # Dword
-    finderIndexBottom: ClassVar = UnsupportedMember("struct", 0x148)  # Dword
-    repulseUnknown: ClassVar = ByteMember("struct", 0x14C)
+    unknown0x132: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x132)
+    "Word. padding"
+    AI: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x134)  # Dword
+    airStrength: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x138)
+    """Word"""
+    groundStrength: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x13A)
+    """Word"""
+    finderIndexLeft: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x13C)
+    """Dword"""
+    finderIndexRight: ClassVar[UnsupportedMember] = UnsupportedMember(
+        "struct", 0x140
+    )  # Dword
+    finderIndexTop: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x144)
+    """Dword"""
+    finderIndexBottom: ClassVar[UnsupportedMember] = UnsupportedMember(
+        "struct", 0x148
+    )  # Dword
+    repulseUnknown: ClassVar[ByteMember] = ByteMember("struct", 0x14C)
     "updated only when air unit is being pushed"
-    repulseAngle: ClassVar = ByteMember("struct", 0x14D)
-    driftPos: ClassVar = WordMember("struct", 0x14E)
+    repulseAngle: ClassVar[ByteMember] = ByteMember("struct", 0x14D)
+    driftPos: ClassVar[WordMember] = WordMember("struct", 0x14E)
     "(mapsizex / 1.5 max)"
-    driftX: ClassVar = ByteMember("struct", 0x14E)
-    driftY: ClassVar = ByteMember("struct", 0x14F)
+    driftX: ClassVar[ByteMember] = ByteMember("struct", 0x14E)
+    driftY: ClassVar[ByteMember] = ByteMember("struct", 0x14F)
 
     @classproperty
     def range(self):

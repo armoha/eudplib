@@ -18,14 +18,14 @@ from .offsetmap import BoolMember, EPDOffsetMap, ImageMember
 class Sprite(EPDOffsetMap, ConstType):
     __slots__ = ()
     # Read only data skipped
-    image: ClassVar = ImageMember("array", 0x666160)
-    # hpBarSize: ClassVar = ArrayMember(0x665E50, Mk.BYTE)
+    image: ClassVar[ImageMember] = ImageMember("array", 0x666160)
+    # hpBarSize: ClassVar[ArrayMember] = ArrayMember(0x665E50, Mk.BYTE)
     # hpBarSize starts on Sprites.dat ID 130
-    # unknownFlag: ClassVar = ArrayMember(0x666570, Mk.BYTE)
-    isVisible: ClassVar = BoolMember("array", 0x665C48)
-    # selectionCircle: ClassVar = ArrayMember(0x665AC0, Mk.BYTE)
+    # unknownFlag: ClassVar[ArrayMember] = ArrayMember(0x666570, Mk.BYTE)
+    isVisible: ClassVar[BoolMember] = BoolMember("array", 0x665C48)
+    # selectionCircle: ClassVar[ArrayMember] = ArrayMember(0x665AC0, Mk.BYTE)
     # selectionCircle and selectionVerticalOffset start on Sprites.dat ID 130
-    # selectionVerticalOffset: ClassVar = ArrayMember(0x665FD8, Mk.BYTE)
+    # selectionVerticalOffset: ClassVar[ArrayMember] = ArrayMember(0x665FD8, Mk.BYTE)
 
     @ut.classproperty
     def range(self):

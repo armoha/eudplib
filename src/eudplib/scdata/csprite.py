@@ -48,29 +48,29 @@ int_or_var: TypeAlias = int | c.EUDVariable | ExprProxy
 
 
 class CSprite(EPDOffsetMap):
-    __slots__ = ("_ptr",)
-    prev: ClassVar = CSpriteMember("struct", 0x00)
-    next: ClassVar = CSpriteMember("struct", 0x04)
-    sprite: ClassVar = SpriteMember("struct", 0x08)
-    player: ClassVar = PlayerMember("struct", 0x0A)
+    __slots__ = "_ptr"
+    prev: ClassVar[CSpriteMember] = CSpriteMember("struct", 0x00)
+    next: ClassVar[CSpriteMember] = CSpriteMember("struct", 0x04)
+    sprite: ClassVar[SpriteMember] = SpriteMember("struct", 0x08)
+    player: ClassVar[PlayerMember] = PlayerMember("struct", 0x0A)
     "officially 'creator'"
-    selectionIndex: ClassVar = ByteMember("struct", 0x0B)
+    selectionIndex: ClassVar[ByteMember] = ByteMember("struct", 0x0B)
     "0 <= selectionIndex <= 11. Index in the selection area at bottom of screen."
-    visibilityFlags: ClassVar = ByteMember("struct", 0x0C)
+    visibilityFlags: ClassVar[ByteMember] = ByteMember("struct", 0x0C)
     "Player bits indicating visibility for a player (not hidden by the fog-of-war)"
-    elevationLevel: ClassVar = ByteMember("struct", 0x0D)
+    elevationLevel: ClassVar[ByteMember] = ByteMember("struct", 0x0D)
     flags = CSpriteFlags("struct", 0x0E)
-    selectionTimer: ClassVar = ByteMember("struct", 0x0F)
-    index: ClassVar = WordMember("struct", 0x10)
-    grpWidth: ClassVar = ByteMember("struct", 0x12)
-    grpHeight: ClassVar = ByteMember("struct", 0x13)
-    pos: ClassVar = PositionMember("struct", 0x14)
-    posX: ClassVar = PositionXMember("struct", 0x14)
-    posY: ClassVar = PositionYMember("struct", 0x16)
-    mainGraphic: ClassVar = DwordMember("struct", 0x18)
+    selectionTimer: ClassVar[ByteMember] = ByteMember("struct", 0x0F)
+    index: ClassVar[WordMember] = WordMember("struct", 0x10)
+    grpWidth: ClassVar[ByteMember] = ByteMember("struct", 0x12)
+    grpHeight: ClassVar[ByteMember] = ByteMember("struct", 0x13)
+    pos: ClassVar[PositionMember] = PositionMember("struct", 0x14)
+    posX: ClassVar[PositionXMember] = PositionXMember("struct", 0x14)
+    posY: ClassVar[PositionYMember] = PositionYMember("struct", 0x16)
+    mainGraphic: ClassVar[DwordMember] = DwordMember("struct", 0x18)
     "officially 'pImagePrimary', CImage"
-    imageHead: ClassVar = DwordMember("struct", 0x1C)
-    imageTail: ClassVar = DwordMember("struct", 0x20)
+    imageHead: ClassVar[DwordMember] = DwordMember("struct", 0x1C)
+    imageTail: ClassVar[DwordMember] = DwordMember("struct", 0x20)
 
     @classproperty
     def range(self):

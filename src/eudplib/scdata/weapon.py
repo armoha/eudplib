@@ -54,7 +54,7 @@ class Weapon(EPDOffsetMap, ConstType):
     minRange: ClassVar = DwordMember("array", 0x656A18)
     maxRange: ClassVar = DwordMember("array", 0x657470)
     upgrade: ClassVar = UpgradeMember("array", 0x6571D0)
-    damageType: ClassVar = DamageTypeMember("array", 0x657258)
+    damageType: ClassVar[DamageTypeMember] = DamageTypeMember("array", 0x657258)
     behavior: ClassVar = WeaponBehaviorMember("array", 0x656670)
     "Fly and follow target, appear on target unit, etc."
     removeAfter: ClassVar = ByteMember("array", 0x657040)

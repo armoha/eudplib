@@ -26,17 +26,17 @@ from .player import TrgPlayer
 
 class Tech(EPDOffsetMap, ConstType):
     __slots__ = ()
-    mineralCost: ClassVar = WordMember("array", 0x656248)
-    gasCost: ClassVar = WordMember("array", 0x6561F0)
-    timeCost: ClassVar = WordMember("array", 0x6563D8)
-    energyCost: ClassVar = WordMember("array", 0x656380)
-    researchRequirementOffset: ClassVar = WordMember("array", 0x656198)
-    techUseRequirementOffset: ClassVar = WordMember("array", 0x6562F8)
-    icon: ClassVar = IconMember("array", 0x656430)
-    label: ClassVar = StatTextMember("array", 0x6562A0)
-    race: ClassVar = RaceResearchMember("array", 0x656488)
-    researched: ClassVar = ByteMember("array", 0x656350)  # UNUSED?
-    broodWarFlag: ClassVar = ByteMember("array", 0x6564B4)  # bool?
+    mineralCost: ClassVar[WordMember] = WordMember("array", 0x656248)
+    gasCost: ClassVar[WordMember] = WordMember("array", 0x6561F0)
+    timeCost: ClassVar[WordMember] = WordMember("array", 0x6563D8)
+    energyCost: ClassVar[WordMember] = WordMember("array", 0x656380)
+    researchRequirementOffset: ClassVar[WordMember] = WordMember("array", 0x656198)
+    techUseRequirementOffset: ClassVar[WordMember] = WordMember("array", 0x6562F8)
+    icon: ClassVar[IconMember] = IconMember("array", 0x656430)
+    label: ClassVar[StatTextMember] = StatTextMember("array", 0x6562A0)
+    race: ClassVar[RaceResearchMember] = RaceResearchMember("array", 0x656488)
+    researched: ClassVar[ByteMember] = ByteMember("array", 0x656350)  # UNUSED?
+    broodWarFlag: ClassVar[ByteMember] = ByteMember("array", 0x6564B4)  # bool?
 
     @ut.classproperty
     def range(self):

@@ -26,18 +26,18 @@ from .player import TrgPlayer
 
 class Upgrade(EPDOffsetMap, ConstType):
     __slots__ = ()
-    mineralCostBase: ClassVar = WordMember("array", 0x655740)
-    mineralCostFactor: ClassVar = WordMember("array", 0x6559C0)
-    gasCostBase: ClassVar = WordMember("array", 0x655840)
-    gasCostFactor: ClassVar = WordMember("array", 0x6557C0)
-    timeCostBase: ClassVar = WordMember("array", 0x655B80)
-    timeCostFactor: ClassVar = WordMember("array", 0x655940)
-    requirementOffset: ClassVar = WordMember("array", 0x6558C0)
-    icon: ClassVar = IconMember("array", 0x655AC0)
-    label: ClassVar = StatTextMember("array", 0x655A40)
-    race: ClassVar = RaceResearchMember("array", 0x655BFC)
-    maxLevel: ClassVar = ByteMember("array", 0x655700)
-    broodWarFlag: ClassVar = ByteMember("array", 0x655B3C)  # bool?
+    mineralCostBase: ClassVar[WordMember] = WordMember("array", 0x655740)
+    mineralCostFactor: ClassVar[WordMember] = WordMember("array", 0x6559C0)
+    gasCostBase: ClassVar[WordMember] = WordMember("array", 0x655840)
+    gasCostFactor: ClassVar[WordMember] = WordMember("array", 0x6557C0)
+    timeCostBase: ClassVar[WordMember] = WordMember("array", 0x655B80)
+    timeCostFactor: ClassVar[WordMember] = WordMember("array", 0x655940)
+    requirementOffset: ClassVar[WordMember] = WordMember("array", 0x6558C0)
+    icon: ClassVar[IconMember] = IconMember("array", 0x655AC0)
+    label: ClassVar[StatTextMember] = StatTextMember("array", 0x655A40)
+    race: ClassVar[RaceResearchMember] = RaceResearchMember("array", 0x655BFC)
+    maxLevel: ClassVar[ByteMember] = ByteMember("array", 0x655700)
+    broodWarFlag: ClassVar[ByteMember] = ByteMember("array", 0x655B3C)  # bool?
 
     @ut.classproperty
     def range(self):

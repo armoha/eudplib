@@ -24,14 +24,16 @@ from .offsetmap import (
 
 class Flingy(EPDOffsetMap, ConstType):
     __slots__ = ()
-    sprite: ClassVar = SpriteMember("array", 0x6CA318)
-    topSpeed: ClassVar = DwordMember("array", 0x6C9EF8)
-    acceleration: ClassVar = WordMember("array", 0x6C9C78)
-    haltDistance: ClassVar = DwordMember("array", 0x6C9930)
-    turnSpeed: ClassVar = ByteMember("array", 0x6C9E20)
+    sprite: ClassVar[SpriteMember] = SpriteMember("array", 0x6CA318)
+    topSpeed: ClassVar[DwordMember] = DwordMember("array", 0x6C9EF8)
+    acceleration: ClassVar[WordMember] = WordMember("array", 0x6C9C78)
+    haltDistance: ClassVar[DwordMember] = DwordMember("array", 0x6C9930)
+    turnSpeed: ClassVar[ByteMember] = ByteMember("array", 0x6C9E20)
     turnRadius = turnSpeed
-    # unused: ClassVar = ByteMember("array", 0x6CA240)
-    movementControl: ClassVar = MovementControlMember("array", 0x6C9858)
+    # unused: ClassVar[ByteMember] = ByteMember("array", 0x6CA240)
+    movementControl: ClassVar[MovementControlMember] = MovementControlMember(
+        "array", 0x6C9858
+    )
 
     @ut.classproperty
     def range(self):

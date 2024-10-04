@@ -18,23 +18,25 @@ from .offsetmap import BoolMember, DrawingFunctionMember, EPDOffsetMap, IscriptM
 class Image(EPDOffsetMap, ConstType):
     __slots__ = ()
     # Read only data skipped
-    # grpFile: ClassVar = ArrayMember(0x668AA0, Mk.DWORD)
-    isTurnable: ClassVar = BoolMember("array", 0x66E860)
+    # grpFile: ClassVar[ArrayMember] = ArrayMember(0x668AA0, Mk.DWORD)
+    isTurnable: ClassVar[BoolMember] = BoolMember("array", 0x66E860)
     graphicTurn = isTurnable
-    isClickable: ClassVar = BoolMember("array", 0x66C150)
-    useFullIscript: ClassVar = BoolMember("array", 0x66D4D8)
-    drawIfCloaked: ClassVar = BoolMember("array", 0x667718)
-    drawingFunction: ClassVar = DrawingFunctionMember("array", 0x669E28)
+    isClickable: ClassVar[BoolMember] = BoolMember("array", 0x66C150)
+    useFullIscript: ClassVar[BoolMember] = BoolMember("array", 0x66D4D8)
+    drawIfCloaked: ClassVar[BoolMember] = BoolMember("array", 0x667718)
+    drawingFunction: ClassVar[DrawingFunctionMember] = DrawingFunctionMember(
+        "array", 0x669E28
+    )
     # FIXME: Add UnsupportedMember?
-    # remapping: ClassVar = ArrayMember(0x669A40, Mk.BYTE)
+    # remapping: ClassVar[ArrayMember] = ArrayMember(0x669A40, Mk.BYTE)
     # Remapping table is skipped because it doesn't work in SC:R
-    iscript: ClassVar = IscriptMember("array", 0x66EC48)
-    # shieldsOverlay: ClassVar = ArrayMember(0x66C538, Mk.DWORD)
-    # attackOverlay: ClassVar = ArrayMember(0x66B1B0, Mk.DWORD)
-    # damageOverlay: ClassVar = ArrayMember(0x66A210, Mk.DWORD)
-    # specialOverlay: ClassVar = ArrayMember(0x667B00, Mk.DWORD)
-    # landingDustOverlay: ClassVar = ArrayMember(0x666778, Mk.DWORD)
-    # liftOffDustOverlay: ClassVar = ArrayMember(0x66D8C0, Mk.DWORD)
+    iscript: ClassVar[IscriptMember] = IscriptMember("array", 0x66EC48)
+    # shieldsOverlay: ClassVar[ArrayMember] = ArrayMember(0x66C538, Mk.DWORD)
+    # attackOverlay: ClassVar[ArrayMember] = ArrayMember(0x66B1B0, Mk.DWORD)
+    # damageOverlay: ClassVar[ArrayMember] = ArrayMember(0x66A210, Mk.DWORD)
+    # specialOverlay: ClassVar[ArrayMember] = ArrayMember(0x667B00, Mk.DWORD)
+    # landingDustOverlay: ClassVar[ArrayMember] = ArrayMember(0x666778, Mk.DWORD)
+    # liftOffDustOverlay: ClassVar[ArrayMember] = ArrayMember(0x66D8C0, Mk.DWORD)
 
     @ut.classproperty
     def range(self):
