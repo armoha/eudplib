@@ -226,18 +226,18 @@ def EncodeString(s: str | bytes) -> int:
 
 
 @overload
-def EncodeString(s: T) -> T:
+def EncodeString(s: U) -> U:
     ...
 
 
 @overload
-def EncodeString(s: _ExprProxy) -> _Dword:
+def EncodeString(s: __ExprProxy) -> _Word:
     ...
 
 
-def EncodeString(s: _Arg) -> _Dword:  # noqa: N802
+def EncodeString(s: __Arg) -> _Word:  # noqa: N802
     _def_string_dict: dict[str, int] = {}
-    return _EncodeAny("MapString", GetStringIndex, _def_string_dict, s)
+    return _EncodeAny("MapString", GetStringIndex, _def_string_dict, s)  # type: ignore[return-value]
 
 
 @overload

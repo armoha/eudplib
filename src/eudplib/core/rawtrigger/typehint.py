@@ -88,6 +88,6 @@ Upgrade: TypeAlias = "DefaultUpgrade | _Upgrade | Byte | ExprProxy[Upgrade]"
 Weapon: TypeAlias = "DefaultWeapon | _Weapon | Byte | ExprProxy[Weapon]"
 
 Location: TypeAlias = "str | Dword | bytes | ExprProxy[Location]"
-String: TypeAlias = "str | Dword | bytes | ExprProxy[String]"
+String: TypeAlias = "str | Word | bytes | ExprProxy[String]"
 Switch: TypeAlias = "str | Byte | bytes | ExprProxy[Switch]"
 """Byte in Condition, Dword in Action"""
