@@ -195,6 +195,17 @@ class UnsupportedMember(BaseMember):
     def kind(self):
         return BaseKind
 
+    def __init__(
+        self,
+        layout: Literal["struct", "array"],
+        offset: int,
+        *,
+        stride: int | None = None,
+    ) -> None:
+        self.layout = layout
+        self.offset = offset
+        self.stride = 0 if stride is None else stride
+
     @overload
     def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
         ...
@@ -228,6 +239,17 @@ class NotImplementedMember(BaseMember):
     @property
     def kind(self):
         return BaseKind
+
+    def __init__(
+        self,
+        layout: Literal["struct", "array"],
+        offset: int,
+        *,
+        stride: int | None = None,
+    ) -> None:
+        self.layout = layout
+        self.offset = offset
+        self.stride = 0 if stride is None else stride
 
     @overload
     def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
