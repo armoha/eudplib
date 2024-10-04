@@ -4,6 +4,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 from collections.abc import Iterator
+from typing import Literal
 
 from ... import core as c
 from ... import ctrlstru as cs
@@ -47,7 +48,23 @@ def f_playerexist(player):
 
 
 def EUDLoopPlayer(  # noqa: N802
-    ptype: str | None = "Human", force=None, race: str | None = None
+    ptype: Literal[
+        "Zerg",
+        "Terran",
+        "Protoss",
+        "Independent",
+        "Neutral",
+        "User selectable",
+        "Inactive",
+        "Human",
+        "Human",
+        "Starcraft Campaign Editor",
+        "",
+    ]
+    | None = "Human",
+    force: int | TrgPlayer | None = None,
+    race: Literal["Unused", "Rescuable", "Computer", "Human", "Neutral", ""]
+    | None = None,
 ) -> Iterator[TrgPlayer]:
     def encode_force(f) -> int:
         if isinstance(f, TrgPlayer) and isinstance(f._value, int):
