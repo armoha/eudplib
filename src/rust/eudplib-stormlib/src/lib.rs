@@ -168,6 +168,10 @@ impl Archive {
         unsafe_try_call!(SFileCompactArchive(self.handle, ptr::null(), false));
         Ok(())
     }
+
+    pub fn set_file_locale(file_locale: u32) {
+        unsafe { SFileSetLocale(file_locale) };
+    }
 }
 
 impl std::ops::Drop for Archive {

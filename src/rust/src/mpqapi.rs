@@ -48,6 +48,11 @@ impl PyMPQ {
             .add_file(file_path, archived_name, replace_existing)?)
     }
 
+    #[staticmethod]
+    fn set_file_locale(file_locale: u32) {
+        Archive::set_file_locale(file_locale);
+    }
+
     fn get_max_file_count(&mut self) -> u32 {
         self.0.get_max_file_count()
     }
