@@ -165,10 +165,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         return EPDOffsetMap._advance[value]
 
     def __iadd__(self, other):
-        from ...core.rawtrigger.consttype import ConstType
-
         if (
-            isinstance(self, ConstType)  # FIXME: should be 'hasArrayMember'
+            type(self)._has_array_member
             and isinstance(self._value, c.EUDVariable)
             and isinstance(other, int)
             and other == 1
