@@ -5,6 +5,8 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
+from typing import ClassVar
+
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeSprite
@@ -16,14 +18,14 @@ from .offsetmap import BoolMember, EPDOffsetMap, ImageMember
 class Sprite(EPDOffsetMap, ConstType):
     __slots__ = ()
     # Read only data skipped
-    image = ImageMember("array", 0x666160)
-    # hpBarSize = ArrayMember(0x665E50, Mk.BYTE)
+    image: ClassVar = ImageMember("array", 0x666160)
+    # hpBarSize: ClassVar = ArrayMember(0x665E50, Mk.BYTE)
     # hpBarSize starts on Sprites.dat ID 130
-    # unknownFlag = ArrayMember(0x666570, Mk.BYTE)
-    isVisible = BoolMember("array", 0x665C48)
-    # selectionCircle = ArrayMember(0x665AC0, Mk.BYTE)
+    # unknownFlag: ClassVar = ArrayMember(0x666570, Mk.BYTE)
+    isVisible: ClassVar = BoolMember("array", 0x665C48)
+    # selectionCircle: ClassVar = ArrayMember(0x665AC0, Mk.BYTE)
     # selectionCircle and selectionVerticalOffset start on Sprites.dat ID 130
-    # selectionVerticalOffset = ArrayMember(0x665FD8, Mk.BYTE)
+    # selectionVerticalOffset: ClassVar = ArrayMember(0x665FD8, Mk.BYTE)
 
     @ut.classproperty
     def range(self):

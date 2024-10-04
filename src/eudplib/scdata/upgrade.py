@@ -5,6 +5,8 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
+from typing import ClassVar
+
 from .. import core as c
 from .. import memio
 from .. import utils as ut
@@ -24,18 +26,18 @@ from .player import TrgPlayer
 
 class Upgrade(EPDOffsetMap, ConstType):
     __slots__ = ()
-    mineralCostBase = WordMember("array", 0x655740)
-    mineralCostFactor = WordMember("array", 0x6559C0)
-    gasCostBase = WordMember("array", 0x655840)
-    gasCostFactor = WordMember("array", 0x6557C0)
-    timeCostBase = WordMember("array", 0x655B80)
-    timeCostFactor = WordMember("array", 0x655940)
-    requirementOffset = WordMember("array", 0x6558C0)
-    icon = IconMember("array", 0x655AC0)
-    label = StatTextMember("array", 0x655A40)
-    race = RaceResearchMember("array", 0x655BFC)
-    maxLevel = ByteMember("array", 0x655700)
-    broodWarFlag = ByteMember("array", 0x655B3C)  # bool?
+    mineralCostBase: ClassVar = WordMember("array", 0x655740)
+    mineralCostFactor: ClassVar = WordMember("array", 0x6559C0)
+    gasCostBase: ClassVar = WordMember("array", 0x655840)
+    gasCostFactor: ClassVar = WordMember("array", 0x6557C0)
+    timeCostBase: ClassVar = WordMember("array", 0x655B80)
+    timeCostFactor: ClassVar = WordMember("array", 0x655940)
+    requirementOffset: ClassVar = WordMember("array", 0x6558C0)
+    icon: ClassVar = IconMember("array", 0x655AC0)
+    label: ClassVar = StatTextMember("array", 0x655A40)
+    race: ClassVar = RaceResearchMember("array", 0x655BFC)
+    maxLevel: ClassVar = ByteMember("array", 0x655700)
+    broodWarFlag: ClassVar = ByteMember("array", 0x655B3C)  # bool?
 
     @ut.classproperty
     def range(self):

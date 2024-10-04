@@ -5,7 +5,7 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
-from typing import TypeAlias, TypeVar, cast
+from typing import ClassVar, TypeAlias, TypeVar, cast
 
 from .. import core as c
 from ..localize import _
@@ -49,28 +49,28 @@ int_or_var: TypeAlias = int | c.EUDVariable | ExprProxy
 
 class CSprite(EPDOffsetMap):
     __slots__ = ("_ptr",)
-    prev = CSpriteMember("struct", 0x00)
-    next = CSpriteMember("struct", 0x04)
-    sprite = SpriteMember("struct", 0x08)
-    player = PlayerMember("struct", 0x0A)
+    prev: ClassVar = CSpriteMember("struct", 0x00)
+    next: ClassVar = CSpriteMember("struct", 0x04)
+    sprite: ClassVar = SpriteMember("struct", 0x08)
+    player: ClassVar = PlayerMember("struct", 0x0A)
     "officially 'creator'"
-    selectionIndex = ByteMember("struct", 0x0B)
+    selectionIndex: ClassVar = ByteMember("struct", 0x0B)
     "0 <= selectionIndex <= 11. Index in the selection area at bottom of screen."
-    visibilityFlags = ByteMember("struct", 0x0C)
+    visibilityFlags: ClassVar = ByteMember("struct", 0x0C)
     "Player bits indicating visibility for a player (not hidden by the fog-of-war)"
-    elevationLevel = ByteMember("struct", 0x0D)
+    elevationLevel: ClassVar = ByteMember("struct", 0x0D)
     flags = CSpriteFlags("struct", 0x0E)
-    selectionTimer = ByteMember("struct", 0x0F)
-    index = WordMember("struct", 0x10)
-    grpWidth = ByteMember("struct", 0x12)
-    grpHeight = ByteMember("struct", 0x13)
-    pos = PositionMember("struct", 0x14)
-    posX = PositionXMember("struct", 0x14)
-    posY = PositionYMember("struct", 0x16)
-    mainGraphic = DwordMember("struct", 0x18)
+    selectionTimer: ClassVar = ByteMember("struct", 0x0F)
+    index: ClassVar = WordMember("struct", 0x10)
+    grpWidth: ClassVar = ByteMember("struct", 0x12)
+    grpHeight: ClassVar = ByteMember("struct", 0x13)
+    pos: ClassVar = PositionMember("struct", 0x14)
+    posX: ClassVar = PositionXMember("struct", 0x14)
+    posY: ClassVar = PositionYMember("struct", 0x16)
+    mainGraphic: ClassVar = DwordMember("struct", 0x18)
     "officially 'pImagePrimary', CImage"
-    imageHead = DwordMember("struct", 0x1C)
-    imageTail = DwordMember("struct", 0x20)
+    imageHead: ClassVar = DwordMember("struct", 0x1C)
+    imageTail: ClassVar = DwordMember("struct", 0x20)
 
     @classproperty
     def range(self):
@@ -150,3 +150,6 @@ class CSprite(EPDOffsetMap):
         if self._ptr is None:
             self._ptr = c.EUDVariable()
         return _ptr_cache(self._value, self._ptr)
+
+s = CSprite(0)
+s.flags.IscriptCode = True

@@ -5,6 +5,8 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
+from typing import ClassVar
+
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeUnitOrder
@@ -25,33 +27,33 @@ from .offsetmap import (
 
 class UnitOrder(EPDOffsetMap, ConstType):
     __slots__ = ()
-    label = StatTextMember("array", 0x665280)
-    useWeaponTargeting = BoolMember("array", 0x664B00)
-    # secondaryOrder = BoolMember("array", 0x665940)
+    label: ClassVar = StatTextMember("array", 0x665280)
+    useWeaponTargeting: ClassVar = BoolMember("array", 0x664B00)
+    # secondaryOrder: ClassVar = BoolMember("array", 0x665940)
     # secondary order is for reference only (unused)
-    # nonSubunit = BoolMember("array", 0x665A00)
+    # nonSubunit: ClassVar = BoolMember("array", 0x665A00)
     # non subunit is for reference only (unused)
-    subunitInheritance = BoolMember("array", 0x664A40)
+    subunitInheritance: ClassVar = BoolMember("array", 0x664A40)
     "when main unit receives the order, gives it to subunit as well"
-    # subunitCanUse = BoolMember("array", 0x6657C0)
+    # subunitCanUse: ClassVar = BoolMember("array", 0x6657C0)
     # subunit can use is for reference only (unused)
-    canBeInterrupted = BoolMember("array", 0x665040)
-    canBeLifted = BoolMember("array", 0x665100)
+    canBeInterrupted: ClassVar = BoolMember("array", 0x665040)
+    canBeLifted: ClassVar = BoolMember("array", 0x665100)
     "if a movement-type order, sets/clears Lifted (0x20) cunit movement flag"
-    canBeQueued = BoolMember("array", 0x665700)
-    disablingKeepsTarget = BoolMember("array", 0x6651C0)
+    canBeQueued: ClassVar = BoolMember("array", 0x665700)
+    disablingKeepsTarget: ClassVar = BoolMember("array", 0x6651C0)
     "does not clear order target unit when frozen by lockdown/stasis/maelstrom"
-    canBeObstructed = BoolMember("array", 0x6654C0)
-    fleeable = BoolMember("array", 0x664C80)
+    canBeObstructed: ClassVar = BoolMember("array", 0x6654C0)
+    fleeable: ClassVar = BoolMember("array", 0x664C80)
     "order can be interrupted by unit fleeing from hit reaction"
-    # requireMoving = BoolMember("array", 0x664BC0)
+    # requireMoving: ClassVar = BoolMember("array", 0x664BC0)
     # require moving is for reference only (unused)
-    weapon = WeaponMember("array", 0x665880)
-    techUsed = TechMember("array", 0x664E00)
-    animation = AnimationMember("array", 0x664D40)
-    icon = IconMember("array", 0x664EC0)
-    requirementOffset = WordMember("array", 0x665580)
-    obscuredOrder = UnitOrderMember("array", 0x665400)
+    weapon: ClassVar = WeaponMember("array", 0x665880)
+    techUsed: ClassVar = TechMember("array", 0x664E00)
+    animation: ClassVar = AnimationMember("array", 0x664D40)
+    icon: ClassVar = IconMember("array", 0x664EC0)
+    requirementOffset: ClassVar = WordMember("array", 0x665580)
+    obscuredOrder: ClassVar = UnitOrderMember("array", 0x665400)
 
     @ut.classproperty
     def range(self):

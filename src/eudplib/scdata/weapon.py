@@ -5,6 +5,8 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
+from typing import ClassVar
+
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeWeapon
@@ -43,34 +45,36 @@ class TargetFlags(WordEnumMember):
 
 class Weapon(EPDOffsetMap, ConstType):
     __slots__ = ()
-    label = StatTextMember("array", 0x6572E0)
-    flingy = FlingyMember("array", 0x656CA8)
-    # specialAttack = ByteMember("array", 0x6573E8)
+    label: ClassVar = StatTextMember("array", 0x6572E0)
+    flingy: ClassVar = FlingyMember("array", 0x656CA8)
+    # specialAttack: ClassVar = ByteMember("array", 0x6573E8)
     # special attack is for reference only (unused)
     targetFlags = TargetFlags("array", 0x657998)
     # can't use name 'range' because it's a python keyword
-    minRange = DwordMember("array", 0x656A18)
-    maxRange = DwordMember("array", 0x657470)
-    upgrade = UpgradeMember("array", 0x6571D0)
-    damageType = DamageTypeMember("array", 0x657258)
-    behavior = WeaponBehaviorMember("array", 0x656670)
+    minRange: ClassVar = DwordMember("array", 0x656A18)
+    maxRange: ClassVar = DwordMember("array", 0x657470)
+    upgrade: ClassVar = UpgradeMember("array", 0x6571D0)
+    damageType: ClassVar = DamageTypeMember("array", 0x657258)
+    behavior: ClassVar = WeaponBehaviorMember("array", 0x656670)
     "Fly and follow target, appear on target unit, etc."
-    removeAfter = ByteMember("array", 0x657040)
-    explosionType = ExplosionTypeMember("array", 0x6566F8)
-    splashInnerRadius = WordMember("array", 0x656888)
-    splashMiddleRadius = WordMember("array", 0x6570C8)
-    splashOuterRadius = WordMember("array", 0x657780)
-    damage = WordMember("array", 0x656EB0)
-    damageBonus = WordMember("array", 0x657678)
-    cooldown = ByteMember("array", 0x656FB8)
-    damageFactor = ByteMember("array", 0x6564E0)
+    removeAfter: ClassVar = ByteMember("array", 0x657040)
+    explosionType: ClassVar = ExplosionTypeMember("array", 0x6566F8)
+    splashInnerRadius: ClassVar = WordMember("array", 0x656888)
+    splashMiddleRadius: ClassVar = WordMember("array", 0x6570C8)
+    splashOuterRadius: ClassVar = WordMember("array", 0x657780)
+    damage: ClassVar = WordMember("array", 0x656EB0)
+    damageBonus: ClassVar = WordMember("array", 0x657678)
+    cooldown: ClassVar = ByteMember("array", 0x656FB8)
+    damageFactor: ClassVar = ByteMember("array", 0x6564E0)
     "aka 'missile count'"
-    attackAngle = ByteMember("array", 0x656990)
-    launchSpin = ByteMember("array", 0x657888)
-    forwardOffset = graphicXOffset = ByteMember("array", 0x657910)
-    verticalOffset = graphicYOffset = ByteMember("array", 0x656C20)
-    targetErrorMessage = StatTextMember("array", 0x656568)
-    icon = IconMember("array", 0x656780)
+    attackAngle: ClassVar = ByteMember("array", 0x656990)
+    launchSpin: ClassVar = ByteMember("array", 0x657888)
+    forwardOffset: ClassVar = ByteMember("array", 0x657910)
+    graphicXOffset: ClassVar = ByteMember("array", 0x657910)
+    verticalOffset: ClassVar = ByteMember("array", 0x656C20)
+    graphicYOffset: ClassVar = ByteMember("array", 0x656C20)
+    targetErrorMessage: ClassVar = StatTextMember("array", 0x656568)
+    icon: ClassVar = IconMember("array", 0x656780)
 
     @ut.classproperty
     def range(self):

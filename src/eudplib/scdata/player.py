@@ -5,6 +5,8 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
+from typing import ClassVar
+
 from .. import utils as ut
 from ..core.rawtrigger.constenc import EncodePlayer, PlayerDict, _Player
 from ..core.rawtrigger.consttype import ConstType
@@ -20,61 +22,61 @@ class TrgPlayer(EPDOffsetMap, _Player):
     """
 
     __slots__ = ()
-    mineral = ore = DwordMember("array", 0x57F0F0)
-    gas = DwordMember("array", 0x57F120)
-    cumulativeGas = DwordMember("array", 0x57F150)
-    cumulativeMineral = cumulativeOre = DwordMember("array", 0x57F180)
-    zergControlAvailable = DwordMember("array", 0x582144)
-    zergControlUsed = DwordMember("array", 0x582174)
-    zergControlMax = DwordMember("array", 0x5821A4)
-    terranSupplyAvailable = DwordMember("array", 0x5821D4)
-    terranSupplyUsed = DwordMember("array", 0x582204)
-    terranSupplyMax = DwordMember("array", 0x582234)
-    protossPsiAvailable = DwordMember("array", 0x582264)
-    protossPsiUsed = DwordMember("array", 0x582294)
-    protossPsiMax = DwordMember("array", 0x5822C4)
-    unitColor = ByteMember("array", 0x581D76, stride=8)
-    minimapColor = ByteMember("array", 0x581DD6)
-    remainingGamePause = ByteMember("array", 0x58D718)  # length=8
-    missionObjectives = MapStringMember("array", 0x58D6C4, stride=4)
-    unitScore = DwordMember("array", 0x581E44)
+    mineral: ClassVar = DwordMember("array", 0x57F0F0)
+    gas: ClassVar = DwordMember("array", 0x57F120)
+    cumulativeGas: ClassVar = DwordMember("array", 0x57F150)
+    cumulativeMineral: ClassVar = DwordMember("array", 0x57F180)
+    zergControlAvailable: ClassVar = DwordMember("array", 0x582144)
+    zergControlUsed: ClassVar = DwordMember("array", 0x582174)
+    zergControlMax: ClassVar = DwordMember("array", 0x5821A4)
+    terranSupplyAvailable: ClassVar = DwordMember("array", 0x5821D4)
+    terranSupplyUsed: ClassVar = DwordMember("array", 0x582204)
+    terranSupplyMax: ClassVar = DwordMember("array", 0x582234)
+    protossPsiAvailable: ClassVar = DwordMember("array", 0x582264)
+    protossPsiUsed: ClassVar = DwordMember("array", 0x582294)
+    protossPsiMax: ClassVar = DwordMember("array", 0x5822C4)
+    unitColor: ClassVar = ByteMember("array", 0x581D76, stride=8)
+    minimapColor: ClassVar = ByteMember("array", 0x581DD6)
+    remainingGamePause: ClassVar = ByteMember("array", 0x58D718)  # length=8
+    missionObjectives: ClassVar = MapStringMember("array", 0x58D6C4, stride=4)
+    unitScore: ClassVar = DwordMember("array", 0x581E44)
     "Score for units produced"
-    buildingScore = DwordMember("array", 0x582024)
+    buildingScore: ClassVar = DwordMember("array", 0x582024)
     "Score for buildings produced"
-    killScore = DwordMember("array", 0x581F04)
-    razingScore = DwordMember("array", 0x582054)
-    customScore = DwordMember("array", 0x5822F4)
-    # scoreUnitTotal = ArrayMember(0x581ED4)
-    # numOfFactoriesRazed = ArrayMember(0x582114) Kills for "Factories" stored
-    # numOfBuildingsRazed = ArrayMember(0x581FF4) Kills for "Buildings" stored
-    # numOfUnitsKilled = ArrayMember(0x581EA4) Kills for "Any Unit" stored here.
-    # humanID = DwordMember("array", 0x57EE7C)
-    # nationID = DwordMember("array", 0x57EEC0)
-    # networkStatus = DwordMember("array", 0x57F0B8)
-    # playerSlotType = ByteMember("array", 0x57F1B4)
-    # playerSlotRace = ByteMember("array", 0x57F1C0)
-    # sharedVision = DwordMember("array", 0x57F1EC)
-    # colorMapping = DwordMember("array", 0x57F21C) length=8
-    # singleplayerComputerRace = ByteMember("array", 0x57F267) length=8
-    # hasLeftGame = ArrayMember(0x581D62, Mk.BOOL) length=8
-    # selectionCircleColor = ByteMember("array", 0x581D6A)
-    # ownedTotalUnitsScore = ArrayMember(0x581DE4)
-    # ownedUnitsScore = ArrayMember(0x581E14)
-    # numOfUnitsLost = ArrayMember(0x581E74) Deaths for "Any Unit" stored here.
-    # scoreStructuresConstructedTotal = ArrayMember(0x581F34)
-    # numOfBuildingsConstructed = ArrayMember(0x581F64)
-    # numOfBuildingsOwned = ArrayMember(0x581F94)
-    # numOfBuildingsLost = ArrayMember(0x581FC4) Deaths for "Buildings" stored
-    # numOfFactoriesConstructed = ArrayMember(0x582084)
-    # numOfFactoriesOwned = ArrayMember(0x5820B4)
-    # numOfFactoriesLost = ArrayMember(0x5820E4) Deaths for "Factories" stored
-    # larvaCount = ByteMember("array", 0x585474)
-    # force = ByteMember("array", 0x58D5B0) length=8
-    # allyStatus = ByteMember("array", 0x58D634)
-    # victoryStatus = ByteMember("array", 0x58D700) length=8
-    # startLocationPos = ArrayMember(0x58D720, Mk.POSITION) length=8
+    killScore: ClassVar = DwordMember("array", 0x581F04)
+    razingScore: ClassVar = DwordMember("array", 0x582054)
+    customScore: ClassVar = DwordMember("array", 0x5822F4)
+    # scoreUnitTotal: ClassVar = ArrayMember(0x581ED4)
+    # numOfFactoriesRazed: ClassVar = ArrayMember(0x582114) Kills for "Factories"
+    # numOfBuildingsRazed: ClassVar = ArrayMember(0x581FF4) Kills for "Buildings"
+    # numOfUnitsKilled: ClassVar = ArrayMember(0x581EA4) Kills for "Any Unit"
+    # humanID: ClassVar = DwordMember("array", 0x57EE7C)
+    # nationID: ClassVar = DwordMember("array", 0x57EEC0)
+    # networkStatus: ClassVar = DwordMember("array", 0x57F0B8)
+    # playerSlotType: ClassVar = ByteMember("array", 0x57F1B4)
+    # playerSlotRace: ClassVar = ByteMember("array", 0x57F1C0)
+    # sharedVision: ClassVar = DwordMember("array", 0x57F1EC)
+    # colorMapping: ClassVar = DwordMember("array", 0x57F21C) length=8
+    # singleplayerComputerRace: ClassVar = ByteMember("array", 0x57F267) length=8
+    # hasLeftGame: ClassVar = ArrayMember(0x581D62, Mk.BOOL) length=8
+    # selectionCircleColor: ClassVar = ByteMember("array", 0x581D6A)
+    # ownedTotalUnitsScore: ClassVar = ArrayMember(0x581DE4)
+    # ownedUnitsScore: ClassVar = ArrayMember(0x581E14)
+    # numOfUnitsLost: ClassVar = ArrayMember(0x581E74) Deaths for "Any Unit"
+    # scoreStructuresConstructedTotal: ClassVar = ArrayMember(0x581F34)
+    # numOfBuildingsConstructed: ClassVar = ArrayMember(0x581F64)
+    # numOfBuildingsOwned: ClassVar = ArrayMember(0x581F94)
+    # numOfBuildingsLost: ClassVar = ArrayMember(0x581FC4) Deaths for "Buildings"
+    # numOfFactoriesConstructed: ClassVar = ArrayMember(0x582084)
+    # numOfFactoriesOwned: ClassVar = ArrayMember(0x5820B4)
+    # numOfFactoriesLost: ClassVar = ArrayMember(0x5820E4) Deaths for "Factories"
+    # larvaCount: ClassVar = ByteMember("array", 0x585474)
+    # force: ClassVar = ByteMember("array", 0x58D5B0) length=8
+    # allyStatus: ClassVar = ByteMember("array", 0x58D634)
+    # victoryStatus: ClassVar = ByteMember("array", 0x58D700) length=8
+    # startLocationPos: ClassVar = ArrayMember(0x58D720, Mk.POSITION) length=8
     # 0x58F442 Unknown Player Color Something length=8
-    # triggerWaitTimer = DwordMember("array", 0x650980) length=8
+    # triggerWaitTimer: ClassVar = DwordMember("array", 0x650980) length=8
     # 0x6D0F3C Replay Header - Player Bytes: Read Only
     # 0x6D0FD1 Replay Header - Player Entries: Read Only
     # 0x6D1181 Replay Header - Player Colors: Read Only length=8

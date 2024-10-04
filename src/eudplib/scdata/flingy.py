@@ -5,6 +5,8 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
+from typing import ClassVar
+
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeFlingy
@@ -22,13 +24,14 @@ from .offsetmap import (
 
 class Flingy(EPDOffsetMap, ConstType):
     __slots__ = ()
-    sprite = SpriteMember("array", 0x6CA318)
-    topSpeed = DwordMember("array", 0x6C9EF8)
-    acceleration = WordMember("array", 0x6C9C78)
-    haltDistance = DwordMember("array", 0x6C9930)
-    turnSpeed = turnRadius = ByteMember("array", 0x6C9E20)
-    # unused = ByteMember("array", 0x6CA240)
-    movementControl = MovementControlMember("array", 0x6C9858)
+    sprite: ClassVar = SpriteMember("array", 0x6CA318)
+    topSpeed: ClassVar = DwordMember("array", 0x6C9EF8)
+    acceleration: ClassVar = WordMember("array", 0x6C9C78)
+    haltDistance: ClassVar = DwordMember("array", 0x6C9930)
+    turnSpeed: ClassVar = ByteMember("array", 0x6C9E20)
+    turnRadius = turnSpeed
+    # unused: ClassVar = ByteMember("array", 0x6CA240)
+    movementControl: ClassVar = MovementControlMember("array", 0x6C9858)
 
     @ut.classproperty
     def range(self):

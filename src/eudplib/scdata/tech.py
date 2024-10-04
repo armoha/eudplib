@@ -5,6 +5,8 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
+from typing import ClassVar
+
 from .. import core as c
 from .. import memio
 from .. import utils as ut
@@ -24,17 +26,17 @@ from .player import TrgPlayer
 
 class Tech(EPDOffsetMap, ConstType):
     __slots__ = ()
-    mineralCost = WordMember("array", 0x656248)
-    gasCost = WordMember("array", 0x6561F0)
-    timeCost = WordMember("array", 0x6563D8)
-    energyCost = WordMember("array", 0x656380)
-    researchRequirementOffset = WordMember("array", 0x656198)
-    techUseRequirementOffset = WordMember("array", 0x6562F8)
-    icon = IconMember("array", 0x656430)
-    label = StatTextMember("array", 0x6562A0)
-    race = RaceResearchMember("array", 0x656488)
-    researched = ByteMember("array", 0x656350)  # UNUSED?
-    broodWarFlag = ByteMember("array", 0x6564B4)  # bool?
+    mineralCost: ClassVar = WordMember("array", 0x656248)
+    gasCost: ClassVar = WordMember("array", 0x6561F0)
+    timeCost: ClassVar = WordMember("array", 0x6563D8)
+    energyCost: ClassVar = WordMember("array", 0x656380)
+    researchRequirementOffset: ClassVar = WordMember("array", 0x656198)
+    techUseRequirementOffset: ClassVar = WordMember("array", 0x6562F8)
+    icon: ClassVar = IconMember("array", 0x656430)
+    label: ClassVar = StatTextMember("array", 0x6562A0)
+    race: ClassVar = RaceResearchMember("array", 0x656488)
+    researched: ClassVar = ByteMember("array", 0x656350)  # UNUSED?
+    broodWarFlag: ClassVar = ByteMember("array", 0x6564B4)  # bool?
 
     @ut.classproperty
     def range(self):
