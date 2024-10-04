@@ -11,7 +11,7 @@ build-backend = "maturin"
 
 [project]
 name = "eudplib"
-version = "0.79.4"
+version = "0.79.5"
 authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},
