@@ -78,6 +78,7 @@ def main_starter(mf: Callable) -> c.Forward:
         _jumper << c.RawTrigger(nextptr=rootstarter)
 
     c.PopTriggerScope()
+    _has_already_started = 0
 
     return _jumper
 
