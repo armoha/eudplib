@@ -14,35 +14,35 @@ from ..localize import _
 from ..utils import EPD, EPError, classproperty, unProxy
 from .csprite import int_or_var
 from .offsetmap import (
+    BoolMember,
+    ByteEnumMember,
+    ByteMember,
+    CSpriteMember,
+    CUnitMember,
+    DwordEnumMember,
+    DwordMember,
     EPDOffsetMap,
     Flag,
-    StructEnumMember,
-    StructMember,
+    FlingyMember,
+    MovementFlags,
+    PlayerMember,
+    PositionMember,
+    PositionXMember,
+    PositionYMember,
+    TechMember,
+    UnitMember,
+    UnitOrderMember,
     UnsupportedMember,
+    UpgradeMember,
+    WordMember,
+    WorkerCarryTypeMember,
 )
-from .offsetmap import MemberKind as Mk
 from .offsetmap.epdoffsetmap import _epd_cache, _ptr_cache
 from .player import CurrentPlayer, TrgPlayer
 from .unit import TrgUnit
 
 
-class MovementFlags(StructEnumMember):
-    """Flags that enable/disable certain movement."""
-
-    __slots__ = ()
-    OrderedAtLeastOnce = Flag(0x01)
-    Accelerating = Flag(0x02)
-    Braking = Flag(0x04)
-    StartingAttack = Flag(0x08)
-    Moving = Flag(0x10)
-    Lifted = Flag(0x20)
-    BrakeOnPathStep = Flag(0x40)
-    "unit decelerates when reaching the end of current path segment"
-    AlwaysZero = Flag(0x80)
-    HoverUnit = Flag(0xC1)
-
-
-class StatusFlags(StructEnumMember):
+class StatusFlags(DwordEnumMember):
     __slots__ = ()
     Completed = Flag(0x00000001)
     GroundedBuilding = Flag(0x00000002)
@@ -92,7 +92,7 @@ class StatusFlags(StructEnumMember):
     "Set for when the unit is self-destructing (scarab, scourge, infested terran)"
 
 
-class PathingFlags(StructEnumMember):
+class PathingFlags(ByteEnumMember):
     __slots__ = ()
     HasCollision = Flag(0x01)
     IsStacked = Flag(0x02)
@@ -101,300 +101,300 @@ class PathingFlags(StructEnumMember):
 
 class CUnit(EPDOffsetMap):
     __slots__ = ("_ptr",)
-    prev = StructMember(0x000, Mk.C_UNIT)
-    next = StructMember(0x004, Mk.C_UNIT)
-    hp = StructMember(0x008, Mk.DWORD)
+    prev = CUnitMember("struct", 0x000)
+    next = CUnitMember("struct", 0x004)
+    hp = DwordMember("struct", 0x008)
     "displayed value is ceil(healthPoints/256)"
-    sprite = StructMember(0x00C, Mk.C_SPRITE)
-    moveTargetPos = StructMember(0x010, Mk.POSITION)
-    moveTargetX = StructMember(0x010, Mk.POSITION_X)
-    moveTargetY = StructMember(0x012, Mk.POSITION_Y)
-    moveTarget = moveTargetUnit = StructMember(0x014, Mk.C_UNIT)
-    nextMovementWaypoint = StructMember(0x018, Mk.POSITION)
+    sprite = CSpriteMember("struct", 0x00C)
+    moveTargetPos = PositionMember("struct", 0x010)
+    moveTargetX = PositionXMember("struct", 0x010)
+    moveTargetY = PositionYMember("struct", 0x012)
+    moveTarget = moveTargetUnit = CUnitMember("struct", 0x014)
+    nextMovementWaypoint = PositionMember("struct", 0x018)
     """The next way point in the path the unit is following to get to its
     destination. Equal to moveToPos for air units since they don't need to
     navigate around buildings."""
-    nextTargetWaypoint = StructMember(0x01C, Mk.POSITION)
+    nextTargetWaypoint = PositionMember("struct", 0x01C)
     "The desired position"
-    movementFlags = MovementFlags(0x020, Mk.BYTE)
-    currentDirection1 = StructMember(0x021, Mk.BYTE)
+    movementFlags = MovementFlags("struct", 0x020)
+    currentDirection1 = ByteMember("struct", 0x021)
     "current direction the unit is facing"
-    turnSpeed = turnRadius = StructMember(0x022, Mk.BYTE)  # flingy
-    velocityDirection1 = StructMember(0x023, Mk.BYTE)
+    turnSpeed = turnRadius = ByteMember("struct", 0x022)  # flingy
+    velocityDirection1 = ByteMember("struct", 0x023)
     """usually only differs from the currentDirection field for units that
     can accelerate and travel in a different direction than they are facing.
     For example Mutalisks can change the direction they are facing
     faster than then can change the direction they are moving."""
-    flingyID = StructMember(0x024, Mk.FLINGY)
-    unknown0x26 = StructMember(0x026, Mk.BYTE)
-    flingyMovementType = StructMember(0x027, Mk.BYTE)
-    pos = StructMember(0x028, Mk.POSITION)
+    flingyID = FlingyMember("struct", 0x024)
+    unknown0x26 = ByteMember("struct", 0x026)
+    flingyMovementType = ByteMember("struct", 0x027)
+    pos = PositionMember("struct", 0x028)
     "Current position of the unit"
-    posX = StructMember(0x028, Mk.POSITION_X)
-    posY = StructMember(0x02A, Mk.POSITION_Y)
-    haltX = StructMember(0x02C, Mk.DWORD)
-    haltY = StructMember(0x030, Mk.DWORD)
-    topSpeed = StructMember(0x034, Mk.DWORD)
-    currentSpeed1 = StructMember(0x038, Mk.DWORD)
-    currentSpeed2 = StructMember(0x03C, Mk.DWORD)
-    currentVelocityX = StructMember(0x040, Mk.DWORD)
-    currentVelocityY = StructMember(0x044, Mk.DWORD)
-    acceleration = StructMember(0x048, Mk.WORD)
-    currentDirection2 = StructMember(0x04A, Mk.BYTE)
-    velocityDirection2 = StructMember(0x04B, Mk.BYTE)
+    posX = PositionXMember("struct", 0x028)
+    posY = PositionYMember("struct", 0x02A)
+    haltX = DwordMember("struct", 0x02C)
+    haltY = DwordMember("struct", 0x030)
+    topSpeed = DwordMember("struct", 0x034)
+    currentSpeed1 = DwordMember("struct", 0x038)
+    currentSpeed2 = DwordMember("struct", 0x03C)
+    currentVelocityX = DwordMember("struct", 0x040)
+    currentVelocityY = DwordMember("struct", 0x044)
+    acceleration = WordMember("struct", 0x048)
+    currentDirection2 = ByteMember("struct", 0x04A)
+    velocityDirection2 = ByteMember("struct", 0x04B)
     "pathing related"
-    owner = playerID = StructMember(0x04C, Mk.PLAYER)
-    order = orderID = StructMember(0x04D, Mk.UNIT_ORDER)
-    orderState = StructMember(0x04E, Mk.BYTE)
-    orderSignal = StructMember(0x04F, Mk.BYTE)
-    orderUnitType = StructMember(0x050, Mk.UNIT)
-    unknown0x52 = StructMember(0x052, Mk.WORD)
+    owner = playerID = PlayerMember("struct", 0x04C)
+    order = orderID = UnitOrderMember("struct", 0x04D)
+    orderState = ByteMember("struct", 0x04E)
+    orderSignal = ByteMember("struct", 0x04F)
+    orderUnitType = UnitMember("struct", 0x050)
+    unknown0x52 = WordMember("struct", 0x052)
     "2-byte padding"
-    cooldown = StructMember(0x054, Mk.DWORD)
-    orderTimer = StructMember(0x054, Mk.BYTE)
-    groundWeaponCooldown = gCooldown = StructMember(0x055, Mk.BYTE)
-    airWeaponCooldown = aCooldown = StructMember(0x056, Mk.BYTE)
-    spellCooldown = StructMember(0x057, Mk.BYTE)
+    cooldown = DwordMember("struct", 0x054)
+    orderTimer = ByteMember("struct", 0x054)
+    groundWeaponCooldown = gCooldown = ByteMember("struct", 0x055)
+    airWeaponCooldown = aCooldown = ByteMember("struct", 0x056)
+    spellCooldown = ByteMember("struct", 0x057)
     # ActionFocus
-    orderTargetXY = orderTargetPos = StructMember(0x058, Mk.POSITION)
-    orderTargetX = StructMember(0x058, Mk.POSITION_X)
-    orderTargetY = StructMember(0x05A, Mk.POSITION_Y)
-    orderTarget = StructMember(0x05C, Mk.C_UNIT)
-    orderTargetUnit = StructMember(0x05C, Mk.C_UNIT)
-    shield = StructMember(0x060, Mk.DWORD)
-    unitType = unitID = StructMember(0x064, Mk.UNIT)
-    unknown0x66 = StructMember(0x066, Mk.WORD)
+    orderTargetXY = orderTargetPos = PositionMember("struct", 0x058)
+    orderTargetX = PositionXMember("struct", 0x058)
+    orderTargetY = PositionYMember("struct", 0x05A)
+    orderTarget = CUnitMember("struct", 0x05C)
+    orderTargetUnit = CUnitMember("struct", 0x05C)
+    shield = DwordMember("struct", 0x060)
+    unitType = unitID = UnitMember("struct", 0x064)
+    unknown0x66 = WordMember("struct", 0x066)
     "2-byte padding"
-    prevPlayerUnit = StructMember(0x068, Mk.C_UNIT)
-    nextPlayerUnit = StructMember(0x06C, Mk.C_UNIT)
-    subUnit = StructMember(0x070, Mk.C_UNIT)
-    orderQueueHead = UnsupportedMember(0x074, Mk.DWORD)  # COrder
-    orderQueueTail = UnsupportedMember(0x078, Mk.DWORD)
-    autoTargetUnit = StructMember(0x07C, Mk.C_UNIT)
-    connectedUnit = StructMember(0x080, Mk.C_UNIT)
+    prevPlayerUnit = CUnitMember("struct", 0x068)
+    nextPlayerUnit = CUnitMember("struct", 0x06C)
+    subUnit = CUnitMember("struct", 0x070)
+    orderQueueHead = UnsupportedMember("struct", 0x074)  # Dword  # COrder
+    orderQueueTail = UnsupportedMember("struct", 0x078)  # Dword
+    autoTargetUnit = CUnitMember("struct", 0x07C)
+    connectedUnit = CUnitMember("struct", 0x080)
     "larva, in-transit, addons"
-    orderQueueCount = StructMember(0x084, Mk.BYTE)
+    orderQueueCount = ByteMember("struct", 0x084)
     "may be count in addition to first since can be 2 when 3 orders are queued"
-    orderQueueTimer = StructMember(0x085, Mk.BYTE)
+    orderQueueTimer = ByteMember("struct", 0x085)
     "Cycles down from from 8 to 0 (inclusive). See also 0x122."
-    unknown0x86 = StructMember(0x086, Mk.BYTE)
-    attackNotifyTimer = StructMember(0x087, Mk.BYTE)
+    unknown0x86 = ByteMember("struct", 0x086)
+    attackNotifyTimer = ByteMember("struct", 0x087)
     "Prevent 'Your forces are under attack.' on every attack"
-    prevUnitType = UnsupportedMember(0x088, Mk.UNIT)
+    prevUnitType = UnsupportedMember("struct", 0x088)  # Unit
     "zerg buildings while morphing"
-    lastEventTimer = UnsupportedMember(0x08A, Mk.BYTE)
-    lastEventColor = UnsupportedMember(0x08B, Mk.BYTE)
+    lastEventTimer = UnsupportedMember("struct", 0x08A)  # Byte
+    lastEventColor = UnsupportedMember("struct", 0x08B)  # Byte
     "17 = was completed (train, morph), 174 = was attacked"
-    unknown0x8C = StructMember(0x08C, Mk.WORD)
+    unknown0x8C = WordMember("struct", 0x08C)
     "might have originally been RGB from lastEventColor"
-    rankIncrease = StructMember(0x08E, Mk.RANK)
-    killCount = StructMember(0x08F, Mk.BYTE)
-    lastAttackingPlayer = StructMember(0x090, Mk.PLAYER)
-    secondaryOrderTimer = StructMember(0x091, Mk.BYTE)
-    AIActionFlag = StructMember(0x092, Mk.BYTE)
-    userActionFlags = StructMember(0x093, Mk.BYTE)
+    rankIncrease = ByteMember("struct", 0x08E)
+    killCount = ByteMember("struct", 0x08F)
+    lastAttackingPlayer = PlayerMember("struct", 0x090)
+    secondaryOrderTimer = ByteMember("struct", 0x091)
+    AIActionFlag = ByteMember("struct", 0x092)
+    userActionFlags = ByteMember("struct", 0x093)
     """2 = issued an order,
     3 = interrupted an order,
     4 = hide self before death (self-destruct?)"""
-    currentButtonSet = StructMember(0x094, Mk.UNIT)
-    isCloaked = StructMember(0x096, Mk.BOOL)
-    movementState = StructMember(0x097, Mk.BYTE)
-    buildQueue1 = StructMember(0x098, Mk.UNIT)
-    buildQueue2 = StructMember(0x09A, Mk.UNIT)
-    buildQueue3 = StructMember(0x09C, Mk.UNIT)
-    buildQueue4 = StructMember(0x09E, Mk.UNIT)
-    buildQueue5 = StructMember(0x0A0, Mk.UNIT)
-    buildQueue12 = StructMember(0x098, Mk.DWORD)
-    buildQueue34 = StructMember(0x09C, Mk.DWORD)
-    energy = StructMember(0x0A2, Mk.WORD)
-    buildQueueSlot = StructMember(0x0A4, Mk.BYTE)
-    uniquenessIdentifier = targetOrderSpecial = StructMember(0x0A5, Mk.BYTE)
-    secondaryOrder = secondaryOrderID = StructMember(0x0A6, Mk.UNIT_ORDER)
-    buildingOverlayState = StructMember(0x0A7, Mk.BYTE)
+    currentButtonSet = UnitMember("struct", 0x094)
+    isCloaked = BoolMember("struct", 0x096)
+    movementState = ByteMember("struct", 0x097)
+    buildQueue1 = UnitMember("struct", 0x098)
+    buildQueue2 = UnitMember("struct", 0x09A)
+    buildQueue3 = UnitMember("struct", 0x09C)
+    buildQueue4 = UnitMember("struct", 0x09E)
+    buildQueue5 = UnitMember("struct", 0x0A0)
+    buildQueue12 = DwordMember("struct", 0x098)
+    buildQueue34 = DwordMember("struct", 0x09C)
+    energy = WordMember("struct", 0x0A2)
+    buildQueueSlot = ByteMember("struct", 0x0A4)
+    uniquenessIdentifier = targetOrderSpecial = ByteMember("struct", 0x0A5)
+    secondaryOrder = secondaryOrderID = UnitOrderMember("struct", 0x0A6)
+    buildingOverlayState = ByteMember("struct", 0x0A7)
     "0 means the building has the largest amount of fire/blood"
-    hpGain = StructMember(0x0A8, Mk.WORD)
+    hpGain = WordMember("struct", 0x0A8)
     "buildRepairHpGain"
-    shieldGain = StructMember(0x0AA, Mk.WORD)
+    shieldGain = WordMember("struct", 0x0AA)
     "Shield gain on construction"
-    remainingBuildTime = StructMember(0x0AC, Mk.WORD)
+    remainingBuildTime = WordMember("struct", 0x0AC)
     """Remaining bulding time; also used by powerups (flags)
     as the timer for returning to their original location."""
-    prevHp = StructMember(0x0AE, Mk.WORD)
+    prevHp = WordMember("struct", 0x0AE)
     """The HP of the unit before it changed
     (example: Drone->Hatchery, the Drone's HP will be stored here)"""
-    loadedUnit1 = UnsupportedMember(0x0B0, Mk.WORD)
+    loadedUnit1 = UnsupportedMember("struct", 0x0B0)  # Word
     "alphaID (StoredUnit)"
-    loadedUnit2 = UnsupportedMember(0x0B2, Mk.WORD)
-    loadedUnit3 = UnsupportedMember(0x0B4, Mk.WORD)
-    loadedUnit4 = UnsupportedMember(0x0B6, Mk.WORD)
-    loadedUnit5 = UnsupportedMember(0x0B8, Mk.WORD)
-    loadedUnit6 = UnsupportedMember(0x0BA, Mk.WORD)
-    loadedUnit7 = UnsupportedMember(0x0BC, Mk.WORD)
-    loadedUnit8 = UnsupportedMember(0x0BE, Mk.WORD)
+    loadedUnit2 = UnsupportedMember("struct", 0x0B2)  # Word
+    loadedUnit3 = UnsupportedMember("struct", 0x0B4)  # Word
+    loadedUnit4 = UnsupportedMember("struct", 0x0B6)  # Word
+    loadedUnit5 = UnsupportedMember("struct", 0x0B8)  # Word
+    loadedUnit6 = UnsupportedMember("struct", 0x0BA)  # Word
+    loadedUnit7 = UnsupportedMember("struct", 0x0BC)  # Word
+    loadedUnit8 = UnsupportedMember("struct", 0x0BE)  # Word
     # union (0xC0 ~ 0xCF) //==================================
-    spiderMineCount = StructMember(0x0C0, Mk.BYTE)  # vulture
+    spiderMineCount = ByteMember("struct", 0x0C0)  # vulture
     # carrier, reaver ----------------------------------------
-    inHangarChild = StructMember(0x0C0, Mk.C_UNIT)
-    outHangarChild = StructMember(0x0C4, Mk.C_UNIT)
-    inHangarCount = StructMember(0x0C8, Mk.BYTE)
-    outHangarCount = StructMember(0x0C9, Mk.BYTE)
+    inHangarChild = CUnitMember("struct", 0x0C0)
+    outHangarChild = CUnitMember("struct", 0x0C4)
+    inHangarCount = ByteMember("struct", 0x0C8)
+    outHangarCount = ByteMember("struct", 0x0C9)
     # interceptor, scarab ------------------------------------
-    parent = StructMember(0x0C0, Mk.C_UNIT)
-    prevFighter = StructMember(0x0C4, Mk.C_UNIT)
-    nextFighter = StructMember(0x0C8, Mk.C_UNIT)
-    isOutsideHangar = StructMember(0x0CC, Mk.BOOL)
+    parent = CUnitMember("struct", 0x0C0)
+    prevFighter = CUnitMember("struct", 0x0C4)
+    nextFighter = CUnitMember("struct", 0x0C8)
+    isOutsideHangar = BoolMember("struct", 0x0CC)
     # beacon -------------------------------------------------
-    beaconUnknown0xC0 = StructMember(0x0C0, Mk.DWORD)
-    beaconUnknown0xC4 = StructMember(0x0C4, Mk.DWORD)
-    flagSpawnFrame = StructMember(0x0C8, Mk.DWORD)  # beacon
+    beaconUnknown0xC0 = DwordMember("struct", 0x0C0)
+    beaconUnknown0xC4 = DwordMember("struct", 0x0C4)
+    flagSpawnFrame = DwordMember("struct", 0x0C8)  # beacon
     # building /==============================================
-    addon = StructMember(0x0C0, Mk.C_UNIT)
-    addonBuildType = StructMember(0x0C4, Mk.UNIT)
-    upgradeResearchTime = StructMember(0x0C6, Mk.WORD)
-    techType = StructMember(0x0C8, Mk.TECH)
-    upgradeType = StructMember(0x0C9, Mk.UPGRADE)
-    larvaTimer = StructMember(0x0CA, Mk.BYTE)
-    landingTimer = StructMember(0x0CB, Mk.BYTE)
-    creepTimer = StructMember(0x0CC, Mk.BYTE)
-    upgradeLevel = StructMember(0x0CD, Mk.BYTE)
+    addon = CUnitMember("struct", 0x0C0)
+    addonBuildType = UnitMember("struct", 0x0C4)
+    upgradeResearchTime = WordMember("struct", 0x0C6)
+    techType = TechMember("struct", 0x0C8)
+    upgradeType = UpgradeMember("struct", 0x0C9)
+    larvaTimer = ByteMember("struct", 0x0CA)
+    landingTimer = ByteMember("struct", 0x0CB)
+    creepTimer = ByteMember("struct", 0x0CC)
+    upgradeLevel = ByteMember("struct", 0x0CD)
     # padding0xCE
     # resource -----------------------------------------------
-    resourceAmount = StructMember(0x0D0, Mk.WORD)  # 0x0D0 union
-    resourceIscript = StructMember(0x0D2, Mk.BYTE)
-    gatherQueueCount = StructMember(0x0D3, Mk.BOOL)
+    resourceAmount = WordMember("struct", 0x0D0)  # 0x0D0 union
+    resourceIscript = ByteMember("struct", 0x0D2)
+    gatherQueueCount = BoolMember("struct", 0x0D3)
     """it is byte but effectively bool; always set to 1 when beginning to harvest,
     but when finshed, it is    by 1 instead of set to 0"""
-    nextGatherer = StructMember(0x0D4, Mk.C_UNIT)
+    nextGatherer = CUnitMember("struct", 0x0D4)
     "pointer to the next worker unit waiting in line to gather"
-    resourceGroup = StructMember(0x0D8, Mk.BYTE)
-    resourceBelongsToAI = StructMember(0x0D9, Mk.BOOL)
+    resourceGroup = ByteMember("struct", 0x0D8)
+    resourceBelongsToAI = BoolMember("struct", 0x0D9)
     # other buildings ----------------------------------------
-    nydusExit = StructMember(0x0D0, Mk.C_UNIT)
+    nydusExit = CUnitMember("struct", 0x0D0)
     "connected nydus canal"
-    ghostNukeDot = StructMember(0x0D0, Mk.DWORD)  # FIXME: should be CThingy
+    ghostNukeDot = DwordMember("struct", 0x0D0)  # FIXME: should be CThingy
     """CThingy struct is same as CUnit but trimmed down to [prev, next, hp, sprite],
     with "hp" field used as unitID for fog thingies or otherwise unused"""
-    pylonAura = StructMember(0x0D0, Mk.C_SPRITE)
+    pylonAura = CSpriteMember("struct", 0x0D0)
     # silo
-    siloNuke = StructMember(0x0D0, Mk.C_UNIT)
-    siloReady = StructMember(0x0D4, Mk.BOOL)
+    siloNuke = CUnitMember("struct", 0x0D0)
+    siloReady = BoolMember("struct", 0x0D4)
     # hatchery
-    hatcheryHarvestLT = StructMember(0x0D0, Mk.DWORD)
-    hatcheryHarvestRB = StructMember(0x0D4, Mk.DWORD)
-    hatcheryHarvestL = StructMember(0x0D0, Mk.WORD)
-    hatcheryHarvestT = StructMember(0x0D2, Mk.WORD)
-    hatcheryHarvestR = StructMember(0x0D4, Mk.WORD)
-    hatcheryHarvestB = StructMember(0x0D6, Mk.WORD)
+    hatcheryHarvestLT = DwordMember("struct", 0x0D0)
+    hatcheryHarvestRB = DwordMember("struct", 0x0D4)
+    hatcheryHarvestL = WordMember("struct", 0x0D0)
+    hatcheryHarvestT = WordMember("struct", 0x0D2)
+    hatcheryHarvestR = WordMember("struct", 0x0D4)
+    hatcheryHarvestB = WordMember("struct", 0x0D6)
     # ==============================================/ building
     # worker -------------------------------------------------
-    powerup = StructMember(0x0C0, Mk.C_UNIT)
-    targetResourcePos = StructMember(0x0C4, Mk.POSITION)
-    targetResourceX = StructMember(0x0C4, Mk.POSITION_X)
-    targetResourceY = StructMember(0x0C6, Mk.POSITION_Y)
-    targetResourceUnit = StructMember(0x0C8, Mk.C_UNIT)
-    repairResourceLossTimer = StructMember(0x0CC, Mk.WORD)
-    isCarryingSomething = StructMember(0x0CE, Mk.BOOL)
-    resourceCarryAmount = StructMember(0x0CF, Mk.BYTE)
-    harvestTarget = StructMember(0x0D0, Mk.C_UNIT)
-    prevHarvestUnit = StructMember(0x0D4, Mk.C_UNIT)
-    nextHarvestUnit = StructMember(0x0D8, Mk.C_UNIT)
+    powerup = CUnitMember("struct", 0x0C0)
+    targetResourcePos = PositionMember("struct", 0x0C4)
+    targetResourceX = PositionXMember("struct", 0x0C4)
+    targetResourceY = PositionYMember("struct", 0x0C6)
+    targetResourceUnit = CUnitMember("struct", 0x0C8)
+    repairResourceLossTimer = WordMember("struct", 0x0CC)
+    isCarryingSomething = BoolMember("struct", 0x0CE)
+    resourceCarryAmount = ByteMember("struct", 0x0CF)
+    harvestTarget = CUnitMember("struct", 0x0D0)
+    prevHarvestUnit = CUnitMember("struct", 0x0D4)
+    nextHarvestUnit = CUnitMember("struct", 0x0D8)
     "When there is a gather conflict"
     # powerup ------------------------------------------------
-    powerupOrigin = StructMember(0x0D0, Mk.POSITION)
-    powerupOriginX = StructMember(0x0D0, Mk.POSITION_X)
-    powerupOriginY = StructMember(0x0D2, Mk.POSITION_Y)
-    powerupCarryingUnit = StructMember(0x0D4, Mk.C_UNIT)
+    powerupOrigin = PositionMember("struct", 0x0D0)
+    powerupOriginX = PositionXMember("struct", 0x0D0)
+    powerupOriginY = PositionYMember("struct", 0x0D2)
+    powerupCarryingUnit = CUnitMember("struct", 0x0D4)
     # \\\\\\\\\\\\\\\=================================// union
-    statusFlags = StatusFlags(0x0DC, Mk.DWORD)
-    resourceType = StructMember(0x0E0, Mk.WORKER_CARRY_TYPE)
+    statusFlags = StatusFlags("struct", 0x0DC)
+    resourceType = WorkerCarryTypeMember("struct", 0x0E0)
     "Type of resource chunk carried by worker: (None, Gas, Ore, GasOrOre, PowerUp)"
-    wireframeRandomizer = StructMember(0x0E1, Mk.BYTE)
-    secondaryOrderState = StructMember(0x0E2, Mk.BYTE)
-    recentOrderTimer = StructMember(0x0E3, Mk.BYTE)
+    wireframeRandomizer = ByteMember("struct", 0x0E1)
+    secondaryOrderState = ByteMember("struct", 0x0E2)
+    recentOrderTimer = ByteMember("struct", 0x0E3)
     """Counts down from 15 to 0 when most orders are given,
     or when the unit moves after reaching a patrol location"""
-    visibilityStatus = StructMember(0x0E4, Mk.DWORD)
+    visibilityStatus = DwordMember("struct", 0x0E4)
     "which players can detect this unit (cloaked/burrowed)"
-    secondaryOrderPos = StructMember(0x0E8, Mk.POSITION)
-    secondaryOrderX = StructMember(0x0E8, Mk.POSITION_X)
-    secondaryOrderY = StructMember(0x0EA, Mk.POSITION_Y)
-    currentBuildUnit = StructMember(0x0EC, Mk.C_UNIT)
-    prevBurrowedUnit = UnsupportedMember(0x0F0, Mk.C_UNIT)
-    nextBurrowedUnit = UnsupportedMember(0x0F4, Mk.C_UNIT)
-    rallyPos = StructMember(0x0F8, Mk.POSITION)
-    rallyX = StructMember(0x0F8, Mk.POSITION_X)
-    rallyY = StructMember(0x0FA, Mk.POSITION_Y)
-    rallyUnit = StructMember(0x0FC, Mk.C_UNIT)
-    prevPsiProvider = StructMember(0x0F8, Mk.C_UNIT)
-    nextPsiProvider = StructMember(0x0FC, Mk.C_UNIT)
-    path = UnsupportedMember(0x100, Mk.DWORD)
-    pathingCollisionInterval = StructMember(0x104, Mk.BYTE)
-    pathingFlags = PathingFlags(0x105, Mk.BYTE)
-    unknown0x106 = StructMember(0x106, Mk.BYTE)
-    isBeingHealed = StructMember(0x107, Mk.BOOL)
+    secondaryOrderPos = PositionMember("struct", 0x0E8)
+    secondaryOrderX = PositionXMember("struct", 0x0E8)
+    secondaryOrderY = PositionYMember("struct", 0x0EA)
+    currentBuildUnit = CUnitMember("struct", 0x0EC)
+    prevBurrowedUnit = UnsupportedMember("struct", 0x0F0)  # CUnit
+    nextBurrowedUnit = UnsupportedMember("struct", 0x0F4)  # CUnit
+    rallyPos = PositionMember("struct", 0x0F8)
+    rallyX = PositionXMember("struct", 0x0F8)
+    rallyY = PositionYMember("struct", 0x0FA)
+    rallyUnit = CUnitMember("struct", 0x0FC)
+    prevPsiProvider = CUnitMember("struct", 0x0F8)
+    nextPsiProvider = CUnitMember("struct", 0x0FC)
+    path = UnsupportedMember("struct", 0x100)  # Dword
+    pathingCollisionInterval = ByteMember("struct", 0x104)
+    pathingFlags = PathingFlags("struct", 0x105)
+    unknown0x106 = ByteMember("struct", 0x106)
+    isBeingHealed = BoolMember("struct", 0x107)
     "1 if a medic is currently healing this unit"
-    contourBoundsLT = UnsupportedMember(0x108, Mk.DWORD)
+    contourBoundsLT = UnsupportedMember("struct", 0x108)  # Dword
     "A rect that specifies the closest contour (collision) points"
-    contourBoundsRB = UnsupportedMember(0x10C, Mk.DWORD)
-    contourBoundsL = UnsupportedMember(0x108, Mk.WORD)
-    contourBoundsT = UnsupportedMember(0x10A, Mk.WORD)
-    contourBoundsR = UnsupportedMember(0x10C, Mk.WORD)
-    contourBoundsB = UnsupportedMember(0x10E, Mk.WORD)
-    removeTimer = StructMember(0x110, Mk.WORD)
+    contourBoundsRB = UnsupportedMember("struct", 0x10C)  # Dword
+    contourBoundsL = UnsupportedMember("struct", 0x108)  # Word
+    contourBoundsT = UnsupportedMember("struct", 0x10A)  # Word
+    contourBoundsR = UnsupportedMember("struct", 0x10C)  # Word
+    contourBoundsB = UnsupportedMember("struct", 0x10E)  # Word
+    removeTimer = WordMember("struct", 0x110)
     """Hallucination, Dark Swarm, Disruption Web, Broodling
     (but not Scanner Sweep according to BWAPI)"""
-    defensiveMatrixHp = StructMember(0x112, Mk.WORD)
-    defensiveMatrixTimer = StructMember(0x114, Mk.BYTE)
-    stimTimer = StructMember(0x115, Mk.BYTE)
-    ensnareTimer = StructMember(0x116, Mk.BYTE)
-    lockdownTimer = StructMember(0x117, Mk.BYTE)
-    irradiateTimer = StructMember(0x118, Mk.BYTE)
-    stasisTimer = StructMember(0x119, Mk.BYTE)
-    plagueTimer = StructMember(0x11A, Mk.BYTE)
-    stormTimer = StructMember(0x11B, Mk.BYTE)
-    isUnderStorm = StructMember(0x11B, Mk.BOOL)
+    defensiveMatrixHp = WordMember("struct", 0x112)
+    defensiveMatrixTimer = ByteMember("struct", 0x114)
+    stimTimer = ByteMember("struct", 0x115)
+    ensnareTimer = ByteMember("struct", 0x116)
+    lockdownTimer = ByteMember("struct", 0x117)
+    irradiateTimer = ByteMember("struct", 0x118)
+    stasisTimer = ByteMember("struct", 0x119)
+    plagueTimer = ByteMember("struct", 0x11A)
+    stormTimer = ByteMember("struct", 0x11B)
+    isUnderStorm = BoolMember("struct", 0x11B)
     "Used to tell if a unit is under psi storm"
-    irradiatedBy = StructMember(0x11C, Mk.C_UNIT)
-    irradiatePlayerID = StructMember(0x120, Mk.PLAYER)
-    parasiteFlags = StructMember(0x121, Mk.BYTE)
+    irradiatedBy = CUnitMember("struct", 0x11C)
+    irradiatePlayerID = PlayerMember("struct", 0x120)
+    parasiteFlags = ByteMember("struct", 0x121)
     "Each bit corresponds to the player who has parasited this unit"
-    cycleCounter = StructMember(0x122, Mk.BYTE)
+    cycleCounter = ByteMember("struct", 0x122)
     "counts/cycles up from 0 to 7 (inclusive). See also 0x85"
-    blindFlags = StructMember(0x123, Mk.BYTE)
+    blindFlags = ByteMember("struct", 0x123)
     """Each bit corresponds to the player who has optical flared this unit,
     like parasiteFlags, but is read as a bool for vision check"""
-    maelstromTimer = StructMember(0x124, Mk.BYTE)
-    unusedTimer = StructMember(0x125, Mk.BYTE)
+    maelstromTimer = ByteMember("struct", 0x124)
+    unusedTimer = ByteMember("struct", 0x125)
     "Might be afterburner timer or ultralisk roar timer"
-    acidSporeCount = StructMember(0x126, Mk.BYTE)
-    acidSporeTime0 = StructMember(0x127, Mk.BYTE)
-    acidSporeTime1 = StructMember(0x128, Mk.BYTE)
-    acidSporeTime2 = StructMember(0x129, Mk.BYTE)
-    acidSporeTime3 = StructMember(0x12A, Mk.BYTE)
-    acidSporeTime4 = StructMember(0x12B, Mk.BYTE)
-    acidSporeTime5 = StructMember(0x12C, Mk.BYTE)
-    acidSporeTime6 = StructMember(0x12D, Mk.BYTE)
-    acidSporeTime7 = StructMember(0x12E, Mk.BYTE)
-    acidSporeTime8 = StructMember(0x12F, Mk.BYTE)
-    offsetIndex3by3 = UnsupportedMember(0x130, Mk.WORD)
+    acidSporeCount = ByteMember("struct", 0x126)
+    acidSporeTime0 = ByteMember("struct", 0x127)
+    acidSporeTime1 = ByteMember("struct", 0x128)
+    acidSporeTime2 = ByteMember("struct", 0x129)
+    acidSporeTime3 = ByteMember("struct", 0x12A)
+    acidSporeTime4 = ByteMember("struct", 0x12B)
+    acidSporeTime5 = ByteMember("struct", 0x12C)
+    acidSporeTime6 = ByteMember("struct", 0x12D)
+    acidSporeTime7 = ByteMember("struct", 0x12E)
+    acidSporeTime8 = ByteMember("struct", 0x12F)
+    offsetIndex3by3 = UnsupportedMember("struct", 0x130)  # Word
     """Cycles between 0-12 for each bullet fired by this unit
     (if it uses a 'Attack 3x3 area' weapon)"""
-    unknown0x132 = UnsupportedMember(0x132, Mk.WORD)
+    unknown0x132 = UnsupportedMember("struct", 0x132)  # Word
     "padding"
-    AI = UnsupportedMember(0x134, Mk.DWORD)
-    airStrength = UnsupportedMember(0x138, Mk.WORD)
-    groundStrength = UnsupportedMember(0x13A, Mk.WORD)
-    finderIndexLeft = UnsupportedMember(0x13C, Mk.DWORD)
-    finderIndexRight = UnsupportedMember(0x140, Mk.DWORD)
-    finderIndexTop = UnsupportedMember(0x144, Mk.DWORD)
-    finderIndexBottom = UnsupportedMember(0x148, Mk.DWORD)
-    repulseUnknown = StructMember(0x14C, Mk.BYTE)
+    AI = UnsupportedMember("struct", 0x134)  # Dword
+    airStrength = UnsupportedMember("struct", 0x138)  # Word
+    groundStrength = UnsupportedMember("struct", 0x13A)  # Word
+    finderIndexLeft = UnsupportedMember("struct", 0x13C)  # Dword
+    finderIndexRight = UnsupportedMember("struct", 0x140)  # Dword
+    finderIndexTop = UnsupportedMember("struct", 0x144)  # Dword
+    finderIndexBottom = UnsupportedMember("struct", 0x148)  # Dword
+    repulseUnknown = ByteMember("struct", 0x14C)
     "updated only when air unit is being pushed"
-    repulseAngle = StructMember(0x14D, Mk.BYTE)
-    driftPos = StructMember(0x14E, Mk.WORD)
+    repulseAngle = ByteMember("struct", 0x14D)
+    driftPos = WordMember("struct", 0x14E)
     "(mapsizex / 1.5 max)"
-    driftX = StructMember(0x14E, Mk.BYTE)
-    driftY = StructMember(0x14F, Mk.BYTE)
+    driftX = ByteMember("struct", 0x14E)
+    driftY = ByteMember("struct", 0x14F)
 
     @classproperty
     def range(self):

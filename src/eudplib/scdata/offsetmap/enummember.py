@@ -4,23 +4,69 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from typing import TYPE_CHECKING, Final, Self
+from abc import abstractmethod
+from typing import Final, Literal, Self, overload
 
 from ... import core as c
 from ... import ctrlstru as cs
+from ...core import EUDVariable
 from ...utils import ExprProxy, ep_assert
-from .member import ArrayMember, BaseMember
-from .memberkind import MemberKind
-
-if TYPE_CHECKING:
-    from .epdoffsetmap import EPDOffsetMap
+from .epdoffsetmap import EPDOffsetMap
+from .member import BaseMember
+from .memberkind import BaseKind, ByteKind, DwordKind, WordKind
 
 
-class EnumMember(ExprProxy):
-    __slots__ = ()
+class EnumMember(BaseMember, ExprProxy):
+    __slots__ = (
+        "_instance",
+        "layout",
+        "offset",
+        "stride",
+        "__objclass__",
+        "__name__",
+    )
 
-    def __init__(self):
-        super().__init__(None)
+    @property
+    @abstractmethod
+    def kind(self) -> type[BaseKind]:
+        ...
+
+    def __init__(
+        self,
+        layout: Literal["struct", "array"],
+        offset: int,
+        *,
+        stride: int | None = None,
+    ) -> None:
+        self._instance: EPDOffsetMap | None = None  # FIXME
+        super().__init__(layout, offset, stride=stride)
+        super(BaseMember, self).__init__(None)
+
+    def _get_epd(self, instance=None):
+        if instance is None:
+            instance = self._instance
+        return super()._get_epd(self, instance)
+
+    def __get__(
+        self, instance: EPDOffsetMap | None, owner: type[EPDOffsetMap]
+    ) -> Self:
+        if instance is None:
+            return self
+        elif isinstance(instance, EPDOffsetMap):
+            self._instance = instance
+            # FIXME: fix reading value on every usages
+            # example)
+            # const movementFlags = unit.movementFlags;
+            # arr[0] = movementFlags;
+            # arr[1] = movementFlags;
+            # unit.movementFlags += 1;
+            # arr[2] = movementFlags;  // <- always read new value
+            return self
+        raise AttributeError
+
+    def __set__(self, instance: EPDOffsetMap, value) -> None:
+        self._instance = instance
+        super().__set__(instance, value)
 
     # FIXME: Overwriting ExprProxy.getValue is kinda hacky...
     def getValue(self):  # noqa: N802
@@ -123,90 +169,28 @@ class EnumMember(ExprProxy):
         return self.getValue() > k
 
 
-class StructEnumMember(BaseMember, EnumMember):
-    __slots__ = ("offset", "kind", "_instance", "__objclass__", "__name__")
+class ByteEnumMember(EnumMember):
+    __slots__ = ()
 
-    def __init__(self, offset: int, kind: MemberKind) -> None:
-        self._instance: EPDOffsetMap | None = None  # FIXME
-        super().__init__(offset, kind)
-        super(BaseMember, self).__init__()
-
-    def _get_epd(self, instance=None):
-        q, r = divmod(self.offset, 4)
-        if instance is None:
-            instance = self._instance
-        return instance._value + q, r
-
-    def __get__(self, instance, owner=None) -> Self:
-        from .epdoffsetmap import EPDOffsetMap
-
-        if instance is None:
-            return self
-        elif isinstance(instance, EPDOffsetMap):
-            self._instance = instance
-            # FIXME: fix reading value on every usages
-            # example)
-            # const movementFlags = unit.movementFlags;
-            # arr[0] = movementFlags;
-            # arr[1] = movementFlags;
-            # unit.movementFlags += 1;
-            # arr[2] = movementFlags;  // <- always read new value
-            return self
-        raise AttributeError
-
-    def __set__(self, instance, value) -> None:
-        from .epdoffsetmap import EPDOffsetMap
-
-        if isinstance(instance, EPDOffsetMap):
-            self._instance = instance
-            epd, subp = self._get_epd(instance)
-            self.kind.write_epd(epd, subp, self.kind.cast(value))
-            return
-        raise AttributeError
+    @property
+    def kind(self):
+        return ByteKind
 
 
-class ArrayEnumMember(BaseMember, EnumMember):
-    __slots__ = ("offset", "kind", "stride", "_instance", "__objclass__", "__name__")
+class WordEnumMember(EnumMember):
+    __slots__ = ()
 
-    def __init__(
-        self, offset: int, kind: MemberKind, *, stride: int | None = None
-    ) -> None:
-        self._instance: EPDOffsetMap | None = None  # FIXME
-        super().__init__(offset, kind)
-        super(BaseMember, self).__init__()
-        if stride is None:
-            self.stride: int = self.kind.size()
-        else:
-            ep_assert(
-                self.kind.size() <= stride, "stride is greater than member size"
-            )
-            self.stride = stride
+    @property
+    def kind(self):
+        return WordKind
 
-    def _get_epd(self, instance=None):
-        if instance is None:
-            instance = self._instance
-        return ArrayMember._get_epd(self, instance)
 
-    def __get__(self, instance, owner=None) -> Self:
-        from .epdoffsetmap import EPDOffsetMap
+class DwordEnumMember(EnumMember):
+    __slots__ = ()
 
-        if instance is None:
-            return self
-        if isinstance(instance, EPDOffsetMap):
-            self._instance = instance
-            # FIXME: fix reading value on every usages
-            return self
-        raise AttributeError
-
-    def __set__(self, instance, value) -> None:
-        from .epdoffsetmap import EPDOffsetMap
-
-        if isinstance(instance, EPDOffsetMap):
-            self._instance = instance
-            epd, subp = self._get_epd(instance)
-            self.kind.write_epd(epd, subp, self.kind.cast(value))
-            return
-        raise AttributeError
+    @property
+    def kind(self):
+        return DwordKind
 
 
 class Flag:
@@ -218,24 +202,32 @@ class Flag:
         ep_assert(0 < mask <= 0xFFFFFFFF, f"Invalid bitmask: {mask}")
         self.mask = mask
 
-    def __get__(self, instance, owner=None) -> c.EUDVariable | Self:
+    @overload
+    def __get__(self, instance: None, owner: type[EnumMember]) -> Self:
+        ...
+
+    @overload
+    def __get__(self, instance: EnumMember, owner: type[EnumMember]) -> EUDVariable:
+        ...
+
+    def __get__(self, instance, owner=None) -> EUDVariable | Self:
         if instance is None:
             return self
-        if isinstance(instance, StructEnumMember):
+        if instance.layout == "struct":
             from ...trigger import Trigger
 
             epd, subp = instance._get_epd()
             mask = self.mask << (8 * subp)
-            ret = c.EUDVariable()
+            ret = EUDVariable()
             ret << True
             Trigger(
                 c.MemoryXEPD(epd, c.AtMost, mask - 1, mask), ret.SetNumber(False)
             )
             return ret
-        if isinstance(instance, ArrayEnumMember):
+        elif instance.layout == "array":
             # FIXME: replace to efficent implementation
             flags = instance.getValue()
-            ret = c.EUDVariable()
+            ret = EUDVariable()
             ret << True
             c.RawTrigger(
                 conditions=flags.AtMostX(self.mask - 1, self.mask),
@@ -245,10 +237,10 @@ class Flag:
 
         raise AttributeError
 
-    def __set__(self, instance, value) -> None:
+    def __set__(self, instance: EnumMember, value) -> None:
         from ...memio import f_maskwrite_epd
 
-        if isinstance(instance, StructEnumMember):
+        if instance.layout == "struct":
             epd, subp = instance._get_epd()
             mask = self.mask << (8 * subp)
             f_maskwrite_epd(epd, ~0, mask)
@@ -256,7 +248,7 @@ class Flag:
                 f_maskwrite_epd(epd, 0, mask)
             cs.EUDEndIf()
             return
-        if isinstance(instance, ArrayEnumMember):
+        elif instance.layout == "array":
             # FIXME: replace to efficent implementation
             # while subp is always int for StructMember,
             # subp can be EUDVariable or int for ArrayMember
@@ -269,3 +261,19 @@ class Flag:
             return
 
         raise AttributeError
+
+
+class MovementFlags(ByteEnumMember):
+    """Flags that enable/disable certain movement."""
+
+    __slots__ = ()
+    OrderedAtLeastOnce = Flag(0x01)
+    Accelerating = Flag(0x02)
+    Braking = Flag(0x04)
+    StartingAttack = Flag(0x08)
+    Moving = Flag(0x10)
+    Lifted = Flag(0x20)
+    BrakeOnPathStep = Flag(0x40)
+    "unit decelerates when reaching the end of current path segment"
+    AlwaysZero = Flag(0x80)
+    HoverUnit = Flag(0xC1)

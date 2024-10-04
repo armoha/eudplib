@@ -16,6 +16,7 @@ from ...memio import muldiv4table
 class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     __slots__ = ()
     _cast: ClassVar[bool] = False
+    _has_array_member: ClassVar[bool] = False
     _update: ClassVar[
         dict[c.EUDVariable, tuple[c.Forward, c.Forward, c.Forward]]
     ] = {}
@@ -181,7 +182,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         return self
 
     def getepd(self, name: str) -> c.EUDVariable:
-        from .memberimpl import CSpriteKind, CUnitKind, IscriptKind, PositionKind
+        from .memberkind import CSpriteKind, CUnitKind, IscriptKind, PositionKind
 
         member = type(self).__dict__[name]
         kind = member.kind
@@ -197,7 +198,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         return f_epdread_epd(epd)
 
     def getdwepd(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
-        from .memberimpl import CSpriteKind, CUnitKind, IscriptKind, PositionKind
+        from .memberkind import CSpriteKind, CUnitKind, IscriptKind, PositionKind
 
         member = type(self).__dict__[name]
         kind = member.kind
@@ -214,7 +215,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         return f_dwepdread_epd(epd)
 
     def getpos(self, name: str) -> tuple[c.EUDVariable, c.EUDVariable]:
-        from .memberimpl import CSpriteKind, CUnitKind, IscriptKind
+        from .memberkind import CSpriteKind, CUnitKind, IscriptKind
 
         member = type(self).__dict__[name]
         kind = member.kind

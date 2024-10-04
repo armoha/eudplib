@@ -10,25 +10,31 @@ from .. import memio
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..localize import _
-from .offsetmap import ArrayMember, EPDOffsetMap
-from .offsetmap import MemberKind as Mk
+from .offsetmap import (
+    ByteMember,
+    EPDOffsetMap,
+    IconMember,
+    RaceResearchMember,
+    StatTextMember,
+    WordMember,
+)
 from .player import TrgPlayer
 
 
 class Upgrade(EPDOffsetMap, ConstType):
     __slots__ = ()
-    mineralCostBase = ArrayMember(0x655740, Mk.WORD)
-    mineralCostFactor = ArrayMember(0x6559C0, Mk.WORD)
-    gasCostBase = ArrayMember(0x655840, Mk.WORD)
-    gasCostFactor = ArrayMember(0x6557C0, Mk.WORD)
-    timeCostBase = ArrayMember(0x655B80, Mk.WORD)
-    timeCostFactor = ArrayMember(0x655940, Mk.WORD)
-    requirementOffset = ArrayMember(0x6558C0, Mk.WORD)
-    icon = ArrayMember(0x655AC0, Mk.ICON)
-    label = ArrayMember(0x655A40, Mk.STATTEXT)
-    race = ArrayMember(0x655BFC, Mk.RACE_RESEARCH)
-    maxLevel = ArrayMember(0x655700, Mk.BYTE)
-    broodWarFlag = ArrayMember(0x655B3C, Mk.BYTE)  # bool?
+    mineralCostBase = WordMember("array", 0x655740)
+    mineralCostFactor = WordMember("array", 0x6559C0)
+    gasCostBase = WordMember("array", 0x655840)
+    gasCostFactor = WordMember("array", 0x6557C0)
+    timeCostBase = WordMember("array", 0x655B80)
+    timeCostFactor = WordMember("array", 0x655940)
+    requirementOffset = WordMember("array", 0x6558C0)
+    icon = IconMember("array", 0x655AC0)
+    label = StatTextMember("array", 0x655A40)
+    race = RaceResearchMember("array", 0x655BFC)
+    maxLevel = ByteMember("array", 0x655700)
+    broodWarFlag = ByteMember("array", 0x655B3C)  # bool?
 
     @ut.classproperty
     def range(self):

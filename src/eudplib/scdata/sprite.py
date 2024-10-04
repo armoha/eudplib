@@ -9,18 +9,17 @@ from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeSprite
 from ..localize import _
-from .offsetmap import ArrayMember, EPDOffsetMap
-from .offsetmap import MemberKind as Mk
+from .offsetmap import BoolMember, EPDOffsetMap, ImageMember
 
 
 class Sprite(EPDOffsetMap, ConstType):
     __slots__ = ()
     # Read only data skipped
-    image = ArrayMember(0x666160, Mk.IMAGE)
+    image = ImageMember("array", 0x666160)
     # hpBarSize = ArrayMember(0x665E50, Mk.BYTE)
     # hpBarSize starts on Sprites.dat ID 130
     # unknownFlag = ArrayMember(0x666570, Mk.BYTE)
-    isVisible = ArrayMember(0x665C48, Mk.BOOL)
+    isVisible = BoolMember("array", 0x665C48)
     # selectionCircle = ArrayMember(0x665AC0, Mk.BYTE)
     # selectionCircle and selectionVerticalOffset start on Sprites.dat ID 130
     # selectionVerticalOffset = ArrayMember(0x665FD8, Mk.BYTE)

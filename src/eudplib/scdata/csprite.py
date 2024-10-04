@@ -11,16 +11,23 @@ from .. import core as c
 from ..localize import _
 from ..utils import EPD, EPError, ExprProxy, classproperty, unProxy
 from .offsetmap import (
+    ByteEnumMember,
+    ByteMember,
+    CSpriteMember,
+    DwordMember,
     EPDOffsetMap,
     Flag,
-    StructEnumMember,
-    StructMember,
+    PlayerMember,
+    PositionMember,
+    PositionXMember,
+    PositionYMember,
+    SpriteMember,
+    WordMember,
 )
-from .offsetmap import MemberKind as Mk
 from .offsetmap.epdoffsetmap import _epd_cache, _ptr_cache
 
 
-class CSpriteFlags(StructEnumMember):
+class CSpriteFlags(ByteEnumMember):
     __slots__ = ()
     DrawSelCircle = Flag(0x01)
     "Draw selection circle"
@@ -42,28 +49,28 @@ int_or_var: TypeAlias = int | c.EUDVariable | ExprProxy
 
 class CSprite(EPDOffsetMap):
     __slots__ = ("_ptr",)
-    prev = StructMember(0x00, Mk.C_SPRITE)
-    next = StructMember(0x04, Mk.C_SPRITE)
-    sprite = StructMember(0x08, Mk.SPRITE)
-    playerID = StructMember(0x0A, Mk.PLAYER)
+    prev = CSpriteMember("struct", 0x00)
+    next = CSpriteMember("struct", 0x04)
+    sprite = SpriteMember("struct", 0x08)
+    player = PlayerMember("struct", 0x0A)
     "officially 'creator'"
-    selectionIndex = StructMember(0x0B, Mk.BYTE)
+    selectionIndex = ByteMember("struct", 0x0B)
     "0 <= selectionIndex <= 11. Index in the selection area at bottom of screen."
-    visibilityFlags = StructMember(0x0C, Mk.BYTE)
+    visibilityFlags = ByteMember("struct", 0x0C)
     "Player bits indicating visibility for a player (not hidden by the fog-of-war)"
-    elevationLevel = StructMember(0x0D, Mk.BYTE)
-    flags = CSpriteFlags(0x0E, Mk.BYTE)
-    selectionTimer = StructMember(0x0F, Mk.BYTE)
-    index = StructMember(0x10, Mk.WORD)
-    grpWidth = StructMember(0x12, Mk.BYTE)
-    grpHeight = StructMember(0x13, Mk.BYTE)
-    pos = StructMember(0x14, Mk.POSITION)
-    posX = StructMember(0x14, Mk.POSITION_X)
-    posY = StructMember(0x16, Mk.POSITION_Y)
-    mainGraphic = StructMember(0x18, Mk.DWORD)
+    elevationLevel = ByteMember("struct", 0x0D)
+    flags = CSpriteFlags("struct", 0x0E)
+    selectionTimer = ByteMember("struct", 0x0F)
+    index = WordMember("struct", 0x10)
+    grpWidth = ByteMember("struct", 0x12)
+    grpHeight = ByteMember("struct", 0x13)
+    pos = PositionMember("struct", 0x14)
+    posX = PositionXMember("struct", 0x14)
+    posY = PositionYMember("struct", 0x16)
+    mainGraphic = DwordMember("struct", 0x18)
     "officially 'pImagePrimary', CImage"
-    imageHead = StructMember(0x1C, Mk.DWORD)
-    imageTail = StructMember(0x20, Mk.DWORD)
+    imageHead = DwordMember("struct", 0x1C)
+    imageTail = DwordMember("struct", 0x20)
 
     @classproperty
     def range(self):

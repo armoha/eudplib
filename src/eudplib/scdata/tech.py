@@ -10,24 +10,30 @@ from .. import memio
 from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..localize import _
-from .offsetmap import ArrayMember, EPDOffsetMap
-from .offsetmap import MemberKind as Mk
+from .offsetmap import (
+    ByteMember,
+    EPDOffsetMap,
+    IconMember,
+    RaceResearchMember,
+    StatTextMember,
+    WordMember,
+)
 from .player import TrgPlayer
 
 
 class Tech(EPDOffsetMap, ConstType):
     __slots__ = ()
-    mineralCost = ArrayMember(0x656248, Mk.WORD)
-    gasCost = ArrayMember(0x6561F0, Mk.WORD)
-    timeCost = ArrayMember(0x6563D8, Mk.WORD)
-    energyCost = ArrayMember(0x656380, Mk.WORD)
-    researchRequirementOffset = ArrayMember(0x656198, Mk.WORD)
-    techUseRequirementOffset = ArrayMember(0x6562F8, Mk.WORD)
-    icon = ArrayMember(0x656430, Mk.ICON)
-    label = ArrayMember(0x6562A0, Mk.STATTEXT)
-    race = ArrayMember(0x656488, Mk.RACE_RESEARCH)
-    researched = ArrayMember(0x656350, Mk.BYTE)  # UNUSED?
-    broodWarFlag = ArrayMember(0x6564B4, Mk.BYTE)  # bool?
+    mineralCost = WordMember("array", 0x656248)
+    gasCost = WordMember("array", 0x6561F0)
+    timeCost = WordMember("array", 0x6563D8)
+    energyCost = WordMember("array", 0x656380)
+    researchRequirementOffset = WordMember("array", 0x656198)
+    techUseRequirementOffset = WordMember("array", 0x6562F8)
+    icon = IconMember("array", 0x656430)
+    label = StatTextMember("array", 0x6562A0)
+    race = RaceResearchMember("array", 0x656488)
+    researched = ByteMember("array", 0x656350)  # UNUSED?
+    broodWarFlag = ByteMember("array", 0x6564B4)  # bool?
 
     @ut.classproperty
     def range(self):

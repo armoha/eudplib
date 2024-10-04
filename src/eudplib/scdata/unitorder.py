@@ -9,39 +9,48 @@ from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeUnitOrder
 from ..localize import _
-from .offsetmap import ArrayMember, EPDOffsetMap
-from .offsetmap import MemberKind as Mk
+from .offsetmap import (
+    AnimationMember,
+    BoolMember,
+    EPDOffsetMap,
+    IconMember,
+    StatTextMember,
+    TechMember,
+    UnitOrderMember,
+    WeaponMember,
+    WordMember,
+)
 
 
 class UnitOrder(EPDOffsetMap, ConstType):
     __slots__ = ()
-    label = ArrayMember(0x665280, Mk.STATTEXT)
-    useWeaponTargeting = ArrayMember(0x664B00, Mk.BOOL)
-    # secondaryOrder = ArrayMember(0x665940, Mk.BOOL)
+    label = StatTextMember("array", 0x665280)
+    useWeaponTargeting = BoolMember("array", 0x664B00)
+    # secondaryOrder = BoolMember("array", 0x665940)
     # secondary order is for reference only (unused)
-    # nonSubunit = ArrayMember(0x665A00, Mk.BOOL)
+    # nonSubunit = BoolMember("array", 0x665A00)
     # non subunit is for reference only (unused)
-    subunitInheritance = ArrayMember(0x664A40, Mk.BOOL)
+    subunitInheritance = BoolMember("array", 0x664A40)
     "when main unit receives the order, gives it to subunit as well"
-    # subunitCanUse = ArrayMember(0x6657C0, Mk.BOOL)
+    # subunitCanUse = BoolMember("array", 0x6657C0)
     # subunit can use is for reference only (unused)
-    canBeInterrupted = ArrayMember(0x665040, Mk.BOOL)
-    canBeLifted = ArrayMember(0x665100, Mk.BOOL)
+    canBeInterrupted = BoolMember("array", 0x665040)
+    canBeLifted = BoolMember("array", 0x665100)
     "if a movement-type order, sets/clears Lifted (0x20) cunit movement flag"
-    canBeQueued = ArrayMember(0x665700, Mk.BOOL)
-    disablingKeepsTarget = ArrayMember(0x6651C0, Mk.BOOL)
+    canBeQueued = BoolMember("array", 0x665700)
+    disablingKeepsTarget = BoolMember("array", 0x6651C0)
     "does not clear order target unit when frozen by lockdown/stasis/maelstrom"
-    canBeObstructed = ArrayMember(0x6654C0, Mk.BOOL)
-    fleeable = ArrayMember(0x664C80, Mk.BOOL)
+    canBeObstructed = BoolMember("array", 0x6654C0)
+    fleeable = BoolMember("array", 0x664C80)
     "order can be interrupted by unit fleeing from hit reaction"
-    # requireMoving = ArrayMember(0x664BC0, Mk.BOOL)
+    # requireMoving = BoolMember("array", 0x664BC0)
     # require moving is for reference only (unused)
-    weapon = ArrayMember(0x665880, Mk.WEAPON)
-    techUsed = ArrayMember(0x664E00, Mk.TECH)
-    animation = ArrayMember(0x664D40, Mk.ANIMATION)
-    icon = ArrayMember(0x664EC0, Mk.ICON)
-    requirementOffset = ArrayMember(0x665580, Mk.WORD)
-    obscuredOrder = ArrayMember(0x665400, Mk.UNIT_ORDER)
+    weapon = WeaponMember("array", 0x665880)
+    techUsed = TechMember("array", 0x664E00)
+    animation = AnimationMember("array", 0x664D40)
+    icon = IconMember("array", 0x664EC0)
+    requirementOffset = WordMember("array", 0x665580)
+    obscuredOrder = UnitOrderMember("array", 0x665400)
 
     @ut.classproperty
     def range(self):

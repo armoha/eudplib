@@ -9,23 +9,22 @@ from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeImage
 from ..localize import _
-from .offsetmap import ArrayMember, EPDOffsetMap
-from .offsetmap import MemberKind as Mk
+from .offsetmap import BoolMember, DrawingFunctionMember, EPDOffsetMap, IscriptMember
 
 
 class Image(EPDOffsetMap, ConstType):
     __slots__ = ()
     # Read only data skipped
     # grpFile = ArrayMember(0x668AA0, Mk.DWORD)
-    isTurnable = graphicTurn = ArrayMember(0x66E860, Mk.BOOL)
-    isClickable = ArrayMember(0x66C150, Mk.BOOL)
-    useFullIscript = ArrayMember(0x66D4D8, Mk.BOOL)
-    drawIfCloaked = ArrayMember(0x667718, Mk.BOOL)
-    drawingFunction = ArrayMember(0x669E28, Mk.DRAWING_FUNCION)
+    isTurnable = graphicTurn = BoolMember("array", 0x66E860)
+    isClickable = BoolMember("array", 0x66C150)
+    useFullIscript = BoolMember("array", 0x66D4D8)
+    drawIfCloaked = BoolMember("array", 0x667718)
+    drawingFunction = DrawingFunctionMember("array", 0x669E28)
     # FIXME: Add UnsupportedMember?
     # remapping = ArrayMember(0x669A40, Mk.BYTE)
     # Remapping table is skipped because it doesn't work in SC:R
-    iscript = ArrayMember(0x66EC48, Mk.ISCRIPT)
+    iscript = IscriptMember("array", 0x66EC48)
     # shieldsOverlay = ArrayMember(0x66C538, Mk.DWORD)
     # attackOverlay = ArrayMember(0x66B1B0, Mk.DWORD)
     # damageOverlay = ArrayMember(0x66A210, Mk.DWORD)

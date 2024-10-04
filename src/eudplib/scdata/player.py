@@ -9,8 +9,7 @@ from .. import utils as ut
 from ..core.rawtrigger.constenc import EncodePlayer, PlayerDict, _Player
 from ..core.rawtrigger.consttype import ConstType
 from ..localize import _
-from .offsetmap import ArrayMember, EPDOffsetMap
-from .offsetmap import MemberKind as Mk
+from .offsetmap import ByteMember, DwordMember, EPDOffsetMap, MapStringMember
 
 
 class TrgPlayer(EPDOffsetMap, _Player):
@@ -21,44 +20,44 @@ class TrgPlayer(EPDOffsetMap, _Player):
     """
 
     __slots__ = ()
-    mineral = ore = ArrayMember(0x57F0F0, Mk.DWORD)
-    gas = ArrayMember(0x57F120, Mk.DWORD)
-    cumulativeGas = ArrayMember(0x57F150, Mk.DWORD)
-    cumulativeMineral = cumulativeOre = ArrayMember(0x57F180, Mk.DWORD)
-    zergControlAvailable = ArrayMember(0x582144, Mk.DWORD)
-    zergControlUsed = ArrayMember(0x582174, Mk.DWORD)
-    zergControlMax = ArrayMember(0x5821A4, Mk.DWORD)
-    terranSupplyAvailable = ArrayMember(0x5821D4, Mk.DWORD)
-    terranSupplyUsed = ArrayMember(0x582204, Mk.DWORD)
-    terranSupplyMax = ArrayMember(0x582234, Mk.DWORD)
-    protossPsiAvailable = ArrayMember(0x582264, Mk.DWORD)
-    protossPsiUsed = ArrayMember(0x582294, Mk.DWORD)
-    protossPsiMax = ArrayMember(0x5822C4, Mk.DWORD)
-    unitColor = ArrayMember(0x581D76, Mk.BYTE, stride=8)
-    minimapColor = ArrayMember(0x581DD6, Mk.BYTE)
-    remainingGamePause = ArrayMember(0x58D718, Mk.BYTE)  # length=8
-    missionObjectives = ArrayMember(0x58D6C4, Mk.MAP_STRING, stride=4)
-    unitScore = ArrayMember(0x581E44, Mk.DWORD)
+    mineral = ore = DwordMember("array", 0x57F0F0)
+    gas = DwordMember("array", 0x57F120)
+    cumulativeGas = DwordMember("array", 0x57F150)
+    cumulativeMineral = cumulativeOre = DwordMember("array", 0x57F180)
+    zergControlAvailable = DwordMember("array", 0x582144)
+    zergControlUsed = DwordMember("array", 0x582174)
+    zergControlMax = DwordMember("array", 0x5821A4)
+    terranSupplyAvailable = DwordMember("array", 0x5821D4)
+    terranSupplyUsed = DwordMember("array", 0x582204)
+    terranSupplyMax = DwordMember("array", 0x582234)
+    protossPsiAvailable = DwordMember("array", 0x582264)
+    protossPsiUsed = DwordMember("array", 0x582294)
+    protossPsiMax = DwordMember("array", 0x5822C4)
+    unitColor = ByteMember("array", 0x581D76, stride=8)
+    minimapColor = ByteMember("array", 0x581DD6)
+    remainingGamePause = ByteMember("array", 0x58D718)  # length=8
+    missionObjectives = MapStringMember("array", 0x58D6C4, stride=4)
+    unitScore = DwordMember("array", 0x581E44)
     "Score for units produced"
-    buildingScore = ArrayMember(0x582024, Mk.DWORD)
+    buildingScore = DwordMember("array", 0x582024)
     "Score for buildings produced"
-    killScore = ArrayMember(0x581F04, Mk.DWORD)
-    razingScore = ArrayMember(0x582054, Mk.DWORD)
-    customScore = ArrayMember(0x5822F4, Mk.DWORD)
+    killScore = DwordMember("array", 0x581F04)
+    razingScore = DwordMember("array", 0x582054)
+    customScore = DwordMember("array", 0x5822F4)
     # scoreUnitTotal = ArrayMember(0x581ED4)
     # numOfFactoriesRazed = ArrayMember(0x582114) Kills for "Factories" stored
     # numOfBuildingsRazed = ArrayMember(0x581FF4) Kills for "Buildings" stored
     # numOfUnitsKilled = ArrayMember(0x581EA4) Kills for "Any Unit" stored here.
-    # humanID = ArrayMember(0x57EE7C, Mk.DWORD)
-    # nationID = ArrayMember(0x57EEC0, Mk.DWORD)
-    # networkStatus = ArrayMember(0x57F0B8, Mk.DWORD)
-    # playerSlotType = ArrayMember(0x57F1B4, Mk.BYTE)
-    # playerSlotRace = ArrayMember(0x57F1C0, Mk.BYTE)
-    # sharedVision = ArrayMember(0x57F1EC, Mk.DWORD)
-    # colorMapping = ArrayMember(0x57F21C, Mk.DWORD) length=8
-    # singleplayerComputerRace = ArrayMember(0x57F267, Mk.BYTE) length=8
+    # humanID = DwordMember("array", 0x57EE7C)
+    # nationID = DwordMember("array", 0x57EEC0)
+    # networkStatus = DwordMember("array", 0x57F0B8)
+    # playerSlotType = ByteMember("array", 0x57F1B4)
+    # playerSlotRace = ByteMember("array", 0x57F1C0)
+    # sharedVision = DwordMember("array", 0x57F1EC)
+    # colorMapping = DwordMember("array", 0x57F21C) length=8
+    # singleplayerComputerRace = ByteMember("array", 0x57F267) length=8
     # hasLeftGame = ArrayMember(0x581D62, Mk.BOOL) length=8
-    # selectionCircleColor = ArrayMember(0x581D6A, Mk.BYTE)
+    # selectionCircleColor = ByteMember("array", 0x581D6A)
     # ownedTotalUnitsScore = ArrayMember(0x581DE4)
     # ownedUnitsScore = ArrayMember(0x581E14)
     # numOfUnitsLost = ArrayMember(0x581E74) Deaths for "Any Unit" stored here.
@@ -69,13 +68,13 @@ class TrgPlayer(EPDOffsetMap, _Player):
     # numOfFactoriesConstructed = ArrayMember(0x582084)
     # numOfFactoriesOwned = ArrayMember(0x5820B4)
     # numOfFactoriesLost = ArrayMember(0x5820E4) Deaths for "Factories" stored
-    # larvaCount = ArrayMember(0x585474, Mk.BYTE)
-    # force = ArrayMember(0x58D5B0, Mk.BYTE) length=8
-    # allyStatus = ArrayMember(0x58D634, Mk.BYTE)
-    # victoryStatus = ArrayMember(0x58D700, Mk.BYTE) length=8
+    # larvaCount = ByteMember("array", 0x585474)
+    # force = ByteMember("array", 0x58D5B0) length=8
+    # allyStatus = ByteMember("array", 0x58D634)
+    # victoryStatus = ByteMember("array", 0x58D700) length=8
     # startLocationPos = ArrayMember(0x58D720, Mk.POSITION) length=8
     # 0x58F442 Unknown Player Color Something length=8
-    # triggerWaitTimer = ArrayMember(0x650980, Mk.DWORD) length=8
+    # triggerWaitTimer = DwordMember("array", 0x650980) length=8
     # 0x6D0F3C Replay Header - Player Bytes: Read Only
     # 0x6D0FD1 Replay Header - Player Entries: Read Only
     # 0x6D1181 Replay Header - Player Colors: Read Only length=8
@@ -90,9 +89,7 @@ class TrgPlayer(EPDOffsetMap, _Player):
         if isinstance(other, cls):
             return other
         if isinstance(other, ConstType):
-            raise ut.EPError(
-                _('"{}" is not a {}').format(other, cls.__name__)
-            )
+            raise ut.EPError(_('"{}" is not a {}').format(other, cls.__name__))
         EPDOffsetMap._cast = True
         return cls(other)
 

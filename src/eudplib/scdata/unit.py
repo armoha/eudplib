@@ -10,33 +10,37 @@ from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeUnit
 from ..localize import _
 from .offsetmap import (
-    ArrayEnumMember,
-    ArrayMember,
+    Bit1Member,
+    BoolMember,
+    ByteEnumMember,
+    ByteMember,
+    DwordEnumMember,
+    DwordMember,
     EPDOffsetMap,
     Flag,
+    FlingyMember,
+    ImageMember,
+    MapStringMember,
+    MovementFlags,
     NotImplementedMember,
+    PortraitMember,
+    PositionMember,
+    PositionXMember,
+    PositionYMember,
+    RankMember,
+    RightClickActionMember,
+    SfxDataMember,
+    UnitMember,
+    UnitOrderMember,
+    UnitSizeMember,
+    UpgradeMember,
+    WeaponMember,
+    WordEnumMember,
+    WordMember,
 )
-from .offsetmap import MemberKind as Mk
 
 
-# FIXME: integrate with CUnit MovementFlags
-class MovementFlags(ArrayEnumMember):
-    """u8: Flags that enable/disable certain movement."""
-
-    __slots__ = ()
-    OrderedAtLeastOnce = Flag(0x01)
-    Accelerating = Flag(0x02)
-    Braking = Flag(0x04)
-    StartingAttack = Flag(0x08)
-    Moving = Flag(0x10)
-    Lifted = Flag(0x20)
-    BrakeOnPathStep = Flag(0x40)
-    "unit decelerates when reaching the end of current path segment"
-    AlwaysZero = Flag(0x80)
-    HoverUnit = Flag(0xC1)
-
-
-class GroupFlags(ArrayEnumMember):
+class GroupFlags(ByteEnumMember):
     __slots__ = ()
     Zerg = Flag(0x01)
     """Uses underlings, can build on creep"""
@@ -51,7 +55,7 @@ class GroupFlags(ArrayEnumMember):
     Neutral = Flag(0x80)
 
 
-class BaseProperty(ArrayEnumMember):
+class BaseProperty(DwordEnumMember):
     """SpecialAbilityFlag in PyMS, UnitPrototypeFlags in bwapi, BaseProperty in GPTP"""  # noqa: E501
 
     __slots__ = ()
@@ -100,7 +104,7 @@ class BaseProperty(ArrayEnumMember):
     "It can produce units directly (making buildings doesn't count)"
 
 
-class AvailabilityFlags(ArrayEnumMember):
+class AvailabilityFlags(WordEnumMember):
     __slots__ = ()
     NonNeutral = Flag(0x001)
     UnitListing = Flag(0x002)
@@ -117,23 +121,23 @@ class AvailabilityFlags(ArrayEnumMember):
 
 class TrgUnit(EPDOffsetMap, ConstType):
     __slots__ = ()
-    flingy = ArrayMember(0x6644F8, Mk.FLINGY)
+    flingy = FlingyMember("array", 0x6644F8)
     "Flingy: Flingy of unit. 유닛의 비행정보."
-    subUnit = ArrayMember(0x6607C0, Mk.UNIT)
+    subUnit = UnitMember("array", 0x6607C0)
     "TrgUnit: Subunit of unit. 유닛의 부가유닛"
-    # subunit2 = ArrayMember(0x660C38, Mk.WORD)
+    # subunit2 = WordMember("array", 0x660C38)
     # subunit2 is unused. 유닛의 두번째 부가유닛. 사용되지 않습니다.
     # infestationUnit is not implemented yet (different beginning index)
     # SCBW_DATA(u16*, InfestedUnitPartial, unitsDat[3].address);
     # 0x664980, (Id - UnitId::TerranCommandCenter) for it to work,
     # last valid id is UnitId::Special_OvermindCocoon
     # 퀸이 감염 시켰을 경우 바뀌는 대상 유닛. 106-201 (건물)에만 존재합니다.
-    constructionGraphic = ArrayMember(0x6610B0, Mk.IMAGE, stride=4)
+    constructionGraphic = ImageMember("array", 0x6610B0, stride=4)
     """Image: Sets the graphic when the unit is built.
 
     유닛이 건설될 때의 그래픽을 설정합니다.
     """
-    startDirection = ArrayMember(0x6605F0, Mk.BYTE)
+    startDirection = ByteMember("array", 0x6605F0)
     """u8: Direction unit will face after it is created.
 
     Values start at 0 (the unit will face the top of the screen) and go on clockwise
@@ -144,7 +148,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     방향으로 31(위쪽에서 약간 왼쪽)까지 증가합니다. 값이 32이면 랜덤 방향을 향하게
     됩니다.
     """
-    hasShield = ArrayMember(0x6647B0, Mk.BOOL)
+    hasShield = BoolMember("array", 0x6647B0)
     """bool: Flag indicating if the unit's shields are enabled.
 
     When enabled, the unit's shields can be modified with `ModifyUnitShields` action.
@@ -153,16 +157,16 @@ class TrgUnit(EPDOffsetMap, ConstType):
     활성화하면 `ModifyUnitShields` 액션으로 유닛의 보호막을 수정할 수 있습니다. 건설
     중인 테란 및 저그 건물은 보호막을 재생하지 않습니다.
     """
-    maxShield = ArrayMember(0x660E00, Mk.WORD)
+    maxShield = WordMember("array", 0x660E00)
     "u16: Shield amount of unit. 유닛의 최대 실드량."
-    maxHp = ArrayMember(0x662350, Mk.DWORD)
+    maxHp = DwordMember("array", 0x662350)
     """i32: Max hit point of unit.
 
     Values above '10000' are allowed in the game, but no numbers are displayed.
 
     유닛의 체력. '10000' 이상의 값은 게임에서 허용되지만 수치가 표시되지 않습니다.
     """
-    elevation = ArrayMember(0x663150, Mk.BYTE)
+    elevation = ByteMember("array", 0x663150)
     """u8: The unit's visible height.
 
     When set to Air (12 <= elevation <= 18), allows the unit to pass over impassable
@@ -173,8 +177,8 @@ class TrgUnit(EPDOffsetMap, ConstType):
     지상 유닛 위로 지나다닐 수 있습니다. 값이 높을수록 지형이나 다른 유닛보다 위에
     표시됩니다.
     """
-    movementFlags = MovementFlags(0x660FC8, Mk.BYTE)
-    rank = ArrayMember(0x663DD0, Mk.RANK)
+    movementFlags = MovementFlags("array", 0x660FC8)
+    rank = RankMember("array", 0x663DD0)
     """u8: Stat text id offset for unit rank, starting from [1302] Recruit.
 
     Sets the rank of the unit. Unit status text is prioritized in the following order
@@ -195,22 +199,22 @@ class TrgUnit(EPDOffsetMap, ConstType):
     고정으로 사용합니다. 이 외의 유닛은 `groupFlags`의 종족 플래그에서 `Terran`만
     활성화해야 계급이 보입니다.
     """
-    computerIdleOrder = ArrayMember(0x662EA0, Mk.UNIT_ORDER)
+    computerIdleOrder = UnitOrderMember("array", 0x662EA0)
     """UnitOrder: An order issued when unit owned by computer is doing nothing.
 
     컴퓨터의 유닛이 아무것도 하고있지 않을 때 내려지는 명령.
     """
-    humanIdleOrder = ArrayMember(0x662268, Mk.UNIT_ORDER)
+    humanIdleOrder = UnitOrderMember("array", 0x662268)
     """UnitOrder: An order issued when unit owned by huamn is doing nothing
 
     사람의 유닛이 아무것도 하고있지 않을 때 내려지는 명령.
     """
-    returnToIdleOrder = ArrayMember(0x664898, Mk.UNIT_ORDER)
+    returnToIdleOrder = UnitOrderMember("array", 0x664898)
     """UnitOrder: An order issued when unit return to idle state.
 
     유닛이 이전 명령을 수행한 후 아무것도 하지 않는 상태로 돌아가는 명령.
     """
-    attackUnitOrder = ArrayMember(0x663320, Mk.UNIT_ORDER)
+    attackUnitOrder = UnitOrderMember("array", 0x663320)
     """UnitOrder: An order performed when a unit is ordered to attack.
 
     Also performed by right-clicking if the target is an enemy.
@@ -218,10 +222,10 @@ class TrgUnit(EPDOffsetMap, ConstType):
     유닛이 대상을 공격하라고 명령 받았을 때 수행하는 명령. 대상이 적이면 우클릭으로도
     수행합니다.
     """
-    attackMoveOrder = ArrayMember(0x663A50, Mk.UNIT_ORDER)
-    groundWeapon = ArrayMember(0x6636B8, Mk.WEAPON)
-    airWeapon = ArrayMember(0x6616E0, Mk.WEAPON)
-    maxGroundHits = ArrayMember(0x6645E0, Mk.BYTE)
+    attackMoveOrder = UnitOrderMember("array", 0x663A50)
+    groundWeapon = WeaponMember("array", 0x6636B8)
+    airWeapon = WeaponMember("array", 0x6616E0)
+    maxGroundHits = ByteMember("array", 0x6645E0)
     """u8: (UNUSED) Maximum number of hits this unit can deal to ground targets.
 
     This attribute represents the maximum number of hits this unit can inflict on a
@@ -233,7 +237,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     사이오닉 검의 `damageFactor`는 1이고 질럿의 `maxGroundHits`은 2입니다.
     실제 공격 횟수는 iscript에서 결정됩니다.
     """
-    maxAirHits = ArrayMember(0x65FC18, Mk.BYTE)
+    maxAirHits = ByteMember("array", 0x65FC18)
     """u8: (UNUSED) Maximum number of hits this unit can deal to air targets.
 
     This attribute represents the maximum number of hits this unit can inflict on a
@@ -245,7 +249,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     로켓의 `damageFactor`는 최대치인 2이고 발키리의 `maxAirHits`은 4입니다. 실제 공격
     횟수는 iscript에서 결정됩니다.
     """
-    ignoreStrategicSuicideMissions = ArrayMember(0x660178, Mk.BOOL)
+    ignoreStrategicSuicideMissions = BoolMember("array", 0x660178)
     """bool: Flag indicating if the unit is excluded from Strategic Suicide Missions.
 
     When `ignoreStrategicSuicideMissions` is enabled, the unit will be excluded from
@@ -258,7 +262,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     기본적으로 모든 유닛에서 `ignoreStrategicSuicideMissions`와 `dontBecomeGuard`는
     둘 다 켜져있거나 둘 다 꺼져있습니다.
     """
-    dontBecomeGuard = ArrayMember(0x660178, Mk.BIT_1)
+    dontBecomeGuard = Bit1Member("array", 0x660178)
     """bool: Flag to prevent unit from returning to original position.
 
     Enabling `dontBecomeGuard` can cause game crashes, especially if the CPU controls
@@ -278,11 +282,11 @@ class TrgUnit(EPDOffsetMap, ConstType):
     있거나 (유닛 AI 타입 2가 됨), `baseProperty.Building`이 있고 베스핀 간헐천이
     아니거나, 라바/에그/오버로드인 경우 (유닛AI 타입 3이 됨) AI가 할당됩니다.
     """
-    baseProperty = BaseProperty(0x664080, Mk.DWORD)
-    seekRange = ArrayMember(0x662DB8, Mk.BYTE)
-    sightRange = ArrayMember(0x663238, Mk.BYTE)
-    armorUpgrade = ArrayMember(0x6635D0, Mk.UPGRADE)
-    sizeType = ArrayMember(0x662180, Mk.UNIT_SIZE)
+    baseProperty = BaseProperty("array", 0x664080)
+    seekRange = ByteMember("array", 0x662DB8)
+    sightRange = ByteMember("array", 0x663238)
+    armorUpgrade = UpgradeMember("array", 0x6635D0)
+    sizeType = UnitSizeMember("array", 0x662180)
     """u8: Size classification of the unit.
 
     Defines the size of unit as one of four types: `"Small"`, `"Medium"`, `"Large"`,
@@ -295,16 +299,16 @@ class TrgUnit(EPDOffsetMap, ConstType):
     줍니다. 각 무기 타입마다 방어 타입에 대한 대미지 비율은 메모리 주소 `0x515B84`에
     있습니다.
     """
-    armor = ArrayMember(0x65FEC8, Mk.BYTE)
-    rightClickAction = ArrayMember(0x662098, Mk.RCLICK_ACTION)
-    readySound = ArrayMember(0x661FC0, Mk.SFXDATA_DAT)
-    whatSoundStart = ArrayMember(0x65FFB0, Mk.SFXDATA_DAT)
-    whatSoundEnd = ArrayMember(0x662BF0, Mk.SFXDATA_DAT)
-    pissedSoundStart = ArrayMember(0x663B38, Mk.SFXDATA_DAT)
-    pissedSoundEnd = ArrayMember(0x661EE8, Mk.SFXDATA_DAT)
-    yesSoundStart = ArrayMember(0x663C10, Mk.SFXDATA_DAT)
-    yesSoundEnd = ArrayMember(0x661440, Mk.SFXDATA_DAT)
-    buildingDimensions = ArrayMember(0x662860, Mk.POSITION)
+    armor = ByteMember("array", 0x65FEC8)
+    rightClickAction = RightClickActionMember("array", 0x662098)
+    readySound = SfxDataMember("array", 0x661FC0)
+    whatSoundStart = SfxDataMember("array", 0x65FFB0)
+    whatSoundEnd = SfxDataMember("array", 0x662BF0)
+    pissedSoundStart = SfxDataMember("array", 0x663B38)
+    pissedSoundEnd = SfxDataMember("array", 0x661EE8)
+    yesSoundStart = SfxDataMember("array", 0x663C10)
+    yesSoundEnd = SfxDataMember("array", 0x661440)
+    buildingDimensions = PositionMember("array", 0x662860)
     """Position: Dimensions for building placement and visibility.
 
     This dimension is used when determining if units with the Building flag can fit
@@ -322,27 +326,27 @@ class TrgUnit(EPDOffsetMap, ConstType):
     이하로 설정하면 배치 메커니즘이 약간 불안정하지만 물과 절벽을 포함한 모든 지형에
     건물을 지을 수 있습니다.
     """
-    addonPlacement = NotImplementedMember(0x6626E0, Mk.POSITION)
+    addonPlacement = NotImplementedMember("array", 0x6626E0)  # Position
     """AddonPlacement is not implemented yet because its beginning index isn't 0."""
-    unitBoundsLT = ArrayMember(0x6617C8, Mk.POSITION, stride=8)
-    unitBoundsRB = ArrayMember(0x6617CC, Mk.POSITION, stride=8)
-    unitBoundsL = ArrayMember(0x6617C8, Mk.POSITION_X, stride=8)
-    unitBoundsT = ArrayMember(0x6617CA, Mk.POSITION_Y, stride=8)
-    unitBoundsR = ArrayMember(0x6617CC, Mk.POSITION_X, stride=8)
-    unitBoundsB = ArrayMember(0x6617CE, Mk.POSITION_Y, stride=8)
-    portrait = ArrayMember(0x662F88, Mk.PORTRAIT)
-    mineralCost = ArrayMember(0x663888, Mk.WORD)
-    gasCost = ArrayMember(0x65FD00, Mk.WORD)
-    timeCost = ArrayMember(0x660428, Mk.WORD)
-    requirementOffset = ArrayMember(0x660A70, Mk.WORD)
-    groupFlags = GroupFlags(0x6637A0, Mk.BYTE)
-    supplyProvided = ArrayMember(0x6646C8, Mk.BYTE)
-    supplyUsed = ArrayMember(0x663CE8, Mk.BYTE)
-    transportSpaceProvided = ArrayMember(0x660988, Mk.BYTE)
-    transportSpaceRequired = ArrayMember(0x664410, Mk.BYTE)
-    buildScore = ArrayMember(0x663408, Mk.WORD)
-    killScore = ArrayMember(0x663EB8, Mk.WORD)
-    nameString = ArrayMember(0x660260, Mk.MAP_STRING)
+    unitBoundsLT = PositionMember("array", 0x6617C8, stride=8)
+    unitBoundsRB = PositionMember("array", 0x6617CC, stride=8)
+    unitBoundsL = PositionXMember("array", 0x6617C8, stride=8)
+    unitBoundsT = PositionYMember("array", 0x6617CA, stride=8)
+    unitBoundsR = PositionXMember("array", 0x6617CC, stride=8)
+    unitBoundsB = PositionYMember("array", 0x6617CE, stride=8)
+    portrait = PortraitMember("array", 0x662F88)
+    mineralCost = WordMember("array", 0x663888)
+    gasCost = WordMember("array", 0x65FD00)
+    timeCost = WordMember("array", 0x660428)
+    requirementOffset = WordMember("array", 0x660A70)
+    groupFlags = GroupFlags("array", 0x6637A0)
+    supplyProvided = ByteMember("array", 0x6646C8)
+    supplyUsed = ByteMember("array", 0x663CE8)
+    transportSpaceProvided = ByteMember("array", 0x660988)
+    transportSpaceRequired = ByteMember("array", 0x664410)
+    buildScore = WordMember("array", 0x663408)
+    killScore = WordMember("array", 0x663EB8)
+    nameString = MapStringMember("array", 0x660260)
     """TrgString: Map string id for the unit's name.
 
     When this property is non-zero, the unit's name is read from the strings in
@@ -351,8 +355,8 @@ class TrgUnit(EPDOffsetMap, ConstType):
     이 속성이 0이 아닌 경우, 유닛의 이름은 `stat_txt.tbl` 파일 대신 현재 로드된
     맵(CHK) 내의 문자열에서 읽어옵니다.
     """
-    broodWarFlag = ArrayMember(0x6606D8, Mk.BYTE)  # bool?
-    availabilityFlags = AvailabilityFlags(0x661518, Mk.WORD)
+    broodWarFlag = ByteMember("array", 0x6606D8)  # bool?
+    availabilityFlags = AvailabilityFlags("array", 0x661518)
 
     @ut.classproperty
     def range(self):

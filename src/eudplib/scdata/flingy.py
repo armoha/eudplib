@@ -9,19 +9,25 @@ from .. import utils as ut
 from ..core.rawtrigger.consttype import ConstType
 from ..core.rawtrigger.strenc import EncodeFlingy
 from ..localize import _
-from .offsetmap import ArrayMember, EPDOffsetMap
-from .offsetmap import MemberKind as Mk
+from .offsetmap import (
+    ByteMember,
+    DwordMember,
+    EPDOffsetMap,
+    MovementControlMember,
+    SpriteMember,
+    WordMember,
+)
 
 
 class Flingy(EPDOffsetMap, ConstType):
     __slots__ = ()
-    sprite = ArrayMember(0x6CA318, Mk.SPRITE)
-    topSpeed = ArrayMember(0x6C9EF8, Mk.DWORD)
-    acceleration = ArrayMember(0x6C9C78, Mk.WORD)
-    haltDistance = ArrayMember(0x6C9930, Mk.DWORD)
-    turnSpeed = turnRadius = ArrayMember(0x6C9E20, Mk.BYTE)
-    # unused = ArrayMember(0x6CA240, Mk.BYTE)
-    movementControl = ArrayMember(0x6C9858, Mk.MOVEMENT_CONTROL)
+    sprite = SpriteMember("array", 0x6CA318)
+    topSpeed = DwordMember("array", 0x6C9EF8)
+    acceleration = WordMember("array", 0x6C9C78)
+    haltDistance = DwordMember("array", 0x6C9930)
+    turnSpeed = turnRadius = ByteMember("array", 0x6C9E20)
+    # unused = ByteMember("array", 0x6CA240)
+    movementControl = MovementControlMember("array", 0x6C9858)
 
     @ut.classproperty
     def range(self):
