@@ -1,13 +1,19 @@
 from helper import *
-from eudplib.scdata.offsetmap import EPDOffsetMap, StructMember, MemberKind
+
+from eudplib.scdata.offsetmap import (
+    ByteMember,
+    DwordMember,
+    EPDOffsetMap,
+    WordMember,
+)
 
 
 class T(EPDOffsetMap):
-    a = StructMember(0x00, MemberKind.DWORD)
-    b = StructMember(0x00, MemberKind.WORD)
-    c = StructMember(0x02, MemberKind.WORD)
-    d = StructMember(0x04, MemberKind.DWORD)
-    e = StructMember(0x07, MemberKind.BYTE)
+    a = DwordMember("struct", 0x00)
+    b = WordMember("struct", 0x00)
+    c = WordMember("struct", 0x02)
+    d = DwordMember("struct", 0x04)
+    e = ByteMember("struct", 0x07)
 
 
 @TestInstance
