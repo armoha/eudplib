@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-10-02 22:26+0900\n"
+"POT-Creation-Date: 2024-10-05 06:17+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,6 +35,7 @@ msgstr ""
 #: src/eudplib\core\eudstruct\eudstruct.py:102
 #: src/eudplib\core\eudstruct\vararray.py:475
 #: src/eudplib\core\rawtrigger\consttype.py:49
+#: src/eudplib\scdata\offsetmap\enummember.py:262
 msgid "Can't assign {} to {}"
 msgstr ""
 
@@ -349,16 +350,16 @@ msgstr ""
 msgid "Can't negate condition"
 msgstr ""
 
-#: src/eudplib\core\rawtrigger\constenc.py:258
-#: src/eudplib\core\rawtrigger\consttype.py:33
-#: src/eudplib\core\rawtrigger\strenc.py:177
-#: src/eudplib\core\rawtrigger\strenc.py:214
-#: src/eudplib\core\rawtrigger\strenc.py:217 src/eudplib\scdata\flingy.py:35
-#: src/eudplib\scdata\image.py:45 src/eudplib\scdata\player.py:94
-#: src/eudplib\scdata\sprite.py:37 src/eudplib\scdata\tech.py:41
-#: src/eudplib\scdata\unit.py:366 src/eudplib\scdata\unitorder.py:55
-#: src/eudplib\scdata\upgrade.py:42 src/eudplib\scdata\weapon.py:70
-msgid "[Warning] \"{}\" is not a {}"
+#: src/eudplib\core\rawtrigger\constenc.py:248
+#: src/eudplib\core\rawtrigger\consttype.py:34
+#: src/eudplib\core\rawtrigger\strenc.py:160
+#: src/eudplib\core\rawtrigger\strenc.py:197
+#: src/eudplib\core\rawtrigger\strenc.py:200 src/eudplib\scdata\flingy.py:43
+#: src/eudplib\scdata\image.py:46 src/eudplib\scdata\player.py:92
+#: src/eudplib\scdata\sprite.py:37 src/eudplib\scdata\tech.py:48
+#: src/eudplib\scdata\unit.py:371 src/eudplib\scdata\unitorder.py:65
+#: src/eudplib\scdata\upgrade.py:49 src/eudplib\scdata\weapon.py:86
+msgid "\"{}\" is not a {}"
 msgstr ""
 
 #: src/eudplib\core\rawtrigger\rawtriggerdef.py:117
@@ -373,85 +374,85 @@ msgstr ""
 msgid "nextptr should be ConstExpr"
 msgstr ""
 
-#: src/eudplib\core\rawtrigger\stockact.py:87
-#: src/eudplib\core\rawtrigger\stockact.py:144
+#: src/eudplib\core\rawtrigger\stockact.py:89
+#: src/eudplib\core\rawtrigger\stockact.py:146
 msgid "Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"
 msgstr ""
 
-#: src/eudplib\core\rawtrigger\stockact.py:141
-#: src/eudplib\core\rawtrigger\stockact.py:169
+#: src/eudplib\core\rawtrigger\stockact.py:143
+#: src/eudplib\core\rawtrigger\stockact.py:171
 msgid "AlwaysDisplay argument must be int, not '{}'"
 msgstr ""
 
-#: src/eudplib\core\rawtrigger\stockact.py:907
+#: src/eudplib\core\rawtrigger\stockact.py:909
 msgid "SetKills Player should be only P1~P12 or CurrentPlayer"
 msgstr ""
 
-#: src/eudplib\core\rawtrigger\stockact.py:910
+#: src/eudplib\core\rawtrigger\stockact.py:912
 msgid "SetKills Unit should be at most 227"
 msgstr ""
 
-#: src/eudplib\core\rawtrigger\strenc.py:159
+#: src/eudplib\core\rawtrigger\strenc.py:142
 msgid "AIScript name too short"
 msgstr ""
 
-#: src/eudplib\core\rawtrigger\strenc.py:164
-#: src/eudplib\core\rawtrigger\strenc.py:171
-#: src/eudplib\core\rawtrigger\strenc.py:210
+#: src/eudplib\core\rawtrigger\strenc.py:147
+#: src/eudplib\core\rawtrigger\strenc.py:154
+#: src/eudplib\core\rawtrigger\strenc.py:193
 msgid "Cannot encode string {} as {}."
 msgstr ""
 
-#: src/eudplib\core\rawtrigger\strenc.py:166
-#: src/eudplib\core\rawtrigger\strenc.py:173
-#: src/eudplib\core\rawtrigger\strenc.py:212
+#: src/eudplib\core\rawtrigger\strenc.py:149
+#: src/eudplib\core\rawtrigger\strenc.py:156
+#: src/eudplib\core\rawtrigger\strenc.py:195
 msgid " - Suggestion: {}"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:52
+#: src/eudplib\core\variable\eudv.py:53
 msgid "Invalid dest: {}"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:120 src/eudplib\core\variable\eudxv.py:44
+#: src/eudplib\core\variable\eudv.py:121 src/eudplib\core\variable\eudxv.py:44
 msgid "Invalid initval: {}"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:153
+#: src/eudplib\core\variable\eudv.py:154
 msgid "Trying to modify value of r-value variable"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:232
+#: src/eudplib\core\variable\eudv.py:233
 msgid "Unexpected modifier {}"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:561
+#: src/eudplib\core\variable\eudv.py:562
 msgid "{}: Comparing with temporary variable."
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:578 src/eudplib\core\variable\eudv.py:589
+#: src/eudplib\core\variable\eudv.py:579 src/eudplib\core\variable\eudv.py:590
 msgid "{}: Patching comparison condition."
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:604
+#: src/eudplib\core\variable\eudv.py:605
 msgid "No unsigned number can be leq than {}"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:618
+#: src/eudplib\core\variable\eudv.py:619
 msgid "No unsigned number can be greater than {}"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:879
+#: src/eudplib\core\variable\eudv.py:880
 msgid "dst and src have intersection"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:903
+#: src/eudplib\core\variable\eudv.py:904
 msgid "src{} is RValue variable"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:908
+#: src/eudplib\core\variable\eudv.py:909
 msgid "Input/output size mismatch"
 msgstr ""
 
-#: src/eudplib\core\variable\eudv.py:914 src/eudplib\core\variable\eudv.py:917
+#: src/eudplib\core\variable\eudv.py:915 src/eudplib\core\variable\eudv.py:918
 msgid "Multiple error occurred on SetVariables:"
 msgstr ""
 
@@ -539,32 +540,32 @@ msgstr ""
 msgid "listloop mismatch"
 msgstr ""
 
-#: src/eudplib\eudlib\utilf\pexist.py:54 src/eudplib\eudlib\utilf\pexist.py:56
-#: src/eudplib\eudlib\utilf\pexist.py:59
+#: src/eudplib\eudlib\utilf\pexist.py:71 src/eudplib\eudlib\utilf\pexist.py:73
+#: src/eudplib\eudlib\utilf\pexist.py:76
 msgid "{} is not force"
 msgstr ""
 
-#: src/eudplib\eudlib\utilf\pexist.py:74
+#: src/eudplib\eudlib\utilf\pexist.py:91
 msgid "No player met condition for input map settings:"
 msgstr ""
 
-#: src/eudplib\eudlib\utilf\pexist.py:76
+#: src/eudplib\eudlib\utilf\pexist.py:93
 msgid " ptype {}"
 msgstr ""
 
-#: src/eudplib\eudlib\utilf\pexist.py:78
+#: src/eudplib\eudlib\utilf\pexist.py:95
 msgid " force {}"
 msgstr ""
 
-#: src/eudplib\eudlib\utilf\pexist.py:80
+#: src/eudplib\eudlib\utilf\pexist.py:97
 msgid " race {}"
 msgstr ""
 
-#: src/eudplib\eudlib\utilf\pexist.py:82
+#: src/eudplib\eudlib\utilf\pexist.py:99
 msgid "Check out whether Start Locations are placed correctly."
 msgstr ""
 
-#: src/eudplib\maprw\injector\mainloop.py:89
+#: src/eudplib\maprw\injector\mainloop.py:90
 msgid "main_starter has not called"
 msgstr ""
 
@@ -596,23 +597,23 @@ msgstr ""
 msgid "Fail to open input map"
 msgstr ""
 
-#: src/eudplib\maprw\loadmap.py:49 src/eudplib\maprw\loadmap.py:51
+#: src/eudplib\maprw\loadmap.py:49 src/eudplib\maprw\loadmap.py:56
 msgid "Fail to extract scenario.chk, maybe invalid scx"
 msgstr ""
 
-#: src/eudplib\maprw\mpqadd.py:44
+#: src/eudplib\maprw\mpqadd.py:46
 msgid "MPQ filename duplicate : \"{}\""
 msgstr ""
 
-#: src/eudplib\maprw\mpqadd.py:71
+#: src/eudplib\maprw\mpqadd.py:73
 msgid "Invalid file path or content: {}"
 msgstr ""
 
-#: src/eudplib\maprw\mpqadd.py:103
+#: src/eudplib\maprw\mpqadd.py:105
 msgid "Failed to increase max file limit"
 msgstr ""
 
-#: src/eudplib\maprw\mpqadd.py:122
+#: src/eudplib\maprw\mpqadd.py:124
 msgid "Failed adding file {} to mpq: May be duplicate"
 msgstr ""
 
@@ -635,19 +636,19 @@ msgstr ""
 msgid "Fail to access output map"
 msgstr ""
 
-#: src/eudplib\maprw\savemap.py:119
+#: src/eudplib\maprw\savemap.py:120 src/eudplib\maprw\savemap.py:132
 msgid "Fail to add scenario.chk"
 msgstr ""
 
-#: src/eudplib\maprw\savemap.py:126
+#: src/eudplib\maprw\savemap.py:140
 msgid "Fail to compact MPQ"
 msgstr ""
 
-#: src/eudplib\maprw\savemap.py:130
+#: src/eudplib\maprw\savemap.py:144
 msgid "Writing trace file to {}"
 msgstr ""
 
-#: src/eudplib\maprw\savemap.py:132
+#: src/eudplib\maprw\savemap.py:146
 msgid "Unreachable callback error"
 msgstr ""
 
@@ -663,69 +664,73 @@ msgstr ""
 msgid "safe read functions are deprecated in 0.61 and will be removed in 0.63"
 msgstr ""
 
-#: src/eudplib\scdata\csprite.py:87 src/eudplib\scdata\csprite.py:109
-#: src/eudplib\scdata\csprite.py:124 src/eudplib\scdata\csprite.py:128
+#: src/eudplib\scdata\csprite.py:94 src/eudplib\scdata\csprite.py:116
+#: src/eudplib\scdata\csprite.py:131 src/eudplib\scdata\csprite.py:135
 msgid "Invalid input for CSprite: {}"
 msgstr ""
 
-#: src/eudplib\scdata\csprite.py:90 src/eudplib\scdata\csprite.py:102
+#: src/eudplib\scdata\csprite.py:97 src/eudplib\scdata\csprite.py:109
 msgid "Invalid input for CSprite.ptr: {}"
 msgstr ""
 
-#: src/eudplib\scdata\cunit.py:418 src/eudplib\scdata\cunit.py:439
-#: src/eudplib\scdata\cunit.py:454 src/eudplib\scdata\cunit.py:458
+#: src/eudplib\scdata\cunit.py:429 src/eudplib\scdata\cunit.py:450
+#: src/eudplib\scdata\cunit.py:465 src/eudplib\scdata\cunit.py:469
 msgid "Invalid input for CUnit: {}"
 msgstr ""
 
-#: src/eudplib\scdata\cunit.py:421 src/eudplib\scdata\cunit.py:432
+#: src/eudplib\scdata\cunit.py:432 src/eudplib\scdata\cunit.py:443
 msgid "Invalid input for CUnit.ptr: {}"
 msgstr ""
 
-#: src/eudplib\scdata\cunit.py:759
+#: src/eudplib\scdata\cunit.py:772
 msgid "Can't detect unit dying with [unlimiter]"
 msgstr ""
 
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:146
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:147
 msgid "Reference type can't have ArrayMember"
 msgstr ""
 
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:188
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:193
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:204
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:210
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:189
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:194
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:205
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:211
 msgid "Only dword can be read as epd"
 msgstr ""
 
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:221
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:223
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:222
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:224
 msgid "Only dword can be read as position"
 msgstr ""
 
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:288
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:306
-#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:321
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:289
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:307
+#: src/eudplib\scdata\offsetmap\epdoffsetmap.py:322
 msgid "{} is out of range({}) for {} Member {}"
 msgstr ""
 
-#: src/eudplib\scdata\offsetmap\member.py:32
+#: src/eudplib\scdata\offsetmap\member.py:109
 msgid "Malaligned member"
 msgstr ""
 
-#: src/eudplib\scdata\offsetmap\member.py:169
-#: src/eudplib\scdata\offsetmap\member.py:177
-msgid "StarCraft: Remastered does not support {}.{} and causes in-game errors."
+#: src/eudplib\scdata\offsetmap\member.py:111
+msgid "stride should be at least member size"
 msgstr ""
 
-#: src/eudplib\scdata\offsetmap\member.py:191
-#: src/eudplib\scdata\offsetmap\member.py:198
+#: src/eudplib\scdata\offsetmap\member.py:223
+#: src/eudplib\scdata\offsetmap\member.py:231
+msgid "StarCraft: Remastered does not support {} and causes in-game errors."
+msgstr ""
+
+#: src/eudplib\scdata\offsetmap\member.py:268
+#: src/eudplib\scdata\offsetmap\member.py:275
 msgid "{} is not implemented for {}"
 msgstr ""
 
-#: src/eudplib\scdata\tech.py:60
+#: src/eudplib\scdata\tech.py:66
 msgid "To get current tech, player must be in range from P1 to P12"
 msgstr ""
 
-#: src/eudplib\scdata\upgrade.py:61
+#: src/eudplib\scdata\upgrade.py:67
 msgid "To get current upgrade, player must be in range from P1 to P12"
 msgstr ""
 

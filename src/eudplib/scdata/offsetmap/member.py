@@ -221,17 +221,17 @@ class UnsupportedMember(BaseMember):
             return self
         raise ut.EPError(
             _(
-                "StarCraft: Remastered does not support {}.{} "
+                "StarCraft: Remastered does not support {} "
                 "and causes in-game errors."
-            ).format(self.__objclass__, self.__name__)
+            ).format(f"{self.__objclass__}.{self.__name__}")
         )
 
     def __set__(self, instance: EPDOffsetMap, value) -> None:
         raise ut.EPError(
             _(
-                "StarCraft: Remastered does not support {}.{} "
+                "StarCraft: Remastered does not support {} "
                 "and causes in-game errors."
-            ).format(self.__objclass__, self.__name__)
+            ).format(f"{self.__objclass__}.{self.__name__}")
         )
 
 
