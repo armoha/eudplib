@@ -23,4 +23,3 @@ tests/outputmap/
 tests/output.png
 tests/output.pstats
 *.svg
-src/epscript/pybind11
