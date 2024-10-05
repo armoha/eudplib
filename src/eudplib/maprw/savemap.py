@@ -87,6 +87,19 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size: int | None = None) -> N
         except Exception as e:
             raise EPError(_("Fail to access output map")) from e
 
+        # add fake staredit\scenario.chk
+        mw.set_file_locale(0)
+        f = tempfile.NamedTemporaryFile(delete=False)
+        f.write(b"")
+        chk_path = f.name
+        f.close()
+        try:
+            mw.add_file("staredit\\scenario.chk", chk_path)
+        except Exception as e:
+            raise EPError(_("Fail to add scenario.chk")) from e
+        os.unlink(chk_path)
+        mw.set_file_locale(0x409)
+
     else:
         # Process by modifying existing mpqfile
         try:
@@ -108,24 +121,11 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size: int | None = None) -> N
         except Exception as e:
             raise EPError(_("Fail to access output map")) from e
 
-    # add fake staredit\scenario.chk
-    mw.set_file_locale(0)
-    f = tempfile.NamedTemporaryFile(delete=False)
-    f.write(b"")
-    chk_path = f.name
-    f.close()
-    try:
-        mw.add_file("staredit\\scenario.chk", chk_path)
-    except Exception as e:
-        raise EPError(_("Fail to add scenario.chk")) from e
-    os.unlink(chk_path)
-
     # add real staredit\scenario.chk
     f = tempfile.NamedTemporaryFile(delete=False)
     f.write(bytes(rawchk))
     chk_path = f.name
     f.close()
-    mw.set_file_locale(0x409)
     try:
         mw.add_file("staredit\\scenario.chk", chk_path)
     except Exception as e:
