@@ -1,4 +1,4 @@
-[submodule "pybind11"]
+[submodule "src/epscript/pybind11"]
     path = src/epscript/pybind11
     url = https://github.com/pybind/pybind11
     branch = stable
