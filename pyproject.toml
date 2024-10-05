@@ -3,6 +3,7 @@
 # ./.github/requirements/build-requirements.{in,txt}
 requires = [
     "maturin>=1,<2",
+    "cmake",  # need for static build StormLib
 
     # Must be kept in sync with `project.dependencies`
     "typing_extensions",
