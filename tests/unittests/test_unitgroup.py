@@ -12,8 +12,12 @@ def test_unitgroup():
     get_epd = lambda x: x if x._value._is_epd() else EPD(x)
     g = UnitGroup(1000)
     g.add(3)
-    g.add(EUDVariable(2))
-    g.add(EUDVariable(6))
+    p, q = EUDVariable(2), EUDVariable(6)
+    g.add(p)
+    g.add(q)
+    test_equality(
+        "UnitGroup.add test", [p, q, f_dwread(p._varact + 24)], [2, 6, 0x072D0000]
+    )
 
     k = EUDArray(7)
     for unit in g.cploop:  # 22, 21, 25

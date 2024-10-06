@@ -131,8 +131,8 @@ class UnitGroup:
             SeqCompute(
                 [
                     (self._length, Add, 1),
-                    (self.trg, Subtract, 72),
-                    (self.pos, Subtract, 18),
+                    (self.trg, Add, -72),
+                    (self.pos, Add, -18),
                     (_assign_helper, SetTo, unit_epd + 0x4C // 4),
                     (EPD(_assign_helper.getDestAddr()), None, self.pos),
                     (None, None, _assign_helper),

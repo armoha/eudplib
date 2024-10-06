@@ -193,10 +193,8 @@ class _PlayerName:
 
         once = c.Forward()
         cs.EUDJumpIf([once << c.Memory(0x57F23C, c.Exactly, ~0)], self.optimize_end)
-        cs.DoActions(
-            self.is_chatptr_unchanged.Clear(),
-            c.SetMemory(once + 8, c.SetTo, f_getgametick()),
-        )
+        cs.DoActions(self.is_chatptr_unchanged.Clear())
+        f_getgametick(ret=[ut.EPD(once) + 2])
         c.RawTrigger(
             conditions=[prev_textptr << c.Memory(0x640B58, c.Exactly, 11)],
             actions=self.is_chatptr_unchanged.Set(),

@@ -18,8 +18,8 @@ def f_getgametick():
     _gametick_cond = c.Forward()
 
     if cs.EUDIfNot()([_gametick_cond << c.Memory(0x57F23C, c.Exactly, 0)]):
-        c.SetVariables(gametick_cache, f_dwread_epd(ut.EPD(0x57F23C)))
-        cs.DoActions(c.SetMemory(_gametick_cond + 8, c.SetTo, gametick_cache))
+        f_dwread_epd(ut.EPD(0x57F23C), ret=[gametick_cache])
+        c.SetVariables(ut.EPD(_gametick_cond) + 2, gametick_cache)
     cs.EUDEndIf()
 
     return gametick_cache

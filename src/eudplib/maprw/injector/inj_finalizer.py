@@ -291,7 +291,7 @@ def create_inject_finalizer(
 
         if c.PushTriggerScope():
             tmcheckt << c.NextTrigger()
-            f_getgametick(ret=curtime)
+            f_getgametick(ret=[curtime])
             if cs.EUDIfNot()(curtime <= lasttime):  # beware QueueAddTo (-)
                 c.VProc(curtime, curtime.SetDest(lasttime))
                 c.SetNextTrigger(root)
@@ -304,7 +304,7 @@ def create_inject_finalizer(
         c.PopTriggerScope()
 
         # lasttime << curtime
-        f_getgametick(ret=curtime)
+        f_getgametick(ret=[curtime])
         c.VProc(
             curtime,
             [
