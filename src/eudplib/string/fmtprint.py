@@ -21,7 +21,10 @@ class _EUDFormatter(string.Formatter):
 
     def vformat(self, format_string, args, kwargs):
         used_args = set()
-        result, _ = self._eudformat(format_string, args, kwargs, used_args, 2)
+        try:
+            result, _i = self._eudformat(format_string, args, kwargs, used_args, 2)
+        except IndexError:
+            raise ut.EPError(_("Too many placeholders in the format string."))
         self.check_unused_args(used_args, args, kwargs)
         return result
 
