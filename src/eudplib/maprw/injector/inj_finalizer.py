@@ -225,7 +225,6 @@ def create_inject_finalizer(
 
         # Create payload for each players & Link them with pts
         lasttime = c.EUDVariable()
-        curtime = c.EUDVariable()
         tmcheckt = c.Forward()
 
         for player in ut._rand_lst(range(8)):
@@ -291,9 +290,8 @@ def create_inject_finalizer(
 
         if c.PushTriggerScope():
             tmcheckt << c.NextTrigger()
-            f_getgametick(ret=[curtime])
-            if cs.EUDIfNot()(curtime <= lasttime):  # beware QueueAddTo (-)
-                c.VProc(curtime, curtime.SetDest(lasttime))
+            if cs.EUDIfNot()(c.Memory(0x57F23C, c.Exactly, lasttime)):
+                f_getgametick(ret=[lasttime])
                 c.SetNextTrigger(root)
             cs.EUDEndIf()
 
@@ -303,15 +301,9 @@ def create_inject_finalizer(
             )
         c.PopTriggerScope()
 
-        # lasttime << curtime
-        f_getgametick(ret=[curtime])
-        c.VProc(
-            curtime,
-            [
-                curtime.SetDest(lasttime),
-                c.SetMemory(0x6509B0, c.SetTo, 0),  # Current player = 1
-            ],
-        )
+        # update lasttime
+        f_getgametick(ret=[lasttime])
+        c.RawTrigger(actions=c.SetMemory(0x6509B0, c.SetTo, 0))  # Current player = 1
 
         # now jump to root
         c.SetNextTrigger(root)
