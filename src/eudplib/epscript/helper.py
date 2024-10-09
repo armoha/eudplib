@@ -111,7 +111,7 @@ def _TYSV(types, vs):  # noqa: N802
     var_list = []
     for ty, v in zip(types, vs):
         is_untyped = ty is None or issubclass(ty, EUDVariable)
-        if not is_untyped:
+        if not is_untyped and not (type(v) is int and v == 0):  # noqa: E721
             v = ty.cast(v)
         value = EUDVariable(v)
         if not is_untyped:
@@ -131,7 +131,7 @@ def _TYLV(types, vs):  # noqa: N802
         if is_eudvar and is_rvalue:
             nv = v.makeL()
         else:
-            if not is_untyped:
+            if not is_untyped and not (type(v) is int and v == 0):  # noqa: E721
                 v = ty.cast(v)
             nv = EUDVariable()
             ops.append((nv, SetTo, v))
