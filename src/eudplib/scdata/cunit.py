@@ -791,10 +791,10 @@ class CUnit(EPDOffsetMap):
     def set_ground(self) -> None:
         self.clear_status_flag(0x00000004)
 
-    def set_noclip(self) -> None:
+    def clear_noclip(self) -> None:
         self.set_status_flag(0x00100000)
 
-    def clear_noclip(self) -> None:
+    def set_noclip(self) -> None:
         self.clear_status_flag(0x00100000)
 
     def is_dying(self) -> tuple[c.Condition, c.Condition]:
