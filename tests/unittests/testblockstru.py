@@ -1,5 +1,19 @@
 from helper import *
 
+import eudplib.core.variable.eudv as ev
+import inspect
+
+_frames = {}
+original_init = ev.EUDVariable.__init__
+
+
+def _patched_init(self, *args, **kwargs):
+    _frames[0] = inspect.currentframe().f_back  # 이 줄
+    return original_init(self, *args, **kwargs)
+
+
+ev.EUDVariable.__init__ = _patched_init
+
 
 @TestInstance
 def test_blockstru():

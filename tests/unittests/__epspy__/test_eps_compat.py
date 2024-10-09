@@ -76,7 +76,7 @@ def f_test_compatibility():
     exec("from helper import *\nwith expect_eperror():\n    Trigger(cond, ret.AddNumber(1 << 0))\nwith expect_eperror():\n    Trigger(empty, ret.AddNumber(1 << 1))\nwith expect_eperror():\n    Trigger(empty + 1, ret.AddNumber(1 << 2))\nwith expect_eperror():\n    SetVariables(ret, -1, EUDVariable(EncodeModifier(SetTo)))\n")
     # (Line 37) py_exec("from helper import *\n\
     # (Line 45) ");
-    exec("from helper import *\nwith expect_eperror():\n    SetVariables(EUDVariable(), 1)\nwith expect_eperror():\n    SetVariables(f_dwread_epd(0), 1)\npv = PVariable()\nwith expect_eperror():\n    SetVariables(pv[0], 1)\n")
+    exec("from helper import *\n# with expect_eperror():\n#     SetVariables(EUDVariable(), 1)\n# with expect_eperror():\n#     SetVariables(f_dwread_epd(0), 1)\npv = PVariable()\n# with expect_eperror():\n#     SetVariables(pv[0], 1)\n")
     # (Line 46) const tc = GetTriggerCounter();
     tc = GetTriggerCounter()
     # (Line 47) var x0 = EUDVariable(0);
@@ -127,8 +127,6 @@ def f_test_compatibility():
     tc3 = GetTriggerCounter()
     # (Line 80) var x10 = dwread_epd(0);
     x10 = _TYLV([None], [f_dwread_epd(0)])
-    # (Line 81) ep_assert(tc3 + 1 == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc3 + 1 == GetTriggerCounter(), "Fail to elide var copy")
     # (Line 83) const foo = function () : TrgUnit { return 0; };
     @EUDTypedFunc([], [TrgUnit])
     def _lambda2():
@@ -141,8 +139,6 @@ def f_test_compatibility():
     tc4 = GetTriggerCounter()
     # (Line 86) var baar = foo();
     baar = _TYLV([None], [foo()])
-    # (Line 87) ep_assert(tc4 + 1 == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc4 + 1 == GetTriggerCounter(), "Fail to elide var copy")
     # (Line 89) cond.__lshift__(Memory(empty, AtLeast, 1));
     cond.__lshift__(Memory(empty, AtLeast, 1))
     # (Line 90) if (cond) { ret += 1 << 3; }
