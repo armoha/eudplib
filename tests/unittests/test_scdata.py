@@ -18,6 +18,7 @@ def test_scdata():
     test_equality(
         "marine.maxHp = EUDVar(40 * 256)", marine.maxHp, EUDVariable(40 * 256)
     )
+    test_assert("marine.maxHp = 40 * 256 conditional", marine.maxHp == 40 * 256)
 
     one = EUDVariable(1)
     trigcount = GetTriggerCounter()
@@ -30,6 +31,10 @@ def test_scdata():
         "TrgUnit(EUDVar(ghost)).maxHp = EUDVar(45 * 256)",
         ghost.maxHp,
         EUDVariable(45 * 256),
+    )
+    test_assert(
+        "TrgUnit(EUDVar(ghost)).maxHp = EUDVar(45 * 256) conditional",
+        ghost.maxHp == 45 * 256,
     )
 
     trigcount = GetTriggerCounter()
@@ -50,6 +55,10 @@ def test_scdata():
         "TrgUnit(eudvar).maxHp, referencing variable",
         ghost_cast.maxHp,
         EUDVariable(80 * 256),
+    )
+    test_assert(
+        "TrgUnit(eudvar).maxHp conditional",
+        ghost_cast.maxHp == 80 * 256,
     )
 
     test_equality("arithmetic on UnitData", ghost + 3, 4)
@@ -75,7 +84,7 @@ def test_scdata():
     )
 
     test_equality(
-        "TrgUnit.maxH, check if write writes to the correct address",
+        "TrgUnit.maxHp, check if write writes to the correct address",
         zealot_data.maxHp,
         f_dwread(0x662350 + 4 * TrgUnit("Protoss Zealot")),
     )
@@ -90,10 +99,18 @@ def test_scdata():
         TrgUnit("Terran Goliath").subUnit,
         TrgUnit("Goliath Turret"),
     )
+    test_assert(
+        "TrgUnit.subUnit conditional",
+        TrgUnit("Terran Goliath").subUnit == TrgUnit("Goliath Turret"),
+    )
     test_equality(
         "TrgUnit.subUnit, check if member type of unit works",
         TrgUnit("Terran Goliath").subUnit.maxHp,
         512,
+    )
+    test_assert(
+        "TrgUnit.subUnit.maxHp conditional",
+        TrgUnit("Terran Goliath").subUnit.maxHp == 512,
     )
 
     test_equality(
@@ -101,11 +118,19 @@ def test_scdata():
         TrgUnit("Terran Goliath").subUnit.subUnit,
         228,
     )
+    test_assert(
+        "TrgUnit.subUnit.subUnit conditional",
+        TrgUnit("Terran Goliath").subUnit.subUnit == 228,
+    )
 
     test_equality(
         "TrgUnit.flingy, check if chain through other data types works",
         TrgUnit("Protoss Dragoon").flingy,
         Flingy("Dragoon"),
+    )
+    test_assert(
+        "TrgUnit.flingy conditional",
+        TrgUnit("Protoss Dragoon").flingy == Flingy("Dragoon"),
     )
 
     test_equality(
@@ -113,11 +138,19 @@ def test_scdata():
         TrgUnit("Zerg Zergling").flingy.sprite,
         Sprite("Zergling"),
     )
+    test_assert(
+        "TrgUnit.flingy.sprite conditional",
+        TrgUnit("Zerg Zergling").flingy.sprite == Sprite("Zergling"),
+    )
 
     test_equality(
         "TrgUnit.flingy.sprite.image, check if chain through other data types works",
         TrgUnit("Terran Marine").flingy.sprite.image,
         Image("Marine"),
+    )
+    test_assert(
+        "TrgUnit.flingy.sprite.image conditional",
+        TrgUnit("Terran Marine").flingy.sprite.image == Image("Marine"),
     )
 
     archon_variable = EUDVariable()
@@ -129,11 +162,18 @@ def test_scdata():
         archon.flingy,
         Flingy("Archon Energy"),
     )
+    test_assert(
+        "TrgUnit.flingy conditional", archon.flingy == Flingy("Archon Energy")
+    )
 
     test_equality(
         "TrgUnit.flingy.sprite, check if chain from variable works",
         archon.flingy.sprite,
         Sprite("Archon Energy"),
+    )
+    test_assert(
+        "TrgUnit.flingy.sprite conditional",
+        archon.flingy.sprite == Sprite("Archon Energy"),
     )
 
     test_equality(
@@ -141,12 +181,20 @@ def test_scdata():
         archon.flingy.sprite.image,
         Image("Archon Energy"),
     )
+    test_assert(
+        "TrgUnit.flingy.sprite.image conditional",
+        archon.flingy.sprite.image == Image("Archon Energy"),
+    )
 
     TrgUnit("Goliath Turret").maxHp = previous_value
     DoActions(SetResources(P7, SetTo, 100, OreAndGas))
 
     test_equality(
         "TrgPlayer.ore, check ore, gas amounts read", [P7.ore, P7.gas], [100, 100]
+    )
+    test_assert(
+        "TrgPlayer.ore/gas conditional",
+        [P7.ore == 100, P7.gas == 100],
     )
 
     P7.ore += 200
@@ -160,6 +208,7 @@ def test_scdata():
 
     scv = TrgUnit("Terran SCV")
     test_equality("scv.baseProperty flags", scv.baseProperty, 0x58010008)
+    test_assert("scv.baseProperty flags conditional", scv.baseProperty == 0x58010008)
     scv.baseProperty.Hero = True
     test_equality(
         "scv.baseProperty individual flags",
@@ -178,6 +227,17 @@ def test_scdata():
             True,
             True,
             False,
+        ],
+    )
+    test_assert(
+        "scv.baseProperty individual flags conditional",
+        [
+            scv.baseProperty.Worker == True,
+            scv.baseProperty.AutoAttackAndMove == True,
+            scv.baseProperty.CanAttack == True,
+            scv.baseProperty.Mechanical == True,
+            scv.baseProperty.Hero == True,
+            scv.baseProperty.ResourceDepot == False,
         ],
     )
 
@@ -205,6 +265,7 @@ def test_scdata():
 
     P1.unitColor = 123
     test_equality("P1.unitColor = 123", P1.unitColor, 123)
+    test_assert("P1.unitColor = 123 conditional", P1.unitColor == 123)
     test_equality("P1.unitColor", P1.unitColor, f_bread(0x581D76))
     P2.unitColor = 234
     test_equality("P2.unitColor = 234", P2.unitColor, 234)

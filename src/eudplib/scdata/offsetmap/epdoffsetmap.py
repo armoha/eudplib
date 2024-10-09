@@ -278,11 +278,11 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     def eqattr(self, name: str, value):
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
-        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
+        mask = c.f_bitlshift((1 << (8 * member.kind.size())) - 1, 8 * subp)
         value = member.kind.cast(value)
-        if subp != 0:
+        if not (isinstance(subp, int) and subp == 0):
             value = c.f_bitlshift(value, 8 * subp)
-        if isinstance(value, int) and value & ~mask:
+        if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
             raise ut.EPError(
                 _("{} is out of range({}) for {} Member {}").format(
                     value, mask, type(self), name
@@ -296,11 +296,11 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     def leattr(self, name, value):
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
-        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
+        mask = c.f_bitlshift((1 << (8 * member.kind.size())) - 1, 8 * subp)
         value = member.kind.cast(value)
-        if subp != 0:
+        if not (isinstance(subp, int) and subp == 0):
             value = c.f_bitlshift(value, 8 * subp)
-        if isinstance(value, int) and value & ~mask:
+        if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
             raise ut.EPError(
                 _("{} is out of range({}) for {} Member {}").format(
                     value, mask, type(self), name
@@ -311,11 +311,11 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     def geattr(self, name, value):
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
-        mask = ((1 << (8 * member.kind.size())) - 1) << (8 * subp)
+        mask = c.f_bitlshift((1 << (8 * member.kind.size())) - 1, 8 * subp)
         value = member.kind.cast(value)
-        if subp != 0:
+        if not (isinstance(subp, int) and subp == 0):
             value = c.f_bitlshift(value, 8 * subp)
-        if isinstance(value, int) and value & ~mask:
+        if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
             raise ut.EPError(
                 _("{} is out of range({}) for {} Member {}").format(
                     value, mask, type(self), name
