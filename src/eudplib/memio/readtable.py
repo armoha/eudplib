@@ -140,14 +140,17 @@ def _cp_caller(readtrg: c.RawTrigger, *, _operations=None) -> Callable:
         else:
             retepd = ret
 
+        operations = []
         if not (isinstance(cpo, int) and cpo == 0):
-            cs.DoActions(c.SetMemory(0x6509B0, c.Add, cpo))
+            operations.append((ut.EPD(0x6509B0), c.Add, cpo))
 
         nexttrg = c.Forward()
-        operations = [
-            (ut.EPD(read_end_common) + 1, c.SetTo, nexttrg),
-            (ut.EPD(copy_ret) + 4, c.SetTo, retepd),
-        ]
+        operations.extend(
+            (
+                (ut.EPD(read_end_common) + 1, c.SetTo, nexttrg),
+                (ut.EPD(copy_ret) + 4, c.SetTo, retepd),
+            )
+        )
         if _operations:
             operations.extend(_operations)
         c.NonSeqCompute(operations)
