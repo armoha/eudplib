@@ -16,6 +16,7 @@ from ..scdata import CurrentPlayer
 from .cpprint import FixedText, f_cpstr_print, f_gettextptr
 from .cpstr import GetMapStringAddr
 from .fmtprint import _format_args
+from .strcommon import epd2s
 from .strfunc import f_strlen_epd
 from .texteffect import (
     TextFX_FadeIn,
@@ -132,6 +133,9 @@ class StringBuffer(c.EUDStruct):
         else:
             super().__init__(_from=_from)
 
+    def fmt(self):
+        return epd2s(self.epd)
+
     def constructor(self, *args, **kwargs):
         raise ut.EPError(_("Dynamically allocating StringBuffer is not supported"))
 
@@ -159,9 +163,13 @@ class StringBuffer(c.EUDStruct):
 
     # Field setter & getter
 
-    def getfield(self, name):
+    def getfield(self, name: str):
         # get static field
-        if c.IsConstExpr(self.getValue()) and name != "pos":
+        if (
+            c.IsConstExpr(self.getValue())
+            and name != "pos"
+            and not name.startswith("_")
+        ):
             return getattr(self, f"_{name}")
         return super().getfield(name)
 

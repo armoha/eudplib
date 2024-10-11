@@ -122,6 +122,15 @@ def test_strbuffer():
         b"Never say never\r\0",
     )
 
+    f_dwwrite(0x640B58, 0)
+    f_setcurpl(userid)
+    f_println("{}", StringBuffer("dpdkfah!"))
+    test_equality(
+        "StringBuffer concat test",
+        [f_bread(0x640B60 + i) for i in range(len("dpdkfah!\0"))],
+        b"dpdkfah!\0",
+    )
+
     f_setcurpl(userid)
     hammo = StringBuffer.cast(EUDVariable(StringBuffer()))
     for i in range(11):
