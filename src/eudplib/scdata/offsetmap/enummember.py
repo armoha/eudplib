@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Final, Generic, Literal, Self, TypeVar, overload
+from typing import Final, Literal, Self, TypeVar, overload
 
 from ... import core as c
 from ... import ctrlstru as cs
@@ -63,7 +63,7 @@ class EnumMember(ExprProxy):
 T = TypeVar("T", bound=EnumMember)
 
 
-class BaseEnum(Generic[T], BaseMember):
+class BaseEnum(BaseMember[T]):
     __slots__ = ("_enum", "layout", "offset", "stride", "__objclass__", "__name__")
 
     def __init__(

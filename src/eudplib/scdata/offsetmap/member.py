@@ -7,7 +7,16 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Final, Literal, Self, TypeAlias, overload
+from typing import (
+    TYPE_CHECKING,
+    Final,
+    Generic,
+    Literal,
+    Self,
+    TypeAlias,
+    TypeVar,
+    overload,
+)
 
 from ... import core as c
 from ... import utils as ut
@@ -89,7 +98,10 @@ if TYPE_CHECKING:
     from ..weapon import Weapon
 
 
-class BaseMember(metaclass=ABCMeta):
+T = TypeVar("T")
+
+
+class BaseMember(Generic[T], metaclass=ABCMeta):
     """Base descriptor class/mixin for EPDOffsetMap"""
 
     __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
@@ -118,7 +130,7 @@ class BaseMember(metaclass=ABCMeta):
         ...
 
     @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]):
+    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> T:
         ...
 
     def __get__(self, instance, owner):
@@ -254,175 +266,77 @@ class NotImplementedMember(BaseMember):
         )
 
 
-class BoolMember(BaseMember):
+class BoolMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return Bit0Kind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class Bit1Member(BaseMember):
+class Bit1Member(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return Bit1Kind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class ByteMember(BaseMember):
+class ByteMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return ByteKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class PlayerMember(BaseMember):
+class PlayerMember(BaseMember["TrgPlayer"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return PlayerKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> TrgPlayer:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class WeaponMember(BaseMember):
+class WeaponMember(BaseMember["Weapon"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return WeaponKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> Weapon:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _Weapon) -> None:
         super().__set__(instance, value)
 
 
-class UnitOrderMember(BaseMember):
+class UnitOrderMember(BaseMember["UnitOrder"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return UnitOrderKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> UnitOrder:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _UnitOrder) -> None:
         super().__set__(instance, value)
 
 
-class UpgradeMember(BaseMember):
+class UpgradeMember(BaseMember["Upgrade"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return UpgradeKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> Upgrade:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _Upgrade) -> None:
         super().__set__(instance, value)
 
 
-class TechMember(BaseMember):
+class TechMember(BaseMember["Tech"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return TechKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> Tech:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: _Tech) -> None:
         super().__set__(instance, value)
@@ -431,25 +345,12 @@ class TechMember(BaseMember):
 UnitSize: TypeAlias = Literal["Independent", "Small", "Medium", "Large"] | Byte
 
 
-class UnitSizeMember(BaseMember):
+class UnitSizeMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return UnitSizeKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: UnitSize) -> None:
         super().__set__(instance, value)
@@ -469,25 +370,12 @@ RightClickAction: TypeAlias = (
 )
 
 
-class RightClickActionMember(BaseMember):
+class RightClickActionMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return RightClickActionKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: RightClickAction) -> None:
         super().__set__(instance, value)
@@ -498,25 +386,12 @@ MovementControl: TypeAlias = (
 )
 
 
-class MovementControlMember(BaseMember):
+class MovementControlMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return MovementControlKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: MovementControl) -> None:
         super().__set__(instance, value)
@@ -527,25 +402,12 @@ DamageType: TypeAlias = (
 )
 
 
-class DamageTypeMember(BaseMember):
+class DamageTypeMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return DamageTypeKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: DamageType) -> None:
         super().__set__(instance, value)
@@ -568,25 +430,12 @@ WeaponBehavior: TypeAlias = (
 )
 
 
-class WeaponBehaviorMember(BaseMember):
+class WeaponBehaviorMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return WeaponBehaviorKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: WeaponBehavior) -> None:
         super().__set__(instance, value)
@@ -624,25 +473,12 @@ ExplosionType: TypeAlias = (
 )
 
 
-class ExplosionTypeMember(BaseMember):
+class ExplosionTypeMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return ExplosionTypeKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: ExplosionType) -> None:
         super().__set__(instance, value)
@@ -673,25 +509,12 @@ DrawingFunction: TypeAlias = (
 )
 
 
-class DrawingFunctionMember(BaseMember):
+class DrawingFunctionMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return DrawingFunctionKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: DrawingFunction) -> None:
         super().__set__(instance, value)
@@ -733,25 +556,12 @@ IscriptAnimation: TypeAlias = (
 )
 
 
-class AnimationMember(BaseMember):
+class AnimationMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return AnimationKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: IscriptAnimation) -> None:
         super().__set__(instance, value)
@@ -760,25 +570,12 @@ class AnimationMember(BaseMember):
 RaceResearch: TypeAlias = Literal["Zerg", "Terran", "Protoss", "All"] | Byte
 
 
-class RaceResearchMember(BaseMember):
+class RaceResearchMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return RaceResearchKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: RaceResearch) -> None:
         super().__set__(instance, value)
@@ -789,448 +586,200 @@ WorkerCarryType: TypeAlias = (
 )
 
 
-class WorkerCarryTypeMember(BaseMember):
+class WorkerCarryTypeMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return WorkerCarryTypeKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: WorkerCarryType) -> None:
         super().__set__(instance, value)
 
 
-class RankMember(BaseMember):
+class RankMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return RankKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: Rank) -> None:
         super().__set__(instance, value)
 
 
-class FlingyMember(BaseMember):
+class FlingyMember(BaseMember["Flingy"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return FlingyKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> Flingy:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _Flingy) -> None:
         super().__set__(instance, value)
 
 
-class WordMember(BaseMember):
+class WordMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return WordKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class PositionXMember(BaseMember):
+class PositionXMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return PositionXKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class PositionYMember(BaseMember):
+class PositionYMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return PositionYKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class UnitMember(BaseMember):
+class UnitMember(BaseMember["TrgUnit"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return UnitKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> TrgUnit:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: Unit) -> None:
         super().__set__(instance, value)
 
 
-class SpriteMember(BaseMember):
+class SpriteMember(BaseMember["Sprite"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return SpriteKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> Sprite:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _Sprite) -> None:
         super().__set__(instance, value)
 
 
-class ImageMember(BaseMember):
+class ImageMember(BaseMember["Image"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return ImageKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> Image:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _Image) -> None:
         super().__set__(instance, value)
 
 
-class StatTextMember(BaseMember):
+class StatTextMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return StatTextKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _StatText) -> None:
         super().__set__(instance, value)
 
 
-class SfxDataMember(BaseMember):
+class SfxDataMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return SfxDataKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: SfxData) -> None:
         super().__set__(instance, value)
 
 
-class PortraitMember(BaseMember):
+class PortraitMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return PortraitKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _Portrait) -> None:
         super().__set__(instance, value)
 
 
-class IconMember(BaseMember):
+class IconMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return IconKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: _Icon) -> None:
         super().__set__(instance, value)
 
 
-class MapStringMember(BaseMember):
+class MapStringMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return MapStringKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: String) -> None:
         super().__set__(instance, value)
 
 
-class ButtonSetMember(BaseMember):
+class ButtonSetMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return ButtonSetKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
     def __set__(self, instance: EPDOffsetMap, value: ButtonSet) -> None:
         super().__set__(instance, value)
 
 
-class DwordMember(BaseMember):
+class DwordMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return DwordKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class PositionMember(BaseMember):
+class PositionMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return PositionKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class CUnitMember(BaseMember):
+class CUnitMember(BaseMember["CUnit"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return CUnitKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> CUnit:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class CSpriteMember(BaseMember):
+class CSpriteMember(BaseMember["CSprite"]):
     __slots__ = ()
 
     @property
     def kind(self):
         return CSpriteKind
 
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
 
-    @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> CSprite:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
-
-
-class IscriptMember(BaseMember):
+class IscriptMember(BaseMember[EUDVariable]):
     __slots__ = ()
 
     @property
     def kind(self):
         return IscriptKind
-
-    @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
-
-    @overload
-    def __get__(
-        self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]
-    ) -> EUDVariable:
-        ...
-
-    def __get__(self, instance, owner):
-        return super().__get__(instance, owner)
 
     def __set__(self, instance: EPDOffsetMap, value: _Iscript) -> None:
         super().__set__(instance, value)

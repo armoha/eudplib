@@ -137,6 +137,9 @@ exclude = ["pybind11"]
 "tests/unittests/__epspy__/**.py" = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
 "tests/unittests/report/__epspy__/**.py" = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
 
+[tool.ruff.lint.pyflakes]
+extend-generics = ["eudplib.scdata.offsetmap.member.BaseMember"]
+
 [tool.ruff.lint.isort]
 known-first-party = ["eudplib", "tests"]
 
