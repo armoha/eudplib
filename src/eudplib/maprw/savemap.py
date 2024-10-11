@@ -138,6 +138,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size: int | None = None) -> N
         mw.compact()
     except Exception as e:
         raise EPError(_("Fail to compact MPQ")) from e
+    del mw
 
     if trace_map:
         trace_fname = fname + ".epmap"
