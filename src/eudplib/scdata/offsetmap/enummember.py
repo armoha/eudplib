@@ -4,8 +4,10 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from __future__ import annotations
+
 from abc import abstractmethod
-from typing import Final, Literal, Self, overload
+from typing import Final, Generic, Literal, Self, TypeVar, overload
 
 from ... import core as c
 from ... import ctrlstru as cs
@@ -17,160 +19,89 @@ from .member import BaseMember
 from .memberkind import BaseKind, ByteKind, DwordKind, WordKind
 
 
-class EnumMember(BaseMember, ExprProxy):
-    __slots__ = (
-        "_instance",
-        "layout",
-        "offset",
-        "stride",
-        "__objclass__",
-        "__name__",
-    )
+class EnumMember(ExprProxy):
+    __slots__ = ("_parent", "_instance", "_is_initialized", "_value_lazy")
+
+    def __getattr__(self, name):
+        try:
+            return object.__getattribute__(self, name)
+        except AttributeError:
+            return super().__getattr__(name)
+
+    def __init__(self, parent: BaseEnum, instance: EPDOffsetMap) -> None:
+        self._parent = parent
+        self._instance = instance
+        self._is_initialized = False
+        super().__init__(None)
+        self._value_lazy = c.Forward()
+        c.SetNextTrigger(self._value_lazy)
+        self._value_lazy << c.NextTrigger()
+
+    @property
+    def _value(self):
+        if type(self._value_lazy) is c.Forward:
+            c.PushTriggerScope()
+            nptr = self._value_lazy.expr
+            self._value_lazy.Reset()
+            self._value_lazy << c.NextTrigger()
+
+            epd, subp = self._parent._get_epd(self._instance)
+            kind = self._parent.kind
+            self._value_lazy = kind.cast(kind.read_epd(epd, subp))
+            c.SetNextTrigger(nptr)
+            c.PopTriggerScope()
+        return self._value_lazy
+
+    @_value.setter
+    def _value(self, _new_value) -> None:
+        if self._is_initialized is False:
+            self._is_initialized = True
+        else:
+            raise EPError(_("EnumMember is already initialized"))
+
+
+T = TypeVar("T", bound=EnumMember)
+
+
+class BaseEnum(Generic[T], BaseMember):
+    __slots__ = ("_enum", "layout", "offset", "stride", "__objclass__", "__name__")
+
+    def __init__(
+        self,
+        layout: Literal["struct", "array"],
+        offset: int,
+        enum: type[T],
+        *,
+        stride: int | None = None,
+    ) -> None:
+        self._enum = enum
+        super().__init__(layout, offset, stride=stride)
 
     @property
     @abstractmethod
     def kind(self) -> type[BaseKind]:
         ...
 
-    def __init__(
-        self,
-        layout: Literal["struct", "array"],
-        offset: int,
-        *,
-        stride: int | None = None,
-    ) -> None:
-        self._instance: EPDOffsetMap | None = None  # FIXME
-        super().__init__(layout, offset, stride=stride)
-        super(BaseMember, self).__init__(None)
+    @overload
+    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
+        ...
 
-    def _get_epd(self, instance=None):
-        if instance is None:
-            instance = self._instance
-        return super()._get_epd(instance)
+    @overload
+    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> T:
+        ...
 
-    def __get__(
-        self, instance: EPDOffsetMap | None, owner: type[EPDOffsetMap]
-    ) -> Self:
+    def __get__(self, instance: EPDOffsetMap | None, owner: type[EPDOffsetMap]):
         if instance is None:
             return self
         elif isinstance(instance, EPDOffsetMap):
-            self._instance = instance
-            # FIXME: fix reading value on every usages
-            # example)
-            # const movementFlags = unit.movementFlags;
-            # arr[0] = movementFlags;
-            # arr[1] = movementFlags;
-            # unit.movementFlags += 1;
-            # arr[2] = movementFlags;  // <- always read new value
-            return self
+            return self._enum(self, instance)
         raise AttributeError
 
     def __set__(self, instance: EPDOffsetMap, value) -> None:
-        self._instance = instance
         super().__set__(instance, value)
 
-    # FIXME: Overwriting ExprProxy.getValue is kinda hacky...
-    def getValue(self):  # noqa: N802
-        epd, subp = self._get_epd()
-        return self.kind.cast(self.kind.read_epd(epd, subp))
 
-    def __lshift__(self, k):
-        return self.getValue() << k
-
-    def __rlshift__(self, k):
-        return k << self.getValue()
-
-    def __rshift__(self, k):
-        return self.getValue() >> k
-
-    def __rrshift__(self, k):
-        return k >> self.getValue()
-
-    def __add__(self, k):
-        return self.getValue() + k
-
-    def __radd__(self, k):
-        return k + self.getValue()
-
-    def __sub__(self, k):
-        return self.getValue() - k
-
-    def __rsub__(self, k):
-        return k - self.getValue()
-
-    def __mul__(self, k):
-        return self.getValue() * k
-
-    def __rmul__(self, k):
-        return k * self.getValue()
-
-    def __floordiv__(self, k):
-        return self.getValue() // k
-
-    def __rfloordiv__(self, k):
-        return k // self.getValue()
-
-    def __divmod__(self, k):
-        return divmod(self.getValue(), k)
-
-    def __rdivmod__(self, k):
-        return divmod(k, self.getValue())
-
-    def __mod__(self, k):
-        return self.getValue() % k
-
-    def __rmod__(self, k):
-        return k % self.getValue()
-
-    def __and__(self, k):
-        return self.getValue() & k
-
-    def __rand__(self, k):
-        return k & self.getValue()
-
-    def __or__(self, k):
-        return self.getValue() | k
-
-    def __ror__(self, k):
-        return k | self.getValue()
-
-    def __xor__(self, k):
-        return self.getValue() ^ k
-
-    def __rxor__(self, k):
-        return k ^ self.getValue()
-
-    def __neg__(self):
-        return -self.getValue()
-
-    def __invert__(self):
-        return ~self.getValue()
-
-    def __bool__(self):
-        return bool(self.getValue())
-
-    # Proxy comparison operator
-
-    def __eq__(self, k):
-        return self.getValue() == k
-
-    def __ne__(self, k):
-        return self.getValue() != k
-
-    def __le__(self, k):
-        return self.getValue() <= k
-
-    def __lt__(self, k):
-        return self.getValue() < k
-
-    def __ge__(self, k):
-        return self.getValue() >= k
-
-    def __gt__(self, k):
-        return self.getValue() > k
-
-
-class ByteEnumMember(EnumMember):
+class ByteEnum(BaseEnum[T]):
     __slots__ = ()
 
     @property
@@ -178,7 +109,7 @@ class ByteEnumMember(EnumMember):
         return ByteKind
 
 
-class WordEnumMember(EnumMember):
+class WordEnum(BaseEnum[T]):
     __slots__ = ()
 
     @property
@@ -186,7 +117,7 @@ class WordEnumMember(EnumMember):
         return WordKind
 
 
-class DwordEnumMember(EnumMember):
+class DwordEnum(BaseEnum[T]):
     __slots__ = ()
 
     @property
@@ -211,13 +142,14 @@ class Flag:
     def __get__(self, instance: EnumMember, owner: type[EnumMember]) -> EUDVariable:
         ...
 
-    def __get__(self, instance, owner=None) -> EUDVariable | Self:
+    def __get__(self, instance: EnumMember | None, owner=None) -> EUDVariable | Self:
         if instance is None:
             return self
-        if instance.layout == "struct":
+        parent = instance._parent
+        if parent.layout == "struct":
             from ...trigger import Trigger
 
-            epd, subp = instance._get_epd()
+            epd, subp = parent._get_epd(instance._instance)
             mask = self.mask << (8 * subp)
             ret = EUDVariable()
             ret << True
@@ -225,9 +157,9 @@ class Flag:
                 c.MemoryXEPD(epd, c.AtMost, mask - 1, mask), ret.SetNumber(False)
             )
             return ret
-        elif instance.layout == "array":
+        elif parent.layout == "array":
             # FIXME: replace to efficent implementation
-            flags = instance.getValue()
+            flags = instance._value
             ret = EUDVariable()
             ret << True
             c.RawTrigger(
@@ -244,7 +176,8 @@ class Flag:
         # FIXME: replace to efficent implementation
         # while subp is always int for StructMember,
         # subp can be EUDVariable or int for ArrayMember
-        epd, subp = instance._get_epd()
+        parent = instance._parent
+        epd, subp = parent._get_epd(instance._instance)
         mask = self.mask << (8 * subp)
 
         unproxied = unProxy(value)
@@ -269,7 +202,7 @@ class Flag:
         self.__name__ = name
 
 
-class MovementFlags(ByteEnumMember):
+class MovementFlags(EnumMember):
     """Flags that enable/disable certain movement."""
 
     __slots__ = ()

@@ -5,11 +5,12 @@
 # file that should have been included as part of this package.
 
 from .enummember import (
-    ByteEnumMember,
-    DwordEnumMember,
+    ByteEnum,
+    DwordEnum,
+    EnumMember,
     Flag,
     MovementFlags,
-    WordEnumMember,
+    WordEnum,
 )
 from .epdoffsetmap import EPDOffsetMap
 from .member import (
@@ -56,11 +57,12 @@ from .member import (
 )
 
 __all__ = [
-    "ByteEnumMember",
-    "DwordEnumMember",
+    "ByteEnum",
+    "DwordEnum",
+    "EnumMember",
     "Flag",
     "MovementFlags",
-    "WordEnumMember",
+    "WordEnum",
     "EPDOffsetMap",
     "AnimationMember",
     "BaseMember",

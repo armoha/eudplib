@@ -100,32 +100,37 @@ def f_flagread_epd(targetplayer, *flags, _readerdict={}):
 
 
 def setdw_epd(targetplayer, modifier, value):
-    if c.IsEUDVariable(value):
-        if c.IsEUDVariable(targetplayer):
-            if targetplayer is value:
+    v = ut.unProxy(value)
+    if isinstance(v, c.EUDVariable):
+        p = ut.unProxy(targetplayer)
+        if isinstance(p, c.EUDVariable):
+            if p is v:
                 c.VProc(
-                    value,
+                    v,
                     [
-                        value.SetDest(value),
-                        value.SetModifier(c.SetTo),
+                        v.SetDest(v),
+                        v.SetModifier(c.SetTo),
                     ],
                 )
-                return c.VProc(value, value.SetModifier(modifier))
-            return c.VProc(
-                [targetplayer, value],
+                c.VProc(v, v.SetModifier(modifier))
+                return
+            c.VProc(
+                [p, v],
                 [
-                    targetplayer.QueueAssignTo(ut.EPD(value.getDestAddr())),
-                    value.SetModifier(modifier),
+                    p.QueueAssignTo(ut.EPD(v.getDestAddr())),
+                    v.SetModifier(modifier),
                 ],
             )
-        return c.VProc(
-            value,
+            return
+        c.VProc(
+            v,
             [
-                value.SetDest(targetplayer),
-                value.SetModifier(modifier),
+                v.SetDest(p),
+                v.SetModifier(modifier),
             ],
         )
-    cs.DoActions(c.SetDeaths(targetplayer, modifier, value, 0))
+        return
+    cs.DoActions(c.SetDeaths(targetplayer, modifier, v, 0))
 
 
 def f_dwwrite_epd(targetplayer, value):

@@ -16,6 +16,7 @@ from .offsetmap import (
     ByteMember,
     DamageTypeMember,
     DwordMember,
+    EnumMember,
     EPDOffsetMap,
     ExplosionTypeMember,
     Flag,
@@ -24,12 +25,12 @@ from .offsetmap import (
     StatTextMember,
     UpgradeMember,
     WeaponBehaviorMember,
-    WordEnumMember,
+    WordEnum,
     WordMember,
 )
 
 
-class TargetFlags(WordEnumMember):
+class TargetFlags(EnumMember):
     __slots__ = ()
     Air = Flag(0x001)
     Ground = Flag(0x002)
@@ -49,7 +50,7 @@ class Weapon(EPDOffsetMap, ConstType):
     flingy: ClassVar = FlingyMember("array", 0x656CA8)
     # specialAttack: ClassVar = ByteMember("array", 0x6573E8)
     # special attack is for reference only (unused)
-    targetFlags = TargetFlags("array", 0x657998)
+    targetFlags = WordEnum("array", 0x657998, TargetFlags)
     # can't use name 'range' because it's a python keyword
     minRange: ClassVar = DwordMember("array", 0x656A18)
     maxRange: ClassVar = DwordMember("array", 0x657470)

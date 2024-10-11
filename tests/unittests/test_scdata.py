@@ -209,6 +209,14 @@ def test_scdata():
     scv = TrgUnit("Terran SCV")
     test_equality("scv.baseProperty flags", scv.baseProperty, 0x58010008)
     test_assert("scv.baseProperty flags conditional", scv.baseProperty == 0x58010008)
+
+    temp = scv.baseProperty
+    temp.Building = False
+    ep_assert(type(temp._value_lazy) is Forward)
+    _flag = temp.Building
+    ep_assert(type(temp._value_lazy) is EUDVariable)
+    scv.baseProperty = temp
+
     scv.baseProperty.Hero = True
     test_equality(
         "scv.baseProperty individual flags",

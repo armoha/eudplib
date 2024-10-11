@@ -11,10 +11,11 @@ from .. import core as c
 from ..localize import _
 from ..utils import EPD, EPError, ExprProxy, classproperty, unProxy
 from .offsetmap import (
-    ByteEnumMember,
+    ByteEnum,
     ByteMember,
     CSpriteMember,
     DwordMember,
+    EnumMember,
     EPDOffsetMap,
     Flag,
     PlayerMember,
@@ -27,7 +28,7 @@ from .offsetmap import (
 from .offsetmap.epdoffsetmap import _epd_cache, _ptr_cache
 
 
-class CSpriteFlags(ByteEnumMember):
+class CSpriteFlags(EnumMember):
     __slots__ = ()
     DrawSelCircle = Flag(0x01)
     "Draw selection circle"
@@ -59,7 +60,7 @@ class CSprite(EPDOffsetMap):
     visibilityFlags: ClassVar[ByteMember] = ByteMember("struct", 0x0C)
     "Player bits indicating visibility for a player (not hidden by the fog-of-war)"
     elevationLevel: ClassVar[ByteMember] = ByteMember("struct", 0x0D)
-    flags = CSpriteFlags("struct", 0x0E)
+    flags = ByteEnum("struct", 0x0E, CSpriteFlags)
     selectionTimer: ClassVar[ByteMember] = ByteMember("struct", 0x0F)
     index: ClassVar[WordMember] = WordMember("struct", 0x10)
     grpWidth: ClassVar[ByteMember] = ByteMember("struct", 0x12)

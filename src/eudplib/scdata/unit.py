@@ -15,10 +15,11 @@ from ..localize import _
 from .offsetmap import (
     Bit1Member,
     BoolMember,
-    ByteEnumMember,
+    ByteEnum,
     ByteMember,
-    DwordEnumMember,
+    DwordEnum,
     DwordMember,
+    EnumMember,
     EPDOffsetMap,
     Flag,
     FlingyMember,
@@ -38,12 +39,12 @@ from .offsetmap import (
     UnitSizeMember,
     UpgradeMember,
     WeaponMember,
-    WordEnumMember,
+    WordEnum,
     WordMember,
 )
 
 
-class GroupFlags(ByteEnumMember):
+class GroupFlags(EnumMember):
     __slots__ = ()
     Zerg = Flag(0x01)
     """Uses underlings, can build on creep"""
@@ -58,7 +59,7 @@ class GroupFlags(ByteEnumMember):
     Neutral = Flag(0x80)
 
 
-class BaseProperty(DwordEnumMember):
+class BaseProperty(EnumMember):
     """SpecialAbilityFlag in PyMS, UnitPrototypeFlags in bwapi, BaseProperty in GPTP"""  # noqa: E501
 
     __slots__ = ()
@@ -107,7 +108,7 @@ class BaseProperty(DwordEnumMember):
     "It can produce units directly (making buildings doesn't count)"
 
 
-class AvailabilityFlags(WordEnumMember):
+class AvailabilityFlags(EnumMember):
     __slots__ = ()
     NonNeutral = Flag(0x001)
     UnitListing = Flag(0x002)
@@ -182,7 +183,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     지상 유닛 위로 지나다닐 수 있습니다. 값이 높을수록 지형이나 다른 유닛보다 위에
     표시됩니다.
     """
-    movementFlags = MovementFlags("array", 0x660FC8)
+    movementFlags = ByteEnum("array", 0x660FC8, MovementFlags)
     rank: ClassVar[RankMember] = RankMember("array", 0x663DD0)
     """u8: Stat text id offset for unit rank, starting from [1302] Recruit.
 
@@ -289,7 +290,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     있거나 (유닛 AI 타입 2가 됨), `baseProperty.Building`이 있고 베스핀 간헐천이
     아니거나, 라바/에그/오버로드인 경우 (유닛AI 타입 3이 됨) AI가 할당됩니다.
     """
-    baseProperty = BaseProperty("array", 0x664080)
+    baseProperty = DwordEnum("array", 0x664080, BaseProperty)
     seekRange: ClassVar[ByteMember] = ByteMember("array", 0x662DB8)
     sightRange: ClassVar[ByteMember] = ByteMember("array", 0x663238)
     armorUpgrade: ClassVar[UpgradeMember] = UpgradeMember("array", 0x6635D0)
@@ -362,7 +363,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     gasCost: ClassVar[WordMember] = WordMember("array", 0x65FD00)
     timeCost: ClassVar[WordMember] = WordMember("array", 0x660428)
     requirementOffset: ClassVar[WordMember] = WordMember("array", 0x660A70)
-    groupFlags = GroupFlags("array", 0x6637A0)
+    groupFlags = ByteEnum("array", 0x6637A0, GroupFlags)
     supplyProvided: ClassVar[ByteMember] = ByteMember("array", 0x6646C8)
     supplyUsed: ClassVar[ByteMember] = ByteMember("array", 0x663CE8)
     transportSpaceProvided: ClassVar[ByteMember] = ByteMember("array", 0x660988)
@@ -379,7 +380,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     맵(CHK) 내의 문자열에서 읽어옵니다.
     """
     broodWarFlag: ClassVar[ByteMember] = ByteMember("array", 0x6606D8)  # bool?
-    availabilityFlags = AvailabilityFlags("array", 0x661518)
+    availabilityFlags = WordEnum("array", 0x661518, AvailabilityFlags)
 
     @ut.classproperty
     def range(self):

@@ -16,12 +16,13 @@ from .csprite import int_or_var
 from .offsetmap import (
     BoolMember,
     ButtonSetMember,
-    ByteEnumMember,
+    ByteEnum,
     ByteMember,
     CSpriteMember,
     CUnitMember,
-    DwordEnumMember,
+    DwordEnum,
     DwordMember,
+    EnumMember,
     EPDOffsetMap,
     Flag,
     FlingyMember,
@@ -43,7 +44,7 @@ from .player import CurrentPlayer, TrgPlayer
 from .unit import TrgUnit
 
 
-class StatusFlags(DwordEnumMember):
+class StatusFlags(EnumMember):
     __slots__ = ()
     Completed = Flag(0x00000001)
     GroundedBuilding = Flag(0x00000002)
@@ -93,7 +94,7 @@ class StatusFlags(DwordEnumMember):
     "Set for when the unit is self-destructing (scarab, scourge, infested terran)"
 
 
-class PathingFlags(ByteEnumMember):
+class PathingFlags(EnumMember):
     __slots__ = ()
     HasCollision = Flag(0x01)
     IsStacked = Flag(0x02)
@@ -118,7 +119,7 @@ class CUnit(EPDOffsetMap):
     navigate around buildings."""
     nextTargetWaypoint: ClassVar[PositionMember] = PositionMember("struct", 0x01C)
     "The desired position"
-    movementFlags = MovementFlags("struct", 0x020)
+    movementFlags = ByteEnum("struct", 0x020, MovementFlags)
     currentDirection1: ClassVar[ByteMember] = ByteMember("struct", 0x021)
     "current direction the unit is facing"
     turnSpeed: ClassVar[ByteMember] = ByteMember("struct", 0x022)  # flingy
@@ -327,7 +328,7 @@ class CUnit(EPDOffsetMap):
     powerupOriginY: ClassVar[PositionYMember] = PositionYMember("struct", 0x0D2)
     powerupCarryingUnit: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D4)
     # \\\\\\\\\\\\\\\=================================// union
-    statusFlags = StatusFlags("struct", 0x0DC)
+    statusFlags = DwordEnum("struct", 0x0DC, StatusFlags)
     resourceType: ClassVar[WorkerCarryTypeMember] = WorkerCarryTypeMember(
         "struct", 0x0E0
     )
@@ -357,7 +358,7 @@ class CUnit(EPDOffsetMap):
     nextPsiProvider: ClassVar[CUnitMember] = CUnitMember("struct", 0x0FC)
     path: ClassVar[UnsupportedMember] = UnsupportedMember("struct", 0x100)  # Dword
     pathingCollisionInterval: ClassVar[ByteMember] = ByteMember("struct", 0x104)
-    pathingFlags = PathingFlags("struct", 0x105)
+    pathingFlags = ByteEnum("struct", 0x105, PathingFlags)
     unknown0x106: ClassVar[ByteMember] = ByteMember("struct", 0x106)
     isBeingHealed: ClassVar[BoolMember] = BoolMember("struct", 0x107)
     "1 if a medic is currently healing this unit"
