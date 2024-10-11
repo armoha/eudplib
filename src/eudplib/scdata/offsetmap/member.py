@@ -54,6 +54,7 @@ from .memberkind import (
     WeaponKind,
     WordKind,
     WorkerCarryTypeKind,
+    _NeverKind,
 )
 
 if TYPE_CHECKING:
@@ -91,10 +92,7 @@ if TYPE_CHECKING:
 class BaseMember(metaclass=ABCMeta):
     """Base descriptor class/mixin for EPDOffsetMap"""
 
-    __slots__ = ()
-    layout: Final[Literal["struct", "array"]]
-    offset: Final[int]
-    stride: Final[int]
+    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
 
     def __init__(
         self,
@@ -103,11 +101,11 @@ class BaseMember(metaclass=ABCMeta):
         *,
         stride: int | None = None,
     ) -> None:
-        self.layout = layout  # type: ignore[misc]
-        self.offset = offset  # type: ignore[misc]
+        self.layout: Final[Literal["struct", "array"]] = layout
+        self.offset: Final[int] = offset
         size = self.kind.size()
         ut.ep_assert(offset % 4 + size <= 4, _("Malaligned member"))
-        self.stride = size if stride is None else stride  # type: ignore[misc]
+        self.stride: Final[int] = size if stride is None else stride
         ut.ep_assert(size <= self.stride, _("stride should be at least member size"))
 
     @property
@@ -134,8 +132,8 @@ class BaseMember(metaclass=ABCMeta):
         self.kind.write_epd(epd, subp, self.kind.cast(value))
 
     def __set_name__(self, owner: type[EPDOffsetMap], name: str) -> None:
-        self.__objclass__ = owner  # type: ignore[misc]
-        self.__name__ = name  # type: ignore[misc]
+        self.__objclass__ = owner
+        self.__name__ = name
         if self.layout == "array":
             owner._has_array_member = True
 
@@ -191,22 +189,11 @@ class UnsupportedMember(BaseMember):
     '이 EUD 지도는 스타크래프트 리마스터와 호환되지 않습니다.' 오류가 발생합니다.
     """
 
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
-        return BaseKind
-
-    def __init__(
-        self,
-        layout: Literal["struct", "array"],
-        offset: int,
-        *,
-        stride: int | None = None,
-    ) -> None:
-        self.layout = layout  # type: ignore[misc]
-        self.offset = offset  # type: ignore[misc]
-        self.stride = 0 if stride is None else stride  # type: ignore[misc]
+        return _NeverKind
 
     @overload
     def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
@@ -236,22 +223,11 @@ class UnsupportedMember(BaseMember):
 
 
 class NotImplementedMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
-        return BaseKind
-
-    def __init__(
-        self,
-        layout: Literal["struct", "array"],
-        offset: int,
-        *,
-        stride: int | None = None,
-    ) -> None:
-        self.layout = layout  # type: ignore[misc]
-        self.offset = offset  # type: ignore[misc]
-        self.stride = 0 if stride is None else stride  # type: ignore[misc]
+        return _NeverKind
 
     @overload
     def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
@@ -279,7 +255,7 @@ class NotImplementedMember(BaseMember):
 
 
 class BoolMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -300,7 +276,7 @@ class BoolMember(BaseMember):
 
 
 class Bit1Member(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -321,7 +297,7 @@ class Bit1Member(BaseMember):
 
 
 class ByteMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -342,7 +318,7 @@ class ByteMember(BaseMember):
 
 
 class PlayerMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -363,7 +339,7 @@ class PlayerMember(BaseMember):
 
 
 class WeaponMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -385,7 +361,7 @@ class WeaponMember(BaseMember):
 
 
 class UnitOrderMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -409,7 +385,7 @@ class UnitOrderMember(BaseMember):
 
 
 class UpgradeMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -431,7 +407,7 @@ class UpgradeMember(BaseMember):
 
 
 class TechMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -456,7 +432,7 @@ UnitSize: TypeAlias = Literal["Independent", "Small", "Medium", "Large"] | Byte
 
 
 class UnitSizeMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -494,7 +470,7 @@ RightClickAction: TypeAlias = (
 
 
 class RightClickActionMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -523,7 +499,7 @@ MovementControl: TypeAlias = (
 
 
 class MovementControlMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -552,7 +528,7 @@ DamageType: TypeAlias = (
 
 
 class DamageTypeMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -593,7 +569,7 @@ WeaponBehavior: TypeAlias = (
 
 
 class WeaponBehaviorMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -649,7 +625,7 @@ ExplosionType: TypeAlias = (
 
 
 class ExplosionTypeMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -698,7 +674,7 @@ DrawingFunction: TypeAlias = (
 
 
 class DrawingFunctionMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -758,7 +734,7 @@ IscriptAnimation: TypeAlias = (
 
 
 class AnimationMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -785,7 +761,7 @@ RaceResearch: TypeAlias = Literal["Zerg", "Terran", "Protoss", "All"] | Byte
 
 
 class RaceResearchMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -814,7 +790,7 @@ WorkerCarryType: TypeAlias = (
 
 
 class WorkerCarryTypeMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -838,7 +814,7 @@ class WorkerCarryTypeMember(BaseMember):
 
 
 class RankMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -862,7 +838,7 @@ class RankMember(BaseMember):
 
 
 class FlingyMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -884,7 +860,7 @@ class FlingyMember(BaseMember):
 
 
 class WordMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -905,7 +881,7 @@ class WordMember(BaseMember):
 
 
 class PositionXMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -926,7 +902,7 @@ class PositionXMember(BaseMember):
 
 
 class PositionYMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -947,7 +923,7 @@ class PositionYMember(BaseMember):
 
 
 class UnitMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -969,7 +945,7 @@ class UnitMember(BaseMember):
 
 
 class SpriteMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -991,7 +967,7 @@ class SpriteMember(BaseMember):
 
 
 class ImageMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1013,7 +989,7 @@ class ImageMember(BaseMember):
 
 
 class StatTextMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1037,7 +1013,7 @@ class StatTextMember(BaseMember):
 
 
 class SfxDataMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1061,7 +1037,7 @@ class SfxDataMember(BaseMember):
 
 
 class PortraitMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1085,7 +1061,7 @@ class PortraitMember(BaseMember):
 
 
 class IconMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1109,7 +1085,7 @@ class IconMember(BaseMember):
 
 
 class MapStringMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1133,7 +1109,7 @@ class MapStringMember(BaseMember):
 
 
 class ButtonSetMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1157,7 +1133,7 @@ class ButtonSetMember(BaseMember):
 
 
 class DwordMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1178,7 +1154,7 @@ class DwordMember(BaseMember):
 
 
 class PositionMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1199,7 +1175,7 @@ class PositionMember(BaseMember):
 
 
 class CUnitMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1218,7 +1194,7 @@ class CUnitMember(BaseMember):
 
 
 class CSpriteMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):
@@ -1237,7 +1213,7 @@ class CSpriteMember(BaseMember):
 
 
 class IscriptMember(BaseMember):
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ()
 
     @property
     def kind(self):

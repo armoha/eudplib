@@ -30,7 +30,7 @@ class BaseKind(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def size(cls) -> Literal[1, 2, 4]:
+    def size(cls) -> Literal[0, 1, 2, 4]:
         ...
 
     @classmethod
@@ -687,5 +687,25 @@ class IscriptKind(DwordKind):
         return EncodeIscript(other)
 
 
-class SelfKind(BaseKind):
+class _NeverKind(BaseKind):
     __slots__ = ()
+
+    @classmethod
+    def size(cls) -> Literal[0]:
+        return 0
+
+    @classmethod
+    def read_epd(cls, epd, subp) -> EUDVariable:
+        raise NotImplementedError
+
+    @classmethod
+    def write_epd(cls, epd, subp, value) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def add_epd(cls, epd, subp, value) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def subtract_epd(cls, epd, subp, value) -> None:
+        raise NotImplementedError
