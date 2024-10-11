@@ -132,10 +132,10 @@ class EUDVariable(VariableBase):
         return self._varact
 
     def getDestAddr(self) -> ConstExpr:  # noqa: N802
-        return self._varact + 16  # type: ignore[return-value]
+        return self._varact + 16
 
     def getValueAddr(self) -> ConstExpr:  # noqa: N802
-        return self._varact + 20  # type: ignore[return-value]
+        return self._varact + 20
 
     def __hash__(self) -> int:
         return id(self)
