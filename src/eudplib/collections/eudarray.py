@@ -74,11 +74,7 @@ class EUDArrayData(c.EUDObject):
 
 @c.EUDFunc
 def _get_epd(ptr):
-    if EUDIf()(ptr >= 1 << 31):
-        ptr -= 1 << 31
-    if EUDElse()():
-        ut.EPD(ptr, ret=[ptr])
-    EUDEndIf()
+    ut.EPD(ptr, ret=[ptr])
     c.EUDReturn(ptr)
 
 
