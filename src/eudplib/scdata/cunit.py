@@ -11,6 +11,7 @@ from .. import core as c
 from .. import ctrlstru as cs
 from ..core.eudfunc.eudf import _EUDPredefineReturn
 from ..localize import _
+from ..memio import f_setcurpl2cpcache
 from ..utils import EPD, EPError, classproperty, unProxy
 from .csprite import int_or_var
 from .offsetmap import (
@@ -642,8 +643,6 @@ class CUnit(EPDOffsetMap):
     @_EUDPredefineReturn(2, 3)
     @c.EUDTypedFunc([None, TrgUnit])
     def _check_buildq(unit, unit_type):
-        from ..memio import f_setcurpl2cpcache
-
         ret = CUnit._check_buildq._frets[0]
 
         check_bq0 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)
@@ -692,8 +691,6 @@ class CUnit(EPDOffsetMap):
     @_EUDPredefineReturn(1, 2)
     @c.EUDTypedFunc([None, TrgUnit, None])
     def _check_buildq_const(unit, unit_type, unit65536):
-        from ..memio import f_setcurpl2cpcache
-
         ret = CUnit._check_buildq_const._frets[0]
 
         check_bq0 = c.DeathsX(CurrentPlayer, c.Exactly, 0, 0, 0xFFFF)
@@ -740,11 +737,25 @@ class CUnit(EPDOffsetMap):
         else:
             return CUnit._check_buildq(self, unit)
 
-    def reset_buildq(self, q1=0xE4) -> None:
-        # See https://github.com/python/mypy/issues/14969
-        self.buildQueue12 = 0xE40000 + q1  # type: ignore[misc]
-        self.buildQueue34 = 0xE400E4  # type: ignore[misc]
-        self.buildQueue5 = 0xE4  # type: ignore[misc]
+    def reset_buildq(self, *, q1: int = 0xE4) -> None:
+        c.VProc(
+            self,
+            [
+                c.SetMemory(0x6509B0, c.SetTo, 0x98 // 4),
+                self.QueueAddTo(EPD(0x6509B0)),
+            ],
+        )
+        f_setcurpl2cpcache(
+            actions=[
+                c.SetDeaths(CurrentPlayer, c.SetTo, 0xE40000 + q1, 0),
+                c.SetMemory(0x6509B0, c.Add, 1),
+                c.SetDeaths(CurrentPlayer, c.SetTo, 0xE400E4, 0),
+                c.SetMemory(0x6509B0, c.Add, 1),
+                c.SetDeathsX(CurrentPlayer, c.SetTo, 0xE4, 0, 0xFFFF),
+                c.SetMemory(0x6509B0, c.Add, 1),
+                c.SetDeathsX(CurrentPlayer, c.SetTo, 2 << 16, 0, 0xFF0000),
+            ]
+        )
 
     def die(self) -> None:
         # See https://github.com/python/mypy/issues/14969
