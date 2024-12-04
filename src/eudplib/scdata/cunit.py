@@ -130,7 +130,7 @@ class CUnit(EPDOffsetMap):
     can accelerate and travel in a different direction than they are facing.
     For example Mutalisks can change the direction they are facing
     faster than then can change the direction they are moving."""
-    flingyID: ClassVar[FlingyMember] = FlingyMember("struct", 0x024)
+    flingyID: ClassVar[FlingyMember] = FlingyMember("struct", 0x024, stride=2)
     unknown0x26: ClassVar[ByteMember] = ByteMember("struct", 0x026)
     flingyMovementType: ClassVar[ByteMember] = ByteMember("struct", 0x027)
     pos: ClassVar[PositionMember] = PositionMember("struct", 0x028)

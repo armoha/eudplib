@@ -47,7 +47,7 @@ class TargetFlags(EnumMember):
 class Weapon(EPDOffsetMap, ConstType):
     __slots__ = ()
     label: ClassVar = StatTextMember("array", 0x6572E0)
-    flingy: ClassVar = FlingyMember("array", 0x656CA8)
+    flingy: ClassVar = FlingyMember("array", 0x656CA8, stride=4)
     # specialAttack: ClassVar = ByteMember("array", 0x6573E8)
     # special attack is for reference only (unused)
     targetFlags = WordEnum("array", 0x657998, TargetFlags)
