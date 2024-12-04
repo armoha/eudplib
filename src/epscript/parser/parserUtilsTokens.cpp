@@ -45,12 +45,12 @@ void checkIsFunction(std::string& objName, int line) {
         return;
     }
 
-    if (!closure->getFunction(objName)) {
-        if(closure->defFunction(objName)) {
+    if (!closure->getFunction(objName) && !closure->getVariable(objName)) {
+        if(closure->defFunction(objName) || closure->defVariable(objName)) {
             throw_error(7041, ("Undefined function " + objName), line);
         }
         else {
-            throw_error(3967, ("Not a function : " + objName), line);
+            throw_error(3967, ("Not a function nor variable: " + objName), line);
         }
     }
 }

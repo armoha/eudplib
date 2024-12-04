@@ -1,0 +1,5 @@
+function test(fn: EUDFuncPtr(0, 0)) {
+    fn();
+}
+
+EUDOnStart(function () { test(function () {}); });

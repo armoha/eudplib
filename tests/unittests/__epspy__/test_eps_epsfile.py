@@ -15,57 +15,62 @@ try:
     C240903 = _RELIMP(".report", "C240903")
 except ImportError:
     from .report import C240903
-# (Line 7) function square(x) : None;
+# (Line 6) import .report.C241219;
 try:
     C240930 = _RELIMP(".report", "C240930")
 except ImportError:
     from .report import C240930
-# (Line 9) const a = [
-# (Line 10) square(1),
-# (Line 11) square(2),
-# (Line 12) square(3),
-# (Line 13) square(4),
-# (Line 14) square(5)
-# (Line 15) ];
+# (Line 8) function square(x) : None;
+try:
+    C241219 = _RELIMP(".report", "C241219")
+except ImportError:
+    from .report import C241219
+# (Line 10) const a = [
+# (Line 11) square(1),
+# (Line 12) square(2),
+# (Line 13) square(3),
+# (Line 14) square(4),
+# (Line 15) square(5)
+# (Line 16) ];
 a = _CGFW(lambda: [_ARR(FlattenList([f_square(1), f_square(2), f_square(3), f_square(4), f_square(5)]))], 1)[0]
-# (Line 17) function testLineno() {
+# (Line 18) function testLineno() {
 @EUDFunc
 def f_testLineno():
-    # (Line 18) const foo = py_eval("warnings.warn");
+    # (Line 19) const foo = py_eval("warnings.warn");
     foo = eval("warnings.warn")
-    # (Line 19) foo("ㅇㅅㅇ");
+    # (Line 20) foo("ㅇㅅㅇ");
     foo("ㅇㅅㅇ")
-    # (Line 20) }
-    # (Line 22) function square(x) {
+    # (Line 21) }
+    # (Line 23) function square(x) {
 
 @EUDFunc
 def f_square(x):
-    # (Line 23) testLineno();
+    # (Line 24) testLineno();
     f_testLineno()
-    # (Line 24) return x * x; // + z.k;
+    # (Line 25) return x * x; // + z.k;
     EUDReturn(x * x)
-    # (Line 25) }
-    # (Line 27) const receives = py_eval('[PVariable() for _ in range(8)]');
+    # (Line 26) }
+    # (Line 28) const receives = py_eval('[PVariable() for _ in range(8)]');
 
 receives = _CGFW(lambda: [eval('[PVariable() for _ in range(8)]')], 1)[0]
-# (Line 28) const attack_gwpID = 4;
+# (Line 29) const attack_gwpID = 4;
 attack_gwpID = _CGFW(lambda: [4], 1)[0]
-# (Line 29) function constv_thing() {
+# (Line 30) function constv_thing() {
 @EUDFunc
 def f_constv_thing():
-    # (Line 30) foreach(i, pvar: py_enumerate(receives)) {}
+    # (Line 31) foreach(i, pvar: py_enumerate(receives)) {}
     for i, pvar in enumerate(receives):
-        # (Line 31) SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
+        # (Line 32) SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID/4, Add, 100 << (attack_gwpID%4 * 8), 0xFF << (attack_gwpID%4 * 8));  // cooldown +100
         pass
 
-    # (Line 32) return a[0] + a[1] + a[2] + a[3] + a[4];
+    # (Line 33) return a[0] + a[1] + a[2] + a[3] + a[4];
     DoActions(SetMemoryXEPD(EPD(0x656FB8) + attack_gwpID // 4, Add, _LSH(100,(attack_gwpID % 4 * 8)), _LSH(0xFF,(attack_gwpID % 4 * 8))))
     EUDReturn(a[0] + a[1] + a[2] + a[3] + a[4])
-    # (Line 33) }
-    # (Line 35) function test_reported() {
+    # (Line 34) }
+    # (Line 36) function test_reported() {
 
 @EUDFunc
 def f_test_reported():
-    # (Line 36) return C240903.updateUnitNameAndRank();
+    # (Line 37) return C240903.updateUnitNameAndRank();
     EUDReturn(C240903.f_updateUnitNameAndRank())
-    # (Line 37) }
+    # (Line 38) }
