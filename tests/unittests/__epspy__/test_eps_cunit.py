@@ -215,3 +215,10 @@ def f_test_cunit2():
     EUDEndIf()
     EUDReturn(ret)
     # (Line 93) }
+    # (Line 94) function test_scdata() {
+
+@EUDFunc
+def f_test_scdata():
+    # (Line 95) (Upgrade("Protoss Ground Weapons"))[P1] = 88;
+    _ARRW((Upgrade("Protoss Ground Weapons")), P1) << (88)
+    # (Line 96) }

@@ -393,6 +393,7 @@ def test_scdata_var():
 
 @TestInstance
 def test_scdata_current_upgrade():
+    DoActions(CreateUnit(1, "Protoss Zealot", "Anywhere", P1))
     for upgrade_id in (Upgrade("Protoss Plasma Shields"), Upgrade("Charon Booster")):
         upgrades = [Upgrade(upgrade_id), Upgrade(EUDVariable(upgrade_id))]
         players = [P11, TrgPlayer(EUDVariable(10))]

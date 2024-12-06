@@ -315,9 +315,9 @@ class _ARRW:  # array write
         self.index = index
 
     def __lshift__(self, r):
-        isUnproxyInstance
-        if not IsEUDVariable(self.obj) and not isUnproxyInstance(
-            self.obj, ConstExpr
+        if not (
+            isinstance(self.obj, ExprProxy)
+            or isinstance(self.obj, (EUDVariable, ConstExpr))  # noqa: UP038
         ):
             # maybe Python collections
             ov = self.obj[self.index]

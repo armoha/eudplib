@@ -13,7 +13,7 @@ from .test_eps_array import (
     f_test_write,
 )
 from .test_eps_compat import f_test_compatibility, stat
-from .test_eps_cunit import f_test_cunit1, f_test_cunit2
+from .test_eps_cunit import f_test_cunit1, f_test_cunit2, f_test_scdata
 from .test_eps_epsfile import (
     f_constv_thing,
     f_square,
@@ -89,6 +89,7 @@ def test_epscript():
     test_equality("epScript EUDMethod", f_test_eudmethods(), 7)
     test_equality("epScript EPDCUnitMap", f_test_cunit1(), 0x7FFFF)
     test_equality("epScript CUnit", f_test_cunit2(), 8191)
+    f_test_scdata()
     test_equality("epScript compatibility", f_test_compatibility(), 32)
     test_equality(
         "epScript stat_txt.tbl",
