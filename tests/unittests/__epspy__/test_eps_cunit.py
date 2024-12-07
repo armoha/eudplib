@@ -130,95 +130,128 @@ def f_test_cunit1():
 
 @EUDFunc
 def f_test_cunit2():
-    # (Line 56) const u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)));
-    u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)))
-    # (Line 57) var ret = 0;
+    # (Line 56) const trgCount = GetTriggerCounter();
+    trgCount = GetTriggerCounter()
+    # (Line 57) const u = CUnit.cast(EUDVariable(EPD(0x59CCA8 + 336)));
+    u = CUnit.cast(EUDVariable(EPD(0x59CCA8 + 336)))
+    # (Line 58) ep_assert(trgCount == GetTriggerCounter());
+    ep_assert(trgCount == GetTriggerCounter())
+    # (Line 59) var ret = 0;
     ret = _TYLV([None], [0])
-    # (Line 59) u.orderQueueCount = 123;
+    # (Line 61) u.orderQueueCount = 123;
     _ATTW(u, 'orderQueueCount') << (123)
-    # (Line 60) if (u.orderQueueCount == 123) ret += 1;
+    # (Line 62) if (u.orderQueueCount == 123) ret += 1;
     if EUDIf()(_ATTC(u, 'orderQueueCount') == 123):
         ret.__iadd__(1)
-        # (Line 61) u.orderQueueCount = 0;
+        # (Line 63) u.orderQueueCount = 0;
     EUDEndIf()
     _ATTW(u, 'orderQueueCount') << (0)
-    # (Line 62) if (u.orderQueueCount == 0) ret += 2;
+    # (Line 64) if (u.orderQueueCount == 0) ret += 2;
     if EUDIf()(_ATTC(u, 'orderQueueCount') == 0):
         ret.__iadd__(2)
-        # (Line 64) u.currentDirection1 = 234;
+        # (Line 66) u.currentDirection1 = 234;
     EUDEndIf()
     _ATTW(u, 'currentDirection1') << (234)
-    # (Line 65) if (u.currentDirection1 == 234) ret += 4;
+    # (Line 67) if (u.currentDirection1 == 234) ret += 4;
     if EUDIf()(_ATTC(u, 'currentDirection1') == 234):
         ret.__iadd__(4)
-        # (Line 66) u.currentDirection1 = 0;
+        # (Line 68) u.currentDirection1 = 0;
     EUDEndIf()
     _ATTW(u, 'currentDirection1') << (0)
-    # (Line 67) if (u.currentDirection1 == 0) ret += 8;
+    # (Line 69) if (u.currentDirection1 == 0) ret += 8;
     if EUDIf()(_ATTC(u, 'currentDirection1') == 0):
         ret.__iadd__(8)
-        # (Line 69) u.turnRadius = 34;
+        # (Line 71) u.turnRadius = 34;
     EUDEndIf()
     _ATTW(u, 'turnRadius') << (34)
-    # (Line 70) if (u.turnRadius == 34) ret += 16;
+    # (Line 72) if (u.turnRadius == 34) ret += 16;
     if EUDIf()(_ATTC(u, 'turnRadius') == 34):
         ret.__iadd__(16)
-        # (Line 71) u.turnRadius = 0;
+        # (Line 73) u.turnRadius = 0;
     EUDEndIf()
     _ATTW(u, 'turnRadius') << (0)
-    # (Line 72) if (u.turnRadius == 0) ret += 32;
+    # (Line 74) if (u.turnRadius == 0) ret += 32;
     if EUDIf()(_ATTC(u, 'turnRadius') == 0):
         ret.__iadd__(32)
-        # (Line 74) u.velocityDirection1 = 45;
+        # (Line 76) u.velocityDirection1 = 45;
     EUDEndIf()
     _ATTW(u, 'velocityDirection1') << (45)
-    # (Line 75) if (u.velocityDirection1 == 45) ret += 64;
+    # (Line 77) if (u.velocityDirection1 == 45) ret += 64;
     if EUDIf()(_ATTC(u, 'velocityDirection1') == 45):
         ret.__iadd__(64)
-        # (Line 76) u.velocityDirection1 = 0;
+        # (Line 78) u.velocityDirection1 = 0;
     EUDEndIf()
     _ATTW(u, 'velocityDirection1') << (0)
-    # (Line 77) if (u.velocityDirection1 == 0) ret += 128;
+    # (Line 79) if (u.velocityDirection1 == 0) ret += 128;
     if EUDIf()(_ATTC(u, 'velocityDirection1') == 0):
         ret.__iadd__(128)
-        # (Line 79) u.energy = 567;
+        # (Line 81) u.energy = 567;
     EUDEndIf()
     _ATTW(u, 'energy') << (567)
-    # (Line 80) if (u.energy == 567) ret += 256;
+    # (Line 82) if (u.energy == 567) ret += 256;
     if EUDIf()(_ATTC(u, 'energy') == 567):
         ret.__iadd__(256)
-        # (Line 81) u.energy = 0;
+        # (Line 83) u.energy = 0;
     EUDEndIf()
     _ATTW(u, 'energy') << (0)
-    # (Line 82) if (u.energy == 0) ret += 512;
+    # (Line 84) if (u.energy == 0) ret += 512;
     if EUDIf()(_ATTC(u, 'energy') == 0):
         ret.__iadd__(512)
-        # (Line 84) u.acceleration = 678;
+        # (Line 86) u.acceleration = 678;
     EUDEndIf()
     _ATTW(u, 'acceleration') << (678)
-    # (Line 85) if (u.acceleration == 678) ret += 1024;
+    # (Line 87) if (u.acceleration == 678) ret += 1024;
     if EUDIf()(_ATTC(u, 'acceleration') == 678):
         ret.__iadd__(1024)
-        # (Line 86) u.acceleration = 0;
+        # (Line 88) u.acceleration = 0;
     EUDEndIf()
     _ATTW(u, 'acceleration') << (0)
-    # (Line 87) if (u.acceleration == 0) ret += 2048;
+    # (Line 89) if (u.acceleration == 0) ret += 2048;
     if EUDIf()(_ATTC(u, 'acceleration') == 0):
         ret.__iadd__(2048)
-        # (Line 89) u.remove();
+        # (Line 91) u.remove();
     EUDEndIf()
     u.remove()
-    # (Line 90) if (u.order == 0 && u.userActionFlags & 4) ret += 4096;
+    # (Line 92) if (u.order == 0 && u.userActionFlags & 4) ret += 4096;
     if EUDIf()(EUDSCAnd()(_ATTC(u, 'order') == 0)(u.userActionFlags & 4)()):
         ret.__iadd__(4096)
-        # (Line 92) return ret;
+        # (Line 94) return ret;
     EUDEndIf()
     EUDReturn(ret)
-    # (Line 93) }
-    # (Line 94) function test_scdata() {
+    # (Line 95) }
+    # (Line 96) function test_scdata() {
 
 @EUDFunc
 def f_test_scdata():
-    # (Line 95) (Upgrade("Protoss Ground Weapons"))[P1] = 88;
+    # (Line 97) (Upgrade("Protoss Ground Weapons"))[P1] = 88;
     _ARRW((Upgrade("Protoss Ground Weapons")), P1) << (88)
-    # (Line 96) }
+    # (Line 98) const testStatic = function () {
+    @EUDFunc
+    def _lambda1():
+        # (Line 99) const trgCount = GetTriggerCounter();
+        trgCount = GetTriggerCounter()
+        # (Line 100) static var unit: CUnit = 0;
+        unit = _TYSV([CUnit], [0])
+        # (Line 101) ep_assert(trgCount == GetTriggerCounter());
+        ep_assert(trgCount == GetTriggerCounter())
+        # (Line 102) unit += 1;
+        unit.__iadd__(1)
+        # (Line 103) return unit;
+        EUDReturn(unit)
+        # (Line 104) };
+
+    testStatic = _lambda1
+    # (Line 105) for(var n = 0 ; n < 11 ; n++) {
+    n = _TYLV([None], [0])
+    if EUDWhile()(n >= 11, neg=True):
+        def _t2():
+            n.__iadd__(1)
+        # (Line 106) testStatic();
+        testStatic()
+        # (Line 107) }
+        # (Line 108) return testStatic();
+        EUDSetContinuePoint()
+        _t2()
+    EUDEndWhile()
+    EUDReturn(testStatic())
+    # (Line 109) }

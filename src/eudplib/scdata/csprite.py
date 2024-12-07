@@ -116,7 +116,6 @@ class CSprite(EPDOffsetMap):
         else:
             raise EPError(_("Invalid input for CSprite: {}").format(epd))
 
-        EPDOffsetMap._cast = False
         super().__init__(_epd)
 
     @classmethod

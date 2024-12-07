@@ -53,7 +53,9 @@ with expect_error(AttributeError):\n\
     return ret;
 }
 function test_cunit2() {
-    const u = CUnit(EUDVariable(EPD(0x59CCA8 + 336)));
+    const trgCount = GetTriggerCounter();
+    const u = CUnit.cast(EUDVariable(EPD(0x59CCA8 + 336)));
+    ep_assert(trgCount == GetTriggerCounter());
     var ret = 0;
 
     u.orderQueueCount = 123;
@@ -93,4 +95,15 @@ function test_cunit2() {
 }
 function test_scdata() {
     (Upgrade("Protoss Ground Weapons"))[P1] = 88;
+    const testStatic = function () {
+        const trgCount = GetTriggerCounter();
+        static var unit: CUnit = 0;
+        ep_assert(trgCount == GetTriggerCounter());
+        unit += 1;
+        return unit;
+    };
+    for(var n = 0 ; n < 11 ; n++) {
+        testStatic();
+    }
+    return testStatic();
 }
