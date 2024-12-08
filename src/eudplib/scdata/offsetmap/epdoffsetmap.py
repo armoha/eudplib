@@ -176,7 +176,8 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             c.RawTrigger(nextptr=add_start, actions=c.SetNextPtr(add_end, nexttrg))
             nexttrg << c.NextTrigger()
         else:
-            super().__iadd__(other)
+            ut.ep_assert(c.IsEUDVariable(self._value))
+            self._value += other
         return self
 
     def getepd(self, name: str) -> c.EUDVariable:
