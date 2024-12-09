@@ -667,6 +667,14 @@ class CUnitKind(DwordKind):
         ep_assert(isinstance(subp, int) and subp == 0, "malaligned CUnit member")
         return CUnit.from_read(epd)
 
+    @classmethod
+    def write_epd(cls, epd, subp, value) -> None:
+        from ..cunit import CUnit
+
+        if isinstance(value, CUnit):
+            value = value.ptr
+        super().write_epd(epd, subp, value)
+
 
 class CSpriteKind(DwordKind):
     __slots__ = ()
@@ -677,6 +685,14 @@ class CSpriteKind(DwordKind):
 
         ep_assert(isinstance(subp, int) and subp == 0, "malaligned CSprite member")
         return CSprite.from_read(epd)
+
+    @classmethod
+    def write_epd(cls, epd, subp, value) -> None:
+        from ..cunit import CSprite
+
+        if isinstance(value, CSprite):
+            value = value.ptr
+        super().write_epd(epd, subp, value)
 
 
 class IscriptKind(DwordKind):

@@ -225,33 +225,59 @@ def f_test_cunit2():
 def f_test_scdata():
     # (Line 97) (Upgrade("Protoss Ground Weapons"))[P1] = 88;
     _ARRW((Upgrade("Protoss Ground Weapons")), P1) << (88)
-    # (Line 98) const testStatic = function () {
+    # (Line 99) var ret = 0;
+    ret = _TYLV([None], [0])
+    # (Line 100) const u = CUnit(EPD(0x59CCA8) + 84);
+    u = CUnit(EPD(0x59CCA8) + 84)
+    # (Line 101) u.orderTarget = CUnit(EUDVariable(0));
+    _ATTW(u, 'orderTarget') << (CUnit(EUDVariable(0)))
+    # (Line 102) if (u.orderTarget == 0) ret += 1;
+    if EUDIf()(_ATTC(u, 'orderTarget') == 0):
+        ret.__iadd__(1)
+        # (Line 103) const x = CUnit(EUDVariable(EPD(0x59CCA8)));
+    EUDEndIf()
+    x_1 = CUnit(EUDVariable(EPD(0x59CCA8)))
+    # (Line 104) u.orderTarget = x;
+    _ATTW(u, 'orderTarget') << (x_1)
+    # (Line 105) if (u.orderTarget == 0x59CCA8) ret += 2;
+    if EUDIf()(_ATTC(u, 'orderTarget') == 0x59CCA8):
+        ret.__iadd__(2)
+        # (Line 106) if (Memory(0x59CCA8 + 336 + 0x5C, Exactly, 0x59CCA8)) ret += 4;
+    EUDEndIf()
+    if EUDIf()(Memory(0x59CCA8 + 336 + 0x5C, Exactly, 0x59CCA8)):
+        ret.__iadd__(4)
+        # (Line 107) if (u.orderTarget == x) ret += 8;
+    EUDEndIf()
+    if EUDIf()(_ATTC(u, 'orderTarget') == x_1):
+        ret.__iadd__(8)
+        # (Line 109) const testStatic = function () {
+    EUDEndIf()
     @EUDFunc
     def _lambda1():
-        # (Line 99) const trgCount = GetTriggerCounter();
+        # (Line 110) const trgCount = GetTriggerCounter();
         trgCount = GetTriggerCounter()
-        # (Line 100) static var unit: CUnit = 0;
+        # (Line 111) static var unit: CUnit = 0;
         unit = _TYSV([CUnit], [0])
-        # (Line 101) ep_assert(trgCount == GetTriggerCounter());
+        # (Line 112) ep_assert(trgCount == GetTriggerCounter());
         ep_assert(trgCount == GetTriggerCounter())
-        # (Line 102) unit += 1;
+        # (Line 113) unit += 1;
         unit.__iadd__(1)
-        # (Line 103) return unit;
+        # (Line 114) return unit;
         EUDReturn(unit)
-        # (Line 104) };
+        # (Line 115) };
 
     testStatic = _lambda1
-    # (Line 105) for(var n = 0 ; n < 11 ; n++) {
+    # (Line 116) for(var n = 0 ; n < 11 ; n++) {
     n = _TYLV([None], [0])
     if EUDWhile()(n >= 11, neg=True):
         def _t2():
             n.__iadd__(1)
-        # (Line 106) testStatic();
+        # (Line 117) testStatic();
         testStatic()
-        # (Line 107) }
-        # (Line 108) return testStatic();
+        # (Line 118) }
+        # (Line 119) return ret, testStatic();
         EUDSetContinuePoint()
         _t2()
     EUDEndWhile()
-    EUDReturn(testStatic())
-    # (Line 109) }
+    EUDReturn(ret, testStatic())
+    # (Line 120) }
