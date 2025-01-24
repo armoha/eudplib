@@ -256,11 +256,22 @@ create_unit = c.Forward()
 @c.EUDTypedFunc([TrgPlayer])
 def f_raise_CCMU(player):  # noqa: N802
     f_cunitread_epd(ut.EPD(0x628438), ret=[ut.EPD(create_unit + 328 + 32 * 2 + 20)])
+
+    c.RawTrigger(
+        conditions=c.Memory(0x628438, c.Exactly, 0),
+        actions=[
+            c.SetMemoryX(create_unit + 328 + 28, c.SetTo, 2, 2),
+            c.SetMemoryX(create_unit + 328 + 32 * 2 + 28, c.SetTo, 2, 2),
+        ],
+    )
+
     create_unit << c.RawTrigger(
         actions=[
             c.SetMemory(0x628438, c.SetTo, 0),
             c.CreateUnit(1, 0, 64, 0),
             c.SetMemory(0x628438, c.SetTo, 0),
+            c.SetMemoryX(create_unit + 328 + 28, c.SetTo, 0, 2),
+            c.SetMemoryX(create_unit + 328 + 32 * 2 + 28, c.SetTo, 0, 2),
         ]
     )
 
