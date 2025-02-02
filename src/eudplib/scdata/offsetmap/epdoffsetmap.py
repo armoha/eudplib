@@ -33,11 +33,11 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         ...
 
     @classmethod
-    def cast(cls, _from):
+    def cast(cls, _from, *args, **kwargs):
         if type(_from) is cls:
             return _from
         EPDOffsetMap._cast = True
-        return cls(_from)
+        return cls(_from, *args, **kwargs)
 
     def __init__(self, epd: int | c.EUDVariable) -> None:
         if isinstance(epd, c.EUDVariable) and not EPDOffsetMap._cast:

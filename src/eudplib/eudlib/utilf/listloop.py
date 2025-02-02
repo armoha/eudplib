@@ -310,7 +310,7 @@ def EUDLoopSprite() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N
 
 def EUDLoopNewCUnit(allowance: int = 2) -> Iterator[CUnit]:  # noqa: N802
     for ptr, epd in EUDLoopNewUnit(allowance):
-        yield CUnit(epd, ptr=ptr)
+        yield CUnit.cast(epd, ptr=ptr)
 
 
 def EUDLoopCUnit() -> Iterator[CUnit]:  # noqa: N802
@@ -318,9 +318,9 @@ def EUDLoopCUnit() -> Iterator[CUnit]:  # noqa: N802
     1700개 유닛을 도는 방식으로 작동합니다.
     """
     for ptr, epd in EUDLoopUnit2():
-        yield CUnit(epd, ptr=ptr)
+        yield CUnit.cast(epd, ptr=ptr)
 
 
 def EUDLoopPlayerCUnit(player) -> Iterator[CUnit]:  # noqa: N802
     for ptr, epd in EUDLoopPlayerUnit(player):
-        yield CUnit(epd, ptr=ptr)
+        yield CUnit.cast(epd, ptr=ptr)
