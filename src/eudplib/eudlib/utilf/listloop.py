@@ -5,15 +5,18 @@
 # file that should have been included as part of this package.
 
 from collections.abc import Iterator
+from typing import ClassVar, Self
 
 from ... import core as c
 from ... import ctrlstru as cs
 from ... import utils as ut
 from ...localize import _
+from ...maprw.injector.mainloop import _on_game_loop_start
 from ...memio import (
     f_bread_cp,
     f_cunitepdread_epd,
     f_dwepdread_epd,
+    f_epdcunitread_epd,
     f_setcurpl2cpcache,
 )
 from ...memio import modcurpl as cp
@@ -62,6 +65,17 @@ def EUDLoopUnit() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N80
 
 
 class _UniqueIdentifier(c.EUDObject):
+    _instances: ClassVar[list[Self]] = []
+
+    def __new__(cls, *args, **kwargs) -> Self:
+        return super().__new__(cls)
+
+    def __init__(self) -> None:
+        super().__init__()
+        if not _UniqueIdentifier._instances:
+            _on_game_loop_start(lambda: _UniqueIdentifier._init())
+        _UniqueIdentifier._instances.append(self)
+
     def GetDataSize(self) -> int:  # noqa: N802
         return 4 + 336 * 1699
 
@@ -69,12 +83,81 @@ class _UniqueIdentifier(c.EUDObject):
         emitbuffer.WriteDword(0)
         for _unit_data in range(1699):
             emitbuffer.WriteSpace(332)
-            emitbuffer.WriteDword(0xFF)
+            emitbuffer.WriteDword(0)
+
+    @classmethod
+    def _init(cls):
+        first_empty_unir_ptr = EPD(0x628438)
+        epd = f_epdcunitread_epd(first_empty_unir_ptr)
+        quot, rem = divmod(len(_UniqueIdentifier._instances), 32)
+        endflags = c.Db((len(_UniqueIdentifier._instances) + 7) // 8)
+        cs.DoActions(
+            *[c.SetMemory(endflags + 4 * i, c.SetTo, 0) for i in range(quot)],
+            c.SetMemoryX(endflags + 4 * quot, c.SetTo, 0, (1 << rem) - 1)
+            if rem > 0
+            else [],
+        )
+        if cs.EUDWhileNot()(epd == 0):
+            c.VProc(
+                epd,
+                [
+                    c.SetMemory(0x6509B0, c.SetTo, 0xA5 // 4),
+                    epd.QueueAddTo(EPD(0x6509B0)),
+                ],
+            )
+            uniq = f_bread_cp(0, 1)
+            check_unique = c.DeathsX(cp.CP, c.Exactly, 0, 0, 0xFF)
+            for i, unique_identifier in enumerate(_UniqueIdentifier._instances):
+                q, r = divmod(i, 32)
+                if cs.EUDIfNot()(c.MemoryX(endflags + 4 * q, c.AtLeast, 1, 1 << r)):
+                    prev = (
+                        EPD(0x59CCA8) + 0xA5 // 4
+                        if i == 0
+                        else EPD(_UniqueIdentifier._instances[i - 1])
+                    )
+                    c.VProc(
+                        uniq,
+                        [
+                            c.SetMemory(0x6509B0, c.Add, -prev),
+                            c.SetMemory(0x6509B0, c.Add, EPD(unique_identifier)),
+                            uniq.SetDest(EPD(check_unique + 8)),
+                        ],
+                    )
+                    if cs.EUDIf()(check_unique):
+                        cs.DoActions(
+                            c.SetMemoryX(endflags + 4 * q, c.SetTo, 1 << r, 1 << r)
+                        )
+                    if cs.EUDElse()():
+                        c.VProc(uniq, uniq.SetDest(cp.CP))
+                    cs.EUDEndIf()
+                cs.EUDEndIf()
+            cs.EUDBreakIf(
+                [
+                    *[
+                        c.Memory(endflags + 4 * i, c.Exactly, 0xFFFFFFFF)
+                        for i in range(quot)
+                    ],
+                    c.MemoryX(
+                        endflags + 4 * quot,
+                        c.Exactly,
+                        (1 << rem) - 1,
+                        (1 << rem) - 1,
+                    )
+                    if rem > 0
+                    else [],
+                ]
+            )
+            cs.EUDSetContinuePoint()
+            epd += 1
+            f_epdcunitread_epd(epd, ret=[epd])
+        cs.EUDEndWhile()
+        f_setcurpl2cpcache()
 
 
 def EUDLoopNewUnit(  # noqa: N802
     allowance: int = 2,
 ) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
+    unique_identifier = _UniqueIdentifier()
     ut.ep_assert(isinstance(allowance, int))
     first_unit_ptr = EPD(0x628430)
     ut.EUDCreateBlock("newunitloop", "newlo")
@@ -91,7 +174,6 @@ def EUDLoopNewUnit(  # noqa: N802
             ],
         )
         uniq = f_bread_cp(0, 1)
-        unique_identifier = _UniqueIdentifier()
         check_unique = c.DeathsX(cp.CP, c.Exactly, 0, 0, 0xFF)
         c.VProc(
             uniq,

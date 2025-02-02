@@ -18,6 +18,8 @@ _jumper: c.Forward | None = None
 _start_functions1: list[Callable] = []
 _start_functions2: list[Callable] = []
 _has_already_started: int = 0
+_game_loop_start = c.Forward()
+_game_loop_start_functions: list[Callable] = []
 
 
 def has_already_started() -> bool:
@@ -37,7 +39,23 @@ def EUDOnStart(func: Callable) -> None:  # noqa: N802
 
 
 def eud_onstart2(func: Callable) -> None:
+    ep_assert(
+        _has_already_started < 2,
+        "Can't use EUDOnStart here. See https://cafe.naver.com/edac/69262",
+    )
     _start_functions2.append(func)
+
+
+def _set_game_loop_start():
+    if _game_loop_start.IsSet():
+        raise EPError(_("Game loop start is already set."))
+    c.SetNextTrigger(_game_loop_start)
+    start = c.NextTrigger()
+    _game_loop_start << start
+
+
+def _on_game_loop_start(func: Callable):
+    _game_loop_start_functions.append(func)
 
 
 def main_starter(mf: Callable) -> c.Forward:
@@ -79,6 +97,17 @@ def main_starter(mf: Callable) -> c.Forward:
 
     c.PopTriggerScope()
     _has_already_started = 0
+    if _game_loop_start_functions:
+        if not _game_loop_start.IsSet():
+            raise EPError(_("_set_game_loop_start() is not used"))
+        c.PushTriggerScope()
+        start = _game_loop_start.expr
+        _game_loop_start.Reset()
+        _game_loop_start << c.NextTrigger()
+        for func in _game_loop_start_functions:
+            func()
+        c.SetNextTrigger(start)
+        c.PopTriggerScope()
 
     return _jumper
 
