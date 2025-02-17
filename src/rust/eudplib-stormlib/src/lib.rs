@@ -121,7 +121,7 @@ impl Archive {
         replace_existing: bool,
     ) -> Result<()> {
         #[cfg(not(target_os = "windows"))]
-        let cpath = {
+        let cfile_path = {
             let pathstr = file_path
                 .as_ref()
                 .to_str()
