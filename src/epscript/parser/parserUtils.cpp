@@ -3,6 +3,7 @@
 #include <vector>
 #include <regex>
 #include <iostream>
+#include <cstring>
 
 #include "generator/pygen.h"
 #include "generator/eudplibGlobals.h"
