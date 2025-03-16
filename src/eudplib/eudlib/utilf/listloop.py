@@ -106,9 +106,9 @@ class _UniqueIdentifier(c.EUDObject):
                 ],
             )
             uniq = f_bread_cp(0, 1)
-            check_unique = c.DeathsX(cp.CP, c.Exactly, 0, 0, 0xFF)
             for i, unique_identifier in enumerate(_UniqueIdentifier._instances):
                 q, r = divmod(i, 32)
+                check_unique = c.DeathsX(cp.CP, c.Exactly, 0, 0, 0xFF)
                 if cs.EUDIfNot()(c.MemoryX(endflags + 4 * q, c.AtLeast, 1, 1 << r)):
                     prev = (
                         EPD(0x59CCA8) + 0xA5 // 4
