@@ -149,4 +149,4 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size: int | None = None) -> N
             wf.write(f"H0: {binascii.hexlify(trace_header[0]).decode('ascii')}\n")
             wf.write(f"H1: {binascii.hexlify(trace_header[1]).decode('ascii')}\n")
             for k, v in trace_map:
-                wf.write(f" - {k:08}%08X : {v}\n")
+                wf.write(f" - {k:08X} : {v}\n")
