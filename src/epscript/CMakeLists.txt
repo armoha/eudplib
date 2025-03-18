@@ -35,7 +35,7 @@ else ()
             DEPENDS ./lemon2 parser/epparser.lemon
             COMMAND ./lemon2 -p -c -l parser/epparser.lemon
             COMMAND cmake -E rm -f parser/epparser.cpp
-            COMMAND cmake -E mv parser/epparser.c parser/epparser.cpp
+            COMMAND cmake -E rename parser/epparser.c parser/epparser.cpp
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             VERBATIM
     )
