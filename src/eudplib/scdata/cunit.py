@@ -546,7 +546,7 @@ class CUnit(EPDOffsetMap):
         if cs.EUDIf()(prev_ptr >= 0x59CCA8):
             f_dwwrite_epd(prev_epd, next_ptr)
         if cs.EUDElse()():
-            f_dwwrite_epd(EPD(0x6283F8) + prev_owner, next_ptr)
+            f_dwwrite_epd(prev_owner, next_ptr)
         cs.EUDEndIf()
 
         if cs.EUDIf()(next_ptr >= 0x59CCA8):
