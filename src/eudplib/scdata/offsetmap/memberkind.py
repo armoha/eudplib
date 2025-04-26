@@ -30,28 +30,23 @@ class BaseKind(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def size(cls) -> Literal[0, 1, 2, 4]:
-        ...
+    def size(cls) -> Literal[0, 1, 2, 4]: ...
 
     @classmethod
     @abstractmethod
-    def read_epd(cls, epd, subp):
-        ...
+    def read_epd(cls, epd, subp): ...
 
     @classmethod
     @abstractmethod
-    def write_epd(cls, epd, subp, value) -> None:
-        ...
+    def write_epd(cls, epd, subp, value) -> None: ...
 
     @classmethod
     @abstractmethod
-    def add_epd(cls, epd, subp, value) -> None:
-        ...
+    def add_epd(cls, epd, subp, value) -> None: ...
 
     @classmethod
     @abstractmethod
-    def subtract_epd(cls, epd, subp, value) -> None:
-        ...
+    def subtract_epd(cls, epd, subp, value) -> None: ...
 
 
 class ByteKind(BaseKind):
@@ -688,7 +683,7 @@ class CSpriteKind(DwordKind):
 
     @classmethod
     def write_epd(cls, epd, subp, value) -> None:
-        from ..cunit import CSprite
+        from ..csprite import CSprite
 
         if isinstance(value, CSprite):
             value = value.ptr
