@@ -736,25 +736,54 @@ class CUnit(EPDOffsetMap):
         else:
             return CUnit._check_buildq(self, unit)
 
+    @staticmethod
+    def _reset_buildq(t: list[c.RawTrigger] = []):
+        if not t:
+            c.PushTriggerScope()
+            cpcache = c.curpl.GetCPCache()
+            trig_fw = c.Forward()
+            trig = c.RawTrigger(
+                nextptr=cpcache.GetVTable(),
+                actions=[
+                    c.SetMemory(0x6509B0, c.Add, 0x98 // 4),
+                    c.SetDeaths(CurrentPlayer, c.SetTo, 0xE400E4, 0),
+                    c.SetMemory(0x6509B0, c.Add, 1),
+                    c.SetDeaths(CurrentPlayer, c.SetTo, 0xE400E4, 0),
+                    c.SetMemory(0x6509B0, c.Add, 1),
+                    c.SetDeathsX(CurrentPlayer, c.SetTo, 0xE4, 0, 0xFFFF),
+                    c.SetMemory(0x6509B0, c.Add, 1),
+                    c.SetDeathsX(CurrentPlayer, c.SetTo, 2 << 16, 0, 0xFF0000),
+                    cpcache.SetDest(EPD(0x6509B0)),
+                ],
+            )
+            trig_fw << trig
+            t.append(trig)
+            c.PopTriggerScope()
+        return t[0]
+
     def reset_buildq(self, *, q1: int = 0xE4) -> None:
-        c.VProc(
-            self,
-            [
-                c.SetMemory(0x6509B0, c.SetTo, 0x98 // 4),
-                self.QueueAddTo(EPD(0x6509B0)),
-            ],
-        )
-        f_setcurpl2cpcache(
-            actions=[
-                c.SetDeaths(CurrentPlayer, c.SetTo, 0xE40000 + q1, 0),
-                c.SetMemory(0x6509B0, c.Add, 1),
-                c.SetDeaths(CurrentPlayer, c.SetTo, 0xE400E4, 0),
-                c.SetMemory(0x6509B0, c.Add, 1),
-                c.SetDeathsX(CurrentPlayer, c.SetTo, 0xE4, 0, 0xFFFF),
-                c.SetMemory(0x6509B0, c.Add, 1),
-                c.SetDeathsX(CurrentPlayer, c.SetTo, 2 << 16, 0, 0xFF0000),
-            ]
-        )
+        reset_trig = CUnit._reset_buildq()
+        cpcache = c.curpl.GetCPCache()
+        nexttrig = c.Forward()
+        if c.IsEUDVariable(self):
+            c.VProc(
+                self,
+                [
+                    c.SetMemoryX(reset_trig + 380, c.SetTo, q1, 0xFFFF),
+                    c.SetNextPtr(cpcache.GetVTable(), nexttrig),
+                    self.QueueAssignTo(EPD(0x6509B0)),
+                ],
+            )
+        else:
+            c.RawTrigger(
+                actions=[
+                    c.SetMemoryX(reset_trig + 380, c.SetTo, q1, 0xFFFF),
+                    c.SetNextPtr(cpcache.GetVTable(), nexttrig),
+                    c.SetMemory(0x6509B0, c.SetTo, self),
+                ],
+            )
+        c.SetNextTrigger(reset_trig)
+        nexttrig << c.NextTrigger()
 
     def die(self) -> None:
         # See https://github.com/python/mypy/issues/14969
