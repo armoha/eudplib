@@ -47,7 +47,9 @@ def _f_updatecpcache():
     from .s import SetMemoryC
 
     c.RawTrigger(actions=SetMemoryC(cpcache.getValueAddr(), c.SetTo, 0))
-    for i in ut._rand_lst(range(32)):
+    rand32 = list(range(32))
+    random.shuffle(rand32)
+    for i in rand32:
         u = random.randint(234, 65535)
         c.RawTrigger(
             conditions=c.DeathsX(ut.EPD(0x6509B0) - 12 * u, c.AtLeast, 1, u, 2**i),

@@ -6,12 +6,13 @@
 
 from __future__ import annotations
 
+import random
 import time
 from typing import TYPE_CHECKING, TypeAlias
 
 from ...bindings._rust import allocator
 from ...localize import _
-from ...utils import EPError, _rand_lst, ep_assert
+from ...utils import EPError, ep_assert
 from .constexpr import Evaluable, Evaluate, Forward
 from .pbuffer import Payload
 from .rlocint import RlocInt, RlocInt_C
@@ -160,7 +161,8 @@ def _collect_objects(root: EUDObject | Forward) -> None:
         # Shuffle objects -> Randomize(?) addresses
         iterobj = iter(_found_objects_dict)
         rootobj = next(iterobj)
-        found_objects = _rand_lst(iterobj)
+        found_objects = list(iterobj)
+        random.shuffle(found_objects)
         found_objects.append(rootobj)
         _found_objects_dict = {
             obj: i for i, obj in enumerate(reversed(found_objects))

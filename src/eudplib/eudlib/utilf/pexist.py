@@ -28,7 +28,7 @@ def f_playerexist(player):
     cs.EUDSwitch(player)
     block = ut.EUDGetLastBlockOfName("swblock")[1]
     block["_actions"].append(ret.SetNumber(1))
-    for p in ut._rand_lst(range(8)):
+    for p in range(8):
         if cs.EUDSwitchCase()(p):
             c.RawTrigger(
                 nextptr=block["swend"],

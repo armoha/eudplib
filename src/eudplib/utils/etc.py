@@ -134,18 +134,15 @@ def List2Assignable(lst: Sequence[T]) -> T | Sequence[T]:  # noqa: N802
 
 
 @overload
-def Assignable2List(a: None) -> list:
-    ...
+def Assignable2List(a: None) -> list: ...
 
 
 @overload
-def Assignable2List(a: Iterable[T]) -> list[T]:
-    ...
+def Assignable2List(a: Iterable[T]) -> list[T]: ...
 
 
 @overload
-def Assignable2List(a: T) -> list[T]:
-    ...
+def Assignable2List(a: T) -> list[T]: ...
 
 
 def Assignable2List(a: Any) -> list:  # noqa: N802
@@ -249,13 +246,11 @@ BytesPath = bytes | os.PathLike[bytes]
 
 
 @overload
-def find_data_file(filename: StrPath, file: StrPath) -> str:
-    ...
+def find_data_file(filename: StrPath, file: StrPath) -> str: ...
 
 
 @overload
-def find_data_file(filename: BytesPath, file: BytesPath) -> bytes:
-    ...
+def find_data_file(filename: BytesPath, file: BytesPath) -> bytes: ...
 
 
 def find_data_file(filename, file) -> str | bytes:
@@ -268,12 +263,6 @@ def find_data_file(filename, file) -> str | bytes:
         datadir = os.path.dirname(file)
 
     return os.path.join(datadir, filename)
-
-
-def _rand_lst(lst: Iterable) -> list:
-    lst = list(lst)
-    random.shuffle(lst)
-    return lst
 
 
 class classproperty:  # noqa: N801

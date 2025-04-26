@@ -205,7 +205,7 @@ def _const_mul(number: int) -> Callable:
         def _mulf(a):
             ret = _mulf._frets[0]
             ret << 0
-            for i in ut._rand_lst(range(32)):
+            for i in range(32):
                 if (2**i * number) & 0xFFFFFFFF == 0:
                     continue
                 rt.RawTrigger(
@@ -412,15 +412,14 @@ def _eud_mul(a, b):
         p3 << ev.VProc(b, [b.SetDest(ret), rt.SetNextPtr(p1, p2)])
         p2 << rt.NextTrigger()
         if i <= 30:
-            acts = [
-                rt.SetNextPtr(p2, endmul),
-                rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
-                rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
-            ]
             rt.RawTrigger(
                 nextptr=p4,
                 conditions=a.ExactlyX(0, remaining_bits),
-                actions=ut._rand_lst(acts),
+                actions=[
+                    rt.SetNextPtr(p2, endmul),
+                    rt.SetMemory(reset_nptr + 16, rt.SetTo, ut.EPD(p2 + 4)),
+                    rt.SetMemory(reset_nptr + 20, rt.SetTo, p4),
+                ],
             )
             p4 << ev.VProc(b, b.SetDest(b))  # b += b
 

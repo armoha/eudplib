@@ -63,10 +63,10 @@ def _dwread(ptr):
         cs.EUDBreak()
 
     # Else → Complex
-    for i in ut._rand_lst(range(1, 4)):
+    for i in range(1, 4):
         cs.EUDSwitchCase()(i)
 
-        for j in ut._rand_lst(range(8 * i, 32)):
+        for j in range(8 * i, 32):
             c.RawTrigger(
                 conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
                 actions=dw.AddNumber(2 ** (j - 8 * i)),
@@ -74,7 +74,7 @@ def _dwread(ptr):
 
         c.SeqCompute([(ut.EPD(0x6509B0), c.Add, 1)])
 
-        for j in ut._rand_lst(range(8 * i)):
+        for j in range(8 * i):
             c.RawTrigger(
                 conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**j),
                 actions=dw.AddNumber(2 ** (j + 32 - 8 * i)),

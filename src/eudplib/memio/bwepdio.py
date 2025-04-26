@@ -28,11 +28,13 @@ def _lshift(a, b):
 
 @c.EUDFunc
 def _wwriter(epd, subp, w):
+    # TODO: use _EUDPredefineParam to set 0x6509B0 on func call
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(3)):
+    for i in range(3):
         if cs.EUDSwitchCase()(i):
-            c.f_bitlshift(w, 8 * i, ret=[w])
+            if i != 0:
+                c.f_bitlshift(w, 8 * i, ret=[w])
             cs.DoActions(c.SetDeathsX(cp.CP, c.SetTo, w, 0, 0xFFFF << (8 * i)))
             cs.EUDBreak()
 
@@ -62,9 +64,10 @@ def f_wwrite_epd(epd, subp, w):
 def _wadder(epd, subp, w):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(3)):
+    for i in range(3):
         if cs.EUDSwitchCase()(i):
-            c.f_bitlshift(w, 8 * i, ret=[w])
+            if i != 0:
+                c.f_bitlshift(w, 8 * i, ret=[w])
             cs.DoActions(c.SetDeathsX(cp.CP, c.Add, w, 0, 0xFFFF << (8 * i)))
             cs.EUDBreak()
 
@@ -90,9 +93,10 @@ def f_wadd_epd(epd, subp, w):
 def _wsubtracter(epd, subp, w):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(3)):
+    for i in range(3):
         if cs.EUDSwitchCase()(i):
-            c.f_bitlshift(w, 8 * i, ret=[w])
+            if i != 0:
+                c.f_bitlshift(w, 8 * i, ret=[w])
             cs.DoActions(c.SetDeathsX(cp.CP, c.Subtract, w, 0, 0xFFFF << (8 * i)))
             cs.EUDBreak()
 
@@ -120,13 +124,13 @@ def f_wsubtract_epd(epd, subp, w):
 def _bwriter(epd, subp, b):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(4)):
+    for i in range(4):
         if cs.EUDSwitchCase()(i):
             cs.DoActions(
                 c.SetDeathsX(
                     cp.CP,
                     c.SetTo,
-                    _lshift(b, 8 * i),
+                    _lshift(b, 8 * i) if i != 0 else b,
                     0,
                     0xFF << (8 * i),
                 )
@@ -180,7 +184,7 @@ def _bitwrite_epd(epd, subp, bit, b) -> None:
         def _bitwriter(epd, subp, b):
             c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
             cs.EUDSwitch(subp)
-            for i in ut._rand_lst(range(4)):
+            for i in range(4):
                 if cs.EUDSwitchCase()(i):
                     c.RawTrigger(
                         actions=c.SetDeathsX(cp.CP, c.SetTo, 0, 0, bit << (8 * i))
@@ -205,7 +209,7 @@ def _bitwrite_epd(epd, subp, bit, b) -> None:
 def _badder(epd, subp, b):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(4)):
+    for i in range(4):
         if cs.EUDSwitchCase()(i):
             c.f_bitlshift(b, 8 * i, ret=[b])
             cs.DoActions(c.SetDeathsX(13, c.Add, b, 0, 0xFF << (8 * i)))
@@ -228,7 +232,7 @@ def f_badd_epd(epd, subp, b):
 def _bsubtracter(epd, subp, b):
     c.VProc(epd, epd.SetDest(ut.EPD(0x6509B0)))
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(4)):
+    for i in range(4):
         if cs.EUDSwitchCase()(i):
             c.f_bitlshift(b, 8 * i, ret=[b])
             cs.DoActions(c.SetDeathsX(cp.CP, c.Subtract, b, 0, 0xFF << (8 * i)))
@@ -362,7 +366,7 @@ def _boolread_epd(epd, subp):
             cpcache.SetDest(ut.EPD(0x6509B0)),
         ]
     )
-    for i in ut._rand_lst(range(4)):
+    for i in range(4):
         if cs.EUDSwitchCase()(i):
             c.RawTrigger(
                 conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 0xFF << (8 * i)),
@@ -395,7 +399,7 @@ def _bitread_epd(bit):
             b = c.EUDVariable()
             c.VProc(epd, [epd.SetDest(ut.EPD(0x6509B0)), b.SetNumber(0)])
             cs.EUDSwitch(subp)
-            for i in ut._rand_lst(range(4)):
+            for i in range(4):
                 if cs.EUDSwitchCase()(i):
                     mask = bit << (8 * i)
                     c.RawTrigger(

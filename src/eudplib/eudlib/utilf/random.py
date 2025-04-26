@@ -88,7 +88,7 @@ def f_dwrand():
     )
 
     # LOWORD
-    for i in ut._rand_lst(range(16, 32)):
+    for i in range(16, 32):
         c.RawTrigger(
             conditions=_seed.AtLeastX(1, 2**i),
             actions=dseed.AddNumber(2 ** (i - 16)),

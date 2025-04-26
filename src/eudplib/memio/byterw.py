@@ -8,7 +8,7 @@ from .. import core as c
 from .. import ctrlstru as cs
 from ..core.variable.evcommon import _ev
 from ..localize import _
-from ..utils import EPD, EPError, _rand_lst
+from ..utils import EPD, EPError
 from . import modcurpl as cp
 from . import readtable
 
@@ -183,7 +183,7 @@ class EUDByteWriter:
                 cs.DoActions(
                     c.SetMemory(self._write + 328, c.SetTo, 0xFF << (8 * i))
                 )
-                for j in _rand_lst(range(8)):
+                for j in range(8):
                     c.RawTrigger(
                         conditions=byte.AtLeastX(1, 2**j),
                         actions=c.SetMemory(
@@ -307,7 +307,7 @@ class EUDByteStream:
             case[i] << c.NextTrigger()
             if i < 3:
                 cs.EUDJumpIfNot(self._suboffset == i, case[i + 1])
-            for j in _rand_lst(range(8)):
+            for j in range(8):
                 c.RawTrigger(
                     conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2 ** (j + 8 * i)),
                     actions=ret.AddNumber(2**j),
@@ -351,7 +351,7 @@ class EUDByteStream:
         for i in range(1, 4):
             if cs.EUDSwitchCase()(i):
                 cs.DoActions(c.SetMemory(write, c.SetTo, 0xFF << (8 * i)))
-                for j in _rand_lst(range(8)):
+                for j in range(8):
                     c.RawTrigger(
                         conditions=byte.AtLeastX(1, 2**j),
                         actions=c.SetMemory(write + 20, c.Add, 2 ** (j + i * 8)),

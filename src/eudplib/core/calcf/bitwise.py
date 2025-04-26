@@ -4,7 +4,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from ...utils import EPD, _rand_lst, unProxy
+from ...utils import EPD, unProxy
 from .. import allocator as ac
 from .. import rawtrigger as rt
 from .. import variable as ev
@@ -82,7 +82,7 @@ def f_bitsplit(a):
 def _exp2_vv(n):
     ret = _exp2_vv._frets[0]
     ret << 0
-    for i in _rand_lst(range(32)):
+    for i in range(32):
         rt.RawTrigger(conditions=[n == i], actions=ret.SetNumber(2**i))
     # return ret
 

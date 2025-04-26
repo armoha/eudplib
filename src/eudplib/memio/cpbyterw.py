@@ -32,7 +32,7 @@ class CPByteWriter:
             buffer.
         """
         cs.EUDSwitch(self._suboffset)
-        for i in ut._rand_lst(range(3)):
+        for i in range(3):
             if cs.EUDSwitchCase()(i):
                 c.VProc(
                     byte,
@@ -56,7 +56,7 @@ class CPByteWriter:
         cs.EUDEndIf()
 
         c.VProc(self._b[0], self._b[0].SetDest(cp.CP))
-        for k in ut._rand_lst(range(8, 32)):
+        for k in range(8, 32):
             i, j = divmod(k, 8)
             c.RawTrigger(
                 conditions=self._b[i].AtLeastX(1, 2**j),

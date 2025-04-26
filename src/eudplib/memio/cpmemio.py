@@ -18,7 +18,7 @@ from . import readtable
 def _reader():
     ptr, epd = _reader._frets
     cs.DoActions(ptr.SetNumber(0), epd.SetNumber(ut.EPD(0)))
-    for i in ut._rand_lst(range(32)):
+    for i in range(32):
         c.RawTrigger(
             conditions=c.DeathsX(cp.CP, c.AtLeast, 1, 0, 2**i),
             actions=[
@@ -181,7 +181,7 @@ def f_dwsubtract_cp(cpo, value):
 @c.EUDFunc
 def _wwriter(subp, w):
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(3)):
+    for i in range(3):
         if cs.EUDSwitchCase()(i):
             c.RawTrigger(
                 actions=c.SetDeathsX(cp.CP, c.SetTo, 0, 0, 65535 << (8 * i))
@@ -227,7 +227,7 @@ def f_wwrite_cp(cpo, subp, w):
 @c.EUDFunc
 def _bwriter(subp, b):
     cs.EUDSwitch(subp)
-    for i in ut._rand_lst(range(4)):
+    for i in range(4):
         if cs.EUDSwitchCase()(i):
             c.RawTrigger(actions=c.SetDeathsX(cp.CP, c.SetTo, 0, 0, 255 << (8 * i)))
 

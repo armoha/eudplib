@@ -27,16 +27,15 @@ def f_dwepdread_epd(targetplayer):
         epd.SetNumber(ut.EPD(0)),
         c.SetMemory(0x6509B0, c.Add, -12 * u),
     ]
-    cs.DoActions(ut._rand_lst(acts))
+    cs.DoActions(acts)
 
-    for i in ut._rand_lst(range(32)):
-        acts = [
-            ptr.AddNumber(2**i),
-            epd.AddNumber(2 ** (i - 2)) if i >= 2 else [],
-        ]
+    for i in range(32):
         c.RawTrigger(
             conditions=c.DeathsX(cp.CP, c.AtLeast, 1, u, 2**i),
-            actions=ut._rand_lst(acts),
+            actions=[
+                ptr.AddNumber(2**i),
+                epd.AddNumber(2 ** (i - 2)) if i >= 2 else [],
+            ],
         )
 
     cp.f_setcurpl2cpcache()
@@ -165,7 +164,7 @@ def f_dwbreak(number):
         ],
     )
 
-    for i in ut._rand_lst(range(8, 32)):
+    for i in range(8, 32):
         byteidx = i // 8
         wordidx = i // 16
         byteexp = i % 8

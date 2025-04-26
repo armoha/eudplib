@@ -46,17 +46,18 @@ key3 = random.randint(1, 0xFF)
 key4 = random.randint(1, 0xFF)
 
 c.PushTriggerScope()
-init = [
-    c.SetMemoryX(dbstr_cont + 380, c.Add, key1, 0xAA),
-    c.SetMemoryX(dbstr_cont + 380, c.Add, key1, 0x55),
-    c.SetMemoryX(dbstr_cont + 412, c.Add, key2, 0xAA),
-    c.SetMemoryX(dbstr_cont + 412, c.Add, key2, 0x55),
-]
-dbstr_start = c.RawTrigger(actions=ut._rand_lst(init))
+dbstr_start = c.RawTrigger(
+    actions=[
+        c.SetMemoryX(dbstr_cont + 380, c.Add, key1, 0xAA),
+        c.SetMemoryX(dbstr_cont + 380, c.Add, key1, 0x55),
+        c.SetMemoryX(dbstr_cont + 412, c.Add, key2, 0xAA),
+        c.SetMemoryX(dbstr_cont + 412, c.Add, key2, 0x55),
+    ]
+)
 if cs.EUDWhileNot()(count >= 0x80000000):
     b = br1.readbyte()
     set_read = c.SetNextPtr(br1._read, 0)
-    for i in ut._rand_lst(range(4)):
+    for i in range(4):
         c.RawTrigger(
             conditions=c.Memory(br1._read + 4, c.Exactly, br1._case[i]),
             actions=[
@@ -84,17 +85,18 @@ dbstr_end = c.RawTrigger(
     ],
 )
 
-init = [
-    c.SetMemoryX(cp_cont + 380, c.Add, key3, 0xAA),
-    c.SetMemoryX(cp_cont + 380, c.Add, key3, 0x55),
-    c.SetMemoryX(cp_cont + 412, c.Add, key4, 0xAA),
-    c.SetMemoryX(cp_cont + 412, c.Add, key4, 0x55),
-]
-cp_start = c.RawTrigger(actions=ut._rand_lst(init))
+cp_start = c.RawTrigger(
+    actions=[
+        c.SetMemoryX(cp_cont + 380, c.Add, key3, 0xAA),
+        c.SetMemoryX(cp_cont + 380, c.Add, key3, 0x55),
+        c.SetMemoryX(cp_cont + 412, c.Add, key4, 0xAA),
+        c.SetMemoryX(cp_cont + 412, c.Add, key4, 0x55),
+    ]
+)
 if cs.EUDWhileNot()(count >= 0x80000000):
     b = br1.readbyte()
     set_read = c.SetNextPtr(br1._read, 0)
-    for i in ut._rand_lst(range(4)):
+    for i in range(4):
         c.RawTrigger(
             conditions=c.Memory(br1._read + 4, c.Exactly, br1._case[i]),
             actions=[

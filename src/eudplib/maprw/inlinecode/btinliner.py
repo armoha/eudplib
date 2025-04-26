@@ -82,7 +82,7 @@ def inline_codify_binary_trigger(btrigger: bytes) -> t_start_end:
             tend = c.RawTrigger()
         else:
             cs.EUDSwitch(cp)
-            for player in ut._rand_lst(range(8)):
+            for player in range(8):
                 if executing_players[player]:
                     if cs.EUDSwitchCase()(player):
                         c.RawTrigger(trigSection=btrigger)

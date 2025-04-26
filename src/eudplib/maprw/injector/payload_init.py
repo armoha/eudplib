@@ -81,7 +81,7 @@ def initialize_payload(
     pts = 0x51A284
     curpl = 0x6509B0
 
-    for player in ut._rand_lst(range(8)):
+    for player in range(8):
         triggerend = ~(pts + player * 12)
 
         _Trigger(
@@ -93,7 +93,7 @@ def initialize_payload(
         )
 
     # read pts[player].lasttrigger
-    for e in ut._rand_lst(range(2, 32)):
+    for e in range(2, 32):
         _Trigger(
             conditions=tt.DeathsX(tt.CurrentPlayer, tt.AtLeast, 1, 0, 2**e),
             actions=tt.SetDeaths(11, tt.Add, 2**e, 0),
@@ -106,7 +106,7 @@ def initialize_payload(
             tt.SetMemory(curpl, tt.SetTo, ut.EPD(4)),
         ]
     )
-    for e in ut._rand_lst(range(2, 32)):
+    for e in range(2, 32):
         _Trigger(
             conditions=tt.DeathsX(11, tt.AtLeast, 1, 0, 2**e),
             actions=[
