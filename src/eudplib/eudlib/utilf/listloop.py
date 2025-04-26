@@ -16,7 +16,7 @@ from ...memio import (
     f_bread_cp,
     f_cunitepdread_epd,
     f_dwepdread_epd,
-    f_epdcunitread_epd,
+    f_epdcunitread_cp,
     f_setcurpl2cpcache,
 )
 from ...memio import modcurpl as cp
@@ -87,8 +87,7 @@ class _UniqueIdentifier(c.EUDObject):
 
     @classmethod
     def _init(cls):
-        first_empty_unir_ptr = EPD(0x628438)
-        epd = f_epdcunitread_epd(first_empty_unir_ptr)
+        first_empty_unit = EPD(0x628438)
         quot, rem = divmod(len(_UniqueIdentifier._instances), 32)
         endflags = c.Db((len(_UniqueIdentifier._instances) + 7) // 8)
         cs.DoActions(
@@ -96,30 +95,25 @@ class _UniqueIdentifier(c.EUDObject):
             c.SetMemoryX(endflags + 4 * quot, c.SetTo, 0, (1 << rem) - 1)
             if rem > 0
             else [],
+            c.SetMemory(0x6509B0, c.SetTo, first_empty_unit),
         )
+        epd = c.EUDXVariable(EPD(0x6509B0), c.Add, 0)
+        f_epdcunitread_cp(0, ret=[epd])
         if cs.EUDWhileNot()(epd == 0):
-            c.VProc(
-                epd,
-                [
-                    c.SetMemory(0x6509B0, c.SetTo, 0xA5 // 4),
-                    epd.QueueAddTo(EPD(0x6509B0)),
-                ],
-            )
+            c.VProc(epd, c.SetMemory(0x6509B0, c.SetTo, 0xA5 // 4))
             uniq = f_bread_cp(0, 1)
             for i, unique_identifier in enumerate(_UniqueIdentifier._instances):
                 q, r = divmod(i, 32)
-                check_unique = c.DeathsX(cp.CP, c.Exactly, 0, 0, 0xFF)
                 if cs.EUDIfNot()(c.MemoryX(endflags + 4 * q, c.AtLeast, 1, 1 << r)):
-                    prev = (
-                        EPD(0x59CCA8) + 0xA5 // 4
-                        if i == 0
-                        else EPD(_UniqueIdentifier._instances[i - 1])
-                    )
+                    check_unique = c.DeathsX(cp.CP, c.Exactly, 0, 0, 0xFF)
                     c.VProc(
-                        uniq,
+                        [epd, uniq],
                         [
-                            c.SetMemory(0x6509B0, c.Add, -prev),
-                            c.SetMemory(0x6509B0, c.Add, EPD(unique_identifier)),
+                            c.SetMemory(
+                                0x6509B0,
+                                c.SetTo,
+                                EPD(unique_identifier) - EPD(0x59CCA8),
+                            ),
                             uniq.SetDest(EPD(check_unique + 8)),
                         ],
                     )
@@ -148,8 +142,8 @@ class _UniqueIdentifier(c.EUDObject):
                 ]
             )
             cs.EUDSetContinuePoint()
-            epd += 1
-            f_epdcunitread_epd(epd, ret=[epd])
+            c.VProc(epd, c.SetMemory(0x6509B0, c.SetTo, 0x04 // 4))
+            f_epdcunitread_cp(0, ret=[epd])
         cs.EUDEndWhile()
         f_setcurpl2cpcache()
 
