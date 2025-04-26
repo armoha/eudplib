@@ -79,16 +79,13 @@ class BaseEnum(BaseMember[T]):
 
     @property
     @abstractmethod
-    def kind(self) -> type[BaseKind]:
-        ...
+    def kind(self) -> type[BaseKind]: ...
 
     @overload
-    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self:
-        ...
+    def __get__(self, instance: None, owner: type[EPDOffsetMap]) -> Self: ...
 
     @overload
-    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> T:
-        ...
+    def __get__(self, instance: EPDOffsetMap, owner: type[EPDOffsetMap]) -> T: ...
 
     def __get__(self, instance: EPDOffsetMap | None, owner: type[EPDOffsetMap]):
         if instance is None:
@@ -135,12 +132,12 @@ class Flag:
         self.mask = mask
 
     @overload
-    def __get__(self, instance: None, owner: type[EnumMember]) -> Self:
-        ...
+    def __get__(self, instance: None, owner: type[EnumMember]) -> Self: ...
 
     @overload
-    def __get__(self, instance: EnumMember, owner: type[EnumMember]) -> EUDVariable:
-        ...
+    def __get__(
+        self, instance: EnumMember, owner: type[EnumMember]
+    ) -> EUDVariable: ...
 
     def __get__(self, instance: EnumMember | None, owner=None) -> EUDVariable | Self:
         if instance is None:

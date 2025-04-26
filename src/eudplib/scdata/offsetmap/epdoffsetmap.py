@@ -29,8 +29,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
 
     @ut.classproperty
     @abstractmethod
-    def range(self) -> tuple[int, int, int]:
-        ...
+    def range(self) -> tuple[int, int, int]: ...
 
     @classmethod
     def cast(cls, _from, *args, **kwargs):
@@ -277,10 +276,22 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     # Attribute comparisons
 
     def eqattr(self, name: str, value):
+        from ..csprite import CSprite
+        from ..cunit import CUnit
+        from .memberkind import CSpriteKind, CUnitKind
+
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
-        mask = c.f_bitlshift((1 << (8 * member.kind.size())) - 1, 8 * subp)
-        value = member.kind.cast(value)
+        kind = member.kind
+        mask = c.f_bitlshift((1 << (8 * kind.size())) - 1, 8 * subp)
+
+        if kind is CSpriteKind and isinstance(value, CSprite):
+            value = value.ptr
+        elif kind is CUnitKind and isinstance(value, CUnit):
+            value = value.ptr
+        else:
+            value = kind.cast(value)
+
         if not (isinstance(subp, int) and subp == 0):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
@@ -295,10 +306,22 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         raise AttributeError
 
     def leattr(self, name, value):
+        from ..csprite import CSprite
+        from ..cunit import CUnit
+        from .memberkind import CSpriteKind, CUnitKind
+
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
-        mask = c.f_bitlshift((1 << (8 * member.kind.size())) - 1, 8 * subp)
-        value = member.kind.cast(value)
+        kind = member.kind
+        mask = c.f_bitlshift((1 << (8 * kind.size())) - 1, 8 * subp)
+
+        if kind is CSpriteKind and isinstance(value, CSprite):
+            value = value.ptr
+        elif kind is CUnitKind and isinstance(value, CUnit):
+            value = value.ptr
+        else:
+            value = kind.cast(value)
+
         if not (isinstance(subp, int) and subp == 0):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
@@ -310,10 +333,22 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
         return c.MemoryXEPD(epd, c.AtMost, value, mask)
 
     def geattr(self, name, value):
+        from ..csprite import CSprite
+        from ..cunit import CUnit
+        from .memberkind import CSpriteKind, CUnitKind
+
         member = type(self).__dict__[name]
         epd, subp = member._get_epd(self)
-        mask = c.f_bitlshift((1 << (8 * member.kind.size())) - 1, 8 * subp)
-        value = member.kind.cast(value)
+        kind = member.kind
+        mask = c.f_bitlshift((1 << (8 * kind.size())) - 1, 8 * subp)
+
+        if kind is CSpriteKind and isinstance(value, CSprite):
+            value = value.ptr
+        elif kind is CUnitKind and isinstance(value, CUnit):
+            value = value.ptr
+        else:
+            value = kind.cast(value)
+
         if not (isinstance(subp, int) and subp == 0):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
