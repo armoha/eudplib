@@ -214,36 +214,6 @@ def EUDQueue(capacity):  # noqa: N802
         def length(self):
             return self._length
 
-        def eqattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length == k
-            raise AttributeError
-
-        def neattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length != k
-            raise AttributeError
-
-        def leattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length <= k
-            raise AttributeError
-
-        def ltattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length < k
-            raise AttributeError
-
-        def geattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length >= k
-            raise AttributeError
-
-        def gtattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length > k
-            raise AttributeError
-
     return _EUDQueue
 
 
@@ -545,35 +515,5 @@ def EUDDeque(capacity):  # noqa: N802
         @property  # FIXME: eudplib code can mutate length
         def length(self):
             return self._length
-
-        def eqattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length == k
-            raise AttributeError
-
-        def neattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length != k
-            raise AttributeError
-
-        def leattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length <= k
-            raise AttributeError
-
-        def ltattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length < k
-            raise AttributeError
-
-        def geattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length >= k
-            raise AttributeError
-
-        def gtattr(self, attr, k):
-            if isinstance(attr, str) and attr == "length":
-                return self._length > k
-            raise AttributeError
 
     return _EUDDeque
