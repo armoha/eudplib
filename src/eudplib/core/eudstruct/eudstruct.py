@@ -170,81 +170,138 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
     # Specializations
 
     def iaddattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.iadditem(attrid, value)
 
     # FIXME: add operator for Subtract
     def isubtractattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.isubtractitem(attrid, value)
 
     def isubattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.isubitem(attrid, value)
 
     def imulattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.imulitem(attrid, value)
 
     def ifloordivattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.ifloordivitem(attrid, value)
 
     def imodattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.imoditem(attrid, value)
 
     def ilshiftattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.ilshiftitem(attrid, value)
 
     def irshiftattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.irshiftitem(attrid, value)
 
     def ipowattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.ipowitem(attrid, value)
 
     def iandattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.ianditem(attrid, value)
 
     def iorattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.ioritem(attrid, value)
 
     def ixorattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.ixoritem(attrid, value)
 
     # FIXME: Add operator for x[i] = ~x[i]
     def iinvertattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         self.iinvertitem(attrid, value)
 
     # Attribute comparisons
 
     def eqattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         return self.eqitem(attrid, value)
 
     def neattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         return self.neitem(attrid, value)
 
     def leattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         return self.leitem(attrid, value)
 
     def geattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         return self.geitem(attrid, value)
 
     def ltattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         return self.ltitem(attrid, value)
 
     def gtattr(self, name, value):
-        attrid, _ = self._fielddict[name]
+        try:
+            attrid, _ = self._fielddict[name]
+        except KeyError as e:
+            raise AttributeError from e
         return self.gtitem(attrid, value)
