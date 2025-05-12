@@ -125,13 +125,12 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
         attrid, attrtype = self._fielddict[name]
         attr = self._value.get(attrid)
         if attrtype:
-            return attrtype.cast(attr)
-        else:
-            return attr
+            attr = attrtype.cast(attr)
+        return attr
 
     def setfield(self, name, value):
         attrid, attrtype = self._fielddict[name]
-        if isinstance(attrtype, ConstType):
+        if attrtype:
             value = attrtype.cast(value)
         self._value.set(attrid, value)
 
