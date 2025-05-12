@@ -371,7 +371,8 @@ class _VArrayIterator:
             loopstart << block["loopstart"]
             loopbody << bt.NextTrigger()
             yield item
-            cs.EUDSetContinuePoint()
+            if not cs.EUDIsContinuePointSet():
+                cs.EUDSetContinuePoint()
             bt.RawTrigger(
                 actions=[
                     counter.SubtractNumber(1),
