@@ -370,6 +370,9 @@ class _VArrayIterator:
             block = EUDPeekBlock("whileblock")[1]
             loopstart << block["loopstart"]
             loopbody << bt.NextTrigger()
+            basetype = self._varray._basetype
+            if basetype:
+                item = basetype.cast(item)
             yield item
             if not cs.EUDIsContinuePointSet():
                 cs.EUDSetContinuePoint()
