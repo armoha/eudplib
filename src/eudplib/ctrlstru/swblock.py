@@ -77,7 +77,10 @@ def EUDSwitchCase() -> CtrlStruOpener:  # noqa: N802
                     number, block["bitmask"]
                 ),
             )
-            ut.ep_assert(case not in block["casebrlist"], _("Duplicate cases"))
+            ut.ep_assert(
+                case not in block["casebrlist"],
+                _("Duplicate cases: {}").format(case),
+            )
             block["casebrlist"][case] = c.NextTrigger()
 
         return True
