@@ -108,5 +108,5 @@ def EUDLoopTrigger(player) -> Iterator[tuple[EUDVariable, EUDVariable]]:  # noqa
     tbegin = TrigTriggerBegin(player)
     if EUDIfNot()(tbegin == 0):
         tend = TrigTriggerEnd(player)
-        yield from EUDLoopList(tbegin, tend)
+        yield from EUDLoopList(EPD(tbegin), tend)
     EUDEndIf()
