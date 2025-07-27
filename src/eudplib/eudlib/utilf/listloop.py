@@ -54,7 +54,7 @@ def EUDLoopUnit() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N80
 
     ptr, epd = f_cunitepdread_epd(EPD(0x628430))
 
-    if cs.EUDWhile()(ptr >= 1):
+    if cs.EUDWhileNot()(ptr == 0):
         yield ptr, epd
         cs.EUDSetContinuePoint()
         epd += 1
@@ -206,7 +206,6 @@ def EUDLoopUnit2() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N8
         offset, is_dead = 0x0C // 4, c.MemoryEPD(0, c.Exactly, 0)
     ptr = c.EUDVariable()
     epd = c.EUDVariable()
-    continue_if = c.Forward()
     set_ptr, set_epd = ptr.SetNumber(0), epd.SetNumber(0)
 
     cs.DoActions(
@@ -217,23 +216,11 @@ def EUDLoopUnit2() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N8
         c.SetMemory(set_epd + 20, c.SetTo, EPD(0x59CCA8)),
     )
     if cs.EUDWhileNot()(ptr >= 0x59CCA8 + 336 * 1699 + 1):
-        whileblock = ut.EUDPeekBlock("whileblock")[1]
-        c.PushTriggerScope()
-        continue_okay = c.Forward()
-        continue_jump = c.RawTrigger(
-            nextptr=whileblock["contpoint"],
-            actions=c.SetNextPtr(continue_if, continue_okay),
-        )
-        c.PopTriggerScope()
-        continue_if << c.RawTrigger(
-            conditions=is_dead, actions=c.SetNextPtr(continue_if, continue_jump)
-        )
-        continue_okay << c.NextTrigger()
+        cs.EUDContinueIf(is_dead)
         yield ptr, epd
 
         cs.EUDSetContinuePoint()
         c.RawTrigger(
-            nextptr=whileblock["loopstart"],
             actions=[
                 c.SetMemory(is_dead + 4, c.Add, 84),
                 c.SetMemory(set_ptr + 20, c.Add, 336),
