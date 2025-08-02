@@ -9,7 +9,7 @@ use pyo3::types::{PyBytes, PyDict, PyTuple};
 create_exception!(allocator, AllocError, pyo3::exceptions::PyException);
 
 /// Object having PayloadBuffer-like interfaces. Collects all objects by
-/// calling object.WritePayload() for every related objects.
+/// calling object.WritePayload() for every related object.
 #[pyclass(module = "eudplib.core.allocator")]
 pub struct ObjAllocator {
     suboccupmap: bool,
@@ -44,7 +44,7 @@ impl ObjAllocator {
         self.occupmap.push(if !suboccupmap {
             -1
         } else if *self.occupmap.last().unwrap_or(&-1) != -1 {
-            // Safety: unwrap_or handles empty occupmap case
+            // Safety: unwrap_or handles an empty occupmap case
             unsafe { *self.occupmap.last().unwrap_unchecked() }
         } else {
             self.occupmap.len() as i32
@@ -178,7 +178,7 @@ fn stack_objects(dwoccupmap_list: Vec<Vec<i32>>) -> (Vec<u32>, usize) {
     let mut payload_size = 0;
 
     for dwoccupmap in dwoccupmap_list {
-        // Find appropriate position to allocate object
+        // Find the appropriate position to allocate an object
         let mut i = 0;
         while i < dwoccupmap.len() {
             // Update on conflict map

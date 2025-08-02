@@ -77,7 +77,7 @@ impl From<ErrorCode> for StormError {
     }
 }
 
-impl From<std::ffi::NulError> for StormError {
+impl From<NulError> for StormError {
     fn from(_: NulError) -> Self {
         StormError::InteriorNul
     }

@@ -301,9 +301,9 @@ impl Forward {
         &self,
         py: Python,
         name: &Bound<'_, PyAny>,
-        newvalue: Bound<'_, PyAny>,
+        new_value: Bound<'_, PyAny>,
     ) -> PyResult<()> {
-        self.expr.bind(py).set_item(name, newvalue)
+        self.expr.bind(py).set_item(name, new_value)
     }
 }
 

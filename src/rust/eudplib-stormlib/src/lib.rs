@@ -62,7 +62,7 @@ impl Archive {
         };
         let mut handle: HANDLE = ptr::null_mut();
         let mut create_info = SFILE_CREATE_MPQ {
-            cbSize: mem::size_of::<SFILE_CREATE_MPQ>() as u32,
+            cbSize: size_of::<SFILE_CREATE_MPQ>() as u32,
             dwMpqVersion: 0,
             pvUserData: ptr::null_mut(),
             cbUserData: 0,
@@ -97,7 +97,7 @@ impl Archive {
     }
 
     /// Opens a file from MPQ archive
-    pub fn open_file<'a>(&'a mut self, path: &str) -> Result<File<'a>> {
+    pub fn open_file(&mut self, path: &str) -> Result<File> {
         let mut file_handle: HANDLE = ptr::null_mut();
         let cpath = CString::new(path)?;
         unsafe_try_call!(SFileOpenFileEx(
@@ -174,7 +174,7 @@ impl Archive {
     }
 }
 
-impl std::ops::Drop for Archive {
+impl Drop for Archive {
     fn drop(&mut self) {
         unsafe {
             SFileCloseArchive(self.handle);
@@ -206,7 +206,7 @@ impl<'a> File<'a> {
             let high = (high as u64) << 32;
             let size = high | (low as u64);
             self.size = Some(size);
-            return Ok(size);
+            Ok(size)
         }
     }
 
@@ -229,7 +229,7 @@ impl<'a> File<'a> {
         self.need_reset = true;
         unsafe_try_call!(SFileReadFile(
             self.file_handle,
-            std::mem::transmute(buf.as_mut_ptr()),
+            mem::transmute(buf.as_mut_ptr()),
             size as u32,
             &mut read as *mut DWORD,
             ptr::null_mut(),
@@ -241,7 +241,7 @@ impl<'a> File<'a> {
     }
 }
 
-impl<'a> std::ops::Drop for File<'a> {
+impl<'a> Drop for File<'a> {
     fn drop(&mut self) {
         unsafe {
             SFileCloseFile(self.file_handle);

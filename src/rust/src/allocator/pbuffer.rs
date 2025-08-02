@@ -63,10 +63,7 @@ impl PayloadBuffer {
         let offset = rlocint.0.offset;
 
         if rlocmode != 0 {
-            assert!(
-                self.datacur % 4 == 0,
-                "Non-const dwords must be aligned to 4byte"
-            );
+            assert_eq!(self.datacur % 4, 0, "Non-const dwords must be aligned to 4byte");
             if rlocmode == 1 {
                 self.prttable.push(self.datacur);
             } else if rlocmode == 4 {

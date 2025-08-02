@@ -16,7 +16,7 @@ impl DivFloor for i32 {
 
     fn div_floor(&self, rhs: i32) -> i32 {
         if rhs < 0 {
-            -((-self).div_euclid(rhs))
+            -(-self).div_euclid(rhs)
         } else {
             self.div_euclid(rhs)
         }
@@ -24,7 +24,7 @@ impl DivFloor for i32 {
 
     fn rem_floor(&self, rhs: i32) -> i32 {
         let quotient = if rhs < 0 {
-            -((-self).div_euclid(rhs))
+            -(-self).div_euclid(rhs)
         } else {
             self.div_euclid(rhs)
         };
@@ -33,7 +33,7 @@ impl DivFloor for i32 {
 
     fn divrem_floor(&self, rhs: i32) -> (i32, i32) {
         let quotient = if rhs < 0 {
-            -((-self).div_euclid(rhs))
+            -(-self).div_euclid(rhs)
         } else {
             self.div_euclid(rhs)
         };
@@ -46,7 +46,7 @@ impl DivFloor for i64 {
 
     fn div_floor(&self, rhs: i64) -> i64 {
         if rhs < 0 {
-            -((-self).div_euclid(rhs))
+            -(-self).div_euclid(rhs)
         } else {
             self.div_euclid(rhs)
         }
@@ -54,7 +54,7 @@ impl DivFloor for i64 {
 
     fn rem_floor(&self, rhs: i64) -> i64 {
         let quotient = if rhs < 0 {
-            -((-self).div_euclid(rhs))
+            -(-self).div_euclid(rhs)
         } else {
             self.div_euclid(rhs)
         };
@@ -63,7 +63,7 @@ impl DivFloor for i64 {
 
     fn divrem_floor(&self, rhs: i64) -> (i64, i64) {
         let quotient = if rhs < 0 {
-            -((-self).div_euclid(rhs))
+            -(-self).div_euclid(rhs)
         } else {
             self.div_euclid(rhs)
         };
@@ -225,9 +225,7 @@ impl PyRlocInt {
             RlocInt::new(self.0.offset & rhs.0.offset, 0)
         } else if let Ok(rhs) = rhs.extract::<i32>() {
             if self.0.rlocmode == 4 && rhs & 3 != rhs {
-                return Err(PyValueError::new_err(format!(
-                    "non-const ptr RlocInt can only compute bitwise & from 0 to 3"
-                )));
+                return Err(PyValueError::new_err("non-const ptr RlocInt can only compute bitwise & from 0 to 3".to_string()));
             }
             RlocInt::new(self.0.offset & rhs, self.0.rlocmode)
         } else {
@@ -258,9 +256,7 @@ impl PyRlocInt {
             RlocInt::new(self.0.offset | rhs.0.offset, 0)
         } else if let Ok(rhs) = rhs.extract::<i32>() {
             if self.0.rlocmode == 4 && rhs & 3 != rhs {
-                return Err(PyValueError::new_err(format!(
-                    "non-const ptr RlocInt can only compute bitwise | from 0 to 3"
-                )));
+                return Err(PyValueError::new_err("non-const ptr RlocInt can only compute bitwise | from 0 to 3".to_string()));
             }
             RlocInt::new(self.0.offset | rhs, self.0.rlocmode)
         } else {
@@ -388,10 +384,7 @@ impl Mul<RlocInt> for RlocInt {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
-        assert!(
-            other.rlocmode == 0,
-            "Cannot multiply RlocInt with non-const"
-        );
+        assert_eq!(other.rlocmode, 0, "Cannot multiply RlocInt with non-const");
         Self {
             offset: self.offset.wrapping_mul(other.offset),
             rlocmode: self.rlocmode.wrapping_mul(other.offset),
@@ -425,8 +418,8 @@ impl Div<RlocInt> for RlocInt {
     type Output = Self;
 
     fn div(self, other: Self) -> Self {
-        assert!(other.rlocmode == 0, "Cannot divide RlocInt with non-const");
-        assert!(other.offset != 0, "Divide by zero");
+        assert_eq!(other.rlocmode, 0, "Cannot divide RlocInt with non-const");
+        assert_ne!(other.offset, 0, "Divide by zero");
         assert!(
             self.rlocmode == 0
                 || (self.offset % other.offset == 0 && self.rlocmode % other.offset == 0),
@@ -443,7 +436,7 @@ impl Div<i32> for RlocInt {
     type Output = Self;
 
     fn div(self, other: i32) -> Self {
-        assert!(other != 0, "Divide by zero");
+        assert_ne!(other, 0, "Divide by zero");
         assert!(
             self.rlocmode == 0 || (self.offset % other == 0 && self.rlocmode % other == 0),
             "{self} is not divisible by {other}"
@@ -459,12 +452,9 @@ impl Div<RlocInt> for i32 {
     type Output = i32;
 
     fn div(self, other: RlocInt) -> i32 {
-        assert!(other.rlocmode == 0, "Cannot divide RlocInt with non-const");
-        assert!(other.offset != 0, "Divide by zero");
-        assert!(
-            self % other.offset == 0,
-            "{self} is not divisible by {other}"
-        );
+        assert_eq!(other.rlocmode, 0, "Cannot divide RlocInt with non-const");
+        assert_ne!(other.offset, 0, "Divide by zero");
+        assert_eq!(self % other.offset, 0, "{self} is not divisible by {other}");
         DivFloor::div_floor(&self, other.offset)
     }
 }
@@ -473,8 +463,8 @@ impl Rem<RlocInt> for RlocInt {
     type Output = Self;
 
     fn rem(self, other: Self) -> Self {
-        assert!(other.rlocmode == 0, "Cannot divide RlocInt with non-const");
-        assert!(other.offset != 0, "Divide by zero");
+        assert_eq!(other.rlocmode, 0, "Cannot divide RlocInt with non-const");
+        assert_ne!(other.offset, 0, "Divide by zero");
         assert!(
             self.rlocmode == 0
                 || (self.offset % other.offset == 0 && self.rlocmode % other.offset == 0),
@@ -491,7 +481,7 @@ impl Rem<i32> for RlocInt {
     type Output = Self;
 
     fn rem(self, other: i32) -> Self {
-        assert!(other != 0, "Divide by zero");
+        assert_ne!(other, 0, "Divide by zero");
         assert!(
             self.rlocmode == 0 || (self.offset % other == 0 && self.rlocmode % other == 0),
             "{self} is not divisible by {other}"
@@ -507,12 +497,9 @@ impl Rem<RlocInt> for i32 {
     type Output = i32;
 
     fn rem(self, other: RlocInt) -> i32 {
-        assert!(other.rlocmode == 0, "Cannot divide RlocInt with non-const");
-        assert!(other.offset != 0, "Divide by zero");
-        assert!(
-            self % other.offset == 0,
-            "{self} is not divisible by {other}"
-        );
+        assert_eq!(other.rlocmode, 0, "Cannot divide RlocInt with non-const");
+        assert_ne!(other.offset, 0, "Divide by zero");
+        assert_eq!(self % other.offset, 0, "{self} is not divisible by {other}");
         self / other.offset
     }
 }
