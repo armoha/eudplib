@@ -27,7 +27,7 @@ def _add_str(dst, *, operations=[], _f=[]):
             )
             write << c.NextTrigger()
             bw1.writebyte(b)
-            c.RawTrigger(actions=c.SetMemory(end + 380, c.Add, 1))
+            c.RawTrigger(actions=c.SetMemory(end + 348, c.Add, 1))
         cs.EUDEndInfLoop()
 
         end << c.RawTrigger(
