@@ -26,6 +26,7 @@ from .test_eps_object import (
     f_test_object,
     f_test_selftype_member,
 )
+from .epscript.attribute import f_test_attribute
 
 
 @TestInstance
@@ -97,3 +98,5 @@ def test_epscript():
         [ord(c) for c in stat.expected_result],
     )
     test_equality("test updateUnitNameAndRank", f_test_reported(), [0, 0])
+
+    test_equality("test attribute", f_test_attribute(), [0x0F])
