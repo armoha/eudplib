@@ -26,12 +26,12 @@ from .unlimiterflag import IsUnlimiterOn
 
 
 def EUDLoopList(  # noqa: N802
-    header_epd, break_offset=None
+    header_offset, break_offset=None
 ) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:
     blockname = "listloop"
-    ut.EUDCreateBlock(blockname, header_epd)
+    ut.EUDCreateBlock(blockname, header_offset)
 
-    ptr, epd = f_dwepdread_epd(header_epd)
+    ptr, epd = f_dwepdread_epd(ut.EPD(header_offset))
 
     if break_offset is not None:
         cs.EUDWhileNot()(ptr == break_offset)
@@ -45,7 +45,7 @@ def EUDLoopList(  # noqa: N802
     cs.EUDEndWhile()
 
     ut.ep_assert(
-        ut.EUDPopBlock(blockname)[1] is header_epd, _("listloop mismatch")
+        ut.EUDPopBlock(blockname)[1] is header_offset, _("listloop mismatch")
     )
 
 
@@ -266,7 +266,7 @@ def EUDLoopPlayerUnit(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]: 
 
 
 def EUDLoopBullet() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N802
-    yield from EUDLoopList(EPD(0x64DEC4))
+    yield from EUDLoopList(0x64DEC4)
 
 
 def EUDLoopSprite() -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]:  # noqa: N802
