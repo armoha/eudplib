@@ -12,7 +12,7 @@ build-backend = "maturin"
 
 [project]
 name = "eudplib"
-version = "0.80.4"
+version = "0.80.6"
 authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},
@@ -36,6 +36,8 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Games/Entertainment :: Real Time Strategy",
 ]
