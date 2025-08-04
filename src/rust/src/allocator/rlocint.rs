@@ -16,7 +16,7 @@ impl DivFloor for i32 {
 
     fn div_floor(&self, rhs: i32) -> i32 {
         if rhs < 0 {
-            -(-self).div_euclid(rhs)
+            -((-self).div_euclid(rhs))
         } else {
             self.div_euclid(rhs)
         }
@@ -24,7 +24,7 @@ impl DivFloor for i32 {
 
     fn rem_floor(&self, rhs: i32) -> i32 {
         let quotient = if rhs < 0 {
-            -(-self).div_euclid(rhs)
+            -((-self).div_euclid(rhs))
         } else {
             self.div_euclid(rhs)
         };
@@ -33,7 +33,7 @@ impl DivFloor for i32 {
 
     fn divrem_floor(&self, rhs: i32) -> (i32, i32) {
         let quotient = if rhs < 0 {
-            -(-self).div_euclid(rhs)
+            -((-self).div_euclid(rhs))
         } else {
             self.div_euclid(rhs)
         };
@@ -46,7 +46,7 @@ impl DivFloor for i64 {
 
     fn div_floor(&self, rhs: i64) -> i64 {
         if rhs < 0 {
-            -(-self).div_euclid(rhs)
+            -((-self).div_euclid(rhs))
         } else {
             self.div_euclid(rhs)
         }
@@ -54,7 +54,7 @@ impl DivFloor for i64 {
 
     fn rem_floor(&self, rhs: i64) -> i64 {
         let quotient = if rhs < 0 {
-            -(-self).div_euclid(rhs)
+            -((-self).div_euclid(rhs))
         } else {
             self.div_euclid(rhs)
         };
@@ -63,7 +63,7 @@ impl DivFloor for i64 {
 
     fn divrem_floor(&self, rhs: i64) -> (i64, i64) {
         let quotient = if rhs < 0 {
-            -(-self).div_euclid(rhs)
+            -((-self).div_euclid(rhs))
         } else {
             self.div_euclid(rhs)
         };
