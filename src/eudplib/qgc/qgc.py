@@ -14,6 +14,7 @@ from ..memio import (
     f_memcpy,
     f_setcurpl2cpcache,
 )
+from ..core.rawtrigger.consttype import Dword
 from ..scdata import CurrentPlayer, TrgUnit
 from ..utils import EPD, ep_assert
 
@@ -49,7 +50,7 @@ def _set_cmdqlen(new_len: c.EUDVariable) -> None:
 
 
 class QueueGameCommandHelper:
-    def __init__(self, size: int):
+    def __init__(self, size: Dword):
         self.size = size
 
     def __enter__(self):
@@ -67,7 +68,7 @@ class QueueGameCommandHelper:
 
 
 @c.EUDFunc
-def QueueGameCommand(data: c.Db, size: int):  # noqa: N802
+def QueueGameCommand(data: Dword, size: Dword):  # noqa: N802
     """Queue game command to packet queue.
 
     Starcraft periodically broadcasts game packets to other player. Game
@@ -91,9 +92,7 @@ bw = EUDByteWriter()
 
 
 @c.EUDFunc
-def _qgc_alphaids(
-    packet_id: int | c.EUDVariable, n: int, arr_epd: int | c.EUDVariable | c.ConstExpr
-) -> None:
+def _qgc_alphaids(packet_id: Dword, n: Dword, arr_epd: Dword) -> None:
     """
     == 0x0B - Select Delta Del ==
     == 0x0A - Select Delta Add ==
@@ -156,9 +155,7 @@ def _qgc_alphaids(
         f_setcurpl2cpcache()
 
 
-def QueueGameCommand_Select(
-    n: int, ptr_arr: int | c.EUDVariable | c.ConstExpr
-):  # noqa: N802
+def QueueGameCommand_Select(n: Dword, ptr_arr: Dword):  # noqa: N802
     """
     == 0x09 - Select Units ==
     {{{
@@ -174,9 +171,7 @@ def QueueGameCommand_Select(
         _qgc_alphaids(0x09, n, EPD(ptr_arr))
 
 
-def QueueGameCommand_AddSelect(
-    n: int, ptr_arr: int | c.EUDVariable | c.ConstExpr
-):  # noqa: N802
+def QueueGameCommand_AddSelect(n: Dword, ptr_arr: Dword):  # noqa: N802
     """
     == 0x0A - Select Delta Add ==
     {{{
@@ -192,9 +187,7 @@ def QueueGameCommand_AddSelect(
         _qgc_alphaids(0x0A, n, EPD(ptr_arr))
 
 
-def QueueGameCommand_RemoveSelect(
-    n: int, ptr_arr: int | c.EUDVariable | c.ConstExpr
-):  # noqa: N802
+def QueueGameCommand_RemoveSelect(n: Dword, ptr_arr: Dword):  # noqa: N802
     """
     == 0x0B - Select Delta Del ==
     {{{
@@ -245,7 +238,7 @@ def QueueGameCommand_MinimapPing(xy: int):  # noqa: N802
 
 @c.EUDTypedFunc([TrgUnit])
     train_unit_command = c.Db(b"...\x1FUU..")
-def QueueGameCommand_TrainUnit(unit: TrgUnit):  # noqa: N802
+def QueueGameCommand_TrainUnit(unit: TrgUnit | str | int | c.EUDVariable):  # noqa: N802
     c.SetVariables(EPD(train_unit_command + 4), unit)
     QueueGameCommand(train_unit_command + 3, 3)
 
