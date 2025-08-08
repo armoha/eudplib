@@ -14,60 +14,77 @@ pub(crate) trait DivFloor {
 impl DivFloor for i32 {
     type Num = i32;
 
+    #[inline]
     fn div_floor(&self, rhs: i32) -> i32 {
-        if rhs < 0 {
-            -((-self).div_euclid(rhs))
+        let a = *self;
+        if rhs > 0 {
+            a.div_euclid(rhs)
         } else {
-            self.div_euclid(rhs)
+            // rhs < 0: div_euclid는 ceil(a/rhs)이므로, 나머지가 0이 아니면 1 감소
+            let q = a.div_euclid(rhs);
+            let r = a.rem_euclid(rhs);
+            if r == 0 { q } else { q - 1 }
         }
     }
 
+    #[inline]
     fn rem_floor(&self, rhs: i32) -> i32 {
-        let quotient = if rhs < 0 {
-            -((-self).div_euclid(rhs))
+        let a = *self;
+        let r = a.rem_euclid(rhs); // 0 <= r < |rhs|
+        if rhs > 0 {
+            r
+        } else if r == 0 {
+            0
         } else {
-            self.div_euclid(rhs)
-        };
-        self - quotient * rhs
+            // floor 의미의 나머지는 제수의 부호를 따라야 하므로 음수로 이동
+            r + rhs // rhs < 0 이므로 r - |rhs|
+        }
     }
 
+    #[inline]
     fn divrem_floor(&self, rhs: i32) -> (i32, i32) {
-        let quotient = if rhs < 0 {
-            -((-self).div_euclid(rhs))
-        } else {
-            self.div_euclid(rhs)
-        };
-        (quotient, self - quotient * rhs)
+        // 같은 규칙을 일관되게 적용해 (q, r)를 구성
+        let q = self.div_floor(rhs);
+        // 곱셈으로 r = a - rhs*q 를 만들 수도 있지만, 오버플로 경로를 줄이기 위해
+        // rem_floor 규칙을 재사용하는 편이 안전합니다.
+        let r = self.rem_floor(rhs);
+        (q, r)
     }
 }
 
 impl DivFloor for i64 {
     type Num = i64;
 
+    #[inline]
     fn div_floor(&self, rhs: i64) -> i64 {
-        if rhs < 0 {
-            -((-self).div_euclid(rhs))
+        let a = *self;
+        if rhs > 0 {
+            a.div_euclid(rhs)
         } else {
-            self.div_euclid(rhs)
+            let q = a.div_euclid(rhs);
+            let r = a.rem_euclid(rhs);
+            if r == 0 { q } else { q - 1 }
         }
     }
 
+    #[inline]
     fn rem_floor(&self, rhs: i64) -> i64 {
-        let quotient = if rhs < 0 {
-            -((-self).div_euclid(rhs))
+        let a = *self;
+        let r = a.rem_euclid(rhs);
+        if rhs > 0 {
+            r
+        } else if r == 0 {
+            0
         } else {
-            self.div_euclid(rhs)
-        };
-        self - quotient * rhs
+            r + rhs
+        }
     }
 
+    #[inline]
     fn divrem_floor(&self, rhs: i64) -> (i64, i64) {
-        let quotient = if rhs < 0 {
-            -((-self).div_euclid(rhs))
-        } else {
-            self.div_euclid(rhs)
-        };
-        (quotient, self - quotient * rhs)
+        let q = self.div_floor(rhs);
+        let r = self.rem_floor(rhs);
+        (q, r)
     }
 }
 
