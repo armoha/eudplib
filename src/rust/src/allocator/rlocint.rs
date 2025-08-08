@@ -3,90 +3,58 @@ use pyo3::prelude::*;
 use std::fmt;
 use std::ops::{Add, Div, Mul, Rem, Sub};
 
-// div_floor is not stabilized yet
-pub(crate) trait DivFloor {
-    type Num;
-    fn div_floor(&self, rhs: Self::Num) -> Self::Num;
-    fn rem_floor(&self, rhs: Self::Num) -> Self::Num;
-    fn divrem_floor(&self, rhs: Self::Num) -> (Self::Num, Self::Num);
+// Note: Rust's std does not provide a stabilized div_floor yet for integers.
+// See https://github.com/rust-lang/rust/issues/88581
+pub(crate) trait DivFloor: Sized {
+    fn div_floor(&self, rhs: Self) -> Self;
+    fn rem_floor(&self, rhs: Self) -> Self;
+    fn divrem_floor(&self, rhs: Self) -> (Self, Self);
 }
 
-impl DivFloor for i32 {
-    type Num = i32;
+macro_rules! impl_div_floor_signed {
+    ($t:ty) => {
+        impl DivFloor for $t {
+            #[inline]
+            fn div_floor(&self, rhs: $t) -> $t {
+                let a: $t = *self;
+                if rhs > 0 {
+                    a.div_euclid(rhs)
+                } else {
+                    // For a negative divisor, div_euclid returns ceil(a / rhs).
+                    // If there is a non-zero remainder, subtract 1 to get floor(a / rhs).
+                    let q = a.div_euclid(rhs);
+                    let r = a.rem_euclid(rhs);
+                    if r == 0 { q } else { q - 1 }
+                }
+            }
 
-    #[inline]
-    fn div_floor(&self, rhs: i32) -> i32 {
-        let a = *self;
-        if rhs > 0 {
-            a.div_euclid(rhs)
-        } else {
-            // rhs < 0: div_euclid는 ceil(a/rhs)이므로, 나머지가 0이 아니면 1 감소
-            let q = a.div_euclid(rhs);
-            let r = a.rem_euclid(rhs);
-            if r == 0 { q } else { q - 1 }
+            #[inline]
+            fn rem_floor(&self, rhs: $t) -> $t {
+                let a: $t = *self;
+                let r = a.rem_euclid(rhs); // 0 <= r < |rhs|
+                if rhs > 0 {
+                    r
+                } else if r == 0 {
+                    0
+                } else {
+                    // For a negative divisor, the floor-style remainder should have the same sign
+                    // as rhs (non-positive). Convert the non-negative Euclidean remainder into a
+                    // non-positive floor remainder.
+                    r + rhs // rhs < 0, so this makes the remainder negative.
+                }
+            }
+
+            #[inline]
+            fn divrem_floor(&self, rhs: $t) -> ($t, $t) {
+                // Compute both using the definitions above.
+                (self.div_floor(rhs), self.rem_floor(rhs))
+            }
         }
-    }
-
-    #[inline]
-    fn rem_floor(&self, rhs: i32) -> i32 {
-        let a = *self;
-        let r = a.rem_euclid(rhs); // 0 <= r < |rhs|
-        if rhs > 0 {
-            r
-        } else if r == 0 {
-            0
-        } else {
-            // floor 의미의 나머지는 제수의 부호를 따라야 하므로 음수로 이동
-            r + rhs // rhs < 0 이므로 r - |rhs|
-        }
-    }
-
-    #[inline]
-    fn divrem_floor(&self, rhs: i32) -> (i32, i32) {
-        // 같은 규칙을 일관되게 적용해 (q, r)를 구성
-        let q = self.div_floor(rhs);
-        // 곱셈으로 r = a - rhs*q 를 만들 수도 있지만, 오버플로 경로를 줄이기 위해
-        // rem_floor 규칙을 재사용하는 편이 안전합니다.
-        let r = self.rem_floor(rhs);
-        (q, r)
-    }
+    };
 }
 
-impl DivFloor for i64 {
-    type Num = i64;
-
-    #[inline]
-    fn div_floor(&self, rhs: i64) -> i64 {
-        let a = *self;
-        if rhs > 0 {
-            a.div_euclid(rhs)
-        } else {
-            let q = a.div_euclid(rhs);
-            let r = a.rem_euclid(rhs);
-            if r == 0 { q } else { q - 1 }
-        }
-    }
-
-    #[inline]
-    fn rem_floor(&self, rhs: i64) -> i64 {
-        let a = *self;
-        let r = a.rem_euclid(rhs);
-        if rhs > 0 {
-            r
-        } else if r == 0 {
-            0
-        } else {
-            r + rhs
-        }
-    }
-
-    #[inline]
-    fn divrem_floor(&self, rhs: i64) -> (i64, i64) {
-        let q = self.div_floor(rhs);
-        let r = self.rem_floor(rhs);
-        (q, r)
-    }
-}
+impl_div_floor_signed!(i32);
+impl_div_floor_signed!(i64);
 
 #[derive(Clone, Debug)]
 pub(crate) struct RlocInt {
