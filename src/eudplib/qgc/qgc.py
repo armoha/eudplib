@@ -209,7 +209,7 @@ def QueueGameCommand_RightClick(xy: int):  # noqa: N802
 
     :param xy: (y * 65536) + x, where (x, y) is coordinate for right click.
     """
-    right_click_command = c.Db(b"...\x14XXYY\0\0\xE4\0\x00")
+    right_click_command = c.Db(b"...\x14XXYY\0\0\xe4\0\x00")
     c.SetVariables(EPD(right_click_command + 4), xy)
     QueueGameCommand(right_click_command + 3, 10)
 
@@ -220,7 +220,7 @@ def QueueGameCommand_QueuedRightClick(xy: int):  # noqa: N802
 
     :param xy: (y * 65536) + x, where (x, y) is coordinate for right click.
     """
-    queued_right_click_command = c.Db(b"...\x14XXYY\0\0\xE4\0\x01")
+    queued_right_click_command = c.Db(b"...\x14XXYY\0\0\xe4\0\x01")
     c.SetVariables(EPD(queued_right_click_command + 4), xy)
     QueueGameCommand(queued_right_click_command + 3, 10)
 
@@ -237,8 +237,8 @@ def QueueGameCommand_MinimapPing(xy: int):  # noqa: N802
 
 
 @c.EUDTypedFunc([TrgUnit])
-    train_unit_command = c.Db(b"...\x1FUU..")
 def QueueGameCommand_TrainUnit(unit: TrgUnit | str | int | c.EUDVariable):  # noqa: N802
+    train_unit_command = c.Db(b"...\x1fUU..")
     c.SetVariables(EPD(train_unit_command + 4), unit)
     QueueGameCommand(train_unit_command + 3, 3)
 
@@ -263,13 +263,13 @@ def QueueGameCommand_RestartGame():  # noqa: N802
 
 @c.EUDFunc
 def QueueGameCommand_MergeDarkArchon():  # noqa: N802
-    merge_dark_archon_command = c.Db(b"\x5A")
+    merge_dark_archon_command = c.Db(b"\x5a")
     QueueGameCommand(merge_dark_archon_command, 1)
 
 
 @c.EUDFunc
 def QueueGameCommand_MergeArchon():  # noqa: N802
-    merge_archon_command = c.Db(b"\x2A")
+    merge_archon_command = c.Db(b"\x2a")
     QueueGameCommand(merge_archon_command, 1)
 
 
