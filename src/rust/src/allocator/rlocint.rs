@@ -5,49 +5,40 @@ use std::ops::{Add, Div, Mul, Rem, Sub};
 
 // Note: Rust's std does not provide a stabilized div_floor yet for integers.
 // See https://github.com/rust-lang/rust/issues/88581
-pub(crate) trait DivFloor: Sized {
-    fn div_floor(&self, rhs: Self) -> Self;
-    fn rem_floor(&self, rhs: Self) -> Self;
-    fn divrem_floor(&self, rhs: Self) -> (Self, Self);
+pub(crate) trait DivFloor: Sized + Copy {
+    fn divrem_floor(self, rhs: Self) -> (Self, Self);
+
+    #[inline]
+    fn div_floor(self, rhs: Self) -> Self {
+        let (q, _) = self.divrem_floor(rhs);
+        q
+    }
+
+    #[inline]
+    fn rem_floor(self, rhs: Self) -> Self {
+        let (_, r) = self.divrem_floor(rhs);
+        r
+    }
 }
 
 macro_rules! impl_div_floor_signed {
     ($t:ty) => {
         impl DivFloor for $t {
             #[inline]
-            fn div_floor(&self, rhs: $t) -> $t {
-                let a: $t = *self;
-                if rhs > 0 {
-                    a.div_euclid(rhs)
-                } else {
-                    // For a negative divisor, div_euclid returns ceil(a / rhs).
-                    // If there is a non-zero remainder, subtract 1 to get floor(a / rhs).
-                    let q = a.div_euclid(rhs);
-                    let r = a.rem_euclid(rhs);
-                    if r == 0 { q } else { q - 1 }
-                }
-            }
+            fn divrem_floor(self, rhs: $t) -> ($t, $t) {
+                let a: $t = self;
+                let q = a.div_euclid(rhs);
+                let r = a.rem_euclid(rhs);
 
-            #[inline]
-            fn rem_floor(&self, rhs: $t) -> $t {
-                let a: $t = *self;
-                let r = a.rem_euclid(rhs); // 0 <= r < |rhs|
                 if rhs > 0 {
-                    r
+                    (q, r)
                 } else if r == 0 {
-                    0
+                    (q, 0)
                 } else {
-                    // For a negative divisor, the floor-style remainder should have the same sign
-                    // as rhs (non-positive). Convert the non-negative Euclidean remainder into a
-                    // non-positive floor remainder.
-                    r + rhs // rhs < 0, so this makes the remainder negative.
+                    // Negative divisor: adjust quotient/remainder to floor-style.
+                    // Make remainder non-positive and decrease quotient by 1.
+                    (q - 1, r + rhs) // rhs < 0, so r becomes negative.
                 }
-            }
-
-            #[inline]
-            fn divrem_floor(&self, rhs: $t) -> ($t, $t) {
-                // Compute both using the definitions above.
-                (self.div_floor(rhs), self.rem_floor(rhs))
             }
         }
     };
@@ -68,6 +59,12 @@ impl RlocInt {
     }
 }
 
+impl fmt::Display for RlocInt {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "offset={:#08X}, rlocmode={}", self.offset, self.rlocmode)
+    }
+}
+
 /// Relocatable int
 #[derive(Clone)]
 #[pyclass(frozen, name = "RlocInt_C", module = "eudplib.core.allocator")]
@@ -76,8 +73,10 @@ pub struct PyRlocInt(pub(crate) RlocInt);
 #[pymethods]
 impl PyRlocInt {
     #[new]
-    fn new(offset: i32, rlocmode: i32) -> Self {
-        Self(RlocInt::new(offset, rlocmode))
+    fn new(offset: i64, rlocmode: i32) -> PyResult<Self> {
+        let offset_i32 = i32::try_from(offset)
+            .map_err(|_| PyValueError::new_err(format!("offset out of range for i32: {offset}")))?;
+        Ok(Self(RlocInt::new(offset_i32, rlocmode)))
     }
 
     #[getter]
@@ -91,7 +90,7 @@ impl PyRlocInt {
     }
 
     fn __repr__(&self) -> String {
-        format!("{:?}", self.0)
+        format!("RlocInt_C({})", self.0)
     }
 
     fn __str__(&self) -> String {
@@ -189,8 +188,8 @@ impl PyRlocInt {
             )));
         };
         Ok(PyRlocInt(RlocInt::new(
-            DivFloor::div_floor(&self.0.offset, rhs),
-            DivFloor::div_floor(&self.0.rlocmode, rhs),
+            DivFloor::div_floor(self.0.offset, rhs),
+            DivFloor::div_floor(self.0.rlocmode, rhs),
         )))
     }
 
@@ -286,16 +285,6 @@ impl PyRlocInt {
 
     fn _is_epd(&self) -> bool {
         self.0.rlocmode == 1
-    }
-}
-
-impl fmt::Display for RlocInt {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // Write strictly the first element into the supplied output
-        // stream: `f`. Returns `fmt::Result` which indicates whether the
-        // operation succeeded or failed. Note that `write!` uses syntax which
-        // is very similar to `println!`.
-        write!(f, "RlocInt({:#08X}, {})", self.offset, self.rlocmode)
     }
 }
 
@@ -411,8 +400,8 @@ impl Div<RlocInt> for RlocInt {
             "{self} is not divisible by {other}"
         );
         Self {
-            offset: DivFloor::div_floor(&self.offset, other.offset),
-            rlocmode: DivFloor::div_floor(&self.rlocmode, other.offset),
+            offset: DivFloor::div_floor(self.offset, other.offset),
+            rlocmode: DivFloor::div_floor(self.rlocmode, other.offset),
         }
     }
 }
@@ -427,8 +416,8 @@ impl Div<i32> for RlocInt {
             "{self} is not divisible by {other}"
         );
         Self {
-            offset: DivFloor::div_floor(&self.offset, other),
-            rlocmode: DivFloor::div_floor(&self.rlocmode, other),
+            offset: DivFloor::div_floor(self.offset, other),
+            rlocmode: DivFloor::div_floor(self.rlocmode, other),
         }
     }
 }
@@ -440,7 +429,7 @@ impl Div<RlocInt> for i32 {
         assert_eq!(other.rlocmode, 0, "Cannot divide RlocInt with non-const");
         assert_ne!(other.offset, 0, "Divide by zero");
         assert_eq!(self % other.offset, 0, "{self} is not divisible by {other}");
-        DivFloor::div_floor(&self, other.offset)
+        DivFloor::div_floor(self, other.offset)
     }
 }
 
@@ -491,8 +480,8 @@ impl Rem<RlocInt> for i32 {
 
 #[pyfunction]
 #[pyo3(name = "RlocInt")]
-pub fn py_rlocint(offset: i64, rlocmode: i32) -> PyRlocInt {
-    PyRlocInt::new(offset as i32, rlocmode)
+pub fn py_rlocint(offset: i64, rlocmode: i32) -> PyResult<PyRlocInt> {
+    PyRlocInt::new(offset, rlocmode)
 }
 
 /// Convert int/RlocInt to rlocint

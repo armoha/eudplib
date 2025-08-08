@@ -148,8 +148,8 @@ impl PyConstExpr {
                 rhs
             )));
         }
-        let offset = DivFloor::div_floor(&slf.0.offset, rhs);
-        let rlocmode = DivFloor::div_floor(&slf.0.rlocmode, rhs);
+        let offset = DivFloor::div_floor(slf.0.offset, rhs);
+        let rlocmode = DivFloor::div_floor(slf.0.rlocmode, rhs);
         Ok(Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
                 slf.into_py(py)
@@ -169,7 +169,7 @@ impl PyConstExpr {
                 rhs
             )));
         }
-        Ok(DivFloor::rem_floor(&self.0.offset, rhs))
+        Ok(DivFloor::rem_floor(self.0.offset, rhs))
     }
 
     fn __divmod__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<(Self, i32)> {
