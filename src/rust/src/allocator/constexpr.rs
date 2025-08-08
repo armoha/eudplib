@@ -1,7 +1,7 @@
 use crate::allocator::rlocint::{DivFloor, PyRlocInt, RlocInt};
 use crate::types::EXPRPROXY;
 use pyo3::exceptions::{PyAttributeError, PyRuntimeError, PyValueError};
-use pyo3::intern;
+use pyo3::{intern, IntoPyObjectExt};
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyInt, PyNone, PyString, PyTuple};
 
@@ -74,69 +74,69 @@ impl PyConstExpr {
         }
     }
 
-    fn __add__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
+    fn __add__(slf: PyRef<Self>, py: Python, rhs: i64) -> PyResult<Self> {
         let offset = slf.0.offset + rhs as i32;
         let rlocmode = slf.0.rlocmode;
-        Self(ConstExpr {
+        Ok(Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
-                slf.into_py(py)
+                slf.into_py_any(py)?
             } else {
                 slf.0.baseobj.clone_ref(py)
             },
             offset,
             rlocmode,
-        })
+        }))
     }
 
-    fn __radd__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
+    fn __radd__(slf: PyRef<Self>, py: Python, rhs: i64) -> PyResult<Self> {
         Self::__add__(slf, py, rhs)
     }
 
-    fn __sub__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
+    fn __sub__(slf: PyRef<Self>, py: Python, rhs: i64) -> PyResult<Self> {
         let offset = slf.0.offset - rhs as i32;
         let rlocmode = slf.0.rlocmode;
-        Self(ConstExpr {
+        Ok(Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
-                slf.into_py(py)
+                slf.into_py_any(py)?
             } else {
                 slf.0.baseobj.clone_ref(py)
             },
             offset,
             rlocmode,
-        })
+        }))
     }
 
-    fn __rsub__(slf: PyRef<Self>, py: Python, rhs: i64) -> Self {
+    fn __rsub__(slf: PyRef<Self>, py: Python, rhs: i64) -> PyResult<Self> {
         let offset = rhs as i32 - slf.0.offset;
         let rlocmode = -slf.0.rlocmode;
-        Self(ConstExpr {
+        Ok(Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
-                slf.into_py(py)
+                slf.into_py_any(py)?
             } else {
                 slf.0.baseobj.clone_ref(py)
             },
             offset,
             rlocmode,
-        })
+        }))
     }
 
-    fn __mul__(slf: PyRef<Self>, py: Python, rhs: i32) -> Self {
+    fn __mul__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<Self> {
         let offset = slf.0.offset * rhs;
         let rlocmode = slf.0.rlocmode * rhs;
-        Self(ConstExpr {
+        Ok(Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
-                slf.into_py(py)
+                slf.into_py_any(py)?
             } else if rlocmode == 0 {
-                PyNone::get_bound(py).into_py(py)
+                PyNone::get(py).into_py_any(py)?
             } else {
                 slf.0.baseobj.clone_ref(py)
             },
             offset,
             rlocmode,
-        })
+        }))
     }
 
-    fn __rmul__(slf: PyRef<Self>, py: Python, rhs: i32) -> Self {
+    fn __rmul__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<Self> {
         Self::__mul__(slf, py, rhs)
     }
 
@@ -152,7 +152,7 @@ impl PyConstExpr {
         let rlocmode = DivFloor::div_floor(slf.0.rlocmode, rhs);
         Ok(Self(ConstExpr {
             baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
-                slf.into_py(py)
+                slf.into_py_any(py)?
             } else {
                 slf.0.baseobj.clone_ref(py)
             },
@@ -185,7 +185,7 @@ impl PyConstExpr {
         Ok((
             Self(ConstExpr {
                 baseobj: if rlocmode != 0 && slf.0.baseobj.is_none(py) {
-                    slf.into_py(py)
+                    slf.into_py_any(py)?
                 } else {
                     slf.0.baseobj.clone_ref(py)
                 },
@@ -222,14 +222,14 @@ pub struct Forward {
 #[pymethods]
 impl Forward {
     #[new]
-    fn new(py: Python) -> (Self, PyConstExpr) {
-        let expr = ConstExpr::new(PyNone::get_bound(py).into_py(py), 0, 4);
-        (
+    fn new(py: Python) -> PyResult<(Self, PyConstExpr)> {
+        let expr = ConstExpr::new(PyNone::get(py).into_py_any(py)?, 0, 4);
+        Ok((
             Self {
-                expr: PyNone::get_bound(py).into_py(py),
+                expr: PyNone::get(py).into_py_any(py)?,
             },
             PyConstExpr(expr),
-        )
+        ))
     }
 
     #[getter]
@@ -237,7 +237,7 @@ impl Forward {
         Ok(self.expr.clone_ref(py))
     }
 
-    fn __lshift__(&mut self, py: Python, mut expr: Bound<'_, PyAny>) -> PyResult<PyObject> {
+    fn __lshift__<'a>(&mut self, py: Python<'a>, mut expr: Bound<'a, PyAny>) -> PyResult<PyObject> {
         if !self.expr.is_none(py) {
             return Err(PyAttributeError::new_err(
                 "Reforwarding without reset is not allowed",
@@ -251,9 +251,9 @@ impl Forward {
             expr = expr.getattr(intern!(py, "_value"))?;
         }
         let expr: Py<PyAny> = if let Ok(offset) = expr.extract::<i32>() {
-            PyConstExpr(ConstExpr::new(PyNone::get_bound(py).into_py(py), offset, 0)).into_py(py)
+            PyConstExpr(ConstExpr::new(PyNone::get(py).into_py_any(py)?, offset, 0)).into_py_any(py)?
         } else {
-            expr.into_py(py)
+            expr.into_py_any(py)?
         };
         self.expr = expr.clone_ref(py);
         Ok(expr)
@@ -265,8 +265,9 @@ impl Forward {
     }
 
     #[allow(non_snake_case)]
-    fn Reset(&mut self, py: Python) {
-        self.expr = PyNone::get_bound(py).into_py(py)
+    fn Reset(&mut self, py: Python) -> PyResult<()> {
+        self.expr = PyNone::get(py).into_py_any(py)?;
+        Ok(())
     }
 
     #[allow(non_snake_case)]
@@ -286,7 +287,7 @@ impl Forward {
         py_args: &Bound<'_, PyTuple>,
         py_kwargs: Option<&Bound<'_, PyDict>>,
     ) -> PyResult<PyObject> {
-        self.expr.call_bound(py, py_args, py_kwargs)
+        self.expr.call(py, py_args, py_kwargs)
     }
 
     fn __getattr__(&self, py: Python, name: &Bound<'_, PyString>) -> PyResult<PyObject> {
@@ -294,7 +295,7 @@ impl Forward {
     }
 
     fn __getitem__(&self, py: Python, name: &Bound<'_, PyAny>) -> PyResult<PyObject> {
-        Ok(self.expr.bind(py).get_item(name)?.into_py(py))
+        Ok(self.expr.bind(py).get_item(name)?.into_py_any(py)?)
     }
 
     fn __setitem__(

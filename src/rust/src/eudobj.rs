@@ -1,7 +1,7 @@
 use crate::allocator::constexpr::{ConstExpr, PyConstExpr};
 use crate::types::GET_OBJECT_ADDR;
 use pyo3::exceptions::PyNotImplementedError;
-use pyo3::intern;
+use pyo3::{intern, IntoPyObjectExt};
 use pyo3::prelude::*;
 use pyo3::types::PyNone;
 
@@ -26,9 +26,9 @@ pub struct PyEUDObject;
 #[pymethods]
 impl PyEUDObject {
     #[new]
-    fn new(py: Python) -> (Self, PyConstExpr) {
-        let expr = ConstExpr::new(PyNone::get_bound(py).into_py(py), 0, 4);
-        (Self {}, PyConstExpr(expr))
+    fn new(py: Python) -> PyResult<(Self, PyConstExpr)> {
+        let expr = ConstExpr::new(PyNone::get(py).into_py_any(py)?, 0, 4);
+        Ok((Self {}, PyConstExpr(expr)))
     }
 
     /// Whether function is constructed dynamically.
@@ -51,8 +51,8 @@ impl PyEUDObject {
     #[allow(non_snake_case)]
     fn Evaluate(slf: PyRef<Self>, py: Python) -> PyResult<PyObject> {
         let get_object_addr = GET_OBJECT_ADDR.get(py)?;
-        let addr = get_object_addr.call1((slf.into_py(py),))?;
-        Ok(addr.into_py(py))
+        let addr = get_object_addr.call1((slf.into_py_any(py)?,))?;
+        Ok(addr.into_py_any(py)?)
     }
 
     /// Memory size of object.

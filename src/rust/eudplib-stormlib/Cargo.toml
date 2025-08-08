@@ -7,7 +7,7 @@ publish.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-pyo3 = { version = "0.22.3", features = ["abi3"] }
+pyo3 = { version = "0.25.1", features = ["abi3"] }
 stormlib-sys = { path = "../stormlib-rs/crates/stormlib-sys" }
 bitflags = "1.2"
 libc = "0.2"

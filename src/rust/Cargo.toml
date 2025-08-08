@@ -15,7 +15,7 @@ publish.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-pyo3 = { version = "0.22.3", features = ["abi3"] }
+pyo3 = { version = "0.25.1", features = ["abi3"] }
 indicatif = "0.17.7"
 regex = { version = "1.10.3", features = [] }
 tempfile = "3"

@@ -264,7 +264,7 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
-        let arg = PyTuple::new_bound(py, [obja.clone()]);
+        let arg = PyTuple::new(py, [obja.clone()])?;
         for (obj, _v) in found_objects.iter() {
             {
                 let mut obja = obja.borrow_mut();
@@ -305,7 +305,7 @@ impl PayloadBuilder {
                 .unwrap()
                 .progress_chars("##-"),
         );
-        let arg = PyTuple::new_bound(py, [pbuf.clone()]);
+        let arg = PyTuple::new(py, [pbuf.clone()])?;
         for (i, (obj, _v)) in found_objects.iter().enumerate() {
             {
                 let mut pbuf = pbuf.borrow_mut();

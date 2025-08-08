@@ -19,7 +19,7 @@ impl LazyPyImport {
 
     pub(crate) fn get<'p>(&'p self, py: Python<'p>) -> PyResult<Bound<'p, PyAny>> {
         let p = self.value.get_or_try_init(py, || {
-            let mut obj = py.import_bound(self.module)?.into_any();
+            let mut obj = py.import(self.module)?.into_any();
             for name in self.names {
                 obj = obj.getattr(*name)?;
             }
