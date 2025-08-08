@@ -8,4 +8,4 @@ rust-version.workspace = true
 
 [dependencies]
 pyo3 = { version = "0.25.1", features = ["abi3"] }
-regex = { version = "1.10.3", features = [] }
+regex = { version = "1.11.1", features = [] }

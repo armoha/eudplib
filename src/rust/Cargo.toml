@@ -16,8 +16,8 @@ rust-version.workspace = true
 
 [dependencies]
 pyo3 = { version = "0.25.1", features = ["abi3"] }
-indicatif = "0.17.7"
-regex = { version = "1.10.3", features = [] }
+indicatif = "0.18.0"
+regex = { version = "1.11.1", features = [] }
 tempfile = "3"
 eudplib-epscript = { path = "eudplib-epscript" }
 eudplib-stormlib = { path = "eudplib-stormlib" }
