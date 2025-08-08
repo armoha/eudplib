@@ -4,6 +4,8 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
+from typing import Any
+
 from .. import core as c
 from .. import ctrlstru as cs
 from ..memio import (
@@ -12,6 +14,7 @@ from ..memio import (
     f_memcpy,
     f_setcurpl2cpcache,
 )
+from ..core.rawtrigger.consttype import Dword
 from ..scdata import CurrentPlayer, TrgUnit
 from ..utils import EPD, ep_assert
 
@@ -34,7 +37,7 @@ def _get_cmdqlen():
     return _cmdqlen
 
 
-def _set_cmdqlen(new_len):
+def _set_cmdqlen(new_len: c.EUDVariable) -> None:
     ep_assert(c.IsEUDVariable(new_len), "new command queue length can't be constant")
     c.VProc(
         [new_len, _cmdqlen],
@@ -47,7 +50,7 @@ def _set_cmdqlen(new_len):
 
 
 class QueueGameCommandHelper:
-    def __init__(self, size):
+    def __init__(self, size: Dword):
         self.size = size
 
     def __enter__(self):
@@ -56,14 +59,16 @@ class QueueGameCommandHelper:
         if cs.EUDIfNot()(c.Memory(_PROV_MAXBUFFER, c.AtMost, self.new_len + 1)):
             return self
 
-    def __exit__(self, exception_type, exception_value, exception_traceback):
+    def __exit__(
+        self, exception_type: Any, exception_value: Any, exception_traceback: Any
+    ):
         if exception_type is None:
             _set_cmdqlen(self.new_len)
             cs.EUDEndIf()
 
 
 @c.EUDFunc
-def QueueGameCommand(data, size):  # noqa: N802
+def QueueGameCommand(data: Dword, size: Dword):  # noqa: N802
     """Queue game command to packet queue.
 
     Starcraft periodically broadcasts game packets to other player. Game
@@ -87,7 +92,7 @@ bw = EUDByteWriter()
 
 
 @c.EUDFunc
-def _qgc_alphaids(packet_id, n, arr_epd):
+def _qgc_alphaids(packet_id: Dword, n: Dword, arr_epd: Dword) -> None:
     """
     == 0x0B - Select Delta Del ==
     == 0x0A - Select Delta Add ==
@@ -150,7 +155,7 @@ def _qgc_alphaids(packet_id, n, arr_epd):
         f_setcurpl2cpcache()
 
 
-def QueueGameCommand_Select(n, ptr_arr):  # noqa: N802
+def QueueGameCommand_Select(n: Dword, ptr_arr: Dword):  # noqa: N802
     """
     == 0x09 - Select Units ==
     {{{
@@ -166,7 +171,7 @@ def QueueGameCommand_Select(n, ptr_arr):  # noqa: N802
         _qgc_alphaids(0x09, n, EPD(ptr_arr))
 
 
-def QueueGameCommand_AddSelect(n, ptr_arr):  # noqa: N802
+def QueueGameCommand_AddSelect(n: Dword, ptr_arr: Dword):  # noqa: N802
     """
     == 0x0A - Select Delta Add ==
     {{{
@@ -182,7 +187,7 @@ def QueueGameCommand_AddSelect(n, ptr_arr):  # noqa: N802
         _qgc_alphaids(0x0A, n, EPD(ptr_arr))
 
 
-def QueueGameCommand_RemoveSelect(n, ptr_arr):  # noqa: N802
+def QueueGameCommand_RemoveSelect(n: Dword, ptr_arr: Dword):  # noqa: N802
     """
     == 0x0B - Select Delta Del ==
     {{{
@@ -199,7 +204,7 @@ def QueueGameCommand_RemoveSelect(n, ptr_arr):  # noqa: N802
 
 
 @c.EUDFunc
-def QueueGameCommand_RightClick(xy):  # noqa: N802
+def QueueGameCommand_RightClick(xy: int):  # noqa: N802
     """Queue right click action.
 
     :param xy: (y * 65536) + x, where (x, y) is coordinate for right click.
@@ -210,7 +215,7 @@ def QueueGameCommand_RightClick(xy):  # noqa: N802
 
 
 @c.EUDFunc
-def QueueGameCommand_QueuedRightClick(xy):  # noqa: N802
+def QueueGameCommand_QueuedRightClick(xy: int):  # noqa: N802
     """Queue right click action.
 
     :param xy: (y * 65536) + x, where (x, y) is coordinate for right click.
@@ -221,7 +226,7 @@ def QueueGameCommand_QueuedRightClick(xy):  # noqa: N802
 
 
 @c.EUDFunc
-def QueueGameCommand_MinimapPing(xy):  # noqa: N802
+def QueueGameCommand_MinimapPing(xy: int):  # noqa: N802
     """Queue minimap ping action.
 
     :param xy: (y * 65536) + x, where (x, y) is coordinate for minimap ping.
@@ -232,8 +237,8 @@ def QueueGameCommand_MinimapPing(xy):  # noqa: N802
 
 
 @c.EUDTypedFunc([TrgUnit])
-def QueueGameCommand_TrainUnit(unit):  # noqa: N802
     train_unit_command = c.Db(b"...\x1FUU..")
+def QueueGameCommand_TrainUnit(unit: TrgUnit | str | int | c.EUDVariable):  # noqa: N802
     c.SetVariables(EPD(train_unit_command + 4), unit)
     QueueGameCommand(train_unit_command + 3, 3)
 
