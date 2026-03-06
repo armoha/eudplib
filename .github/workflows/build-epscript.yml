@@ -1,0 +1,119 @@
+name: Build epscript libraries
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/epscript/**'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+
+      - name: Build epscript
+        shell: msys2 {0}
+        working-directory: src/epscript
+        run: |
+          mkdir -p cmake-release
+          cd cmake-release
+          cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --target epScriptLib -- -j4
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-lib
+          path: src/epscript/cmake-release/libepScriptLib.dll
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build lemon2
+        working-directory: src/epscript
+        run: gcc lemon2.c -o lemon2
+
+      - name: Build epscript
+        working-directory: src/epscript
+        run: |
+          mkdir -p cmake-release
+          cd cmake-release
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --target epScriptLib -- -j4
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-lib
+          path: src/epscript/cmake-release/libepScriptLib.so
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build lemon2
+        working-directory: src/epscript
+        run: gcc lemon2.c -o lemon2
+
+      - name: Build epscript
+        working-directory: src/epscript
+        run: |
+          mkdir -p cmake-release
+          cd cmake-release
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --target epScriptLib -- -j4
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-lib
+          path: src/epscript/cmake-release/libepScriptLib.dylib
+
+  commit:
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-lib
+          path: src/eudplib/epscript/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-lib
+          path: src/eudplib/epscript/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos-lib
+          path: src/eudplib/epscript/
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/eudplib/epscript/libepScriptLib.dll \
+                  src/eudplib/epscript/libepScriptLib.so \
+                  src/eudplib/epscript/libepScriptLib.dylib
+          git diff --staged --quiet || git commit -m "build: update epscript libraries"
+          git push
