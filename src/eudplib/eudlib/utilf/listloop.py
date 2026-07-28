@@ -238,7 +238,7 @@ def EUDLoopPlayerUnit(player) -> Iterator[tuple[c.EUDVariable, c.EUDVariable]]: 
     ut.EUDCreateBlock("playerunitloop", first_player_unit)
     ptr, epd = f_cunitepdread_epd(ut.EPD(first_player_unit) + player)
 
-    if cs.EUDWhile()(ptr >= 1):
+    if cs.EUDWhileNot()(ptr == 0):
         next_unit, nextptr = c.Forward(), c.Forward()
         # /*0x06C*/ BW::CUnit*  nextPlayerUnit;
         # f_cunitepdread_epd(
