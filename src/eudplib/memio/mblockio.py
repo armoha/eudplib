@@ -55,7 +55,7 @@ def _memcpy(dst, src, copylen):
     br1.seekoffset(src)
     bw1.seekoffset(dst)
 
-    if cs.EUDWhile()(copylen >= 1):
+    if cs.EUDWhileNot()(copylen == 0):
         b = br1.readbyte()
         bw1.writebyte(b)
         copylen -= 1
