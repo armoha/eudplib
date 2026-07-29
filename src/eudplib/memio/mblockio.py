@@ -80,7 +80,7 @@ def f_memcmp(buf1, buf2, count):
     br1.seekoffset(buf1)
     br2.seekoffset(buf2)
 
-    if cs.EUDWhile()(count >= 1):
+    if cs.EUDWhileNot()(count == 0):
         count -= 1
         ch1 = br1.readbyte()
         ch2 = br2.readbyte()
