@@ -9,7 +9,8 @@ TEST_CASE("Control block parsing") {
         checkBlock(
                 "once { const A = 1; }",
 
-                "if EUDExecuteOnce()():\n"
+                "_t1 = EUDExecuteOnce()\n"
+                        "if _t1():\n"
                         "    A = 1\n"
                         "EUDEndExecuteOnce()\n"
         );
