@@ -46,7 +46,7 @@ def f_randomize():
         actions=c.SetMemoryX(end + 328 + 24, c.SetTo, 4 << 24, 0xFF << 24),
     )
 
-    if cs.EUDWhile()(n >= 1):
+    if cs.EUDWhileNot()(n == 0):
         # _seed += _seed
         c.VProc(
             _seed,
