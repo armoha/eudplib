@@ -28,6 +28,32 @@ def f_pow(a, b):
     """
     f_pow(a, b) calculates a ** b
     """
-    if isinstance(a, int) and isinstance(b, int):
-        return a**b
+    if isinstance(a, int):
+        # Constant base and exponent
+        if isinstance(b, int):
+            return a**b
+
+        # Constant base and variable exponent
+        if a == 0:
+            ret = c.EUDVariable()
+            ret << 0
+            # 0**0 = 1
+            c.RawTrigger(
+                conditions=b.Exactly(0),
+                actions=ret.SetNumber(1),
+            )
+            return ret
+        if a == 1:
+            return 1
+
+        trailing_zeros = (a & -a).bit_length() - 1
+        if trailing_zeros == 0:
+            return _pow(a, b)
+
+        odd_part = a >> trailing_zeros
+        powered = 1 if odd_part == 1 else _pow(odd_part, b)
+        shift = c.f_mul(b, trailing_zeros)
+        return c.f_bitlshift(powered, shift)
+
+    # Variable base
     return _pow(a, b)
