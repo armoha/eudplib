@@ -127,13 +127,14 @@ def _collect_objects(root: EUDObject | Forward) -> None:
     objc = ObjCollector()
     _found_objects_dict = {}
     _dynamic_objects_set = set()
+    _dynamic_objects_sizes: dict[EUDObject, int] = {}
     _untraversed_objects = []
 
     # Evaluate root to register root object.
     # root may not have WritePayload() method e.g: Forward()
     Evaluate(root)
 
-    while _untraversed_objects:
+    while True:
         while _untraversed_objects:
             lprint(
                 _(" - Collected {} / {} objects").format(
@@ -149,10 +150,21 @@ def _collect_objects(root: EUDObject | Forward) -> None:
             objc.EndWrite()
 
         # Check for new objects
+        _dynamic_objects_changed = False
         for obj in _dynamic_objects_set:
             objc.StartWrite()
             obj.CollectDependency(objc)
             objc.EndWrite()
+            try:
+                size = obj.GetDataSize()
+            except NotImplementedError:
+                continue
+            if _dynamic_objects_sizes.get(obj) != size:
+                _dynamic_objects_sizes[obj] = size
+                _dynamic_objects_changed = True
+
+        if not _dynamic_objects_changed and not _untraversed_objects:
+            break
 
     if len(_found_objects_dict) == 0:
         raise EPError(_("No object collected"))
