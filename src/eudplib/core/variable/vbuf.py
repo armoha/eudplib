@@ -17,6 +17,7 @@ from ..allocator import (
     RlocInt_C,
 )
 from ..eudobj import EUDObject
+from ...localize import _
 
 if TYPE_CHECKING:
     from ..allocator.payload import ObjCollector
@@ -76,7 +77,8 @@ class EUDVarBuffer(EUDObject):
         output = bytearray(72)
         output[0:4] = b"\xFF\xFF\xFF\xFF"
         output[24:36] = b"\0\0\x2D\x07\0\0SC\x04\0\0\0"
-        output = output * len(self._initvals)
+        initval_count = len(self._initvals)
+        output = output * initval_count
 
         heads = 0
         for i, initval in enumerate(self._initvals):
@@ -103,6 +105,11 @@ class EUDVarBuffer(EUDObject):
             emitbuffer.WriteDword(4)  # flags
             emitbuffer.WriteSpace(27)
             emitbuffer.WriteByte(0)  # currentAction
+
+        ut.ep_assert(
+            len(self._initvals) == initval_count,
+            _("variable triggers were created while writing the variable buffer"),
+        )
 
 
 _evb = None
@@ -178,7 +185,8 @@ class EUDCustomVarBuffer(EUDObject):
                     emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802
-        output = bytearray(72 * (len(self._actnptr_pairs) + len(self._5acts)))
+        initval_count = len(self._actnptr_pairs) + len(self._5acts)
+        output = bytearray(72 * initval_count)
 
         for i in range(5):
             try:
@@ -192,7 +200,7 @@ class EUDCustomVarBuffer(EUDObject):
             else:
                 emitbuffer.WriteSpace(16)
 
-        for i in range(len(self._actnptr_pairs) + len(self._5acts)):
+        for i in range(initval_count):
             # 'preserve rawtrigger'
             output[72 * i : 72 * i + 4] = b"\xFF\xFF\xFF\xFF"
             output[72 * i + 24 : 72 * i + 28] = b"\0\0\x2D\x07"
@@ -230,6 +238,11 @@ class EUDCustomVarBuffer(EUDObject):
             emitbuffer.WriteDword(4)  # flags
             emitbuffer.WriteSpace(27)
             emitbuffer.WriteByte(0)  # currentAction
+
+        ut.ep_assert(
+            len(self._actnptr_pairs) + len(self._5acts) == initval_count,
+            _("variable triggers were created while writing the variable buffer"),
+        )
 
 
 _ecvb = None

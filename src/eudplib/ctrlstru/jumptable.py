@@ -9,6 +9,8 @@ from typing import Literal
 from typing_extensions import Self
 
 from .. import core as c
+from ..localize import _
+from ..utils import ep_assert
 
 
 class EUDJumpBuffer(c.EUDObject):
@@ -50,6 +52,7 @@ class EUDJumpBuffer(c.EUDObject):
                 emitbuffer.WriteDword(nextptr)
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802
+        nextptr_count = len(self._nextptrs)
         for nextptr in self._nextptrs[:17]:
             emitbuffer.WriteDword(nextptr)  # nextptr
             emitbuffer.WriteSpace(12)
@@ -76,6 +79,11 @@ class EUDJumpBuffer(c.EUDObject):
         for _ in range(117 - 16):
             emitbuffer.WriteSpace(16)
             emitbuffer.WriteDword(8)  # flags
+
+        ep_assert(
+            len(self._nextptrs) == nextptr_count,
+            _("jump triggers were created while writing the jump buffer"),
+        )
 
 
 _jtb = None
