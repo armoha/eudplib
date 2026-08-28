@@ -281,7 +281,8 @@ impl PayloadBuilder {
                 .extract::<usize>()?;
             let datasize = (datasize + 3) >> 2;
             if dwoccupmap_len != datasize {
-                return Err(AllocError::new_err(format!("Occupation map length ({dwoccupmap_len}) & Object size ({datasize}) mismatch for {obj}")));
+                let classname = obj.get_type().qualname()?.to_string_lossy();
+                return Err(AllocError::new_err(format!("Occupation map length ({dwoccupmap_len}) & Object size ({datasize}) mismatch for {classname} {obj:?}")));
             }
             dwoccupmap_list.push(dwoccupmap);
             bar.inc(1);
@@ -320,8 +321,9 @@ impl PayloadBuilder {
                 .call_method0(intern!(py, "GetDataSize"))?
                 .extract::<usize>()?;
             if written_bytes != objsize {
+                let classname = obj.get_type().qualname()?.to_string_lossy();
                 return Err(AllocError::new_err(format!(
-                    "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {obj:?}"
+                    "obj.GetDataSize() ({objsize}) != Real payload size({written_bytes}) for {classname} {obj:?}"
                 )));
             }
             bar.inc(1);
