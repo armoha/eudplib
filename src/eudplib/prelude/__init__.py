@@ -4,8 +4,9 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-# ruff: noqa: I001
+# ruff: isort: skip_file
 # fmt: off
+# isort: skip
 from ..core import (
     f_div,
     EUDVariable, EUDCreateVariables, SetVariables,
@@ -147,7 +148,7 @@ from ..eudlib.utilf.userpl import (
 )
 from ..eudlib.wireframe.wireframe import (
     InitialWireframe, Is64BitWireframe,
-    SetGrpWire, SetTranWire,  SetWirefram, SetWireframes,
+    SetGrpWire, SetTranWire, SetWirefram, SetWireframes,
 )
 from ..string import (
     IsPName, SetPNamef,
