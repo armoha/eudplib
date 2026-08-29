@@ -31,7 +31,7 @@ class EUDArrayData(c.EUDObject):
     Structure for storing multiple values.
     """
 
-    __slots__ = ("_datas", "_arrlen")
+    __slots__ = ("_data", "_arrlen")
 
     dont_flatten = True
 
@@ -45,7 +45,7 @@ class EUDArrayData(c.EUDObject):
 
         if isinstance(arr, int):
             arrlen = arr
-            self._datas = [0] * arrlen
+            self._data = [0] * arrlen
             self._arrlen = arrlen
 
         else:
@@ -55,14 +55,14 @@ class EUDArrayData(c.EUDObject):
                     if not c.IsConstExpr(item):
                         err.append(f"\t#{i}: {item}")
                 raise ut.EPError("\n".join(err))
-            self._datas = arr
+            self._data = arr
             self._arrlen = len(arr)
 
     def GetDataSize(self) -> int:  # noqa: N802
         return self._arrlen * 4
 
     def WritePayload(self, buf) -> None:  # noqa: N802
-        for item in self._datas:
+        for item in self._data:
             buf.WriteDword(item)
 
     # --------

@@ -1,5 +1,17 @@
 [files]
-extend-exclude = [".*__epspy__.*"]
+extend-exclude = [
+  ".*__epspy__.*",
+  "src/epscript/**",
+  "tests/gprof2dot.py",
+]
 
 [default.extend-words]
 inot = "inot"
+cpy = "cpy"          # f_cp949_to_utf8_cpy
+tre = "tre"
+skipt = "skipt"
+tpos = "tpos"
+heade = "heade"
+LAMDA = "LAMDA"        # UNICODE
+BA = "BA"              # UNICODE
+SEH = "SEH"            # abbreviation

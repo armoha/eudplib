@@ -792,9 +792,9 @@ DefStatTextDict: dict[str, int] = {
     "Firebat Requires: Academy": 702,
     "Goliath Requires: Armory": 703,
     "Siege Tank Requires: Attached Machine Shop": 704,
-    "Science Vessel Requires: Attached Constrol Tower Science Facility": 705,
-    "Dropship Requires: Attached Constrol Tower": 706,
-    "Battlecruiser Requires: Attached Constrol Tower Science Facility with attached Physics Lab": 707,  # noqa: E501
+    "Science Vessel Requires: Attached Control Tower Science Facility": 705,
+    "Dropship Requires: Attached Control Tower": 706,
+    "Battlecruiser Requires: Attached Control Tower Science Facility with attached Physics Lab": 707,  # noqa: E501
     "Comsat Station Requires: Academy": 708,
     "Nuclear Silo Requires: Science Facility with attached Covert Ops": 709,
     "Barracks Requires: Command Center": 710,
@@ -2346,9 +2346,9 @@ DefaultStatText: TypeAlias = Literal[
     "Firebat Requires: Academy",
     "Goliath Requires: Armory",
     "Siege Tank Requires: Attached Machine Shop",
-    "Science Vessel Requires: Attached Constrol Tower Science Facility",
-    "Dropship Requires: Attached Constrol Tower",
-    "Battlecruiser Requires: Attached Constrol Tower Science Facility with attached Physics Lab",  # noqa: E501
+    "Science Vessel Requires: Attached Control Tower Science Facility",
+    "Dropship Requires: Attached Control Tower",
+    "Battlecruiser Requires: Attached Control Tower Science Facility with attached Physics Lab",  # noqa: E501
     "Comsat Station Requires: Academy",
     "Nuclear Silo Requires: Science Facility with attached Covert Ops",
     "Barracks Requires: Command Center",

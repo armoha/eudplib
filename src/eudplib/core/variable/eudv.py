@@ -686,8 +686,8 @@ def VProc(  # noqa: N802
 
 
 # From vbuffer.py
-def EUDCreateVariables(varn: int):  # noqa: N802
-    return List2Assignable([EUDVariable() for _ in range(varn)])
+def EUDCreateVariables(var_count: int):  # noqa: N802
+    return List2Assignable([EUDVariable() for _ in range(var_count)])
 
 
 # -------
