@@ -38,10 +38,11 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Games/Entertainment :: Real Time Strategy",
 ]
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.15"
 dependencies = [
     # Must be kept in sync with `build-system.requires`
     "typing_extensions"
@@ -96,6 +97,7 @@ exclude = [
 ]
 
 [tool.mypy]
+exclude = "src/epscript"
 show_error_codes = true
 check_untyped_defs = true
 no_implicit_reexport = true
@@ -134,6 +136,8 @@ line-length = 85
 exclude = ["pybind11"]
 
 [tool.ruff.lint.per-file-ignores]
+"src/eudplib/__init__.py" = ['F401', 'F403']
+"src/eudplib/prelude/__init__.py" = ['RUF022']
 "tests/**.py" = ['F403', 'F405']
 "tests/unittests/**.py" = ['F403', 'F405']
 "tests/unittests/__epspy__/**.py" = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
