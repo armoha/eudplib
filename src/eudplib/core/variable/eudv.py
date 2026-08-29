@@ -56,7 +56,7 @@ def process_dest(dest) -> int | ConstExpr:
 
 if sys.version_info >= (3, 14):
     _initial_refcount = 0
-elif sys.version_info >= (3, 11):
+elif sys.version_info >= (3, 10):
     _initial_refcount = 2
 else:
     _initial_refcount = 3
