@@ -1,0 +1,220 @@
+use std::path::PathBuf;
+
+fn main() {
+  // The bindgen::Builder is the main entry point
+  // to bindgen, and lets you build up options for
+  // the resulting bindings.
+  let mut bindings = bindgen::Builder::default()
+    // The input header we would like to generate
+    // bindings for.
+    .clang_arg("-I./deps/StormLib/src")
+    .header("./crates/stormlib-bindgen/src/wrapper.hpp")
+    // Tell cargo to invalidate the built crate whenever any of the
+    // included header files changed.
+    .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
+    .allowlist_type("^S[A-Z].+")
+    .allowlist_function("^S[A-Z].+")
+    .allowlist_var("^ERROR_.+");
+
+  for var in VARS {
+    bindings = bindings.allowlist_var(var);
+  }
+
+  #[cfg(target_os = "windows")]
+  let bindings = bindings.blocklist_function("SetLastError");
+
+  let bindings = bindings
+    // Finish the builder and generate the bindings.
+    .generate()
+    // Unwrap the Result and panic on failure.
+    .expect("Unable to generate bindings");
+
+  // Write the bindings to the $OUT_DIR/bindings.rs file.
+  let out_path = PathBuf::from("./crates/stormlib-sys/src");
+  #[cfg(target_os = "windows")]
+  let file_name = "bindings_windows.rs";
+  #[cfg(target_os = "linux")]
+  let file_name = "bindings_linux.rs";
+  #[cfg(target_os = "macos")]
+  let file_name = "bindings_macos.rs";
+  bindings
+    .write_to_file(out_path.join(file_name))
+    .expect("Couldn't write bindings!");
+}
+
+const VARS: &[&str] = &[
+  "STORMLIB_VERSION",
+  "STORMLIB_VERSION_STRING",
+  "ID_MPQ",
+  "ID_MPQ_USERDATA",
+  "ID_MPK",
+  "ERROR_AVI_FILE",
+  "ERROR_UNKNOWN_FILE_KEY",
+  "ERROR_CHECKSUM_ERROR",
+  "ERROR_INTERNAL_FILE",
+  "ERROR_BASE_FILE_MISSING",
+  "ERROR_MARKED_FOR_DELETE",
+  "ERROR_FILE_INCOMPLETE",
+  "ERROR_UNKNOWN_FILE_NAMES",
+  "ERROR_CANT_FIND_PATCH_PREFIX",
+  "HASH_TABLE_SIZE_MIN",
+  "HASH_TABLE_SIZE_DEFAULT",
+  "HASH_TABLE_SIZE_MAX",
+  "HASH_ENTRY_DELETED",
+  "HASH_ENTRY_FREE",
+  "HET_ENTRY_DELETED",
+  "HET_ENTRY_FREE",
+  "HASH_STATE_SIZE",
+  "SFILE_OPEN_HARD_DISK_FILE",
+  "SFILE_OPEN_CDROM_FILE",
+  "SFILE_OPEN_FROM_MPQ",
+  "SFILE_OPEN_CHECK_EXISTS",
+  "SFILE_OPEN_BASE_FILE",
+  "SFILE_OPEN_ANY_LOCALE",
+  "SFILE_OPEN_LOCAL_FILE",
+  "MPQ_FLAG_READ_ONLY",
+  "MPQ_FLAG_CHANGED",
+  "MPQ_FLAG_MALFORMED",
+  "MPQ_FLAG_HASH_TABLE_CUT",
+  "MPQ_FLAG_BLOCK_TABLE_CUT",
+  "MPQ_FLAG_CHECK_SECTOR_CRC",
+  "MPQ_FLAG_SAVING_TABLES",
+  "MPQ_FLAG_PATCH",
+  "MPQ_FLAG_WAR3_MAP",
+  "MPQ_FLAG_LISTFILE_NONE",
+  "MPQ_FLAG_LISTFILE_NEW",
+  "MPQ_FLAG_LISTFILE_FORCE",
+  "MPQ_FLAG_ATTRIBUTES_NONE",
+  "MPQ_FLAG_ATTRIBUTES_NEW",
+  "MPQ_FLAG_SIGNATURE_NONE",
+  "MPQ_FLAG_SIGNATURE_NEW",
+  "MPQ_SUBTYPE_MPQ",
+  "MPQ_SUBTYPE_SQP",
+  "MPQ_SUBTYPE_MPK",
+  "SFILE_INVALID_SIZE",
+  "SFILE_INVALID_POS",
+  "SFILE_INVALID_ATTRIBUTES",
+  "MPQ_FILE_IMPLODE",
+  "MPQ_FILE_COMPRESS",
+  "MPQ_FILE_ENCRYPTED",
+  "MPQ_FILE_FIX_KEY",
+  "MPQ_FILE_PATCH_FILE",
+  "MPQ_FILE_SINGLE_UNIT",
+  "MPQ_FILE_DELETE_MARKER",
+  "MPQ_FILE_SECTOR_CRC",
+  "MPQ_FILE_SIGNATURE",
+  "MPQ_FILE_EXISTS",
+  "MPQ_FILE_REPLACEEXISTING",
+  "MPQ_FILE_COMPRESS_MASK",
+  "MPQ_FILE_DEFAULT_INTERNAL",
+  "MPQ_FILE_VALID_FLAGS",
+  "MPQ_FILE_VALID_FLAGS_W3X",
+  "BLOCK_INDEX_MASK",
+  "MPQ_COMPRESSION_HUFFMANN",
+  "MPQ_COMPRESSION_ZLIB",
+  "MPQ_COMPRESSION_PKWARE",
+  "MPQ_COMPRESSION_BZIP2",
+  "MPQ_COMPRESSION_SPARSE",
+  "MPQ_COMPRESSION_ADPCM_MONO",
+  "MPQ_COMPRESSION_ADPCM_STEREO",
+  "MPQ_COMPRESSION_LZMA",
+  "MPQ_COMPRESSION_NEXT_SAME",
+  "MPQ_WAVE_QUALITY_HIGH",
+  "MPQ_WAVE_QUALITY_MEDIUM",
+  "MPQ_WAVE_QUALITY_LOW",
+  "HET_TABLE_SIGNATURE",
+  "BET_TABLE_SIGNATURE",
+  "MPQ_KEY_HASH_TABLE",
+  "MPQ_KEY_BLOCK_TABLE",
+  "LISTFILE_NAME",
+  "SIGNATURE_NAME",
+  "ATTRIBUTES_NAME",
+  "PATCH_METADATA_NAME",
+  "MPQ_FORMAT_VERSION_1",
+  "MPQ_FORMAT_VERSION_2",
+  "MPQ_FORMAT_VERSION_3",
+  "MPQ_FORMAT_VERSION_4",
+  "MPQ_ATTRIBUTE_CRC32",
+  "MPQ_ATTRIBUTE_FILETIME",
+  "MPQ_ATTRIBUTE_MD5",
+  "MPQ_ATTRIBUTE_PATCH_BIT",
+  "MPQ_ATTRIBUTE_ALL",
+  "MPQ_ATTRIBUTES_V1",
+  "BASE_PROVIDER_FILE",
+  "BASE_PROVIDER_MAP",
+  "BASE_PROVIDER_HTTP",
+  "BASE_PROVIDER_MASK",
+  "STREAM_PROVIDER_FLAT",
+  "STREAM_PROVIDER_PARTIAL",
+  "STREAM_PROVIDER_MPQE",
+  "STREAM_PROVIDER_BLOCK4",
+  "STREAM_PROVIDER_MASK",
+  "STREAM_FLAG_READ_ONLY",
+  "STREAM_FLAG_WRITE_SHARE",
+  "STREAM_FLAG_USE_BITMAP",
+  "STREAM_OPTIONS_MASK",
+  "STREAM_PROVIDERS_MASK",
+  "STREAM_FLAGS_MASK",
+  "MPQ_OPEN_NO_LISTFILE",
+  "MPQ_OPEN_NO_ATTRIBUTES",
+  "MPQ_OPEN_NO_HEADER_SEARCH",
+  "MPQ_OPEN_FORCE_MPQ_V1",
+  "MPQ_OPEN_CHECK_SECTOR_CRC",
+  "MPQ_OPEN_PATCH",
+  "MPQ_OPEN_FORCE_LISTFILE",
+  "MPQ_OPEN_READ_ONLY",
+  "MPQ_CREATE_LISTFILE",
+  "MPQ_CREATE_ATTRIBUTES",
+  "MPQ_CREATE_SIGNATURE",
+  "MPQ_CREATE_ARCHIVE_V1",
+  "MPQ_CREATE_ARCHIVE_V2",
+  "MPQ_CREATE_ARCHIVE_V3",
+  "MPQ_CREATE_ARCHIVE_V4",
+  "MPQ_CREATE_ARCHIVE_VMASK",
+  "FLAGS_TO_FORMAT_SHIFT",
+  "SFILE_VERIFY_SECTOR_CRC",
+  "SFILE_VERIFY_FILE_CRC",
+  "SFILE_VERIFY_FILE_MD5",
+  "SFILE_VERIFY_RAW_MD5",
+  "SFILE_VERIFY_ALL",
+  "VERIFY_OPEN_ERROR",
+  "VERIFY_READ_ERROR",
+  "VERIFY_FILE_HAS_SECTOR_CRC",
+  "VERIFY_FILE_SECTOR_CRC_ERROR",
+  "VERIFY_FILE_HAS_CHECKSUM",
+  "VERIFY_FILE_CHECKSUM_ERROR",
+  "VERIFY_FILE_HAS_MD5",
+  "VERIFY_FILE_MD5_ERROR",
+  "VERIFY_FILE_HAS_RAW_MD5",
+  "VERIFY_FILE_RAW_MD5_ERROR",
+  "VERIFY_FILE_ERROR_MASK",
+  "SFILE_VERIFY_MPQ_HEADER",
+  "SFILE_VERIFY_HET_TABLE",
+  "SFILE_VERIFY_BET_TABLE",
+  "SFILE_VERIFY_HASH_TABLE",
+  "SFILE_VERIFY_BLOCK_TABLE",
+  "SFILE_VERIFY_HIBLOCK_TABLE",
+  "SFILE_VERIFY_FILE",
+  "SIGNATURE_TYPE_NONE",
+  "SIGNATURE_TYPE_WEAK",
+  "SIGNATURE_TYPE_STRONG",
+  "ERROR_NO_SIGNATURE",
+  "ERROR_VERIFY_FAILED",
+  "ERROR_WEAK_SIGNATURE_OK",
+  "ERROR_WEAK_SIGNATURE_ERROR",
+  "ERROR_STRONG_SIGNATURE_OK",
+  "ERROR_STRONG_SIGNATURE_ERROR",
+  "MD5_DIGEST_SIZE",
+  "SHA1_DIGEST_SIZE",
+  "LANG_NEUTRAL",
+  "CCB_CHECKING_FILES",
+  "CCB_CHECKING_HASH_TABLE",
+  "CCB_COPYING_NON_MPQ_DATA",
+  "CCB_COMPACTING_FILES",
+  "CCB_CLOSING_ARCHIVE",
+  "MPQ_HEADER_SIZE_V1",
+  "MPQ_HEADER_SIZE_V2",
+  "MPQ_HEADER_SIZE_V3",
+  "MPQ_HEADER_SIZE_V4",
+  "MPQ_HEADER_DWORDS",
+];

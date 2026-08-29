@@ -1,0 +1,13 @@
+[package]
+name = "stormlib-sys"
+version = "0.1.2"
+authors = ["Flux Xu <fluxxu@gmail.com>"]
+build = "build.rs"
+edition = "2018"
+
+[dependencies]
+libc = "0.2.155"
+bitflags = "1.2"
+
+[build-dependencies]
+cmake = "0.1.49"

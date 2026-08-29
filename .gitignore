@@ -15,6 +15,7 @@ htmlcov/
 .hypothesis/
 target/
 .rust-cov/
+src/rust/stormlib-rs/**/*.lock
 
 .idea/
 *.vscode
