@@ -10,6 +10,7 @@
 
 import builtins
 import keyword
+import types
 
 __version__ = "0.80.6"
 

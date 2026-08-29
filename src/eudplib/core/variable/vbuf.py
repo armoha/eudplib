@@ -63,7 +63,7 @@ class EUDVarBuffer(EUDObject):
                 emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802
-        for _ in range(4):
+        for _i in range(4):
             emitbuffer.WriteDword(0)  # nextptr
             emitbuffer.WriteSpace(15)
             emitbuffer.WriteByte(0)  # nocond
@@ -100,7 +100,7 @@ class EUDVarBuffer(EUDObject):
         emitbuffer.WriteSpace(27)
         emitbuffer.WriteByte(0)  # currentAction
 
-        for _ in range(27):
+        for _i in range(27):
             emitbuffer.WriteSpace(40)
             emitbuffer.WriteDword(4)  # flags
             emitbuffer.WriteSpace(27)
@@ -233,7 +233,7 @@ class EUDCustomVarBuffer(EUDObject):
         emitbuffer.WriteSpace(27)
         emitbuffer.WriteByte(0)  # currentAction
 
-        for _ in range(27):
+        for _i in range(27):
             emitbuffer.WriteSpace(40)
             emitbuffer.WriteDword(4)  # flags
             emitbuffer.WriteSpace(27)
