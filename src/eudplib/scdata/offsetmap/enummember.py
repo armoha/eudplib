@@ -7,7 +7,9 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Final, Literal, Self, TypeVar, overload
+from typing import Final, Literal, TypeVar, overload
+
+from typing_extensions import Self
 
 from ... import core as c
 from ... import ctrlstru as cs

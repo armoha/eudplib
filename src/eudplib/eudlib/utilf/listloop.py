@@ -5,7 +5,9 @@
 # file that should have been included as part of this package.
 
 from collections.abc import Iterator
-from typing import ClassVar, Self
+from typing import ClassVar
+
+from typing_extensions import Self
 
 from ... import core as c
 from ... import ctrlstru as cs

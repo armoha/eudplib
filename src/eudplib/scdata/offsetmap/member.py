@@ -12,11 +12,12 @@ from typing import (
     Final,
     Generic,
     Literal,
-    Self,
     TypeAlias,
     TypeVar,
     overload,
 )
+
+from typing_extensions import Self
 
 from ... import core as c
 from ... import utils as ut

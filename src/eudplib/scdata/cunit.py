@@ -5,7 +5,9 @@
 # file that should have been included as part of this package.
 
 # ruff: noqa: N815
-from typing import ClassVar, Self, cast
+from typing import ClassVar, cast
+
+from typing_extensions import Self
 
 from .. import core as c
 from .. import ctrlstru as cs
