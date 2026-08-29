@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 permissions:
@@ -15,15 +15,22 @@ concurrency:
 
 jobs:
   unittest:
-    name: Unittest
+    name: Unittest (${{ matrix.python-version }})
     runs-on: windows-latest
     timeout-minutes: 30
     env:
       CMAKE_GENERATOR: Ninja
+    continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.14"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        experimental: [false]
+        include:
+          - python-version: "3.13t"
+            experimental: true
+          - python-version: "3.14t"
+            experimental: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,6 +40,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
           cache: pip
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
@@ -87,10 +95,10 @@ jobs:
           python-version: "3.11"
       - name: Install mypy
         run: pip install "mypy==1.14.1" typing_extensions
-      - name: Run mypy for Python 3.11
-        run: mypy src/eudplib --python-version 3.11
-      - name: Run mypy for Python 3.10
+      - name: Run mypy for Python 3.10 (min)
         run: mypy src/eudplib --python-version 3.10
+      - name: Run mypy for Python 3.14 (max)
+        run: mypy src/eudplib --python-version 3.14
 
   typos:
     name: Typos
@@ -103,3 +111,16 @@ jobs:
       - uses: crate-ci/typos@v1
         with:
           config: ./.typos.toml
+
+  ruff:
+    name: Ruff
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: chartboost/ruff-action@v1
+        with:
+          version: "0.9.0"
+          src: "./src/eudplib"
