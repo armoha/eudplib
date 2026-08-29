@@ -184,7 +184,7 @@ class Condition(ConstExpr):
             pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
     def WritePayload(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802
-        pbuffer.WritePack("IIIHBBBBH", self.fields)  # type: ignore[arg-type]
+        pbuffer.WritePack("IIIHBBBBH", self.fields)
 
     def __bool__(self) -> NoReturn:
         raise RuntimeError(_("To prevent error, Condition can't be put into if."))

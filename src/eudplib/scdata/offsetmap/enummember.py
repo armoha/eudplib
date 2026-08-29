@@ -155,7 +155,7 @@ class Flag:
             )
             return ret
         elif parent.layout == "array":
-            # FIXME: replace to efficent implementation
+            # FIXME: replace to efficient implementation
             flags = instance._value
             ret = EUDVariable()
             ret << True
@@ -170,7 +170,7 @@ class Flag:
     def __set__(self, instance: EnumMember, value) -> None:
         from ...memio import f_maskwrite_epd
 
-        # FIXME: replace to efficent implementation
+        # FIXME: replace to efficient implementation
         # while subp is always int for StructMember,
         # subp can be EUDVariable or int for ArrayMember
         parent = instance._parent

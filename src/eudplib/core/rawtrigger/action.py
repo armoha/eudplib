@@ -258,4 +258,4 @@ class Action(ConstExpr):
                 pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
     def WritePayload(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802
-        pbuffer.WritePack("IIIIIIHBBBBH", self.fields)  # type: ignore[arg-type]
+        pbuffer.WritePack("IIIIIIHBBBBH", self.fields)

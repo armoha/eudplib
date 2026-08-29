@@ -325,7 +325,7 @@ class TrgUnit(EPDOffsetMap, ConstType):
     in the available spaace. Units without the Building flag will rely on their
     collision dimensions instead. Setting to 0x0 will make the unit invisible: It
     won't appear on screen and minimap, can't be selected by the mouse, and can't be
-    targetted by other units. `Bring` condition will not locate it. Setting this to
+    targeted by other units. `Bring` condition will not locate it. Setting this to
     a size of 31x31 or smaller will allow buildings to be built on any terrain,
     including water and cliffs, although the placement mechanics are a little wonky.
 

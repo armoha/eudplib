@@ -571,7 +571,7 @@ class EUDVariable(VariableBase):
                 return self.AtMost(0xFFFFFFFE)
         return (self - other).AtLeast(1)
 
-    def __le__(self, other) -> bt.Condition:  # type: ignore[override]
+    def __le__(self, other) -> bt.Condition:
         try:
             return self.AtMost(other)
 
@@ -582,7 +582,7 @@ class EUDVariable(VariableBase):
             SeqCompute(((EPD(condition) + 2, bt.SetTo, other),))
             return condition
 
-    def __ge__(self, other) -> bt.Condition:  # type: ignore[override]
+    def __ge__(self, other) -> bt.Condition:
         try:
             return self.AtLeast(other)
 
@@ -593,7 +593,7 @@ class EUDVariable(VariableBase):
             SeqCompute(((EPD(condition) + 2, bt.SetTo, other),))
             return condition
 
-    def __lt__(self, other) -> bt.Condition:  # type: ignore[override]
+    def __lt__(self, other) -> bt.Condition:
         other = unProxy(other)
         if isinstance(other, EUDVariable):
             bitmask = Forward()  # u32: Location number or bitmask for the condition
@@ -607,7 +607,7 @@ class EUDVariable(VariableBase):
             return bt.Never()  # No unsigned number is less than 0
         return self.AtMost(other - 1)
 
-    def __gt__(self, other) -> bt.Condition:  # type: ignore[override]
+    def __gt__(self, other) -> bt.Condition:
         other = unProxy(other)
         if isinstance(other, EUDVariable):
             bitmask = Forward()  # u32: Location number or bitmask for the condition

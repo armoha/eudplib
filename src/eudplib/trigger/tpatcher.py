@@ -115,7 +115,7 @@ def patch_action(act: Action | Forward | ExprProxy[Action | Forward]) -> Action:
     if isinstance(action, Forward):
         if action._expr is None:
             raise EPError(_("Forward not initialized"))
-        action = action._expr  # type: ignore[assignment]
+        action = action._expr
     if not isinstance(action, Action):
         raise EPError(_("Action expected, found {}").format(act))
     apply_patch_table(EPD(action), action, actpt)
