@@ -3,6 +3,7 @@ extend-exclude = [
   ".*__epspy__.*",
   "src/epscript/**",
   "tests/gprof2dot.py",
+  "src/rust/stormlib-rs/crates/stormlib-sys/src/bindings_windows.rs",
 ]
 
 [default.extend-words]
