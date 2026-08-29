@@ -9,7 +9,7 @@ extern bool TOKEN_MEMORY_DEBUG;
 TEST_CASE("Global variable management") {
     // Variable declaration is allowed
     check_string("var a;", "a = EUDVariable()\n");
-    // Cannot assign varable on global scope
+    // Cannot assign variable on global scope
     checkError("var b; b = 2;");
 }
 

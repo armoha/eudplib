@@ -15,7 +15,7 @@
 extern bool PARSER_DEBUG, MAP_DEBUG;
 
 std::string unindentString(const std::string& data);
-std::string trim(std::string s);  // Declared from parserUtilites.h
+std::string trim(std::string s);  // Declared from parserUtilities.h
 
 #define check_string(in, out) \
     CHECK(trim(ParseString("<test>", in, false)) == trim(out)); \

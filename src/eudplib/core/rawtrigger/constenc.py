@@ -424,7 +424,7 @@ def EncodePropState(s: __ExprProxy) -> _Byte:
 
 
 def EncodePropState(s: __Arg) -> _Byte:  # noqa: N802
-    """Convert [Enable, Disable, Toogle] to number [4, 5, 6]"""
+    """Convert [Enable, Disable, Toggle] to number [4, 5, 6]"""
     try:
         return PropStateDict[s]  # type: ignore[index]
     except KeyError:
@@ -508,7 +508,7 @@ def EncodeSwitchAction(s: __ExprProxy) -> _Byte:
 
 
 def EncodeSwitchAction(s: __Arg) -> _Byte:  # noqa: N802
-    """Convert [Set, Clear, Toogle, Random] to [4, 5, 6, 11]."""
+    """Convert [Set, Clear, Toggle, Random] to [4, 5, 6, 11]."""
     try:
         return SwitchActionDict[s]  # type: ignore[index]
     except KeyError:

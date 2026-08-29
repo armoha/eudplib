@@ -159,7 +159,7 @@ Initially `UnitGroup.pos` points to last entry of `UnitGroup`.\
 After every `UnitGroup.add(unitEPD)`, `UnitGroup.pos` decrements by 18 (= 72 // 4).
 * 348 = 8 (prev and next) + 320 (20 conditions * 16 bytes sized) + 20 (Value of SetDeaths action)\
     See http://www.staredit.net/wiki/index.php/Scenario.chk#.22TRIG.22_-_Triggers for TRIG layout
-* 72 = distance between TriggerX and TriggerX+1 (mininal overlapping distance of 0C 1A triggers)
+* 72 = distance between TriggerX and TriggerX+1 (minimal overlapping distance of 0C 1A triggers)
 * // 4 : SetDeaths uses EPD, not plain memory address.
 ```js
 function add(unitEPD) {
@@ -200,7 +200,7 @@ function add(unitEPD) {
 
 As mentioned above, all triggers in `UnitGroup` is *always* pointing `loopvar`: their nextptrs point to Trigger of loopvar, and their SetDeaths actions substitute to value of loopvar.
 
-So executing trigger of UnitGroup will feed loopvar with its value, and execute loopvar trigger. Destination of loopvar is initially 0x6509B0 (CurrentPlayer) so it edits CurrentPlayer to **unitEPD**, feeded from UnitGroup trigger just now.
+Executing the UnitGroup trigger will feed the loopvar with its value, and execute the loopvar trigger. Initial destination of the loopvar is 0x6509B0 (CurrentPlayer), so it will edit CurrentPlayer to **unitEPD**, which was fed from the UnitGroup trigger just now.
 
 ```js
 function UnitGroup.cploop() {

@@ -233,7 +233,7 @@ class CUnit(EPDOffsetMap):
     shieldGain: ClassVar[WordMember] = WordMember("struct", 0x0AA)
     "Shield gain on construction"
     remainingBuildTime: ClassVar[WordMember] = WordMember("struct", 0x0AC)
-    """Remaining bulding time; also used by powerups (flags)
+    """Remaining building time; also used by powerups (flags)
     as the timer for returning to their original location."""
     prevHp: ClassVar[WordMember] = WordMember("struct", 0x0AE)
     """The HP of the unit before it changed
@@ -286,7 +286,7 @@ class CUnit(EPDOffsetMap):
     resourceIscript: ClassVar[ByteMember] = ByteMember("struct", 0x0D2)
     gatherQueueCount: ClassVar[BoolMember] = BoolMember("struct", 0x0D3)
     """it is byte but effectively bool; always set to 1 when beginning to harvest,
-    but when finshed, it is    by 1 instead of set to 0"""
+    but when finished, it is subtracted by 1 instead of set to 0"""
     nextGatherer: ClassVar[CUnitMember] = CUnitMember("struct", 0x0D4)
     "pointer to the next worker unit waiting in line to gather"
     resourceGroup: ClassVar[ByteMember] = ByteMember("struct", 0x0D8)

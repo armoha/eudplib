@@ -119,7 +119,7 @@ class Upgrade(EPDOffsetMap, ConstType):
                     ],
                     [c.Add, c.Add],
                 )
-                # (BW) Trigger 4: nagative subp borrow from epd
+                # (BW) Trigger 4: negative subp borrow from epd
                 c.RawTrigger(
                     conditions=subp.AtLeast(0x80000000),
                     actions=[subp.AddNumber(4), epd.AddNumber(-1)],
@@ -206,7 +206,7 @@ class Upgrade(EPDOffsetMap, ConstType):
                 [ut.EPD(bw_researched) - q_off, -r_off, q15, r15],
                 [c.Add, c.Add, c.Add, c.Add],
             )
-            # (BW) Trigger 5: nagative subp borrow from epd
+            # (BW) Trigger 5: negative subp borrow from epd
             c.RawTrigger(
                 conditions=subp.AtLeast(0x80000000),
                 actions=[subp.AddNumber(4), epd.AddNumber(-1)],

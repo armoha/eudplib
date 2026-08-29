@@ -134,7 +134,7 @@ def initialize_payload(
 
     # -------
 
-    # Previous rawtrigger datas
+    # Previous rawtrigger data
 
     oldtrigraw = chkt.getsection("TRIG")
     oldtrigs = [oldtrigraw[i : i + 2400] for i in range(0, len(oldtrigraw), 2400)]

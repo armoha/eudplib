@@ -119,7 +119,7 @@ Token* TokenizerImpl::getToken() {
                     line++;
                 }
 
-                    // No special procesing is required. Python will take care of that.
+                    // No special processing is required. Python will take care of that.
                 else {
                     buffer.push_back('\\');
                     buffer.push_back(*cursor);

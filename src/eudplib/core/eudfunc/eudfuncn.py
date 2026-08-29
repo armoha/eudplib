@@ -85,7 +85,7 @@ class EUDFuncN:
         # Add return point
         self._fend = ac.Forward()
 
-        # Prevent double compilication
+        # Prevent double compilation
         ut.ep_assert(self._fstart is None, "EUDFuncN was already compiled")
 
         # Initialize new namespace

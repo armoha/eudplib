@@ -1338,7 +1338,7 @@ assign_stmt ::= lvalue(A) IBXR expr(B). [ASSIGN] { writeTraceInfo(ps->gen, A); p
 //     control structure reduce action.
 //
 
-// Once block. This block gets exceuted only once.
+// Once block. This block gets executed only once.
 once_start(A) ::= ONCE(B). {
     A = genTemp(B);
     ps->gen << A->data << " = EUDExecuteOnce()" << std::endl;

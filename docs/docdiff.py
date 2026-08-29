@@ -83,7 +83,7 @@ print('==================================')
 unused_functions = documented_functions.difference(doc_needed_functions)
 
 if unused_functions:
-    print("Entrys now unused:")
+    print("Entries now unused:")
     if unused_functions:
         print("  Unused functions:")
         print(unused_functions)

@@ -3576,7 +3576,7 @@ class DotWriter:
                     labels.append("%u%s" % (function1.called, MULTIPLICATION_SIGN))
 
             if color_by_difference and weight_difference:
-                # min and max is calculated whe color_by_difference is true
+                # min and max is calculated when color_by_difference is true
                 weight = rescale_difference(weight_difference, min_diff, max_diff)
 
             elif function1.weight is not None and not color_by_difference:

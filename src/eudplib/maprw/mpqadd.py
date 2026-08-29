@@ -61,8 +61,8 @@ def MPQAddFile(  # noqa: N802
 
     .. note::
         This function may error if duplicate filenames is found. However, not
-        all duplicated filenames are guaranteed to be catched here. Some of
-        them may be catched at _update_mpq(internal) function.
+        all duplicated filenames are guaranteed to be caught here. Some of
+        them may be caught at _update_mpq(internal) function.
     """
 
     if not (

@@ -11,14 +11,14 @@ from .playerinfo import init_player_info
 from .proptable import apply_property_map, init_property_map
 from .stringmap import apply_string_map, init_stringmaps
 
-_inited: bool = False
+_initialized: bool = False
 _chkt: CHK | None = None
 _origchkt: CHK | None = None
 _rawfile: bytes | None = None
 
 
 def init_map_data(chkt: CHK, rawfile: bytes) -> None:
-    global _inited, _origchkt, _chkt, _rawfile
+    global _initialized, _origchkt, _chkt, _rawfile
     _chkt = chkt
     _origchkt = chkt.clone()
     _rawfile = rawfile
@@ -26,7 +26,7 @@ def init_map_data(chkt: CHK, rawfile: bytes) -> None:
     init_stringmaps(chkt)
     init_property_map(chkt)
     init_player_info(chkt)
-    _inited = True
+    _initialized = True
 
 
 def update_map_data() -> None:
@@ -37,7 +37,7 @@ def update_map_data() -> None:
 
 
 def IsMapdataInitialized() -> bool:  # noqa: N802
-    return _inited
+    return _initialized
 
 
 def GetChkTokenized() -> CHK:  # noqa: N802

@@ -41,7 +41,7 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
     def __init__(self, epd: int | c.EUDVariable) -> None:
         if isinstance(epd, c.EUDVariable) and not EPDOffsetMap._cast:
             epd = c.EUDVariable() << epd
-            # To ellide var copy of rvalue variable (rvalue optimization),
+            # To elide var copy of rvalue variable (rvalue optimization),
             # variable is not added in dict to not increment refcount.
             #
             # example)
