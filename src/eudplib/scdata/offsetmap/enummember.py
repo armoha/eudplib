@@ -20,7 +20,7 @@ from .memberkind import BaseKind, ByteKind, DwordKind, WordKind
 
 
 class EnumMember(ExprProxy):
-    __slots__ = ("_parent", "_instance", "_is_initialized", "_value_lazy")
+    __slots__ = ("_instance", "_is_initialized", "_parent", "_value_lazy")
 
     def __getattr__(self, name):
         try:

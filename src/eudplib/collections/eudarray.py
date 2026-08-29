@@ -10,7 +10,7 @@ from typing_extensions import Self
 from .. import core as c
 from .. import utils as ut
 from ..core.inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
-from ..ctrlstru import EUDElse, EUDEndIf, EUDIf, EUDNot
+from ..ctrlstru import EUDNot
 from ..localize import _
 from ..memio import f_dwread_epd, f_dwwrite_epd
 from ..utils import EPError
@@ -31,7 +31,7 @@ class EUDArrayData(c.EUDObject):
     Structure for storing multiple values.
     """
 
-    __slots__ = ("_data", "_arrlen")
+    __slots__ = "_arrlen", "_data"
 
     dont_flatten = True
 
@@ -79,7 +79,7 @@ def _get_epd(ptr):
 
 
 class EUDArray(ut.ExprProxy):
-    __slots__ = ("length", "_epd")
+    __slots__ = "_epd", "length"
     dont_flatten = True
 
     def __init__(self, initval=None, *, _from=None) -> None:

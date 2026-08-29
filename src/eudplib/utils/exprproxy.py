@@ -64,7 +64,7 @@ class ExprProxy(Generic[T_co]):
 
         if not isinstance(self._value, EUDVariable):
             raise EPError(_("Can't assign {} to constant expression").format(other))
-        if not (type(other) is int and other == 0):  # noqa: E721
+        if not (type(other) is int and other == 0):
             try:
                 other = type(self).cast(other)
             except (AttributeError, TypeError):

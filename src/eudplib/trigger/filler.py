@@ -7,7 +7,6 @@
 from typing import TypeAlias
 
 from .. import core as c
-from .. import utils as ut
 from ..core import ConstExpr, EUDVariable, RlocInt_C
 from ..core.eudfunc.eudf import _EUDPredefineParam
 from ..core.rawtrigger.constenc import SetTo, TrgModifier
