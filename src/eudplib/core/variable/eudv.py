@@ -54,13 +54,17 @@ def process_dest(dest) -> int | ConstExpr:
     return epd
 
 
-if sys.version_info >= (3, 11):
+if sys.version_info >= (3, 14):
+    _initial_refcount = 0
+elif sys.version_info >= (3, 11):
     _initial_refcount = 2
 else:
     _initial_refcount = 3
 
 
 def _is_rvalue(obj: object, refcount_bonus: int = 0, /) -> bool:
+    if sys.version_info >= (3, 14):
+        return False
     refcount = _initial_refcount + 2 + refcount_bonus
     if isinstance(obj, EUDVariable) and sys.getrefcount(obj) != refcount:
         return False
@@ -74,6 +78,8 @@ def _is_rvalue(obj: object, refcount_bonus: int = 0, /) -> bool:
 def _yield_and_check_rvalue(
     obj: Any, refcount_bonus: int = 0, is_rvalue: bool = True
 ) -> Iterator[tuple[Any, bool]]:
+    if sys.version_info >= (3, 14):
+        is_rvalue = False
     refcount = _initial_refcount + refcount_bonus
     is_rvalue &= sys.getrefcount(obj) <= refcount
     if isinstance(obj, ExprProxy):
