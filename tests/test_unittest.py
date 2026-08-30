@@ -49,6 +49,7 @@ from unittests import (
     test_lvalue,
     test_sq_from_1var,
     test_eps,
+    test_linetable,
     testshortcircuit,
     testlistloopcompiles,
     testmapdatahelper,
