@@ -5,6 +5,6 @@
 #include "../test_base.hpp"
 
 TEST_CASE("Static variable") {
-    checkBlock("static var x = 0;", "x = EUDVariable(0)\n");
-    checkBlock("static var x, y = 0, 1;", "x, y = (EUDVariable(x) for x in (0, 1))\n");
+    checkBlock("static var x = 0;", "x = _TYSV([None], [0])\n");
+    checkBlock("static var x, y = 0, 1;", "x, y = _TYSV([None, None], [0, 1])\n");
 }

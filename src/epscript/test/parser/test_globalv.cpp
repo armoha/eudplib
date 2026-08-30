@@ -18,8 +18,7 @@ TEST_CASE("Multiple variable") {
     check_string(
             "var a, b = 1, 2;",
 
-            "a, b = EUDCreateVariables(2)\n"
-                    "_IGVA([a, b], lambda: [1, 2])\n"
+            "a, b = _TYGV([None, None], lambda: [1, 2])\n"
     );
 
     check_string(
