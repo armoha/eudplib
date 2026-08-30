@@ -5,4 +5,6 @@ use pyo3::prelude::*;
 pub(crate) mod epscript_mod {
     #[pymodule_export]
     use eudplib_epscript::linetable::generate_linetable;
+    #[pymodule_export]
+    use eudplib_epscript::linetable::LineMap;
 }
