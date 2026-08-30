@@ -21,13 +21,13 @@ maintainers = [
      {name = "Armoha", email = "kein0011@naver.com"},
 ]
 description = "eudplib is a package which provides scripting for StarCraft Use Map Setting(UMS) to UMS map and tool developers."
-readme = "README.rst"
-license = {text = "MIT"}
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 keywords = ["StarCraft", "EUD", "Trigger"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: POSIX :: Linux",
     "Operating System :: Microsoft :: Windows",
