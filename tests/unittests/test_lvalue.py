@@ -86,5 +86,6 @@ def test_rvalue():
             [12, v3.GetVTable(), 0x55555555, EPD(v5.getValueAddr()), 0xFFFFFFFF],
         )
 
-    with expect_eperror():
-        SetVariables(f_dwread_epd(0), 0)
+        # this test is for _yield_and_check_rvalue(), not checkNonRValue()
+        with expect_eperror():
+            SetVariables(f_dwread_epd(0), 0)

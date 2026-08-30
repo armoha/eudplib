@@ -25,3 +25,4 @@ tests/output.png
 tests/output.pstats
 *.svg
 .venv
+uv.lock
