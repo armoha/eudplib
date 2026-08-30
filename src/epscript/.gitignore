@@ -44,6 +44,7 @@ crashlytics-build.properties
 fabric.properties
 
 # CMake
+/lemon2
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts

@@ -4,6 +4,8 @@ build/
 dist/
 htmlcov/
 *.so
+*.dll
+*.dylib
 .tox/
 .cache/
 .coverage

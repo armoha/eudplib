@@ -65,10 +65,19 @@ set_target_properties(epScriptLib  PROPERTIES
         VERSION ${EPSCRIPT_VERSION}
         SOVERSION ${EPSCRIPT_SOVERSION}
         )
+if (WIN32)
+    # Match the name loaded by eudplib.epscript.epscompile on every platform.
+    set_target_properties(epScriptLib PROPERTIES PREFIX "" OUTPUT_NAME libepScriptLib)
+endif()
 
-# Python binding (.pyd/.so)
-add_subdirectory(pybind11)
-pybind11_add_module(pyepScript ${SOURCE_FILES} pybindmain.cpp)
+# Python binding (.pyd/.so). Optional: the wheel build only needs epScriptLib,
+# so it configures with -DBUILD_PYEPSCRIPT=OFF and does not require Python
+# development headers.
+option(BUILD_PYEPSCRIPT "Build the pyepScript pybind11 Python module" ON)
+if (BUILD_PYEPSCRIPT)
+    add_subdirectory(pybind11)
+    pybind11_add_module(pyepScript ${SOURCE_FILES} pybindmain.cpp)
+endif()
 
 # Testing
 add_executable(epScriptTest ${SOURCE_FILES} ${TEST_SOURCE_FILES} test/testmain.cpp)
@@ -85,8 +94,10 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
             # COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_LINKER_FILE:epScriptLib>" "${EUDDRAFT_PATH}$<TARGET_LINKER_FILE_NAME:libepScriptLib>"
             COMMENT "Copying to other projects - eudtrglib & euddraft"
             VERBATIM)
-    add_custom_command(TARGET pyepScript POST_BUILD
-            COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_LINKER_FILE:pyepScript>" "${CMAKE_CURRENT_SOURCE_DIR}/../eudplib/epscript/$<TARGET_LINKER_FILE_NAME:pyepScript>"
-            COMMENT "Copying python extension to pyepScript"
-            VERBATIM)
+    if (BUILD_PYEPSCRIPT)
+        add_custom_command(TARGET pyepScript POST_BUILD
+                COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_LINKER_FILE:pyepScript>" "${CMAKE_CURRENT_SOURCE_DIR}/../eudplib/epscript/$<TARGET_LINKER_FILE_NAME:pyepScript>"
+                COMMENT "Copying python extension to pyepScript"
+                VERBATIM)
+    endif()
 endif()

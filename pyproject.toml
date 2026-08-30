@@ -3,12 +3,13 @@
 # ./.github/requirements/build-requirements.{in,txt}
 requires = [
     "maturin>=1,<2",
-    "cmake",  # need for static build StormLib
+    "cmake",  # need for static build StormLib and the epScript library
 
     # Must be kept in sync with `project.dependencies`
     "typing_extensions",
 ]
-build-backend = "maturin"
+build-backend = "build_backend"
+backend-path = ["."]
 
 [project]
 name = "eudplib"
@@ -61,34 +62,27 @@ python-packages = ["eudplib"]
 manifest-path = "src/rust/Cargo.toml"
 module-name = "eudplib.bindings._rust"
 locked = true
-sdist-generator = "git"
+sdist-generator = "cargo"
 features = ["pyo3/abi3-py310"]
 include = [
     "LICENSE",
-
+    "build_backend.py",
     "docs/**/*",
 
-    "src/epscript/**/*.py",
-    "src/epscript/**/*.c",
-    "src/epscript/**/*.h",
-    "src/epscript/**/*.cpp",
-    "src/epscript/**/*.hpp",
-    "src/epscript/**/*.txt",
+    # libepScriptLib is built per-platform by src/epscript/build_epscript.py and
+    # must end up in the wheel even though it is gitignored (*.so/*.dll/*.dylib).
+    { path = "src/eudplib/epscript/libepScriptLib.*", format = "wheel" },
 
-    "src/rust/**/Cargo.toml",
-    "src/rust/**/Cargo.lock",
-    "src/rust/**/*.rs",
-    "src/rust/stormlib-rs/deps/StormLib/**/*",
-
-    "tests/**/*.py",
-    "tests/**/*.eps",
-    "tests/**/*.bat",
-    "tests/**/*.tbl",
-    "tests/outputmap/basemap/*.scx",
-    "tests/outputmap/basemap/RequireData",
+    # Build sources. Only needed to build the epScript library and the Rust
+    # extension from a source distribution, not to install the wheel.
+    { path = "src/epscript/**/*", format = "sdist" },
+    { path = "src/rust/**/*", format = "sdist" },
+    { path = "tests/**/*", format = "sdist" },
 ]
 exclude = [
     "src/epscript/build/**/*",
+    "src/epscript/cmake-*/**/*",
+    "src/epscript/pybind11/**/*",
     "src/rust/target/**/*",
     "tools/**/*",
     ".github/**/*",
