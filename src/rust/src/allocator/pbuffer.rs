@@ -146,7 +146,7 @@ impl PayloadBuffer {
         // Conditions
         let mut condition_count = 0;
         for condition in conditions {
-            self.WritePack("IIIHBBBBH", condition?.downcast()?)?;
+            self.WritePack("IIIHBBBBH", condition?.cast()?)?;
             condition_count += 1;
         }
         if condition_count < 16 {
@@ -157,7 +157,7 @@ impl PayloadBuffer {
         // Actions
         let mut action_count = 0;
         for action in actions {
-            self.WritePack("IIIIIIHBBBBH", action?.downcast()?)?;
+            self.WritePack("IIIIIIHBBBBH", action?.cast()?)?;
             action_count += 1;
         }
         if action_count < 64 {

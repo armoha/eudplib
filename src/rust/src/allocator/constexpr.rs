@@ -7,13 +7,13 @@ use pyo3::types::{PyDict, PyInt, PyNone, PyString, PyTuple};
 
 #[derive(Debug)]
 pub(crate) struct ConstExpr {
-    baseobj: PyObject,
+    baseobj: Py<PyAny>,
     offset: i32,
     rlocmode: i32,
 }
 
 impl ConstExpr {
-    pub(crate) fn new(baseobj: PyObject, offset: i32, rlocmode: i32) -> Self {
+    pub(crate) fn new(baseobj: Py<PyAny>, offset: i32, rlocmode: i32) -> Self {
         Self {
             baseobj,
             offset,
@@ -35,7 +35,7 @@ pub struct PyConstExpr(pub(crate) ConstExpr);
 impl PyConstExpr {
     #[new]
     #[pyo3(signature = (baseobj, offset=0, rlocmode=4))]
-    fn new(baseobj: PyObject, offset: i32, rlocmode: i32) -> PyResult<Self> {
+    fn new(baseobj: Py<PyAny>, offset: i32, rlocmode: i32) -> PyResult<Self> {
         Ok(Self(ConstExpr::new(baseobj, offset, rlocmode)))
     }
 
@@ -216,28 +216,25 @@ impl PyConstExpr {
 /// Class for forward definition.
 #[pyclass(extends = PyConstExpr, module = "eudplib.core.allocator")]
 pub struct Forward {
-    expr: PyObject,
+    expr: Py<PyAny>,
 }
 
 #[pymethods]
 impl Forward {
     #[new]
-    fn new(py: Python) -> PyResult<(Self, PyConstExpr)> {
+    fn new(py: Python) -> PyResult<PyClassInitializer<Self>> {
         let expr = ConstExpr::new(PyNone::get(py).into_py_any(py)?, 0, 4);
-        Ok((
-            Self {
-                expr: PyNone::get(py).into_py_any(py)?,
-            },
-            PyConstExpr(expr),
-        ))
+        Ok(PyClassInitializer::from(PyConstExpr(expr)).add_subclass(Self {
+            expr: PyNone::get(py).into_py_any(py)?,
+        }))
     }
 
     #[getter]
-    fn get_expr(&self, py: Python) -> PyResult<PyObject> {
+    fn get_expr(&self, py: Python) -> PyResult<Py<PyAny>> {
         Ok(self.expr.clone_ref(py))
     }
 
-    fn __lshift__<'a>(&mut self, py: Python<'a>, mut expr: Bound<'a, PyAny>) -> PyResult<PyObject> {
+    fn __lshift__<'a>(&mut self, py: Python<'a>, mut expr: Bound<'a, PyAny>) -> PyResult<Py<PyAny>> {
         if !self.expr.is_none(py) {
             return Err(PyAttributeError::new_err(
                 "Reforwarding without reset is not allowed",
@@ -275,9 +272,10 @@ impl Forward {
         if self.expr.is_none(py) {
             return Err(PyRuntimeError::new_err("Forward not initialized"));
         }
-        self.expr
+        Ok(self
+            .expr
             .call_method0(py, intern!(py, "Evaluate"))?
-            .extract::<PyRlocInt>(py)
+            .extract::<PyRlocInt>(py)?)
     }
 
     #[pyo3(signature = (*py_args, **py_kwargs))]
@@ -286,15 +284,15 @@ impl Forward {
         py: Python,
         py_args: &Bound<'_, PyTuple>,
         py_kwargs: Option<&Bound<'_, PyDict>>,
-    ) -> PyResult<PyObject> {
+    ) -> PyResult<Py<PyAny>> {
         self.expr.call(py, py_args, py_kwargs)
     }
 
-    fn __getattr__(&self, py: Python, name: &Bound<'_, PyString>) -> PyResult<PyObject> {
+    fn __getattr__(&self, py: Python, name: &Bound<'_, PyString>) -> PyResult<Py<PyAny>> {
         self.expr.getattr(py, name)
     }
 
-    fn __getitem__(&self, py: Python, name: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+    fn __getitem__(&self, py: Python, name: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
         Ok(self.expr.bind(py).get_item(name)?.into_py_any(py)?)
     }
 
