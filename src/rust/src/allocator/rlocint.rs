@@ -67,7 +67,7 @@ impl fmt::Display for RlocInt {
 
 /// Relocatable int
 #[derive(Clone)]
-#[pyclass(frozen, name = "RlocInt_C", module = "eudplib.core.allocator")]
+#[pyclass(from_py_object, frozen, name = "RlocInt_C", module = "eudplib.core.allocator")]
 pub struct PyRlocInt(pub(crate) RlocInt);
 
 #[pymethods]

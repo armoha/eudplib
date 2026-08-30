@@ -1,11 +1,11 @@
 //! from https://github.com/pyca/cryptography/blob/main/src/rust/src/types.rs
 use pyo3::prelude::*;
-use pyo3::sync::GILOnceCell;
+use pyo3::sync::PyOnceLock;
 
 pub(crate) struct LazyPyImport {
     module: &'static str,
     names: &'static [&'static str],
-    value: GILOnceCell<PyObject>,
+    value: PyOnceLock<Py<PyAny>>,
 }
 
 impl LazyPyImport {
@@ -13,7 +13,7 @@ impl LazyPyImport {
         LazyPyImport {
             module,
             names,
-            value: GILOnceCell::new(),
+            value: PyOnceLock::new(),
         }
     }
 

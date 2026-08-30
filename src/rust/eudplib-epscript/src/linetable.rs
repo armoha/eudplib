@@ -489,8 +489,8 @@ mod tests {
 
     #[test]
     fn test_generate_linetable_roundtrip() {
-        pyo3::prepare_freethreaded_python();
-        Python::with_gil(|py| {
+        Python::initialize();
+        Python::attach(|py| {
             let line_map = Py::new(
                 py,
                 LineMap::from_pairs(vec![(0, 0), (1, 10), (2, 20), (5, 50)]),
@@ -538,8 +538,8 @@ mod tests {
 
     #[test]
     fn test_generate_linetable_errors() {
-        pyo3::prepare_freethreaded_python();
-        Python::with_gil(|py| {
+        Python::initialize();
+        Python::attach(|py| {
             let line_map = Py::new(py, LineMap::from_pairs(vec![(0, 0)])).unwrap();
             let empty_map = Py::new(py, LineMap::from_pairs(vec![])).unwrap();
 
@@ -559,8 +559,8 @@ mod tests {
 
     #[test]
     fn test_fixture_tables() {
-        pyo3::prepare_freethreaded_python();
-        Python::with_gil(|py| {
+        Python::initialize();
+        Python::attach(|py| {
             for name in ["linetable_before1", "linetable_before2"] {
                 let table = std::fs::read(format!("test/{name}")).unwrap();
                 let (entries, covered) = decode_entries(&table, 1).unwrap();

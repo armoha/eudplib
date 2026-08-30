@@ -20,15 +20,15 @@ use pyo3::types::PyNone;
 ///     it should on Writing phase here.
 ///     - Writing phase : Object is written into payload.
 #[derive(Clone)]
-#[pyclass(subclass, frozen, extends = PyConstExpr, name = "EUDObject", module = "eudplib.core.eudobj")]
+#[pyclass(from_py_object, subclass, frozen, extends = PyConstExpr, name = "EUDObject", module = "eudplib.core.eudobj")]
 pub struct PyEUDObject;
 
 #[pymethods]
 impl PyEUDObject {
     #[new]
-    fn new(py: Python) -> PyResult<(Self, PyConstExpr)> {
+    fn new(py: Python) -> PyResult<PyClassInitializer<Self>> {
         let expr = ConstExpr::new(PyNone::get(py).into_py_any(py)?, 0, 4);
-        Ok((Self {}, PyConstExpr(expr)))
+        Ok(PyClassInitializer::from(PyConstExpr(expr)).add_subclass(Self {}))
     }
 
     /// Whether function is constructed dynamically.
@@ -49,7 +49,7 @@ impl PyEUDObject {
     ///     In overriding this method, you can use
     ///     :func:`eudplib.GetObjectAddr`.
     #[allow(non_snake_case)]
-    fn Evaluate(slf: PyRef<Self>, py: Python) -> PyResult<PyObject> {
+    fn Evaluate(slf: PyRef<Self>, py: Python) -> PyResult<Py<PyAny>> {
         let get_object_addr = GET_OBJECT_ADDR.get(py)?;
         let addr = get_object_addr.call1((slf.into_py_any(py)?,))?;
         Ok(addr.into_py_any(py)?)
