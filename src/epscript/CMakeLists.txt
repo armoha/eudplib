@@ -7,10 +7,15 @@ set(EUDPLIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../eudplib/")
 set(EUDDRAFT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../euddraft/")
 
 if (WIN32)
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-    # set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s -static-libgcc -static")
-    # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -static-libgcc -static-libstdc++ -static")
+    if (MSVC)
+        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+    else()
+        # MinGW: statically link the GCC runtime so the DLL does not depend on
+        # libgcc/libstdc++/winpthread DLLs.
+        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -static-libgcc -static")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static")
+    endif()
     SET(CMAKE_AR  "gcc-ar")
     SET(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")
     SET(CMAKE_C_ARCHIVE_FINISH   true)
@@ -89,11 +94,6 @@ add_executable(epScriptProfile ${SOURCE_FILES} libmain.cpp test/stresstest.cpp)
 
 if (CMAKE_BUILD_TYPE MATCHES "Release")
     message("release mode - static linked")
-    add_custom_command(TARGET epScriptLib POST_BUILD
-            # COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_LINKER_FILE:epScriptLib>" "${EUDPLIB_PATH}epscript/$<TARGET_LINKER_FILE_NAME:libepScriptLib>"
-            # COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_LINKER_FILE:epScriptLib>" "${EUDDRAFT_PATH}$<TARGET_LINKER_FILE_NAME:libepScriptLib>"
-            COMMENT "Copying to other projects - eudtrglib & euddraft"
-            VERBATIM)
     if (BUILD_PYEPSCRIPT)
         add_custom_command(TARGET pyepScript POST_BUILD
                 COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_LINKER_FILE:pyepScript>" "${CMAKE_CURRENT_SOURCE_DIR}/../eudplib/epscript/$<TARGET_LINKER_FILE_NAME:pyepScript>"
