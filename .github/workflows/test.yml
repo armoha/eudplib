@@ -27,8 +27,8 @@ jobs:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         experimental: [false]
         include:
-          - python-version: "3.13t"
-            experimental: true
+          # PyO3 supports the free-threaded build of CPython 3.14+ only.
+          # (see MIN_FREE_THREADED_VERSION in pyo3-ffi's build script)
           - python-version: "3.14t"
             experimental: true
     steps:
