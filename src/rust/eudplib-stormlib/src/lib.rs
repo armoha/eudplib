@@ -15,6 +15,22 @@ pub use constants::*;
 pub mod error;
 use error::*;
 
+/// StormLib defines `GetLastError`/`SetLastError` only on Windows; on other
+/// platforms errors are tracked in a thread-local read via `SErrGetLastError`.
+/// Provide the missing `GetLastError` symbol so the extension links and runs on
+/// non-Windows targets.
+#[cfg(not(target_os = "windows"))]
+mod err_compat {
+    extern "C" {
+        fn SErrGetLastError() -> u32;
+    }
+
+    #[no_mangle]
+    pub extern "C" fn GetLastError() -> u32 {
+        unsafe { SErrGetLastError() }
+    }
+}
+
 /// MPQ archive
 #[derive(Debug)]
 pub struct Archive {
