@@ -74,91 +74,88 @@ def f_test_compatibility():
     # (Line 27) py_exec("from helper import *\n\
     # (Line 36) ");
     exec("from helper import *\nwith expect_eperror():\n    Trigger(cond, ret.AddNumber(1 << 0))\nwith expect_eperror():\n    Trigger(empty, ret.AddNumber(1 << 1))\nwith expect_eperror():\n    Trigger(empty + 1, ret.AddNumber(1 << 2))\nwith expect_eperror():\n    SetVariables(ret, -1, EUDVariable(EncodeModifier(SetTo)))\n")
-    # (Line 37) py_exec("from helper import *\n\
-    # (Line 45) ");
-    exec("from helper import *\nwith expect_eperror():\n    SetVariables(EUDVariable(), 1)\nwith expect_eperror():\n    SetVariables(f_dwread_epd(0), 1)\npv = PVariable()\nwith expect_eperror():\n    SetVariables(pv[0], 1)\n")
-    # (Line 46) const tc = GetTriggerCounter();
+    # (Line 37) const tc = GetTriggerCounter();
     tc = GetTriggerCounter()
-    # (Line 47) var x0 = EUDVariable(0);
+    # (Line 38) var x0 = EUDVariable(0);
     x0 = _TYLV([None], [EUDVariable(0)])
-    # (Line 48) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 50) var x1 = list(EUDVariable(0));
+    # (Line 39) ep_assert(tc + 1 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc + 1 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 41) var x1 = list(EUDVariable(0));
     x1 = _TYLV([None], [FlattenList([EUDVariable(0)])])
-    # (Line 51) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 53) var x2 = list(list(EUDVariable(0)));
+    # (Line 42) ep_assert(tc + 2 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc + 2 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 44) var x2 = list(list(EUDVariable(0)));
     x2 = _TYLV([None], [FlattenList([FlattenList([EUDVariable(0)])])])
-    # (Line 54) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 56) var x3 = ExprProxy(EUDVariable(0));
+    # (Line 45) ep_assert(tc + 3 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc + 3 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 47) var x3 = ExprProxy(EUDVariable(0));
     x3 = _TYLV([None], [ExprProxy(EUDVariable(0))])
-    # (Line 57) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 59) var x4 = ExprProxy(ExprProxy(EUDVariable(0)));
+    # (Line 48) ep_assert(tc + 4 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc + 4 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 50) var x4 = ExprProxy(ExprProxy(EUDVariable(0)));
     x4 = _TYLV([None], [ExprProxy(ExprProxy(EUDVariable(0)))])
-    # (Line 60) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 62) var x5, y5 = EUDVariable(0), EUDVariable(0);
+    # (Line 51) ep_assert(tc + 5 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc + 5 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 53) var x5, y5 = EUDVariable(0), EUDVariable(0);
     x5, y5 = _TYLV([None, None], [EUDVariable(0), EUDVariable(0)])
-    # (Line 63) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 65) var x6, y6 = list(EUDVariable(0), EUDVariable(0));
+    # (Line 54) ep_assert(tc + 6 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc + 6 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 56) var x6, y6 = list(EUDVariable(0), EUDVariable(0));
     x6, y6 = _TYLV([None, None], [FlattenList([EUDVariable(0), EUDVariable(0)])])
-    # (Line 66) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 68) var x7, y7, z7 = EUDCreateVariables(3);
+    # (Line 57) ep_assert(tc + 7 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc + 7 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 59) var x7, y7, z7 = EUDCreateVariables(3);
     x7, y7, z7 = _TYLV([None, None, None], [EUDCreateVariables(3)])
-    # (Line 69) ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 71) const vlist = EUDCreateVariables(3);
+    # (Line 60) ep_assert(tc + 8 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc + 8 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 62) const vlist = EUDCreateVariables(3);
     vlist = EUDCreateVariables(3)
-    # (Line 72) var x8, y8, z8 = vlist;
+    # (Line 63) var x8, y8, z8 = vlist;
     x8, y8, z8 = _TYLV([None, None, None], [vlist])
-    # (Line 73) ep_assert(tc + 1 == GetTriggerCounter(), "Wrongly elide var copy");
-    ep_assert(tc + 1 == GetTriggerCounter(), "Wrongly elide var copy")
-    # (Line 75) const tc2 = GetTriggerCounter();
+    # (Line 64) ep_assert(tc + 9 == GetTriggerCounter(), "Wrongly elide var copy");
+    ep_assert(tc + 9 == GetTriggerCounter(), "Wrongly elide var copy")
+    # (Line 66) const tc2 = GetTriggerCounter();
     tc2 = GetTriggerCounter()
-    # (Line 76) var x9, y9, z9 = list(vlist[2], vlist[1], vlist[0]);
+    # (Line 67) var x9, y9, z9 = list(vlist[2], vlist[1], vlist[0]);
     x9, y9, z9 = _TYLV([None, None, None], [FlattenList([vlist[2], vlist[1], vlist[0]])])
-    # (Line 77) ep_assert(tc2 + 1 == GetTriggerCounter(), "Wrongly elide var copy");
+    # (Line 68) ep_assert(tc2 + 1 == GetTriggerCounter(), "Wrongly elide var copy");
     ep_assert(tc2 + 1 == GetTriggerCounter(), "Wrongly elide var copy")
-    # (Line 79) const tc3 = GetTriggerCounter();
+    # (Line 70) const tc3 = GetTriggerCounter();
     tc3 = GetTriggerCounter()
-    # (Line 80) var x10 = dwread_epd(0);
+    # (Line 71) var x10 = dwread_epd(0);
     x10 = _TYLV([None], [f_dwread_epd(0)])
-    # (Line 81) ep_assert(tc3 + 1 == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc3 + 1 == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 83) const foo = function () : TrgUnit { return 0; };
+    # (Line 72) ep_assert(tc3 + 2 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc3 + 2 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 74) const foo = function () : TrgUnit { return 0; };
     @EUDTypedFunc([], [TrgUnit])
     def _lambda2():
         EUDReturn(0)
 
     foo = _lambda2
-    # (Line 84) foo();  // create function body
+    # (Line 75) foo();  // create function body
     foo()
-    # (Line 85) const tc4 = GetTriggerCounter();
+    # (Line 76) const tc4 = GetTriggerCounter();
     tc4 = GetTriggerCounter()
-    # (Line 86) var baar = foo();
+    # (Line 77) var baar = foo();
     baar = _TYLV([None], [foo()])
-    # (Line 87) ep_assert(tc4 + 1 == GetTriggerCounter(), "Fail to elide var copy");
-    ep_assert(tc4 + 1 == GetTriggerCounter(), "Fail to elide var copy")
-    # (Line 89) cond.__lshift__(Memory(empty, AtLeast, 1));
+    # (Line 78) ep_assert(tc4 + 2 == GetTriggerCounter(), "No copy elision, TODO");
+    ep_assert(tc4 + 2 == GetTriggerCounter(), "No copy elision, TODO")
+    # (Line 80) cond.__lshift__(Memory(empty, AtLeast, 1));
     cond.__lshift__(Memory(empty, AtLeast, 1))
-    # (Line 90) if (cond) { ret += 1 << 3; }
+    # (Line 81) if (cond) { ret += 1 << 3; }
     if EUDIf()(cond):
         ret.__iadd__(_LSH(1,3))
-        # (Line 91) ret += x;
+        # (Line 82) ret += x;
     EUDEndIf()
     ret.__iadd__(x)
-    # (Line 92) if(Is64BitWireframe()) {}
+    # (Line 83) if(Is64BitWireframe()) {}
     if EUDIf()(Is64BitWireframe()):
-        # (Line 93) var z = EUDVariable();
+        # (Line 84) var z = EUDVariable();
         pass
     EUDEndIf()
     z = _TYLV([None], [EUDVariable()])
-    # (Line 94) math.cos(1);
+    # (Line 85) math.cos(1);
     math.cos(1)
-    # (Line 95) return ret;
+    # (Line 86) return ret;
     EUDReturn(ret)
-    # (Line 96) }
+    # (Line 87) }

@@ -124,7 +124,7 @@ def _TYLV(types, vs):  # noqa: N802
     from ..core.variable.eudv import _yield_and_check_rvalue
 
     ret, ops = [], []
-    for ty, v_and_is_rvalue in zip(types, _yield_and_check_rvalue(vs, 1)):
+    for ty, v_and_is_rvalue in zip(types, _yield_and_check_rvalue(vs)):
         is_untyped = ty is None or issubclass(ty, EUDVariable)
         v, is_rvalue = v_and_is_rvalue
         is_eudvar = IsEUDVariable(v)
