@@ -66,7 +66,7 @@ T = TypeVar("T", bound=EnumMember)
 
 
 class BaseEnum(BaseMember[T]):
-    __slots__ = ("_enum", "layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ("__name__", "__objclass__", "_enum", "layout", "offset", "stride")
 
     def __init__(
         self,
@@ -125,7 +125,7 @@ class DwordEnum(BaseEnum[T]):
 
 
 class Flag:
-    __slots__ = ("mask", "__objclass__", "__name__")
+    __slots__ = ("__name__", "__objclass__", "mask")
 
     mask: Final[int]
 

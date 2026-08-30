@@ -118,7 +118,7 @@ class EUDVariable(VariableBase):
     """Full variable."""
 
     _addor: EUDVariable
-    __slots__ = ("_vartrigger", "_varact", "_rvalue")
+    __slots__ = ("_rvalue", "_varact", "_vartrigger")
 
     def __init__(self, initval=0) -> None:
         if not isinstance(initval, (int, ConstExpr)):  # noqa: UP038

@@ -105,7 +105,7 @@ T = TypeVar("T")
 class BaseMember(Generic[T], metaclass=ABCMeta):
     """Base descriptor class/mixin for EPDOffsetMap"""
 
-    __slots__ = ("layout", "offset", "stride", "__objclass__", "__name__")
+    __slots__ = ("__name__", "__objclass__", "layout", "offset", "stride")
 
     def __init__(
         self,
