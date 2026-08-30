@@ -165,9 +165,9 @@ class Action(ConstExpr):
             and IsConstExpr(fields[3])
             and IsConstExpr(fields[4])
             and IsConstExpr(fields[5])
-            and isinstance(fields[6], int)
-            and isinstance(fields[7], int)
-            and isinstance(fields[8], int)
+            and type(fields[6]) is int
+            and type(fields[7]) is int
+            and type(fields[8]) is int
             and isinstance(fields[9], int)
         ):
             return
@@ -254,7 +254,7 @@ class Action(ConstExpr):
 
     def CollectDependency(self, pbuffer: ObjCollector) -> None:  # noqa: N802
         for field in self.fields[:6]:
-            if not isinstance(field, int):
+            if not type(field) is int:
                 pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
     def WritePayload(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802

@@ -99,7 +99,7 @@ def FlattenList(lst: Any, ret=None) -> list:  # noqa: N802
     if ret is None:
         ret = []
 
-    if isinstance(lst, _string_types) or hasattr(lst, "dont_flatten"):
+    if hasattr(lst, "dont_flatten") or isinstance(lst, _string_types):
         ret.append(lst)
         return ret
 
@@ -114,7 +114,7 @@ def FlattenList(lst: Any, ret=None) -> list:  # noqa: N802
 
 
 def FlattenIter(lst: Any) -> Iterator:  # noqa: N802
-    if isinstance(lst, _string_types) or hasattr(lst, "dont_flatten"):
+    if hasattr(lst, "dont_flatten") or isinstance(lst, _string_types):
         yield lst
     else:
         try:

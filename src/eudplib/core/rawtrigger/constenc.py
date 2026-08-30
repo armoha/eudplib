@@ -23,6 +23,11 @@ from .consttype import (
     _ExprProxy,
 )
 
+# Sentinel used by the Encode* helpers to tell a dict miss apart from a
+# legitimate value, avoiding the cost of raising and catching KeyError on
+# the hot encode path.
+_MISSING = object()
+
 # fmt: off
 
 
@@ -240,6 +245,10 @@ def _EncodeConst(t: type[ConstType], s: _ExprProxy, u: str | None = None) -> _Dw
 
 
 def _EncodeConst(t: type[ConstType], s: _Arg, u: str | None = None) -> _Dword:  # noqa: N802
+    # Common case: int / EUDVariable / ConstExpr — passthrough
+    if not isinstance(s, ExprProxy):
+        return s
+
     while isinstance(s, ExprProxy) and not isinstance(s, ConstType):
         s = s._value
     if isinstance(s, ConstType):
@@ -266,10 +275,10 @@ def EncodeAllyStatus(s: __ExprProxy) -> _Byte:
 
 def EncodeAllyStatus(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2]."""
-    try:
-        return AllyStatusDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgAllyStatus, s)  # type: ignore[return-value]
+    v = AllyStatusDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgAllyStatus, s)
+    return v
 
 
 @overload
@@ -289,10 +298,10 @@ def EncodeComparison(s: __ExprProxy) -> _Byte:
 
 def EncodeComparison(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10]."""
-    try:
-        return ComparisonDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgComparison, s)  # type: ignore[return-value]
+    v = ComparisonDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgComparison, s)
+    return v
 
 
 @overload
@@ -312,10 +321,10 @@ def EncodeModifier(s: __ExprProxy) -> _Byte:
 
 def EncodeModifier(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [SetTo, Add, Subtract] to number [7, 8, 9]."""
-    try:
-        return ModifierDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgModifier, s)  # type: ignore[return-value]
+    v = ModifierDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgModifier, s)
+    return v
 
 
 @overload
@@ -335,10 +344,10 @@ def EncodeOrder(s: __ExprProxy) -> _Byte:
 
 def EncodeOrder(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Move, Patrol, Attack] to number [0, 1, 2]."""
-    try:
-        return OrderDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgOrder, s)  # type: ignore[return-value]
+    v = OrderDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgOrder, s)
+    return v
 
 
 @overload
@@ -402,10 +411,10 @@ def EncodePlayer(s: _Arg) -> _Dword:  # noqa: N802
     if type(s) is ev.EUDVariable:
         return s
 
-    try:
-        return PlayerDict[s]  # type: ignore[index]
-    except KeyError:
+    v = PlayerDict.get(s, _MISSING)
+    if v is _MISSING:
         return _EncodeConst(_Player, s, "TrgPlayer")
+    return v
 
 
 @overload
@@ -425,10 +434,10 @@ def EncodePropState(s: __ExprProxy) -> _Byte:
 
 def EncodePropState(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Enable, Disable, Toggle] to number [4, 5, 6]"""
-    try:
-        return PropStateDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgPropState, s)  # type: ignore[return-value]
+    v = PropStateDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgPropState, s)
+    return v
 
 
 @overload
@@ -448,10 +457,10 @@ def EncodeResource(s: __ExprProxy) -> _Byte:
 
 def EncodeResource(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Ore, Gas, OreAndGas] to [0, 1, 2]"""
-    try:
-        return ResourceDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgResource, s)  # type: ignore[return-value]
+    v = ResourceDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgResource, s)
+    return v
 
 
 @overload
@@ -486,10 +495,10 @@ def EncodeScore(s: __Arg) -> _Byte:  # noqa: N802
     ================= ========
 
     """
-    try:
-        return ScoreDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgScore, s)  # type: ignore[return-value]
+    v = ScoreDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgScore, s)
+    return v
 
 
 @overload
@@ -509,10 +518,10 @@ def EncodeSwitchAction(s: __ExprProxy) -> _Byte:
 
 def EncodeSwitchAction(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Set, Clear, Toggle, Random] to [4, 5, 6, 11]."""
-    try:
-        return SwitchActionDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgSwitchAction, s)  # type: ignore[return-value]
+    v = SwitchActionDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgSwitchAction, s)
+    return v
 
 
 @overload
@@ -532,10 +541,10 @@ def EncodeSwitchState(s: __ExprProxy) -> _Byte:
 
 def EncodeSwitchState(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Set, Cleared] to [2, 3]."""
-    try:
-        return SwitchStateDict[s]  # type: ignore[index]
-    except KeyError:
-        return _EncodeConst(TrgSwitchState, s)  # type: ignore[return-value]
+    v = SwitchStateDict.get(s, _MISSING)
+    if v is _MISSING:
+        return _EncodeConst(TrgSwitchState, s)
+    return v
 
 
 @overload

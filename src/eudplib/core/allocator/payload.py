@@ -99,12 +99,12 @@ class ObjCollector:
         pass
 
     def WriteDword(self, obj: Evaluable) -> None:  # noqa: N802
-        if not isinstance(obj, int):
+        if not type(obj) is int:
             Evaluate(obj)
 
     def WritePack(self, structformat: str, arglist: list[Evaluable]) -> None:  # noqa: N802
         for arg in arglist:
-            if not isinstance(arg, int):
+            if not type(arg) is int:
                 Evaluate(arg)
 
     def WriteBytes(self, b: bytes) -> None:  # noqa: N802

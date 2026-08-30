@@ -59,7 +59,7 @@ class EUDVarBuffer(EUDObject):
 
     def CollectDependency(self, emitbuffer: ObjCollector) -> None:  # noqa: N802
         for initval in self._initvals:
-            if not isinstance(initval, int):
+            if not type(initval) is int:
                 emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802
@@ -173,15 +173,15 @@ class EUDCustomVarBuffer(EUDObject):
 
     def CollectDependency(self, emitbuffer: ObjCollector):  # noqa: N802
         for initval in self._5nptrs:
-            if not isinstance(initval, int):
+            if not type(initval) is int:
                 emitbuffer.WriteDword(initval)
         for initvals in self._actnptr_pairs:
             for initval in initvals:
-                if not isinstance(initval, int):
+                if not type(initval) is int:
                     emitbuffer.WriteDword(initval)
         for initvals in self._5acts:
             for initval in initvals:
-                if not isinstance(initval, int):
+                if not type(initval) is int:
                     emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802
