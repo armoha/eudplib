@@ -15,8 +15,8 @@ concurrency:
 
 jobs:
   unittest:
-    name: Unittest (${{ matrix.python-version }})
-    runs-on: windows-latest
+    name: Unittest (${{ matrix.os }}, ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     env:
       CMAKE_GENERATOR: Ninja
@@ -24,18 +24,41 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-        experimental: [false]
         include:
+          - os: windows-latest
+            python-version: "3.10"
+          - os: windows-latest
+            python-version: "3.11"
+          - os: windows-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.13"
+          - os: windows-latest
+            python-version: "3.14"
           # PyO3 supports the free-threaded build of CPython 3.14+ only.
           # (see MIN_FREE_THREADED_VERSION in pyo3-ffi's build script)
-          - python-version: "3.14t"
+          - os: windows-latest
+            python-version: "3.14t"
             experimental: true
+          - os: ubuntu-latest
+            python-version: "3.12"
+          - os: ubuntu-latest
+            python-version: "3.14"
+          - os: macos-latest
+            python-version: "3.12"
+          - os: macos-latest
+            python-version: "3.14"
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
           submodules: recursive
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build zlib1g-dev libbz2-dev
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
