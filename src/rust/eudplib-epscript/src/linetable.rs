@@ -1,188 +1,385 @@
+//! Python 3.11+ `co_linetable` rewriting for epScript.
+//!
+//! Rewrites the raw `co_linetable` bytes of a code object so that its line
+//! numbers point to epScript source lines.
+//! Each entry is decoded directly, its start line is mapped
+//! through [`LineMap`], and it is re-encoded as kind 13 (no column info).
+//! Entries without a location (kind 15) are preserved unchanged.
+//!
+//! Only applies to Python 3.11+; Python 3.10 uses the legacy `co_lnotab`
+//! format, handled elsewhere.
+//!
+//! # References
+//!
+//! The `co_linetable` format is specified in
+//! [`Objects/locations.md`](https://github.com/python/cpython/blob/3.13/Objects/locations.md)
+//! (Python 3.11–3.13). On Python 3.14+/`main` it was inlined into
+//! [`InternalDocs/code_objects.md`](https://github.com/python/cpython/blob/main/InternalDocs/code_objects.md).
+//! Entry lengths are in code units (2 bytes each), so a
+//! table must cover exactly `len(co_code) / 2` units.
+//!
+//! The decoder follows the line-state machine in
+//! [`Objects/codeobject.c`](https://github.com/python/cpython/blob/3.13/Objects/codeobject.c):
+//!
+//! * `_PyLineTable_NextAddressRange` / `advance()` / `retreat()` /
+//!   `get_line_delta` — the start-line delta of an entry is relative to the
+//!   previous entry's start line, or `co_firstlineno` for the first entry;
+//!   kind 15 consumes no payload and does not change the state.
+//! * `advance_with_locations` — exact payload layout per kind:
+//!   - 0–9 short form: one column byte, same line;
+//!   - 10–12 one-line form: two column bytes, line delta `code - 10`;
+//!   - 13 no column info: one signed varint;
+//!   - 14 long form: start-line svarint, end-line varint, start-column varint,
+//!     end-column varint (columns are stored as `value + 1`, `0` = `None`);
+//!   - 15 no location: no payload.
+//!
+//! The writer mirrors CPython's `remove_column_info`: located entries are
+//! rewritten to kind 13 keeping their length and line delta, and kind 15
+//! entries are kept as-is.
+//!
+//! Variable-length integer helpers follow
+//! [`Include/internal/pycore_code.h`](https://github.com/python/cpython/blob/3.13/Include/internal/pycore_code.h)
+//! (`write_varint`, `write_signed_varint`, `write_location_entry_start`), and
+//! the 1..=8 code-unit entry limit comes from the assembler
+//! [`Python/compile.c`](https://github.com/python/cpython/blob/3.13/Python/compile.c)
+//! (`assemble_emit_location`), which splits longer spans. Original entry
+//! lengths are preserved, so no splitting is needed here.
+
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use pyo3::sync::GILOnceCell;
-use pyo3::types::PyIterator;
-use regex::Regex;
-use std::borrow::Cow;
-use std::collections::BTreeMap;
-use std::iter::Iterator;
-use std::str;
+use pyo3::types::PyBytes;
+use std::fmt;
 
-static LINENO_REGEX: GILOnceCell<Regex> = GILOnceCell::new();
+const NO_COLUMNS: u8 = 13;
+const NO_LOCATION: u8 = 15;
 
-#[allow(dead_code)]
-fn print_entries(linetable_bytes: Vec<u8>) {
-    let linetable_reader = LinetableReader {
-        data: linetable_bytes,
-        cursor: 0,
-    };
-    for entry in linetable_reader {
-        let head = entry[0];
-        let code = (head & 0x78) >> 3;
-        let num_bytecode = (head & 0x07) + 1;
-        print!("code is: {code:2}, num_bytecode is: {num_bytecode:2},");
-        for byte in entry {
-            print!(" {byte:08b}");
+#[derive(Debug)]
+enum LinetableError {
+    Truncated { offset: usize, what: &'static str },
+    ExpectedHeader { offset: usize },
+    UnexpectedHeader { offset: usize },
+    VarintOverflow { offset: usize },
+    LineOverflow { line: i64 },
+    CoverageMismatch { covered: usize, expected: usize },
+    UnmappedLine { line: i64 },
+    Internal(&'static str),
+}
+
+impl fmt::Display for LinetableError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Truncated { offset, what } => {
+                write!(
+                    f,
+                    "unexpected end of linetable at byte {offset} while reading {what}"
+                )
+            }
+            Self::ExpectedHeader { offset } => {
+                write!(f, "expected linetable entry header at byte {offset}")
+            }
+            Self::UnexpectedHeader { offset } => {
+                write!(
+                    f,
+                    "unexpected entry header at byte {offset} inside entry payload"
+                )
+            }
+            Self::VarintOverflow { offset } => {
+                write!(f, "linetable varint at byte {offset} is too large")
+            }
+            Self::LineOverflow { line } => write!(f, "line number overflow: {line}"),
+            Self::CoverageMismatch { covered, expected } => write!(
+                f,
+                "linetable covers {covered} code units but co_code has {expected}"
+            ),
+            Self::UnmappedLine { line } => write!(f, "no epScript line mapped for line {line}"),
+            Self::Internal(what) => write!(f, "internal error: {what}"),
         }
-        println!();
     }
 }
 
-/// generate_linetable(data, linetable, positions, /)
+impl From<LinetableError> for PyErr {
+    fn from(error: LinetableError) -> Self {
+        PyValueError::new_err(error.to_string())
+    }
+}
+
+/// A sorted map from generated Python line numbers to epScript line numbers.
+#[pyclass(frozen)]
+pub struct LineMap {
+    points: Vec<(i64, i64)>,
+}
+
+impl LineMap {
+    fn from_pairs(points: Vec<(i64, i64)>) -> Self {
+        let mut points = points;
+        points.sort_by_key(|&(key, _)| key);
+        Self { points }
+    }
+
+    fn map(&self, line: i64) -> Option<i64> {
+        let index = self.points.partition_point(|&(key, _)| key <= line);
+        if index == 0 {
+            None
+        } else {
+            Some(self.points[index - 1].1)
+        }
+    }
+}
+
+#[pymethods]
+impl LineMap {
+    #[new]
+    fn new(points: Vec<(i64, i64)>) -> Self {
+        Self::from_pairs(points)
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct Entry {
+    length: u8,
+    start_line: Option<i64>,
+}
+
+struct Reader<'a> {
+    data: &'a [u8],
+    pos: usize,
+}
+
+impl Reader<'_> {
+    fn byte(&mut self, what: &'static str) -> Result<u8, LinetableError> {
+        let byte = *self.data.get(self.pos).ok_or(LinetableError::Truncated {
+            offset: self.pos,
+            what,
+        })?;
+        self.pos += 1;
+        Ok(byte)
+    }
+
+    fn payload(&mut self, what: &'static str) -> Result<u8, LinetableError> {
+        let offset = self.pos;
+        let byte = self.byte(what)?;
+        if byte & 0x80 != 0 {
+            return Err(LinetableError::UnexpectedHeader { offset });
+        }
+        Ok(byte)
+    }
+
+    fn uvarint(&mut self) -> Result<i64, LinetableError> {
+        let offset = self.pos;
+        let mut value = 0u64;
+        let mut chunks = 0u32;
+        loop {
+            if chunks == 10 {
+                return Err(LinetableError::VarintOverflow { offset });
+            }
+            let byte = self.payload("varint")?;
+            value |= u64::from(byte & 0x3f) << (chunks * 6);
+            chunks += 1;
+            if byte & 0x40 == 0 {
+                return Ok(value as i64);
+            }
+        }
+    }
+
+    fn svarint(&mut self) -> Result<i64, LinetableError> {
+        let encoded = self.uvarint()?;
+        if encoded & 1 != 0 {
+            Ok(-(encoded >> 1))
+        } else {
+            Ok(encoded >> 1)
+        }
+    }
+}
+
+/// Decodes a Python 3.11+ `co_linetable` into entries.
+///
+/// Column information is discarded; only the start line of each entry and its
+/// length in code units are kept. Entries with no location (kind 15) keep
+/// `start_line == None` and do not affect the line state of following entries.
+fn decode_entries(table: &[u8], firstlineno: i64) -> Result<(Vec<Entry>, usize), LinetableError> {
+    let mut reader = Reader {
+        data: table,
+        pos: 0,
+    };
+    let mut entries = Vec::new();
+    let mut current_line = firstlineno;
+    let mut covered = 0usize;
+    while reader.pos < table.len() {
+        let offset = reader.pos;
+        let header = reader.byte("location entry header")?;
+        if header & 0x80 == 0 {
+            return Err(LinetableError::ExpectedHeader { offset });
+        }
+        let kind = (header >> 3) & 0x0f;
+        let length = (header & 0x07) + 1;
+        let start_line = match kind {
+            0..=9 => {
+                reader.payload("short form column byte")?;
+                Some(current_line)
+            }
+            10..=12 => {
+                current_line = current_line
+                    .checked_add(i64::from(kind) - 10)
+                    .ok_or(LinetableError::LineOverflow { line: current_line })?;
+                reader.payload("one line form start column")?;
+                reader.payload("one line form end column")?;
+                Some(current_line)
+            }
+            13 => {
+                current_line = current_line
+                    .checked_add(reader.svarint()?)
+                    .ok_or(LinetableError::LineOverflow { line: current_line })?;
+                Some(current_line)
+            }
+            14 => {
+                current_line = current_line
+                    .checked_add(reader.svarint()?)
+                    .ok_or(LinetableError::LineOverflow { line: current_line })?;
+                reader.uvarint()?;
+                reader.uvarint()?;
+                reader.uvarint()?;
+                Some(current_line)
+            }
+            15 => None,
+            _ => unreachable!("kind is masked to 4 bits"),
+        };
+        covered += usize::from(length);
+        entries.push(Entry { length, start_line });
+    }
+    Ok((entries, covered))
+}
+
+fn encode_varint(out: &mut Vec<u8>, mut value: u64) {
+    loop {
+        let chunk = (value & 0x3f) as u8;
+        value >>= 6;
+        if value == 0 {
+            out.push(chunk);
+            return;
+        }
+        out.push(chunk | 0x40);
+    }
+}
+
+fn encode_svarint(out: &mut Vec<u8>, value: i64) -> Result<(), LinetableError> {
+    let encoded = if value < 0 {
+        let magnitude = value
+            .checked_neg()
+            .ok_or(LinetableError::LineOverflow { line: value })? as u64;
+        (magnitude << 1) | 1
+    } else {
+        (value as u64) << 1
+    };
+    if encoded >> 60 != 0 {
+        return Err(LinetableError::LineOverflow { line: value });
+    }
+    encode_varint(out, encoded);
+    Ok(())
+}
+
+/// Re-encodes entries with line numbers mapped through `line_map`.
+///
+/// Located entries are emitted as kind 13 (no column info); entries without a
+/// location are preserved as kind 15 so that they keep covering their code
+/// units without affecting the line state of following entries.
+fn rewrite_entries(
+    entries: &[Entry],
+    new_firstlineno: i64,
+    line_map: &LineMap,
+) -> Result<Vec<u8>, LinetableError> {
+    let mut out = Vec::with_capacity(entries.len() * 2);
+    let mut current_line = new_firstlineno;
+    for entry in entries {
+        match entry.start_line {
+            None => {
+                out.push(0x80 | (NO_LOCATION << 3) | (entry.length - 1));
+            }
+            Some(line) => {
+                let mapped = line_map
+                    .map(line)
+                    .ok_or(LinetableError::UnmappedLine { line })?;
+                out.push(0x80 | (NO_COLUMNS << 3) | (entry.length - 1));
+                let delta = mapped
+                    .checked_sub(current_line)
+                    .ok_or(LinetableError::LineOverflow { line: mapped })?;
+                encode_svarint(&mut out, delta)?;
+                current_line = mapped;
+            }
+        }
+    }
+    Ok(out)
+}
+
+/// generate_linetable(line_map, linetable, code, firstlineno, /)
 /// --
 ///
-/// Returns a Python 3.11+ co_linetable from data and co_positions.
+/// Rewrites a Python 3.11+ `co_linetable` so that its line numbers point to
+/// epScript source lines, using the given line map.
+///
+/// Returns a `(new_firstlineno, new_linetable)` tuple.
 ///
 /// # Arguments
 ///
-/// * `data` - UTF-8 encoded python source code compiled from .eps
-/// * `linetable` - `codeObj.co_linetable` bytes
-/// * `positions` - `codeObj.co_positions()` iterator
+/// * `line_map` - `LineMap` of generated Python line to epScript line
+/// * `linetable` - `codeobj.co_linetable` bytes
+/// * `code` - `codeobj.co_code` bytes, used to validate table coverage
+/// * `firstlineno` - `codeobj.co_firstlineno`
 #[pyfunction]
-pub fn generate_linetable<'a>(
-    data: &'a [u8],
-    linetable: Vec<u8>,
-    positions: &Bound<'a, PyIterator>,
-) -> PyResult<Cow<'a, [u8]>> {
-    let line_regex = LINENO_REGEX.get_or_init(positions.py(), || {
-        Regex::new(r" *# \(Line (\d+)\)").unwrap()
-    });
-    let mut eps_linemap: BTreeMap<u32, u32> = str::from_utf8(data)?
-        .lines()
-        .enumerate()
-        .filter_map(|(index, line)| {
-            line_regex.captures(line).and_then(|c| {
-                c.get(1)?
-                    .as_str()
-                    .parse()
-                    .ok()
-                    .map(|x| (1 + index as u32, x))
-            })
-        })
-        .collect();
-    eps_linemap.insert(0, 0);
+#[pyo3(signature = (line_map, linetable, code, firstlineno, /))]
+pub fn generate_linetable<'py>(
+    py: Python<'py>,
+    line_map: PyRef<'_, LineMap>,
+    linetable: &[u8],
+    code: &[u8],
+    firstlineno: i64,
+) -> PyResult<(i64, Bound<'py, PyBytes>)> {
+    if code.len() % 2 != 0 {
+        return Err(PyValueError::new_err(
+            "co_code length must be a multiple of two",
+        ));
+    }
+    let code_units = code.len() / 2;
+    let new_firstlineno = line_map
+        .map(firstlineno)
+        .ok_or(LinetableError::UnmappedLine { line: firstlineno })?;
 
-    // co_positions is iterator of (int, int, int, int)
-    // = (start_line, end_line, start_column, end_column)
-    // TODO: use epScript column as well for richer error message
-    let epspy_lines: Vec<u32> = positions
-        .try_iter()?
-        .map(|i| {
-            i.and_then(|ob: Bound<'_, PyAny>| <(u32, u32, u32, u32)>::extract_bound(&ob))
-                .map(|x| x.0)
-                .unwrap_or(u32::MAX)
-        })
-        .collect();
-
-    let linetable_reader = LinetableReader::new(linetable);
-    let mut linetable_writer = LinetableWriter::new();
-    let mut code_length = 0;
-    for entry in linetable_reader {
-        let epspy_line = epspy_lines[code_length as usize];
-        let (_, new_startline) = eps_linemap.range(..=epspy_line).next_back().unwrap();
-        linetable_writer.calc_linetable(*new_startline, code_length);
-        linetable_writer.update_cursor(*new_startline, code_length);
-
-        let num_bytecode = (entry[0] & 0x07) + 1;
-        code_length += num_bytecode as u32;
+    let (entries, covered) = decode_entries(linetable, firstlineno)?;
+    if covered != code_units {
+        return Err(LinetableError::CoverageMismatch {
+            covered,
+            expected: code_units,
+        }
+        .into());
     }
 
-    linetable_writer.calc_linetable(linetable_writer.cur_lineno, code_length);
-    Ok(linetable_writer.linetable.into())
-}
+    let new_table = rewrite_entries(&entries, new_firstlineno, &line_map)?;
 
-struct LinetableReader {
-    data: Vec<u8>,
-    cursor: usize,
-}
-
-impl LinetableReader {
-    fn new(linetable: Vec<u8>) -> Self {
-        Self {
-            data: linetable,
-            cursor: 0,
+    let (redecoded, recovered) = decode_entries(&new_table, new_firstlineno)?;
+    if recovered != code_units {
+        return Err(LinetableError::CoverageMismatch {
+            covered: recovered,
+            expected: code_units,
         }
+        .into());
     }
-}
-
-impl Iterator for LinetableReader {
-    type Item = Vec<u8>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.cursor >= self.data.len() {
-            return None;
+    for (entry, redecoded_entry) in entries.iter().zip(redecoded.iter()) {
+        if entry.length != redecoded_entry.length {
+            return Err(LinetableError::Internal("entry length mismatch").into());
         }
-        let mut item = Vec::new();
-        for byte in &self.data[self.cursor..] {
-            if !item.is_empty() && byte & 0x80 == 0x80 {
-                break;
+        match (entry.start_line, redecoded_entry.start_line) {
+            (None, None) => {}
+            (Some(line), Some(new_line)) => {
+                if line_map.map(line) != Some(new_line) {
+                    return Err(LinetableError::Internal("entry line mismatch").into());
+                }
             }
-            item.push(*byte);
-        }
-        self.cursor += item.len();
-        Some(item)
-    }
-}
-
-struct LinetableWriter {
-    cur_lineno: u32,
-    cur_bytecode: u32,
-    linetable: Vec<u8>,
-}
-
-impl LinetableWriter {
-    fn new() -> Self {
-        Self {
-            cur_lineno: 0,
-            cur_bytecode: 0,
-            linetable: Vec::new(),
+            _ => {
+                return Err(LinetableError::Internal("entry location mismatch").into());
+            }
         }
     }
 
-    fn update_cursor(&mut self, starts_line: u32, code_length: u32) {
-        self.cur_lineno = starts_line;
-        self.cur_bytecode = code_length;
-    }
-
-    fn encode_varint(buffer: &mut Vec<u8>, mut num: u32) {
-        let continue_flag: u8 = 1 << 6;
-
-        while num >= 0x40 {
-            buffer.push((num & 0x3F) as u8 | continue_flag);
-            num >>= 6;
-        }
-        buffer.push((num as u8) & !continue_flag);
-    }
-
-    fn encode_svarint(buffer: &mut Vec<u8>, num: i32) {
-        let unsigned_value = if num < 0 {
-            ((-num as u32) << 1) | 1
-        } else {
-            (num as u32) << 1
-        };
-        Self::encode_varint(buffer, unsigned_value)
-    }
-
-    fn encode_bytecode_to_entries(&mut self, line_offset: i32, byte_offset: u32) {
-        if byte_offset == 0 {
-            return;
-        }
-        if 0 < byte_offset && byte_offset <= 8 {
-            // code: 13 (No column info)
-            #[allow(clippy::unusual_byte_groupings)]
-            let entry_head: u8 = (0b1_1101_000 | (byte_offset - 1)) as u8;
-            self.linetable.push(entry_head);
-            Self::encode_svarint(&mut self.linetable, line_offset);
-            return;
-        }
-        self.encode_bytecode_to_entries(line_offset, 8);
-        self.encode_bytecode_to_entries(line_offset, byte_offset - 8);
-    }
-
-    fn calc_linetable(&mut self, starts_line: u32, code_length: u32) {
-        let line_offset = (starts_line - self.cur_lineno) as i32;
-        let byte_offset = code_length - self.cur_bytecode;
-        self.encode_bytecode_to_entries(line_offset, byte_offset);
-    }
+    Ok((new_firstlineno, PyBytes::new(py, &new_table)))
 }
 
 #[cfg(test)]
@@ -190,24 +387,202 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_linetables() -> PyResult<()> {
+    fn test_decode_all_kinds() {
+        let table = [
+            0xD0, 0x05, 0x07, // kind 10, 1 unit, +0
+            0xD9, 0x01, 0x02, // kind 11, 2 units, +1
+            0x91, 0x35, // kind 2 (short form), 2 units, same line
+            0xF0, 0x00, 0x02, 0x01, 0x01, // kind 14, 1 unit, +0
+            0xF8, // kind 15, 1 unit
+        ];
+        let (entries, covered) = decode_entries(&table, 3).unwrap();
+        assert_eq!(covered, 7);
+        assert_eq!(
+            entries,
+            vec![
+                Entry {
+                    length: 1,
+                    start_line: Some(3)
+                },
+                Entry {
+                    length: 2,
+                    start_line: Some(4)
+                },
+                Entry {
+                    length: 2,
+                    start_line: Some(4)
+                },
+                Entry {
+                    length: 1,
+                    start_line: Some(4)
+                },
+                Entry {
+                    length: 1,
+                    start_line: None
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn test_no_location_preserves_line_state() {
+        let table = [
+            0xE8, 0x08, // kind 13, +4 -> line 5
+            0xF8, // kind 15, no line state change
+            0xE8, 0x02, // kind 13, +1 -> line 6
+        ];
+        let (entries, covered) = decode_entries(&table, 1).unwrap();
+        assert_eq!(covered, 3);
+        assert_eq!(
+            entries,
+            vec![
+                Entry {
+                    length: 1,
+                    start_line: Some(5)
+                },
+                Entry {
+                    length: 1,
+                    start_line: None
+                },
+                Entry {
+                    length: 1,
+                    start_line: Some(6)
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn test_decode_errors() {
+        assert!(matches!(
+            decode_entries(&[0xE8, 0x40], 1),
+            Err(LinetableError::Truncated { .. })
+        ));
+        assert!(matches!(
+            decode_entries(&[0xE8, 0x80], 1),
+            Err(LinetableError::UnexpectedHeader { .. })
+        ));
+        assert!(matches!(
+            decode_entries(&[0x00], 1),
+            Err(LinetableError::ExpectedHeader { .. })
+        ));
+        let mut overflow = vec![0xE8];
+        overflow.extend(std::iter::repeat(0x40).take(10));
+        assert!(matches!(
+            decode_entries(&overflow, 1),
+            Err(LinetableError::VarintOverflow { .. })
+        ));
+    }
+
+    #[test]
+    fn test_line_map_lookup() {
+        let line_map = LineMap::from_pairs(vec![(0, 0), (3, 30), (7, 70)]);
+        assert_eq!(line_map.map(-1), None);
+        assert_eq!(line_map.map(0), Some(0));
+        assert_eq!(line_map.map(2), Some(0));
+        assert_eq!(line_map.map(3), Some(30));
+        assert_eq!(line_map.map(6), Some(30));
+        assert_eq!(line_map.map(7), Some(70));
+        assert_eq!(line_map.map(1000), Some(70));
+        assert_eq!(LineMap::from_pairs(vec![]).map(1), None);
+    }
+
+    #[test]
+    fn test_generate_linetable_roundtrip() {
         pyo3::prepare_freethreaded_python();
-        Python::with_gil(|py| -> PyResult<()> {
-            let positions = py.eval(c"iter([(0, 1, 0, 0), (2, 2, 0, 21), (2, 2, 0, 21), (2, 2, 0, 21), (2, 2, 0, 21), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (6, 6, 6, 11), (6, 6, 6, 11), (6, 6, 12, 23), (6, 6, 12, 23), (6, 6, 25, 26), (6, 6, 6, 27), (6, 6, 6, 27), (6, 6, 6, 27), (6, 6, 6, 27), (6, 6, 6, 27), (6, 6, 6, 27), (6, 6, 6, 27), (6, 6, 28, 29), (6, 6, 6, 30), (6, 6, 6, 30), (6, 6, 6, 30), (6, 6, 6, 30), (6, 6, 6, 30), (6, 6, 0, 3), (6, 6, 0, 3), (6, 6, 0, 3)])", None, None)?;
-            let data = std::fs::read("test/data1")?;
-            let linetable_before = std::fs::read("test/linetable_before1")?;
-            let linetable = generate_linetable(&data, linetable_before, positions.downcast()?)?;
-            let linetable_after = std::fs::read("test/linetable_after1")?;
-            assert_eq!(linetable, linetable_after);
+        Python::with_gil(|py| {
+            let line_map = Py::new(
+                py,
+                LineMap::from_pairs(vec![(0, 0), (1, 10), (2, 20), (5, 50)]),
+            )
+            .unwrap();
+            let table = [
+                0xE8, 0x00, // kind 13, 1 unit, +0 -> line 1
+                0xF8, // kind 15, 1 unit
+                0xE9, 0x08, // kind 13, 2 units, +4 -> line 5
+                0xE8, 0x07, // kind 13, 1 unit, -3 -> line 2
+            ];
+            let code = [0u8; 10];
+            let (new_firstlineno, new_table) =
+                generate_linetable(py, line_map.borrow(py), &table, &code, 1).unwrap();
+            assert_eq!(new_firstlineno, 10);
+            assert_eq!(
+                new_table.as_bytes(),
+                [0xE8, 0x00, 0xF8, 0xE9, 0x50, 0x01, 0xE8, 0x3D]
+            );
+            let (entries, covered) = decode_entries(new_table.as_bytes(), 10).unwrap();
+            assert_eq!(covered, 5);
+            assert_eq!(
+                entries,
+                vec![
+                    Entry {
+                        length: 1,
+                        start_line: Some(10)
+                    },
+                    Entry {
+                        length: 1,
+                        start_line: None
+                    },
+                    Entry {
+                        length: 2,
+                        start_line: Some(50)
+                    },
+                    Entry {
+                        length: 1,
+                        start_line: Some(20)
+                    },
+                ]
+            );
+        });
+    }
 
-            let positions = py.eval(c"iter([(0, 1, 0, 0), (2, 2, 0, 21), (2, 2, 0, 21), (2, 2, 0, 21), (2, 2, 0, 21), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (3, 3, 0, 118), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (4, 4, 0, 129), (6, 6, 0, 13), (6, 6, 0, 13), (6, 6, 0, 13), (6, 6, 0, 13), (8, 8, 0, 16), (8, 8, 0, 16), (8, 8, 0, 16), (8, 8, 0, 16), (10, 10, 0, 29), (10, 10, 0, 29), (10, 10, 0, 29), (10, 10, 0, 29), (10, 10, 0, 29), (10, 10, 0, 29), (12, 12, 12, 17), (12, 12, 12, 17), (12, 12, 18, 59), (12, 12, 18, 59), (12, 12, 61, 62), (12, 12, 12, 63), (12, 12, 12, 63), (12, 12, 12, 63), (12, 12, 12, 63), (12, 12, 12, 63), (12, 12, 12, 63), (12, 12, 12, 63), (12, 12, 64, 65), (12, 12, 12, 66), (12, 12, 12, 66), (12, 12, 12, 66), (12, 12, 12, 66), (12, 12, 12, 66), (12, 12, 0, 9), (14, 14, 1, 8), (15, 153, 0, 35), (15, 153, 0, 35), (14, 14, 1, 8), (14, 14, 1, 8), (14, 14, 1, 8), (14, 14, 1, 8), (14, 14, 1, 8), (14, 14, 1, 8), (14, 14, 1, 8), (15, 153, 0, 35), (157, 157, 1, 8), (158, 211, 0, 35), (158, 211, 0, 35), (157, 157, 1, 8), (157, 157, 1, 8), (157, 157, 1, 8), (157, 157, 1, 8), (157, 157, 1, 8), (157, 157, 1, 8), (157, 157, 1, 8), (158, 211, 0, 35), (215, 215, 5, 10), (215, 215, 5, 10), (215, 215, 11, 34), (215, 215, 11, 34), (215, 215, 36, 37), (215, 215, 5, 38), (215, 215, 5, 38), (215, 215, 5, 38), (215, 215, 5, 38), (215, 215, 5, 38), (215, 215, 5, 38), (215, 215, 5, 38), (215, 215, 39, 40), (215, 215, 5, 41), (215, 215, 5, 41), (215, 215, 5, 41), (215, 215, 5, 41), (215, 215, 5, 41), (215, 215, 0, 2), (217, 217, 1, 8), (218, 240, 0, 18), (218, 240, 0, 18), (217, 217, 1, 8), (217, 217, 1, 8), (217, 217, 1, 8), (217, 217, 1, 8), (217, 217, 1, 8), (217, 217, 1, 8), (217, 217, 1, 8), (218, 240, 0, 18), (244, 244, 1, 8), (245, 325, 0, 35), (245, 325, 0, 35), (244, 244, 1, 8), (244, 244, 1, 8), (244, 244, 1, 8), (244, 244, 1, 8), (244, 244, 1, 8), (244, 244, 1, 8), (244, 244, 1, 8), (245, 325, 0, 35), (330, 330, 10, 15), (330, 330, 10, 15), (330, 330, 16, 115), (330, 330, 16, 115), (330, 330, 117, 118), (330, 330, 10, 119), (330, 330, 10, 119), (330, 330, 10, 119), (330, 330, 10, 119), (330, 330, 10, 119), (330, 330, 10, 119), (330, 330, 10, 119), (330, 330, 120, 121), (330, 330, 10, 122), (330, 330, 10, 122), (330, 330, 10, 122), (330, 330, 10, 122), (330, 330, 10, 122), (330, 330, 0, 7), (332, 332, 13, 18), (332, 332, 13, 18), (332, 332, 19, 92), (332, 332, 19, 92), (332, 332, 94, 95), (332, 332, 13, 96), (332, 332, 13, 96), (332, 332, 13, 96), (332, 332, 13, 96), (332, 332, 13, 96), (332, 332, 13, 96), (332, 332, 13, 96), (332, 332, 97, 98), (332, 332, 13, 99), (332, 332, 13, 99), (332, 332, 13, 99), (332, 332, 13, 99), (332, 332, 13, 99), (332, 332, 0, 10), (334, 334, 12, 17), (334, 334, 12, 17), (334, 334, 18, 81), (334, 334, 18, 81), (334, 334, 83, 84), (334, 334, 12, 85), (334, 334, 12, 85), (334, 334, 12, 85), (334, 334, 12, 85), (334, 334, 12, 85), (334, 334, 12, 85), (334, 334, 12, 85), (334, 334, 86, 87), (334, 334, 12, 88), (334, 334, 12, 88), (334, 334, 12, 88), (334, 334, 12, 88), (334, 334, 12, 88), (334, 334, 0, 9), (336, 336, 5, 10), (336, 336, 5, 10), (336, 336, 11, 34), (336, 336, 11, 34), (336, 336, 36, 37), (336, 336, 5, 38), (336, 336, 5, 38), (336, 336, 5, 38), (336, 336, 5, 38), (336, 336, 5, 38), (336, 336, 5, 38), (336, 336, 5, 38), (336, 336, 39, 40), (336, 336, 5, 41), (336, 336, 5, 41), (336, 336, 5, 41), (336, 336, 5, 41), (336, 336, 5, 41), (336, 336, 0, 2), (338, 338, 1, 8), (339, 398, 0, 35), (339, 398, 0, 35), (338, 338, 1, 8), (338, 338, 1, 8), (338, 338, 1, 8), (338, 338, 1, 8), (338, 338, 1, 8), (338, 338, 1, 8), (338, 338, 1, 8), (339, 398, 0, 35), (339, 398, 0, 35), (339, 398, 0, 35)])", None, None)?;
-            let data = std::fs::read("test/data2")?;
-            let linetable_before = std::fs::read("test/linetable_before2")?;
-            let linetable = generate_linetable(&data, linetable_before, positions.downcast()?)?;
-            let linetable_after = std::fs::read("test/linetable_after2")?;
-            assert_eq!(linetable, linetable_after);
+    #[test]
+    fn test_generate_linetable_errors() {
+        pyo3::prepare_freethreaded_python();
+        Python::with_gil(|py| {
+            let line_map = Py::new(py, LineMap::from_pairs(vec![(0, 0)])).unwrap();
+            let empty_map = Py::new(py, LineMap::from_pairs(vec![])).unwrap();
 
-            Ok(())
-        })
+            assert!(
+                generate_linetable(py, line_map.borrow(py), &[0xE8, 0x00], &[0, 1, 2], 1).is_err()
+            );
+            assert!(
+                generate_linetable(py, line_map.borrow(py), &[0xE8, 0x00], &[0, 1, 2, 3], 1)
+                    .is_err()
+            );
+            assert!(
+                generate_linetable(py, empty_map.borrow(py), &[0xE8, 0x00], &[0, 1], 1).is_err()
+            );
+            assert!(generate_linetable(py, line_map.borrow(py), &[0xE8], &[0, 1], 1).is_err());
+        });
+    }
+
+    #[test]
+    fn test_fixture_tables() {
+        pyo3::prepare_freethreaded_python();
+        Python::with_gil(|py| {
+            for name in ["linetable_before1", "linetable_before2"] {
+                let table = std::fs::read(format!("test/{name}")).unwrap();
+                let (entries, covered) = decode_entries(&table, 1).unwrap();
+                assert!(!entries.is_empty());
+                assert!(covered > 0);
+                assert_eq!(
+                    entries
+                        .iter()
+                        .map(|entry| usize::from(entry.length))
+                        .sum::<usize>(),
+                    covered
+                );
+
+                let line_map = Py::new(py, LineMap::from_pairs(vec![(i64::MIN, 0)])).unwrap();
+                let code = vec![0u8; covered * 2];
+                let (new_firstlineno, new_table) =
+                    generate_linetable(py, line_map.borrow(py), &table, &code, 1).unwrap();
+                assert_eq!(new_firstlineno, 0);
+                let (redecoded, recovered) = decode_entries(new_table.as_bytes(), 0).unwrap();
+                assert_eq!(recovered, covered);
+                assert_eq!(redecoded.len(), entries.len());
+            }
+        });
     }
 }

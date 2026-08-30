@@ -4,8 +4,9 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from collections.abc import Iterator
+class LineMap:
+    def __new__(cls, points: list[tuple[int, int]]) -> LineMap: ...
 
 def generate_linetable(
-    data: bytes, linetable: bytes, positions: Iterator
-) -> bytes: ...
+    line_map: LineMap, linetable: bytes, code: bytes, firstlineno: int
+) -> tuple[int, bytes]: ...

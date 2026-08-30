@@ -12,14 +12,10 @@ import types
 from bisect import bisect_right
 from importlib.machinery import FileFinder, SourceFileLoader
 
+from ..bindings._rust import epscript
 from ..localize import _
 from ..utils import EPError
 from .epscompile import epsCompile
-from .linetable_calculator import (
-    PYCODE_ATTRIBUTES,
-    gen_code_options,
-    gen_new_opcode,
-)
 
 lineno_regex = re.compile(b" *# \\(Line (\\d+)\\) (.+)")
 is_scdb_map = False
@@ -29,21 +25,28 @@ def IsSCDBMap():  # noqa: N802
     return is_scdb_map
 
 
-def _modify_code_linetable(codeobj: types.CodeType, ep_lineno_map):
-    # See: https://github.com/python/cpython/blob/main/Objects/locations.md
-    # https://github.com/python/cpython/blob/c1652d6d6201e5407b94afc297115a584b5a0955/Python/assemble.c#L231-L242
-    code_options = gen_code_options(codeobj)
+def _modify_code_linetable(codeobj: types.CodeType, line_map):
+    # See: https://github.com/python/cpython/blob/main/InternalDocs/code_objects.md
+    # https://github.com/python/cpython/blob/main/Objects/codeobject.c#L_PyLineTable_NextAddressRange
+    new_co_consts = tuple(
+        _modify_code_linetable(c, line_map)
+        if isinstance(c, types.CodeType)
+        else c
+        for c in codeobj.co_consts
+    )
 
-    # For code objects
-    new_co_consts = []
-    for c in code_options["co_consts"]:
-        if isinstance(c, types.CodeType):
-            c = _modify_code_linetable(c, ep_lineno_map)
-        new_co_consts.append(c)
+    new_firstlineno, linetable = epscript.generate_linetable(
+        line_map,
+        codeobj.co_linetable,
+        codeobj.co_code,
+        codeobj.co_firstlineno,
+    )
 
-    code_options["co_consts"] = new_co_consts
-
-    return gen_new_opcode(codeobj, code_options, PYCODE_ATTRIBUTES, ep_lineno_map)
+    return codeobj.replace(
+        co_consts=new_co_consts,
+        co_firstlineno=new_firstlineno,
+        co_linetable=linetable,
+    )
 
 
 # TODO: refactor code or remove as duplicate
@@ -146,19 +149,20 @@ class EPSLoader(SourceFileLoader):
             match = lineno_regex.match(line)
             if match:
                 code_line.append(lineno + 1)
-                ep_lineno_map.append(int(match.group(1)))
-
-        # Reconstruct code data
-        def line_mapper(line):
-            # FIXME: sometimes return lineno off-by-one
-            lineno = ep_lineno_map[bisect_right(code_line, line) - 1]
-            if line != 0:
-                lineno = max(0, lineno)
-            return lineno
+                ep_lineno_map.append(max(0, int(match.group(1))))
 
         if sys.version_info >= (3, 11):
-            codeobj = _modify_code_linetable(codeobj, line_mapper)
+            line_map = epscript.LineMap(list(zip(code_line, ep_lineno_map)))
+            codeobj = _modify_code_linetable(codeobj, line_map)
         else:
+            # Reconstruct code data
+            def line_mapper(line):
+                # FIXME: sometimes return lineno off-by-one
+                lineno = ep_lineno_map[bisect_right(code_line, line) - 1]
+                if line != 0:
+                    lineno = max(0, lineno)
+                return lineno
+
             codeobj = _modify_code_lnotab(codeobj, line_mapper)
         return codeobj
 
