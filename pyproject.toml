@@ -91,7 +91,7 @@ exclude = [
 ]
 
 [tool.mypy]
-exclude = "src/epscript"
+exclude = ["pybind11", "src/epscript", "tests"]
 show_error_codes = true
 check_untyped_defs = true
 no_implicit_reexport = true
@@ -127,7 +127,7 @@ exclude_lines = [
 [tool.ruff]
 lint.select = ['E', 'F', 'I', 'N', 'W', 'UP', 'RUF']
 line-length = 85
-exclude = ["pybind11"]
+exclude = ["pybind11", "src/epscript", "tests"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/eudplib/__init__.py" = ['F401', 'F403']
