@@ -186,8 +186,7 @@ def f_bitlshift(a, b, _fdict={}, **kwargs):
                 retarg = EPD(ret.getValueAddr())
             else:
                 retarg = ret
-            if "ret" in kwargs:
-                del kwargs["ret"]
+            kwargs.pop("ret", None)
             f(retarg, a, **kwargs)
         else:
             if a is not ret:

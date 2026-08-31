@@ -8,9 +8,7 @@
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ... import utils as ut
 from ...core.eudfunc.eudf import _EUDPredefineReturn
-from ...core.variable.vbase import VariableBase
 from ...memio.rwcommon import lv
 
 _seed = c.EUDVariable()

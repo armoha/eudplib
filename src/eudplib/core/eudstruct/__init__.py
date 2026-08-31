@@ -10,6 +10,6 @@ from .vararray import EUDVArray
 
 __all__ = [
     "EUDStruct",
-    "selftype",
     "EUDVArray",
+    "selftype",
 ]

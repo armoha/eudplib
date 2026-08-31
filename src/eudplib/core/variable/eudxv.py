@@ -40,19 +40,19 @@ class EUDXVariable(EUDVariable):
         modifier = ((bt.EncodeModifier(modtype) & 0xFF) << 24) + 0x2D0000
         if not isinstance(initval, int | ConstExpr):
             unproxied = unProxy(initval)
-            if not isinstance(unproxied, (int, ConstExpr)):  # noqa: UP038
+            if not isinstance(unproxied, (int, ConstExpr)):
                 raise EPError(_("Invalid initval: {}").format(initval))
             else:
                 initval = unproxied
         if not isinstance(nextptr, int | ConstExpr):
             unproxied = unProxy(nextptr)
-            if not isinstance(unproxied, (int, ConstExpr)):  # noqa: UP038
+            if not isinstance(unproxied, (int, ConstExpr)):
                 raise EPError(_("Invalid nextptr: {}").format(nextptr))
             else:
                 nextptr = unproxied
         if not isinstance(mask, int | ConstExpr):
             unproxied = unProxy(mask)
-            if not isinstance(unproxied, (int, ConstExpr)):  # noqa: UP038
+            if not isinstance(unproxied, (int, ConstExpr)):
                 raise EPError(_("Invalid mask: {}").format(mask))
             else:
                 mask = unproxied

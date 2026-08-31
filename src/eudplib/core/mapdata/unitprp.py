@@ -16,7 +16,7 @@ class UnitProperty(LittleEndianStructure):
     UnitProperty class. Used in 'Create Unit with Properties' action.
     """
 
-    _fields_ = [  # noqa: RUF012
+    _fields_ = [
         ("sprpvalid", c_ushort),
         ("prpvalid", c_ushort),
         ("player", c_byte),

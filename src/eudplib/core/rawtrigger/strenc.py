@@ -183,7 +183,7 @@ def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: _Arg) -> _Dword:  
 
     u = ut.unProxy(s)
 
-    if isinstance(u, (str, bytes)):  # noqa: UP038
+    if isinstance(u, (str, bytes)):
         try:
             return f(u)
         except KeyError:

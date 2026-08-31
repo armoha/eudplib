@@ -8,13 +8,13 @@ from typing import Any
 
 from .. import core as c
 from .. import ctrlstru as cs
+from ..core.rawtrigger.consttype import Dword
 from ..memio import (
     EUDByteWriter,
     f_dwread_epd,
     f_memcpy,
     f_setcurpl2cpcache,
 )
-from ..core.rawtrigger.consttype import Dword
 from ..scdata import CurrentPlayer, TrgUnit
 from ..utils import EPD, ep_assert
 

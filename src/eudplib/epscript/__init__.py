@@ -8,7 +8,7 @@ from .epscompile import EPS_SetDebug, epsCompile
 from .epsimp import EPSLoader
 
 __all__ = [
-    "EPS_SetDebug",
     "EPSLoader",
+    "EPS_SetDebug",
     "epsCompile",
 ]

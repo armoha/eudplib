@@ -113,8 +113,8 @@ class Tech(EPDOffsetMap, ConstType):
             if not isinstance(r_tech, c.EUDVariable):
                 assert False
             t_update_start, t_update_restore, t_update_end = update_tech
-            q24, r24, update_player = player._get_stride_cache(24)
-            q20, r20, _update = player._get_stride_cache(20)
+            q24, _r24, update_player = player._get_stride_cache(24)
+            q20, _r20, _update = player._get_stride_cache(20)
             p_update_start, p_update_restore, p_update_end = update_player
 
             # Trigger 1: update tech cache

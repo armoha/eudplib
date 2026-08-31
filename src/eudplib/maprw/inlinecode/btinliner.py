@@ -9,7 +9,6 @@ from typing import TypeAlias
 
 from ... import core as c
 from ... import ctrlstru as cs
-from ... import utils as ut
 from ...trigtrg.runtrigtrg import _runner_cp
 
 _shared_triggers: list[bytes | c.RawTrigger] = []

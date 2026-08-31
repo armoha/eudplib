@@ -10,6 +10,7 @@ from collections import deque
 from typing import TYPE_CHECKING, Literal
 
 from ... import utils as ut
+from ...localize import _
 from ..allocator import (
     ConstExpr,
     GetObjectAddr,
@@ -17,7 +18,6 @@ from ..allocator import (
     RlocInt_C,
 )
 from ..eudobj import EUDObject
-from ...localize import _
 
 if TYPE_CHECKING:
     from ..allocator.payload import ObjCollector
@@ -59,7 +59,7 @@ class EUDVarBuffer(EUDObject):
 
     def CollectDependency(self, emitbuffer: ObjCollector) -> None:  # noqa: N802
         for initval in self._initvals:
-            if not type(initval) is int:
+            if type(initval) is not int:
                 emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802
@@ -137,9 +137,9 @@ class EUDCustomVarBuffer(EUDObject):
         super().__init__()
 
         self._vdict = {}
-        self._5nptrs = deque([], maxlen=5)
+        self._5nptrs = deque(maxlen=5)
         self._actnptr_pairs = []
-        self._5acts = deque([], maxlen=5)
+        self._5acts = deque(maxlen=5)
 
     def DynamicConstructed(self):  # noqa: N802
         return True
@@ -173,15 +173,15 @@ class EUDCustomVarBuffer(EUDObject):
 
     def CollectDependency(self, emitbuffer: ObjCollector):  # noqa: N802
         for initval in self._5nptrs:
-            if not type(initval) is int:
+            if type(initval) is not int:
                 emitbuffer.WriteDword(initval)
         for initvals in self._actnptr_pairs:
             for initval in initvals:
-                if not type(initval) is int:
+                if type(initval) is not int:
                     emitbuffer.WriteDword(initval)
         for initvals in self._5acts:
             for initval in initvals:
-                if not type(initval) is int:
+                if type(initval) is not int:
                     emitbuffer.WriteDword(initval)
 
     def WritePayload(self, emitbuffer) -> None:  # noqa: N802

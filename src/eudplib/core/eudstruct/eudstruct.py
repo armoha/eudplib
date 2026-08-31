@@ -11,7 +11,6 @@ from typing_extensions import Self
 from ... import utils as ut
 from ...localize import _
 from ...utils import EPError
-from ..rawtrigger.consttype import ConstType
 from .structarr import _EUDStructMetaclass
 from .vararray import _InternalVArray
 

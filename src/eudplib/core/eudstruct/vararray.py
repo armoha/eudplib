@@ -17,7 +17,7 @@ from typing_extensions import Self
 from ...localize import _
 from ...utils import EPD, EPError, EUDPeekBlock, ExprProxy, ep_assert, unProxy
 from .. import rawtrigger as bt
-from ..allocator import ConstExpr, Forward, IsConstExpr
+from ..allocator import ConstExpr, Forward
 from ..curpl import GetCPCache
 from ..inplacecw import iand, ilshift, ior, irshift, iset, isub, ixor
 from ..variable import (
@@ -47,10 +47,10 @@ class _EUDVArrayData(ConstExpr):
         for i, items in enumerate(initvar):
             dest, value, nextptr = items
             value = unProxy(value)
-            if not isinstance(value, (int, ConstExpr)):  # noqa: UP038
+            if not isinstance(value, (int, ConstExpr)):
                 raise EPError(_("Invalid item #{}: {}").format(i, items))
             nextptr = unProxy(nextptr)
-            if not isinstance(nextptr, (int, ConstExpr)):  # noqa: UP038
+            if not isinstance(nextptr, (int, ConstExpr)):
                 raise EPError(_("Invalid item #{}: {}").format(i, items))
             init.append((0xFFFFFFFF, process_dest(dest), value, 0x072D0000, nextptr))
         self._init = init

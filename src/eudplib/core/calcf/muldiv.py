@@ -46,14 +46,14 @@ def f_div(a, b, **kwargs):
             _("Can't use negative dividend for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
-            ),  # noqa: E501
+            ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
             _("Can't use negative divider for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
-            ),  # noqa: E501
+            ),
         )
 
     if ev.IsEUDVariable(b):
@@ -81,14 +81,14 @@ def _quot(a, b, **kwargs):
             _("Can't use negative dividend for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
-            ),  # noqa: E501
+            ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
             _("Can't use negative divider for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
-            ),  # noqa: E501
+            ),
         )
 
     if isinstance(b, ev.EUDVariable):
@@ -116,14 +116,14 @@ def _rem(a, b, **kwargs):
             _("Can't use negative dividend for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
-            ),  # noqa: E501
+            ),
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
             _("Can't use negative divider for unsigned division: {}").format(a),
             _(
                 "For signed division, use `f_div_towards_zero`, `f_div_floor` and `f_div_euclid`."
-            ),  # noqa: E501
+            ),
         )
 
     if isinstance(b, ev.EUDVariable):

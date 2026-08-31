@@ -15,16 +15,16 @@ from .payload import (
 from .rlocint import RlocInt, RlocInt_C, toRlocInt
 
 __all__ = [
+    "CompressPayload",
     "ConstExpr",
+    "CreatePayload",
     "Evaluate",
     "Forward",
-    "IsConstExpr",
-    "CompressPayload",
-    "CreatePayload",
     "GetObjectAddr",
+    "IsConstExpr",
     "RegisterCreatePayloadCallback",
-    "ShufflePayload",
     "RlocInt",
     "RlocInt_C",
+    "ShufflePayload",
     "toRlocInt",
 ]

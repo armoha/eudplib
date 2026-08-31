@@ -18,15 +18,15 @@ from .eudv import (
 from .eudxv import EUDXVariable
 
 __all__ = [
-    "EUDLightBool",
-    "EUDLightVariable",
     "EP_SetRValueStrictMode",
     "EUDCreateVariables",
+    "EUDLightBool",
+    "EUDLightVariable",
     "EUDVariable",
+    "EUDXVariable",
     "IsEUDVariable",
     "NonSeqCompute",
     "SeqCompute",
     "SetVariables",
     "VProc",
-    "EUDXVariable",
 ]

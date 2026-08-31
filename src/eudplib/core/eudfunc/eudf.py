@@ -126,7 +126,7 @@ def _EUDPredefineParam(*args):  # noqa: N802
     for arg in args:
         if EncodePlayer(arg) == 13:  # CurrentPlayer
             fnargs.append(ut.EPD(0x6509B0))
-        elif isinstance(arg, (list, tuple)):  # noqa: UP038
+        elif isinstance(arg, (list, tuple)):
             fnargs.extend(arg)
         else:
             slicer.append(arg)

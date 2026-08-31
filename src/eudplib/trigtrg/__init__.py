@@ -100,7 +100,6 @@ from .trigtrg import (
 )
 
 __all__ = [
-    "EUDLoopTrigger",
     "Accumulate",
     "Action",
     "Always",
@@ -122,12 +121,13 @@ __all__ = [
     "Defeat",
     "DisplayText",
     "Draw",
+    "EUDLoopTrigger",
     "ElapsedTime",
     "GiveUnits",
     "HighestScore",
-    "Kills",
     "KillUnit",
     "KillUnitAt",
+    "Kills",
     "LeaderBoardComputerPlayers",
     "LeaderBoardControl",
     "LeaderBoardControlAt",

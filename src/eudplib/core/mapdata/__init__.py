@@ -12,14 +12,14 @@ from .tblformat import TBL
 from .unitprp import UnitProperty
 
 __all__ = [
+    "TBL",
     "GetChkTokenized",
-    "IsMapdataInitialized",
+    "GetLocationIndex",
     "GetPlayerInfo",
     "GetPropertyIndex",
-    "GetLocationIndex",
     "GetStringIndex",
     "GetSwitchIndex",
     "GetUnitIndex",
-    "TBL",
+    "IsMapdataInitialized",
     "UnitProperty",
 ]

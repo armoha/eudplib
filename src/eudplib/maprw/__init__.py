@@ -12,13 +12,13 @@ from .mpqadd import MPQAddFile, MPQAddWave, MPQCheckFile
 from .savemap import SaveMap
 
 __all__ = [
-    "PRT_SkipPayloadRelocator",
     "EUDDoEvents",
     "EUDOnStart",
-    "PRT_SetInliningRate",
     "LoadMap",
     "MPQAddFile",
     "MPQAddWave",
     "MPQCheckFile",
+    "PRT_SetInliningRate",
+    "PRT_SkipPayloadRelocator",
     "SaveMap",
 ]

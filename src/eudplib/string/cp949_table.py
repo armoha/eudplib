@@ -1,4 +1,3 @@
-# ruff: noqa: E501
 
 cp949_table = [
     ((0x81, 0x41), (0xAC02)),  # HANGUL SYLLABLE KIYEOK A SSANGKIYEOK

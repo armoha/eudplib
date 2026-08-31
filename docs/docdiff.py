@@ -12,14 +12,14 @@ module_to_doc = eudplib
 
 exclude_types = [dict, str, types.ModuleType]
 eudftypes = [eudplib.EUDFuncN]
-allowed_type = eudftypes + [type, types.FunctionType]
+allowed_type = [*eudftypes, type, types.FunctionType]
 exclude_names = ["__loader__", "__path__", "__spec__"]
 section_header_charr = ["=", "-", "'", "~", "^"]
 
 
 # Get list of already documented items
 print("Getting list of currently documented structures")
-with open("api.rst", "r", encoding="utf-8") as doc_file:
+with open("api.rst", encoding="utf-8") as doc_file:
     rstinputs = doc_file.read().split("\n")
 documented_functions = set()
 
@@ -31,7 +31,7 @@ for line in rstinputs:
         funcname = func_match_result.groups(1)[0]
         print(funcname)
         if funcname in documented_functions:
-            print("[Warning] Document duplication of function %s." % funcname)
+            print(f"[Warning] Document duplication of function {funcname}.")
         documented_functions.add(funcname)
         continue
 
@@ -50,7 +50,7 @@ for name, value in module_to_doc.__dict__.items():
         continue
 
     if value.__doc__ is None:
-        print(" [Warning] undocumented value %s" % name)
+        print(f" [Warning] undocumented value {name}")
         documented = False
 
     else:
@@ -88,7 +88,7 @@ if unused_functions:
         print("  Unused functions:")
         print(unused_functions)
         for k in sorted(list(unused_functions)):
-            print("    - %s" % k)
+            print(f"    - {k}")
 
     print("\n==================================\n")
 
@@ -99,7 +99,7 @@ used_functions = doc_needed_functions.difference(documented_functions)
 if used_functions:
     print("New entries:")
     for k in sorted(list(used_functions)):
-        print("    - %s %s" % (k, "(Undocumented)" if not fc_documented[k] else ""))
+        print("    - {} {}".format(k, "(Undocumented)" if not fc_documented[k] else ""))
 
     print("\n==================================\n")
 

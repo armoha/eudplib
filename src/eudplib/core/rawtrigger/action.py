@@ -254,7 +254,7 @@ class Action(ConstExpr):
 
     def CollectDependency(self, pbuffer: ObjCollector) -> None:  # noqa: N802
         for field in self.fields[:6]:
-            if not type(field) is int:
+            if type(field) is not int:
                 pbuffer.WriteDword(field)  # type: ignore[arg-type]
 
     def WritePayload(self, pbuffer: _PayloadBuffer) -> None:  # noqa: N802

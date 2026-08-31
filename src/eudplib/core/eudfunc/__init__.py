@@ -19,12 +19,12 @@ from .trace.tracetool import EUDTraceLog, GetTraceStackDepth
 
 __all__ = [
     "EUDFullFunc",
-    "EUDTracedFunc",
-    "EUDTracedTypedFunc",
-    "EUDXTypedFunc",
-    "EUDTracedMethod",
-    "EUDTracedTypedMethod",
     "EUDFuncN",
     "EUDTraceLog",
+    "EUDTracedFunc",
+    "EUDTracedMethod",
+    "EUDTracedTypedFunc",
+    "EUDTracedTypedMethod",
+    "EUDXTypedFunc",
     "GetTraceStackDepth",
 ]

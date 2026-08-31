@@ -63,7 +63,7 @@ def _yield_and_check_rvalue(obj: Any) -> Iterator[tuple[Any, bool]]:
         yield from _yield_and_check_rvalue(obj.getValue())
     elif isinstance(obj, EUDVariable):
         yield obj, False
-    elif isinstance(obj, (bytes, str)) or hasattr(obj, "dont_flatten"):  # noqa: UP038
+    elif isinstance(obj, (bytes, str)) or hasattr(obj, "dont_flatten"):
         yield obj, False
     else:
         try:
@@ -98,9 +98,9 @@ class EUDVariable(VariableBase):
     __slots__ = ("_rvalue", "_varact", "_vartrigger")
 
     def __init__(self, initval=0) -> None:
-        if not isinstance(initval, (int, ConstExpr)):  # noqa: UP038
+        if not isinstance(initval, (int, ConstExpr)):
             unproxied = unProxy(initval)
-            if not isinstance(unproxied, (int, ConstExpr)):  # noqa: UP038
+            if not isinstance(unproxied, (int, ConstExpr)):
                 raise EPError(_("Invalid initval: {}").format(initval))
             else:
                 initval = unproxied
@@ -845,7 +845,7 @@ def NonSeqCompute(assignpairs):  # noqa: N802
     varassigndict = dict()
 
     for assignpair in assignpairs:
-        dst, mdt, src = assignpair
+        dst, _mdt, src = assignpair
         if IsEUDVariable(dst):
             dstvarset.add(dst)
         if IsEUDVariable(src):

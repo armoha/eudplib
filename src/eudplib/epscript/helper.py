@@ -31,7 +31,6 @@ from ..utils import (
     List2Assignable,
     ep_assert,
     ep_warn,
-    isUnproxyInstance,
 )
 
 
@@ -82,7 +81,7 @@ def _TYGV(types, expr_list_gen):  # noqa: N802
     for ty, value in zip(types, values):
         is_eudvar = IsEUDVariable(value)
         is_untyped = ty is None or issubclass(ty, EUDVariable)
-        if not is_untyped and not (type(value) is int and value == 0):  # noqa: E721
+        if not is_untyped and not (type(value) is int and value == 0):
             value = ty.cast(value)
         if not is_eudvar:
             value = EUDVariable(value)
@@ -111,7 +110,7 @@ def _TYSV(types, vs):  # noqa: N802
     var_list = []
     for ty, v in zip(types, vs):
         is_untyped = ty is None or issubclass(ty, EUDVariable)
-        if not is_untyped and not (type(v) is int and v == 0):  # noqa: E721
+        if not is_untyped and not (type(v) is int and v == 0):
             v = ty.cast(v)
         value = EUDVariable(v)
         if not is_untyped:
@@ -131,7 +130,7 @@ def _TYLV(types, vs):  # noqa: N802
         if is_eudvar and is_rvalue:
             nv = v.makeL()
         else:
-            if not is_untyped and not (type(v) is int and v == 0):  # noqa: E721
+            if not is_untyped and not (type(v) is int and v == 0):
                 v = ty.cast(v)
             nv = EUDVariable()
             ops.append((nv, SetTo, v))
@@ -317,7 +316,7 @@ class _ARRW:  # array write
     def __lshift__(self, r):
         if not (
             isinstance(self.obj, ExprProxy)
-            or isinstance(self.obj, (EUDVariable, ConstExpr))  # noqa: UP038
+            or isinstance(self.obj, (EUDVariable, ConstExpr))
         ):
             # maybe Python collections
             ov = self.obj[self.index]
