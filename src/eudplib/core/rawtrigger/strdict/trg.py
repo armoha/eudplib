@@ -6,11 +6,13 @@
 from typing import Literal, TypeAlias
 
 DefLocationDict: dict[str, int] = {
-    "Location %u" % i: i for i in range(1, 256) if i != 64
+    f"Location {i}": i for i in range(1, 256) if i != 64
 }
 DefLocationDict["Anywhere"] = 64
 
-DefSwitchDict: dict[str, int] = {"Switch %d" % (i + 1): i for i in range(256)}
+DefSwitchDict: dict[str, int] = {
+    f"Switch {i + 1}": i for i in range(256)
+}
 
 # ======================================
 

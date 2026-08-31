@@ -99,7 +99,8 @@ used_functions = doc_needed_functions.difference(documented_functions)
 if used_functions:
     print("New entries:")
     for k in sorted(list(used_functions)):
-        print("    - {} {}".format(k, "(Undocumented)" if not fc_documented[k] else ""))
+        note = "(Undocumented)" if not fc_documented[k] else ""
+        print(f"    - {k} {note}")
 
     print("\n==================================\n")
 

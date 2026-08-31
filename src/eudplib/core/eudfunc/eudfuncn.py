@@ -182,7 +182,7 @@ class EUDFuncN:
         ut.ep_assert(
             len(ret) == self._retn,
             _("Return number mismatch : ")
-            + "len(%s) != %d" % (repr(ret), self._retn),
+            + f"len({ret!r}) != {self._retn}",
         )
         next_ptr_assignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:
@@ -215,7 +215,7 @@ class EUDFuncN:
         ut.ep_assert(
             len(args) == self._argn,
             _("Argument number mismatch : ")
-            + "len(%s) != %d" % (repr(args), self._argn),
+            + f"len({args!r}) != {self._argn}",
         )
 
         fcallend = ac.Forward()
@@ -228,7 +228,7 @@ class EUDFuncN:
         ut.ep_assert(
             len(ret) == self._retn,
             _("Return number mismatch : ")
-            + "len(%s) != %d" % (repr(ret), self._retn),
+            + f"len({ret!r}) != {self._retn}",
         )
         next_ptr_assignment = [(ut.EPD(self._nptr), bt.SetTo, fcallend)]
         if self._retn >= 1:

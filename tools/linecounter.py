@@ -20,8 +20,8 @@ for root, dirs, files in os.walk("../eudplib"):
                 code = file.read()
             totsize += len(code)
             linen = code.count("\n") + 1
-            print("%-40s : %4d" % (finalpath, linen))
+            print(f"{finalpath:<40s} : {linen:4d}")
             totlinen += linen
 
-print("Total lines: %d" % totlinen)
-print("Total size: %d" % totsize)
+print(f"Total lines: {totlinen}")
+print(f"Total size: {totsize}")

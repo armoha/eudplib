@@ -277,7 +277,7 @@ class _EUDVArray(ExprProxy):
 
         # execution order: self._epd -> value -> index(->_convert_index)
         vv = []
-        Cfirst_next_trigger = None
+        cfirst_next_trigger = None
 
         writing_trigger = _set_index
         write_dest = _set_index + 344
@@ -290,8 +290,8 @@ class _EUDVArray(ExprProxy):
         for v in (self._epd, value, index):
             if isinstance(v, EUDVariable):
                 vv.append(v)
-                if Cfirst_next_trigger is None:
-                    Cfirst_next_trigger = v.GetVTable()
+                if cfirst_next_trigger is None:
+                    cfirst_next_trigger = v.GetVTable()
 
         # nextptr
         for i in range(len(vv) - 1):
@@ -331,7 +331,7 @@ class _EUDVArray(ExprProxy):
         else:
             actions.append(bt.SetMemory(_set_index + 348, bt.SetTo, value))
 
-        bt.RawTrigger(nextptr=Cfirst_next_trigger, actions=actions)
+        bt.RawTrigger(nextptr=cfirst_next_trigger, actions=actions)
         nexttrg << bt.NextTrigger()
 
 

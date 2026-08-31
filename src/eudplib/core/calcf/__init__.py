@@ -5,4 +5,4 @@
 # file that should have been included as part of this package.
 
 # Just run _eudvsupport. This won't be visible in user side.
-from . import _eudvsupport  # FIXME: remove hacky way
+from . import _eudvsupport as _eudvsupport  # FIXME: remove hacky way

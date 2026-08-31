@@ -92,7 +92,7 @@ def eudplibVersion():  # noqa: N802
 _alllist.append("eudplibVersion")
 
 
-from .epscript import epscompile
+from .epscript import epscompile  # noqa: E402
 
 epscompile._set_eps_globals(_alllist)
 epscompile._set_py_keywords(keyword.kwlist)
