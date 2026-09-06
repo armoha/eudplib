@@ -1,6 +1,7 @@
 mod allocator;
 mod epscript;
 mod eudobj;
+pub(crate) mod localize;
 mod mpqapi;
 mod types;
 
@@ -15,5 +16,8 @@ mod _rust {
     #[pymodule_export]
     use crate::eudobj::eudobj_mod;
     #[pymodule_export]
+    use crate::localize::register_translator;
+    #[pymodule_export]
     use crate::mpqapi::mpqapi_mod;
 }
+

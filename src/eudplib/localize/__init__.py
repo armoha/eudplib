@@ -29,6 +29,13 @@ if not isinstance(t, gettext.GNUTranslations):
 # Set up gettext function
 _ = t.gettext
 
+try:
+    from ..bindings import _rust
+
+    _rust.register_translator(_)
+except (ImportError, AttributeError):
+    pass
+
 # Preserve original hooks
 original_excepthook = sys.excepthook
 original_unraisablehook = sys.unraisablehook

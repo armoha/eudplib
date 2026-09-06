@@ -68,9 +68,9 @@ impl PyConstExpr {
         if self.0.rlocmode == 0 && self.0.baseobj.is_none(py) {
             Ok(self.0.offset)
         } else {
-            Err(PyValueError::new_err(
+            Err(PyValueError::new_err(crate::localize::tr(
                 "int(ConstExpr) failed because ConstExpr has baseobj",
-            ))
+            )))
         }
     }
 
@@ -142,11 +142,11 @@ impl PyConstExpr {
 
     fn __floordiv__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<Self> {
         if slf.0.rlocmode != 0 && slf.0.rlocmode % rhs != 0 {
-            return Err(PyValueError::new_err(format!(
-                "Address not divisible: {} ÷ {}",
-                slf.__str__(),
-                rhs
-            )));
+            let template = crate::localize::tr("Address not divisible: {dividend} ÷ {divisor}");
+            let msg = template
+                .replace("{dividend}", &slf.__str__())
+                .replace("{divisor}", &rhs.to_string());
+            return Err(PyValueError::new_err(msg));
         }
         let offset = DivFloor::div_floor(slf.0.offset, rhs);
         let rlocmode = DivFloor::div_floor(slf.0.rlocmode, rhs);
@@ -163,22 +163,22 @@ impl PyConstExpr {
 
     fn __mod__(&self, rhs: i32) -> PyResult<i32> {
         if self.0.rlocmode != 4 || 4 % rhs != 0 {
-            return Err(PyValueError::new_err(format!(
-                "Address not divisible: {} ÷ {}",
-                self.__str__(),
-                rhs
-            )));
+            let template = crate::localize::tr("Address not divisible: {dividend} ÷ {divisor}");
+            let msg = template
+                .replace("{dividend}", &self.__str__())
+                .replace("{divisor}", &rhs.to_string());
+            return Err(PyValueError::new_err(msg));
         }
         Ok(DivFloor::rem_floor(self.0.offset, rhs))
     }
 
     fn __divmod__(slf: PyRef<Self>, py: Python, rhs: i32) -> PyResult<(Self, i32)> {
         if slf.0.rlocmode != 4 || 4 % rhs != 0 {
-            return Err(PyValueError::new_err(format!(
-                "Address not divisible: {} ÷ {}",
-                slf.__str__(),
-                rhs
-            )));
+            let template = crate::localize::tr("Address not divisible: {dividend} ÷ {divisor}");
+            let msg = template
+                .replace("{dividend}", &slf.__str__())
+                .replace("{divisor}", &rhs.to_string());
+            return Err(PyValueError::new_err(msg));
         }
         let (offset, modulo) = slf.0.offset.divrem_floor(rhs);
         let rlocmode = slf.0.rlocmode / rhs;
@@ -236,12 +236,12 @@ impl Forward {
 
     fn __lshift__<'a>(&mut self, py: Python<'a>, mut expr: Bound<'a, PyAny>) -> PyResult<Py<PyAny>> {
         if !self.expr.is_none(py) {
-            return Err(PyAttributeError::new_err(
+            return Err(PyAttributeError::new_err(crate::localize::tr(
                 "Reforwarding without reset is not allowed",
-            ));
+            )));
         }
         if expr.is_none() {
-            return Err(PyValueError::new_err("Cannot forward to None"));
+            return Err(PyValueError::new_err(crate::localize::tr("Cannot forward to None")));
         }
         let exprproxy = EXPRPROXY.get(py)?;
         while expr.is_instance(&exprproxy)? {
@@ -270,7 +270,7 @@ impl Forward {
     #[allow(non_snake_case)]
     fn Evaluate(&self, py: Python) -> PyResult<PyRlocInt> {
         if self.expr.is_none(py) {
-            return Err(PyRuntimeError::new_err("Forward not initialized"));
+            return Err(PyRuntimeError::new_err(crate::localize::tr("Forward not initialized")));
         }
         Ok(self
             .expr

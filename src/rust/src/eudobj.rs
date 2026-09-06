@@ -58,9 +58,9 @@ impl PyEUDObject {
     /// Memory size of object.
     #[allow(non_snake_case)]
     fn GetDataSize(&self) -> PyResult<usize> {
-        Err(PyNotImplementedError::new_err(
+        Err(PyNotImplementedError::new_err(crate::localize::tr(
             "GetDataSize must be overridden",
-        ))
+        )))
     }
 
     #[allow(non_snake_case)]
@@ -72,9 +72,9 @@ impl PyEUDObject {
     /// Write object
     #[allow(non_snake_case)]
     fn WritePayload(&self, _pbuf: &Bound<'_, PyAny>) -> PyResult<()> {
-        Err(PyNotImplementedError::new_err(
+        Err(PyNotImplementedError::new_err(crate::localize::tr(
             "WritePayload must be overridden",
-        ))
+        )))
     }
 }
 

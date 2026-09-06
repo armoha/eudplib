@@ -75,7 +75,10 @@ impl PyRlocInt {
     #[new]
     fn new(offset: i64, rlocmode: i32) -> PyResult<Self> {
         let offset_i32 = i32::try_from(offset)
-            .map_err(|_| PyValueError::new_err(format!("offset out of range for i32: {offset}")))?;
+            .map_err(|_| {
+                let template = crate::localize::tr("offset out of range for i32: {offset}");
+                PyValueError::new_err(template.replace("{offset}", &offset.to_string()))
+            })?;
         Ok(Self(RlocInt::new(offset_i32, rlocmode)))
     }
 
@@ -152,9 +155,9 @@ impl PyRlocInt {
     fn __mul__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         let rhs = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             if rhs.0.rlocmode != 0 {
-                return Err(PyTypeError::new_err(
+                return Err(PyTypeError::new_err(crate::localize::tr(
                     "Cannot multiply RlocInt with non-const",
-                ));
+                )));
             }
             rhs.0.offset
         } else if let Ok(rhs) = rhs.extract::<i32>() {
@@ -177,7 +180,9 @@ impl PyRlocInt {
     fn __floordiv__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         let rhs = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             if rhs.0.rlocmode != 0 {
-                return Err(PyTypeError::new_err("Cannot divide RlocInt with non-const"));
+                return Err(PyTypeError::new_err(crate::localize::tr(
+                    "Cannot divide RlocInt with non-const",
+                )));
             }
             rhs.0.offset
         } else if let Ok(rhs) = rhs.extract::<i32>() {
@@ -195,21 +200,19 @@ impl PyRlocInt {
 
     fn __and__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         if self.0.rlocmode != 0 && self.0.rlocmode != 4 {
-            return Err(PyValueError::new_err(format!(
-                "unsupported rlocmode for &: '{}'",
-                self.0.rlocmode
-            )));
+            let template = crate::localize::tr("unsupported rlocmode for &: '{rlocmode}'");
+            return Err(PyValueError::new_err(template.replace("{rlocmode}", &self.0.rlocmode.to_string())));
         }
         let rlocint = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             if self.0.rlocmode != 0 || rhs.0.rlocmode != 0 {
-                return Err(PyTypeError::new_err(
+                return Err(PyTypeError::new_err(crate::localize::tr(
                     "Cannot bitwise & RlocInt with non-const",
-                ));
+                )));
             }
             RlocInt::new(self.0.offset & rhs.0.offset, 0)
         } else if let Ok(rhs) = rhs.extract::<i32>() {
             if self.0.rlocmode == 4 && rhs & 3 != rhs {
-                return Err(PyValueError::new_err("non-const ptr RlocInt can only compute bitwise & from 0 to 3".to_string()));
+                return Err(PyValueError::new_err(crate::localize::tr("non-const ptr RlocInt can only compute bitwise & from 0 to 3")));
             }
             RlocInt::new(self.0.offset & rhs, self.0.rlocmode)
         } else {
@@ -226,21 +229,19 @@ impl PyRlocInt {
 
     fn __or__(&self, rhs: &Bound<'_, PyAny>) -> PyResult<PyRlocInt> {
         if self.0.rlocmode != 0 && self.0.rlocmode != 4 {
-            return Err(PyValueError::new_err(format!(
-                "unsupported rlocmode for |: '{}'",
-                self.0.rlocmode
-            )));
+            let template = crate::localize::tr("unsupported rlocmode for |: '{rlocmode}'");
+            return Err(PyValueError::new_err(template.replace("{rlocmode}", &self.0.rlocmode.to_string())));
         }
         let rlocint = if let Ok(rhs) = rhs.extract::<PyRlocInt>() {
             if self.0.rlocmode != 0 || rhs.0.rlocmode != 0 {
-                return Err(PyTypeError::new_err(
+                return Err(PyTypeError::new_err(crate::localize::tr(
                     "Cannot bitwise | RlocInt with non-const",
-                ));
+                )));
             }
             RlocInt::new(self.0.offset | rhs.0.offset, 0)
         } else if let Ok(rhs) = rhs.extract::<i32>() {
             if self.0.rlocmode == 4 && rhs & 3 != rhs {
-                return Err(PyValueError::new_err("non-const ptr RlocInt can only compute bitwise | from 0 to 3".to_string()));
+                return Err(PyValueError::new_err(crate::localize::tr("non-const ptr RlocInt can only compute bitwise | from 0 to 3")));
             }
             RlocInt::new(self.0.offset | rhs, self.0.rlocmode)
         } else {
@@ -257,20 +258,16 @@ impl PyRlocInt {
 
     fn __invert__(&self) -> PyResult<PyRlocInt> {
         if self.0.rlocmode != 0 {
-            return Err(PyValueError::new_err(format!(
-                "unsupported rlocmode for ~: '{}'",
-                self.0.rlocmode
-            )));
+            let template = crate::localize::tr("unsupported rlocmode for ~: '{rlocmode}'");
+            return Err(PyValueError::new_err(template.replace("{rlocmode}", &self.0.rlocmode.to_string())));
         }
         Ok(PyRlocInt(RlocInt::new(!self.0.offset, 0)))
     }
 
     fn __neg__(&self) -> PyResult<PyRlocInt> {
         if self.0.rlocmode != 0 && self.0.rlocmode != 4 {
-            return Err(PyValueError::new_err(format!(
-                "unsupported rlocmode for -: '{}'",
-                self.0.rlocmode
-            )));
+            let template = crate::localize::tr("unsupported rlocmode for -: '{rlocmode}'");
+            return Err(PyValueError::new_err(template.replace("{rlocmode}", &self.0.rlocmode.to_string())));
         }
         Ok(PyRlocInt(RlocInt::new(-self.0.offset, 0)))
     }

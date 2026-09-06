@@ -69,9 +69,8 @@ impl PayloadBuffer {
             } else if rlocmode == 4 {
                 self.orttable.push(self.datacur);
             } else {
-                return Err(PyValueError::new_err(format!(
-                    "rlocmode should be 1 or 4, not {rlocmode}"
-                )));
+                let template = crate::localize::tr("rlocmode should be 1 or 4, not {rlocmode}");
+                return Err(PyValueError::new_err(template.replace("{rlocmode}", &rlocmode.to_string())));
             }
         }
 
@@ -94,9 +93,9 @@ impl PayloadBuffer {
             let offset = rlocint.0.offset;
 
             if !(rlocmode == 0 || (argsize == 4 && self.datacur % 4 == 0)) {
-                return Err(PyValueError::new_err(
+                return Err(PyValueError::new_err(crate::localize::tr(
                     "Cannot write non-const in byte/word/nonalligned dword.",
-                ));
+                )));
             }
 
             if rlocmode == 1 {
