@@ -31,14 +31,18 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
         if isinstance(_from, cls):
             return _from
         if isinstance(_from, ConstType):
-            raise EPError(_('"{}" is not a {}').format(_from, cls.__name__))
+            raise EPError(
+                _('"{value}" is not a {expected}').format(
+                    value=_from, expected=cls.__name__
+                )
+            )
         return cls(_from)
 
     def _check_assign(self, other) -> None:
         from ..variable import EUDVariable
 
         if not isinstance(self._value, EUDVariable):
-            raise EPError(_("Can't assign {} to constant expression").format(other))
+            raise EPError(_("Can't assign {src} to constant expression").format(src=other))
         if type(other) is ExprProxy:
             other = other._value
         if isinstance(other, type(self)):
@@ -46,7 +50,7 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
         if isinstance(other, int | EUDVariable | str):
             return
         else:
-            raise EPError(_("Can't assign {} to {}").format(other, self))
+            raise EPError(_("Can't assign {src} to {dst}").format(src=other, dst=self))
 
     def Assign(self, other) -> Self:  # noqa: N802
         self._check_assign(other)

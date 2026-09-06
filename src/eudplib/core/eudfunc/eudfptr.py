@@ -104,7 +104,7 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
 
         def _check_valid_function(self, f):
             ut.ep_assert(
-                isinstance(f, EUDFuncN), _("{} is not an EUDFuncN").format(f)
+                isinstance(f, EUDFuncN),                 _("'{name}' is not an EUDFuncN").format(name=f)
             )
             if not f._fstart:
                 f._create_func_body()
@@ -113,13 +113,15 @@ def EUDTypedFuncPtr(argtypes, rettypes):  # noqa: N802
             f_retn = f._retn
             ut.ep_assert(
                 argn == f_argn,
-                _("Function requires {} arguments (Expected {})").format(
-                    f_argn, argn
+                _("Function requires {given} arguments (Expected {expected})").format(
+                    given=f_argn, expected=argn
                 ),
             )
             ut.ep_assert(
                 retn == f_retn,
-                _("Function returns {} values (Expected {})").format(f_retn, retn),
+                _("Function returns {given} values (Expected {expected})").format(
+                    given=f_retn, expected=retn
+                ),
             )
 
         def setFunc(self, f):  # noqa: N802

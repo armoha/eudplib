@@ -87,7 +87,7 @@ def EPD(p: Any, **kwargs) -> Any:  # noqa: N802
         nexttrg << c.NextTrigger()
         return ret
 
-    raise EPError(_("Invalid input for EPD: {}").format(p))
+    raise EPError(_("Invalid input for EPD: {value}").format(value=p))
 
 
 # -------

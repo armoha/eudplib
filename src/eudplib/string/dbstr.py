@@ -83,8 +83,8 @@ class DBStringData(c.EUDObject):
             self.content = ut.u2utf8(content)
             if 0 in self.content:
                 raise ut.EPError(
-                    _("no nul bytes allowed in the middle of {}").format(
-                        self.__class__
+                    _("no nul bytes allowed in the middle of {name}").format(
+                        name=self.__class__
                     )
                 )
 

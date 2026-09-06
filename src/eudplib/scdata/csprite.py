@@ -92,10 +92,14 @@ class CSprite(EPDOffsetMap):
             if r == 0 and 0 <= q < 2500:
                 _epd, self._ptr = u, 0x629D98 + 36 * q
             else:
-                raise EPError(_("Invalid input for CSprite: {}").format(epd))
+                raise EPError(
+                    _("Invalid input for CSprite: {value}").format(value=epd)
+                )
 
             if p is not None and (not isinstance(p, int) or p != self._ptr):
-                raise EPError(_("Invalid input for CSprite.ptr: {}").format(ptr))
+                raise EPError(
+                    _("Invalid input for CSprite.ptr: {value}").format(value=ptr)
+                )
         elif isinstance(u, c.EUDVariable):
             if p is None:
                 self._ptr = None
@@ -107,14 +111,20 @@ class CSprite(EPDOffsetMap):
 
             else:
                 if not isinstance(p, c.EUDVariable):
-                    raise EPError(_("Invalid input for CSprite.ptr: {}").format(ptr))
+                    raise EPError(
+                        _("Invalid input for CSprite.ptr: {value}").format(
+                            value=ptr
+                        )
+                    )
                 if EPDOffsetMap._cast:
                     _epd, self._ptr = u, p
                 else:
                     _epd, self._ptr = c.EUDCreateVariables(2)
                     c.SetVariables((_epd, self._ptr), (u, p))
         else:
-            raise EPError(_("Invalid input for CSprite: {}").format(epd))
+            raise EPError(
+                _("Invalid input for CSprite: {value}").format(value=epd)
+            )
 
         super().__init__(_epd)
 
@@ -128,11 +138,15 @@ class CSprite(EPDOffsetMap):
             if r == 0 and 0 <= q < 2500:
                 epd = EPD(u)
             else:
-                raise EPError(_("Invalid input for CSprite: {}").format(ptr))
+                raise EPError(
+                    _("Invalid input for CSprite: {value}").format(value=ptr)
+                )
         elif isinstance(u, c.EUDVariable):
             epd = _epd_cache(u)
         else:
-            raise EPError(_("Invalid input for CSprite: {}").format(epd))
+            raise EPError(
+                _("Invalid input for CSprite: {value}").format(value=epd)
+            )
 
         return cls(epd, ptr=u)
 

@@ -462,10 +462,14 @@ class CUnit(EPDOffsetMap):
             if r == 0 and 0 <= q < 1700:
                 _epd, self._ptr = u, 0x59CCA8 + 336 * q
             else:
-                raise EPError(_("Invalid input for CUnit: {}").format(epd))
+                raise EPError(
+                    _("Invalid input for CUnit: {value}").format(value=epd)
+                )
 
             if p is not None and (not isinstance(p, int) or p != self._ptr):
-                raise EPError(_("Invalid input for CUnit.ptr: {}").format(ptr))
+                raise EPError(
+                    _("Invalid input for CUnit.ptr: {value}").format(value=ptr)
+                )
         elif isinstance(u, c.EUDVariable):
             if p is None:
                 self._ptr = None
@@ -476,14 +480,20 @@ class CUnit(EPDOffsetMap):
                     _epd << u
             else:
                 if not isinstance(p, c.EUDVariable):
-                    raise EPError(_("Invalid input for CUnit.ptr: {}").format(ptr))
+                    raise EPError(
+                        _("Invalid input for CUnit.ptr: {value}").format(
+                            value=ptr
+                        )
+                    )
                 if EPDOffsetMap._cast:
                     _epd, self._ptr = u, p
                 else:
                     _epd, self._ptr = c.EUDCreateVariables(2)
                     c.SetVariables((_epd, self._ptr), (u, p))
         else:
-            raise EPError(_("Invalid input for CUnit: {}").format(epd))
+            raise EPError(
+                _("Invalid input for CUnit: {value}").format(value=epd)
+            )
 
         super().__init__(_epd)
 
@@ -497,11 +507,15 @@ class CUnit(EPDOffsetMap):
             if r == 0 and 0 <= q < 1700:
                 epd = EPD(u)
             else:
-                raise EPError(_("Invalid input for CUnit: {}").format(ptr))
+                raise EPError(
+                    _("Invalid input for CUnit: {value}").format(value=ptr)
+                )
         elif isinstance(u, c.EUDVariable):
             epd = _epd_cache(u)
         else:
-            raise EPError(_("Invalid input for CUnit: {}").format(epd))
+            raise EPError(
+                _("Invalid input for CUnit: {value}").format(value=epd)
+            )
 
         return cls(epd, ptr=u)
 

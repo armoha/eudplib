@@ -260,8 +260,8 @@ def f_dbstr_print(dst, *args, EOS=True, encoding="UTF-8"):  # noqa: N803
         elif isinstance(x, c.EUDVariable | c.ConstExpr):
             _add_dw(ret, x)
         else:
-            e = _("Object with unknown parameter type {} given to {}")
-            raise ut.EPError(e.format(arg, "f_dbstr_print"))
+            e = _("Object with unknown parameter type {type} given to {func}")
+            raise ut.EPError(e.format(type=arg, func="f_dbstr_print"))
 
     if static_len:
         ret += static_len

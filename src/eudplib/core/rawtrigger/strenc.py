@@ -144,20 +144,32 @@ def EncodeAIScript(ais: _Arg) -> _Dword:  # noqa: N802
         if len(ai) > 4:
             if ai in DefAIScriptDict:
                 return ut.b2i4(DefAIScriptDict[ai])
-            sl = _("Cannot encode string {} as {}.").format(ai, "AIScript")
+            sl = _("Cannot encode string {string} as {type}.").format(
+                string=ai, type="AIScript"
+            )
             for match in difflib.get_close_matches(ai, DefAIScriptDict.keys()):
-                sl += "\n" + _(" - Suggestion: {}").format(match)
+                sl += "\n" + _(" - Suggestion: {suggestion}").format(
+                    suggestion=match
+                )
 
         elif len(ai) == 4:
             if ai in DefAIScriptDict.values():
                 return ut.b2i4(ai)
-            sl = _("Cannot encode string {} as {}.").format(ai, "AIScript")
+            sl = _("Cannot encode string {string} as {type}.").format(
+                string=ai, type="AIScript"
+            )
             for match in difflib.get_close_matches(ai, DefAIScriptDict.values()):
-                sl += "\n" + _(" - Suggestion: {}").format(match)
+                sl += "\n" + _(" - Suggestion: {suggestion}").format(
+                    suggestion=match
+                )
         raise ut.EPError(sl)
 
     if isinstance(ai, ConstType):
-        raise ut.EPError(_('"{}" is not a {}').format(ais, "AIScript"))
+        raise ut.EPError(
+            _('"{value}" is not a {expected}').format(
+                value=ais, expected="AIScript"
+            )
+        )
     assert not isinstance(ai, ExprProxy), "unreachable"
     return ai
 
@@ -190,14 +202,24 @@ def _EncodeAny(t: str, f: Callable, dl: Mapping[str, int], s: _Arg) -> _Dword:  
             if isinstance(u, str):
                 if u in dl:
                     return dl[u]
-                sl = _("Cannot encode string {} as {}.").format(u, t)
+                sl = _("Cannot encode string {string} as {type}.").format(
+                    string=u, type=t
+                )
                 for match in difflib.get_close_matches(u, dl.keys()):
-                    sl += "\n" + _(" - Suggestion: {}").format(match)
+                    sl += "\n" + _(" - Suggestion: {suggestion}").format(
+                        suggestion=match
+                    )
                 raise ut.EPError(sl)
-            raise ut.EPError(_('"{}" is not a {}').format(u, t))
+            raise ut.EPError(
+                _('"{value}" is not a {expected}').format(
+                    value=u, expected=t
+                )
+            )
 
     elif isinstance(u, ConstType):
-        raise ut.EPError(_('"{}" is not a {}').format(u, t))
+        raise ut.EPError(
+            _('"{value}" is not a {expected}').format(value=u, expected=t)
+        )
     assert not isinstance(u, ExprProxy), "unreachable"
     return u
 

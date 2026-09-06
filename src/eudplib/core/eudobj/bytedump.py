@@ -24,8 +24,8 @@ class Db(EUDObject):
             b = b.encode("UTF-8")
             if 0 in b:
                 raise EPError(
-                    _("no nul bytes allowed in the middle of {}").format(
-                        self.__class__
+                    _("no nul bytes allowed in the middle of {name}").format(
+                        name=self.__class__
                     )
                 )
             b += b"\0"

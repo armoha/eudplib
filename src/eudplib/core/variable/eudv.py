@@ -50,7 +50,7 @@ def process_dest(dest) -> int | ConstExpr:
             epd.checkNonRValue()
         return EPD(epd.getValueAddr())
     if not isinstance(epd, int | ConstExpr):
-        raise EPError(_("Invalid dest: {}").format(dest))
+        raise EPError(_("Invalid dest: {dest}").format(dest=dest))
     return epd
 
 
@@ -101,7 +101,7 @@ class EUDVariable(VariableBase):
         if not isinstance(initval, (int, ConstExpr)):
             unproxied = unProxy(initval)
             if not isinstance(unproxied, (int, ConstExpr)):
-                raise EPError(_("Invalid initval: {}").format(initval))
+                raise EPError(_("Invalid initval: {initval}").format(initval=initval))
             else:
                 initval = unproxied
         self._vartrigger = VariableTriggerForward(initval)
@@ -213,7 +213,7 @@ class EUDVariable(VariableBase):
     def SetModifier(self, modifier: TrgModifier) -> bt.Action:  # noqa: N802
         ep_assert(
             modifier is bt.SetTo or modifier is bt.Add or modifier is bt.Subtract,
-            _("Unexpected modifier {}").format(modifier),
+            _("Unexpected modifier {modifier}").format(modifier=modifier),
         )
         mode = bt.EncodeModifier(modifier) << 24
         return bt.SetDeathsX(EPD(self._varact + 24), bt.SetTo, mode, 0, 0xFF000000)
@@ -542,7 +542,9 @@ class EUDVariable(VariableBase):
             return self.Exactly(other)
 
         except Exception as err:
-            ep_warn(_("{}: Comparing with temporary variable.").format(err))
+            ep_warn(
+                _("{err}: Comparing with temporary variable.").format(err=err)
+            )
             traceback.print_stack()
             return (self - other).Exactly(0)
 
@@ -559,7 +561,9 @@ class EUDVariable(VariableBase):
             return self.AtMost(other)
 
         except Exception as err:
-            ep_warn(_("{}: Patching comparison condition.").format(err))
+            ep_warn(
+                _("{err}: Patching comparison condition.").format(err=err)
+            )
             traceback.print_stack()
             condition = self.AtMost(0)
             SeqCompute(((EPD(condition) + 2, bt.SetTo, other),))
@@ -570,7 +574,9 @@ class EUDVariable(VariableBase):
             return self.AtLeast(other)
 
         except Exception as err:
-            ep_warn(_("{}: Patching comparison condition.").format(err))
+            ep_warn(
+                _("{err}: Patching comparison condition.").format(err=err)
+            )
             traceback.print_stack()
             condition = self.AtLeast(0)
             SeqCompute(((EPD(condition) + 2, bt.SetTo, other),))
@@ -585,7 +591,9 @@ class EUDVariable(VariableBase):
             SeqCompute(((bitmask, bt.SetTo, other), (bitmask, bt.Subtract, self)))
             return condition
         if isinstance(other, int) and other <= 0:
-            ep_warn(_("No unsigned number can be leq than {}").format(other))
+            ep_warn(
+                _("No unsigned number can be leq than {value}").format(value=other)
+            )
             traceback.print_stack()
             return bt.Never()  # No unsigned number is less than 0
         return self.AtMost(other - 1)
@@ -599,7 +607,11 @@ class EUDVariable(VariableBase):
             SeqCompute(((bitmask, bt.SetTo, self), (bitmask, bt.Subtract, other)))
             return condition
         if isinstance(other, int) and other >= 0xFFFFFFFF:
-            ep_warn(_("No unsigned number can be greater than {}").format(other))
+            ep_warn(
+                _("No unsigned number can be greater than {value}").format(
+                    value=other
+                )
+            )
             traceback.print_stack()
             return bt.Never()  # No unsigned number is greater than 0xFFFFFFFF
         return self.AtLeast(other + 1)

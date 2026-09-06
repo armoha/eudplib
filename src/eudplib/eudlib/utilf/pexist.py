@@ -68,12 +68,12 @@ def EUDLoopPlayer(  # noqa: N802
 ) -> Iterator[TrgPlayer]:
     def encode_force(f) -> int:
         if isinstance(f, TrgPlayer) and isinstance(f._value, int):
-            ut.ep_assert(18 <= f._value <= 21, _("{} is not force").format(f))
+            ut.ep_assert(18 <= f._value <= 21, _("'{force}' is not force").format(force=f))
             f = f._value
-        ut.ep_assert(isinstance(f, int), _("{} is not force").format(f))
+        ut.ep_assert(isinstance(f, int), _("'{force}' is not force").format(force=f))
         if 18 <= f <= 21:
             f -= 18
-        ut.ep_assert(0 <= f <= 3, _("{} is not force").format(f))
+        ut.ep_assert(0 <= f <= 3, _("'{force}' is not force").format(force=f))
         return f
 
     plist = []
@@ -90,11 +90,11 @@ def EUDLoopPlayer(  # noqa: N802
         e = []
         e.append(_("No player met condition for input map settings:"))
         if ptype is not None:
-            e.append(_(" ptype {}").format(ptype))
+            e.append(_(" ptype {ptype}").format(ptype=ptype))
         if force is not None:
-            e.append(_(" force {}").format(force))
+            e.append(_(" force {force}").format(force=force))
         if race is not None:
-            e.append(_(" race {}").format(race))
+            e.append(_(" race {race}").format(race=race))
         e.append("\n")
         e.append(_("Check out whether Start Locations are placed correctly."))
         raise ut.EPError("".join(e))

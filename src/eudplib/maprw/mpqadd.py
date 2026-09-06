@@ -43,7 +43,7 @@ def MPQCheckFile(fname: str) -> bytes:  # noqa: N802
 
     ut.ep_assert(
         fname_key not in _addedFiles,
-        _('MPQ filename duplicate : "{}"').format(fname),
+        _('MPQ filename duplicate : "{fname}"').format(fname=fname),
     )
 
     return fname_key
@@ -70,7 +70,9 @@ def MPQAddFile(  # noqa: N802
         or path_or_content is None
     ):
         raise ut.EPError(
-            _("Invalid file path or content: {}").format(path_or_content)
+            _("Invalid file path or content: {content}").format(
+                content=path_or_content
+            )
         )
 
     # make fname case_insensitive
@@ -121,7 +123,9 @@ def _update_mpq(mpqw: mpqapi.MPQ) -> None:
             mpqw.add_file(fname, file_path)
         except Exception as e:
             raise ut.EPError(
-                _("Failed adding file {} to mpq: May be duplicate").format(fname)
+                _("Failed adding file {fname} to mpq: May be duplicate").format(
+                    fname=fname
+                )
             ) from e
 
         if not isinstance(path_or_content, str):

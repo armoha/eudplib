@@ -32,7 +32,9 @@ class _EUDStructMetaclass(type):
                     basetype._fields_[i] = (fieldname, cls)
 
                 if fieldname in fielddict:
-                    raise EPError(_("Duplicated field name: {}").format(fieldname))
+                    raise EPError(
+                        _("Duplicated field name: {name}").format(name=fieldname)
+                    )
                 fielddict[fieldname] = (fieldcount, fieldtype)
                 fieldcount += 1
 
@@ -75,20 +77,20 @@ class EUDStructArray(ExprProxy, metaclass=_EUDStructMetaclass):
     def __getitem__(self, index):
         if isinstance(index, int) and not 0 <= index < self._times:
             e = _(
-                "index out of bounds: the length of EUDVArray is {}"
-                " but the index is {}"
+                "index out of bounds: the length of EUDVArray is {length}"
+                " but the index is {index}"
             )
-            raise EPError(e.format(self._times, index))
+            raise EPError(e.format(length=self._times, index=index))
 
         return self.getValue()[index]
 
     def __setitem__(self, index, newval):
         if isinstance(index, int) and not 0 <= index < self._times:
             e = _(
-                "index out of bounds: the length of EUDVArray is {}"
-                " but the index is {}"
+                "index out of bounds: the length of EUDVArray is {length}"
+                " but the index is {index}"
             )
-            raise EPError(e.format(self._times, index))
+            raise EPError(e.format(length=self._times, index=index))
         self.getValue()[index] = newval
 
     def __getattr__(self, name):

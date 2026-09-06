@@ -254,15 +254,15 @@ class NotImplementedMember(BaseMember):
         if instance is None:
             return self
         raise ut.EPError(
-            _("{} is not implemented for {}").format(
-                self.__name__, self.__objclass__
+            _("'{name}' is not implemented for {type}").format(
+                name=self.__name__, type=self.__objclass__
             )
         )
 
     def __set__(self, instance: EPDOffsetMap, value) -> None:
         raise ut.EPError(
-            _("{} is not implemented for {}").format(
-                self.__name__, self.__objclass__
+            _("'{name}' is not implemented for {type}").format(
+                name=self.__name__, type=self.__objclass__
             )
         )
 

@@ -44,7 +44,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size: int | None = None) -> N
     :param fname: Path for output map.
     :param rootf: Main entry function.
     """
-    print(_("Saving to {}...").format(fname))
+    print(_("Saving to {fname}...").format(fname=fname))
     chkt = mapdata.GetChkTokenized()
 
     _reset_trace_map()
@@ -142,7 +142,7 @@ def SaveMap(fname: str, rootf: Callable, *, sector_size: int | None = None) -> N
 
     if trace_map:
         trace_fname = fname + ".epmap"
-        print(_("Writing trace file to {}").format(trace_fname))
+        print(_("Writing trace file to {fname}").format(fname=trace_fname))
         if trace_header is None:
             raise EPError(_("Unreachable callback error"))
         with open(trace_fname, "w", encoding="utf-8") as wf:

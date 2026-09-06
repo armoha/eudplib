@@ -107,7 +107,9 @@ def patch_condition(cond: _Condition) -> Condition:
     if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
         ep_warn(_("Condition is always True"))
         return c.Always() if condition != 0 else c.Never()
-    raise EPError(_("Invalid input for condition: {}").format(cond))
+    raise EPError(
+        _("Invalid input for condition: {cond}").format(cond=cond)
+    )
 
 
 def patch_action(act: Action | Forward | ExprProxy[Action | Forward]) -> Action:
@@ -117,7 +119,9 @@ def patch_action(act: Action | Forward | ExprProxy[Action | Forward]) -> Action:
             raise EPError(_("Forward not initialized"))
         action = action._expr
     if not isinstance(action, Action):
-        raise EPError(_("Action expected, found {}").format(act))
+        raise EPError(
+            _("Action expected, found {action}").format(action=act)
+        )
     apply_patch_table(EPD(action), action, actpt)
     return action
 
@@ -253,4 +257,6 @@ def negate_cond(cond: _Condition) -> Condition:
     if castable and isinstance(condition, (ConstExpr, c.RlocInt_C)):
         ep_warn(_("Condition is always False"))
         return c.Never() if condition == 0 else c.Always()
-    raise EPError(_("Invalid input for condition: {}").format(cond))
+    raise EPError(
+        _("Invalid input for condition: {cond}").format(cond=cond)
+    )

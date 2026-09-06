@@ -92,13 +92,13 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
         from ..variable import EUDVariable, SetVariables
 
         if not isinstance(self._value, EUDVariable):
-            raise EPError(_("Can't assign {} to constant expression").format(other))
+            raise EPError(_("Can't assign {src} to constant expression").format(src=other))
         if isinstance(other, type(self)):
             SetVariables([self._value, self._epd], [other, other._epd])
         elif isinstance(other, int) and other == 0:
             SetVariables([self._value, self._epd], [0, ut.EPD(0)])
         else:
-            raise EPError(_("Can't assign {} to {}").format(other, self))
+            raise EPError(_("Can't assign {src} to {dst}").format(src=other, dst=self))
         return self
 
     # Initializer
@@ -147,7 +147,7 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
             try:
                 self.setfield(name, value)
             except KeyError:
-                raise ut.EPError(_("Unknown field name {}").format(name))
+                raise ut.EPError(                _("Unknown field name {name}").format(name=name))
         else:
             super().__setattr__(name, value)
 

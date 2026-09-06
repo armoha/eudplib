@@ -41,19 +41,25 @@ class EUDXVariable(EUDVariable):
         if not isinstance(initval, int | ConstExpr):
             unproxied = unProxy(initval)
             if not isinstance(unproxied, (int, ConstExpr)):
-                raise EPError(_("Invalid initval: {}").format(initval))
+                raise EPError(
+                    _("Invalid initval: {initval}").format(initval=initval)
+                )
             else:
                 initval = unproxied
         if not isinstance(nextptr, int | ConstExpr):
             unproxied = unProxy(nextptr)
             if not isinstance(unproxied, (int, ConstExpr)):
-                raise EPError(_("Invalid nextptr: {}").format(nextptr))
+                raise EPError(
+                    _("Invalid nextptr: {nextptr}").format(nextptr=nextptr)
+                )
             else:
                 nextptr = unproxied
         if not isinstance(mask, int | ConstExpr):
             unproxied = unProxy(mask)
             if not isinstance(unproxied, (int, ConstExpr)):
-                raise EPError(_("Invalid mask: {}").format(mask))
+                raise EPError(
+                    _("Invalid mask: {mask}").format(mask=mask)
+                )
             else:
                 mask = unproxied
         args = (mask, dest, initval, modifier, nextptr)

@@ -50,7 +50,7 @@ class EUDArrayData(c.EUDObject):
 
         else:
             if any(not c.IsConstExpr(item) for item in arr):
-                err = [_("Invalid item(s) for {}:").format(self.__class__)]
+                err = [_("Invalid item(s) for {type}:").format(type=self.__class__)]
                 for i, item in enumerate(arr):
                     if not c.IsConstExpr(item):
                         err.append(f"\t#{i}: {item}")
@@ -120,7 +120,9 @@ class EUDArray(ut.ExprProxy):
 
     def Assign(self, other) -> Self:  # noqa: N802
         if not isinstance(self._value, c.EUDVariable):
-            raise EPError(_("Can't assign {} to constant expression").format(other))
+            raise EPError(
+                _("Can't assign {src} to constant expression").format(src=other)
+            )
         if isinstance(other, type(self)):
             if _ptr_array:
                 self._lazy_init_epd()
@@ -140,7 +142,7 @@ class EUDArray(ut.ExprProxy):
             elif not _ptr_array and other._is_epd():
                 c.SetVariables(self._value, other)
         else:
-            raise EPError(_("Can't assign {} to {}").format(other, self))
+            raise EPError(_("Can't assign {src} to {dst}").format(src=other, dst=self))
         return self
 
     def _lazy_init_epd(self) -> None:
@@ -161,8 +163,8 @@ class EUDArray(ut.ExprProxy):
                 0 <= index < self.length,
                 _("index out of bounds")
                 + ": "
-                + _("EUDArray.length is {} but the index is {}").format(
-                    self.length, index
+                + _("EUDArray.length is {length} but the index is {index}").format(
+                    length=self.length, index=index
                 ),
             )
         self._lazy_init_epd()

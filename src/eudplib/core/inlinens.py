@@ -19,8 +19,8 @@ def EUDRegisterObjectToNamespace(funcname: str, obj: Any) -> Any:  # noqa: N802
     """Register object to inline code namespace."""
     if funcname[0] != "_":
         if funcname in _objns:
-            err = _("Duplicated name {} for EUDRegisterObjectToNamespace")
-            ep_warn(err.format(funcname))
+            err = _("Duplicated name {name} for EUDRegisterObjectToNamespace")
+            ep_warn(err.format(name=funcname))
             _objns[funcname] = None
         else:
             _objns[funcname] = obj

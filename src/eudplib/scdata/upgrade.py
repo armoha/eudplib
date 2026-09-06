@@ -46,7 +46,11 @@ class Upgrade(EPDOffsetMap, ConstType):
     @classmethod
     def cast(cls, _from: _Upgrade):
         if isinstance(_from, ConstType) and not isinstance(_from, cls):
-            raise ut.EPError(_('"{}" is not a {}').format(_from, cls.__name__))
+            raise ut.EPError(
+                _('"{value}" is not a {expected}').format(
+                    value=_from, expected=cls.__name__
+                )
+            )
         return super().cast(_from)
 
     def __init__(self, initval: _Upgrade) -> None:

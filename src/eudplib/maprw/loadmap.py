@@ -22,7 +22,7 @@ def LoadMap(fname: str) -> None:  # noqa: N802
     """
     global _load_map_path
 
-    print(_("Loading map {}").format(fname))
+    print(_("Loading map {fname}").format(fname=fname))
     if not os.path.isfile(fname):
         raise FileNotFoundError(_("input path is not a map file"))
     try:

@@ -40,7 +40,9 @@ class ExprProxy(Generic[T_co]):
         try:
             return cls(_from=_from)
         except TypeError as e:
-            raise TypeError(_("Type {} is not castable").format(cls.__name__), e)
+            raise TypeError(
+                _("Type {type} is not castable").format(type=cls.__name__), e
+            )
 
     def getValue(self) -> T_co:  # noqa: N802
         return self._value
@@ -63,7 +65,9 @@ class ExprProxy(Generic[T_co]):
         from ..core import EUDVariable
 
         if not isinstance(self._value, EUDVariable):
-            raise EPError(_("Can't assign {} to constant expression").format(other))
+            raise EPError(
+                _("Can't assign {src} to constant expression").format(src=other)
+            )
         if not (type(other) is int and other == 0):
             try:
                 other = type(self).cast(other)
@@ -218,7 +222,9 @@ def unProxy(x):  # noqa: N802
         x = x.getValue()
         if x is x_cyclic_check:
             # Reconstruct cyclic reference
-            err = _("ExprProxy {} has cyclic references: ")
+            err = _("ExprProxy {name} has cyclic references: ").format(
+                name=type(x).__name__
+            )
             x_list = []
             x_set = set()
 

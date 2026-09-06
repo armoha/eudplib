@@ -110,7 +110,7 @@ def IsPName(player, name):  # noqa: N802
             # fmt: off
             ut.ep_assert(
                 p == c.EncodePlayer(CurrentPlayer),
-                _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {}").format(player),  # noqa: E501
+                _("IsPName player should be Player1 to Player8 or CurrentPlayer, not {player}").format(player=player),  # noqa: E501
             )
             # fmt: on
 

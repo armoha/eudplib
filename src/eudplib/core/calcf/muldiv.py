@@ -43,7 +43,9 @@ def f_div(a, b, **kwargs):
     """
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(a),
+            _("Can't use negative dividend for unsigned division: {value}").format(
+                value=a
+            ),
             _(
                 "For signed division, use "
                 "`f_div_towards_zero`, `f_div_floor` "
@@ -52,7 +54,9 @@ def f_div(a, b, **kwargs):
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(a),
+            _("Can't use negative divider for unsigned division: {value}").format(
+                value=a
+            ),
             _(
                 "For signed division, use "
                 "`f_div_towards_zero`, `f_div_floor` "
@@ -82,7 +86,9 @@ def _quot(a, b, **kwargs):
     """Calculate (a//b)"""
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(a),
+            _("Can't use negative dividend for unsigned division: {value}").format(
+                value=a
+            ),
             _(
                 "For signed division, use "
                 "`f_div_towards_zero`, `f_div_floor` "
@@ -91,7 +97,9 @@ def _quot(a, b, **kwargs):
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(a),
+            _("Can't use negative divider for unsigned division: {value}").format(
+                value=a
+            ),
             _(
                 "For signed division, use "
                 "`f_div_towards_zero`, `f_div_floor` "
@@ -121,7 +129,9 @@ def _rem(a, b, **kwargs):
     """Calculate (a%b)"""
     if ut.isUnproxyInstance(a, int) and a < 0:
         raise ut.EPError(
-            _("Can't use negative dividend for unsigned division: {}").format(a),
+            _("Can't use negative dividend for unsigned division: {value}").format(
+                value=a
+            ),
             _(
                 "For signed division, use "
                 "`f_div_towards_zero`, `f_div_floor` "
@@ -130,7 +140,9 @@ def _rem(a, b, **kwargs):
         )
     if ut.isUnproxyInstance(b, int) and b < 0:
         raise ut.EPError(
-            _("Can't use negative divider for unsigned division: {}").format(a),
+            _("Can't use negative divider for unsigned division: {value}").format(
+                value=a
+            ),
             _(
                 "For signed division, use "
                 "`f_div_towards_zero`, `f_div_floor` "

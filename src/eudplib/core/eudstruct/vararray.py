@@ -48,10 +48,10 @@ class _EUDVArrayData(ConstExpr):
             dest, value, nextptr = items
             value = unProxy(value)
             if not isinstance(value, (int, ConstExpr)):
-                raise EPError(_("Invalid item #{}: {}").format(i, items))
+                raise EPError(_("Invalid item #{index}: {item}").format(index=i, item=items))
             nextptr = unProxy(nextptr)
             if not isinstance(nextptr, (int, ConstExpr)):
-                raise EPError(_("Invalid item #{}: {}").format(i, items))
+                raise EPError(_("Invalid item #{index}: {item}").format(index=i, item=items))
             init.append((0xFFFFFFFF, process_dest(dest), value, 0x072D0000, nextptr))
         self._init = init
 
@@ -142,10 +142,10 @@ class _EUDVArray(ExprProxy):
     def _bound_check(self, index: object) -> None:
         if isinstance(index, int) and not (0 <= index < self._size):
             e = _(
-                "index out of bounds: the length of EUDVArray is {}"
-                " but the index is {}"
+                "index out of bounds: the length of EUDVArray is {length}"
+                " but the index is {index}"
             )
-            raise EPError(e.format(self._size, index))
+            raise EPError(e.format(length=self._size, index=index))
 
     def __getitem__(self, i):
         return self.get(i)
@@ -441,10 +441,10 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
         if not isinstance(index, int) or 0 <= index < size:
             return
         e = _(
-            "index out of bounds: the length of EUDVArray is {}"
-            " but the index is {}"
+            "index out of bounds: the length of EUDVArray is {length}"
+            " but the index is {index}"
         )
-        raise EPError(e.format(size, index))
+        raise EPError(e.format(length=size, index=index))
 
     class _VArray(ExprProxy):
         dont_flatten = True
@@ -469,14 +469,14 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
         def Assign(self, other) -> Self:  # noqa: N802
             if not isinstance(self._value, EUDVariable):
                 raise EPError(
-                    _("Can't assign {} to constant expression").format(other)
+                    _("Can't assign {src} to constant expression").format(src=other)
                 )
             if isinstance(other, type(self)):
                 SetVariables([self._value, self._epd], [other, other._epd])
             elif isinstance(other, int) and other == 0:
                 SetVariables([self._value, self._epd], [0, 0])
             else:
-                raise EPError(_("Can't assign {} to {}").format(other, self))
+                raise EPError(_("Can't assign {src} to {dst}").format(src=other, dst=self))
             return self
 
         def get(self, i, **kwargs):

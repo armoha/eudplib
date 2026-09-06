@@ -62,8 +62,8 @@ class ObjPool:
     def alloc(self, basetype, *args, **kwargs):
         ut.ep_assert(
             len(basetype._fielddict) <= self.max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(
-                self.max_fieldn
+            _("Only structs less than {max_fields} fields can be allocated").format(
+                max_fields=self.max_fieldn
             ),
         )
         data = self._alloc()
@@ -74,8 +74,8 @@ class ObjPool:
     def free(self, basetype, data) -> None:
         ut.ep_assert(
             len(basetype._fielddict) <= self.max_fieldn,
-            _("Only structs less than {} fields can be allocated").format(
-                self.max_fieldn
+            _("Only structs less than {max_fields} fields can be allocated").format(
+                max_fields=self.max_fieldn
             ),
         )
 

@@ -87,8 +87,8 @@ def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):  # noqa:
         argn = len(argspec[0])
         ut.ep_assert(
             argn >= len(arginitvals),
-            _("Different number of variables({}) from initial values({})").format(
-                argn, len(arginitvals)
+            _("Different number of variables({var_count}) from initial values({val_count})").format(
+                var_count=argn, val_count=len(arginitvals)
             ),
         )
         ut.ep_assert(
@@ -167,7 +167,7 @@ def _EUDPredefineReturn(*frets):  # noqa: N802
         rets = frets
 
     else:
-        raise ut.EPError(_("Invalid return variable: {}").format(frets))
+        raise ut.EPError(_("Invalid return variable: {name}").format(name=frets))
 
     rets = ut.FlattenList(rets)
 

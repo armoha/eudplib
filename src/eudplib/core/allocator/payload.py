@@ -137,9 +137,9 @@ def _collect_objects(root: EUDObject | Forward) -> None:
     while True:
         while _untraversed_objects:
             lprint(
-                _(" - Collected {} / {} objects").format(
-                    len(_found_objects_dict),
-                    len(_found_objects_dict) + len(_untraversed_objects),
+                _(" - Collected {count} / {total} objects").format(
+                    count=len(_found_objects_dict),
+                    total=len(_found_objects_dict) + len(_untraversed_objects),
                 )
             )
 
@@ -185,8 +185,8 @@ def _collect_objects(root: EUDObject | Forward) -> None:
 
     # Final
     lprint(
-        _(" - Collected {} / {} objects").format(
-            len(_found_objects_dict), len(_found_objects_dict)
+        _(" - Collected {count} / {total} objects").format(
+            count=len(_found_objects_dict), total=len(_found_objects_dict)
         ),
         flush=True,
     )

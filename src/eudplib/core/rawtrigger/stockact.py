@@ -140,7 +140,9 @@ def Transmission(  # noqa: N802
 
     ep_assert(
         isinstance(AlwaysDisplay, int),
-        _("AlwaysDisplay argument must be int, not '{}'").format(AlwaysDisplay),
+        _("AlwaysDisplay argument must be int, not '{value}'").format(
+            value=AlwaysDisplay
+        ),
     )
     if not IsSCDBMap():
         ep_warn(_("Don't use Wait action UNLESS YOU KNOW WHAT YOU'RE DOING!"))
@@ -168,7 +170,9 @@ def DisplayText(text: String, AlwaysDisplay: Byte = 4) -> Action:  # noqa: N802,
     """
     ep_assert(
         isinstance(AlwaysDisplay, int),
-        _("AlwaysDisplay argument must be int, not '{}'").format(AlwaysDisplay),
+        _("AlwaysDisplay argument must be int, not '{value}'").format(
+            value=AlwaysDisplay
+        ),
     )
     text = EncodeString(text)
     return Action(0, text, 0, 0, 0, 0, 0, 9, 0, 4)

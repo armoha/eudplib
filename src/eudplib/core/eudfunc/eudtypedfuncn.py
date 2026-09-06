@@ -32,8 +32,8 @@ def _apply_types(typesdecl, varlist):
         varlist = varlist[1:]
     ut.ep_assert(
         len(varlist) == len(typesdecl),
-        _("Different number of variables({}) from type declarations({})").format(
-            len(varlist), len(typesdecl)
+        _("Different number of variables({var_count}) from type declarations({type_count})").format(
+            var_count=len(varlist), type_count=len(typesdecl)
         )
         + f"argtypes: {typesdecl}, args: {varlist}",
     )
@@ -88,7 +88,9 @@ class EUDXTypedFuncN(EUDTypedFuncN):
     def _create_func_args(self):
         ut.ep_assert(
             self._argn == len(self._argmasks),
-            _("Different number of arguments({}) from mask declarations({})."),
+            _("Different number of arguments({arg_count}) from mask declarations({mask_count}).").format(
+                arg_count=self._argn, mask_count=len(self._argmasks)
+            ),
         )
         if self._fargs is None:
             self._fargs = [ev.EUDXVariable(0, mask) for mask in self._argmasks]

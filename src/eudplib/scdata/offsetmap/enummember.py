@@ -191,8 +191,8 @@ class Flag:
             f_maskwrite_epd(epd, ~0, mask)
         else:
             raise EPError(
-                _("Can't assign {} to {}").format(
-                    value, f"{self.__objclass__}.{self.__name__}"
+                _("Can't assign {src} to {dst}").format(
+                    src=value, dst=f"{self.__objclass__}.{self.__name__}"
                 )
             )
 

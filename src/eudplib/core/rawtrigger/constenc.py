@@ -254,7 +254,11 @@ def _EncodeConst(t: type[ConstType], s: _Arg, u: str | None = None) -> _Dword:  
     if isinstance(s, ConstType):
         if isinstance(s, t):
             return unProxy(s)
-        raise EPError(_('"{}" is not a {}').format(s, u if u else t.__name__))
+        raise EPError(
+            _('"{value}" is not a {expected}').format(
+                value=s, expected=u if u else t.__name__
+            )
+        )
     return s
 
 

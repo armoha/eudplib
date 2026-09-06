@@ -19,7 +19,7 @@ def u2b(s: str | bytes) -> bytes:
     elif isinstance(s, bytes):
         return s
     else:
-        raise EPError(_("Invalid type {}").format(type(s)))
+        raise EPError(_("Invalid type {type}").format(type=type(s)))
 
 
 def b2u(b: str | bytes) -> str:
@@ -28,7 +28,7 @@ def b2u(b: str | bytes) -> str:
     elif isinstance(b, str):
         return b
     else:
-        raise EPError(_("Invalid type {}").format(type(b)))
+        raise EPError(_("Invalid type {type}").format(type=type(b)))
 
 
 def u2utf8(s: str | bytes) -> bytes:
@@ -37,7 +37,7 @@ def u2utf8(s: str | bytes) -> bytes:
     elif isinstance(s, bytes):
         return s
     else:
-        raise EPError(_("Invalid type {}").format(type(s)))
+        raise EPError(_("Invalid type {type}").format(type=type(s)))
 
 
 def b2utf8(b: str | bytes) -> str:
@@ -46,4 +46,4 @@ def b2utf8(b: str | bytes) -> str:
     elif isinstance(b, str):
         return b
     else:
-        raise EPError(_("Invalid type {}").format(type(b)))
+        raise EPError(_("Invalid type {type}").format(type=type(b)))

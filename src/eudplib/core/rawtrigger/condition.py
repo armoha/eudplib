@@ -111,7 +111,9 @@ class Condition(ConstExpr):
     def _invalid_condition(self, i: int) -> str:
         condtype = self.fields[5]
         condname = _condtypes[condtype] if isinstance(condtype, int) else condtype
-        return _("Invalid fields for condition{} {}:").format(i, condname)
+        return _("Invalid fields for condition{index} {name}:").format(
+            index=i, name=condname
+        )
 
     def CheckArgs(self, i: int) -> None:  # noqa: N802
         fields = self.fields
@@ -156,7 +158,10 @@ class Condition(ConstExpr):
                 i >= 3 and not isinstance(field, int)
             ):
                 error.append(
-                    "\t" + _("invalid {}: {}").format(fieldname[i], repr(field))
+                    "\t"
+                    + _("invalid {name}: {value}").format(
+                        name=fieldname[i], value=repr(field)
+                    )
                 )
 
         raise ut.EPError("\n".join(error))
@@ -234,8 +239,8 @@ class Condition(ConstExpr):
                 self.fields[2] += -((-1) ** comparison)  # type: ignore[operator]
             elif comparison != 10:
                 raise ut.EPError(
-                    _('Invalid comparison "{}" in trigger index {}').format(
-                        comparison, 0
+                    _('Invalid comparison "{comparison}" in trigger index {index}').format(
+                        comparison=comparison, index=0
                     )
                 )
             elif condtype == 15 and self.fields[8] == ut.b2i2(ut.u2b("SC")):

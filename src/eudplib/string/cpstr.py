@@ -37,7 +37,11 @@ def _get_mapstring_addr(str_id):
         c.RawTrigger(actions=add_strepd << str_id.AddNumber(0))
         ret = f_dwread_epd(str_id)
     else:
-        raise ut.EPError(_("Invalid string section name: {}").format(str_chunk_name))
+        raise ut.EPError(
+            _("Invalid string section name: {name}").format(
+                name=str_chunk_name
+            )
+        )
     c.RawTrigger(actions=add_strptr << ret.AddNumber(0))
     c.EUDReturn(ret)
 
@@ -64,8 +68,8 @@ def _initialize_queries():
 
     if non_existing_id:
         raise ut.EPError(
-            _("GetMapStringAddr(str_id) for non-existing string ID(s): {}").format(
-                non_existing_id
+            _("GetMapStringAddr(str_id) for non-existing string ID(s): {ids}").format(
+                ids=non_existing_id
             )
         )
 
@@ -119,7 +123,9 @@ class CPString:
             self.content = _s2b(content)
         else:
             raise ut.EPError(
-                _("Unexpected type for CPString: {}").format(type(content))
+                _("Unexpected type for CPString: {type}").format(
+                    type=type(content)
+                )
             )
 
         self.length = len(self.content) // 4

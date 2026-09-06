@@ -120,10 +120,16 @@ class EPSLoader(SourceFileLoader):
                 return file_data
             if "SCDB.eps" in os.path.relpath(path):
                 is_scdb_map = True
-            print(_('[epScript] Compiling "{}"...').format(os.path.relpath(path)))
+            print(
+                _('[epScript] Compiling "{path}"...').format(
+                    path=os.path.relpath(path)
+                )
+            )
             compiled = epsCompile(path, file_data)
         if compiled is None:
-            raise EPError(_(" - Compiled failed for {}").format(path))
+            raise EPError(
+                _(" - Compiled failed for {path}").format(path=path)
+            )
         dirname, filename = os.path.split(path)
         epsdir = os.path.join(dirname, "__epspy__")
         try:

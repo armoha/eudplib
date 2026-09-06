@@ -154,7 +154,9 @@ class Action(ConstExpr):
     def _invalid_action(self, i: int) -> str:
         acttype = self.fields[7]
         actname = _acttypes[acttype] if isinstance(acttype, int) else acttype
-        return _("Invalid fields for action{} {}:").format(i, actname)
+        return _("Invalid fields for action{index} {name}:").format(
+            index=i, name=actname
+        )
 
     def CheckArgs(self, i: int) -> None:  # noqa: N802
         fields = self.fields
@@ -228,7 +230,10 @@ class Action(ConstExpr):
                 i >= 6 and not isinstance(field, int)
             ):
                 error.append(
-                    "\t" + _("invalid {}: {}").format(fieldname[i], repr(field))
+                    "\t"
+                    + _("invalid {name}: {value}").format(
+                        name=fieldname[i], value=repr(field)
+                    )
                 )
 
         raise ut.EPError("\n".join(error))

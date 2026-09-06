@@ -55,7 +55,7 @@ def EUDGetLastBlockOfName(name: str) -> block:  # noqa: N802
     except (IndexError, KeyError):
         if name == "triggerscope":
             raise TriggerScopeError()
-        raise EPError(_("Block not found: {}").format(name))
+        raise EPError(_("Block not found: {name}").format(name=name))
 
 
 def EUDPeekBlock(name: str) -> block:  # noqa: N802
@@ -63,8 +63,8 @@ def EUDPeekBlock(name: str) -> block:  # noqa: N802
     ep_assert(
         lastblock[0] == name,
         _("Block starting/ending mismatch")
-        + ("\n" + _("    - Started with {}").format(lastblock[0]))
-        + ("\n" + _("    - Ended with {}").format(name)),
+        + ("\n" + _("    - Started with {name}").format(name=lastblock[0]))
+        + ("\n" + _("    - Ended with {name}").format(name=name)),
     )
     return lastblock
 
@@ -77,8 +77,8 @@ def EUDPopBlock(name: str) -> block:  # noqa: N802
     ep_assert(
         lastblock[0] == name,
         _("Block starting/ending mismatch")
-        + ("\n" + _("    - Started with {}").format(lastblock[0]))
-        + ("\n" + _("    - Ended with {}").format(name)),
+        + ("\n" + _("    - Started with {name}").format(name=lastblock[0]))
+        + ("\n" + _("    - Ended with {name}").format(name=name)),
     )
     _lastblockdict[name].pop()
     return lastblock
