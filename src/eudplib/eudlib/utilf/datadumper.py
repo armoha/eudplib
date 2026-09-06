@@ -9,7 +9,7 @@ from ...memio import f_epdread_epd, f_repmovsd_epd
 from ...utils import EPD
 from .mempatch import f_dwpatch_epd
 
-_data = []
+_data: list[tuple[bytes, list[int], set[str]]] = []
 
 
 def _add_datadumper(input_data, out_offsets, flags):

@@ -276,8 +276,8 @@ def create_vector_relocator(chkt: CHK, payload: Payload) -> None:
     proc_trigs = []
 
     # Collect only enabled triggers
-    for trig in oldtrigs:
-        trig = bytearray(trig)
+    for old_trig in oldtrigs:
+        trig = bytearray(old_trig)
         flag = ut.b2i4(trig, 320 + 2048)
         if flag & 8:  # Trigger already disabled
             pass

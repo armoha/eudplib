@@ -20,8 +20,8 @@ from .injector.mainloop import main_starter
 from .inlinecode.ilcprocesstrig import _preprocess_inline_code
 from .mpqadd import _update_mpq
 
-trace_header = None
-trace_map = []
+trace_header: tuple[bytes, bytes] | None = None
+trace_map: list[tuple[int, str]] = []
 
 
 def get_trace_map() -> None:

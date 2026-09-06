@@ -275,7 +275,7 @@ def EncodeAllyStatus(s: __ExprProxy) -> _Byte:
 
 def EncodeAllyStatus(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Enemy, Ally, AlliedVictory] to number [0, 1, 2]."""
-    v = AllyStatusDict.get(s, _MISSING)
+    v = AllyStatusDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgAllyStatus, s)
     return v
@@ -298,7 +298,7 @@ def EncodeComparison(s: __ExprProxy) -> _Byte:
 
 def EncodeComparison(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [AtLeast, AtMost, Exactly] to number [0, 1, 10]."""
-    v = ComparisonDict.get(s, _MISSING)
+    v = ComparisonDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgComparison, s)
     return v
@@ -321,7 +321,7 @@ def EncodeModifier(s: __ExprProxy) -> _Byte:
 
 def EncodeModifier(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [SetTo, Add, Subtract] to number [7, 8, 9]."""
-    v = ModifierDict.get(s, _MISSING)
+    v = ModifierDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgModifier, s)
     return v
@@ -344,7 +344,7 @@ def EncodeOrder(s: __ExprProxy) -> _Byte:
 
 def EncodeOrder(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Move, Patrol, Attack] to number [0, 1, 2]."""
-    v = OrderDict.get(s, _MISSING)
+    v = OrderDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgOrder, s)
     return v
@@ -411,7 +411,7 @@ def EncodePlayer(s: _Arg) -> _Dword:  # noqa: N802
     if type(s) is ev.EUDVariable:
         return s
 
-    v = PlayerDict.get(s, _MISSING)
+    v = PlayerDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(_Player, s, "TrgPlayer")
     return v
@@ -434,7 +434,7 @@ def EncodePropState(s: __ExprProxy) -> _Byte:
 
 def EncodePropState(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Enable, Disable, Toggle] to number [4, 5, 6]"""
-    v = PropStateDict.get(s, _MISSING)
+    v = PropStateDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgPropState, s)
     return v
@@ -457,7 +457,7 @@ def EncodeResource(s: __ExprProxy) -> _Byte:
 
 def EncodeResource(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Ore, Gas, OreAndGas] to [0, 1, 2]"""
-    v = ResourceDict.get(s, _MISSING)
+    v = ResourceDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgResource, s)
     return v
@@ -495,7 +495,7 @@ def EncodeScore(s: __Arg) -> _Byte:  # noqa: N802
     ================= ========
 
     """
-    v = ScoreDict.get(s, _MISSING)
+    v = ScoreDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgScore, s)
     return v
@@ -518,7 +518,7 @@ def EncodeSwitchAction(s: __ExprProxy) -> _Byte:
 
 def EncodeSwitchAction(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Set, Clear, Toggle, Random] to [4, 5, 6, 11]."""
-    v = SwitchActionDict.get(s, _MISSING)
+    v = SwitchActionDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgSwitchAction, s)
     return v
@@ -541,7 +541,7 @@ def EncodeSwitchState(s: __ExprProxy) -> _Byte:
 
 def EncodeSwitchState(s: __Arg) -> _Byte:  # noqa: N802
     """Convert [Set, Cleared] to [2, 3]."""
-    v = SwitchStateDict.get(s, _MISSING)
+    v = SwitchStateDict.get(s, _MISSING)  # type: ignore[arg-type]
     if v is _MISSING:
         return _EncodeConst(TrgSwitchState, s)
     return v

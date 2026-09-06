@@ -94,9 +94,9 @@ def _modify_code_lnotab(codeobj: types.CodeType, ep_lineno_map):
         codeobj.co_filename,
         codeobj.co_name,
         ep_lineno_map(co_firstlineno),  # codeobj.co_firstlineno,
-        b"".join(new_lnotab),  # type: ignore
-        codeobj.co_freevars,  # type: ignore
-        codeobj.co_cellvars,  # type: ignore
+        b"".join(new_lnotab),
+        codeobj.co_freevars,
+        codeobj.co_cellvars
     )
 
     return codeobj

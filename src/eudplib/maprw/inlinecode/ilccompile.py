@@ -15,7 +15,7 @@ from ... import utils as ut
 from ...core import RawTrigger
 from .btinliner import t_start_end
 
-_inline_globals = {}
+_inline_globals: dict[str, Any] = {}
 
 
 def compute_base_inline_code_globals() -> None:

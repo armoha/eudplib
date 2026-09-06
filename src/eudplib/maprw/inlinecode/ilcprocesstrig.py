@@ -58,10 +58,12 @@ def _preprocess_trig_section(
 
         decoded = _dispatch_inline_code(inline_codes, trig_segment)
         if decoded:
-            trig_segment = decoded
+            trig_segment = bytes(decoded)
 
         elif propv < 0x80000000 and random() < _inlining_rate:
-            trig_segment = _inlinify_normal_trigger(inline_codes, trig_segment)
+            trig_segment = bytes(
+                _inlinify_normal_trigger(inline_codes, trig_segment)
+            )
 
         trig_segments.append(trig_segment)
 
@@ -92,7 +94,9 @@ def _consecutive_inline_trig_section(
     def append_ptriggers(p):
         if ptriggers[p]:
             func = inline_codify_binary_triggers(ptriggers[p])
-            trig_segment = _create_inline_code_dispatcher(inline_codes, func, 1 << p)
+            trig_segment = bytes(
+                _create_inline_code_dispatcher(inline_codes, func, 1 << p)
+            )
             trig_segments.append(trig_segment)
             ptriggers[p].clear()
 
@@ -106,7 +110,7 @@ def _consecutive_inline_trig_section(
 
         decoded = _dispatch_inline_code(inline_codes, trig_segment)
         if decoded:
-            trig_segment = decoded
+            trig_segment = bytes(decoded)
 
         elif propv < 0x80000000:
             player_count = executing_players.count(True)

@@ -20,7 +20,7 @@ class _EUDFormatter(string.Formatter):
         self.last_number = 0
 
     def vformat(self, format_string, args, kwargs):
-        used_args = set()
+        used_args: set[int | str] = set()
         try:
             result, _i = self._eudformat(format_string, args, kwargs, used_args, 2)
         except IndexError:

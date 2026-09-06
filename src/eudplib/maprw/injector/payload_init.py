@@ -4,7 +4,7 @@
 # and is released under "MIT License Agreement". Please see the LICENSE
 # file that should have been included as part of this package.
 
-from collections.abc import ByteString
+from __future__ import annotations
 
 from ... import utils as ut
 from ...core.allocator.pbuffer import Payload
@@ -33,7 +33,7 @@ def _Trigger(  # noqa: N802
 
 
 def initialize_payload(
-    chkt: CHK, payload: Payload, mrgndata: ByteString | None = None
+    chkt: CHK, payload: Payload, mrgndata: bytes | bytearray | None = None
 ) -> None:
     strmap = get_string_map()
     if strmap is None:
@@ -141,8 +141,8 @@ def initialize_payload(
     proc_trigs = []
 
     # Collect only enabled triggers
-    for trig in oldtrigs:
-        trig = bytearray(trig)
+    for old_trig in oldtrigs:
+        trig = bytearray(old_trig)
         flag = ut.b2i4(trig, 320 + 2048)
         if flag & 8:  # Trigger already disabled
             pass

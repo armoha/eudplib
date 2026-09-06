@@ -717,7 +717,7 @@ def _seqcompute_sub(assignpairs, _srcdict):
     nextptr = None  # nextptr for this rawtrigger
     vt_nextptr = None  # what to set for nextptr of current vtable
     last_pairs = None
-    non_const_actions = []
+    non_const_actions: list = []  # list of bt.Action
 
     def remove_duplicate_actions() -> None:
         if last_pairs is None:
@@ -764,15 +764,15 @@ def _seqcompute_sub(assignpairs, _srcdict):
 
 def SeqCompute(assignpairs):  # noqa: N802
     # We need dependency map while writing assignment pairs
-    dstvarset = set()
-    srcvarset = set()
+    dstvarset: set[EUDVariable] = set()
+    srcvarset: set[EUDVariable] = set()
 
     # Record previous dst, mdt for src to optimize duplicate actions
-    srcdictsub = {}
-    srcdict = {}
+    srcdictsub: dict[EUDVariable, tuple] = {}
+    srcdict: dict[EUDVariable, tuple] = {}
 
     # Sublist of assignments to put in _seqcompute_sub
-    subassignpairs = []
+    subassignpairs: list = []  # list of assignment tuples
 
     # Is we collecting constant-assigning pairs?
     constcollecting = True
@@ -839,10 +839,10 @@ def SeqCompute(assignpairs):  # noqa: N802
 def NonSeqCompute(assignpairs):  # noqa: N802
     import itertools
 
-    dstvarset = set()
-    srcvarset = set()
-    constpairs = list()
-    varassigndict = dict()
+    dstvarset: set[EUDVariable] = set()
+    srcvarset: set[EUDVariable] = set()
+    constpairs: list = list()
+    varassigndict: dict[EUDVariable, list] = dict()
 
     for assignpair in assignpairs:
         dst, _mdt, src = assignpair

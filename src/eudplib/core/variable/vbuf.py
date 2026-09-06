@@ -136,10 +136,10 @@ class EUDCustomVarBuffer(EUDObject):
     def __init__(self):
         super().__init__()
 
-        self._vdict = {}
-        self._5nptrs = deque(maxlen=5)
-        self._actnptr_pairs = []
-        self._5acts = deque(maxlen=5)
+        self._vdict: dict[VariableTriggerForward, ConstExpr] = {}
+        self._5nptrs: deque[int | ConstExpr] = deque(maxlen=5)
+        self._actnptr_pairs: list[deque[int | ConstExpr]] = []
+        self._5acts: deque[deque[int | ConstExpr]] = deque(maxlen=5)
 
     def DynamicConstructed(self):  # noqa: N802
         return True

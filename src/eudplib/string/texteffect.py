@@ -121,7 +121,7 @@ def f_cpchar_print(*args, EOS=True, encoding="UTF-8"):  # noqa: N803
         cs.DoActions(c.SetDeaths(CurrentPlayer, c.SetTo, 0, 0))
 
 
-_TextFX_dict = dict()
+_TextFX_dict: dict[object, tuple] = dict()
 id_codes = [
     "\x18",
     "\x02",

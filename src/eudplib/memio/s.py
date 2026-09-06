@@ -17,7 +17,7 @@ from ..utils import EPD
 from . import modcurpl as cp
 
 _seed = 0
-_stack = []
+_stack: list[int] = []
 
 
 def push() -> None:

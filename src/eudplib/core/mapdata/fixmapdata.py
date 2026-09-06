@@ -48,7 +48,7 @@ def _fix_unit_map(chkt: CHK) -> None:
             if unit[i + 12] & (2**k) == 0:
                 unit[i + 26] &= ~(2**k)
 
-    chkt.setsection("UNIT", unit)
+    chkt.setsection("UNIT", bytes(unit))
 
 
 def _fix_stats_and_settings(chkt: CHK) -> None:
@@ -71,7 +71,7 @@ def _fix_stats_and_settings(chkt: CHK) -> None:
                     data[offset + setting * i + k] = 0
                 offset += setting * count
 
-        chkt.setsection(name, data)
+        chkt.setsection(name, bytes(data))
 
 
 def _apply_remastered_chk(chkt: CHK) -> None:
@@ -101,4 +101,4 @@ def _fix_mtxm_0_0_null(chkt: CHK) -> None:
             + _("Replaced them to 0000.01, because they cause desync.")
         )
 
-    chkt.setsection("MTXM", mtxm)
+    chkt.setsection("MTXM", bytes(mtxm))

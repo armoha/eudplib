@@ -26,7 +26,7 @@ from . import wiredata as wd
 
 is64bit = c.EUDLightBool()
 tranwire, grpwire, wirefram = c.EUDCreateVariables(3)
-defaultwire = {}
+defaultwire: dict[str, EUDArray] = {}
 
 
 def tranwire_default32():
