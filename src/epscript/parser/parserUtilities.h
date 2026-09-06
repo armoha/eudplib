@@ -47,6 +47,7 @@ void applyNegativeOptimization(std::ostream &os, const Token *lexpr);
 void writeCsOpener(std::ostream &os, const Token *csOpener, const Token *lexpr);
 std::string trim(std::string s);
 std::string iwCollapse(const std::string &in);
+std::string mergeDoActions(const std::string &in);
 void funcNamePreprocess(std::string &s);
 bool impPathProcess(const std::string &s, std::string &impPath, std::string &impModname);
 std::string impPathGetModule(const std::string &s);

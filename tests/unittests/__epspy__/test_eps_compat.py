@@ -156,6 +156,18 @@ def f_test_compatibility():
     z = _TYLV([None], [EUDVariable()])
     # (Line 85) math.cos(1);
     math.cos(1)
-    # (Line 86) return ret;
+    # (Line 86) const tc5 = GetTriggerCounter();
+    tc5 = GetTriggerCounter()
+    DoActions(
+        # (Line 87) DisplayText("testconst doactions merge");
+        DisplayText("testconst doactions merge"),
+        # (Line 88) MinimapPing("Anywhere");
+        MinimapPing("Anywhere"),
+        # (Line 89) SetDeaths(CurrentPlayer, Add, 0, "Kakaru");
+        SetDeaths(CurrentPlayer, Add, 0, "Kakaru"),
+    )
+    # (Line 90) ep_assert(tc5 + 1 == GetTriggerCounter(), "Merging const DoActions failed");
+    ep_assert(tc5 + 1 == GetTriggerCounter(), "Merging const DoActions failed")
+    # (Line 91) return ret;
     EUDReturn(ret)
-    # (Line 87) }
+    # (Line 92) }

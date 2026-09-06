@@ -6,6 +6,9 @@
 #define EPSCRIPT_CONSTPARSER_H
 
 #include <string>
+#include <map>
+
+extern std::map<std::string, int> constMap;
 int parseConstantName(const std::string &name);
 void initConstmap();
 

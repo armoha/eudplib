@@ -19,16 +19,14 @@ TEST_CASE("Complex parsing: Integration tests") {
                     "    A[a] = 7;\n"
                     "}",
 
-            "a = EUDCreateVariables(1)\n"
-                    "_IGVA([a], lambda: [1])\n"
+            "a = _TYGV([None], lambda: [1])\n"
                     "b = _CGFW(lambda: [2], 1)[0]\n"
                     "@EUDFunc\n"
                     "def f_x():\n"
                     "    A = 1\n"
                     "    A.B()\n"
                     "    f_dwread()\n"
-                    "    a_1 = EUDVariable()\n"
-                    "    a_1 << (f_dwread()[5])\n"
+                    "    a_1 = _TYLV([None], [f_dwread()[5]])\n"
                     "    a_1 << (A[5])\n"
                     "    _ARRW(A, a_1) << (7)\n"
     );

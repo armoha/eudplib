@@ -3,11 +3,14 @@
 #include <vector>
 #include <regex>
 #include <iostream>
+#include <sstream>
 #include <cstring>
 
 #include "generator/pygen.h"
 #include "generator/eudplibGlobals.h"
 #include "parserUtilities.h"
+#include "reservedWords/constparser.h"
+#include "reservedWords/condAct.h"
 
 extern int currentTokenizingLine;
 extern std::string currentModule;
@@ -147,6 +150,174 @@ std::string trim(std::string s) {
 static std::regex iwCollapseRegex("\n( *)(_t\\d+) = (EUDWhile|EUDIf|EUDElseIf)\\(\\)\n\\1if \\2\\((.+)\\):");
 std::string iwCollapse(const std::string& in) {
     return std::regex_replace(in, iwCollapseRegex, "\n$1if $3()($4):");
+}
+
+static std::string extractDoActionsInner(const std::string& trimmed) {
+    if (trimmed.size() <= 10 || trimmed.substr(0, 10) != "DoActions(") {
+        return "";
+    }
+    int depth = 1;
+    size_t start = 10;
+    size_t end = std::string::npos;
+    for (size_t i = start; i < trimmed.size(); i++) {
+        if (trimmed[i] == '(') depth++;
+        else if (trimmed[i] == ')') {
+            depth--;
+            if (depth == 0) { end = i; break; }
+        }
+    }
+    if (end == std::string::npos || end <= start) return "";
+    return trimmed.substr(start, end - start);
+}
+
+static bool isSafeIdentifier(const std::string& s) {
+    if (constMap.find(s) != constMap.end()) return true;
+    if (s == "True" || s == "False" || s == "None") return true;
+    return false;
+}
+
+static bool isActionArgSafe(const std::string& arg) {
+    std::string s = trim(arg);
+    if (s.empty()) return false;
+
+    if (s[0] == '\'' || s[0] == '"') return true;
+
+    if (s[0] == '-' || s[0] == '+' || s[0] == '~') s = s.substr(1);
+    if (s.empty()) return false;
+
+    if (s.size() >= 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
+        bool validHex = true;
+        for (size_t i = 2; i < s.size(); i++) {
+            char c = s[i];
+            if (!std::isxdigit(static_cast<unsigned char>(c))) { validHex = false; break; }
+        }
+        if (validHex && s.size() > 2) return true;
+    }
+
+    if (s.size() >= 2 && s[0] == '0' && (s[1] == 'b' || s[1] == 'B')) {
+        bool validBin = true;
+        for (size_t i = 2; i < s.size(); i++) {
+            char c = s[i];
+            if (c != '0' && c != '1') { validBin = false; break; }
+        }
+        if (validBin && s.size() > 2) return true;
+    }
+
+    bool allDigits = true;
+    for (char c : s) {
+        if (!std::isdigit(static_cast<unsigned char>(c))) {
+            allDigits = false;
+            break;
+        }
+    }
+    if (allDigits && !s.empty()) return true;
+
+    if (isSafeIdentifier(s)) return true;
+
+    return false;
+}
+
+static bool isDoActionsSafe(const std::string& inner) {
+    size_t paren = inner.find('(');
+    if (paren == std::string::npos || paren == 0) return false;
+
+    std::string actionName = trim(inner.substr(0, paren));
+    if (!isActionName(actionName) && !isActionAllpName(actionName)) return false;
+
+    size_t rparen = inner.rfind(')');
+    if (rparen == std::string::npos || rparen <= paren) return false;
+
+    std::string args = inner.substr(paren + 1, rparen - paren - 1);
+
+    int depth = 0;
+    std::string current;
+    for (size_t i = 0; i < args.size(); i++) {
+        char c = args[i];
+        if (c == '(') { depth++; current += c; }
+        else if (c == ')') {
+            if (depth == 0) return false;
+            depth--;
+            current += c;
+        }
+        else if (c == ',' && depth == 0) {
+            if (!isActionArgSafe(current)) return false;
+            current.clear();
+        } else {
+            current += c;
+        }
+    }
+    if (!current.empty()) {
+        if (!isActionArgSafe(current)) return false;
+    }
+    return true;
+}
+
+std::string mergeDoActions(const std::string& in) {
+    std::istringstream iss(in);
+    std::string line;
+    std::vector<std::string> pending;
+    std::vector<std::vector<std::string>> pendingComments;
+    std::vector<std::string> commentBuffer;
+    std::string pendingIndent;
+    std::ostringstream out;
+    auto flush = [&]() {
+        if (pending.empty()) {
+            return;
+        }
+        if (pending.size() <= 1) {
+            for (auto& c : pendingComments[0]) out << c;
+            out << pendingIndent << "DoActions(" << pending[0] << ")\n";
+            pending.clear();
+            pendingComments.clear();
+            return;
+        }
+        std::string actionIndent = pendingIndent + "    ";
+        out << pendingIndent << "DoActions(\n";
+        for (size_t i = 0; i < pending.size(); i++) {
+            for (auto& c : pendingComments[i]) {
+                std::string t = trim(c);
+                out << actionIndent << t << "\n";
+            }
+            out << actionIndent << pending[i] << ",\n";
+        }
+        out << pendingIndent << ")\n";
+        pending.clear();
+        pendingComments.clear();
+    };
+    while (std::getline(iss, line)) {
+        std::string trimmed = trim(line);
+        if (!trimmed.empty() && trimmed[0] == '#') {
+            commentBuffer.push_back(line + "\n");
+            continue;
+        }
+        std::string inner = extractDoActionsInner(trimmed);
+        if (!inner.empty() && isDoActionsSafe(inner)) {
+            size_t first = line.find_first_not_of(" \t");
+            std::string indent = (first != std::string::npos) ? line.substr(0, first) : "";
+            if (!pending.empty() && indent == pendingIndent) {
+                pending.push_back(inner);
+            } else {
+                flush();
+                pending.push_back(inner);
+                pendingIndent = indent;
+            }
+            std::vector<std::string> oneComment;
+            if (!commentBuffer.empty()) {
+                oneComment.push_back(std::move(commentBuffer.front()));
+                commentBuffer.erase(commentBuffer.begin());
+            }
+            pendingComments.push_back(std::move(oneComment));
+        } else {
+            flush();
+            for (auto& c : commentBuffer) out << c;
+            commentBuffer.clear();
+            out << line << "\n";
+        }
+    }
+    flush();
+    for (auto& c : commentBuffer) out << c;
+    commentBuffer.clear();
+    return out.str();
 }
 
 const char* stubCode =

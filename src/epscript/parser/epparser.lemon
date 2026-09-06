@@ -1697,7 +1697,7 @@ std::string ParseString(const std::string& fname, const std::string& code, bool 
     Parse (pParser, 0, nullptr, &ps);
     ParseFree(pParser, free );
 
-    std::string ret = iwCollapse(ps.gen.str());
+    std::string ret = mergeDoActions(iwCollapse(ps.gen.str()));
     if(getParseErrorNum() > 0) {
         ret += "\nraise RuntimeError('Compile error')\n";
     }

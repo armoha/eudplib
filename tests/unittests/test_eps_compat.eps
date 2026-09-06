@@ -83,5 +83,10 @@ with expect_eperror():\n\
     if(Is64BitWireframe()) {}
     var z = EUDVariable();
     math.cos(1);
+    const tc5 = GetTriggerCounter();
+    DisplayText("testconst doactions merge");
+    MinimapPing("Anywhere");
+    SetDeaths(CurrentPlayer, Add, 0, "Kakaru");
+    ep_assert(tc5 + 1 == GetTriggerCounter(), "Merging const DoActions failed");
     return ret;
 }

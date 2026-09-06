@@ -41,14 +41,13 @@ TEST_CASE("Debug info") {
 
             checkBlock(
                     "static var A = 1;",
-                    "A = EUDVariable(1)"  // static variable declaration is not traced.
+                    "A = _TYSV([None], [1])"  // static variable declaration is not traced.
             );
 
             checkBlock(  // Variable declaration with assignments.
                     "var A = 1;",
                     "EUDTraceLog(1)\n"
-                            "A = EUDVariable()\n"
-                            "A << (1)\n"
+                            "A = _TYLV([None], [1])\n"
             );
         }
 

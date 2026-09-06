@@ -94,6 +94,9 @@ void initConstmap() {
     //  SwitchStateDict
     constMap.insert(std::make_pair("Set", 2));
     constMap.insert(std::make_pair("Cleared", 3));
+
+    //  QuantityDict (used as first arg in unit actions)
+    constMap.insert(std::make_pair("All", 0));
 }
 
 int parseConstantName(const std::string& name) {

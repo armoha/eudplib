@@ -9,7 +9,8 @@ TEST_CASE("Control block parsing") {
         checkBlock(
                 "once { const A = 1; }",
 
-                "if EUDExecuteOnce()():\n"
+                "_t1 = EUDExecuteOnce()\n"
+                        "if _t1():\n"
                         "    A = 1\n"
                         "EUDEndExecuteOnce()\n"
         );
@@ -79,6 +80,60 @@ TEST_CASE("Control block parsing") {
                         "    for x_1, y in B:\n"
                         "        DoActions(SetDeaths(x_1, SetTo, y, 0))"
 
+        );
+    }
+
+    SECTION("DoActions merging") {
+        check_string(
+                "function testf() {\n"
+                        "    DisplayText('a');\n"
+                        "    DisplayText('b');\n"
+                        "    DisplayText('c');\n"
+                        "}",
+
+                "@EUDFunc\n"
+                        "def f_testf():\n"
+                        "    DoActions(\n"
+                        "        DisplayText('a'),\n"
+                        "        DisplayText('b'),\n"
+                        "        DisplayText('c'),\n"
+                        "    )\n"
+        );
+    }
+
+    SECTION("DoActions merge with constants") {
+        check_string(
+                "function testf() {\n"
+                        "    DisplayText('a');\n"
+                        "    DisplayText('b');\n"
+                        "    DisplayText('c');\n"
+                        "    DisplayText('d');\n"
+                        "}",
+
+                "@EUDFunc\n"
+                        "def f_testf():\n"
+                        "    DoActions(\n"
+                        "        DisplayText('a'),\n"
+                        "        DisplayText('b'),\n"
+                        "        DisplayText('c'),\n"
+                        "        DisplayText('d'),\n"
+                        "    )\n"
+        );
+    }
+
+    SECTION("DoActions no-merge for variables") {
+        check_string(
+                "function testf() {\n"
+                        "    var x;\n"
+                        "    SetDeaths(x, SetTo, 1, 0);\n"
+                        "    DisplayText('a');\n"
+                        "}",
+
+                "@EUDFunc\n"
+                        "def f_testf():\n"
+                        "    x = EUDVariable()\n"
+                        "    DoActions(SetDeaths(x, SetTo, 1, 0))\n"
+                        "    DoActions(DisplayText('a'))\n"
         );
     }
 }
