@@ -12,9 +12,12 @@ from types import TracebackType
 from typing import Any
 
 # Determine locale from environment or default
-lc = None
-if lc is None:
-    lc, _e = locale.getdefaultlocale()
+lc = os.environ.get("LANG")
+if not lc:
+    try:
+        lc, _e = locale.getlocale()
+    except Exception:
+        lc = None
 
 lang = None if lc is None else (lc,)
 
