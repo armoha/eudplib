@@ -3,8 +3,11 @@
 Builds ``libepScriptLib`` for the current platform (see
 ``src/epscript/build_epscript.py``) before maturin packages the wheel, so each
 platform's wheel contains the matching dynamic library.
+
+Also compiles .po files to .mo files for localization support.
 """
 
+import glob
 import os
 import subprocess
 import sys
@@ -35,8 +38,25 @@ def _build_epscript() -> None:
     subprocess.run([sys.executable, str(script)], cwd=root, check=True, env=env)
 
 
+def _compile_locale() -> None:
+    """Compile .po files to .mo files for all locales."""
+    root = Path(__file__).parent
+    po_files = glob.glob(
+        str(root / "src" / "eudplib" / "localize" / "**" / "*.po"),
+        recursive=True,
+    )
+    for po_path in po_files:
+        mo_path = Path(po_path).with_suffix(".mo")
+        subprocess.run(
+            [sys.executable, "-m", "babel.messages.frontend", "compile",
+             "-i", po_path, "-o", str(mo_path)],
+            check=True,
+        )
+
+
 def build_wheel(wheel_directory, config_settings=None, metadata_directory=None):
     _build_epscript()
+    _compile_locale()
     return _build_wheel(wheel_directory, config_settings, metadata_directory)
 
 
@@ -48,4 +68,5 @@ def build_sdist(sdist_directory, config_settings=None):
 
 def build_editable(wheel_directory, config_settings=None, metadata_directory=None):
     _build_epscript()
+    _compile_locale()
     return _build_editable(wheel_directory, config_settings, metadata_directory)

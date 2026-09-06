@@ -28,3 +28,4 @@ tests/output.pstats
 *.svg
 .venv
 uv.lock
+*.mo
