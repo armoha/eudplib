@@ -47,11 +47,24 @@ def _compile_locale() -> None:
     )
     for po_path in po_files:
         mo_path = Path(po_path).with_suffix(".mo")
-        subprocess.run(
-            [sys.executable, "-m", "babel.messages.frontend", "compile",
-             "-i", po_path, "-o", str(mo_path)],
-            check=True,
-        )
+        try:
+            subprocess.run(
+                [sys.executable, "-m", "babel.messages.frontend", "compile",
+                 "-i", po_path, "-o", str(mo_path)],
+                check=True,
+                capture_output=True,
+            )
+        except FileNotFoundError:
+            print(
+                f"Warning: babel not found, skipping compilation of {po_path}",
+                file=sys.stderr,
+            )
+            return
+        except subprocess.CalledProcessError as e:
+            print(
+                f"Warning: failed to compile {po_path}: {e.stderr}",
+                file=sys.stderr,
+            )
 
 
 def build_wheel(wheel_directory, config_settings=None, metadata_directory=None):

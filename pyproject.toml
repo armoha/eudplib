@@ -4,6 +4,7 @@
 requires = [
     "maturin>=1,<2",
     "cmake",  # need for static build StormLib and the epScript library
+    "babel",  # compile .po to .mo for i18n
 
     # Must be kept in sync with `project.dependencies`
     "typing_extensions",
@@ -13,7 +14,7 @@ backend-path = ["."]
 
 [project]
 name = "eudplib"
-version = "0.80.6"
+version = "0.81.0"
 authors = [
      {name = "Trgk", email = "whyask37@naver.com"},
      {name = "Armoha", email = "kein0011@naver.com"},

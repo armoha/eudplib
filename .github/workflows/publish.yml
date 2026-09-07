@@ -20,6 +20,8 @@ jobs:
   build:
     name: Build wheel (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    env:
+      CMAKE_GENERATOR: Ninja
     strategy:
       fail-fast: false
       matrix:
@@ -81,7 +83,7 @@ jobs:
         path: dist
         merge-multiple: true
     - name: Publish package
-      uses: pypa/gh-action-pypi-publish@v1
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
