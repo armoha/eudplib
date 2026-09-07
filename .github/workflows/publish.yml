@@ -45,6 +45,12 @@ jobs:
         pip install build
     - name: Build wheel
       run: python -m build --wheel
+    - name: Repair wheel (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        pip install auditwheel
+        auditwheel repair dist/*.whl -w dist/
+        rm dist/*-linux_*.whl
     - uses: actions/upload-artifact@v4
       with:
         name: wheel-${{ matrix.os }}
