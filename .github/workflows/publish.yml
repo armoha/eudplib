@@ -25,11 +25,11 @@ jobs:
           - os: ubuntu-latest
             abi-feature: "pyo3/abi3-py310"
             abi-tag: "cp310-abi3"
-            auditwheel: manylinux_2_17_x86_64
+            auditwheel: manylinux_2_28_x86_64
           - os: ubuntu-24.04-arm
             abi-feature: "pyo3/abi3-py310"
             abi-tag: "cp310-abi3"
-            auditwheel: manylinux_2_17_aarch64
+            auditwheel: manylinux_2_28_aarch64
           - os: macos-13
             abi-feature: "pyo3/abi3-py310"
             abi-tag: "cp310-abi3"
@@ -46,11 +46,11 @@ jobs:
           - os: ubuntu-latest
             abi-feature: "pyo3/abi3-py311"
             abi-tag: "cp311-abi3"
-            auditwheel: manylinux_2_17_x86_64
+            auditwheel: manylinux_2_28_x86_64
           - os: ubuntu-24.04-arm
             abi-feature: "pyo3/abi3-py311"
             abi-tag: "cp311-abi3"
-            auditwheel: manylinux_2_17_aarch64
+            auditwheel: manylinux_2_28_aarch64
           - os: macos-13
             abi-feature: "pyo3/abi3-py311"
             abi-tag: "cp311-abi3"
@@ -67,7 +67,7 @@ jobs:
           - os: ubuntu-latest
             abi-feature: "none"
             abi-tag: "cp314t"
-            auditwheel: manylinux_2_17_x86_64
+            auditwheel: manylinux_2_28_x86_64
             python-version: "3.14t"
           - os: macos-latest
             abi-feature: "none"
@@ -103,26 +103,25 @@ jobs:
         echo "ARCHFLAGS=-arch ${{ matrix.macos-arch }}" >> $GITHUB_ENV
     - name: Set abi3 feature
       if: matrix.abi-feature != 'pyo3/abi3-py310'
+      shell: python
       env:
         ABI_FEATURE: ${{ matrix.abi-feature }}
       run: |
-        python -c "
         import pathlib, os
         p = pathlib.Path('pyproject.toml')
         content = p.read_text()
         abi = os.environ['ABI_FEATURE']
         if abi == 'none':
-            content = content.replace('features = [\"pyo3/abi3-py310\"]', 'features = []')
+            content = content.replace('features = ["pyo3/abi3-py310"]', 'features = []')
         else:
             content = content.replace('pyo3/abi3-py310', abi)
         p.write_text(content)
-        "
     - name: Build wheel
       run: python -m build --wheel
     - name: Repair wheel (Linux)
       if: runner.os == 'Linux' && matrix.auditwheel
       run: |
-        auditwheel repair --plat ${{ matrix.auditwheel }} dist/*.whl -w dist/
+        auditwheel repair dist/*.whl -w dist/
         rm dist/*-linux_*.whl
     - uses: actions/upload-artifact@v4
       with:
