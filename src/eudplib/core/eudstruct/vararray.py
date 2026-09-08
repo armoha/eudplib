@@ -48,10 +48,18 @@ class _EUDVArrayData(ConstExpr):
             dest, value, nextptr = items
             value = unProxy(value)
             if not isinstance(value, (int, ConstExpr)):
-                raise EPError(_("Invalid item #{index}: {item}").format(index=i, item=items))
+                raise EPError(
+                    _("Invalid item #{index}: {item}").format(
+                        index=i, item=items
+                    )
+                )
             nextptr = unProxy(nextptr)
             if not isinstance(nextptr, (int, ConstExpr)):
-                raise EPError(_("Invalid item #{index}: {item}").format(index=i, item=items))
+                raise EPError(
+                    _("Invalid item #{index}: {item}").format(
+                        index=i, item=items
+                    )
+                )
             init.append((0xFFFFFFFF, process_dest(dest), value, 0x072D0000, nextptr))
         self._init = init
 
@@ -476,7 +484,11 @@ def _InternalVArray(size: int, basetype: type | None = None):  # noqa: N802
             elif isinstance(other, int) and other == 0:
                 SetVariables([self._value, self._epd], [0, 0])
             else:
-                raise EPError(_("Can't assign {src} to {dst}").format(src=other, dst=self))
+                raise EPError(
+                    _("Can't assign {src} to {dst}").format(
+                        src=other, dst=self
+                    )
+                )
             return self
 
         def get(self, i, **kwargs):

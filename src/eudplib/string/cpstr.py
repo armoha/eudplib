@@ -68,7 +68,10 @@ def _initialize_queries():
 
     if non_existing_id:
         raise ut.EPError(
-            _("GetMapStringAddr(str_id) for non-existing string ID(s): {ids}").format(
+            _(
+                "GetMapStringAddr(str_id) for non-existing"
+                " string ID(s): {ids}"
+            ).format(
                 ids=non_existing_id
             )
         )

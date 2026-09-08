@@ -42,7 +42,11 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
         from ..variable import EUDVariable
 
         if not isinstance(self._value, EUDVariable):
-            raise EPError(_("Can't assign {src} to constant expression").format(src=other))
+            raise EPError(
+                _("Can't assign {src} to constant expression").format(
+                    src=other
+                )
+            )
         if type(other) is ExprProxy:
             other = other._value
         if isinstance(other, type(self)):
@@ -50,7 +54,11 @@ class ConstType(ExprProxy, metaclass=ABCMeta):
         if isinstance(other, int | EUDVariable | str):
             return
         else:
-            raise EPError(_("Can't assign {src} to {dst}").format(src=other, dst=self))
+            raise EPError(
+                _("Can't assign {src} to {dst}").format(
+                    src=other, dst=self
+                )
+            )
 
     def Assign(self, other) -> Self:  # noqa: N802
         self._check_assign(other)

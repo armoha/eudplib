@@ -68,7 +68,10 @@ def EUDLoopPlayer(  # noqa: N802
 ) -> Iterator[TrgPlayer]:
     def encode_force(f) -> int:
         if isinstance(f, TrgPlayer) and isinstance(f._value, int):
-            ut.ep_assert(18 <= f._value <= 21, _("'{force}' is not force").format(force=f))
+            ut.ep_assert(
+                18 <= f._value <= 21,
+                _("'{force}' is not force").format(force=f),
+            )
             f = f._value
         ut.ep_assert(isinstance(f, int), _("'{force}' is not force").format(force=f))
         if 18 <= f <= 21:

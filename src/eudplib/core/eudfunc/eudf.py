@@ -87,7 +87,10 @@ def EUDFullFunc(arginitvals, argtypes, rettypes=None, *, traced=False):  # noqa:
         argn = len(argspec[0])
         ut.ep_assert(
             argn >= len(arginitvals),
-            _("Different number of variables({var_count}) from initial values({val_count})").format(
+            _(
+                "Different number of variables({var_count})"
+                " from initial values({val_count})"
+            ).format(
                 var_count=argn, val_count=len(arginitvals)
             ),
         )

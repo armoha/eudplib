@@ -142,7 +142,11 @@ class EUDArray(ut.ExprProxy):
             elif not _ptr_array and other._is_epd():
                 c.SetVariables(self._value, other)
         else:
-            raise EPError(_("Can't assign {src} to {dst}").format(src=other, dst=self))
+            raise EPError(
+                _("Can't assign {src} to {dst}").format(
+                    src=other, dst=self
+                )
+            )
         return self
 
     def _lazy_init_epd(self) -> None:

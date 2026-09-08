@@ -239,7 +239,10 @@ class Condition(ConstExpr):
                 self.fields[2] += -((-1) ** comparison)  # type: ignore[operator]
             elif comparison != 10:
                 raise ut.EPError(
-                    _('Invalid comparison "{comparison}" in trigger index {index}').format(
+                    _(
+                        'Invalid comparison "{comparison}"'
+                        " in trigger index {index}"
+                    ).format(
                         comparison=comparison, index=0
                     )
                 )

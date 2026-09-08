@@ -296,7 +296,10 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
             raise ut.EPError(
-                _("'{value}' is out of range({range}) for {type} Member {name}").format(
+                _(
+                    "'{value}' is out of range({range})"
+                    " for {type} Member {name}"
+                ).format(
                     value=value, range=mask, type=type(self), name=name
                 )
             )
@@ -326,7 +329,10 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
             raise ut.EPError(
-                _("'{value}' is out of range({range}) for {type} Member {name}").format(
+                _(
+                    "'{value}' is out of range({range})"
+                    " for {type} Member {name}"
+                ).format(
                     value=value, range=mask, type=type(self), name=name
                 )
             )
@@ -353,7 +359,10 @@ class EPDOffsetMap(ut.ExprProxy, metaclass=ABCMeta):
             value = c.f_bitlshift(value, 8 * subp)
         if isinstance(subp, int) and isinstance(value, int) and value & ~mask:
             raise ut.EPError(
-                _("'{value}' is out of range({range}) for {type} Member {name}").format(
+                _(
+                    "'{value}' is out of range({range})"
+                    " for {type} Member {name}"
+                ).format(
                     value=value, range=mask, type=type(self), name=name
                 )
             )

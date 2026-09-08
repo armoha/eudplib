@@ -101,7 +101,11 @@ class EUDVariable(VariableBase):
         if not isinstance(initval, (int, ConstExpr)):
             unproxied = unProxy(initval)
             if not isinstance(unproxied, (int, ConstExpr)):
-                raise EPError(_("Invalid initval: {initval}").format(initval=initval))
+                raise EPError(
+                    _("Invalid initval: {initval}").format(
+                        initval=initval
+                    )
+                )
             else:
                 initval = unproxied
         self._vartrigger = VariableTriggerForward(initval)
