@@ -1,4 +1,10 @@
+import sys
 import time
+from pathlib import Path
+
+_TESTS_DIR = Path(__file__).resolve().parent
+if str(_TESTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_TESTS_DIR))
 
 import helper
 import profile_tool
@@ -81,7 +87,7 @@ def f():
 from eudplib.string.tblprint import _AddStatText
 
 
-with open("unittests/custom_txt.tbl", "rb") as tblfile:
+with open(_TESTS_DIR / "unittests/custom_txt.tbl", "rb") as tblfile:
     _AddStatText(tblfile.read())
 
 

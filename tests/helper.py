@@ -3,6 +3,11 @@ import functools
 import os as _os
 import random as _random
 import sys as _sys
+from pathlib import Path as _Path
+
+_TESTS_DIR = _Path(__file__).resolve().parent
+if str(_TESTS_DIR) not in _sys.path:
+    _sys.path.insert(0, str(_TESTS_DIR))
 
 _sys.path.insert(
     1, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), ".."))
@@ -206,8 +211,12 @@ def _testmain():
 
 
 def test_runall(testname):
-    LoadMap("outputmap/basemap/basemap_strx.scx")
-    SaveMap("outputmap/test_%s.scx" % testname, _testmain, sector_size=15)
+    LoadMap(str(_TESTS_DIR / "outputmap/basemap/basemap_strx.scx"))
+    SaveMap(
+        str(_TESTS_DIR / ("outputmap/test_%s.scx" % testname)),
+        _testmain,
+        sector_size=15,
+    )
     print(f"eudplib version {eudplibVersion()}")
 
 
