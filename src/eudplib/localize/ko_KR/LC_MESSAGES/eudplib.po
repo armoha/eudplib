@@ -352,7 +352,7 @@ msgid "Invalid mask: {mask}"
 msgstr "잘못된 비트마스크: {mask}"
 
 msgid "variable triggers were created while writing the variable buffer"
-msgstr ""
+msgstr "변수 버퍼를 작성하는 동안 변수 트리거가 생성되었습니다"
 
 msgid "unreachable EUDJump"
 msgstr "도달할 수 없는 EUDJump"
@@ -364,7 +364,7 @@ msgid "Control structures must be double-parenthesised."
 msgstr "제어문은 괄호를 이중으로 넣어야 합니다."
 
 msgid "jump triggers were created while writing the jump buffer"
-msgstr ""
+msgstr "점프 버퍼를 작성하는 동안 점프 트리거가 생성되었습니다"
 
 msgid "No loop block surrounding this code area"
 msgstr "이 코드를 감싸는 반복문 블럭이 없습니다"
@@ -739,6 +739,14 @@ msgstr "rlocmode는 1 또는 4여야 합니다, 현재 값: {rlocmode}"
 
 msgid "Cannot write non-const in byte/word/nonalligned dword."
 msgstr "바이트/word/정렬되지 않은 dword에 상수가 아닌 값을 작성할 수 없습니다."
+
+#, python-brace-format
+msgid "Invalid jump buffer stride: {stride}. Only 4 or 8 is allowed."
+msgstr "잘못된 점프 버퍼 간격: {stride}. 4 또는 8만 허용됩니다"
+
+#, python-brace-format
+msgid "S=4 jump buffer can't hold more than {max} entries"
+msgstr "S=4 점프 버퍼는 {max}개보다 많은 항목을 담을 수 없습니다"
 
 #~ msgid "Invalid content type: {}"
 #~ msgstr "잘못된 파일 내용: {}"

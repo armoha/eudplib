@@ -236,7 +236,9 @@ def EUDEndSwitch() -> None:  # noqa: N802
         for i, bit in enumerate(keybits):
             lastbit = c.RawTrigger(
                 conditions=c.MemoryXEPD(cmpplayer, c.AtLeast, 1, bit),
-                actions=c.SetMemory(jumper + 4, c.Add, 20 * (1 << i)),
+                actions=c.SetMemory(
+                    jumper + 4, c.Add, jump_table._stride * (1 << i)
+                ),
             )
 
         if c.IsEUDVariable(epd):

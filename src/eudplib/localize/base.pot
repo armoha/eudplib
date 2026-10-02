@@ -728,3 +728,11 @@ msgstr ""
 msgid "Cannot write non-const in byte/word/nonalligned dword."
 msgstr ""
 
+#, python-brace-format
+msgid "Invalid jump buffer stride: {stride}. Only 4 or 8 is allowed."
+msgstr ""
+
+#, python-brace-format
+msgid "S=4 jump buffer can't hold more than {max} entries"
+msgstr ""
+

@@ -64,6 +64,7 @@ from unittests import (
     test_dbstring,
     test_ctypes,
     test_dict_typo,
+    testjumptable,
 
     test_arithmetics,
     test_fmtprint,
