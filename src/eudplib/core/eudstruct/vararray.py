@@ -236,7 +236,9 @@ class _EUDVArray(ExprProxy):
         return ret
 
     def set(self, i, value, **kwargs):
-        if self._basetype:
+        raw_value = unProxy(value)
+        # Zero clears a runtime slot; do not construct a static null instance.
+        if self._basetype and not (isinstance(raw_value, int) and raw_value == 0):
             value = self._basetype.cast(value)
 
         index = unProxy(i)

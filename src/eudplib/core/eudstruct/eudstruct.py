@@ -137,7 +137,9 @@ class EUDStruct(ut.ExprProxy, metaclass=_EUDStructMetaclass):
 
     def setfield(self, name, value):
         attrid, attrtype = self._fielddict[name]
-        if attrtype:
+        raw_value = ut.unProxy(value)
+        # Zero clears a runtime field; static constructors remain non-nullable.
+        if attrtype and not (isinstance(raw_value, int) and raw_value == 0):
             value = attrtype.cast(value)
         self._value.set(attrid, value)
 
