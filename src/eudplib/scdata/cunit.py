@@ -448,10 +448,7 @@ class CUnit(EPDOffsetMap):
         return (EPD(0x59CCA8), EPD(0x59CCA8) + 84 * 1699, 84)
 
     def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
-        """Construct from an EPD, or 0 for an empty reference.
-
-        Use CUnit.from_ptr(ptr) for a pointer. Check for 0 before accessing members.
-        """
+        """EPD Constructor of CUnit. Use CUnit.from_ptr(ptr) for ptr value"""
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
@@ -462,9 +459,7 @@ class CUnit(EPDOffsetMap):
 
         if isinstance(u, int):
             q, r = divmod(u - EPD(0x59CCA8), 84)  # check epd
-            if u == 0:
-                _epd, self._ptr = 0, 0
-            elif r == 0 and 0 <= q < 1700:
+            if r == 0 and 0 <= q < 1700:
                 _epd, self._ptr = u, 0x59CCA8 + 336 * q
             else:
                 raise EPError(
@@ -504,15 +499,12 @@ class CUnit(EPDOffsetMap):
 
     @classmethod
     def from_ptr(cls, ptr: int_or_var) -> Self:
-        """Construct from a unit pointer, or 0 for an empty reference."""
         epd: int | c.EUDVariable
         u = unProxy(ptr)
         # check ptr
         if isinstance(u, int):
             q, r = divmod(u - 0x59CCA8, 336)
-            if u == 0:
-                epd = 0
-            elif r == 0 and 0 <= q < 1700:
+            if r == 0 and 0 <= q < 1700:
                 epd = EPD(u)
             else:
                 raise EPError(
