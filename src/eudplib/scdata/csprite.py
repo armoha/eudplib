@@ -78,7 +78,10 @@ class CSprite(EPDOffsetMap):
         return (EPD(0x629D98), EPD(0x629D98) + 9 * 2499, 9)
 
     def __init__(self, epd: int_or_var, *, ptr: int_or_var | None = None) -> None:
-        """EPD Constructor of CSprite. Use CSprite.from_ptr(ptr) for ptr value"""
+        """Construct from an EPD, or 0 for an empty reference.
+
+        Use CSprite.from_ptr(ptr) for a pointer. Check for 0 before accessing members.
+        """
         _epd: int | c.EUDVariable
         self._ptr: int | c.EUDVariable | None
 
@@ -89,7 +92,9 @@ class CSprite(EPDOffsetMap):
 
         if isinstance(u, int):
             q, r = divmod(u - EPD(0x629D98), 9)  # check epd
-            if r == 0 and 0 <= q < 2500:
+            if u == 0:
+                _epd, self._ptr = 0, 0
+            elif r == 0 and 0 <= q < 2500:
                 _epd, self._ptr = u, 0x629D98 + 36 * q
             else:
                 raise EPError(
@@ -130,12 +135,15 @@ class CSprite(EPDOffsetMap):
 
     @classmethod
     def from_ptr(cls: type[T], ptr: int_or_var) -> T:
+        """Construct from a sprite pointer, or 0 for an empty reference."""
         epd: int | c.EUDVariable
         u = unProxy(ptr)
         # check ptr
         if isinstance(u, int):
             q, r = divmod(u - 0x629D98, 36)
-            if r == 0 and 0 <= q < 2500:
+            if u == 0:
+                epd = 0
+            elif r == 0 and 0 <= q < 2500:
                 epd = EPD(u)
             else:
                 raise EPError(
